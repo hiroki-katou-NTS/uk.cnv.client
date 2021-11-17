@@ -11,6 +11,7 @@ import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.YearMonthDayHolder.Difference;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.gul.util.value.MutableValue;
 import nts.uk.ctx.at.record.dom.adapter.company.AffComHistItemImport;
 import nts.uk.ctx.at.record.dom.adapter.company.AffCompanyHistImport;
 import nts.uk.ctx.at.shared.dom.adapter.employee.EmployeeRecordImport;
@@ -833,22 +834,24 @@ public class CalcNextSpecialLeaveGrantDate {
 		List<NextSpecialLeaveGrant> lstOutput = new ArrayList<>();
 		//期間外次回付与日
 		Optional<GeneralDate> outsideGrantDate = Optional.empty();
+		//付与回数
+		MutableValue<Integer> grantNO = new MutableValue<>(1);
+		
+		// 付与日
+		GeneralDate grantDate = grantBaseDate;
 
 		// 「期間．終了日」＞=「付与日」の間 ループ
-		for(GrantElapseYearMonth grantElapseYearMonth : grantElapseYearMonthList){
-
+		while (period.end().afterOrEquals(grantDate)) {
 
 			// 経過年数（付与回数が同じもの）
 			List<ElapseYearMonthTbl> elapseYearMonthTblListTmp
 				= elapseYearMonthTblList.stream()
-				.filter(d->d.getGrantCnt() == grantElapseYearMonth.getElapseNo())
+				.filter(d->d.getGrantCnt() == grantNO.get())
 				.collect(Collectors.toList());
 
 			// 付与日数
 			double grantDays = 0;
 
-			// 付与日
-			GeneralDate grantDate = grantBaseDate;
 
 			// 【経過年数が設定されている間】
 			if ( !elapseYearMonthTblListTmp.isEmpty() ){
@@ -860,7 +863,14 @@ public class CalcNextSpecialLeaveGrantDate {
 						.addYears(elapseYearMonthTbl.getElapseYearMonth().getYear())
 						.addMonths(elapseYearMonthTbl.getElapseYearMonth().getMonth());
 				// 付与日数
-				grantDays = grantElapseYearMonth.getGrantedDays().v();
+				Optional<GrantElapseYearMonth> grantElapseYearMonth = grantElapseYearMonthList
+						.stream().filter(d->d.getElapseNo() == grantNO.get()).findFirst();
+				if(grantElapseYearMonth.isPresent()){
+					grantDays = grantElapseYearMonth.get().getGrantedDays().v();
+				}else{
+					throw new RuntimeException();
+				}
+				
 			}
 			// 【経過年数が設定されていない】
 			else {
@@ -890,6 +900,8 @@ public class CalcNextSpecialLeaveGrantDate {
 					break;
 				}
 			}
+			
+			grantNO.set(grantNO.get() + 1);
 
 			//付与日が計算できた時点で、期間外付与日に格納する
 			outsideGrantDate = Optional.of(grantDate);
