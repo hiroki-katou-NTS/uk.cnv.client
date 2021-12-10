@@ -59,14 +59,16 @@ module nts.uk.com.view.cli001.a {
                     if (!_.isNil(data)) {
                         $('#tableGrid').focus();
                         let userId = { userId: data.userID };
-                        service.findByUserId(data.userID).done((dto: LockOutDataDto) => {
-                            _self.items.push({ logType: dto.lockType, loginId: data.loginID, userId: dto.userId, userName: data.userName, lockOutDateTime: moment.utc(dto.logoutDateTime).format('YYYY/MM/DD HH:mm:ss')});
+                        service.findByUserId(data.userID).done((dto: LockOutDataUserDto) => {
+                            dto.lockOutDateTime = moment.utc(dto.lockOutDateTime).format('YYYY/MM/DD HH:mm:ss');
+                            // _self.items.push({ logType: dto.lockType, loginId: data.loginID, userId: dto.userId, userName: data.userName, lockOutDateTime: moment.utc(dto.logoutDateTime).format('YYYY/MM/DD HH:mm:ss')});
+                            _self.items.push(dto);
                             _self.items(_.sortBy(_self.items(), item => item.loginId));
                             if (!_.isEmpty($('.ntsSearchBox ')[0].value)) {
                                 $('.search-btn').click();
                             }
                         });
-                    }
+                    }                   
                     nts.uk.ui.block.clear();
                 });
             }

@@ -16,7 +16,7 @@ module nts.uk.com.view.cli001.a {
             return nts.uk.request.ajax(servicePath.findLockOutData);
 
         }
-        export function findByUserId(userId: string): JQueryPromise<model.LockOutDataDto> {
+        export function findByUserId(userId: string): JQueryPromise<model.LockOutDataUserDto> {
             return nts.uk.request.ajax(servicePath.findByUserId + userId);
         }
 
@@ -25,6 +25,8 @@ module nts.uk.com.view.cli001.a {
                 logType: number;
                 loginId: string;
                 userId: string;
+                companyCode: string
+                employeeCode: string
                 userName: string
                 lockOutDateTime: string;
             }
