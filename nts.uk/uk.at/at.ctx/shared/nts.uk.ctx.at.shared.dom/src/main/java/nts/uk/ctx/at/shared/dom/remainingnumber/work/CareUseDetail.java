@@ -24,4 +24,13 @@ public class CareUseDetail {
 	 * 日数
 	 */
 	private double days;
+	
+	public CareUseDetail clone(){
+		CareUseDetail clone = new CareUseDetail();
+		clone.setCareType(this.careType);
+		clone.setDays(this.days);
+		
+		return clone;
+	}
+	
 }

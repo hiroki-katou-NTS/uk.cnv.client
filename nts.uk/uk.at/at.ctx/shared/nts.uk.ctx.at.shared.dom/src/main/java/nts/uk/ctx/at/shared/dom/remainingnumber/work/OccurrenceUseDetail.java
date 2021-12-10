@@ -3,6 +3,7 @@ package nts.uk.ctx.at.shared.dom.remainingnumber.work;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,5 +40,18 @@ public class OccurrenceUseDetail {
 		this.useAtr = useAtr;
 		this.workTypeAtr = workTypeAtr;
 	}
+	
+	public OccurrenceUseDetail clone(){
+		OccurrenceUseDetail clone = new OccurrenceUseDetail();
+		
+		clone.setDays(this.days);
+		clone.setUseAtr(this.useAtr);
+		clone.setWorkTypeAtr(this.workTypeAtr);
+		clone.setVacationUsageTimeDetails(this.vacationUsageTimeDetails.stream().map(c -> c.clone()).collect(Collectors.toList()));
+		clone.setSubstituteHolidayTime(this.substituteHolidayTime);
+		
+		return clone;
+	}
+	
 
 }

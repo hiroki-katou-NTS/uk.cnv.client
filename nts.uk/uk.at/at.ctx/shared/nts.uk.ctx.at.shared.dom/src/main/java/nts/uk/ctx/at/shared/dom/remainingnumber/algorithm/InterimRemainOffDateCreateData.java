@@ -500,11 +500,11 @@ public class InterimRemainOffDateCreateData {
 	private static Optional<WorkTypeRemainInfor> totalMorningAndAfternoonRemain(Optional<WorkTypeRemainInfor> morning, Optional<WorkTypeRemainInfor> after) {
 
 		//午前と午後で同じ勤務種類の残数発生明細をまとめる
-		totalMorningAndAfternoonOccurrence(morning,after);
+		morning = totalMorningAndAfternoonOccurrence(morning,after);
 		//午前と午後で同じ特別休暇コードの特休使用明細をまとめる
-		totalMorningAndAfternoonSpecialHoliday(morning,after);
+		morning = totalMorningAndAfternoonSpecialHoliday(morning,after);
 		//午前と午後で同じ介護看護区分の子の看護介護使用明細をまとめる
-		totalMorningAndAfternoonCare(morning,after);
+		morning = totalMorningAndAfternoonCare(morning,after);
 
 		return morning;
 	}
@@ -514,11 +514,11 @@ public class InterimRemainOffDateCreateData {
 	 * @param morning
 	 * @param after
 	 */
-	private static void totalMorningAndAfternoonOccurrence(Optional<WorkTypeRemainInfor> morning, Optional<WorkTypeRemainInfor> after){
-		TargetWorkTypes().forEach(wkType -> {
+	private static Optional<WorkTypeRemainInfor> totalMorningAndAfternoonOccurrence(Optional<WorkTypeRemainInfor> morning, Optional<WorkTypeRemainInfor> after){
+		for (val wkType : TargetWorkTypes()) {
 
-			Optional<OccurrenceUseDetail> morningType = morning.flatMap(x-> x.getOccurrenceDetailData().stream().filter(od ->od.getWorkTypeAtr().equals(wkType) && od.isUseAtr()).findFirst());
-			Optional<OccurrenceUseDetail> afterNoonType = after.flatMap(x-> x.getOccurrenceDetailData().stream().filter(od ->od.getWorkTypeAtr().equals(wkType) && od.isUseAtr()).findFirst());
+			Optional<OccurrenceUseDetail> morningType = morning.flatMap(x-> x.getOccurrence(wkType));
+			Optional<OccurrenceUseDetail> afterNoonType = after.flatMap(x-> x.getOccurrence(wkType));
 
 			if (morningType.isPresent() && afterNoonType.isPresent()) {
 				morningType.get().setDays(1);
@@ -526,7 +526,14 @@ public class InterimRemainOffDateCreateData {
 			if (morning.isPresent() && !morningType.isPresent() && afterNoonType.isPresent()) {
 				morning.get().getOccurrenceDetailData().add(afterNoonType.get());
 			}
-		});
+			
+			if(!morning.isPresent() && afterNoonType.isPresent()){
+				morning = Optional.of(after.get().clone());
+			}
+			
+		}
+		
+		return morning;
 	}
 	
 	/**
@@ -534,12 +541,10 @@ public class InterimRemainOffDateCreateData {
 	 * @param morning
 	 * @param after
 	 */
-	private static void totalMorningAndAfternoonSpecialHoliday(Optional<WorkTypeRemainInfor> morning, Optional<WorkTypeRemainInfor> after){
-		SpecialHolidayCode.getCodeList().forEach(code ->{
-			Optional<SpecialHolidayUseDetail> morningCode = morning.flatMap(
-					x-> x.getSpeHolidayDetailData().stream().filter(c -> c.getSpecialHolidayCode() == (code.v())).findFirst());
-			Optional<SpecialHolidayUseDetail> afterCode = after.flatMap(
-					x-> x.getSpeHolidayDetailData().stream().filter(c -> c.getSpecialHolidayCode() == (code.v())).findFirst());
+	private static Optional<WorkTypeRemainInfor> totalMorningAndAfternoonSpecialHoliday(Optional<WorkTypeRemainInfor> morning, Optional<WorkTypeRemainInfor> after){
+		for(val code: SpecialHolidayCode.getCodeList()){ 
+			Optional<SpecialHolidayUseDetail> morningCode = morning.flatMap(x-> x.getSpecialHolidayUseDetail(code));
+			Optional<SpecialHolidayUseDetail> afterCode = after.flatMap(x-> x.getSpecialHolidayUseDetail(code));
 				
 			if(morningCode.isPresent() && afterCode.isPresent()){
 				morningCode.get().setDays(1);
@@ -547,7 +552,13 @@ public class InterimRemainOffDateCreateData {
 			if(morning.isPresent() && !morningCode.isPresent() && afterCode.isPresent()){
 				morning.get().getSpeHolidayDetailData().add(afterCode.get());
 			}
-		});
+			
+			if(!morning.isPresent() && afterCode.isPresent()){
+				morning = Optional.of(after.get().clone());
+			}
+		}
+		
+		return morning;
 	}
 	
 	/**
@@ -555,13 +566,11 @@ public class InterimRemainOffDateCreateData {
 	 * @param morning
 	 * @param after
 	 */
-	private static void totalMorningAndAfternoonCare(Optional<WorkTypeRemainInfor> morning, Optional<WorkTypeRemainInfor> after){
+	private static Optional<WorkTypeRemainInfor> totalMorningAndAfternoonCare(Optional<WorkTypeRemainInfor> morning, Optional<WorkTypeRemainInfor> after){
 		
-		Arrays.asList(CareType.values()).forEach(careType ->{
-			Optional<CareUseDetail> morningCare = morning.flatMap(
-					x -> x.getChildCareDetailData().stream().filter(c -> c.getCareType().equals(careType)).findFirst());
-			Optional<CareUseDetail> afterCare = after.flatMap(
-					x -> x.getChildCareDetailData().stream().filter(c -> c.getCareType().equals(careType)).findFirst());		
+		for(val careType :Arrays.asList(CareType.values())){
+			Optional<CareUseDetail> morningCare = morning.flatMap(x -> x.getCareUseDetail(careType));
+			Optional<CareUseDetail> afterCare = after.flatMap(x -> x.getCareUseDetail(careType));		
 			
 			if(morningCare.isPresent() && afterCare.isPresent()){
 				morningCare.get().setDays(1);
@@ -570,7 +579,12 @@ public class InterimRemainOffDateCreateData {
 				morning.get().getChildCareDetailData().add(afterCare.get());
 			}
 			
-		} );
+			if(!morning.isPresent() && afterCare.isPresent()){
+				morning = Optional.of(after.get().clone());
+			}
+			
+		}
+		return morning;
 	}
 
 	
