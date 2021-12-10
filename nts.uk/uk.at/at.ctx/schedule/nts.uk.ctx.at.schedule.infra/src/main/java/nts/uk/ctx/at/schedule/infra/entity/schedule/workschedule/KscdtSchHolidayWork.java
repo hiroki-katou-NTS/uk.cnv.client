@@ -102,7 +102,7 @@ public class KscdtSchHolidayWork extends ContractUkJpaEntity {
 							new TimeWithDayAttr(x.holidayWorkTsStart), new TimeWithDayAttr(x.holidayWorkTsEnd)));
 			HolidayWorkFrameTime frameTime = new HolidayWorkFrameTime(new HolidayWorkFrameNo(x.getPk().frameNo),
 					Finally.of(TimeDivergenceWithCalculation.sameTime(new AttendanceTime(x.getHolidayWorkTime()))),
-					Finally.of(TimeDivergenceWithCalculation.sameTime(new AttendanceTime(x.getHolidayWorkTime()))),
+					Finally.of(TimeDivergenceWithCalculation.sameTime(new AttendanceTime(x.getHolidayWorkTimeTrans()))),
 					Finally.of(new AttendanceTime(x.getHolidayWorkTimePreApp())));
 			holidayWorkFrame.add(frameTimeSheet);
 			holidayWorkFrameTime.add(frameTime);

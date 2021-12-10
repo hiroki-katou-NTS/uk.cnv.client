@@ -7,7 +7,6 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
@@ -19,7 +18,6 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomat
  *
  */
 @AllArgsConstructor
-@NoArgsConstructor
 @Setter
 @Getter
 @Builder
@@ -62,4 +60,20 @@ public class AppRemainCreateInfor {
 	 * 振休振出として扱う日数
 	 */
 	private Optional<NumberOfDaySuspension> numberOfDaySusp;
+	
+	public static AppRemainCreateInfor createDefault(String sid, String appId, GeneralDateTime inputDate,
+			GeneralDate appDate, PrePostAtr prePosAtr, ApplicationType appType, Optional<GeneralDate> startDate, Optional<GeneralDate> endDate) {
+		return new AppRemainCreateInfor(sid, appId, inputDate, appDate, prePosAtr, 
+				appType, 
+				Optional.empty(), 
+				Optional.empty(),
+				new ArrayList<>(), 
+				Optional.empty(), 
+				Optional.empty(), 
+				startDate, 
+				endDate, 
+				new ArrayList<>(),
+				Optional.empty(), 
+				Optional.empty());
+	}
 }

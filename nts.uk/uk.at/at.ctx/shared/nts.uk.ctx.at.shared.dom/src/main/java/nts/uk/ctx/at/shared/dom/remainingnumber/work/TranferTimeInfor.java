@@ -21,7 +21,7 @@ public class TranferTimeInfor {
 	/**	作成元区分 */
 	private CreateAtr createAtr;
 	/**	振替時間 */
-	private Integer tranferTime;
+	private int tranferTime;
 	/**	日数 */
 	private Optional<Double> days;
 

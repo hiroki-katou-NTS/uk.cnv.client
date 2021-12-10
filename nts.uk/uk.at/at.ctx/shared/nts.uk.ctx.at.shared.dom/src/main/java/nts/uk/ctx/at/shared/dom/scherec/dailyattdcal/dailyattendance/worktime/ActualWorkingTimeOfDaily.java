@@ -28,6 +28,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.deviationtime.deviationtime
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensatoryOccurrenceSetting;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingConditionItem;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingSystem;
+import nts.uk.ctx.at.shared.dom.worktime.common.CompensatoryOccurrenceDivision;
 import nts.uk.ctx.at.shared.dom.worktime.common.DeductionTime;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeDailyAtr;
@@ -352,5 +353,13 @@ public class ActualWorkingTimeOfDaily {
 											TotalWorkingTime.createAllZEROInstance(), 
 											new DivergenceTimeOfDaily(new ArrayList<>()), 
 											new PremiumTimeOfDailyPerformance(new ArrayList<>()));
+	}
+	
+	public AttendanceTime getWorkHolidayTime() {
+		return this.getTotalWorkingTime().getWorkHolidayTime();
+	}
+	
+	public AttendanceTime getOverTime() {
+		return this.getTotalWorkingTime().getOverTime();
 	}
 }

@@ -1261,4 +1261,11 @@ public class TotalWorkingTime {
 		this.intervalTime = intervalTime;
 	}
 	
+	public AttendanceTime getWorkHolidayTime() {
+		return this.getExcessOfStatutoryTimeOfDaily().calcWorkHolidayTime();
+	}
+	public AttendanceTime getOverTime() {
+		return this.getExcessOfStatutoryTimeOfDaily().calcOverTime();
+	}
+	
 }
