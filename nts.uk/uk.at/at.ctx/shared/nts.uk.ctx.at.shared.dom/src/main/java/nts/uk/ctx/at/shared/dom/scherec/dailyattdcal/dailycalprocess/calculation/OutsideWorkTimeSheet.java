@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import lombok.Getter;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingWork;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.ConditionAtr;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
@@ -209,6 +210,7 @@ public class OutsideWorkTimeSheet {
 	 * @param deductTimeSheet 控除時間帯
 	 * @param createdWithinWorkTimeSheet 就業時間内時間帯
 	 * @param previousAndNextDaily 前日と翌日の勤務
+	 * @param timeLeavingOfDaily 日別勤怠の出退勤
 	 * @return 就業時間外時間帯
 	 */
 	public static OutsideWorkTimeSheet createOverTimeAsFlow(
@@ -220,7 +222,8 @@ public class OutsideWorkTimeSheet {
 			PredetermineTimeSetForCalc predetermineTimeSetForCalc,
 			DeductionTimeSheet deductTimeSheet,
 			WithinWorkTimeSheet createdWithinWorkTimeSheet,
-			PreviousAndNextDaily previousAndNextDaily) {
+			PreviousAndNextDaily previousAndNextDaily,
+			TimeLeavingOfDailyAttd timeLeavingOfDaily) {
 		
 		Optional<OverTimeSheet> overTimeSheet = OverTimeSheet.createAsFlow(
 				companyCommonSetting,
@@ -230,7 +233,8 @@ public class OutsideWorkTimeSheet {
 				integrationOfDaily,
 				predetermineTimeSetForCalc,
 				deductTimeSheet,
-				createdWithinWorkTimeSheet);
+				createdWithinWorkTimeSheet,
+				timeLeavingOfDaily);
 		
 		if(!overTimeSheet.isPresent())
 			return new OutsideWorkTimeSheet(Optional.empty(), Optional.empty());

@@ -12,6 +12,7 @@ import lombok.val;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.PremiumAtr;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.AdditionAtr;
 import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.HolidayAddtionSet;
 import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.HolidayCalcMethodSet;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.TimevacationUseTimeOfDaily;
@@ -208,7 +209,7 @@ public class LateTimeOfDaily {
 			}
 		}
 		//遅刻計上時間の計算
-		TimeWithCalculation lateTime = lateTimeSheet.calcForRecordTime(late, true);
+		TimeWithCalculation lateTime = lateTimeSheet.calcForRecordTime(late, true, NotUseAtr.USE);
 		//遅刻控除時間の計算
 		TimeWithCalculation lateDeductionTime = lateTimeSheet.calcDedctionTime(late,notDeductLateLeaveEarly);
 		//休暇使用時間
@@ -340,7 +341,7 @@ public class LateTimeOfDaily {
 	 * @param workTimeForm 就業時間帯の勤務形態
 	 * @return 時間休暇加算時間
 	 */
-	public AttendanceTime calcVacationAddTime(HolidayCalcMethodSet calcMethodSet, Optional<HolidayAddtionSet> holidayAddtionSet,
+	public AttendanceTime calcVacationAddTime(HolidayCalcMethodSet calcMethodSet, HolidayAddtionSet holidayAddtionSet,
 			List<WithinWorkTimeFrame> frames, WorkTimeForm workTimeForm) {
 		if(calcMethodSet.getNotUseAtr(PremiumAtr.RegularWork).isNotUse()) {
 			return AttendanceTime.ZERO;
@@ -349,11 +350,19 @@ public class LateTimeOfDaily {
 				.filter(f -> f.getWorkingHoursTimeNo().equals(new EmTimeFrameNo(this.workNo.v())))
 				.map(f -> f.getLateTimeSheet())
 				.findFirst().flatMap(l -> l);
-		//計算遅刻計上時間
+		//計算遅刻計上時間（丸め前）
 		AttendanceTime lateCalcTime = late.isPresent() ?
-				late.get().calcForRecordTime(true, false).getCalcTime() : AttendanceTime.ZERO;
-		
-		return holidayAddtionSet.get().getAddTime(this.timePaidUseTime, lateCalcTime, workTimeForm);
+				late.get().calcForRecordTime(true, false, NotUseAtr.NOT_USE).getCalcTime() : AttendanceTime.ZERO;
+		//計算遅刻計上時間（丸め後）
+		AttendanceTime roundAfter = late.isPresent() ?
+				late.get().calcForRecordTime(true, false, NotUseAtr.USE).getCalcTime() : AttendanceTime.ZERO;
+		//休暇使用時間
+		AttendanceTime useTime = new AttendanceTime(this.timePaidUseTime.calcTotalVacationAddTime(Optional.of(holidayAddtionSet), AdditionAtr.WorkingHoursOnly));
+		if(lateCalcTime.lessThanOrEqualTo(useTime) && roundAfter.greaterThan(useTime)) {
+			//丸め前だったら相殺しきれるが、丸め後だと相殺しきれない場合、休暇加算時間は丸め後の時間帯から計算した値を使いたい
+			return roundAfter;
+		}
+		return holidayAddtionSet.getAddTime(this.timePaidUseTime, roundAfter, workTimeForm);
 	}
 	
 	public void resetData() {

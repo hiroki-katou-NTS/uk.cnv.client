@@ -647,6 +647,8 @@ public class CalculationRangeOfOneDay {
 				integrationOfWorkTime,
 				integrationOfDaily,
 				creatingWithinWorkTimeSheet);
+		//現状integrationOfDailyの出退勤を使用している箇所がある為、自身が持つ出退勤で上書き。いずれ統一させる必要がある。
+		integrationOfDaily.setAttendanceLeave(Optional.of(this.attendanceLeavingWork));
 		
 		if(todayWorkType.isWeekDayAttendance()) {
 			
@@ -674,7 +676,8 @@ public class CalculationRangeOfOneDay {
 					this.predetermineTimeSetForCalc,
 					deductTimeSheet,
 					creatingWithinWorkTimeSheet,
-					timeVacationWork));
+					timeVacationWork,
+					this.attendanceLeavingWork));
 			
 			if(this.withinWorkingTimeSheet.get().getWithinWorkTimeFrame().isEmpty())
 				return;
@@ -690,12 +693,13 @@ public class CalculationRangeOfOneDay {
 							this.predetermineTimeSetForCalc,
 							deductTimeSheet,
 							this.withinWorkingTimeSheet.get(),
-							previousAndNextDaily));
+							previousAndNextDaily,
+							this.attendanceLeavingWork));
 		} else {
 			//休出の場合でも就業時間内時間帯を作成する必要がある為、空で作成
 			this.withinWorkingTimeSheet = Finally.of(WithinWorkTimeSheet.createEmpty());
 			
-			if(!creatingWithinWorkTimeSheet.getStartEndToWithinWorkTimeFrame().isPresent())
+			if(!creatingWithinWorkTimeSheet.getFirstStartAndLastEnd().isPresent())
 				return;
 				
 			//流動勤務(休日出勤)
@@ -707,7 +711,7 @@ public class CalculationRangeOfOneDay {
 							integrationOfWorkTime,
 							integrationOfDaily,
 							deductTimeSheet,
-							creatingWithinWorkTimeSheet.getStartEndToWithinWorkTimeFrame().get(),
+							creatingWithinWorkTimeSheet.getFirstStartAndLastEnd().get(),
 							this.oneDayOfRange,
 							previousAndNextDaily));
 		}
@@ -800,7 +804,6 @@ public class CalculationRangeOfOneDay {
 							timeLeavingWork,
 							creatingWithinWorkTimeSheet));
 		}
-		
 		return deductionTimeSheetCalcAfter;
 	}
 	

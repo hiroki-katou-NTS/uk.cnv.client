@@ -124,6 +124,15 @@ public class TimeSpanForDailyCalc implements Cloneable {
 	}
 	
 	/**
+	 * 開始時刻だけを戻す（前にずらす）
+	 * @param minutesToShiftAhead
+	 * @return
+	 */
+	public TimeSpanForDailyCalc shiftStartBack(int minutesToShiftAhead) {
+		return new TimeSpanForDailyCalc(this.timeSpan.shiftStartBack(minutesToShiftAhead));
+	}
+	
+	/**
 	 * 比較元と比較したい時間帯の位置関係を判定する
 	 * @param other 比較したい時間帯
 	 * @return　重複状態区分
