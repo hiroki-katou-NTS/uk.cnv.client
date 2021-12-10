@@ -344,9 +344,7 @@ module nts.uk.at.view.kmk007.a.viewmodel {
             const legalCloseAtr = self.itemCloseAtr().filter((item) => item.name === nts.uk.resource.getText('Enum_CloseAtr_PRENATAL') ||
                 item.name === nts.uk.resource.getText('Enum_CloseAtr_POSTPARTUM') || item.name === nts.uk.resource.getText('Enum_CloseAtr_CHILD_CARE') ||
                 item.name === nts.uk.resource.getText('Enum_CloseAtr_CARE'));
-            if (self.currentCode()) {
-                return;
-            }
+            
             if (legalCloseAtr.some((item) => item.code === self.currentWorkType().oneDay().closeAtr())) {
                 self.currentWorkType().calculatorMethod(CalculatorMethod.MAKE_ATTENDANCE_DAY);
                 self.enableMethod(false);
