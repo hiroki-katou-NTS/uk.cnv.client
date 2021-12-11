@@ -8,11 +8,13 @@ import java.util.Optional;
 import lombok.Getter;
 import nts.arc.layer.dom.AggregateRoot;
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.interim.TempAnnualLeaveMngs;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveRemainingNumber;
 import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveRemainingTime;
 import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveUsedTime;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.erroralarm.AnnualLeaveError;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.GrantBeforeAfterAtr;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.AnnualNumberDay;
+import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.AnnualPaidLeaveSetting;
 
 @Getter
 /**
@@ -179,17 +181,23 @@ public class AnnualLeaveMaxData extends AggregateRoot {
 	 * @param aggregatePeriodWork
 	 * @return
 	 */
-	public List<AnnualLeaveError>  ErroeCheck(GrantBeforeAfterAtr grantAtr){
+	public List<AnnualLeaveError>  ErroeCheck(GrantBeforeAfterAtr grantAtr, String companyId, LeaveRemainingNumber.RequireM3 require){
 		List<AnnualLeaveError> errorList = new ArrayList<>();
 		
-		if(this.halfdayAnnualLeaveMax.isPresent()){
+		// ドメインモデル「年休設定」を取得する
+		AnnualPaidLeaveSetting annualLeaveSet = require.annualPaidLeaveSetting(companyId);
+		if (annualLeaveSet == null) {
+			return errorList;
+		}
+		
+		if(this.halfdayAnnualLeaveMax.isPresent() &&  annualLeaveSet.getManageAnnualSetting().getHalfDayManage().isManaged()){
 			Optional<AnnualLeaveError> error = this.halfdayAnnualLeaveMax.get().ExcessMaxErroeCheck(grantAtr);
 			if(error.isPresent()){
 				errorList.add(error.get());
 			}
 		}
 		
-		if(this.timeAnnualLeaveMax.isPresent()){
+		if(this.timeAnnualLeaveMax.isPresent() && annualLeaveSet.getTimeSetting().getMaxYearDayLeave().isManaged()){
 			Optional<AnnualLeaveError> error = this.timeAnnualLeaveMax.get().ExcessMaxErroeCheck(grantAtr);
 			if(error.isPresent()){
 				errorList.add(error.get());

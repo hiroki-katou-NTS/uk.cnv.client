@@ -223,7 +223,7 @@ public class AnnualLeaveInfo implements Cloneable {
 				aggrResult);
 
 		// ○エラーをチェックする
-		List<AnnualLeaveError> lstError = checkError(aggregatePeriodWork);
+		List<AnnualLeaveError> lstError = checkError(aggregatePeriodWork, companyId, require);
 
 		// 期間終了退避処理
 		periodEndSaveProcess(companyId, employeeId, aggregatePeriodWork, aggrResult);
@@ -551,7 +551,7 @@ public class AnnualLeaveInfo implements Cloneable {
 	 *            年休集計期間WORK
 	 * @return List<年休エラー>
 	 */
-	public List<AnnualLeaveError> checkError(AggregatePeriodWork aggregatePeriodWork) {
+	public List<AnnualLeaveError> checkError(AggregatePeriodWork aggregatePeriodWork, String companyId, LeaveRemainingNumber.RequireM3 require ) {
 
 		List<AnnualLeaveError> annualLeaveErrors = new ArrayList<AnnualLeaveError>();
 
@@ -565,7 +565,7 @@ public class AnnualLeaveInfo implements Cloneable {
 		// 付与前付与後を判断する
 		GrantBeforeAfterAtr grantAtr = aggregatePeriodWork.getGrantWork().judgeGrantPeriodAtr();
 		// エラーチェック
-		annualLeaveErrors.addAll(this.maxData.ErroeCheck(grantAtr));
+		annualLeaveErrors.addAll(this.maxData.ErroeCheck(grantAtr, companyId, require));
 
 		return annualLeaveErrors;
 	}
