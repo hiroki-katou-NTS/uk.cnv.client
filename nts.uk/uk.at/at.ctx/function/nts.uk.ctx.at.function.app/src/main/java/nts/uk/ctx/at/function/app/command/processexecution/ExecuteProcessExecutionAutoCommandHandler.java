@@ -52,6 +52,8 @@ import nts.uk.ctx.at.function.dom.adapter.worklocation.WorkInfoOfDailyPerFnImpor
 import nts.uk.ctx.at.function.dom.alarm.alarmlist.createextractionprocess.CreateExtraProcessService;
 import nts.uk.ctx.at.function.dom.alarm.alarmlist.execalarmlistprocessing.ExecAlarmListProcessingService;
 import nts.uk.ctx.at.function.dom.alarm.alarmlist.execalarmlistprocessing.OutputExecAlarmListPro;
+import nts.uk.ctx.at.function.dom.alarm.extraprocessstatus.AlarmListExtraProcessStatusRepository;
+import nts.uk.ctx.at.function.dom.alarm.extraprocessstatus.ExtractionState;
 import nts.uk.ctx.at.function.dom.executionstatusmanage.optionalperiodprocess.AggrPeriodExcutionAdapter;
 import nts.uk.ctx.at.function.dom.executionstatusmanage.optionalperiodprocess.AggrPeriodExcutionImport;
 import nts.uk.ctx.at.function.dom.executionstatusmanage.optionalperiodprocess.AggrPeriodTargetAdapter;
@@ -280,6 +282,8 @@ public class ExecuteProcessExecutionAutoCommandHandler extends AsyncCommandHandl
 	
 	@Inject
 	private TopPageAlarmAdapter topPageAlarmAdapter;
+	@Inject
+	private AlarmListExtraProcessStatusRepository alarmExtraProcessStatusRepo;
 	
 	@Inject
 	private ByPeriodAggregationService byPeriodAggregationService;
@@ -1862,8 +1866,8 @@ public class ExecuteProcessExecutionAutoCommandHandler extends AsyncCommandHandl
 								}
 								AsyncCommandHandlerContext<ExecuteProcessExecutionCommand> asyContext = (AsyncCommandHandlerContext<ExecuteProcessExecutionCommand>) context;
 								AggregationResult result = MonthlyAggregationEmployeeService.aggregate(require,
-										cacheCarrier, asyContext, companyId, item, date.get(), execId,
-										ExecutionType.NORMAL_EXECUTION);
+										cacheCarrier, Optional.of(asyContext), companyId, item, date.get(), execId,
+										ExecutionType.NORMAL_EXECUTION, Optional.empty());
 								// 中断
 								transaction.allInOneTransaction(result.getAtomTasks());
 
@@ -2012,6 +2016,7 @@ public class ExecuteProcessExecutionAutoCommandHandler extends AsyncCommandHandl
 					return true;
 				}
 			} catch (Exception e) {
+				setExtractStatusAbnormalTermination(extraProcessStatusID);
 				// 各処理の後のログ更新処理
 				checkException = true;
 				errorMessage = "Msg_1339";
@@ -2027,6 +2032,15 @@ public class ExecuteProcessExecutionAutoCommandHandler extends AsyncCommandHandl
 		updateLogAfterProcess.updateLogAfterProcess(ProcessExecutionTask.AL_EXTRACTION, companyId, execItemCd,
 				processExecution, ProcessExecutionLog, checkException, checkStopExec, errorMessage);
 		return false;
+	}
+
+	private void setExtractStatusAbnormalTermination(String extraProcessStatusID) {
+		val alarmExtraProcessStatusOpt = alarmExtraProcessStatusRepo.getAlListExtaProcessByID(extraProcessStatusID);
+		if (alarmExtraProcessStatusOpt.isPresent()){
+			val extractProcessStatus = alarmExtraProcessStatusOpt.get();
+			extractProcessStatus.setStatus(ExtractionState.ABNORMAL_TERMI);
+			alarmExtraProcessStatusRepo.updateAlListExtaProcess(extractProcessStatus);
+		}
 	}
 
 	private DatePeriod findClosurePeriodMinDate(String companyId, List<Closure> closureList) {
@@ -2223,7 +2237,7 @@ public class ExecuteProcessExecutionAutoCommandHandler extends AsyncCommandHandl
 			}
 		} else {
 			try {
-				processState = this.dailyCalculationEmployeeService.calculateForOnePerson(employeeId, period,
+				processState = this.dailyCalculationEmployeeService.calculateForOnePerson(companyId, employeeId, period,
 						Optional.empty(), empCalAndSumExeLog.getEmpCalAndSumExecLogID(),
 						dailyCreateLog.getIsCalWhenLock().orElse(false));
 			} catch (Exception e) {
@@ -2289,7 +2303,7 @@ public class ExecuteProcessExecutionAutoCommandHandler extends AsyncCommandHandl
 
 		try {
 			// 社員の日別実績を計算
-			ProcessState2 = this.dailyCalculationEmployeeService.calculateForOnePerson(empId, period, Optional.empty(),
+			ProcessState2 = this.dailyCalculationEmployeeService.calculateForOnePerson(companyId, empId, period, Optional.empty(),
 					empCalAndSumExeLogId, dailyCreateLog.getIsCalWhenLock().orElse(false));
 			log.info("更新処理自動実行_日別実績の計算_END_" + procExec.getExecItemCode() + "_" + GeneralDateTime.now());
 		} catch (Exception e) {

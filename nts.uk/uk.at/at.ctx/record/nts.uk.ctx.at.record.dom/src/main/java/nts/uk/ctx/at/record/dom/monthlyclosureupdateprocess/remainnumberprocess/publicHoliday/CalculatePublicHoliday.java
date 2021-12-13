@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import nts.arc.layer.app.cache.CacheCarrier;
+import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.record.dom.monthlycommon.aggrperiod.AggrPeriodEachActualClosure;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.export.query.publicholiday.GetRemainingNumberPublicHolidayService;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.export.query.publicholiday.param.AggrResultOfPublicHoliday;
@@ -30,7 +31,7 @@ public class CalculatePublicHoliday {
 	 * @return 公休の集計結果
 	 */
 	public static AggrResultOfPublicHoliday calculateRemain(Require require, CacheCarrier cacheCarrier, String companyId,
-			AggrPeriodEachActualClosure period, String employeeId, List<TempPublicHolidayManagement> interimPublicDate){
+			AggrPeriodEachActualClosure period, Optional<DatePeriod> periodForOverWrite,String employeeId, List<TempPublicHolidayManagement> interimPublicDate){
 		
 		return GetRemainingNumberPublicHolidayService.getPublicHolidayRemNumWithinPeriod(
 				companyId, 
@@ -41,7 +42,7 @@ public class CalculatePublicHoliday {
 				Optional.of(true),
 				interimPublicDate,
 				Optional.of(CreateAtr.RECORD),
-				Optional.of(period.getPeriod()),
+				periodForOverWrite,
 				cacheCarrier,
 				require);
 	}

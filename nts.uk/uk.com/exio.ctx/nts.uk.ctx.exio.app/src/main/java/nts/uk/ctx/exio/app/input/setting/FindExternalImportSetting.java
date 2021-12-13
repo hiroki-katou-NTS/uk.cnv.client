@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import nts.arc.diagnose.stopwatch.embed.EmbedStopwatch;
+import nts.arc.layer.app.file.storage.FileStorage;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomainId;
 import nts.uk.ctx.exio.dom.input.importableitem.ImportableItem;
 import nts.uk.ctx.exio.dom.input.importableitem.ImportableItemsRepository;
@@ -19,16 +20,23 @@ import nts.uk.shr.com.context.AppContexts;
 
 @Stateless
 public class FindExternalImportSetting {
+	@Inject
+	public ExternalImportSettingRepository externalImportSettingRepo;
+	
+	@Inject
+	private FileStorage fileStorage;
 	
 	public List<ExternalImportSettingListItemDto> findAll() {
 		val settings = externalImportSettingRepo.getAll(AppContexts.user().companyId());
 		return ExternalImportSettingListItemDto.fromDomain(settings);
 	}
 	
-	public ExternalImportSettingDto find(String settingCode) {
+	public ExternalImportSettingDto find(String settingCode, int domainId) {
 		val require = this.createRequire();
-		val settingOpt = require.getSetting(AppContexts.user().companyId(), new ExternalImportCode(settingCode));
-		return ExternalImportSettingDto.fromDomain(require, settingOpt.get());
+		val setting = require.getSetting(AppContexts.user().companyId(), new ExternalImportCode(settingCode)).get();
+		val domainSetting = setting.getDomainSetting(ImportingDomainId.valueOf(domainId))
+				.orElseThrow(() -> new RuntimeException("selected domain setting is not found."));
+		return ExternalImportSettingDto.fromDomain(require, setting, domainSetting);
 	}
 	
 	public Require createRequire() {
@@ -39,10 +47,7 @@ public class FindExternalImportSetting {
 	}
 	
 	@Inject
-	private ImportableItemsRepository importableItemsRepo;
-	
-	@Inject
-	private ExternalImportSettingRepository externalImportSettingRepo;
+	public ImportableItemsRepository importableItemsRepo;
 	
 	@RequiredArgsConstructor
 	public class RequireImpl implements Require {
@@ -54,7 +59,8 @@ public class FindExternalImportSetting {
 		
 		@Override
 		public Optional<ExternalImportSetting> getSetting(String companyId, ExternalImportCode settingCode) {
-			return externalImportSettingRepo.get(companyId, settingCode);
+			val require = new FromCsvBaseSettingToDomainRequireImpl(fileStorage);
+			return externalImportSettingRepo.get(Optional.of(require), companyId, settingCode);
 		}
 	}
 }

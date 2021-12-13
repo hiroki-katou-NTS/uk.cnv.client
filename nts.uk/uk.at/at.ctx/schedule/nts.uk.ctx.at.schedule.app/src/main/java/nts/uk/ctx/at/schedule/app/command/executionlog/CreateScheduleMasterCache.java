@@ -12,7 +12,7 @@ import nts.uk.ctx.at.schedule.dom.adapter.employmentstatus.EmploymentInfoImporte
 import nts.uk.ctx.at.schedule.dom.adapter.executionlog.dto.ShortWorkTimeDto;
 import nts.uk.ctx.at.schedule.dom.adapter.generalinfo.EmployeeGeneralInfoImported;
 import nts.uk.ctx.at.schedule.dom.schedule.algorithm.WorkRestTimeZoneDto;
-import nts.uk.ctx.at.schedule.dom.schedule.workschedule.ScheManaStatuTempo;
+import nts.uk.ctx.at.shared.dom.employeeworkway.EmployeeWorkingStatus;
 import nts.uk.ctx.at.shared.dom.employeeworkway.businesstype.employee.BusinessTypeOfEmployeeHis;
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSetting;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
@@ -43,7 +43,7 @@ public class CreateScheduleMasterCache {
 	//時差勤務設定一覧
 	private final Map<String, WorkRestTimeZoneDto> mapDiffTimeWorkSetting = new HashMap<>();
 	//社員の予定管理状態一覧
-	private final List<ScheManaStatuTempo> listManaStatuTempo;
+	private final List<EmployeeWorkingStatus> listManaStatuTempo;
 	
 	public CreateScheduleMasterCache(
 			EmployeeGeneralInfoImported empGeneralInfo,
@@ -52,7 +52,7 @@ public class CreateScheduleMasterCache {
 			List<ShortWorkTimeDto> listShortWorkTimeDto,
 			List<BusinessTypeOfEmployeeHis> listBusTypeOfEmpHis,
 			List<WorkType> listWorkType,
-			List<ScheManaStatuTempo> listManaStatuTempo) {
+			List<EmployeeWorkingStatus> listManaStatuTempo) {
 		
 		this.empGeneralInfo = empGeneralInfo;
 		this.mapEmploymentStatus = mapEmploymentStatus;

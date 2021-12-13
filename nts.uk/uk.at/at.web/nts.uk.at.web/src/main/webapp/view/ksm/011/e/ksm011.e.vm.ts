@@ -159,11 +159,12 @@ module nts.uk.at.view.ksm011.e {
       vm.componentViewmodel = new ccg.component.viewmodel.ComponentModel({
         roleType: 3,
         multiple: false,
-        isAlreadySetting: false
+        isAlreadySetting: false,
+        onDialog: false
       });
 
       vm.getDataCCG025().done(() => { });
-      vm.componentViewmodel.currentCode.subscribe((roleId) => {
+      vm.componentViewmodel.currentRoleId.subscribe((roleId: string) => {
         if (vm.listRole().length <= 0) vm.listRole(vm.componentViewmodel.listRole());
 
         vm.roleId(roleId);
@@ -199,22 +200,24 @@ module nts.uk.at.view.ksm011.e {
         .filter((i: any) => i.available)
         .map((i: any) => i.functionNo);
       vm.permissionCommon(data.scheModifyCommon.scheModifyFuncCommons.map((i: any) => ({
-        available: checkedCommon.indexOf(i.functionNo) >= 0,
+        available: i.displayOrder == 2 ? false : checkedCommon.indexOf(i.functionNo) >= 0,
         description: i.explanation,
         functionName: i.name,
         functionNo: i.functionNo,
-        orderNumber: i.displayOrder
+        orderNumber: i.displayOrder,
+        disabled: i.displayOrder == 2 ? true : false
       })));
 
       const checkedWorkplace = data.scheModifyByWorkplace.scheModifyAuthCtrlByWkp
         .filter((i: any) => i.available)
         .map((i: any) => i.functionNo);
       vm.permissionByWorkplace(data.scheModifyByWorkplace.scheModifyFuncByWorkplaces.map((i: any) => ({
-        available: checkedWorkplace.indexOf(i.functionNo) >= 0,
+        available: [2, 3, 4, 9, 10, 11, 12, 16].indexOf(i.displayOrder) >= 0 ? false : checkedWorkplace.indexOf(i.functionNo) >= 0,
         description: i.explanation,
         functionName: i.name,
         functionNo: i.functionNo,
-        orderNumber: i.displayOrder
+        orderNumber: i.displayOrder,
+        disabled: [2, 3, 4, 9, 10, 11, 12, 16].indexOf(i.displayOrder) >= 0 ? true : false
       })));
 
       const checkedPerson = data.scheduleModifyByPerson.scheModifyAuthCtrlByPersons

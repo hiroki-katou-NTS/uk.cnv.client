@@ -252,11 +252,11 @@ public class OptionalItem extends AggregateRoot {
 		// 利用区分の確認
 		if (this.usageAtr == OptionalItemUsageAtr.NOT_USE) return TermsOfUseForOptItem.NOT_USE;
 		
-		// 計算条件の判定
-		if (!this.checkTermsOfCalc(empCondition, bsEmploymentHistOpt)) return TermsOfUseForOptItem.NOT_USE;
-			
 		// 実績区分の確認
 		if (this.performanceAtr == PerformanceAtr.DAILY_PERFORMANCE) return TermsOfUseForOptItem.DAILY_VTOTAL;
+		
+		// 計算条件の判定
+		if (!this.checkTermsOfCalc(empCondition, bsEmploymentHistOpt)) return TermsOfUseForOptItem.NOT_USE;
 
 		// 「利用する」を返す
 		return TermsOfUseForOptItem.USE;

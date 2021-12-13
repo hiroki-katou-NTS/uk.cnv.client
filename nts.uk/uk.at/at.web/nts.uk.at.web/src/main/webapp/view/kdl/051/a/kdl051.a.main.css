@@ -1,0 +1,29 @@
+#area-left {
+	float: left;
+}
+
+#input-search{
+	margin-left: 20px;
+}
+
+#search-btn {
+	min-width: 80px;
+	margin-top: -32px;
+	float: right;
+	margin-right: 20px;
+}
+#kcp005 div {
+    nav-index: -1;
+}
+
+table#single-list >tr>td {
+	margin-left: 10px;
+}
+.numberOfUseCss{
+	padding-left: 15px;
+}
+
+table#table-top td {
+    padding-bottom:1.5vh;
+    border-top: none;
+}

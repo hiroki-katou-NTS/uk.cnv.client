@@ -5,7 +5,18 @@
 	padding-left: 10px;
     margin: 5px;
 	max-width: 433px;
-	word-break: break-all
+	word-break: break-all;
+}
+
+.system-notice-label {
+	border: 1px solid #B1B1B1;
+	border-radius: 5px;
+	padding-bottom: 15px;
+	padding-left: 10px;
+    margin: 5px;
+	max-width: 433px;
+	word-break: break-all;
+	min-height: calc(100vh - 77px);
 }
 
 #master-wrapper div#contents-area{

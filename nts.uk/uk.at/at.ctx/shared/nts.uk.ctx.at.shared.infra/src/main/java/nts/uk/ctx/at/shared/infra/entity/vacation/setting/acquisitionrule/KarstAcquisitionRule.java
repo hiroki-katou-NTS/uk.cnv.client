@@ -33,7 +33,7 @@ public class KarstAcquisitionRule extends ContractUkJpaEntity implements Seriali
 	private String cid;
 	/** The setting classfication. */
 	@Column(name = "MANAGE_ATR")
-	private int category;
+	private boolean category;
 	
 	/** 代休を優先 */
 	@Column(name = "COMPENSATORY_DAY_OFF")

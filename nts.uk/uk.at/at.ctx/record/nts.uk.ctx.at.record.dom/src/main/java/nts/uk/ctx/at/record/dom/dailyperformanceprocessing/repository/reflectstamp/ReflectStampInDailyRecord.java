@@ -1,12 +1,18 @@
 package nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.reflectstamp;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import lombok.val;
 import nts.arc.task.tran.AtomTask;
 import nts.arc.time.GeneralDate;
+import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.getperiodcanprocesse.AchievementAtr;
+import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.getperiodcanprocesse.GetPeriodCanProcesse;
+import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.getperiodcanprocesse.IgnoreFlagDuringLock;
 import nts.uk.ctx.at.record.dom.dailyresultcreationprocess.creationprocess.creationclass.dailywork.ReflectStampDailyAttdOutput;
 import nts.uk.ctx.at.record.dom.dailyresultcreationprocess.creationprocess.creationclass.dailywork.TemporarilyReflectStampDailyAttd;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
@@ -18,6 +24,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.u
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.function.algorithm.ChangeDailyAttendance;
 import nts.uk.ctx.at.shared.dom.workrecord.workperfor.dailymonthlyprocessing.enums.ExecutionType;
+import nts.uk.shr.com.context.AppContexts;
 
 /**
  * @author thanh_nx
@@ -26,13 +33,20 @@ import nts.uk.ctx.at.shared.dom.workrecord.workperfor.dailymonthlyprocessing.enu
  */
 public class ReflectStampInDailyRecord {
 
-	public static Optional<StampDataReflectResult> reflect(Require require,
-			Stamp stamp) {
+	public static Optional<StampDataReflectResult> reflect(Require require, Stamp stamp) {
 		// $打刻の反映先情報
 		Optional<InfoReflectDestStamp> reflectDateAndEmpID = ReflectDataStampDailyService.getJudgment(require, stamp);
 		// <>$打刻の反映先情報.isPresent()
 		if (!reflectDateAndEmpID.isPresent())
 			return Optional.empty();
+		
+		/** val $反映できないか　＝　DS_実績処理できる期間を取得する．実績処理できる期間を取得する */
+		val isNotReflect = GetPeriodCanProcesse.get(require, reflectDateAndEmpID.get().getCid(), reflectDateAndEmpID.get().getSid(), 
+				new DatePeriod(reflectDateAndEmpID.get().getDate(), reflectDateAndEmpID.get().getDate()), 
+				new ArrayList<>(), IgnoreFlagDuringLock.CANNOT_CAL_LOCK, AchievementAtr.DAILY).isEmpty();
+		/** if ($反映できないか) return Optional.empty() */
+		if (isNotReflect) return Optional.empty();
+			
 		Optional<ReflectStampDailyAttdOutput> stampDailyAttdOutput = TemporarilyReflectStampDailyAttd
 				.createDailyDomAndReflectStamp(require, reflectDateAndEmpID.get().getCid(),
 						reflectDateAndEmpID.get().getSid(), reflectDateAndEmpID.get().getDate(), stamp);
@@ -73,7 +87,7 @@ public class ReflectStampInDailyRecord {
 		return Optional.of(new StampDataReflectResult(Optional.of(reflectDateAndEmpID.get().getDate()), task));
 	}
 
-	public static interface Require extends ReflectDataStampDailyService.Require {
+	public static interface Require extends ReflectDataStampDailyService.Require, GetPeriodCanProcesse.Require {
 
 		DailyRecordToAttendanceItemConverter createDailyConverter();
 

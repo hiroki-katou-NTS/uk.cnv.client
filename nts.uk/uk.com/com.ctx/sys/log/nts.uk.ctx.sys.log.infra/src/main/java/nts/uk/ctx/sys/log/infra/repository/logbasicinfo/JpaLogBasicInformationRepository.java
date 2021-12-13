@@ -77,4 +77,12 @@ public class JpaLogBasicInformationRepository extends JpaRepository implements L
 		return results;
 	}
 
+	String FIND_WITH_LIST_KEY = "SELECT a FROM SrcdtBasicInfo a WHERE a.operationId IN :operationId";
+
+	@Override
+	public List<LogBasicInformation> getLogBasicInfo(List<String> operationId) {
+		return this.queryProxy().query(FIND_WITH_LIST_KEY, SrcdtBasicInfo.class)
+				.setParameter("operationId", operationId).getList(item -> item.toDomain());
+	}
+
 }

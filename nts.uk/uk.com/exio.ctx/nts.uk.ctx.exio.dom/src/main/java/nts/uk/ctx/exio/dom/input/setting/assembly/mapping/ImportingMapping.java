@@ -105,7 +105,7 @@ public class ImportingMapping {
 
 		if (!errors.isEmpty()) {
 			for (val error : errors) {
-				require.add(context, ExternalImportError.of(csvRecord.getRowNo(), error));
+				require.add(ExternalImportError.of(csvRecord.getRowNo(), context.getDomainId(), error));
 			}
 			return Optional.empty();
 		}
@@ -140,29 +140,40 @@ public class ImportingMapping {
 	/**
 	 * 指定した項目を未設定に変更する
 	 */
-	public void setNoSetting(int itemNo) {
+	public void setNoSetting(int itemNo, boolean withReset) {
 
 		getByItemNo(itemNo).get().setNoSetting();
-		resetCsvColumnNoByOrder();
+		if(withReset) {
+			resetCsvColumnNoByOrder();
+		}
 	}
 
 	/**
 	 * 指定した項目をCSVマッピングに変更する
 	 */
-	public void setCsvMapping(int itemNo) {
-
-		// 一旦ダミーの値を入れてCSVマッピングに切り替えた状態で順番リセット
-		getByItemNo(itemNo).get().setCsvColumnNo(-1);
-		resetCsvColumnNoByOrder();
+	public void setCsvMapping(int itemNo, boolean withReset) {
+		if(withReset) {
+			// 一旦ダミーの値を入れてCSVマッピングに切り替えた状態で順番リセット
+			getByItemNo(itemNo).get().setCsvColumnNo(-1);
+			resetCsvColumnNoByOrder();
+		}
+		else {
+			getByItemNo(itemNo).get().setFixedValue(null);
+			if(!getByItemNo(itemNo).get().getCsvColumnNo().isPresent()){
+				getByItemNo(itemNo).get().setCsvColumnNo(1); // CSV項目NOが未指定の場合いったん先頭列を入れておく
+			}
+		}
 	}
 
 	/**
 	 * 指定した項目を固定値に変更する
 	 */
-	public void setFixedValue(int itemNo, StringifiedValue fixedValue) {
+	public void setFixedValue(int itemNo, StringifiedValue fixedValue, boolean withReset) {
 
 		getByItemNo(itemNo).get().setFixedValue(fixedValue);
-		resetCsvColumnNoByOrder();
+		if(withReset) {
+			resetCsvColumnNoByOrder();
+		}
 	}
 
 	private void resetCsvColumnNoByOrder() {

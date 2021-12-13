@@ -1,97 +1,87 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<ui:composition xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:com="http://xmlns.jcp.org/jsf/component"
-	xmlns:h="http://xmlns.jcp.org/jsf/html">
-
-	<div class="sidebar-content-header">
-		<span class="title" tabindex="1">#{i18n.getText('CAS014_3')}</span>
-		<button tabindex="2"
-			data-bind="click: createNewRoleSetPerson, enable: true">#{i18n.getText('CAS014_10')}</button>
-		<button tabindex="3" class="proceed"
-			data-bind="click: registerRoleSetPerson, enable: $root.errors.isEmpty">#{i18n.getText('CAS014_11')}</button>
-		<button tabindex="4" class="danger"
-			data-bind="click: deleteRoleSetPerson, enable: screenMode() == 1">#{i18n.getText('CAS014_12')}</button>
-		<button tabindex="4" id="print-button" data-bind="click: saveAsExcel" style="width: 130px;">#{i18n.getText('CAS014_53')}</button>
-	</div>
-
-	<div class="contents-area-b">
-		<div class="container-b">
-			<div class="block">
-				<div class="top-row flex valign-center">
-					<label>#{i18n.getText('CAS014_30')}</label>
-				</div>
-				<div class="bottom-row">
-					<div style="float: left">
-						<table id="B3_2" tabindex="5"
-							data-bind="ntsGridList: {
-									name: '#[CAS014_30]',								
-									height: 250,
-									options: roleSetList,
-									primaryKey: 'code',
-									columns: [
-						                { headerText: '#{i18n.getText('CAS014_31')}', key: 'code', width: 130, formatter: _.escape },
-						                { headerText: '#{i18n.getText('CAS014_32')}', key: 'name', width: 150, formatter: _.escape }
-						            ],
-						            rows: 8,
-									multiple: false,
-									value: selectedRoleSet
-								}"></table>
-					</div>
-					<span class="caret-right outline"
-						style="float: left; height: 250px"></span>
-				</div>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:ui="http://java.sun.com/jsf/facelets"
+	  xmlns:com="http://xmlns.jcp.org/jsf/component"
+	  xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+<ui:composition template="../../../../master/dialog.xhtml">
+	<ui:define name="htmlHead">
+		<com:scriptfile set="IGNITE"/>
+        <script>
+            var dialogSize = {
+                width: 950,
+                height: 500
+            };
+        </script>
+		<com:scriptfile path="/view/kcp/share/list.js" of="/nts.uk.com.web"/>
+		<com:stylefile path="cas014.b.main.css"/>
+		<com:scriptfile path="cas014.b.vm.js"/>
+	</ui:define>
+	<ui:define name="content">
+		<div id="functions-area">
+			<!--B1_1-->
+			<button tabindex="1"
+					data-bind="click: createNewRoleSetPerson, enable: true">#{i18n.getText('CAS014_10')}</button>
+			<!--B1_2-->
+			<button tabindex="2" class="proceed"
+					data-bind="click: registerRoleSetPerson, enable: $root.errors.isEmpty">#{i18n.getText('CAS014_11')}</button>
+			<!--B1_3-->
+			<button tabindex="3" class="danger"
+					data-bind="click: deleteRoleSetPerson, enable: screenMode() == 1">#{i18n.getText('CAS014_12')}</button>
+			<!--B1_4-->
+			<button tabindex="4" data-bind="click: closeDialog">#{i18n.getText('CAS014_55')}</button>
+		</div>
+		<div id="contents-area" class="two-panel">
+			<div class="left-panel">
+				<div id="component-items-list"></div>
 			</div>
-			<div class="block">
-				<div class="top-row flex valign-center">
-					<label>#{i18n.getText('CAS014_33')}</label>
-				</div>
-				<div class="bottom-row">
-					<table id="B4_2" tabindex="6"
-						data-bind="ntsGridList: {
-								name: '#[CAS014_34]',
-								rows: 8,								
-								height: 250,
-								options: roleSetPersonList,
-								primaryKey: 'employeeId',
-								columns: [
-									{ headerText: 'id', key: 'employeeId', width: 10, hidden: true },
-					                { headerText: '#{i18n.getText('CAS014_35')}', key: 'employeeCd', width: 90, formatter: _.escape },
-					                { headerText: '#{i18n.getText('CAS014_36')}', key: 'employeeName', width: 120, formatter: _.escape },
-					                { headerText: '#{i18n.getText('CAS014_37')}', key: 'displayDateRange', width: 220, formatter: _.escape }
-					            ],
-								multiple: false,
-								value: selectedEmployeeId
-							}">
-					</table>
-				</div>
-			</div>
-			<div class="block" style="padding-left: 10px;">
-				<div class="top-row"></div>
-				<div class="bottom-row">
-					<div class="valign-center control-group">
-						<div data-bind="ntsFormLabel: { required: true }">#{i18n.getText('CAS014_39')}</div>
-						<button tabindex="7" id="B5_1_1"
+			<div class="right-panel">
+				<div class="valign-center control-group">
+					<!--B3_1-->
+					<div data-bind="ntsFormLabel: { required: true }">#{i18n.getText('CAS014_57')}</div>
+					<!--B3_2-->
+					<button tabindex="5" id="B3_2"
 							data-bind="click: openDialogCDL009, enable: screenMode() == 0">#{i18n.getText('CAS014_39')}</button>
-						<label data-bind="text: roleSetPerson().employeeCd"
-							class="ntsControl label-code"></label> <label
-							data-bind="text: roleSetPerson().employeeName" class="label-name limited-label"></label>
-					</div>
-					<div class="valign-center control-group">
-						<div data-bind="ntsFormLabel: { required: true }">#{i18n.getText('CAS014_40')}</div>
-						<div id="B5_2_1" tabindex="8"
-							style="display: inline-block;"
-							data-bind="ntsDateRangePicker: { 
-											required: true, 
-											enable: true, 
+					<!--B3_3-->
+					<label data-bind="text: selectedEmployeeCode" class="ntsControl label-code"></label>
+					<!--B3_4-->
+					<label data-bind="text: selectedEmployeeName" class="label-name limited-label" style="width: 120px;"></label>
+				</div>
+				<div class="valign-center control-group">
+					<div data-bind="ntsFormLabel: { required: true }">#{i18n.getText('CAS014_58')}</div>
+					<!--B4_2-->
+					<div id="B4_2"
+						 tabindex="6"
+						 style="width: 295px;"
+						 data-bind="ntsComboBox: {
+										options: roleSetList,
+										optionsValue: 'code',
+										visibleItemsCount: 10,
+										value: selectedRoleCode,
+										optionsText: 'name',
+										enable: true,
+										columns: [
+											{ prop: 'code', length: 4 },
+											{ prop: 'name', length: 10 },
+						]}"></div>
+				</div>
+				<div class="valign-center control-group">
+					<!--B5_1-->
+					<div data-bind="ntsFormLabel: { required: true }">#{i18n.getText('CAS014_40')}</div>
+					<div id="B5_2_1" tabindex="7"
+						 style="display: inline-block;"
+						 data-bind="ntsDateRangePicker: {
+											required: true,
+											enable: true,
 											name: '#[CAS014_40]',
-											showNextPrevious: false, 
-											value: dateValue, 
+											showNextPrevious: false,
+											value: dateValue,
 											maxRange: 'none'}" />
-					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-
+	</ui:define>
 </ui:composition>
+</body>
+</html>

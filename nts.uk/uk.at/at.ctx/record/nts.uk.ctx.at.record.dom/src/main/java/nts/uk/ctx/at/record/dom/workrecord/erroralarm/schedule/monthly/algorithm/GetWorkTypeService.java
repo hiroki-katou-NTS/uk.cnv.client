@@ -5,9 +5,12 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
+import nts.arc.enums.EnumAdaptor;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.record.dom.adapter.workschedule.WorkScheduleWorkInforImport;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.NotUseAttribute;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.WorkInfoOfDailyAttendance;
 
 /**
  * UKDesign.ドメインモデル."NittsuSystem.UniversalK".就業.contexts.勤務実績.勤務実績.勤務実績のエラーアラーム設定.アラームリスト.スケジュール日次・月次・年間.スケジュール月次のアラームリストのチェック条件.アルゴリズム.使用しない.特定属性の項目の予定を作成する.日数チェック条件をチェック.勤務種類コードを取得
@@ -48,6 +51,7 @@ public class GetWorkTypeService {
 			// 探した勤務予定　！＝　Empty　AND　探した勤務予定．勤怠時間　！＝　Empty
 			//　勤務種類コード ＝　探した勤務予定．勤務情報．勤務情報．勤務種類コード
 			// 就業時間帯コード　＝　探した勤務予定．勤務情報．勤務情報．就業時間帯コード
+			// 勤務情報　＝　探した勤務予定　＃117221
 			return getWorkTypeCodeFromWorkSched(workScheduleOpt);			
 		}
 		
@@ -69,6 +73,7 @@ public class GetWorkTypeService {
 		return ScheMonWorkTypeWorkTime.builder()
 				.workTimeCode(Optional.ofNullable(workTimeCode))
 				.workTypeCode(daily.getWorkInformation().getRecordInfo().getWorkTypeCode().v())
+				.workInfo(daily.getWorkInformation())
 				.build();
 	}
 	
@@ -89,10 +94,20 @@ public class GetWorkTypeService {
 			return null;
 		}
 		
+		WorkInfoOfDailyAttendance workInfo = getWorkInfo(workSchedule);
+		
 		//　勤務種類コード＝　探した勤務予定．勤務情報．勤務情報．勤務種類コード
 		return ScheMonWorkTypeWorkTime.builder()
 				.workTimeCode(Optional.ofNullable(workSchedule.getWorkTime()))
 				.workTypeCode(workSchedule.getWorkType())
+				.workInfo(workInfo)
 				.build();
+	}
+	
+	private WorkInfoOfDailyAttendance getWorkInfo(WorkScheduleWorkInforImport workSchedule) {
+		WorkInfoOfDailyAttendance workInfo = new WorkInfoOfDailyAttendance();
+		workInfo.setBackStraightAtr(EnumAdaptor.valueOf(workSchedule.getBackStraightAtr(), NotUseAttribute.class));
+		workInfo.setGoStraightAtr(EnumAdaptor.valueOf(workSchedule.getGoStraightAtr(), NotUseAttribute.class));
+		return workInfo;
 	}
 }

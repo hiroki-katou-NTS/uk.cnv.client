@@ -1,0 +1,68 @@
+<div id="area-ab cf screen-ab-id" style="margin-top: 5px;">
+	<div id="screen-Ab1" style="display : none;">
+		<table>
+			<tr>
+				<td><div id="label" class="Abc1">#{i18n.getText('KSU003_64')}</div></td>
+				<td>
+					<div id="button-ab" style="float: right;">
+						<!-- Ab1_4 -->
+						<button tabindex="2" id="open-pallet" class="small" data-bind="click: closeAb1, enable: enableAb">#{i18n.getText('KSU003_66')}</button>
+						<!-- Ab1_5 -->
+						<button tabindex="3" id="open-C" class="small" data-bind="click: openC, enable: enableAb">#{i18n.getText('KSU003_67')}</button>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<!-- Ab1_3 -->
+				<td><div tabindex="1" id="label">#{i18n.getText('KSU003_65')}</div></td>
+				<td style="padding-top: 8px;">
+					<div id="listWorkTime">
+					<div id = "comboTime" data-bind="ntsComboBox: {
+					options: taskList,
+					optionsValue: 'code',
+					value: taskChecked,
+					optionsText: 'name',
+					visibleItemsCount: 10,
+					enable: enableAb,
+					columns: [
+						{ prop: 'code', length: 10 },
+						{ prop: 'name', length: 40 },
+						{ prop: 'des', length: 40 },
+					]}">
+						</div>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<div id="screen-Ab2" style="display : none;">
+		<div id="ab2-area" >
+			<div class="listLink cf" data-bind="">
+				<div class="inlineAc cf" style="width: 500px; white-space: nowrap; float: left;"
+					data-bind="foreach: textButtonArr">
+					<a class="hyperlink" data-bind="click: $parent.clickLinkPage.bind($parent,$element, $index), text: name, css: { active: $index()== $parent.selectedPage()}"></a>
+				</div>
+				<div class="inlineAc right-head-shift" style="margin-bottom: 5px; float: right;">
+					<button class="openDialogB inlineAc" data-bind="click : openB">
+						<i style="margin-left: -5px"
+							data-bind="ntsIcon: { no: 3,width: 16, height: 16 }"></i>
+					</button>
+					<button class="closeAb" data-bind="click : closeAb2">
+						<i style="margin-left: -5px" data-bind="ntsIcon: { no: 177,width: 16, height: 16 }"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div id = "btn-button">
+				<div id="tableButton1"
+					data-bind="ntsTableButton: {
+										source: sourceCompany , 
+										row: 2, 
+										column: 5,
+                        				disableMenuOnDataNotSet:[1,2,3],
+										mode: 'normal', 
+										selectedCell: selectedButton }"></div>
+			</div>
+	</div>
+</div>

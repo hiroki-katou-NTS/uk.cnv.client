@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.val;
 import nts.arc.layer.dom.DomainObject;
 import nts.uk.ctx.exio.dom.input.errors.ErrorMessage;
-import nts.uk.ctx.exio.dom.input.util.Either;
+import nts.gul.util.Either;
 
 /**
  * 受入コード変換

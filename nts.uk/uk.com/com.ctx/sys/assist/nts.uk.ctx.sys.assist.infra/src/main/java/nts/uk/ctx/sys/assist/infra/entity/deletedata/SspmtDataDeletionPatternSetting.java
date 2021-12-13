@@ -15,6 +15,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -51,7 +53,7 @@ public class SspmtDataDeletionPatternSetting extends UkJpaEntity implements Seri
 	 */
 	@Basic(optional = false)
 	@Column(name = "WITHOUT_PASSWORD")
-	private int withoutPassword;
+	private boolean withoutPassword;
 
 	/**
 	 * 削除パターンパスワード
@@ -129,7 +131,7 @@ public class SspmtDataDeletionPatternSetting extends UkJpaEntity implements Seri
 	}
 
 	@Override
-	public void setPatternClassification(int patternClassification) {
+	public void setPatternClassification(boolean patternClassification) {
 		if (pk == null)
 			pk = new SspmtDataDeletionPatternSettingPK();
 		pk.patternClassification = patternClassification;
@@ -162,7 +164,7 @@ public class SspmtDataDeletionPatternSetting extends UkJpaEntity implements Seri
 	@Override
 	public int getPatternClassification() {
 		if (pk != null)
-			return pk.patternClassification;
+			return BooleanUtils.toInteger(pk.patternClassification);
 		return 0;
 	}
 
@@ -178,5 +180,16 @@ public class SspmtDataDeletionPatternSetting extends UkJpaEntity implements Seri
 		return this.categories.stream()
 						.map(DataDeletionSelectionCategory::createFromMemento)
 						.collect(Collectors.toList());
+	}
+
+	@Override
+	public void setWithoutPassword(boolean withoutPassword) {
+		this.withoutPassword = withoutPassword;
+		
+	}
+
+	@Override
+	public int getWithoutPassword() {
+		return BooleanUtils.toInteger(withoutPassword);
 	}
 }

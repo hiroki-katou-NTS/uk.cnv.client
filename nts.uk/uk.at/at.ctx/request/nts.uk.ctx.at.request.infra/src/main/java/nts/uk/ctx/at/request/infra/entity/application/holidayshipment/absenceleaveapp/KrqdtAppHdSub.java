@@ -12,6 +12,8 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.NoArgsConstructor;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.request.dom.application.Application;
@@ -43,7 +45,7 @@ public class KrqdtAppHdSub extends ContractUkJpaEntity implements Serializable {
 	public String workTypeCd;
 	
 	@Column(name = "WORK_CHANGE_ATR")
-	public Integer workChangeAtr;
+	public boolean workChangeAtr;
 	
 	@Column(name = "WORK_TIME_CD")
 	public String workTimeCd;
@@ -82,7 +84,7 @@ public class KrqdtAppHdSub extends ContractUkJpaEntity implements Serializable {
 		super();
 		this.pK = new KrqdtAppRecAbsPK(AppContexts.user().companyId(), domain.getAppID());
 		this.workTypeCd = domain.getWorkInformation().getWorkTypeCode().v();
-		this.workChangeAtr = domain.getWorkChangeUse().value;
+		this.workChangeAtr = BooleanUtils.toBoolean(domain.getWorkChangeUse().value);
 		if(domain.getWorkInformation().getWorkTimeCodeNotNull().isPresent()) {
 			this.workTimeCd = domain.getWorkInformation().getWorkTimeCodeNotNull().get().v();
 			this.workTimeStart1 = domain.getWorkTime(new WorkNo(1)).map(c-> c.getTimeZone().getStartTime().v()).orElse(null);

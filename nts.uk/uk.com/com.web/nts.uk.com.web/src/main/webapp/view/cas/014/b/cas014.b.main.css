@@ -1,0 +1,19 @@
+.two-panel .left-panel {
+    padding-left: 15px !important;
+}
+
+#component-items-list > div {
+    padding: 0 !important;
+}
+
+.two-panel .right-panel .form-label {
+    width: 75px;
+}
+
+.control-group {
+    margin-bottom: 20px;
+}
+
+.label-code, .label-name {
+    padding-left: 10px;
+}

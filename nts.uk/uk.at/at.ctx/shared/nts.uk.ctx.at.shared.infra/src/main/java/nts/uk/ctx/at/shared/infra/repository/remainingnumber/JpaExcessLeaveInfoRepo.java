@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.layer.infra.data.DbConsts;
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.arc.layer.infra.data.jdbc.NtsResultSet;
@@ -31,7 +33,7 @@ public class JpaExcessLeaveInfoRepo extends JpaRepository  implements ExcessLeav
 	 * @return
 	 */
 	private ExcessLeaveInfo toDomain(KrcmtHd60hBasic entity){
-		return new ExcessLeaveInfo(entity.cID, entity.employeeId, entity.useAtr, entity.occurrenceUnit, entity.paymentMethod);
+		return new ExcessLeaveInfo(entity.cID, entity.employeeId, BooleanUtils.toInteger(entity.useAtr), entity.occurrenceUnit, entity.paymentMethod);
 	}
 	
 	/**
@@ -43,7 +45,7 @@ public class JpaExcessLeaveInfoRepo extends JpaRepository  implements ExcessLeav
 		KrcmtHd60hBasic entity = new KrcmtHd60hBasic();
 		entity.cID = domain.getCid();
 		entity.employeeId = domain.getSID();
-		entity.useAtr = domain.getUseAtr().value;
+		entity.useAtr = BooleanUtils.toBoolean(domain.getUseAtr().value);
 		entity.occurrenceUnit = domain.getOccurrenceUnit().v();
 		entity.paymentMethod = domain.getPaymentMethod().value;
 		return entity;
@@ -91,7 +93,7 @@ public class JpaExcessLeaveInfoRepo extends JpaRepository  implements ExcessLeav
 					KrcmtHd60hBasic entity = new KrcmtHd60hBasic();
 					entity.cID = rec.getString("CID");
 					entity.employeeId = rec.getString("SID");
-					entity.useAtr = rec.getInt("USE_ATR");
+					entity.useAtr = rec.getBoolean("USE_ATR");
 					entity.occurrenceUnit = rec.getInt("OCCURRENCE_UNIT");
 					entity.paymentMethod = rec.getInt("PAYMENT_METHOD");
 					
@@ -106,7 +108,7 @@ public class JpaExcessLeaveInfoRepo extends JpaRepository  implements ExcessLeav
 				.map(x -> ExcessLeaveInfo.createDomain(
 							    x.cID,
 								x.employeeId,
-								new BigDecimal(x.useAtr),
+								new BigDecimal(BooleanUtils.toInteger(x.useAtr)),
 								new BigDecimal(x.occurrenceUnit),
 								new BigDecimal(x.paymentMethod))).collect(Collectors.toList());
 	
@@ -127,7 +129,7 @@ public class JpaExcessLeaveInfoRepo extends JpaRepository  implements ExcessLeav
 					KrcmtHd60hBasic entity = new KrcmtHd60hBasic();
 					entity.cID = rec.getString("CID");
 					entity.employeeId = rec.getString("SID");
-					entity.useAtr = rec.getInt("USE_ATR");
+					entity.useAtr = rec.getBoolean("USE_ATR");
 					entity.occurrenceUnit = rec.getInt("OCCURRENCE_UNIT");
 					entity.paymentMethod = rec.getInt("PAYMENT_METHOD");
 					
@@ -146,7 +148,7 @@ public class JpaExcessLeaveInfoRepo extends JpaRepository  implements ExcessLeav
 				.map(x -> ExcessLeaveInfo.createDomainforcps013(
 							    x.cID,
 								x.employeeId,
-								new BigDecimal(x.useAtr),
+								new BigDecimal(BooleanUtils.toInteger(x.useAtr)),
 								new BigDecimal(x.occurrenceUnit),
 								new BigDecimal(x.paymentMethod))).collect(Collectors.toList());
 	}

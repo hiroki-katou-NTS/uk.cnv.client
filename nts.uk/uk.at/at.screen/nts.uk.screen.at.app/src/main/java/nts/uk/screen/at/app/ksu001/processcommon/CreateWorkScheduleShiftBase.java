@@ -16,8 +16,8 @@ import javax.inject.Inject;
 
 import lombok.AllArgsConstructor;
 import nts.arc.enums.EnumAdaptor;
-import nts.uk.ctx.at.schedule.dom.schedule.workschedule.ScheManaStatuTempo;
 import nts.uk.ctx.at.shared.dom.WorkInformation;
+import nts.uk.ctx.at.shared.dom.employeeworkway.EmployeeWorkingStatus;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.BasicScheduleService;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.SetupType;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.WorkStyle;
@@ -80,7 +80,7 @@ public class CreateWorkScheduleShiftBase {
 	private PredetemineTimeSettingRepository predetemineTimeSet;
 
 	public WorkScheduleShiftBaseResult getWorkScheduleShiftBase(
-			Map<ScheManaStatuTempo, Optional<IntegrationOfDaily>> mapDataDaily,
+			Map<EmployeeWorkingStatus, Optional<IntegrationOfDaily>> mapDataDaily,
 			List<ShiftMasterMapWithWorkStyle> listShiftMasterNotNeedGetNew) {
 
 		List<WorkInfoOfDailyAttendance> workInfoOfDailyAttendances = new ArrayList<WorkInfoOfDailyAttendance>();
@@ -119,11 +119,11 @@ public class CreateWorkScheduleShiftBase {
 		// loop：日別実績 in 管理状態と勤務実績Map.values()
 		List<ScheduleOfShiftDto> listWorkScheduleShift = new ArrayList<>();
 		mapDataDaily.forEach((k, v) -> {
-			ScheManaStatuTempo key = k;
+			EmployeeWorkingStatus key = k;
 			Optional<IntegrationOfDaily> value = v;
 
 			// step 4.1
-			boolean needToWork = key.getScheManaStatus().needCreateWorkSchedule();
+			boolean needToWork = key.getWorkingStatus().needCreateWorkSchedule();
 			// 4.2
 			if (value.isPresent()) {
 				IntegrationOfDaily daily = value.get();
@@ -157,6 +157,8 @@ public class CreateWorkScheduleShiftBase {
 							.workHolidayCls(null)
 							.isEdit(false)
 							.isActive(false)
+							.conditionAa1(false)
+							.conditionAa2(false)
 							.build();
 					listWorkScheduleShift.add(dto);
 				}

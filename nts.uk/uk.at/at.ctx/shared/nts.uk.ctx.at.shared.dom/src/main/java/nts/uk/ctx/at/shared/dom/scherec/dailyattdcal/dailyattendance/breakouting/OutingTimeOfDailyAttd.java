@@ -145,4 +145,11 @@ public class OutingTimeOfDailyAttd {
 				.map(c -> c.getTimeZone().get() )
 				.collect( Collectors.toList() );
 	}
+	
+	// 時刻がない時にデータを消す。
+	public void removeTimeDayNull() {
+		this.outingTimeSheets.removeIf(x -> !x.isCalcState()
+				|| (x.isCalcState() && (!x.getComeBack().get().getTimeDay().getTimeWithDay().isPresent())
+						|| (!x.getGoOut().get().getTimeDay().getTimeWithDay().isPresent())));
+	}
 }

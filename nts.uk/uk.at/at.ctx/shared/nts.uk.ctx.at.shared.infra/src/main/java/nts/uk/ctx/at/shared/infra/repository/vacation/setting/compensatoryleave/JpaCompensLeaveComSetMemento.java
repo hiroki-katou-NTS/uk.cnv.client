@@ -6,6 +6,8 @@ package nts.uk.ctx.at.shared.infra.repository.vacation.setting.compensatoryleave
 
 import java.util.List;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensatoryAcquisitionUse;
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensatoryDigestiveTimeUnit;
@@ -51,7 +53,7 @@ public class JpaCompensLeaveComSetMemento implements CompensatoryLeaveComSetMeme
      */
     @Override
     public void setIsManaged(ManageDistinct managed) {
-        this.entity.setManageAtr(managed.value);
+        this.entity.setManageAtr(BooleanUtils.toBoolean(managed.value));
     }
 
     /*

@@ -20,7 +20,7 @@ public class BuiltInUser {
 	private static final String ROLE_ID_COMPANY_ADMIN = "00000000-0000-0000-00000000000000001";
 	
 	/** 個人情報担当者のロールID（０契約０会社データに合わせる） */
-	private static final String ROLE_ID_PERSONAL_INFO = "b92261c6-7b38-4e0c-84ac-8b359a09880a";
+	private static final String ROLE_ID_PERSONAL_INFO = "ROLE_ID_8_000000000000-0000";
 	
 	private static final String ROLE_ID_DUMMY = "BuiltInUser-RoleID";
 	

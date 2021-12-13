@@ -2,6 +2,7 @@ package nts.uk.ctx.at.aggregation.infra.entity.scheduletable.outputsetting;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -26,6 +27,9 @@ public class KagmtRptScheduleTallyByPerson extends ContractUkJpaEntity implement
 	
 	@EmbeddedId
 	public KagmtRptScheduleTallyByPersonPk pk;
+
+	@Column(name = "DISPORDER")
+	public Integer displayOrder;
 
 	@Override
 	protected Object getKey() {

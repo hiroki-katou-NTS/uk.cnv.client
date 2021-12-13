@@ -69,11 +69,15 @@ public class JpaFixedExtractSDailyConRepository extends JpaRepository implements
 	public void update(String contractCode, String companyId, FixedExtractionSDailyCon domain) {
 		KscdtScheFixCondDayPk pk = new KscdtScheFixCondDayPk(companyId, domain.getErrorAlarmWorkplaceId(), domain.getFixedCheckDayItems().value);
 		Optional<KscdtScheFixCondDay> entityOpt = this.queryProxy().find(pk, KscdtScheFixCondDay.class);
-		KscdtScheFixCondDay entity = entityOpt.get();
-		entity.useAtr = domain.isUseAtr();
-		entity.condMsg = domain.getMessageDisp().get().v();
+		if(entityOpt.isPresent()) {
+			KscdtScheFixCondDay entity = entityOpt.get();
+			entity.useAtr = domain.isUseAtr();
+			entity.condMsg = domain.getMessageDisp().get().v();
+			this.commandProxy().update(entity);
+		} else {
+			this.add(contractCode, companyId, domain);
+		}
 		
-		this.commandProxy().update(entity);
 	}
 	
 	private KscdtScheFixCondDay fromDomain(String contractCode, String companyId, FixedExtractionSDailyCon domain) {

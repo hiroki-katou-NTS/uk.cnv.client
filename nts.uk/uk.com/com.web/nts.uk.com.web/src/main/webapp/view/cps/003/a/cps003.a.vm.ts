@@ -119,8 +119,16 @@ module cps003.a.vm {
         fixedColumns = [ "rowNumber", "register", "print", "showControl", "employeeCode", "employeeName", 
                         "rowAdd", "deptName", "workplaceName", "positionName", "employmentName", "className" ];
 
+        isCS00100: KnockoutObservable<boolean> = ko.observable(false);
+        isFromCPS018: KnockoutObservable<boolean> = ko.observable(false);
+    
         constructor() {
             let self = this;
+
+            let params = getShared("CPS003A_PARAMS") || { isFromCPS018: false };
+            self.isFromCPS018(params.isFromCPS018);
+            nts.uk.sessionStorage.removeItem(nts.uk.request.STORAGE_KEY_TRANSFER_DATA);
+
             cps003.control.selectButton();
             cps003.control.relateButton();
             cps003.control.validateDateRange();
@@ -160,6 +168,11 @@ module cps003.a.vm {
                 if (cid) {
                     let cate = _.find(self.category.items(), c => c.id === self.category.catId());
                     if (cate) {
+                        if (cid.includes('CS00100')) {
+                            self.isCS00100(true);
+                        } else {
+                            self.isCS00100(false);
+                        }
                         self.category.cate(cate);
                         self.category.catCode(cate.categoryCode);
                         let roleId = __viewContext.user.role.personalInfo;

@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import nts.arc.layer.dom.objecttype.DomainAggregate;
 import nts.uk.ctx.exio.dom.input.DataItem;
+import nts.uk.ctx.exio.dom.input.domain.ImportingDomainId;
 import nts.uk.ctx.exio.dom.input.errors.ItemError;
 import nts.uk.ctx.exio.dom.input.setting.ExternalImportCode;
-import nts.uk.ctx.exio.dom.input.util.Either;
+import nts.gul.util.Either;
 
 /**
  * 項目の編集
@@ -20,6 +21,9 @@ public class ReviseItem implements DomainAggregate {
 	
 	/** 受入設定コード */
 	private ExternalImportCode settingCode;
+
+	/* 受入グループID */
+	private ImportingDomainId domainId;
 	
 	/** 受入項目NO */
 	private int itemNo;

@@ -37,7 +37,7 @@ public class KshmtHdPublicMgt extends ContractUkJpaEntity implements Serializabl
 	private Integer carryOverDeadline;
 	
 	@Column(name = "CARRY_FWD_MINUS_ART")
-	private Integer carryFwdMinusArt;
+	private boolean carryFwdMinusArt;
 
 	@Override
 	protected Object getKey() {

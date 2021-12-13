@@ -1,10 +1,17 @@
 package nts.uk.ctx.sys.auth.dom.algorithm;
 
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import com.aspose.pdf.Collection;
+import lombok.val;
 import nts.uk.ctx.sys.auth.dom.adapter.person.EmployeeBasicInforAuthImport;
 import nts.uk.ctx.sys.auth.dom.adapter.person.PersonAdapter;
 import nts.uk.ctx.sys.shared.dom.user.User;
@@ -44,4 +51,15 @@ public class AcquireUserIDFromEmpIDServiceImpl implements AcquireUserIDFromEmpID
 		}
 	}
 
+	@Override
+	public Map<String, String> getUserIDByEmpID(List<String> listPid) {
+
+		val listUser = userRepo.getListUserByListAsID(listPid).stream()
+				.filter(User::hasAssociatedPersonID).collect(Collectors.toList());
+		val rs = new HashMap<String,String>();
+		for (User e : listUser) {
+			rs.put(e.getAssociatedPersonID().get(), e.getUserID());
+		}
+		return rs;
+	}
 }

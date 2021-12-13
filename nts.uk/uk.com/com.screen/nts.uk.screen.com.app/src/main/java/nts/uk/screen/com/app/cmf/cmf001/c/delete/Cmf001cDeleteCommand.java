@@ -7,6 +7,7 @@ import nts.uk.ctx.exio.dom.input.setting.ExternalImportCode;
 public class Cmf001cDeleteCommand {
 
 	private String settingCode;
+	int domainId;
 	private int itemNo;
 	
 	public ExternalImportCode getExternalImportCode() {

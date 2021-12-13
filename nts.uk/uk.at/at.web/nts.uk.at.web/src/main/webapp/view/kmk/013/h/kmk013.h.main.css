@@ -3,10 +3,41 @@
     margin-left: 20px;
 }
 
-.control-group div:nth-child(2) {
+.control-group > .control-setting {
     margin-left: 50px;
 }
 
 .style-radio .ntsRadioBox {
     min-width: 170px;
+}
+
+.description-label {
+  display: block;
+  margin-left: 30px;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+}
+
+.usage-settings {
+  margin-left: 50px;
+}
+
+.usage-settings > * {
+  margin-right: 20px;
+}
+
+.usage-settings > label {
+  margin-right: 10px !important;
+}
+
+#H10_3, #H11_3 {
+  width: 15px;
+}
+
+#H10_5 {
+  width: 75px;
+}
+
+#H11_5 {
+  width: 40px;
 }

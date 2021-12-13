@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+<ui:composition template="../../../../../master/base.xhtml">
+    <ui:define name="htmlHead">
+        <com:scriptfile set="IGNITE"/>
+        <com:scriptfile path="ksu003.d.test.vm.js"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div id="functions-area">
+            <button data-bind="click: openKSU003D, enable: enable">Open KSU003D</button>
+        </div>
+        <div id="content-area" class="fixed-flex-layout">
+            <div id="left-content" style="margin-left: 20px;" class="fixed-flex-layout-left">
+                <div class="control-group valign-center" style="margin-bottom: 20px; margin-top: 20px">
+                    <div data-bind="ntsFormLabel: {required: true, text: 'Date period'}"/>
+                    <div data-bind="ntsDateRangePicker: {
+                      required: true,
+                      enable: true,
+                      showNextPrevious: true,
+                      value: dateValue,
+                      name:'dateRange',
+                      maxRange: 'oneYear'
+                     }"/>
+                </div>
+                <div class="control-group valign-center" style="margin-bottom: 20px;">
+                    <div data-bind="ntsFormLabel: {required: true, text: 'Target Organization'}"/>
+                    <button data-bind="enable: true, click : openKDL046 ">Org Selection</button>
+                    <span data-bind="text: targetOrganizationName"></span>
+                </div>
+                <div class="control-group valign-center">
+                    <div data-bind="ntsFormLabel: {required: true, text: 'List EmployeeId'}"/>
+                    <textarea style="width: 600px; height: 300px;" data-bind="ntsMultilineEditor: {value: selectedEmployeeIdTxt}"/>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+</body>
+</html>

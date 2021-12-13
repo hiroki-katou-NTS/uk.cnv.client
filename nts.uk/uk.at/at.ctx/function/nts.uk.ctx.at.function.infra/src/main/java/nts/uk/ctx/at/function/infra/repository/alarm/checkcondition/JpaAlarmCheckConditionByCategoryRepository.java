@@ -131,10 +131,10 @@ public class JpaAlarmCheckConditionByCategoryRepository extends JpaRepository
 			}
 			entity.listAvailableRole = newListRole;
 
-			entity.targetCondition.filterByBusinessType = domain.getExtractTargetCondition().isFilterByBusinessType() ? 1 : 0;
-			entity.targetCondition.filterByClassification = domain.getExtractTargetCondition().isFilterByClassification() ? 1 : 0;
-			entity.targetCondition.filterByEmployment = domain.getExtractTargetCondition().isFilterByEmployment() ? 1 : 0;
-			entity.targetCondition.filterByJobTitle = domain.getExtractTargetCondition().isFilterByJobTitle() ? 1 : 0;
+			entity.targetCondition.filterByBusinessType = domain.getExtractTargetCondition().isFilterByBusinessType();
+			entity.targetCondition.filterByClassification = domain.getExtractTargetCondition().isFilterByClassification();
+			entity.targetCondition.filterByEmployment = domain.getExtractTargetCondition().isFilterByEmployment();
+			entity.targetCondition.filterByJobTitle = domain.getExtractTargetCondition().isFilterByJobTitle();
 
 			List<KfnmtAlarmCheckTargetEmployment> oldListTargetEmployment = entity.targetCondition.listEmployment;
 			List<KfnmtAlarmCheckTargetEmployment> newListTargetEmployment = domain.getExtractTargetCondition().getLstEmploymentCode().stream().map(item -> new KfnmtAlarmCheckTargetEmployment(domain.getExtractTargetCondition().getId(), item)).collect(Collectors.toList());
@@ -186,7 +186,7 @@ public class JpaAlarmCheckConditionByCategoryRepository extends JpaRepository
 			
 			if (entity.pk.category == AlarmCategory.DAILY.value) {
 				DailyAlarmCondition dailyAlarmCondition = (DailyAlarmCondition) domain.getExtractionCondition();
-				entity.dailyAlarmCondition.addApplication = dailyAlarmCondition.isAddApplication() ? 1 : 0;
+				entity.dailyAlarmCondition.addApplication = dailyAlarmCondition.isAddApplication();
 				entity.dailyAlarmCondition.conExtractedDaily = dailyAlarmCondition.getConExtractedDaily().value;
 				
 				List<KrcmtDailyErrorCode> oldListErrorAlarmCode = entity.dailyAlarmCondition.listErrorAlarmCode;

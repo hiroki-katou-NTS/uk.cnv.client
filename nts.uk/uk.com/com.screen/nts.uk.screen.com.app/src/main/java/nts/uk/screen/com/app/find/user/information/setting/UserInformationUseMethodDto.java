@@ -1,23 +1,18 @@
 package nts.uk.screen.com.app.find.user.information.setting;
 
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import nts.arc.primitive.PrimitiveValueBase;
-import nts.uk.ctx.sys.env.dom.mailnoticeset.FunctionId;
 import nts.uk.ctx.sys.env.dom.mailnoticeset.company.ContactName;
 import nts.uk.ctx.sys.env.dom.mailnoticeset.company.ContactSetting;
 import nts.uk.ctx.sys.env.dom.mailnoticeset.company.ContactUsageSetting;
-import nts.uk.ctx.sys.env.dom.mailnoticeset.company.EmailClassification;
-import nts.uk.ctx.sys.env.dom.mailnoticeset.company.EmailDestinationFunction;
 import nts.uk.ctx.sys.env.dom.mailnoticeset.company.OtherContact;
 import nts.uk.ctx.sys.env.dom.mailnoticeset.company.SettingContactInformation;
 import nts.uk.ctx.sys.env.dom.mailnoticeset.company.UserInformationUseMethod;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Dto ユーザー情報の使用方法
@@ -52,37 +47,9 @@ public class UserInformationUseMethodDto implements UserInformationUseMethod.Mem
     private String companyId;
 
     /**
-     * メール送信先機能
-     */
-    private List<EmailDestinationFunctionDto> emailDestinationFunctionDtos;
-
-    /**
      * 連絡先情報の設定
      */
     private SettingContactInformationDto settingContactInformationDto;
-
-    @Override
-    public void setEmailDestinationFunctions(List<EmailDestinationFunction> emailDestinationFunctions) {
-        this.emailDestinationFunctionDtos = emailDestinationFunctions.stream()
-                .map(item -> EmailDestinationFunctionDto.builder()
-                        .emailClassification(item.getEmailClassification().value)
-                        .functionIds(
-                                item.getFunctionIds().stream().map(PrimitiveValueBase::v).collect(Collectors.toList()))
-                        .build())
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<EmailDestinationFunction> getEmailDestinationFunctions() {
-        return this.emailDestinationFunctionDtos.stream()
-                .map(item -> EmailDestinationFunction.builder()
-                        .emailClassification(EmailClassification.valueOf(item.getEmailClassification()))
-                        .functionIds(
-                                item.getFunctionIds().stream().map(FunctionId::new).collect(Collectors.toList())
-                        )
-                        .build())
-                .collect(Collectors.toList());
-    }
 
     @Override
     public void setSettingContactInformation(SettingContactInformation settingContactInformation) {

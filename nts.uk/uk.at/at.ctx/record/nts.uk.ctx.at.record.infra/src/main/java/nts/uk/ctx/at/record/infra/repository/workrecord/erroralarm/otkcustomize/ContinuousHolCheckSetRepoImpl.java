@@ -17,6 +17,7 @@ import javax.ejb.TransactionAttributeType;
 import lombok.val;
 import nts.arc.layer.infra.data.DbConsts;
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.arc.layer.infra.data.database.DatabaseProduct;
 import nts.arc.layer.infra.data.jdbc.NtsResultSet;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.otkcustomize.ContinuousHolCheckSet;
@@ -66,11 +67,17 @@ public class ContinuousHolCheckSetRepoImpl extends JpaRepository implements Cont
 		queryString.append(" LEFT JOIN KRCMT_OTK_HD_CK_WKTP_TGT b ON a.CID = b.CID ");
 		queryString.append(" LEFT JOIN KRCMT_OTK_HD_CK_WKTP_NTGT c ON a.CID = c.CID ");
 		queryString.append(" WHERE a.CID = ? AND a.USE_ATR = ?");
+		
+		boolean isPostGres = this.database().is(DatabaseProduct.POSTGRESQL);
 			
 		try (PreparedStatement statement = this.connection().prepareStatement(queryString.toString())) {
 
 			statement.setString(1, companyId);
-			statement.setInt(2, 1);
+			if (isPostGres) {
+				statement.setBoolean(2, true);	
+			} else {
+				statement.setInt(2, 1);				
+			}
 			val result = new NtsResultSet(statement.executeQuery()).getList(rec -> {
 				Map<String, Object> val = new HashMap<>();
 				val.put("NONTARGET", rec.getString("NONTARGET"));
@@ -122,7 +129,7 @@ public class ContinuousHolCheckSetRepoImpl extends JpaRepository implements Cont
 			this.getEntityManager().flush();
 			entity.continuousDays = setting.getMaxContinuousDays().v();
 			entity.messageDisplay = setting.getDisplayMessege().v();
-			entity.useAtr = setting.isUseAtr() ? 1 : 0;
+			entity.useAtr = setting.isUseAtr();
 			this.commandProxy().insertAll(toNonTarget(setting.getIgnoreWorkType(), setting.getCompanyId()));
 			this.commandProxy().insertAll(toTarget(setting.getTargetWorkType(), setting.getCompanyId()));
 			this.getEntityManager().flush();

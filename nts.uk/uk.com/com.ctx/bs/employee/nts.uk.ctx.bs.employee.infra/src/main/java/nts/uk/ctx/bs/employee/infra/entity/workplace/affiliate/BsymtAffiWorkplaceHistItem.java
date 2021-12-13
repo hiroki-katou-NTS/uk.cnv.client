@@ -45,10 +45,10 @@ public class BsymtAffiWorkplaceHistItem extends ContractUkJpaEntity implements S
 	@Column(name = "WORKPLACE_ID")
 	private String workPlaceId;
 	
-	/** The workPlaceId. */
-	@Basic(optional = false)
-	@Column(name = "NORMAL_WORKPLACE_ID")
-	private String normalWkpId;
+//	/** The workPlaceId. */
+//	@Basic(optional = false)
+//	@Column(name = "NORMAL_WORKPLACE_ID")
+//	private String normalWkpId;
 //
 //	@Basic(optional = false)
 //	@Column(name = "WORK_LOCATION_CD")
@@ -71,10 +71,10 @@ public class BsymtAffiWorkplaceHistItem extends ContractUkJpaEntity implements S
 		return this.hisId;
 	}
 
-	public BsymtAffiWorkplaceHistItem(String hisId, String sid, String workPlaceId, String normalWkpId) {
+	public BsymtAffiWorkplaceHistItem(String hisId, String sid, String workPlaceId) {
 		this.hisId = hisId;
 		this.sid = sid;
 		this.workPlaceId = workPlaceId;
-		this.normalWkpId = normalWkpId;
+//		this.normalWkpId = normalWkpId;
 	}
 }

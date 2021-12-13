@@ -1,6 +1,7 @@
 module nts.uk.at.view.ksu003.a.model {
 	import duration = nts.uk.time.minutesBased.duration; // convert time 
 	import formatById = nts.uk.time.format.byId;
+	import getText = nts.uk.resource.getText;
 
 	export function convertTimeToChart(startTime: any, endTime: any) {
 		let convertTime = null;
@@ -240,10 +241,10 @@ module nts.uk.at.view.ksu003.a.model {
 		timeRangeLimit = timeRangeLimit;
 		let targetInfor = nts.uk.ui.windows.getShared("targetInforKsu003"); // thay tạm cho __viewContext.viewModel.viewmodelA.dataScreen003A().targetInfor sau khi merge 5_3 thì xóa đi
 		let totalTimeAll = 0, totalTimeWork = 0,
-			start1 = (schedule.workScheduleDto != null && schedule.workScheduleDto.startTime1 != null && schedule.workScheduleDto.startTime1 != 0) ? (model.checkTimeChart(schedule.workScheduleDto.startTime1, timeRangeLimit * 5 + dispStart * 5, dispStartHours)) : 0,
-			end1 = (schedule.workScheduleDto != null && schedule.workScheduleDto.endTime1 != null && schedule.workScheduleDto.endTime1 != 0) ? (model.checkTimeChart(schedule.workScheduleDto.endTime1, timeRangeLimit * 5 + dispStart * 5, dispStartHours)) : 0,
-			start2 = (schedule.workScheduleDto != null && schedule.workScheduleDto.startTime2 != null && schedule.workScheduleDto.startTime2 != 0) ? (model.checkTimeChart(schedule.workScheduleDto.startTime2, timeRangeLimit * 5 + dispStart * 5, dispStartHours)) : 0,
-			end2 = (schedule.workScheduleDto != null && schedule.workScheduleDto.endTime2 != null && schedule.workScheduleDto.endTime2 != 0) ? (model.checkTimeChart(schedule.workScheduleDto.endTime2, timeRangeLimit * 5 + dispStart * 5, dispStartHours)) : 0;
+			start1 = (schedule.workScheduleDto != null && schedule.workScheduleDto.startTime1 != null && schedule.workScheduleDto.startTime1 != 0) ? (model.checkTimeChart(schedule.workScheduleDto.startTime1, timeRangeLimit * 5 + dispStart *5, dispStartHours)) : 0,
+			end1 = (schedule.workScheduleDto != null && schedule.workScheduleDto.endTime1 != null && schedule.workScheduleDto.endTime1 != 0) ? (model.checkTimeChart(schedule.workScheduleDto.endTime1, timeRangeLimit * 5 + dispStart *5, dispStartHours)) : 0,
+			start2 = (schedule.workScheduleDto != null && schedule.workScheduleDto.startTime2 != null && schedule.workScheduleDto.startTime2 != 0) ? (model.checkTimeChart(schedule.workScheduleDto.startTime2, timeRangeLimit * 5 + dispStart *5, dispStartHours)) : 0,
+			end2 = (schedule.workScheduleDto != null && schedule.workScheduleDto.endTime2 != null && schedule.workScheduleDto.endTime2 != 0) ? (model.checkTimeChart(schedule.workScheduleDto.endTime2, timeRangeLimit * 5 + dispStart *5, dispStartHours)) : 0;
 
 		lstTime = _.sortBy(lstTime, [function(o: any) { return o.end; }]).reverse();
 		lstTime = _.uniqWith(lstTime, function(arrVal: any, othVal: any) {
@@ -263,7 +264,7 @@ module nts.uk.at.view.ksu003.a.model {
 		if (start2 != null && start2 != 0)
 			start2 = start2 <= dispStart * 5 ? dispStart * 5 : start2;
 
-		if (start2 != 0 && end2 != 0 && targetInfor == 1)
+		if (start2 != 0 && end2 != 0 && __viewContext.viewModel.viewmodelA.dataScreen003A().targetInfor == 1)
 			totalTimeWork = ((end2) - (start2)) + ((end1) - (start1));
 		else if (end1 != 0)
 			totalTimeWork = ((end1) - (start1));
@@ -335,44 +336,25 @@ module nts.uk.at.view.ksu003.a.model {
 
 	// setting show hide for middle
 	export function showHide(showA9: any, indexBtnToLeft: any, targetInfor: any) {
+		let margin = $(".ex-header-leftmost").width() - 12 + $(".ex-header-middle").width();
+		let x = $('.ex-header-leftmost').width() + $('.ex-header-middle').width() + $('.ex-header-detail').width();
 		$("#contents-area").css({ 'overflow-y': 'hidden' });
 		if (indexBtnToLeft() % 2 == 0) {
-			if (!showA9) {
-				$("#extable-ksu003").exTable("showMiddle");
-			}
-			if (window.outerWidth >= 1920) {
-				$(".toLeft").css('margin-left', 587 + 'px');
-				if (targetInfor == 0) {
-					$(".toLeft").css("margin-left", 504 + 'px');
-				}
-			}
-			if (window.outerWidth < 1920) {
-				$(".toLeft").css("margin-left", 588 + 'px');
-				if (targetInfor == 0) {
-					$(".toLeft").css("margin-left", 505 + 'px');
-				}
-			}
+			if (!showA9) 
+			$("#extable-ksu003").exTable("showMiddle");
+			
+			$(".toLeft").css('margin-left', margin + 'px');
+			$("#setting-time-grid").css("margin-left", x + 16 + 'px');
 		} else {
+			margin = $(".ex-header-leftmost").width() - 12	
 			if (showA9) {
 				$("#extable-ksu003").exTable("hideMiddle");
 			}
-			if (window.outerWidth < 1920) {
-				$(".toLeft").css("margin-left", 189 + 'px');
-			}
-			if (window.outerWidth >= 1920) {
-				$(".toLeft").css('margin-left', 188 + 'px');
-			}
+			$(".toLeft").css("margin-left", margin + 'px');
+			
+			x = $('.ex-header-leftmost').width() + $('.ex-header-detail').width();
+				$("#setting-time-grid").css("margin-left", x + 16 + 'px');
 		}
-
-		if (window.innerHeight < 700) {
-			if (window.outerWidth <= 1366) {
-				//$("#label-display").css("margin-left", 55 + 'px');
-				//$(".toDown").css('margin-left', 0 + 'px');
-				if (navigator.userAgent.indexOf("Chrome") == -1) {
-					//$(".toDown").css('margin-left', 0 + 'px');
-				}
-			}
-		} 
 	}
 
 	export function buidDataReg(cellsGroup: any, targetInfor: any, employeeInfo: any, employeeIdLogin: any, colorBreak45: any, index045: any) {
@@ -393,21 +375,25 @@ module nts.uk.at.view.ksu003.a.model {
 						}
 						if (colorBreak45 == true && index045 != -1) isBreakByHand = true;
 					}
-					let dataCell: any = {
-						sid: employeeInfo[cells[0].rowIndex].empId,
-						ymd: employeeInfo[cells[0].rowIndex].workInfoDto.date,
-						workTypeCd: employeeInfo[cells[0].rowIndex].workScheduleDto.workTypeCode,
-						workTimeCd: employeeInfo[cells[0].rowIndex].workScheduleDto.workTimeCode,
-						startTime: employeeInfo[cells[0].rowIndex].workScheduleDto.startTime1,
-						endTime: employeeInfo[cells[0].rowIndex].workScheduleDto.endTime1,
-						startTime2: employeeInfo[cells[0].rowIndex].workScheduleDto.startTime2 == 0 ? null : employeeInfo[cells[0].rowIndex].workScheduleDto.startTime2 ,
-						endTime2: employeeInfo[cells[0].rowIndex].workScheduleDto.endTime2 == 0 ? null : employeeInfo[cells[0].rowIndex].workScheduleDto.endTime2,
-						listBreakTime: employeeInfo[cells[0].rowIndex].workScheduleDto.listBreakTimeZoneDto,
-						directAtr: employeeInfo[cells[0].rowIndex].workInfoDto.directAtr,
-						bounceAtr: employeeInfo[cells[0].rowIndex].workInfoDto.bounceAtr,
-						isBreakByHand: isBreakByHand
+					
+					if (employeeInfo[cells[0].rowIndex].workScheduleDto != null){
+						let dataCell: any = {
+							sid: employeeInfo[cells[0].rowIndex].empId,
+							ymd: employeeInfo[cells[0].rowIndex].workInfoDto.date,
+							workTypeCd: employeeInfo[cells[0].rowIndex].workScheduleDto.workTypeCode,
+							workTimeCd: employeeInfo[cells[0].rowIndex].workScheduleDto.workTimeCode,
+							startTime: employeeInfo[cells[0].rowIndex].workScheduleDto.startTime1,
+							endTime: employeeInfo[cells[0].rowIndex].workScheduleDto.endTime1,
+							startTime2: employeeInfo[cells[0].rowIndex].workScheduleDto.startTime2,
+							endTime2: employeeInfo[cells[0].rowIndex].workScheduleDto.endTime2,
+							listBreakTime: employeeInfo[cells[0].rowIndex].workScheduleDto.listBreakTimeZoneDto,
+							directAtr: employeeInfo[cells[0].rowIndex].workInfoDto.directAtr,
+							bounceAtr: employeeInfo[cells[0].rowIndex].workInfoDto.bounceAtr,
+							isBreakByHand: isBreakByHand
+						}
+						dataReg.push(dataCell);
 					}
-					dataReg.push(dataCell);
+					
 				}
 			});
 		} else {
@@ -444,6 +430,96 @@ module nts.uk.at.view.ksu003.a.model {
 		}
 		console.log(dataReg);
 		return dataReg;
+	}
+	
+	export function createColumnMid(){
+		let middleColumns : any = [];
+		if (__viewContext.viewModel.viewmodelA.dataScreen003A().targetInfor == 1) {
+				middleColumns = [
+					{
+						headerText: getText('KSU003_23'), group: [
+							{ headerText: "", key: "worktypeCode", width: "40px", handlerType: "input", dataType: "text", primitiveValue: "WorkTypeCode", required: true, textFormat: { length: 3, padSide: "left", padChar: '0' } },
+							{
+								headerText: "", key: "worktypeName", width: "38px", control: "link", primitiveValue: "WorkTypeName", css: { whiteSpace: "pre" }, handler: function(e: any) {
+									__viewContext.viewModel.viewmodelA.openKdl003Dialog(e.worktypeCode, e.worktimeCode, e.empId, "WorkTypeName");
+								}
+							}]
+					},
+					{
+						headerText: getText('KSU003_25'), group: [
+							{ headerText: "", key: "worktimeCode", width: "40px", handlerType: "input", dataType: "text", primitiveValue: "WorkTimeCode", required: true, textFormat: { length: 3, padSide: "left", padChar: '0' } },
+							{
+								headerText: "", key: "worktimeName", width: "38px", control: "link", primitiveValue: "WorkTimeName", css: { whiteSpace: "pre" }, handler: function(e: any) {
+									__viewContext.viewModel.viewmodelA.openKdl003Dialog(e.worktypeCode, e.worktimeCode, e.empId, "WorkTimeName");
+								}
+							}]
+					},
+					{
+						headerText: getText('KSU003_27'), group: [
+							{ headerText: "", key: "startTime1", width: "41px", handlerType: "input", dataType: "duration", primitiveValue: "TimeWithDayAttr", required: true }]
+					},
+					{
+						headerText: getText('KSU003_28'), group: [
+							{ headerText: "", key: "endTime1", width: "41px", handlerType: "input", dataType: "duration", primitiveValue: "TimeWithDayAttr", required: true }]
+					},
+					{
+						headerText: getText('KSU003_29'), group: [
+							{ headerText: "", key: "startTime2", width: "41px", handlerType: "input", dataType: "duration", primitiveValue: "TimeWithDayAttr", required: true }]
+					},
+					{
+						headerText: getText('KSU003_30'), group: [
+							{ headerText: "", key: "endTime2", width: "41px", handlerType: "input", dataType: "duration", primitiveValue: "TimeWithDayAttr", required: true }]
+					},
+					{
+						headerText: getText('KSU003_31'), group: [
+							{ headerText: "", key: "totalTime", width: "40px", dataType: "duration", primitiveValue: "TimeWithDayAttr" }]
+					},
+					{
+						headerText: getText('KSU003_32'), group: [
+							{ headerText: "", key: "breaktime", width: "39px", dataType: "duration", primitiveValue: "TimeWithDayAttr" }]
+					}
+				];
+			} else {
+				middleColumns = [
+					{
+						headerText: getText('KSU003_23'), group: [
+							{ headerText: "", key: "worktypeCode", width: "40px", handlerType: "input", dataType: "text", primitiveValue: "WorkTypeCode", required: true, textFormat: { length: 3, padSide: "left", padChar: '0' } },
+							{
+								headerText: "", key: "worktypeName", width: "38px", control: "link", primitiveValue: "WorkTypeName", css: { whiteSpace: "pre" }, handler: function(e: any) {
+									__viewContext.viewModel.viewmodelA.openKdl003Dialog(e.worktypeCode, e.worktimeCode, e.empId, "WorkTypeName");
+								}
+							}]
+					},
+					{
+						headerText: getText('KSU003_25'), group: [
+							{ headerText: "", key: "worktimeCode", width: "40px", handlerType: "input", dataType: "text", primitiveValue: "WorkTimeCode", required: true, textFormat: { length: 3, padSide: "left", padChar: '0' } },
+							{
+								headerText: "", key: "worktimeName", width: "38px", control: "link", primitiveValue: "WorkTimeName", css: { whiteSpace: "pre" }, handler: function(e: any) {
+									__viewContext.viewModel.viewmodelA.openKdl003Dialog(e.worktypeCode, e.worktimeCode, e.empId, "WorkTimeName");
+								}
+							}]
+					},
+					{
+						headerText: getText('KSU003_27'), group: [
+							{ headerText: "", key: "startTime1", width: "41px", handlerType: "input", dataType: "duration", primitiveValue: "TimeWithDayAttr", required: true }]
+					},
+					{
+						headerText: getText('KSU003_28'), group: [
+							{ headerText: "", key: "endTime1", width: "41px", handlerType: "input", dataType: "duration", primitiveValue: "TimeWithDayAttr", required: true }]
+					},
+
+					{
+						headerText: getText('KSU003_31'), group: [
+							{ headerText: "", key: "totalTime", width: "39px", dataType: "duration", primitiveValue: "TimeWithDayAttr" }]
+					},
+					{
+						headerText: getText('KSU003_32'), group: [
+							{ headerText: "", key: "breaktime", width: "39px", dataType: "duration", primitiveValue: "TimeWithDayAttr" }]
+					}
+				];
+			}
+			
+			return middleColumns;
 	}
 
 	export function addColumn(index: any, y: any, detailColumns: any, detailHeaderDs: any, detailHeaders: any, width: any) {
@@ -594,14 +670,17 @@ module nts.uk.at.view.ksu003.a.model {
 		workInfoDto: EmployeeWorkInfoDto; /** 社員勤務情報　dto */
 		workScheduleDto: EmployeeWorkScheduleDto; /** 社員勤務予定　dto */
 		fixedWorkInforDto: FixedWorkInforDto; /** 勤務固定情報　dto */
+		empTaskInfoDto : any;
 		constructor(empId: string,
 			workInfoDto: EmployeeWorkInfoDto,
 			workScheduleDto: EmployeeWorkScheduleDto,
-			fixedWorkInforDto: FixedWorkInforDto) {
+			fixedWorkInforDto: FixedWorkInforDto, 
+			empTaskInfoDto : any) {
 			this.empId = empId;
 			this.workInfoDto = workInfoDto;
 			this.workScheduleDto = workScheduleDto;
 			this.fixedWorkInforDto = fixedWorkInforDto;
+			this.empTaskInfoDto = empTaskInfoDto;
 		}
 	}
 
@@ -1035,7 +1114,7 @@ module nts.uk.at.view.ksu003.a.model {
 		byDateDto: DisplaySettingByDateDto = new DisplaySettingByDateDto(0, 0, 0); //スケジュール修正日付別の表示設定
 		displayInforOrganization: DisplayInfoOrganizationDto = new DisplayInfoOrganizationDto("", "", "", "", ""); // 組織の表示情報
 		manageMultiDto: WorkManageMultiDto = new WorkManageMultiDto("", 0); // 複数回勤務管理
-		functionControlDto: ScheFunctionControlDto = new ScheFunctionControlDto([], 0); // スケジュール修正の機能制御 
+		functionControlDto: ScheFunctionControlDto = new ScheFunctionControlDto([], 0,0, []); // スケジュール修正の機能制御 
 		taskOperationMethod: number;
 		constructor(byDateDto: DisplaySettingByDateDto,
 			displayInforOrganization: DisplayInfoOrganizationDto,
@@ -1098,10 +1177,15 @@ module nts.uk.at.view.ksu003.a.model {
 	export class ScheFunctionControlDto {
 		changeableWorks: Array<number>; /** 時刻修正できる勤務形態 */
 		useATR: number; /** 実績表示できるか */
+		displayWorkTypeControl: number; /** 表示可能勤務種類制御 */
+		displayableWorkTypeCodeList: Array<string>; /** 表示可能勤務種類リスト */
 		constructor(changeableWorks: Array<number>,
-			useATR: number) {
+			useATR: number, displayWorkTypeControl: number, 
+			displayableWorkTypeCodeList: Array<string>) {
 			this.changeableWorks = changeableWorks;
 			this.useATR = useATR;
+			this.displayWorkTypeControl = displayWorkTypeControl;
+			this.displayableWorkTypeCodeList = displayableWorkTypeCodeList;
 		}
 	}
 
@@ -1216,12 +1300,16 @@ module nts.uk.at.view.ksu003.a.model {
 	}
 
 	export interface ILocalStore {
-		startTimeSort: string;
-		showWplName: boolean;
-		operationUnit: string;
-		displayFormat: number;
-		showHide: number;
-		lstEmpIdSort: Array<any>;
+		startTimeSort ?: string;
+		showWplName ?: boolean;
+		operationUnit ?: string;
+		displayFormat ?: number;
+		showHide ?: number;
+		lstEmpIdSort ?: Array<any>;
+		workSelection ?: number;
+		work1Selection ?: string;
+		pageNo ?: number;
+		workPalletDetails ?: any; 
 	}
 
 	export interface IHolidayTime {
@@ -1308,13 +1396,41 @@ module nts.uk.at.view.ksu003.a.model {
 		gcCoreTime: Array<model.ICoreTime>,
 		gcHolidayTime: Array<model.IHolidayTime>,
 		gcShortTime: Array<model.IShortTime>;
+		gcTaskTime : any;
 	};
 
-	export interface IEmpidName {
-		empId: string,
-		name: string,
-		code: string
-	}
+    export interface IEmpidName {
+        empId: string,
+        name: string,
+        code: string
+    }
+
+    export interface IError {
+        sid: string,
+        scd: string,
+        empName: string,
+        date: string,
+        attendanceItemId: string,
+        errorMessage: string,
+    }
+
+    export class InforError {
+        sid: string;
+        scd: string;
+        empName: string;
+        date: string;
+        attendanceItemId: string;
+        errorMessage: string;
+        constructor(param: IError) {
+            let self = this;
+            self.sid = param.sid;
+            self.scd = param.scd;
+            self.empName = param.empName;
+            self.date = param.date;
+            self.attendanceItemId = param.attendanceItemId;
+            self.errorMessage = param.errorMessage;
+        }
+    }
 
 	/*service.sortEmployee(param)
 	.done((data: Array<model.DisplayWorkInfoByDateDto>) => {

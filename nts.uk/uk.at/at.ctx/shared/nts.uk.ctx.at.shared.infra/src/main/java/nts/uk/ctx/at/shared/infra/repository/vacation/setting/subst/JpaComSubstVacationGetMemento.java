@@ -4,13 +4,13 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.infra.repository.vacation.setting.subst;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.subst.ComSubstVacationGetMemento;
 import nts.uk.ctx.at.shared.dom.vacation.setting.subst.SubstVacationSetting;
-import nts.uk.ctx.at.shared.dom.workingcondition.ManageAtr;
 import nts.uk.ctx.at.shared.infra.entity.vacation.setting.subst.KsvstComSubstVacation;
-import nts.uk.ctx.at.shared.infra.entity.vacation.setting.subst.KsvstSubstVacationSetting;
 
 /**
  * The Class JpaComSubstVacationGetMemento.
@@ -56,13 +56,13 @@ public class JpaComSubstVacationGetMemento implements ComSubstVacationGetMemento
 	@Override
 	public ManageDistinct getManageDistinct() {
 
-		return EnumAdaptor.valueOf(this.typeValue.getManageAtr().intValue(), ManageDistinct.class);
+		return EnumAdaptor.valueOf(BooleanUtils.toInteger(this.typeValue.isManageAtr()), ManageDistinct.class);
 	}
 
 	@Override
 	public ManageDistinct getLinkingManagementATR() {
 
-		return EnumAdaptor.valueOf(this.typeValue.getLinkMngAtr().intValue(), ManageDistinct.class);
+		return EnumAdaptor.valueOf(BooleanUtils.toInteger(this.typeValue.isLinkMngAtr()), ManageDistinct.class);
 	}
 
 }

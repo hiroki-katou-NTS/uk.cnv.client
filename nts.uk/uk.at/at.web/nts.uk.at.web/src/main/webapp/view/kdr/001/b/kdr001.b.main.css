@@ -1,9 +1,9 @@
 
 .holidayAction {
-	border-radius: 5px;
+	/*border-radius: 5px;
 	width: 810px;
 	padding: 5px;	
-	margin: -10px;
+	margin: -10px;*/
 }
 
 
@@ -24,31 +24,76 @@
 	margin-left: 20px;
 	width: 420px;
 	float:left;
+	margin-top: 9px;
 }
 
 .labelWork {
 	width: 100px;
 	margin: 10px 0px;
 }
-
+#contents-area {
+	padding: 8px !important;
+}
 
 .holidaytable table, th, td {
-    border: 1px solid black;
+    border-bottom: 1px solid #4e5d6c;
+	border-top: 1px solid #4e5d6c;
    
 }
 
-.ntsCheckBox{
-	width: 150px;
-	height: 20px;
+.checkbox-wrapper{
+	width: 120px !important;
+	height: 20px !important;
+
 }
-.multicheckbox-wrapper label{
+.checkbox-wrappers label{
 	margin-right: 4px;
 }
 
 .holiday-button{
-	margin-left: 50px;
 	height: 50px;
 }
+
 .label-checkbox{
 	width: 110px;
+}
+
+.fixed-checkbox-table, tr, td{
+	padding: 7px;
+	outline: none;
+}
+
+element.style {
+}
+.radio-wrapper.no-text, .radio-wrapper.without-text, .checkbox-wrapper.no-text, .checkbox-wrapper.without-text{
+	margin-left: 3px;
+	margin-right: 41px;
+}
+.radio-wrapper input[type="radio"]+span,
+.radio-wrapper input[type="checkbox"]+span,
+.checkbox-wrapper input[type="radio"]+span,
+.checkbox-wrapper input[type="checkbox"]+span{
+	white-space: nowrap;
+	overflow: hidden;
+	width: 100px;
+	text-overflow: ellipsis;
+}
+.kdr-right{
+    float: right;
+    margin-left: 300px;
+    position: absolute;
+	margin-top: -8px;
+}
+.kdr-left{
+    position: absolute;
+    margin-left: 8px;
+}
+#holidayCode{
+	margin-left: 20px;
+}
+#holidayName{
+	margin: 20px 20px 20px 5px
+}
+.functions-area{
+	border-bottom: solid 1px #B1B1B1;
 }

@@ -8,7 +8,6 @@ import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampCard;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
 
 /**
  * DS : 社員の打刻データを取得する	
@@ -33,12 +32,8 @@ public class GetEmpStampDataService {
 		}
 		List<StampNumber> listCard = listStampCard.stream().map(StampCard::getStampNumber).collect(Collectors.toList());
 		
-		List<StampRecord> listStampRecord = require.getStampRecord(listCard, date);
-		if(listStampRecord.isEmpty()) {
-			return Optional.empty();
-		}
 		List<Stamp> listStamp = require.getStamp(listCard, date);
-		return Optional.of(new StampDataOfEmployees(employeeId, date, listStampRecord, listStamp));
+		return Optional.of(new StampDataOfEmployees(employeeId, date, listStamp));
 		
 	}
 	
@@ -49,14 +44,6 @@ public class GetEmpStampDataService {
 		 * @return
 		 */
 		List<StampCard> getListStampCard(String sid);
-		
-		/**
-		 * [R-2] 打刻記録を取得する  StampRecordRepository
-		 * @param stampNumbers
-		 * @param stampDateTime
-		 * @return
-		 */
-		List<StampRecord> getStampRecord(List<StampNumber> stampNumbers, GeneralDate date);
 		
 		/**
 		 * [R-3] 打刻を取得する   StampDakokuRepository

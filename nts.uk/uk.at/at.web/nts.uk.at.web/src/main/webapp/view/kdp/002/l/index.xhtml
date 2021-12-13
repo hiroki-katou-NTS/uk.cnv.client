@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+    <ui:composition template="/master/dialog.xhtml">
+        <ui:define name="htmlHead">
+
+            <com:scriptfile set="IGNITE" />
+            <script>var dialogSize = { width: 648, height: 490 };</script>
+            <com:stylefile path="./style.css" />
+            <com:scriptfile path="./kdp002.l.vm.js" />
+
+        </ui:define>
+        <ui:define name="content">
+            <div id="contents-area">
+                <div class="view-l">
+                    <!-- L1 枠名 -->
+                    <div class="title" data-bind="text: frameName"></div>
+
+                    <div class="working">
+                        <!-- L2_1 検索作業名 -->
+                       	<input id="L2_1" tabindex="1" data-bind="ntsTextEditor: {
+								value: searchValue,
+								enterkey: onClickSearch,
+								option: ko.mapping.fromJS(new nts.uk.ui.option.TextEditorOption({
+					            	textmode: 'text',
+					            	placeholder: '#{i18n.getText('KDP002_67')}',
+					            	width: '149px',
+					            	textalign: 'left'
+					            }))
+             			}" />
+                        <div style="display: inline-block">
+                             <!-- L2_2 検索ボタン -->
+                            <button tabindex="2" class="small" data-bind="i18n: 'KDP002_68', click: onClickSearch"></button>
+                            <!-- L2_3 解除ボタン -->
+                            <button tabindex="3" class="small" data-bind="i18n: 'KDP002_69', click: onClickCancel"></button>
+                        </div>
+                       
+                    </div>
+
+                    <div class="content">
+                        <!-- L10_1 前へ -->
+                        <div class="btn-back">
+                            <button class="small" tabindex="10" data-bind="click: onClickBack, visible: checkBack"><i class="icon icon-button-arrow-left"></i></button>
+                        </div>
+                        <!-- L3_1 ~ L3_6 作業内容 -->
+                        <div class="task" data-bind="foreach: { data: $vm.taskButtons, as: 'col'}">
+                            <div class="column" data-bind="foreach: {data: col, as: 'row' }">
+                                <button class="large" tabindex="4" data-bind="i18n: row.displayInfo.taskName, click: function() { $vm.onSelect.apply($vm, [row.code]) } "></button>
+                            </div>
+                        </div>
+                        <!-- L10_2 次へ -->
+                        <div class="btn-next">
+                            <button class="small" tabindex="11" data-bind="click: onClickNext, visible: checkNext"><i class="icon icon-button-arrow-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="functions-area-bottom">
+                <!-- L20 戻る -->
+                <button tabindex ="12" class="normal" data-bind="i18n: 'KDP002_72', click: onClickReturn, visible: checkReturn"></button>
+            </div>
+        </ui:define>
+    </ui:composition>
+</body>
+</html>

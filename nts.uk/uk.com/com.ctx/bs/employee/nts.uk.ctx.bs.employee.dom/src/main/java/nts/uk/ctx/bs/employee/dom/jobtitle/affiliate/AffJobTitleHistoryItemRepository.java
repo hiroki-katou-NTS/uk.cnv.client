@@ -4,8 +4,20 @@ import java.util.List;
 import java.util.Optional;
 
 import nts.arc.time.GeneralDate;
+import nts.arc.time.calendar.period.DatePeriod;
 
 public interface AffJobTitleHistoryItemRepository {
+	
+	/**
+	 * [3] 全ての職位履歴を取得する
+	 * 
+	 * 指定社員リストの期間内の所属職場履歴項目を取得する
+	 * 
+	 * @param sids List<社員ID>
+	 * @param datePeriod 期間
+	 * @return 職位履歴リスト List<期間付き職位履歴項目>
+	 */
+	List<AffJobTitleHistoryItemWithPeriod> getBySidAndDatePeriod(List<String> sids, DatePeriod datePeriod);
 	
 	/**
 	 * @param employeeId
@@ -49,9 +61,13 @@ public interface AffJobTitleHistoryItemRepository {
 	List<AffJobTitleHistoryItem> getAllByListSidDate(List<String> lstSid, GeneralDate referDate);
 	
 	/**
-	 * get by historyId list
-	 * @param historyIds
-	 * @return
+	 * [2] Get*
+	 * 
+	 * 履歴IDリストに該当する所属職位履歴項目を取得する
+	 * 
+	 * get by historyId list 
+	 * @param historyIds List<履歴ID>
+	 * @return 履歴項目リスト List<所属職位履歴項目>
 	 */
 	List<AffJobTitleHistoryItem> findByHitoryIds(List<String> historyIds);
 	

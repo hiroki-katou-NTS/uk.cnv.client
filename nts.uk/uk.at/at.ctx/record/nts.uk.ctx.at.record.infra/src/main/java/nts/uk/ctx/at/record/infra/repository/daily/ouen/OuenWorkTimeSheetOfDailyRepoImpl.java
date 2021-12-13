@@ -116,9 +116,11 @@ public class OuenWorkTimeSheetOfDailyRepoImpl extends JpaRepository implements O
 			Optional<KrcdtDayOuenTimeSheet> entityOld = getEntity(i.pk.sid, i.pk.ymd, i.pk.ouenNo);
 			if(!entityOld.isPresent()){
 				commandProxy().insert(i);
+				this.getEntityManager().flush();
 			} else{
 				updateData(entityOld.get(), i);
 				commandProxy().update(entityOld.get());
+				this.getEntityManager().flush();
 			}
 		});
 	}
@@ -156,13 +158,25 @@ public class OuenWorkTimeSheetOfDailyRepoImpl extends JpaRepository implements O
 		entityOld.workCd4 = dataUpdate.workCd4;
 		entityOld.workCd5 = dataUpdate.workCd5;
 		entityOld.workLocationCode = dataUpdate.workLocationCode;
+		entityOld.workNo = dataUpdate.workNo;
+		entityOld.startTimeChangeWay = dataUpdate.startTimeChangeWay;
+		entityOld.endTimeChangeWay = dataUpdate.endTimeChangeWay;
+		entityOld.workRemarks = dataUpdate.workRemarks;
+		entityOld.workplaceId = dataUpdate.workplaceId;
+		entityOld.startStampMethod = dataUpdate.startStampMethod;
+		entityOld.endStampMethod = dataUpdate.endStampMethod;
 		entityOld.workplaceId      = dataUpdate.workplaceId;
 	}
 
 	@Override
 	public void delete(List<OuenWorkTimeSheetOfDaily> domain) {
-		domain.stream().map(c -> KrcdtDayOuenTimeSheet.convert(c)).forEach(e -> {
-			commandProxy().remove(e);
+		domain.stream().map(c -> KrcdtDayOuenTimeSheet.convert(c)).forEach(lstE -> {
+			lstE.forEach(e -> {
+				this.queryProxy().find(e.pk, KrcdtDayOuenTimeSheet.class).ifPresent(entity -> {
+					commandProxy().remove(entity);
+				});
+			});
+
 		});
 	}
 	

@@ -30,4 +30,13 @@ public interface GetConfirmedAnnualLeave {
 	 * @return 年休利用状況リスト
 	 */
 	List<AnnualLeaveUsageExport> getYearHdMonthlyVer2(String employeeId, YearMonthPeriod period, Map<YearMonth, List<RemainMerge>> mapRemainMer);
+
+
+	/**
+	 * RequestList255 社員の月毎の確定済み年休を取得する - ver4
+	 * @param employeeId 社員ID
+	 * @param period 年月期間
+	 * @return 年休利用状況リスト
+	 */
+	List<AnnualLeaveUsageExport> getYearHdMonthlyVer4(String employeeId, YearMonthPeriod period, Map<YearMonth, List<RemainMerge>> mapRemainMer);
 }

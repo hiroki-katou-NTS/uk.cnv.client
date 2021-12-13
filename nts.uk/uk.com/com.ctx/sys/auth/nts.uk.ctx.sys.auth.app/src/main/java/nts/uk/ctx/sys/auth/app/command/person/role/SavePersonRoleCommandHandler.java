@@ -36,9 +36,10 @@ public class SavePersonRoleCommandHandler extends CommandHandlerWithResult<SaveP
 		Role role = command.toDomain(AppContexts.user().companyId(), AppContexts.user().contractCode());
 		roleService.insertRole(role);
 
-		PersonRole personRole = new PersonRole();
-		personRole.setRoleId(role.getRoleId());
-		personRole.setReferFutureDate(command.getReferFutureDate());
+		PersonRole personRole = new PersonRole(
+				role.getRoleId(), 
+				AppContexts.user().companyId(), 
+				command.getReferFutureDate());
 		personRoleRepo.insert(personRole);
 
 		return role.getRoleId();
@@ -48,9 +49,10 @@ public class SavePersonRoleCommandHandler extends CommandHandlerWithResult<SaveP
 		Role role = command.toDomain(AppContexts.user().companyId(), AppContexts.user().contractCode());
 		roleService.updateRole(role);
 
-		PersonRole personRole = new PersonRole();
-		personRole.setRoleId(role.getRoleId());
-		personRole.setReferFutureDate(command.getReferFutureDate());
+		PersonRole personRole = new PersonRole(
+				role.getRoleId(), 
+				AppContexts.user().companyId(), 
+				command.getReferFutureDate());
 		personRoleRepo.update(personRole);
 
 		return role.getRoleId();

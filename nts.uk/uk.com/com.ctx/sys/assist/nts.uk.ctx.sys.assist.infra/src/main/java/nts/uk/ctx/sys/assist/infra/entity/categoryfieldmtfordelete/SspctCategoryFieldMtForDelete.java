@@ -8,6 +8,8 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.sys.assist.dom.categoryfieldmt.CategoryFieldMt;
@@ -497,7 +499,7 @@ public class SspctCategoryFieldMtForDelete extends UkJpaEntity implements Serial
 	 */
 	@Basic(optional = true)
 	@Column(name = "HAS_PARENT_TBL_FLG")
-	public int hasParentTblFlg;
+	public boolean hasParentTblFlg;
 
 	/**
 	 * 親テーブル物理名
@@ -702,7 +704,7 @@ public class SspctCategoryFieldMtForDelete extends UkJpaEntity implements Serial
 				this.filedKeyUpdate11, this.filedKeyUpdate12, this.filedKeyUpdate13, this.filedKeyUpdate14,
 				this.filedKeyUpdate15, this.filedKeyUpdate16, this.filedKeyUpdate17, this.filedKeyUpdate18,
 				this.filedKeyUpdate19, this.filedKeyUpdate20, this.historyCls, this.parentTblJpName,
-				this.hasParentTblFlg, this.parentTblName, this.fieldParent1, this.fieldParent2, this.fieldParent3,
+				BooleanUtils.toInteger(this.hasParentTblFlg), this.parentTblName, this.fieldParent1, this.fieldParent2, this.fieldParent3,
 				this.fieldParent4, this.fieldParent5, this.fieldParent6, this.fieldParent7, this.fieldParent8,
 				this.fieldParent9, this.fieldParent10, this.fieldChild1, this.fieldChild2, this.fieldChild3,
 				this.fieldChild4, this.fieldChild5, this.fieldChild6, this.fieldChild7, this.fieldChild8,
@@ -733,7 +735,7 @@ public class SspctCategoryFieldMtForDelete extends UkJpaEntity implements Serial
 				domain.getFiledKeyUpdate14(), domain.getFiledKeyUpdate15(), domain.getFiledKeyUpdate16(),
 				domain.getFiledKeyUpdate17(), domain.getFiledKeyUpdate18(), domain.getFiledKeyUpdate19(),
 				domain.getFiledKeyUpdate20(), domain.getHistoryCls().value, domain.getParentTblJpName(),
-				domain.getHasParentTblFlg().value, domain.getParentTblName(), domain.getFieldParent1(),
+				BooleanUtils.toBoolean(domain.getHasParentTblFlg().value), domain.getParentTblName(), domain.getFieldParent1(),
 				domain.getFieldParent2(), domain.getFieldParent3(), domain.getFieldParent4(), domain.getFieldParent5(),
 				domain.getFieldParent6(), domain.getFieldParent7(), domain.getFieldParent8(), domain.getFieldParent9(),
 				domain.getFieldParent10(), domain.getFieldChild1(), domain.getFieldChild2(), domain.getFieldChild3(),

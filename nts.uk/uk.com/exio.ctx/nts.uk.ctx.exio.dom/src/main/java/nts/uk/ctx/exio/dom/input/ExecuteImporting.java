@@ -7,7 +7,8 @@ import nts.arc.task.tran.AtomTask;
 import nts.uk.ctx.exio.dom.input.canonicalize.existing.AdjustExistingData;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomain;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomainId;
-import nts.uk.ctx.exio.dom.input.setting.ExternalImportSetting;
+import nts.uk.ctx.exio.dom.input.setting.DomainImportSetting;
+import nts.uk.ctx.exio.dom.input.setting.ExternalImportCode;
 import nts.uk.ctx.exio.dom.input.transfer.TransferCanonicalData;
 
 /**
@@ -15,11 +16,11 @@ import nts.uk.ctx.exio.dom.input.transfer.TransferCanonicalData;
  */
 public class ExecuteImporting {
 
-	public static Iterable<AtomTask> execute(Require require, ExternalImportSetting setting) {
+	public static Iterable<AtomTask> execute(Require require, String companyId, ExternalImportCode code,  DomainImportSetting setting) {
 		
-		val context = ExecutionContext.create(setting);
+		val context = setting.executionContext(companyId, code);
 		
-		val transactionUnit = require.getImportingDomain(context.getDomainId())
+		val transactionUnit = require.getImportingDomain(setting.getDomainId())
 				.getTransactionUnit();
 		
 		switch (transactionUnit) {

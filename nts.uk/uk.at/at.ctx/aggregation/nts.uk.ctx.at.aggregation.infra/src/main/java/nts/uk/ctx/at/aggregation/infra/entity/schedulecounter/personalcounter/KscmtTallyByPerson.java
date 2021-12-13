@@ -28,7 +28,7 @@ public class KscmtTallyByPerson extends ContractUkJpaEntity implements Serializa
     public KscmtTallyByPersonPk pk;
 
     @Column(name = "USE_ATR")
-    public int useAtr;
+    public boolean useAtr;
 
     @Override
     protected Object getKey() {
@@ -41,7 +41,7 @@ public class KscmtTallyByPerson extends ContractUkJpaEntity implements Serializa
             KscmtTallyByPersonPk pk = new KscmtTallyByPersonPk(companyId, x.getValue());
             KscmtTallyByPerson data = new KscmtTallyByPerson(
                 pk,
-                domain.isUsed(PersonalCounterCategory.of(x.getValue())) ? 1 : 0
+                domain.isUsed(PersonalCounterCategory.of(x.getValue()))
             );
             data.contractCd = AppContexts.user().contractCode();
             return data;
@@ -50,7 +50,7 @@ public class KscmtTallyByPerson extends ContractUkJpaEntity implements Serializa
 
     public static PersonalCounter toDomain(List<KscmtTallyByPerson> entities) {
         //TODO how to map entity to domain with category used ?
-        List<PersonalCounterCategory> useCategories = entities.stream().filter(i -> i.useAtr == 1).map(x -> {
+        List<PersonalCounterCategory> useCategories = entities.stream().filter(i -> i.useAtr).map(x -> {
             return EnumAdaptor.valueOf(x.pk.category, PersonalCounterCategory.class);
         }).collect(Collectors.toList());
 

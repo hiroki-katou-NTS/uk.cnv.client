@@ -5,7 +5,7 @@ import nts.arc.task.tran.AtomTask;
 
 /**
  * スケジュール表の出力設定を複製する
- * UKDesign.ドメインモデル.NittsuSystem.UniversalK.就業.contexts.就業機能.スケジュール表.スケジュール表の出力設定を複製する
+ * UKDesign.ドメインモデル.NittsuSystem.UniversalK.就業.contexts.予実集計.スケジュール表.スケジュール表の出力設定を複製する
  * @author dan_pv
  *
  */
@@ -14,9 +14,9 @@ public class CopyScheduleTableOutputSettingService {
 	/**
 	 * 複製する
 	 * @param require
-	 * @param copySource
-	 * @param newCode
-	 * @param newName
+	 * @param copySource 複製元
+	 * @param newCode コード
+	 * @param newName 名称
 	 * @return
 	 * @throws CloneNotSupportedException 
 	 */
@@ -40,14 +40,14 @@ public class CopyScheduleTableOutputSettingService {
 		
 		/**
 		 * 指定のコートが既に保存されるか
-		 * @param code
+		 * @param code 出力設定コード
 		 * @return
 		 */
 		boolean isScheduleTableOutputSettingRegistered(OutputSettingCode code);
 		
 		/**
 		 * スケジュール表の出力設定を追加する
-		 * @param domain
+		 * @param domain スケジュール表の出力設定
 		 */
 		void insertScheduleTableOutputSetting(ScheduleTableOutputSetting domain);
 	}

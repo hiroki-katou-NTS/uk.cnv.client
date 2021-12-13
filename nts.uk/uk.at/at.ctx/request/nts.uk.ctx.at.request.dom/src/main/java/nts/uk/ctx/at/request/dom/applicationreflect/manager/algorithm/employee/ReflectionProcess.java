@@ -28,7 +28,7 @@ public class ReflectionProcess {
 	// 反映処理
 	public static Pair<Optional<OneDayReflectStatusOutput>, Optional<AtomTask>> process(Require require,
 			String companyId, Application application, boolean isCalWhenLock,
-			GeneralDate targetDate, List<SEmpHistImport> empHist) {
+			GeneralDate targetDate, List<SEmpHistImport> empHist, String execId) {
 
 		// 対象日の反映状態を<output>1日の反映状態にセット
 		ReflectionStatusOfDay reflectionStatusOfDay = application.getReflectionStatus().getListReflectionStatusOfDay()
@@ -49,14 +49,14 @@ public class ReflectionProcess {
 		// 勤務予定への反映処理-- in processing
 		Pair<ReflectStatusResult, Optional<AtomTask>> reflectSchedule = ProcessReflectWorkSchedule.processReflect(
 				require, companyId, closureEmpOpt.get().getClosureId(), application, isCalWhenLock,
-				targetDate, result.getStatusWorkSchedule(), empHist);
+				targetDate, result.getStatusWorkSchedule(), empHist, execId);
 		result.setStatusWorkSchedule(reflectSchedule.getLeft());
 		reflectSchedule.getRight().ifPresent(x -> tasks.add(x));
 
 		// 勤務実績への反映処理-- in processing
 		Pair<ReflectStatusResult, Optional<AtomTask>> resultRecord = ProcessReflectWorkRecord.processReflect(require,
 				companyId, closureEmpOpt.get().getClosureId(), application, isCalWhenLock, targetDate,
-				result.getStatusWorkRecord(), empHist);
+				result.getStatusWorkRecord(), empHist, execId);
 		result.setStatusWorkRecord(resultRecord.getLeft());
 		resultRecord.getRight().ifPresent(x -> tasks.add(x));
 

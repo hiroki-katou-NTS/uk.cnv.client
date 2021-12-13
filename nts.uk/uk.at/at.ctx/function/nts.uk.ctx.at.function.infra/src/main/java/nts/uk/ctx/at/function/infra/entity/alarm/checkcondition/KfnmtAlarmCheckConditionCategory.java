@@ -271,10 +271,10 @@ public class KfnmtAlarmCheckConditionCategory extends ContractUkJpaEntity implem
 		}
 		return new AlarmCheckConditionByCategory(entity.pk.companyId, entity.pk.category, entity.pk.code, entity.name,
 				new AlarmCheckTargetCondition(entity.targetConditionId,
-						entity.targetCondition.filterByBusinessType == 1 ? true : false,
-						entity.targetCondition.filterByJobTitle == 1 ? true : false,
-						entity.targetCondition.filterByEmployment == 1 ? true : false,
-						entity.targetCondition.filterByClassification == 1 ? true : false,
+						entity.targetCondition.filterByBusinessType,
+						entity.targetCondition.filterByJobTitle,
+						entity.targetCondition.filterByEmployment,
+						entity.targetCondition.filterByClassification,
 						entity.targetCondition.listBusinessType.stream().map(item -> item.pk.businessTypeCode)
 								.collect(Collectors.toList()),
 						entity.targetCondition.listJobTitle.stream().map(item -> item.pk.jobTitleId)

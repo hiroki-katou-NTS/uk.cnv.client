@@ -72,7 +72,7 @@ implements PeregAddListCommandHandler<AddAffWorkplaceHistoryCommand>{
 			}
 			itemtoBeAdded.add(dateItem);
 			affJobTitleHistoryLst.add(itemtoBeAdded);
-			AffWorkplaceHistoryItem histItem =AffWorkplaceHistoryItem.createFromJavaType(histId,  c.getEmployeeId(), c.getWorkplaceId(), c.getNormalWorkplaceId());
+			AffWorkplaceHistoryItem histItem =AffWorkplaceHistoryItem.createFromJavaType(histId,  c.getEmployeeId(), c.getWorkplaceId());
 			histItems.add(histItem);
 			recordIds.put(c.getEmployeeId(), histId);
 			}catch(BusinessException e) {

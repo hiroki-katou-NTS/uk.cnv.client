@@ -7,39 +7,53 @@ module nts.uk.at.view.kdp.share {
         notiSet: KnockoutObservable<FingerStampSetting>;
         messageNoti: KnockoutObservable<IMessage>;
         viewShow: String;
+        showMessage: KnockoutObservable<boolean | null>;
     }
 
     const API = {
+        GET_NOTI_SYSTEM: 'at/record/stamp/employment/get-stamp-system-outage'
     };
 
     const template = `
-    <div class="company" data-bind="style: { 'background-color': $component.headOfficeNotice.backGroudColor }">
-        <div class="title-company" data-bind="i18n: $component.headOfficeNotice.title,
-            style: { 'color': $component.headOfficeNotice.textColor }"></div>
-        <span class="text-company" data-bind="i18n: $component.headOfficeNotice.contentMessager,
-            style: { 'color': $component.headOfficeNotice.textColor }"></span>
-    </div>
-    <div data-bind="style: { 'background-color': $component.workplaceNotice.backGroudColor }">
-        <div class="workPlace">
-            <div class="title">
-                <div class="name-title">
-                    <div style:"box-sizing: border-box" data-bind="i18n: $component.workplaceNotice.title,
-                        style: { 'color': $component.workplaceNotice.textColor}"></div>
-                </div>
-                <div class="btn-title">
-                    <button style="background-color: transparent;" 
-                            class="icon" 
-                            data-bind="ntsIcon: { no: 160, width: 30, height: 30 }, click: events.registerNoti.click">
-                    </button>
-                </div>
+    <div>
+        <!-- ko if: ko.toJS($component.modeSystemNoti) -->
+            <div data-bind="css: { 'error1': $component.state() === 'state1' , 'error2': $component.state() === 'state2'}">
+                <div class="text-error" data-bind="i18n: $component.messageCom" style="color: white;"></div>
+                <div class="text-error" data-bind="i18n: $component.messageSys" style="color: white;"></div>
             </div>
-            <div class="content">
-                <div class="text-content" data-bind="i18n: $component.workplaceNotice.contentMessager,
-                    style: { 'color': $component.workplaceNotice.textColor}"></div>
-                    <button class="btn-content" data-bind="ntsIcon: { no: 161, width: 30, height: 30 }, click: events.shoNoti.click">
-                    </button>
-            <div>
+        <!-- /ko -->
+        <!-- ko if: $component.showCompanyNoti() -->
+            <div class="company" data-bind="style: { 'background-color': $component.headOfficeNotice.backGroudColor }">
+                <div class="title-company" data-bind="i18n: $component.headOfficeNotice.title,
+                    style: { 'color': $component.headOfficeNotice.textColor }"></div>
+                <span class="text-company" data-bind="i18n: $component.headOfficeNotice.contentMessager,
+                    style: { 'color': $component.headOfficeNotice.textColor }"></span>
+            </div>
+        <!-- /ko -->
+        <!-- ko if: ko.toJS($component.showMessage) -->
+            <div data-bind="style: { 'background-color': $component.workplaceNotice.backGroudColor }">
+                <div class="workPlace">
+                    <div class="title">
+                        <div class="name-title">
+                            <div style:"box-sizing: border-box" data-bind="i18n: $component.workplaceNotice.title,
+                                style: { 'color': $component.workplaceNotice.textColor}"></div>
+                        </div>
+                        <div class="btn-title">
+                            <button style="background-color: transparent;" 
+                                    class="icon" 
+                                    data-bind="ntsIcon: { no: 160, width: 30, height: 30 }, click: events.registerNoti.click">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="content">
+                        <div class="text-content" data-bind="i18n: $component.workplaceNotice.contentMessager,
+                            style: { 'color': $component.workplaceNotice.textColor}"></div>
+                            <button class="btn-content" data-bind="ntsIcon: { no: 161, width: 30, height: 30 }, click: events.shoNoti.click">
+                            </button>
+                        </div>
+                </div>
         </div>
+        <!-- /ko -->
     </div>
     <style>
         .kdp-message-error {
@@ -49,15 +63,45 @@ module nts.uk.at.view.kdp.share {
 
         .kdp-message-error .company {
             padding: 5px 3px;
-            height: 47px;
-            max-height: 47px;
+            height: 55px;
+            max-height: 55px;
             word-break: break-all;
             text-overflow: ellipsis;
             overflow: hidden;
             box-sizing: border-box;
         }
 
+        .kdp-message-error .error1 {
+            padding: 5px 3px;
+            height: 57px;
+            max-height: 54px;
+            word-break: break-all;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            box-sizing: border-box;
+            background: #FD4D4D;
+            margin-bottom: 5px;
+        }
+
+        .kdp-message-error .error2 {
+            padding: 5px 3px;
+            height: 120px;
+            max-height: 120px;
+            word-break: break-all;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            box-sizing: border-box;
+            background: #FD4D4D;
+            margin-bottom: 5px;
+        }
+
         .kdp-message-error .company .title-company {
+            box-sizing: border-box;
+            float: left;
+            height: 100px;
+        }
+
+        .kdp-message-error .error .title-error {
             box-sizing: border-box;
             float: left;
             height: 100px;
@@ -144,15 +188,26 @@ module nts.uk.at.view.kdp.share {
 
         messageNoti: KnockoutObservable<IMessage> = ko.observable();
         notiSet: KnockoutObservable<FingerStampSetting> = ko.observable();
+        messageSys: KnockoutObservable<String> = ko.observable('');
+        messageCom: KnockoutObservable<String> = ko.observable('');
+
+        modeSystemNoti: KnockoutObservable<boolean | null> = ko.observable(null);
+
+        showMessage: KnockoutObservable<boolean | null> = ko.observable(true);
 
         events!: ClickEvent;
 
+        state!: KnockoutComputed<String>;
+
+        showCompanyNoti: KnockoutComputed<boolean>;
 
         created(params?: MessageParam) {
             const vm = this;
 
             if (params) {
                 vm.messageNoti = params.messageNoti;
+
+                vm.showMessage = params.showMessage;
 
                 if (ko.unwrap(params.notiSet)) {
                     vm.notiSet = params.notiSet;
@@ -194,10 +249,39 @@ module nts.uk.at.view.kdp.share {
             vm.messageNoti.subscribe(() => {
                 vm.reload();
             });
+
+            vm.state = ko.computed({
+                read: () => {
+                    const checkShowSystem = ko.unwrap(vm.modeSystemNoti);
+                    const checkShowWorkPlace = ko.unwrap(vm.showMessage);
+
+                    if (checkShowSystem && checkShowWorkPlace) {
+                        return 'state1';
+                    }
+                    return 'state2';
+                }
+            });
+
+            vm.showCompanyNoti = ko.computed({
+                read: () => {
+                    const checkShowSystem = ko.unwrap(vm.modeSystemNoti);
+                    const checkShowWorkPlace = ko.unwrap(vm.showMessage);
+
+                    if (checkShowWorkPlace && checkShowSystem) {
+                        return false;
+                    }
+                    if (checkShowWorkPlace) {
+                        return true
+                    }
+                    return false;
+                }
+            });
         }
 
         mounted() {
             const vm = this;
+
+            // vm.getNotiSys();
 
             if (ko.unwrap(vm.messageNoti)) {
                 vm.reload();
@@ -259,6 +343,26 @@ module nts.uk.at.view.kdp.share {
                         } else {
                             vm.workplaceNotice.update(DestinationClassification.WORKPLACE,
                                 '');
+                        }
+                    }
+
+                    const value: IMessage = ko.unwrap(vm.messageNoti);
+
+                    if (value.stopByCompany.systemStatus == 2) {
+                        vm.messageCom(value.stopByCompany.stopMessage);
+                    } else {
+                        vm.messageCom('');
+                    }
+
+                    if (value.stopBySystem.systemStatusType == 2) {
+                        vm.modeSystemNoti(true);
+                        vm.messageSys(value.stopBySystem.stopMessage);
+                    } else {
+                        if (value.stopByCompany.systemStatus == 2) {
+                            vm.modeSystemNoti(true);
+                        } else {
+                            vm.modeSystemNoti(false);
+                            vm.messageSys('');
                         }
                     }
                 })
@@ -333,6 +437,22 @@ module nts.uk.at.view.kdp.share {
 
     interface IMessage {
         messageNotices: IMessageNotice[];
+        stopBySystem: IStopBySystem;
+        stopByCompany: IStopByCompany;
+    }
+
+    interface IStopBySystem {
+        systemStatusType: number;
+        stopMode: number;
+        stopMessage: String;
+        usageStopMessage: String
+    }
+
+    interface IStopByCompany {
+        systemStatus: number;
+        stopMessage: String;
+        stopMode: number;
+        usageStopMessage: String
     }
 
     interface IMessageNotice {
@@ -350,6 +470,12 @@ module nts.uk.at.view.kdp.share {
         targetSIDs: string[];
         targetWpids: string[];
         destination: number | null;
+    }
+
+    interface IMessageSys {
+        notiMessage: string;
+        stopMessage: string;
+        stopSystem: boolean;
     }
 
     enum DestinationClassification {

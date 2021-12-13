@@ -1,7 +1,7 @@
 package nts.uk.ctx.exio.dom.input.setting.assembly.revise;
 
 import nts.uk.ctx.exio.dom.input.errors.ErrorMessage;
-import nts.uk.ctx.exio.dom.input.util.Either;
+import nts.gul.util.Either;
 
 /**
  * 値の編集インターフェース

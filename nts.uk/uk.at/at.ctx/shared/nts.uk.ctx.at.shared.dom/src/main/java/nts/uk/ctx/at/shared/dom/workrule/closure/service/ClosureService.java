@@ -27,6 +27,7 @@ import nts.uk.ctx.at.shared.dom.workrule.closure.*;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.context.LoginUserContext;
 import nts.uk.shr.com.time.calendar.Day;
+import nts.uk.shr.com.time.calendar.date.ClosureDate;
 
 /**
  * The Class DefaultClosureServiceImpl.
@@ -515,6 +516,72 @@ public class ClosureService {
 		}
 		return false;
 	}
+	
+	/**
+	 * 年月日期間から年月締め期間を求める
+	 * @param require
+	 * @param cacheCarrier
+	 * @param employeeId
+	 * @param baseDate
+	 * @param period
+	 * @return
+	 */
+	public static List<YearMonth> GetYearMonthClosurePeriod(RequireM3 require, CacheCarrier cacheCarrier, 
+	String employeeId, GeneralDate baseDate, DatePeriod period){
+		// 社員に対応する処理締めを取得する.
+		Closure closure = getClosureDataByEmployee(require, cacheCarrier, employeeId, baseDate);
+		if(closure == null) {
+			return new ArrayList<>();
+		}
+		
+		List<DatePeriod> periodList = separateThePeriodByTheClosing(period,closure);
+		
+	
+		return periodList.stream().map(x -> x.end().yearMonth()).collect(Collectors.toList());
+	}
+	
+	/**
+	 * 期間を締め日で区切る
+	 * @param period
+	 * @param closure
+	 * @return
+	 */
+	private static List<DatePeriod> separateThePeriodByTheClosing(DatePeriod period, Closure closure){
+		List<DatePeriod> closurePeriod = new ArrayList<>();
+		
+		//INPUT．期間．開始日を期間．開始日とする
+		GeneralDate startday = period.start();
+		GeneralDate closureday;
+		
+		//当月の締め日を取得する
+		Optional<ClosureDate> closureDate = closure.getClosureDateOfCurrentMonth();
+		if(!closureDate.isPresent()){
+			return closurePeriod;
+		}
+		
+		do {
+			if(closureDate.get().getLastDayOfMonth() == Boolean.TRUE){
+				//期間．開始日の月の末日を締め終了日とする
+				closureday = startday.yearMonth().lastGeneralDate();
+			}else{
+				//締め日．日を締め終了日とする
+				closureday =  GeneralDate.ymd(startday.yearMonth().nextMonth(),closureDate.get().getClosureDay().v().intValue());
+			}
+			
+			
+			if(closureday.beforeOrEquals(startday) || closureday.after(period.end())){
+				closureday = period.end();
+			}
+			
+			closurePeriod.add(new DatePeriod(startday,closureday));
+			
+			
+			startday = closurePeriod.get(closurePeriod.size()-1).end().addDays(1);
+		} while (period.end().before(closurePeriod.get(closurePeriod.size()-1).end()));
+		
+		return closurePeriod;
+	}
+	
 	
 	public static interface RequireM1 extends RequireM4 {
 		

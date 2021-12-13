@@ -12,6 +12,7 @@ import nts.arc.layer.app.command.CommandHandlerContext;
 import nts.arc.layer.app.file.storage.FileStorage;
 import nts.uk.ctx.exio.dom.input.PrepareImporting;
 import nts.uk.ctx.exio.dom.input.manage.ExternalImportStateException;
+import nts.uk.ctx.exio.dom.input.setting.DomainImportSetting;
 import nts.uk.ctx.exio.dom.input.setting.ExternalImportSetting;
 import nts.uk.shr.com.context.AppContexts;
 
@@ -34,11 +35,11 @@ public class ExternalImportPrepareCommandHandler extends AsyncCommandHandler<Ext
 		val taskData = context.asAsync().getDataSetter();
 		try {
 			val require = this.require.create(companyId);
-			val setting = require.getExternalImportSetting(companyId, command.getExternalImportCode());
-			val currentState = require.getExternalImportCurrentState(companyId);
+			val setting = require.getExternalImportSetting(command.getExternalImportCode());
+			val currentState = require.getExternalImportCurrentState();
 			
 			currentState.prepare(require, setting, () -> {
-				run(require, command.getUploadedCsvFileId(), setting);
+				run(require, command.getUploadedCsvFileId(), setting, companyId);
 			});
 			
 			taskData.setData("process", "done");
@@ -59,12 +60,16 @@ public class ExternalImportPrepareCommandHandler extends AsyncCommandHandler<Ext
 	private void run(
 			ExternalImportPrepareRequire.Require require,
 			String fileId,
-			ExternalImportSetting setting) {
-		
-		try (val inputStream = fileStorage.getStream(fileId)
-				.orElseThrow(() -> new RuntimeException("file not found: " + fileId))) {
-			
-			PrepareImporting.prepare(require, setting, inputStream);
+			ExternalImportSetting externalImportSetting,
+			String companyId) {
+
+		require.setupWorkspace();
+		for (DomainImportSetting setting : externalImportSetting.getDomainSettings()) {
+			try (val inputStream = fileStorage.getStream(fileId)
+					.orElseThrow(() -> new RuntimeException("file not found: " + fileId))) {
+				
+				PrepareImporting.prepare(require, externalImportSetting, setting, inputStream);
+			}
 		}
 	}
 }

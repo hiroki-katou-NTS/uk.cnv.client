@@ -1,0 +1,243 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+  <ui:composition template="../../../../master/base.xhtml">
+    <ui:define name="htmlHead">
+      <com:scriptfile set="IGNITE" />
+      <com:scriptfile path="cmm029.a.vm.js" />
+      <com:stylefile path="cmm029.a.style.css" />
+    </ui:define>
+
+    <ui:define name="content">
+      <div id="functions-area">
+        <button id="A0_1" class="large proceed" data-bind="click: performRegister, enable: enableRegister">#{i18n.getText('CMM029_2')}</button>
+      </div>
+      <div id="contents-area">
+        <div id="A1" data-bind="ntsTabPanel: { dataSource: tabs, active: selectedTab }">
+          <div id="A1_1" class="tab-content-1">
+            <div class="hyperlink-header">
+              <a id="A1_3" class="hyperlink" href="#" data-program="CMM029_13"
+                data-bind="click: performHyperlink.bind($data, $element)">#{i18n.getText('CMM029_43')}</a>
+            </div>
+            <div class="setting-zone">
+              <div data-bind="with: displayDataOf('CMM029_15')">
+                <div class="flex valign-center">
+                  <div id="A1_11" class="setting-label">#{i18n.getText('CMM029_7')}</div>
+                  <div id="A1_21" class="setting-item setting-switch" data-bind="ntsSwitchButton: {
+                    options: $parent.useAtrValuesA1,
+                    optionsValue: 'value',
+                    optionsText: 'name',
+                    value: useAtr
+                  }"></div>
+                </div>
+              </div>
+              <div data-bind="with: displayDataOf('CMM029_16')">
+                <div class="flex valign-center">
+                  <div id="A1_12" class="setting-label">#{i18n.getText('CMM029_8')}</div>
+                  <div id="A1_22" class="setting-item setting-switch" data-bind="ntsSwitchButton: {
+                    options: $parent.useAtrValuesA1,
+                    optionsValue: 'value',
+                    optionsText: 'name',
+                    value: useAtr
+                  }"></div>
+                </div>
+              </div>
+              <div data-bind="with: displayDataOf('CMM029_17')">
+                <div class="flex valign-center">
+                  <div id="A1_13" class="setting-label">#{i18n.getText('CMM029_9')}</div>
+                  <div id="A1_23" class="setting-item setting-switch" data-bind="ntsSwitchButton: {
+                    options: $parent.useAtrValuesA1,
+                    optionsValue: 'value',
+                    optionsText: 'name',
+                    value: useAtr,
+                    enable: false
+                  }, enable: false"></div>
+                </div>
+              </div>
+              <div data-bind="with: displayDataOf('CMM029_18')">
+                <div class="flex valign-center">
+                  <div id="A1_14" class="setting-label">#{i18n.getText('CMM029_10')}</div>
+                  <div id="A1_24" class="setting-item setting-switch" data-bind="ntsSwitchButton: {
+                    options: $parent.useAtrValuesA1,
+                    optionsValue: 'value',
+                    optionsText: 'name',
+                    value: useAtr,
+                    enable: false
+                  }, enable: false"></div>
+                </div>
+              </div>
+              <div data-bind="with: displayDataOf('CMM029_19')">
+                <div class="flex valign-center">
+                  <div id="A1_15" class="setting-label">#{i18n.getText('CMM029_12')}</div>
+                  <div id="A1_25" class="setting-item setting-switch" data-bind="ntsSwitchButton: {
+                    options: $parent.useAtrValuesA1,
+                    optionsValue: 'value',
+                    optionsText: 'name',
+                    value: useAtr
+                  }"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="A2" class="tab-content-2">
+            <div class="hyperlink-header">
+              <a id="A2_71" class="hyperlink" href="#" data-program="CMM029_20"
+                data-bind="click: performHyperlink.bind($data, $element)">#{i18n.getText('CMM029_61')}</a>
+            </div>
+            <div class="setting-zone">
+              <div data-bind="with: displayDataOf('CMM029_22')">
+                <div class="flex valign-center">
+                  <label id="A2_11" class="setting-label">#{i18n.getText('CMM029_44')}</label>
+                  <label id="A2_12" class="setting-item manage-remain-number" data-bind="text: $vm.$i18n(getUseValue($element))"></label>
+                  <a id="A2_13" class="hyperlink" href="#" data-program="CMM029_22"
+                    data-bind="click: $parent.performHyperlink.bind($parent, $element)">#{i18n.getText('CMM029_45')}</a>
+                </div>
+                <div class="flex valign-center">
+                  <label id="A2_14" class="setting-description">#{i18n.getText('CMM029_46')}</label>
+                </div>
+              </div>
+              <div data-bind="with: displayDataOf('CMM029_26')">
+                <div class="flex valign-center">
+                  <label id="A2_15" class="setting-label sub-label">#{i18n.getText('CMM029_47')}</label>
+                  <label id="A2_16" class="setting-item" data-bind="text: $vm.$i18n(getUseValue($element))"></label>
+                </div>
+                <hr></hr>
+              </div>
+              <div data-bind="with: displayDataOf('CMM029_25')">
+                <div class="flex valign-center">
+                  <label id="A2_21" class="setting-label">#{i18n.getText('CMM029_48')}</label>
+                  <label id="A2_22" class="setting-item" data-bind="text: $vm.$i18n(getUseValue($element))"></label>
+                  <a id="A2_23" class="hyperlink" href="#" data-program="CMM029_25"
+                    data-bind="click: $parent.performHyperlink.bind($parent, $element)">#{i18n.getText('CMM029_45')}</a>
+                </div>
+                <div class="flex valign-center">
+                  <label id="A2_24" class="setting-description">#{i18n.getText('CMM029_49')}</label>
+                </div>
+                <hr></hr>
+              </div>
+              <div data-bind="with: displayDataOf('CMM029_28')">
+                <div class="flex valign-center">
+                  <label id="A2_31" class="setting-label">#{i18n.getText('CMM029_50')}</label>
+                  <label id="A2_32" class="setting-item" data-bind="text: $vm.$i18n(getUseValue($element))"></label>
+                  <a id="A2_33" class="hyperlink" href="#" data-program="CMM029_28"
+                    data-bind="click: $parent.performHyperlink.bind($parent, $element)">#{i18n.getText('CMM029_45')}</a>
+                </div>
+              </div>
+              <div data-bind="with: displayDataOf('CMM029_29')">
+                <div class="flex valign-center">
+                  <label id="A2_35" class="setting-label sub-label">#{i18n.getText('CMM029_51')}</label>
+                  <label id="A2_36" class="setting-item" data-bind="text: $vm.$i18n(getUseValue($element))"></label>
+                </div>
+                <div class="flex valign-center">
+                  <label id="A2_34" class="setting-description">#{i18n.getText('CMM029_52')}</label>
+                </div>
+                <hr></hr>
+              </div>
+              <div data-bind="with: displayDataOf('CMM029_31')">
+                <div class="flex valign-center">
+                  <label id="A2_41" class="setting-label">#{i18n.getText('CMM029_53')}</label>
+                  <label id="A2_42" class="setting-item" data-bind="text: $vm.$i18n(getUseValue($element))"></label>
+                  <a id="A2_43" class="hyperlink" href="#" data-program="CMM029_31"
+                    data-bind="click: $parent.performHyperlink.bind($parent, $element)">#{i18n.getText('CMM029_45')}</a>
+                </div>
+                <div class="flex valign-center">
+                  <label id="A2_44" class="setting-description">#{i18n.getText('CMM029_54')}</label>
+                </div>
+                <hr></hr>
+              </div>
+              <div data-bind="with: displayDataOf('CMM029_33')">
+                <div class="flex valign-center">
+                  <label id="A2_51" class="setting-label">#{i18n.getText('CMM029_55')}</label>
+                  <label id="A2_52" class="setting-item" data-bind="text: $vm.$i18n(getUseValue($element))"></label>
+                  <a id="A2_53" class="hyperlink" href="#" data-program="CMM029_33"
+                    data-bind="click: $parent.performHyperlink.bind($parent, $element)">#{i18n.getText('CMM029_45')}</a>
+                </div>
+              </div>
+              <div data-bind="with: displayDataOf('CMM029_34')">
+                <div class="flex valign-center">
+                  <label id="A2_55" class="setting-label sub-label">#{i18n.getText('CMM029_56')}</label>
+                  <label id="A2_56" class="setting-item" data-bind="text: $vm.$i18n(getUseValue($element))"></label>
+                </div>
+                <div class="flex valign-center">
+                  <label id="A2_54" class="setting-description">#{i18n.getText('CMM029_57')}</label>
+                </div>
+                <hr></hr>
+              </div>
+              <div data-bind="with: displayDataOf('CMM029_35')">
+                <div class="flex valign-center">
+                  <label id="A2_61" class="setting-label">#{i18n.getText('CMM029_58')}</label>
+                  <label id="A2_62" class="setting-item" data-bind="text: $vm.$i18n(getUseValue($element))"></label>
+                  <a id="A2_63" class="hyperlink" href="#" data-program="CMM029_35"
+                    data-bind="click: $parent.performHyperlink.bind($parent, $element)">#{i18n.getText('CMM029_45')}</a>
+                </div>
+              </div>
+              <div data-bind="with: displayDataOf('CMM029_36')">
+                <div class="flex valign-center">
+                  <label id="A2_65" class="setting-label sub-label">#{i18n.getText('CMM029_59')}</label>
+                  <label id="A2_66" class="setting-item" data-bind="text: $vm.$i18n(getUseValue($element))"></label>
+                </div>
+                <div class="flex valign-center">
+                  <label id="A2_64" class="setting-description">#{i18n.getText('CMM029_60')}</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="A3" class="tab-content-3">
+            <div class="hyperlink-header">
+              <a id="A3_21" class="hyperlink" href="#" data-program="CMM029_37"
+                data-bind="click: performHyperlink.bind($data, $element)">#{i18n.getText('CMM029_63')}</a>
+            </div>
+            <div class="setting-zone">
+              <div data-bind="with: displayDataOf('CMM029_39')">
+                <div class="flex valign-center">
+                  <label id="A3_11" class="setting-label">#{i18n.getText('CMM029_62')}</label>
+                  <label id="A3_12" class="setting-item" data-bind="text: $vm.$i18n(getUseValue($element))"></label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="A4" class="tab-content-4">
+            <div class="setting-zone">
+              <div data-bind="with: displayDataOf('CMM029_42')">
+                <div class="flex valign-center mt-42">
+                  <label id="A4_11" class="setting-label">#{i18n.getText('CMM029_64')}</label>
+                </div>
+                <div class="flex valign-center setting-radio-group">
+                  <label id="A4_211" data-bind="ntsRadioButton: {
+                    checked: taskOperationMethod,
+                    option: $parent.taskOperationMethods()[0].value,
+                    optionText: $parent.taskOperationMethods()[0].name,
+                    group: 'A4_21'
+                  }"></label>
+                </div>
+                <div class="flex valign-center setting-radio-group">
+                  <label id="A4_212" data-bind="ntsRadioButton: {
+                    checked: taskOperationMethod,
+                    option: $parent.taskOperationMethods()[1].value,
+                    optionText: $parent.taskOperationMethods()[1].name,
+                    group: 'A4_21'
+                  }"></label>
+                </div>
+                <div class="flex valign-center setting-radio-group">
+                  <label id="A4_213" data-bind="ntsRadioButton: {
+                    checked: taskOperationMethod,
+                    option: $parent.taskOperationMethods()[2].value,
+                    optionText: $parent.taskOperationMethods()[2].name,
+                    group: 'A4_21'
+                  }"></label>
+                  <a id="A4_214" class="hyperlink" href="#" data-program="CMM029_40"
+                    data-bind="click: $parent.performHyperlink.bind($parent, $element)">#{i18n.getText('CMM029_65')}</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ui:define>
+  </ui:composition>
+</body>
+
+</html>

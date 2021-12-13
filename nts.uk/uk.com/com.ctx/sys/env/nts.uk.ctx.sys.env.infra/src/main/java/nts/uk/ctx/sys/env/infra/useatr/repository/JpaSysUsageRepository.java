@@ -60,8 +60,13 @@ public class JpaSysUsageRepository extends JpaRepository implements SysUsageRepo
 	@Override
 	public void updateUsageSet(SysUsageSet sysUsageSet) {
 		SacmtSysUsageSet entity = toEntitySys(sysUsageSet);
-		SacmtSysUsageSet oldEntity = this.queryProxy()
-										.find(entity.sacmtSysUsageSetPK, SacmtSysUsageSet.class).get();
+		Optional<SacmtSysUsageSet> sacmtSysUsageSetOpt = this.queryProxy()
+				.find(entity.sacmtSysUsageSetPK, SacmtSysUsageSet.class);
+		if (!sacmtSysUsageSetOpt.isPresent()) {
+			this.insertUsageSet(sysUsageSet);
+			return;
+		}
+		SacmtSysUsageSet oldEntity = sacmtSysUsageSetOpt.get();
 		oldEntity.jinji = entity.jinji;
 		oldEntity.shugyo = entity.shugyo;
 		oldEntity.kyuyo = entity.kyuyo;

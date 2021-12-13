@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+
+    <ui:composition template="../../../../master/sidebarpage.xhtml">
+        <ui:define name="sidebar-head">
+            <script>var dialogSize = { width: 1260, height: 660 };</script>
+            <com:ValidatorScript>
+                nts.uk.ctx.at.schedule.dom.shift.estimate.price.EstimatePrice
+            </com:ValidatorScript>
+
+            <com:scriptfile set="IGNITE" />
+            <com:scriptfile path="/view/kcp/share/list.js" of="/nts.uk.com.web" />
+
+            <com:stylefile path="kml002.h.style.css" />
+            <com:scriptfile path="kml002.h.vm.js" />
+        </ui:define>
+
+        <!--H1-->
+        <ui:define name="sidebar" tabindex="1">
+            <ul class="navigator">
+                <!--H1-1-->
+                <li>
+                    <a href="#tabpanel-1" id="screen-h" role="tab-navigator"
+                        class="active">#{i18n.getText('Com_Company')}</a>
+                </li>
+                <!--H1-2-->
+                <li>
+                    <a href="#tabpanel-2" id="screen-k"  role="tab-navigator" data-bind="click: loadDataScreenK, visible: isUseageEmployment">#{i18n.getText('Com_Employment')}</a>
+                </li>
+            </ul>
+        </ui:define>
+
+        <ui:define name="sidebar-content">
+            <div id="tabpanel-1" role="tabpanel">
+                <ui:include src="../h/h_index.xhtml" />
+            </div> 
+            <div id="tabpanel-2" role="tabpanel">
+                <ui:include src="../h/k_index.xhtml" />
+            </div>
+        </ui:define>
+    </ui:composition>
+</body>
+
+</html>

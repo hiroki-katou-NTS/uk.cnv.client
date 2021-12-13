@@ -10,8 +10,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import nts.arc.layer.ws.WebService;
-import nts.uk.screen.com.app.command.sys.auth.role.CopyRoleCas005Command;
-import nts.uk.screen.com.app.command.sys.auth.role.CopyRoleCas005CommandHandler;
 import nts.uk.screen.com.app.command.sys.auth.role.CreateRoleCas005CmdHandler;
 import nts.uk.screen.com.app.command.sys.auth.role.DeleteRoleCas005Command;
 import nts.uk.screen.com.app.command.sys.auth.role.DeleteRoleCas005CommandHandler;
@@ -32,20 +30,6 @@ public class CAS005WebService extends WebService {
     @Inject
     private DeleteRoleCas005CommandHandler deleteRoleCas005CommandHandler;
     
-    @Inject
-    private CopyRoleCas005CommandHandler copyRoleCas005CommandHandler;
-    
-    /**
-     * copy role 
-     * @param command
-     * @return
-     */
-    @POST
-    @Path("copyrolecas005")
-    public void copyRoleCas005(CopyRoleCas005Command command) {
-        this.copyRoleCas005CommandHandler.handle(command);
-    }
-
     /**
      * add new role 
      * @param command

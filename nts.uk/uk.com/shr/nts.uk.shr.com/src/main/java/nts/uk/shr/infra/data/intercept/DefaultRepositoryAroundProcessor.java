@@ -1,11 +1,12 @@
 package nts.uk.shr.infra.data.intercept;
 
-import javax.ejb.Stateless;
-import javax.interceptor.InvocationContext;
-
 import nts.arc.layer.infra.data.intercept.RepositoryAroundProcessor;
 import nts.arc.layer.infra.data.log.RepositoryLogger;
 import nts.arc.validate.Validatable;
+import nts.gul.error.FatalLog;
+
+import javax.ejb.Stateless;
+import javax.interceptor.InvocationContext;
 
 @Stateless
 public class DefaultRepositoryAroundProcessor implements RepositoryAroundProcessor {
@@ -26,10 +27,27 @@ public class DefaultRepositoryAroundProcessor implements RepositoryAroundProcess
 		try {
 			return context.proceed();
 		} catch (Exception e) {
+			if (isConnectionError(e)) {
+				FatalLog.write(this, "データベースとの接続に障害が起きています。");
+			}
+
 			throw new RuntimeException(e);
 		} finally {
 			RepositoryLogger.exited();
 		}
+	}
+
+	private static boolean isConnectionError(Exception e) {
+		String message = e.getMessage();
+		if (message == null) {
+			return false;
+		}
+
+		boolean connectionError
+				= message.contains("Transaction cannot proceed: STATUS_MARKED_ROLLBACK")
+				|| message.contains("This connection has been closed")
+				|| message.contains("このコネクションは既にクローズされています");
+		return connectionError;
 	}
 
 	private void validateParameters(Object[] parameters) {

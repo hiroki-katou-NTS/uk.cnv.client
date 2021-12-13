@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.record.dom.workrecord.erroralarm.alarmlistworkplace.workplace.service;
 
 import nts.arc.time.GeneralDate;
+import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.YearMonthPeriod;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.alarmlistworkplace.extractresult.ExtractResultDto;
@@ -56,40 +57,34 @@ public class NoRefTimeCfmService {
         List<MonthlyWorkTimeSetWkp> monthTimeWpAll = monthlyWorkTimeSetRepo.findWorkplace(cid, workplaceIds);
 
         // 「Input．期間．開始日．年」から「Input．期間．終了日．年」までループする。
-        int startYear = ymPeriod.start().year();
-        int endYear = ymPeriod.end().year();
-        while (startYear <= endYear) {
+        YearMonth startYm = ymPeriod.start();
+        YearMonth endYm = ymPeriod.end();
+        while (startYm.lessThanOrEqualTo(endYm)) {
             // Input．List＜職場ID＞をループする
             for (String workplaceId : workplaceIds) {
                 // 担当の「職場別月単位労働時間」を絞り込む
-                int year = startYear;
-                List<MonthlyWorkTimeSetWkp> monthTimeWps = monthTimeWpAll.stream().filter(x -> x.getWorkplaceId().equals(workplaceId)
-                        && x.getYm().year() == year).collect(Collectors.toList());
+                YearMonth loopYm = startYm;
+                List<MonthlyWorkTimeSetWkp> monthTimeWps = monthTimeWpAll.stream()
+                        .filter(x -> x.getWorkplaceId().equals(workplaceId) && x.getYm().equals(loopYm))
+                        .collect(Collectors.toList());
 
                 if (CollectionUtil.isEmpty(monthTimeWps)) {
-                    // 職場IDから職場の情報をすべて取得する
-                    List<WorkplaceInfor> wpInfos = workplaceConfigInfoAdapter.getWorkplaceInforByWkpIds(cid,
-                            Collections.singletonList(workplaceId), GeneralDate.ymd(startYear, ymPeriod.start().month(), 1));
-                    String wpCode = "";
-                    if (!CollectionUtil.isEmpty(wpInfos)) {
-                        wpCode = wpInfos.get(0).getWorkplaceCode();
-                    }
-
                     // 「アラーム値メッセージ」を作成します。
-                    String message = TextResource.localize("KAL020_200", String.valueOf(startYear));
+                    String message = TextResource.localize("KAL020_200", (loopYm.year() + "/" + String.format("%02d", loopYm.month())));
 
                     // ドメインオブジェクト「抽出結果」を作成してリスト「抽出結果」に追加
-                    ExtractResultDto result = new ExtractResultDto(new AlarmValueMessage(message),
-                            new AlarmValueDate(String.valueOf(startYear), Optional.empty()),
+                    ExtractResultDto result = new ExtractResultDto(
+                            new AlarmValueMessage(message),
+                            new AlarmValueDate(loopYm.toString(), Optional.empty()),
                             workplaceCheckName.v(),
-                            Optional.ofNullable(TextResource.localize("KAL020_208", String.valueOf(startYear))),
+                            Optional.of(TextResource.localize(message)),
                             Optional.of(new MessageDisplay(displayMessage.v())),
                             workplaceId
                     );
                     results.add(result);
                 }
             }
-            startYear++;
+            startYm = startYm.addMonths(1);
         }
 
         // リスト「抽出結果」を返す。

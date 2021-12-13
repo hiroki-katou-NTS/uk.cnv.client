@@ -45,6 +45,7 @@ public class RCApplicationCancellationProcess {
 				// 事前チェック処理
 				PreCheckProcessResult preCheck = PreCheckProcessWorkRecord.preCheck(require, cid, app, closureId, false,
 						statusWorkRecord, date, Arrays.asList(new SEmpHistImport(empHist.getEmployeeId(), empHist.getEmploymentCode(), "", empHist.getPeriod())));
+
 				if (preCheck.getProcessFlag() == NotUseAtr.NOT_USE) {
 					return new RCCancelProcessOneDayOutput(preCheck.getReflectStatus(), Optional.empty(), AtomTask.none());
 				}

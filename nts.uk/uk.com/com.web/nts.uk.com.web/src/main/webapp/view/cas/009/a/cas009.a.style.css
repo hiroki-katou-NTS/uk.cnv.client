@@ -7,27 +7,12 @@
 	padding-left: 4px;
 }
 
-#list_role {
-	margin-top: 10px;
-	border-radius: 7px;
-	padding: 20px;
-	box-sizing: border-box;
-}
-
 #right-content {
 	padding: 25px 0 0 25px;
 	float: left;
 	width: calc(100% - 550px);
 }
 
-.control-group td {
-	padding-bottom: 10px;
-}
-
-table.control-group {
-	min-width: 570px;
-}
-
-#roleName {
-  width: 200px !important;
+#right-content .form-label {
+	width: 160px;
 }

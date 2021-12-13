@@ -158,7 +158,7 @@ public class JpaShiftPaletteOrgRepository extends JpaRepository implements Shift
 										}).collect(Collectors.toList());
 								return new KscmtPaletteOrgCombi(combiPk, positionName, null, cmpCombiDtls);
 							}).collect(Collectors.toList());
-					return new KscmtPaletteOrg(pk, pageName, useAtr ? 1 : 0, note, cmpCombis);
+					return new KscmtPaletteOrg(pk, pageName, useAtr, note, cmpCombis);
 				}).collect(Collectors.toList());
 	}
 

@@ -30,7 +30,7 @@ public interface WorkplacePub {
 	 * @return
 	 */
 	public List<WorkplaceInforExport> getWorkplaceInforByWkpIds(String companyId, List<String> listWorkplaceId,
-			GeneralDate baseDate);
+                                                                GeneralDate baseDate);
 
 	/**
 	 * [No.561]過去の職場の情報を取得する
@@ -41,7 +41,7 @@ public interface WorkplacePub {
 	 * @return
 	 */
 	public List<WorkplaceInforExport> getPastWorkplaceInfor(String companyId, String historyId,
-			List<String> listWorkplaceId);
+                                                            List<String> listWorkplaceId);
 
 	/**
 	 * [No.567]職場の下位職場を取得する

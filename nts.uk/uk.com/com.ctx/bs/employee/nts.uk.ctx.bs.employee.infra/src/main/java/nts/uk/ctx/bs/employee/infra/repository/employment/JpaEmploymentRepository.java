@@ -107,6 +107,8 @@ public class JpaEmploymentRepository extends JpaRepository implements Employment
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@Override
 	public List<Employment> findByEmpCodes(String companyId, List<String> empCodes) {
+    	if(empCodes.isEmpty())
+    		return new ArrayList<>();
 		// Get entity manager
 		EntityManager em = this.getEntityManager();
 		CriteriaBuilder cb = em.getCriteriaBuilder();

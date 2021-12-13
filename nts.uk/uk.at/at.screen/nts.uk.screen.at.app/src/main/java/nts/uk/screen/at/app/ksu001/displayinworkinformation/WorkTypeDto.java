@@ -4,6 +4,7 @@
  *****************************************************************/
 package nts.uk.screen.at.app.ksu001.displayinworkinformation;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
@@ -15,6 +16,7 @@ import nts.uk.ctx.at.shared.dom.worktype.WorkType;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class WorkTypeDto {
 
 	/* 勤務種類コード */

@@ -35,6 +35,7 @@ import nts.uk.ctx.sys.assist.dom.storage.TargetCategoryRepository;
 import nts.uk.ctx.sys.assist.dom.storage.TargetEmployees;
 import nts.uk.ctx.sys.assist.dom.storage.TargetEmployeesRepository;
 import nts.uk.shr.com.context.AppContexts;
+import nts.uk.shr.infra.file.storage.stream.FileStoragePath;
 
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 @Stateless
@@ -168,7 +169,7 @@ public class AutoExecutionPreparationPubImpl implements AutoExecutionPreparation
 				// Since ManualSetDeletionService will return an error in format of NoSuchFileException
 				// even when deletion is successful
 				// so check if this is truly error or not
-				String storePath = String.format("%s\\%s", ServerSystemProperties.fileStoragePath(), taskId);
+				String storePath = String.format("%s\\%s", new FileStoragePath().getPathOfCurrentTenant().toString(), taskId);
 				String msg = optInfo.get().getError().getMessage();
 				if (!storePath.equals(msg)) {
 					return Optional.of(msg);

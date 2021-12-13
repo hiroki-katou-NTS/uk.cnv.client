@@ -6,6 +6,8 @@ package nts.uk.ctx.at.record.dom.workrecord.stampmanagement.support;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.val;
+import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.createdailyoneday.imprint.reflect.StartAtr;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.OuenWorkTimeSheetOfDailyAttendance;
 import nts.uk.shr.com.time.TimeWithDayAttr;
 
@@ -23,11 +25,8 @@ public class GetSupportDataJudgedSameDS {
 	 * @param targetSupportData 対象応援データ	
 	 * @param isStart 開始区分
 	 */
-	public static Optional<OuenWorkTimeSheetOfDailyAttendance> getSupportDataJudgedSame(
-			Required required, 
-			List<OuenWorkTimeSheetOfDailyAttendance> supportDataList,
-			OuenWorkTimeSheetOfDailyAttendance targetSupportData,
-			boolean isStart) {
+	public static Optional<OuenWorkTimeSheetOfDailyAttendance> getSupportDataJudgedSame(Required required, 
+			List<OuenWorkTimeSheetOfDailyAttendance> supportDataList, TimeWithDayAttr targetSupportTime, StartAtr isStart) {
 		
 		// 「応援の同一打刻の判断基準」を取得する		
 		JudgmentCriteriaSameStampOfSupport jcSameStampOfSupport = required.getCriteriaSameStampOfSupport();
@@ -35,36 +34,31 @@ public class GetSupportDataJudgedSameDS {
 		if(jcSameStampOfSupport == null)
 			return Optional.empty();
 		
-		OuenWorkTimeSheetOfDailyAttendance resultCheck = null;
-		
 		// 応援データ一覧をループする
 		for (OuenWorkTimeSheetOfDailyAttendance supportData : supportDataList) {
+			
+			val standardStampStart = supportData.getTimeSheet().getStart().flatMap(c -> c.getTimeWithDay()).orElse(null);
+			
 			// 開始区分を確認する
-			if (isStart && supportData.getTimeSheet().getStart().isPresent() && supportData.getTimeSheet().getStart().get().getTimeWithDay().isPresent()) {
+			if (isStart == StartAtr.START_OF_SUPPORT && standardStampStart != null) {
 				// 同一と認識すべきの打刻か
-				TimeWithDayAttr standardStampStart = supportData.getTimeSheet().getStart().get().getTimeWithDay().get();
-				TimeWithDayAttr targetStampStart = targetSupportData.getTimeSheet().getStart().get().getTimeWithDay().get();
-				boolean check = jcSameStampOfSupport.checkStampRecognizedAsSame(standardStampStart, targetStampStart);
-				if (check) {
-					resultCheck = supportData;
-					break;
+				if (jcSameStampOfSupport.checkStampRecognizedAsSame(standardStampStart, targetSupportTime)) {
+					
+					// 処理中の応援データを返す
+					return Optional.ofNullable(supportData);
 				}
 			} 
-			if (!isStart && supportData.getTimeSheet().getEnd().isPresent() && supportData.getTimeSheet().getEnd().get().getTimeWithDay().isPresent()) {
+			
+			val standardStampEnd = supportData.getTimeSheet().getEnd().flatMap(c -> c.getTimeWithDay()).orElse(null);
+			
+			if (isStart == StartAtr.END_OF_SUPPORT && standardStampEnd != null) {
 				// 同一と認識すべきの打刻か
-				TimeWithDayAttr standardStampEnd = supportData.getTimeSheet().getEnd().get().getTimeWithDay().get();
-				TimeWithDayAttr targetStampEnd = targetSupportData.getTimeSheet().getEnd().get().getTimeWithDay().get();
-				boolean check = jcSameStampOfSupport.checkStampRecognizedAsSame(standardStampEnd, targetStampEnd);
-				if (check) {
-					resultCheck = supportData;
-					break;
+				if (jcSameStampOfSupport.checkStampRecognizedAsSame(standardStampEnd, targetSupportTime)) {
+
+					// 処理中の応援データを返す
+					return Optional.ofNullable(supportData);
 				}
 			}
-		}
-		
-		if(resultCheck != null){
-			// 処理中の応援データを返す
-			return Optional.of(resultCheck);
 		}
 		
 		// Emptyを返す

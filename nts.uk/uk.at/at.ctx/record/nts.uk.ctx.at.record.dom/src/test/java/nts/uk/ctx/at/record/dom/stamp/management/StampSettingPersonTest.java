@@ -1,45 +1,35 @@
 package nts.uk.ctx.at.record.dom.stamp.management;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import lombok.experimental.var;
-import mockit.Expectations;
-import mockit.Injectable;
 import mockit.integration.junit4.JMockit;
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.testing.assertion.NtsAssert;
-import nts.uk.ctx.at.record.dom.stamp.management.StampSettingPersonHelper.Layout;
-import nts.uk.ctx.at.record.dom.stamp.management.StampSettingPersonHelper.Layout.Button;
-import nts.uk.ctx.at.record.dom.stamp.management.StampSettingPersonHelper.Layout.Comment;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.StampFunctionAvailableService.Require;
+import nts.uk.ctx.at.record.dom.stamp.management.StampSettingPersonHelper.StampScreen;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.AssignmentMethod;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.AudioType;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonDisSet;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonLayoutType;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonName;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonNameSet;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonPositionNo;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonSettings;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonType;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.PageComment;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeCalArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.PageNo;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ReservationArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.SetPreClockArt;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampButton;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampPageComment;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampPageLayout;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampPageName;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampSettingPerson;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampType;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.SupportWplSet;
 import nts.uk.ctx.at.shared.dom.common.color.ColorCode;
+import nts.uk.ctx.at.shared.dom.workrule.goingout.GoingOutReason;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
-import nts.uk.ctx.at.record.dom.stamp.management.StampSettingPersonHelper.StampScreen;
 
 /**
  * 
@@ -117,15 +107,23 @@ public class StampSettingPersonTest {
 	public void testNotNull() {
 		StampSettingPerson settingPerson = StampSettingPersonHelper.settingPerson1();
 		
+		StampType stampType = new StampType(
+				true, 
+				EnumAdaptor.valueOf(0, GoingOutReason.class), 
+				EnumAdaptor.valueOf(0, SetPreClockArt.class),
+				EnumAdaptor.valueOf(1, ChangeClockAtr.class),
+				EnumAdaptor.valueOf(0, ChangeCalArt.class));
+		
 		Optional<ButtonSettings> stambutton = settingPerson
 				.getButtonSet(new StampButton(new PageNo(1), new ButtonPositionNo(0)));
 		
 		Optional<ButtonSettings> buttonSettings = Optional.of(new ButtonSettings(new ButtonPositionNo(1),
-				new ButtonDisSet(new ButtonNameSet(new ColorCode("DUMMY"), new ButtonName("DUMMY")), new ColorCode("DUMMY")),
-				new ButtonType(ReservationArt.RESERVATION, null),
 				NotUseAtr.USE,
+				new ButtonDisSet(new ButtonNameSet(new ColorCode("DUMMY"), new ButtonName("DUMMY")), new ColorCode("DUMMY")),
+				stampType,
 				AudioType.GOOD_MORNING,
-				Optional.of(SupportWplSet.USE_THE_STAMPED_WORKPLACE)));
+				Optional.of(SupportWplSet.USE_THE_STAMPED_WORKPLACE),
+				Optional.of(AssignmentMethod.SELECT_AT_THE_TIME_OF_STAMPING)));
 		
 		assertThat(stambutton).isNotEqualTo(buttonSettings);
 

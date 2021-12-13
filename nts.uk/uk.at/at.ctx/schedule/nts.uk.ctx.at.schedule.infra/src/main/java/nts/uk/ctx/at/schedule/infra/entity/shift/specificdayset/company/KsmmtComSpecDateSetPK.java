@@ -19,7 +19,7 @@ public class KsmmtComSpecDateSetPK implements Serializable{
 	@Column(name = "CID")
 	public String companyId;
 
-	@Column(name = "SPECIFIC_DATE")
+	@Column(name = "YMD")
 	public GeneralDate specificDate;
 
 	@Column(name = "SPECIFIC_DATE_ITEM_NO")

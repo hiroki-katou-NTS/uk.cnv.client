@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+	<ui:composition template="/master/base.xhtml">
+		<ui:define name="htmlHead">
+			<com:scriptfile set="IGNITE" />
+			<com:stylefile path="cps018.a.main.css" />
+			<com:scriptfile path="cps018.a.start.js" />
+			<com:scriptfile path="cps018.a.vm.js" />
+			<com:scriptfile path="cps018.a.service.js" />
+		</ui:define>
+
+		<ui:define name="content">
+			<!-- <div id="functions-area">
+				<button id="A1" tabindex="1">#{i18n.getText('CPS018_3')}</button>
+			</div> -->
+			<div id="contents-area">
+				<div style="max-width: 1280px">
+					<div id="A2_1" class="panel panel-frame">
+						<div id="A2_2" class="label">#{i18n.getText('CPS018_4')}</div>
+					</div>
+					<div class="flex-containter">
+						<div class="common-column">
+							<div id="A3" class="panel panel-frame">
+								<div id="A3_1"
+									class="panel panel-gray-bg panel-custom-header">#{i18n.getText('CPS018_5')}</div>
+
+								<div id="A3_2" class="label label-description">#{i18n.getText('CPS018_6')}</div>
+								<div class="btn-redirect-container">
+									<button class="btn-redirect" id="A3_3" tabindex="2" data-bind="click: openCAS001">#{i18n.getText('CPS018_7')}</button>
+									<span class="caret-right"></span>
+								</div>
+							</div>
+						</div>
+						<div class="common-column">
+							<div id="A4" class="panel panel-frame">
+								<div id="A4_1"
+									class="panel panel-gray-bg panel-custom-header">#{i18n.getText('CPS018_8')}</div>
+
+								<div id="A4_2" class="label label-description">#{i18n.getText('CPS018_9')}</div>
+								<div class="btn-redirect-container">
+									<button class="btn-redirect" id="A4_3" tabindex="3" data-bind="click: openCPS007">#{i18n.getText('CPS018_10')}</button>
+									<span class="caret-right"></span>
+								</div>
+
+								<div id="A4_4" class="label label-description">#{i18n.getText('CPS018_11')}</div>
+								<div class="btn-redirect-container">
+									<button class="btn-redirect" id="A4_5" tabindex="4" data-bind="click: openCPS009">#{i18n.getText('CPS018_12')}</button>
+									<span class="caret-right"></span>
+								</div>
+
+								<div id="A4_6" class="label label-description">#{i18n.getText('CPS018_13')}</div>
+								<div class="btn-redirect-container">
+									<button class="btn-redirect" id="A4_7" tabindex="5" data-bind="click: openCPS002">#{i18n.getText('CPS018_14')}</button>
+									<span class="caret-right"></span>
+								</div>
+							</div>
+						</div>
+						<div class="common-column">
+							<div id="A5" class="panel panel-frame">
+								<div id="A5_1"
+									class="panel panel-gray-bg panel-custom-header">#{i18n.getText('CPS018_15')}</div>
+
+								<div id="A5_2" class="label label-description">#{i18n.getText('CPS018_16')}</div>
+								<div class="btn-redirect-container">
+									<button class="btn-redirect" id="A5_3" tabindex="6" data-bind="click: openCPS008">#{i18n.getText('CPS018_17')}</button>
+									<span class="caret-right"></span>
+								</div>
+
+								<div id="A5_4" class="label label-description">#{i18n.getText('CPS018_18')}</div>
+								<div class="btn-redirect-container">
+									<button class="btn-redirect" id="A5_5" tabindex="7" data-bind="click: openCPS001">#{i18n.getText('CPS018_19')}</button>
+									<span class="caret-right"></span>
+								</div>
+							</div>
+						</div>
+						<div class="common-column">
+							<div id="A6" class="panel panel-frame">
+								<div id="A6_1"
+									class="panel panel-gray-bg panel-custom-header">#{i18n.getText('CPS018_20')}</div>
+
+								<div id="A6_2" class="label label-description">#{i18n.getText('CPS018_21')}</div>
+								<div class="btn-redirect-container">
+									<button class="btn-redirect" id="A6_3" tabindex="8" data-bind="click: openCPS003">#{i18n.getText('CPS018_22')}</button>
+									<span class="caret-right"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

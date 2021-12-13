@@ -9,9 +9,6 @@ import nts.uk.ctx.at.shared.infra.entity.holidaysetting.configuration.KshmtHdpub
  */
 public class JpaForwardSettingOfPublicHolidayGetMemento implements ForwardSettingOfPublicHolidayGetMemento {
 	
-	/** The Constant TRUE_VALUE. */
-	private static final int TRUE_VALUE = 1;
-	
 	/** The kshmt forward set of public hd. */
 	private KshmtHdpubForwardSet kshmtForwardSetOfPublicHd;
 	
@@ -37,10 +34,7 @@ public class JpaForwardSettingOfPublicHolidayGetMemento implements ForwardSettin
 	 */
 	@Override
 	public boolean getIsTransferWhenPublicHdIsMinus() {
-		if (this.kshmtForwardSetOfPublicHd.getIsPublicHdMinus() == TRUE_VALUE){
-			return true;
-		}
-		return false;
+		return this.kshmtForwardSetOfPublicHd.isPublicHdMinus();
 	}
 
 	/* (non-Javadoc)

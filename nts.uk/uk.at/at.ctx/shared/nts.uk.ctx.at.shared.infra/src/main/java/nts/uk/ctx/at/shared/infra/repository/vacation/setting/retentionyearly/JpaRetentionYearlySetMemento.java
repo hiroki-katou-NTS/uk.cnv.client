@@ -4,6 +4,8 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.infra.repository.vacation.setting.retentionyearly;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.RetentionYearlySettingSetMemento;
 import nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.UpperLimitSetting;
@@ -51,27 +53,11 @@ public class JpaRetentionYearlySetMemento implements RetentionYearlySettingSetMe
 	/*
 	 * (non-Javadoc)
 	 * @see nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.
-	 * RetentionYearlySettingSetMemento#
-	 * setcanAddToCumulationYearlyAsNormalWorkDay(java.lang.Boolean)
-	 */
-	@Override
-	public void setLeaveAsWorkDays(Boolean leaveAsWorkDays) {
-		if(leaveAsWorkDays) {
-			this.typeValue.setLeaveAsWorkDays((short) 1);
-		}
-		else {
-			this.typeValue.setLeaveAsWorkDays((short) 0);
-		}		
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.
 	 * RetentionYearlySettingSetMemento#setManagementCategory
 	 * (nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct)
 	 */
 	@Override
 	public void setManagementCategory(ManageDistinct managementCategory) {
-		this.typeValue.setManagementYearlyAtr((short) managementCategory.value);		
+		this.typeValue.setManagementYearlyAtr(BooleanUtils.toBoolean(managementCategory.value));		
 	}
 }

@@ -46,10 +46,6 @@ public class KshmtHdpaidSetMng extends ContractUkJpaEntity implements Serializab
     @Column(name = "HALF_MAX_UNIFORM_COMP")
     private Integer halfMaxUniformComp;
 
-    /**年休を出勤日数として加算する */
-    @Column(name = "IS_WORK_DAY_CAL")
-    private Integer isWorkDayCal;
-
     /** 保持年数 */
     @Column(name = "RETENTION_YEAR")
     private Integer retentionYear;

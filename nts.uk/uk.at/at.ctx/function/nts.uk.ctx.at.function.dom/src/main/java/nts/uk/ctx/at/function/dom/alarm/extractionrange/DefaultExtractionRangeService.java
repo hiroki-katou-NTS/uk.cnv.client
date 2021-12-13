@@ -302,13 +302,8 @@ public class DefaultExtractionRangeService implements ExtractionRangeService {
 					startMonthly = targetYearMonth;
 				} else {
 					// 固定月度．年の種類　＝　本年度の場合
-					// 固定月度．指定月　＜　４　の場合　開始月の年　＝　システム日付．年　－　1
-					if (fixMonNo < 4) {
-						startMonthly = targetYearMonth.addYears(-1);
-					} else {
-						// 固定月度．指定月　＞＝　４の場合　開始月の年　＝　システム日付．年
-						startMonthly = targetYearMonth;
-					}
+					// 開始月の年　＝　Input．処理月．年　　＃117102
+					startMonthly = YearMonth.of(yearMonth.year(), fixMonNo);
 				}
 			}
 		} else {

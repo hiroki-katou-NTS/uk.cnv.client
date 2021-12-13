@@ -115,18 +115,7 @@ public class ViewContextCloud extends UIComponentBase {
 	}
 
 	private String getHtmlToLoadResources() {
-		I18NResourcesForUK i18n = CDI.current().select(I18NResourcesForUK.class).get();
-
-		String companyId = DefaultSettingKeys.COMPANY_ID;
-		String languageId = LanguageConsts.DEFAULT_LANGUAGE_ID;
-		if (AppContexts.user().hasLoggedIn()) {
-			companyId = AppContexts.user().companyId();
-			languageId = AppContexts.user().language().basicLanguageId();
-		}
-		String systemId = "COM";
-		String version = i18n.getVersionOfCurrentCompany();
-		String companyVersion = createEtagString(companyId, languageId, systemId, version);
-		return "<script src=\"/nts.uk.com.web/webapi/i18n/resources/screen?v=" + companyVersion + "\"></script>";
+		return "";
 	}
 
 	private String createEtagString(String companyId, String languageId, String systemId, String version) {

@@ -68,7 +68,7 @@ public class EnterStampFromPortalService {
 		// return 社員の打刻データを作成する#作成する(require, 契約コード, 社員ID, NULLL, 打刻日時, $打刻する方法,
 		// $ボタン詳細設定.ボタン種類, 実績への反映内容, NULL)
 		return CreateStampDataForEmployeesService.create(require, cid, contractCode, employeeID, Optional.ofNullable(null),
-				stampDatetime, relieve, settingButton.get().getButtonType(), refActualResults,
+				stampDatetime, relieve, settingButton.get().getType(), refActualResults,
 				Optional.ofNullable(null));
 	}
 

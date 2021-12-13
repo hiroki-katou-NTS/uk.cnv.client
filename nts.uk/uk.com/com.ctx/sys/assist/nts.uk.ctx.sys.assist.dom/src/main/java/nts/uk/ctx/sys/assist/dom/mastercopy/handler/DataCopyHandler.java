@@ -1,5 +1,7 @@
 package nts.uk.ctx.sys.assist.dom.mastercopy.handler;
 
+import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -158,22 +160,10 @@ public class DataCopyHandler {
 
                 String insertQueryString = "";
                 for (int i = 0; i < sourceSize; i++) {
+
                     Object[] rowData = (Object[]) sourceObjects.get(i);
 
-                    if (i == 0) {
-                        StringJoiner joiner = new StringJoiner(",");
-                        for (int j = SOURCE_START_COLUMN; j < rowData.length - keyCheck; j++) {
-                            joiner.add("?");
-                        }
-                        insertQueryString = "INSERT INTO " + this.tableName + " VALUES (" + joiner.toString() + ")";
-                    }
-
-                    if (StringUtils.isEmpty(insertQueryString)) {
-                    	continue;
-                    }
-                    
-                    Query iq = this.entityManager.createNativeQuery(insertQueryString);
-                    // Run insert query
+                    StringJoiner joiner = new StringJoiner(",");
                     for (int k = SOURCE_START_COLUMN; k < rowData.length - keyCheck; k++) {
                         if (rowData[SOURCE_COLUMN_CID].equals(rowData[k])) {
                             rowData[k] = companyId;
@@ -196,15 +186,41 @@ public class DataCopyHandler {
                                 }
                             }
                         }
-                        iq.setParameter(k - QUERY_PARAM_START_INDEX, rowData[k]);
+                        joiner.add(param(rowData[k]));
                     }
+
+                    insertQueryString = "INSERT INTO " + this.tableName + " VALUES (" + joiner.toString() + ")";
+
+                    if (StringUtils.isEmpty(insertQueryString)) {
+                    	continue;
+                    }
+
+                    Query iq = this.entityManager.createNativeQuery(insertQueryString);
                     iq.executeUpdate();
-                    
                 }
 
             default:
                 break;
         }
+    }
+
+    private static String param(Object value) {
+
+        if (value == null) {
+            return "null";
+        }
+
+        Class<?> type = value.getClass();
+
+        if (type == String.class) {
+            return "'" + value + "'";
+        }
+
+        if (type == Timestamp.class || type == Date.class) {
+            return "'" + value + "'";
+        }
+
+        return "" + value;
     }
 
     public static final class DataCopyHandlerBuilder {

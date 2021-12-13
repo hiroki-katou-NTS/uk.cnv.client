@@ -1,7 +1,6 @@
 package nts.uk.ctx.at.shared.infra.entity.monthlyattendanceitemused;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +11,9 @@ import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import nts.uk.shr.infra.data.entity.UkJpaEntity;
 import nts.uk.ctx.at.shared.dom.monthlyattditem.FormCanUsedForTime;
 import nts.uk.ctx.at.shared.dom.monthlyattditem.MonthlyAttendanceItemUsed;
+import nts.uk.shr.infra.data.entity.UkJpaEntity;
 
 @Data
 @Entity
@@ -35,25 +34,25 @@ public class KfnctAtdIdRptMon extends UkJpaEntity implements MonthlyAttendanceIt
 	private String contractCd;
 	
 	@Column(name = "WORK_ATTENDANCE")
-	private BigDecimal workAttendance;
+	private boolean workAttendance;
 	
 	@Column(name = "WORK_MONTHLY")
-	private BigDecimal workMonthly;
+	private boolean workMonthly;
 	
 	@Column(name = "WORK_YEARLY_ATD")
-	private BigDecimal workYearlyAtd;
+	private boolean workYearlyAtd;
 	
 	@Column(name = "WORK_PERIOD")
-	private BigDecimal workPeriod;
+	private boolean workPeriod;
 	
 	@Column(name = "ATD_WORK_ATTENDANCE")
-	private BigDecimal atdWorkAttendance;
+	private boolean atdWorkAttendance;
 	
 	@Column(name = "ATD_WORK_YEARLY")
-	private BigDecimal atdWorkYearly;
+	private boolean atdWorkYearly;
 
 	@Column(name = "WORK_YEARLY_36")
-	private BigDecimal workYearly36;
+	private boolean workYearly36;
 	
 	
 	@Override
@@ -79,35 +78,35 @@ public class KfnctAtdIdRptMon extends UkJpaEntity implements MonthlyAttendanceIt
 
 	@Override
 	public void setFormCanUsedForTimes(List<FormCanUsedForTime> forms) {
-		this.setWorkAttendance(BigDecimal.valueOf(0));
-		this.setWorkMonthly(BigDecimal.valueOf(0));
-		this.setWorkYearlyAtd(BigDecimal.valueOf(0));
-		this.setWorkPeriod(BigDecimal.valueOf(0));
-		this.setAtdWorkAttendance(BigDecimal.valueOf(0));
-		this.setAtdWorkYearly(BigDecimal.valueOf(0));
-		this.setWorkYearly36(BigDecimal.valueOf(0));
+		this.setWorkAttendance(false);
+		this.setWorkMonthly(false);
+		this.setWorkYearlyAtd(false);
+		this.setWorkPeriod(false);
+		this.setAtdWorkAttendance(false);
+		this.setAtdWorkYearly(false);
+		this.setWorkYearly36(false);
 		for (FormCanUsedForTime form : forms) {
 			switch (form) {
 				case ATTENDANCE_BOOK:
-					this.setWorkAttendance(BigDecimal.valueOf(1));
+					this.setWorkAttendance(true);
 					break;
 				case MONTHLY_WORK_SCHEDULE:
-					this.setWorkMonthly(BigDecimal.valueOf(1));
+					this.setWorkMonthly(true);
 					break;
 				case ANNUAL_WORK_SCHEDULE:
-					this.setWorkYearlyAtd(BigDecimal.valueOf(1));
+					this.setWorkYearlyAtd(true);
 					break;
 				case OPTIONAL_PERIOD_SCHEDULE:
-					this.setWorkPeriod(BigDecimal.valueOf(1));
+					this.setWorkPeriod(true);
 					break;
 				case ANNUAL_WORK_LEDGER:
-					this.setAtdWorkAttendance(BigDecimal.valueOf(1));
+					this.setAtdWorkAttendance(true);
 					break;
 				case WORKBOOK:
-					this.setAtdWorkYearly(BigDecimal.valueOf(1));
+					this.setAtdWorkYearly(true);
 					break;
 				case ANNUAL_ROSTER_36_AGREEMENT:
-					this.setWorkYearly36(BigDecimal.valueOf(1));
+					this.setWorkYearly36(true);
 					break;
 				default:
 					break;
@@ -128,31 +127,31 @@ public class KfnctAtdIdRptMon extends UkJpaEntity implements MonthlyAttendanceIt
 	@Override
 	public List<FormCanUsedForTime> getFormCanUsedForTimes() {
 		List<FormCanUsedForTime> canUsedForTimes = new ArrayList<FormCanUsedForTime>();
-		if (this.getWorkAttendance().intValue() == 1) {
+		if (this.workAttendance) {
 			canUsedForTimes.add(FormCanUsedForTime.ATTENDANCE_BOOK);
 		}
 
-		if (this.workMonthly.intValue() == 1) {
+		if (this.workMonthly) {
 			canUsedForTimes.add(FormCanUsedForTime.MONTHLY_WORK_SCHEDULE);
 		}
 
-		if (this.workYearlyAtd.intValue() == 1) {
+		if (this.workYearlyAtd) {
 			canUsedForTimes.add(FormCanUsedForTime.ANNUAL_WORK_SCHEDULE);
 		}
 
-		if (this.workPeriod.intValue() == 1) {
+		if (this.workPeriod) {
 			canUsedForTimes.add(FormCanUsedForTime.OPTIONAL_PERIOD_SCHEDULE);
 		}
 
-		if (this.atdWorkAttendance.intValue() == 1) {
+		if (this.atdWorkAttendance) {
 			canUsedForTimes.add(FormCanUsedForTime.ANNUAL_WORK_LEDGER);
 		}
 
-		if (this.atdWorkYearly.intValue() == 1) {
+		if (this.atdWorkYearly) {
 			canUsedForTimes.add(FormCanUsedForTime.WORKBOOK);
 		}
 
-		if (this.workYearly36.intValue() == 1) {
+		if (this.workYearly36) {
 			canUsedForTimes.add(FormCanUsedForTime.ANNUAL_ROSTER_36_AGREEMENT);
 		}
 

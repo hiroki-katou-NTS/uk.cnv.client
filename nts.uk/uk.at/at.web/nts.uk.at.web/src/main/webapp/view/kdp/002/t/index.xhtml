@@ -29,7 +29,8 @@
         <div id="contents-area">
           <div class="label-title" style="margin-bottom: 5px">
             <label
-              class="basic-label" 
+              class="basic-label"
+              style="color: #C6C6D1" 
               data-bind="text: errorDateStr"
             ></label>
           </div>
@@ -43,7 +44,7 @@
           
             <div id="label-title-2">
               <com:ko-if bind="dataShare.listRequired.length > 0 ">
-                <label class="basic-label">#{i18n.getText('KDP002_95')}</label>
+                <label class="basic-label" style="color: #C6C6D1">#{i18n.getText('KDP002_95')}</label>
               </com:ko-if>
             </div>
           <!-- <com:ko-if bind="dataShare.listRequired.length < 7 ">

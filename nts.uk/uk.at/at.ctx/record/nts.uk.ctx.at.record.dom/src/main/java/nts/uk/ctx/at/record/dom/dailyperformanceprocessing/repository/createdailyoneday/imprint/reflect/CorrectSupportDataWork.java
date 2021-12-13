@@ -6,6 +6,7 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingWork;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkLocationCD;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.algorithmdailyper.EndStatus;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.algorithmdailyper.OutputTimeReflectForWorkinfo;
@@ -102,8 +103,7 @@ public class CorrectSupportDataWork {
 					StartAtr.START_OF_SUPPORT,
 					leavingWork.get().getAttendanceStamp().get().getStamp().isPresent() ?
 							leavingWork.get().getAttendanceStamp().get().getStamp().get().getTimeDay() : null, 
-					Optional.empty(),
-					Optional.empty());
+					Optional.empty(), Optional.empty(), Optional.empty());
 			workReflection.supportWorkReflect(cid, param, integrationOfDaily, stampReflectRangeOutput);
 			// 「反映状態＝反映済み」を返す
 			return ReflectionAtr.REFLECTED;
@@ -117,7 +117,7 @@ public class CorrectSupportDataWork {
 						StartAtr.END_OF_SUPPORT, 
 						leavingWork.get().getLeaveStamp().get().getStamp().isPresent() ? 
 								leavingWork.get().getLeaveStamp().get().getStamp().get().getTimeDay() : null,
-						Optional.empty(), Optional.empty()); // TODO
+						Optional.empty(), Optional.empty(), Optional.empty()); // TODO
 				workReflection.supportWorkReflect(cid, param, integrationOfDaily, stampReflectRangeOutput);
 				// 「反映状態＝反映済み」を返す
 				return ReflectionAtr.REFLECTED;

@@ -43,10 +43,15 @@ module nts.uk.com.view.cps009.a.viewmodel {
         currentItemId: KnockoutObservable<string> = ko.observable('');
         errorList: KnockoutObservableArray<any> = ko.observableArray([]);
         dataSourceFilter: Array<any> = [];
+        isFromCPS018: KnockoutObservable<boolean> = ko.observable(false);
 
         constructor() {
 
             let self = this;
+
+            let params = getShared("CPS009A_PARAMS") || { isFromCPS018: false };
+            self.isFromCPS018(params.isFromCPS018);
+            nts.uk.sessionStorage.removeItem(nts.uk.request.STORAGE_KEY_TRANSFER_DATA);
             
             self.initValue();
             self.start(undefined);

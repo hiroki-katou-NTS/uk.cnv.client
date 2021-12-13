@@ -4,6 +4,7 @@ import java.util.List;
 
 import nts.uk.ctx.bs.employee.pub.employee.EmployeeBasicInfoExport;
 import nts.uk.ctx.bs.employee.pub.employee.export.dto.PersonEmpBasicInfoDto;
+//import nts.uk.ctx.bs.employee.pub.employee.export.dto.PersonEmployeeInfoDto;
 
 public interface PersonEmpBasicInfoPub {
 
@@ -19,4 +20,9 @@ public interface PersonEmpBasicInfoPub {
 	List<PersonEmpBasicInfoDto> getPerEmpBasicInfo(List<String> employeeIds);
 
 	List<PersonEmpBasicInfoDto> getEmpBasicInfo(String companyId, List<String> employeeIds);
+
+	//List<PersonEmployeeInfoDto> getEmployeesMatchingName(List<String> pid, String companyId);
+
+	// Pub get all Sid
+	List<String> getAllSidByCid(String cid);
 }

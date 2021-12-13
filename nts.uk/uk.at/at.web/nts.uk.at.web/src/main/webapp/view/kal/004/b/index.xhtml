@@ -13,10 +13,10 @@
 				nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.Day
 			</com:ValidatorScript>
 			<com:EnumScript>
-				nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.ScheSpecifiedMonth
-				nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.SpecifiedMonth
-				nts.uk.ctx.at.function.dom.alarm.extractionrange.PreviousClassification
-			</com:EnumScript>
+                nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.ScheSpecifiedMonth
+                nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.DailyClosingDateSpecifiedMonth
+                nts.uk.ctx.at.function.dom.alarm.extractionrange.PreviousClassification
+            </com:EnumScript>
 			<com:scriptfile path="../share/model.js" />
 			<com:stylefile path="kal004.b.style.css" />
 			<com:scriptfile path="kal004.b.service.js" />
@@ -32,7 +32,7 @@
 				</div>
 				<div class="cf">
 					<div class="valign-center control-group start">
-						<span class="label">#{i18n.getText('KAL004_29')}</span>
+						<div class="flabel" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KAL004_29')}</div>
 						<div class="day">
 							<div tabindex="1"
 								data-bind="ntsRadioButton: {checked: strSelected, enable: enable, option: dateSpecify()[0], optionValue: 'value', optionText: 'name', group: 'strRadio'}"></div>
@@ -78,7 +78,7 @@
 					</div>
 					<div class="centerSys">#{i18n.getText('KAL004_30')}</div>
 					<div class="valign-center control-group end">
-						<span class="label">#{i18n.getText('KAL004_31')}</span>
+						<div class="flabel" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KAL004_31')}</div>
 						<div class="day">
 							<div tabindex="6" 
 								data-bind="ntsRadioButton: {checked: endSelected, enable: enable, option: dateSpecify()[0], optionValue: 'value', optionText: 'name', group: 'endRadio'}"></div>

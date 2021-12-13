@@ -20,6 +20,9 @@ import nts.uk.ctx.at.record.infra.entity.workrecord.erroralarm.schedule.monthly.
 import nts.uk.ctx.at.record.infra.entity.workrecord.erroralarm.schedule.monthly.KscdtScheAnyCondMonthPk;
 
 import javax.ejb.Stateless;
+
+import org.apache.commons.lang3.BooleanUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -88,7 +91,7 @@ public class JpaExtracCondScheduleMonthRepository  extends JpaRepository impleme
 		
 		entity.condName = domain.getName().v();
 		entity.condMsg = domain.getErrorAlarmMessage() != null ? domain.getErrorAlarmMessage().get().v() : null;
-		entity.useAtr = domain.isUse();
+		entity.useAtr = BooleanUtils.toInteger(domain.isUse());
 		entity.condType = domain.getCheckItemType().value;
 		
 		updateByCheckCondition(contractCode, companyId, domain, entity);
@@ -144,7 +147,7 @@ public class JpaExtracCondScheduleMonthRepository  extends JpaRepository impleme
 	private KscdtScheAnyCondMonth fromDomain(String contractCode, String companyId, ExtractionCondScheduleMonth domain) {
 		KscdtScheAnyCondMonthPk pk = new KscdtScheAnyCondMonthPk(companyId, domain.getErrorAlarmId(), domain.getSortOrder());
 		KscdtScheAnyCondMonth entity = new KscdtScheAnyCondMonth(
-				pk, domain.isUse(), domain.getName().v(), 
+				pk, BooleanUtils.toInteger(domain.isUse()), domain.getName().v(), 
 				domain.getCheckItemType().value,
 				0,
 				domain.getErrorAlarmMessage() != null ? domain.getErrorAlarmMessage().get().v() : "", 

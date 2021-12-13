@@ -3,6 +3,7 @@ package nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.
 import java.util.Optional;
 
 import lombok.Getter;
+import lombok.Setter;
 import nts.arc.layer.dom.objecttype.DomainObject;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.record.WorkplaceOfWorkEachOuen;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.work.WorkGroup;
@@ -18,6 +19,7 @@ public class WorkContent implements DomainObject {
 	private Optional<WorkGroup> work;
 	
 	/** 備考: 作業入力備考 */
+	@Setter
 	private Optional<WorkinputRemarks> workRemarks;
 
 	private WorkContent(WorkplaceOfWorkEachOuen workplace, Optional<WorkGroup> work, Optional<WorkinputRemarks> workRemarks) {

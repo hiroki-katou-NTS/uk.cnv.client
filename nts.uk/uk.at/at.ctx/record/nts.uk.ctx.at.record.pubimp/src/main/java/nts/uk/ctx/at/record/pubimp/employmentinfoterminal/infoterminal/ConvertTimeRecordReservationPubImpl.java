@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Setter;
 import nts.arc.task.tran.AtomTask;
 import nts.arc.time.GeneralDate;
-import nts.arc.time.GeneralDateTime;
 import nts.uk.ctx.at.record.dom.adapter.employeemanage.EmployeeManageRCAdapter;
 import nts.uk.ctx.at.record.dom.employmentinfoterminal.infoterminal.EmpInfoTerminal;
 import nts.uk.ctx.at.record.dom.employmentinfoterminal.infoterminal.EmpInfoTerminalCode;
@@ -31,8 +30,6 @@ import nts.uk.ctx.at.record.dom.stamp.card.stampcard.ContractCode;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampCard;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampCardRepository;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordRepository;
 import nts.uk.ctx.at.record.pub.employmentinfoterminal.infoterminal.ConvertTimeRecordReservationPub;
 import nts.uk.ctx.at.record.pub.employmentinfoterminal.infoterminal.ReservReceptDataExport;
 
@@ -52,9 +49,6 @@ public class ConvertTimeRecordReservationPubImpl implements ConvertTimeRecordRes
 	private BentoReservationRepository bentoReservationRepository;
 
 	@Inject
-	private StampRecordRepository stampRecordRepository;
-
-	@Inject
 	private StampCardRepository stampCardRepository;
 
 	@Inject
@@ -68,7 +62,7 @@ public class ConvertTimeRecordReservationPubImpl implements ConvertTimeRecordRes
 			ReservReceptDataExport reservReceptData) {
 
 		RequireImpl requireImpl = new RequireImpl("", empInfoTerminalRepository, timeRecordReqSettingRepository,
-				employeeManageRCAdapter, bentoMenuRepository, bentoReservationRepository, stampRecordRepository,
+				employeeManageRCAdapter, bentoMenuRepository, bentoReservationRepository,
 				stampCardRepository, executionLog);
 		return ConvertTimeRecordReservationService.convertData(requireImpl, new EmpInfoTerminalCode(empInfoTerCode),
 				new ContractCode(contractCode),
@@ -92,8 +86,6 @@ public class ConvertTimeRecordReservationPubImpl implements ConvertTimeRecordRes
 
 		private final BentoReservationRepository bentoReservationRepository;
 
-		private final StampRecordRepository stampRecordRepository;
-
 		private final StampCardRepository stampCardRepository;
 
 		private final TopPgAlTrRepository executionLog;
@@ -111,12 +103,6 @@ public class ConvertTimeRecordReservationPubImpl implements ConvertTimeRecordRes
 		}
 
 		@Override
-		public Optional<StampRecord> getStampRecord(ContractCode contractCode, StampNumber stampNumber,
-				GeneralDateTime dateTime) {
-			return stampRecordRepository.findByKey(stampNumber, dateTime);
-		}
-
-		@Override
 		public Optional<TimeRecordReqSetting> getTimeRecordReqSetting(EmpInfoTerminalCode empInfoTerCode,
 				ContractCode contractCode) {
 
@@ -127,12 +113,6 @@ public class ConvertTimeRecordReservationPubImpl implements ConvertTimeRecordRes
 				companyId = timeOpt.get().getCompanyId().v();
 			}
 			return timeOpt;
-		}
-
-		@Override
-		public void insert(StampRecord stampRecord) {
-			stampRecordRepository.insert(stampRecord);
-
 		}
 
 		@Override

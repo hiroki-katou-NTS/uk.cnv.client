@@ -1,5 +1,7 @@
 package nts.uk.ctx.at.shared.infra.repository.era.name;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.era.name.EraName;
 import nts.uk.ctx.at.shared.dom.era.name.EraNameDomGetMemento;
@@ -59,7 +61,7 @@ public class JpaEraNameGetMemento implements EraNameDomGetMemento {
 	
 	@Override
 	public SystemType getSystemType(){
-		return SystemType.valueOf(this.entity.getSystemType().intValue());
+		return SystemType.valueOf(BooleanUtils.toInteger(this.entity.isSystemType()));
 	};
 
 }

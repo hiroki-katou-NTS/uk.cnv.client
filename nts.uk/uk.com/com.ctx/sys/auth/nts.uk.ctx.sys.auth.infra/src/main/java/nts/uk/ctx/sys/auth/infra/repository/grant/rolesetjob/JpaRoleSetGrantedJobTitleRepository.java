@@ -1,20 +1,22 @@
 package nts.uk.ctx.sys.auth.infra.repository.grant.rolesetjob;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.transaction.Transactional;
 
+import lombok.val;
 import nts.arc.layer.infra.data.DbConsts;
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.sys.auth.dom.grant.rolesetjob.RoleSetGrantedJobTitle;
 import nts.uk.ctx.sys.auth.dom.grant.rolesetjob.RoleSetGrantedJobTitleRepository;
-import nts.uk.ctx.sys.auth.infra.entity.grant.rolesetjob.SacmtRoleSetGrantedJobTitle;
+import nts.uk.ctx.sys.auth.dom.roleset.RoleSetCode;
 import nts.uk.ctx.sys.auth.infra.entity.grant.rolesetjob.SacmtRoleSetGrantedJobTitleDetail;
+import nts.uk.ctx.sys.auth.infra.entity.grant.rolesetjob.SacmtRoleSetGrantedJobTitleDetailPK;
 
 /**
  * 
@@ -26,88 +28,64 @@ import nts.uk.ctx.sys.auth.infra.entity.grant.rolesetjob.SacmtRoleSetGrantedJobT
 @Transactional
 public class JpaRoleSetGrantedJobTitleRepository extends JpaRepository implements RoleSetGrantedJobTitleRepository {
 
-	private static final String GET_All_BY_COMPANY_ID = "SELECT rs FROM SacmtRoleSetGrantedJobTitle rs WHERE rs.companyId = :companyId ";
-
-	private static final String SELECT_BY_JOBTITLECD = "SELECT c FROM SacmtRoleSetGrantedJobTitleDetail c "
-			+ " WHERE c.roleSetGrantedJobTitleDetailPK.companyId = :companyId"
-			+ " AND c.roleSetGrantedJobTitleDetailPK.jobTitleId = :jobTitleId";
-	
 	private static final String FIND_BY_CID_JOBTITLES = "SELECT c FROM SacmtRoleSetGrantedJobTitleDetail c "
+			+ " WHERE c.roleSetGrantedJobTitleDetailPK.companyId = :companyId";
+
+	private static final String FIND_BY_CID_JOBTITLES_AND_LISTCD = "SELECT c FROM SacmtRoleSetGrantedJobTitleDetail c "
 			+ " WHERE c.roleSetGrantedJobTitleDetailPK.companyId = :companyId"
 			+ " AND c.roleSetCd IN :roleCDLst";
-	
-	@Override
-	public List<RoleSetGrantedJobTitle> getAllByCompanyId(String companyId) {
-		return this.queryProxy().query(GET_All_BY_COMPANY_ID, SacmtRoleSetGrantedJobTitle.class)
-				.setParameter("companyId", companyId).getList(d -> SacmtRoleSetGrantedJobTitle.toDomain(d));
+
+	private RoleSetGrantedJobTitle toDomain(SacmtRoleSetGrantedJobTitleDetail entity) {
+
+		return new RoleSetGrantedJobTitle(
+				entity.roleSetGrantedJobTitleDetailPK.companyId,
+				entity.roleSetGrantedJobTitleDetailPK.jobTitleId,
+				new RoleSetCode(entity.roleSetCd)
+		);
+	}
+	private SacmtRoleSetGrantedJobTitleDetail toEntity(RoleSetGrantedJobTitle domain) {
+		SacmtRoleSetGrantedJobTitleDetailPK key = new SacmtRoleSetGrantedJobTitleDetailPK(domain.getJobTitleId(), domain.getCompanyId());
+		return new SacmtRoleSetGrantedJobTitleDetail(
+				domain.getRoleSetCd().v(),
+				key.jobTitleId,
+				key.companyId
+		);
 	}
 
 	@Override
-	public Optional<RoleSetGrantedJobTitle> getOneByCompanyId(String companyId) {
-		SacmtRoleSetGrantedJobTitle entity = this.queryProxy()
-				.query(GET_All_BY_COMPANY_ID, SacmtRoleSetGrantedJobTitle.class).setParameter("companyId", companyId)
-				.getSingleOrNull();
-		if (entity == null) {
-			return Optional.empty();
-		} else {
-			return Optional.of(SacmtRoleSetGrantedJobTitle.toDomain(entity));
-		}
+	public List<RoleSetGrantedJobTitle> getByCompanyId(String companyId) {
+		return this.queryProxy().query(FIND_BY_CID_JOBTITLES, SacmtRoleSetGrantedJobTitleDetail.class)
+				.setParameter("companyId", companyId)
+				.getList(c -> toDomain(c));
+	}
+	
+	@Override
+	public Optional<RoleSetGrantedJobTitle> getByJobTitleId(String companyId, String jobTitleId) {
+		SacmtRoleSetGrantedJobTitleDetailPK pk = new SacmtRoleSetGrantedJobTitleDetailPK(jobTitleId, companyId);
+		return this.queryProxy().find(pk, SacmtRoleSetGrantedJobTitleDetail.class).map(c -> toDomain(c));
 	}
 
 	@Override
 	public void insert(RoleSetGrantedJobTitle domain) {
-		this.commandProxy().insert(SacmtRoleSetGrantedJobTitle.toEntity(domain));
+		this.commandProxy().insert(toEntity(domain));
 	}
 
 	@Override
 	public void update(RoleSetGrantedJobTitle domain) {
-		SacmtRoleSetGrantedJobTitle entity = this.queryProxy()
-				.find(domain.getCompanyId(), SacmtRoleSetGrantedJobTitle.class).get();
-		entity.applyToConcurrentPerson = domain.isApplyToConcurrentPerson();
-		List<SacmtRoleSetGrantedJobTitleDetail> oldDetails = entity.details;
-		List<SacmtRoleSetGrantedJobTitleDetail> newDetails = domain.getDetails().stream()
-				.map(item -> new SacmtRoleSetGrantedJobTitleDetail(item.getRoleSetCd().v(), item.getJobTitleId(),
-						item.getCompanyId()))
-				.collect(Collectors.toList());
-		
-		for (SacmtRoleSetGrantedJobTitleDetail newDetail : newDetails){
-			for (SacmtRoleSetGrantedJobTitleDetail oldDetail : oldDetails){
-				if (oldDetail.roleSetGrantedJobTitleDetailPK.equals(newDetail.roleSetGrantedJobTitleDetailPK)){
-					newDetails.set(newDetails.indexOf(newDetail), newDetail);
-					break;
-				}
-			}
-		} 
-		
-		entity.details = newDetails;
-		this.commandProxy().update(entity);
-	}
-
-	@Override
-	public void delete(String companyId) {
-		this.commandProxy().remove(SacmtRoleSetGrantedJobTitle.class, companyId);
-
-	}
-
-	@Override
-	public boolean checkRoleSetCdExist(String roleSetCd, String companyId) {
-		SacmtRoleSetGrantedJobTitle entity = this.queryProxy()
-				.query(GET_All_BY_COMPANY_ID, SacmtRoleSetGrantedJobTitle.class).setParameter("companyId", companyId)
-				.getSingleOrNull();
-		if (entity == null) {
-			return false;
-		} else {
-			return SacmtRoleSetGrantedJobTitle.toDomain(entity).isRoleSetCdExist(roleSetCd);
+		Optional<SacmtRoleSetGrantedJobTitleDetail> upEntity = this.queryProxy().find(
+				new SacmtRoleSetGrantedJobTitleDetailPK(domain.getJobTitleId(), domain.getCompanyId()),
+				SacmtRoleSetGrantedJobTitleDetail.class);
+		if (upEntity.isPresent()) {
+			upEntity.get().roleSetCd = domain.getRoleSetCd().v();
+			this.commandProxy().update(upEntity.get());
 		}
 	}
 
 	@Override
-	public Optional<String> getRoleSetCd(String companyId, String jobTitleId) {
-		return this.queryProxy().query(SELECT_BY_JOBTITLECD ,SacmtRoleSetGrantedJobTitleDetail.class )
-				.setParameter("companyId", companyId)
-				.setParameter("jobTitleId", jobTitleId)
-				.getSingle( c -> c.roleSetCd);
-		
+	public boolean checkRoleSetCdExist(String companyId, RoleSetCode roleSetCd) {
+		List<String> listCd = Collections.singletonList(roleSetCd.v());
+		val listItem = this.findJobTitleByRoleCDLst(companyId,listCd);
+		return !listItem.isEmpty();
 	}
 
 	@Override
@@ -117,7 +95,7 @@ public class JpaRoleSetGrantedJobTitleRepository extends JpaRepository implement
 		}
 		List<String> resultList = new ArrayList<>();
 		CollectionUtil.split(roleCDLst, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subList -> {
-			resultList.addAll(this.queryProxy().query(FIND_BY_CID_JOBTITLES ,SacmtRoleSetGrantedJobTitleDetail.class )
+			resultList.addAll(this.queryProxy().query(FIND_BY_CID_JOBTITLES_AND_LISTCD ,SacmtRoleSetGrantedJobTitleDetail.class )
 				.setParameter("companyId", companyID)
 				.setParameter("roleCDLst", subList)
 				.getList( c -> c.roleSetGrantedJobTitleDetailPK.jobTitleId));

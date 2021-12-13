@@ -15,12 +15,16 @@ import mockit.Injectable;
 import mockit.Mock;
 import mockit.MockUp;
 import mockit.integration.junit4.JMockit;
+import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.CreatingDailyResultsCondition;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.createdailyresults.closegetunlockedperiod.ClosingGetUnlockedPeriod;
 import nts.uk.ctx.at.record.dom.organization.EmploymentHistoryImported;
+import nts.uk.ctx.at.shared.dom.adapter.employee.EmployeeImport;
 import nts.uk.ctx.at.shared.dom.scherec.closurestatus.ClosureStatusManagement;
+import nts.uk.shr.com.enumcommon.NotUseAtr;
 import nts.uk.shr.com.time.calendar.date.ClosureDate;
 
 
@@ -38,6 +42,7 @@ public class GetPeriodCanProcesseTest {
 	@Test
 	public void test_get_1() {
 		String employeeId = "employeeId";// dummy
+		String cid = "cid";// dummy
 		DatePeriod period = new DatePeriod(GeneralDate.ymd(2021, 1, 1), GeneralDate.ymd(2021, 2, 1)); 
 		IgnoreFlagDuringLock ignoreFlagDuringLock = IgnoreFlagDuringLock.CAN_CAL_LOCK;
 		AchievementAtr achievementAtr = AchievementAtr.DAILY;
@@ -56,10 +61,17 @@ public class GetPeriodCanProcesseTest {
 		new Expectations() {
 			{
 				require.getAllByEmpId(anyString);
+				result = new ArrayList<>();
+				
+				require.employeeInfo((CacheCarrier) any, anyString);
+				result = new EmployeeImport(GeneralDate.min(), employeeId, "", null, "", GeneralDate.max());
+				
+				require.creatingDailyResultsCondition(anyString);
+				result = Optional.of(new CreatingDailyResultsCondition(cid, NotUseAtr.NOT_USE));
 			}
 		};
 		
-		List<DatePeriod> result = GetPeriodCanProcesse.get(require, employeeId, period, listEmploymentHis, ignoreFlagDuringLock, achievementAtr);
+		List<DatePeriod> result = GetPeriodCanProcesse.get(require, cid, employeeId, period, listEmploymentHis, ignoreFlagDuringLock, achievementAtr);
 		assertThat(result).isEmpty();
 	}
 	
@@ -71,6 +83,7 @@ public class GetPeriodCanProcesseTest {
 	@Test
 	public void test_get_2() {
 		String employeeId = "employeeId";// dummy
+		String cid = "cid";// dummy
 		DatePeriod period = new DatePeriod(GeneralDate.ymd(2021, 3, 1), GeneralDate.ymd(2021, 4, 1)); 
 		IgnoreFlagDuringLock ignoreFlagDuringLock = IgnoreFlagDuringLock.CAN_CAL_LOCK;
 		AchievementAtr achievementAtr = AchievementAtr.DAILY;
@@ -82,10 +95,17 @@ public class GetPeriodCanProcesseTest {
 		new Expectations() {
 			{
 				require.getAllByEmpId(anyString);
+				result = new ArrayList<>();
+				
+				require.employeeInfo((CacheCarrier) any, anyString);
+				result = new EmployeeImport(GeneralDate.min(), employeeId, "", null, "", GeneralDate.max());
+				
+				require.creatingDailyResultsCondition(anyString);
+				result = Optional.of(new CreatingDailyResultsCondition(cid, NotUseAtr.NOT_USE));
 			}
 		};
 		
-		List<DatePeriod> result = GetPeriodCanProcesse.get(require, employeeId, period, listEmploymentHis, ignoreFlagDuringLock, achievementAtr);
+		List<DatePeriod> result = GetPeriodCanProcesse.get(require, cid, employeeId, period, listEmploymentHis, ignoreFlagDuringLock, achievementAtr);
 		assertThat(result).isEmpty();
 	}
 
@@ -96,6 +116,7 @@ public class GetPeriodCanProcesseTest {
 	@Test
 	public void test_get_3() {
 		String employeeId = "employeeId";// dummy
+		String cid = "cid";// dummy
 		DatePeriod period = new DatePeriod(GeneralDate.ymd(2021, 1, 1), GeneralDate.ymd(2021, 2, 1)); 
 		IgnoreFlagDuringLock ignoreFlagDuringLock = IgnoreFlagDuringLock.CAN_CAL_LOCK;
 		AchievementAtr achievementAtr = AchievementAtr.DAILY;
@@ -118,10 +139,16 @@ public class GetPeriodCanProcesseTest {
 			{
 				require.getAllByEmpId(anyString);
 				result = listClosureStatus;
+				
+				require.employeeInfo((CacheCarrier) any, anyString);
+				result = new EmployeeImport(GeneralDate.min(), employeeId, "", null, "", GeneralDate.max());
+				
+				require.creatingDailyResultsCondition(anyString);
+				result = Optional.of(new CreatingDailyResultsCondition(cid, NotUseAtr.NOT_USE));
 			}
 		};
 		
-		List<DatePeriod> result = GetPeriodCanProcesse.get(require, employeeId, period, listEmploymentHis, ignoreFlagDuringLock, achievementAtr);
+		List<DatePeriod> result = GetPeriodCanProcesse.get(require, cid, employeeId, period, listEmploymentHis, ignoreFlagDuringLock, achievementAtr);
 		assertThat(result).isEmpty();
 	}
 	
@@ -133,6 +160,7 @@ public class GetPeriodCanProcesseTest {
 	@Test
 	public void test_get_4() {
 		String employeeId = "employeeId";// dummy
+		String cid = "cid";// dummy
 		DatePeriod period = new DatePeriod(GeneralDate.ymd(2021, 1, 1), GeneralDate.ymd(2021, 2, 1)); 
 		IgnoreFlagDuringLock ignoreFlagDuringLock = IgnoreFlagDuringLock.CAN_CAL_LOCK;
 		AchievementAtr achievementAtr = AchievementAtr.DAILY;
@@ -156,10 +184,16 @@ public class GetPeriodCanProcesseTest {
 			{
 				require.getAllByEmpId(anyString);
 				result = listClosureStatus;
+				
+				require.employeeInfo((CacheCarrier) any, anyString);
+				result = new EmployeeImport(GeneralDate.min(), employeeId, "", null, "", GeneralDate.max());
+				
+				require.creatingDailyResultsCondition(anyString);
+				result = Optional.of(new CreatingDailyResultsCondition(cid, NotUseAtr.NOT_USE));
 			}
 		};
 		
-		List<DatePeriod> result = GetPeriodCanProcesse.get(require, employeeId, period, listEmploymentHis, ignoreFlagDuringLock, achievementAtr);
+		List<DatePeriod> result = GetPeriodCanProcesse.get(require, cid, employeeId, period, listEmploymentHis, ignoreFlagDuringLock, achievementAtr);
 		assertThat(result).isEmpty();
 	}
 	/**
@@ -170,6 +204,7 @@ public class GetPeriodCanProcesseTest {
 	@Test
 	public void test_get_5() {
 		String employeeId = "employeeId";// dummy
+		String cid = "cid";// dummy
 		DatePeriod period = new DatePeriod(GeneralDate.ymd(2021, 1, 1), GeneralDate.ymd(2021, 2, 1)); 
 		IgnoreFlagDuringLock ignoreFlagDuringLock = IgnoreFlagDuringLock.CAN_CAL_LOCK;
 		AchievementAtr achievementAtr = AchievementAtr.DAILY;
@@ -202,10 +237,16 @@ public class GetPeriodCanProcesseTest {
 			{
 				require.getAllByEmpId(anyString);
 				result = listClosureStatus;
+				
+				require.employeeInfo((CacheCarrier) any, anyString);
+				result = new EmployeeImport(GeneralDate.min(), employeeId, "", null, "", GeneralDate.max());
+				
+				require.creatingDailyResultsCondition(anyString);
+				result = Optional.of(new CreatingDailyResultsCondition(cid, NotUseAtr.NOT_USE));
 			}
 		};
 		
-		List<DatePeriod> result = GetPeriodCanProcesse.get(require, employeeId, period, listEmploymentHis, ignoreFlagDuringLock, achievementAtr);
+		List<DatePeriod> result = GetPeriodCanProcesse.get(require, cid, employeeId, period, listEmploymentHis, ignoreFlagDuringLock, achievementAtr);
 		assertThat( result )
 		.extracting( 
 				d -> d.start(),

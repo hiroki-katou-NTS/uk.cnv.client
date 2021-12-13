@@ -1,7 +1,7 @@
 package nts.uk.ctx.sys.auth.app.find.grant.rolesetjob;
 
 import lombok.Data;
-import nts.uk.ctx.sys.auth.dom.grant.rolesetjob.RoleSetGrantedJobTitleDetail;
+import nts.uk.ctx.sys.auth.dom.grant.rolesetjob.RoleSetGrantedJobTitle;
 
 /**
  * 
@@ -16,7 +16,7 @@ public class RoleSetGrantedJobTitleDetailDto {
 	
 	private String jobTitleId;
 	
-	public static RoleSetGrantedJobTitleDetailDto fromDomain(RoleSetGrantedJobTitleDetail detail){
+	public static RoleSetGrantedJobTitleDetailDto fromDomain(RoleSetGrantedJobTitle detail){
 		return new RoleSetGrantedJobTitleDetailDto(detail.getRoleSetCd().v(), detail.getJobTitleId());
 	}
 

@@ -1,272 +1,469 @@
-module nts.uk.at.view.kdl029.a.screenModel {
-    import getText = nts.uk.resource.getText;
-    import text = nts.uk.resource.getText;
-    import block = nts.uk.ui.block;
-    import service = nts.uk.at.view.kdl029.a.service;
+module nts.uk.at.view.kdl029.a.viewmodel {
+	export class ScreenModel {
+		date: KnockoutObservable<any>;
+		empList: KnockoutObservableArray<string> = ko.observableArray([]);
+		dataHoliday: KnockoutObservable<InforAnnualHolidaysAccHolidayDto> = ko.observable();
 
-    export class ViewModel {
+		//_____KCP005________
+		listComponentOption: any = [];
+		selectedCode: KnockoutObservable<string>;
+		multiSelectedCode: KnockoutObservableArray<string>;
+		isShowAlreadySet: KnockoutObservable<boolean>;
+		alreadySettingList: KnockoutObservableArray<UnitAlreadySettingModel>;
+		isDialog: KnockoutObservable<boolean>;
+		isShowNoSelectRow: KnockoutObservable<boolean>;
+		isMultiSelect: KnockoutObservable<boolean>;
+		isShowWorkPlaceName: KnockoutObservable<boolean>;
+		isShowSelectAllButton: KnockoutObservable<boolean>;
+		disableSelection: KnockoutObservable<boolean>;
 
-        columnHolidayGrantInfos = ko.observableArray([
-            { headerText: 'ID', prop: 'id', hidden: true },
-            { headerText: text('KDL029_9') + '(' + text('KDL029_13') + ')', prop: 'dataDate', width: 250 },//付与日
-            { headerText: text('KDL029_10'), prop: 'fundedNumber', width: 90 },//付与日数
-            { headerText: text('KDL029_11'), prop: 'numberOfUses', width: 90 },//使用数
-            { headerText: text('KDL029_12'), prop: 'residualNumber', width: 90 }//残日数 
-        ]);
-        dataHolidayGrantInfo: KnockoutObservableArray<DataHolidayGrantInfo> = ko.observableArray([]);
-        columnSteadyUseInfors = ko.observableArray([
-            { headerText: 'ID', prop: 'id', hidden: true },
-            { headerText: text('KDL029_17'), prop: 'date', width: 100 },
-            { headerText: text('KDL029_18'), prop: 'steadNumberOfUser', width: 90 },
-            { headerText: text('KDL029_19'), prop: 'typeOfStead', width: 125 }
-        ]);
-        dataSteadyUseInfor: KnockoutObservableArray<DataSteadyUseInfor> = ko.observableArray([]);
+		employeeList: KnockoutObservableArray<UnitModel> = ko.observableArray<UnitModel>([]);
+		paramData: any = nts.uk.ui.windows.getShared('KDL029_DATA');
 
-        value: KnockoutObservable<string> = ko.observable('');
-        employeeCode: KnockoutObservable<string> = ko.observable('');
-        employeeName: KnockoutObservable<string> = ko.observable('');
-        listComponentOption: any;
-        employeeList: KnockoutObservableArray<UnitModel> = ko.observableArray([]);
-        employeeIDList: KnockoutObservableArray<string> = ko.observableArray([]);
-        selectedType: KnockoutObservable<number> = ko.observable(0);
-        multiSelect: KnockoutObservable<boolean> = ko.observable(false);
-        inputDate: KnockoutObservable<string> = ko.observable('');
-        totalRemain: KnockoutObservable<string> = ko.observable('0.0 日');
-        displayKCP005: KnockoutObservable<boolean> = ko.observable(false);
+		// search
+		items: KnockoutObservableArray<ItemModel> = ko.observableArray([]);
 
-        isRetentionManage: KnockoutObservable<boolean> = ko.observable(true);
-        lstEmpFull: KnockoutObservableArray<UnitModel> = ko.observableArray([]);
-        //ver7
-        title2: KnockoutObservable<string> = ko.observable('');
+		// area left
+		employeeCodeName: KnockoutObservable<string> = ko.observable('');
 
-        constructor() {
-            let vm = this;
-            let param = nts.uk.ui.windows.getShared('KDL029_PARAM');
-            vm.isRetentionManage(true)
-            vm.employeeIDList(param.employeeIds);
-            vm.multiSelect(false);
-            vm.inputDate(param.baseDate);
-            vm.start().then(() => {
-                if (vm.employeeList().length > 1) {
-                    vm.displayKCP005(true);
-                    vm.employeeCode(vm.employeeList()[0].code);
-                    vm.listComponentOption = {
-                        isShowAlreadySet: false,
-                        isMultiSelect: false,
-                        listType: ListType.EMPLOYEE,
-                        employeeInputList: vm.employeeList,
-                        selectType: SelectType.SELECT_BY_SELECTED_CODE,
-                        selectedCode: vm.employeeCode,
-                        isDialog: false,
-                        isShowNoSelectRow: false,
-                        alreadySettingList: ko.observableArray([]),
-                        isShowWorkPlaceName: false,
-                        isShowSelectAllButton: false,
-                        maxRows: 12
-                    };
+		// Grid A_3
+		columns: KnockoutObservableArray<any>;
+		currentCode: KnockoutObservable<any>;
+		currentCodeList: KnockoutObservableArray<any>;
+		count: number = 100;
+		holidayData: KnockoutObservableArray<HolidayInfo> = ko.observableArray([]);
+		holidayDataOld: KnockoutObservableArray<HolidayInfo> = ko.observableArray([]);
 
-                    $('#component-items-list').ntsListComponent(vm.listComponentOption).then(() => {
-                        $('#component-items-list').focusComponent();
-                    });
-                }
+		// Grid A_5
+		columns2: KnockoutObservableArray<any>;
+		currentCode2: KnockoutObservable<any>;
+		currentCodeList2: KnockoutObservableArray<any>;
+		count2: number = 100;
+		switchOptions2: KnockoutObservableArray<any>;
+		holidayData2: KnockoutObservableArray<HolidayInfo2> = ko.observableArray([]);
+		holidayDataOld2: KnockoutObservableArray<HolidayInfo2> = ko.observableArray([]);
 
-                if (vm.displayKCP005()) {
-                    nts.uk.ui.windows.getSelf().setWidth(990);
-                    nts.uk.ui.windows.getSelf().$dialog.dialogPositionControl();
-                }
-            })
-        }
+		checkSolid: number = 0;
 
-        closeDialog() {
-            nts.uk.ui.windows.close();
-        }
+		// A2_5 
+		currentRemainNum: KnockoutObservable<string> = ko.observable('');
+		// A2_8 
+		nextScheDate: KnockoutObservable<string> = ko.observable('');
+		// A2_11
+		annMaxTime: KnockoutObservable<string> = ko.observable('');
+		// A2_9
+		annLimitStart: KnockoutObservable<string> = ko.observable('');
+		// A2_12
+		annLimitEnd: KnockoutObservable<string> = ko.observable('');
 
-        start(): JQueryPromise<any> {
-            block.invisible();
-            let vm = this,
-                dfd = $.Deferred();
-            service.findAllEmploymentSystem({
-                inputDate: nts.uk.util.isNullOrEmpty(vm.inputDate()) ? null : moment.utc(vm.inputDate()).format("YYYY/MM/DD"),
-                listSID: vm.employeeIDList(),
-            }).then(data => {
-                block.clear();
-                let yearRes = getText('KDL029_15') + data.yearResigName + getText('KDL029_23');
-                vm.title2(yearRes);
-                vm.employeeName(data.employeeName);
-                //create list emp -> kcp005
-                _.each(data.employeeInfors, emp => {
-                    vm.lstEmpFull().push({ id: emp.sid, code: emp.scd, name: emp.bussinessName });
-                    vm.employeeList().push({ code: emp.scd, name: emp.bussinessName });
-                });
+		//
+		checkEnable: KnockoutObservable<boolean> = ko.observable(false);
+		checkSub: KnockoutObservable<boolean> = ko.observable(false);
+		changeMode: KnockoutObservable<boolean> = ko.observable(false);
+		showGrid: KnockoutObservable<boolean> = ko.observable(false);
 
-                vm.employeeCode.subscribe(value => {
-                    let empSelected = _.find(vm.lstEmpFull(), emp => {
-                        if (emp.code === value) {
-                            return emp;
-                        }
-                    });
+		searchText: KnockoutObservable<string> = ko.observable('');
 
-                    if (!nts.uk.util.isNullOrEmpty(empSelected)) {
-                        let employeeIDs = [];
-                        let dfd = $.Deferred();
-                        employeeIDs.push(empSelected.id);
-                        vm.employeeName(empSelected.name);
-                        block.invisible();
-                        service.findByEmployee({
-                            mode: vm.multiSelect(),
-                            inputDate: nts.uk.util.isNullOrEmpty(vm.inputDate()) ? null : moment.utc(vm.inputDate()).format("YYYY/MM/DD"),
-                            listSID: employeeIDs,
-                        }).then(data => {
-                            block.clear();
-                            vm.getDataForTable(data);
-                            vm.isRetentionManage(data.retentionManage);
-                            dfd.resolve();
-                        }).fail(() => {
-                            block.clear();
-                            dfd.reject();
-                        });
-                        return dfd.promise();
-                    }
-                });
-                vm.employeeCode(data.employeeCode);
-                dfd.resolve();
-            }).fail(() => {
-                block.clear();
-                dfd.reject();
-            });
-            return dfd.promise();
+		constructor() {
+			let self = this;
+			self.date = ko.observable(new Date());
+			self.empList = ko.observableArray([]);
 
-        }
+			//_____KCP005________
+			self.selectedCode = ko.observable('1');
+			self.multiSelectedCode = ko.observableArray(['0', '1', '4']);
+			self.isShowAlreadySet = ko.observable(false);
+			self.alreadySettingList = ko.observableArray([
+				{ code: '1', isAlreadySetting: true },
+				{ code: '2', isAlreadySetting: true }
+			]);
+			self.isDialog = ko.observable(false);
+			self.isShowNoSelectRow = ko.observable(false);
+			self.isMultiSelect = ko.observable(false);
+			self.isShowWorkPlaceName = ko.observable(false);
+			self.isShowSelectAllButton = ko.observable(false);
+			self.disableSelection = ko.observable(false);
 
-        getDataForTable(data: EmpRsvLeaveInforDto) {
-            const vm = this;
-            if (!nts.uk.util.isNullOrEmpty(data.rsvLeaManaImport)) {
-                let dataHoliday = [];
-                let total = 0.0;
-                _.each(data.rsvLeaManaImport.grantRemainingList, (rsv, index) => {
-                    dataHoliday.push(new DataHolidayGrantInfo(
-                        index,
-                        rsv.grantDate,
-                        rsv.grantNumber,
-                        rsv.usedNumber,
-                        rsv.remainingNumber,
-                        rsv.deadline,
-                        rsv.expiredInCurrentMonth
-                    ));
-                    total = total + rsv.remainingNumber;
-                });
-                vm.totalRemain(total.toFixed(1) + text('KDL029_22'));
-                vm.dataHolidayGrantInfo(_.orderBy(dataHoliday, ["fundedDate"], ["asc"]));
+			if (self.paramData.length > 1) {
+				$("#area-right").show();
+			} else {
+				$("#area-right").hide();
+			}
 
-                let dataYearly = [];
-                _.each(data.rsvLeaManaImport.tmpManageList, (tmp, index) => {
-                    dataYearly.push(new DataSteadyUseInfor(index, tmp.ymd, tmp.useDays, tmp.creatorAtr));
-                });
-                vm.dataSteadyUseInfor(_.orderBy(dataYearly, ["date"], ["asc"]));
-            }
-        }
-    }
+			//
+			self.listComponentOption = {
+				isShowAlreadySet: self.isShowAlreadySet(),
+				isMultiSelect: false,
+				listType: ListType.EMPLOYEE,
+				employeeInputList: self.employeeList,
+				selectType: SelectType.SELECT_FIRST_ITEM,
+				selectedCode: self.selectedCode,
+				isDialog: self.isDialog(),
+				isShowNoSelectRow: self.isShowNoSelectRow(),
+				alreadySettingList: self.alreadySettingList,
+				isShowWorkPlaceName: self.isShowWorkPlaceName(),
+				isShowSelectAllButton: self.isShowSelectAllButton(),
+				disableSelection: self.disableSelection(),
+				maxRows: 15.51
+			};
 
-    export class DataHolidayGrantInfo {
-        id: any;
-        fundedDate: string;
-        fundedNumber: string;
-        numberOfUses: string;//使用数 - usedNumber
-        residualNumber: string;
-        deadline: string;//期限日 - deadline
-        dataDate: string;
-        constructor(id: any, fundedDate: string, fundedNumber: number, numberOfUses: number,
-            residualNumber: number, deadline: string, expiredInCurrentMonth: boolean) {
-            this.id = id;
-            this.fundedDate = fundedDate;
-            this.fundedNumber = fundedNumber.toFixed(1) + text('KDL029_14');
-            this.numberOfUses = numberOfUses.toFixed(1) + text('KDL029_14');
-            this.residualNumber = residualNumber.toFixed(1) + text('KDL029_14');
-            if (expiredInCurrentMonth) {
-                this.deadline = deadline ? nts.uk.resource.getText("KDL005_38", [deadline]) : '';
-            } else {
-                this.deadline = deadline ? nts.uk.resource.getText("KDL005_37", [deadline]) : '';
-            }
-            this.dataDate = this.fundedDate + this.deadline;
-        }
-    }
+			$('#kcp005component').ntsListComponent(self.listComponentOption);
 
-    export class DataSteadyUseInfor {
-        id: any;
-        date: string;
-        steadNumberOfUser: string;
-        typeOfStead: string;
-        constructor(id: any, date: string, steadNumberOfUser: number, typeOfStead: string) {
-            this.id = id;
-            this.date = date;
-            this.steadNumberOfUser = steadNumberOfUser.toFixed(1) + text('KDL029_14');
-            this.typeOfStead = typeOfStead;
-        }
-    }
+			self.listComponentOption.selectedCode.subscribe((value: any) => {
+				if (value == null) return;
+				self.checkSolid = 0;
 
-    export interface UnitModel {
-        id?: string;
-        code: string;
-        name?: string;
-        workplaceName?: string;
-        isAlreadySetting?: boolean;
-        optionalColumn?: any;
-    }
+				if (self.checkSub()) {
+					$("#grid-grand").ntsGrid("destroy")
+					$("#grid-grand-2").ntsGrid("destroy")
+					self.getData(value).done(() => {
+						self.createGrid();	
+					});
+				}
 
-    export class ListType {
-        static EMPLOYMENT = 1;
-        static Classification = 2;
-        static JOB_TITLE = 3;
-        static EMPLOYEE = 4;
-    }
+				self.checkSub(true);
+			})
+		}
 
-    export class SelectType {
-        static SELECT_BY_SELECTED_CODE = 1;
-        static SELECT_ALL = 2;
-        static SELECT_FIRST_ITEM = 3;
-        static NO_SELECT = 4;
-    }
+		startPage(): JQueryPromise<any> {
+			let self = this, dfd = $.Deferred<any>();
+			self.checkSub(false);
+			nts.uk.ui.block.grayout();
+			self.getData("").done(() => {
+				setTimeout(function() {
+					self.createGrid();
+					dfd.resolve();
+				}, 1);
+			});
+			nts.uk.ui.block.clear();
+			dfd.resolve();
+			return dfd.promise();
+		}
 
-    export interface EmpRsvLeaveInforDto {
-        employeeInfors: EmployeeInfoImport[];
-        rsvLeaManaImport: RsvLeaManagerImport;
-        employeeCode: string;
-        employeeName: string;
-        yearResigName: string;
-        retentionManage: boolean
-    }
+		createGrid() {
+			let self = this;
+			$("#grid-grand").ntsGrid({
+				height: '145px',
+				name: '#KDL029_37',
+				multiple: false,
+				dataSource: self.holidayData(),
+				primaryKey: 'granddate',
+				virtualization: true,
+				virtualizationMode: 'continuous',
+				// virtualizationMode: "fixed",
+				columns: [
+					{ headerText: nts.uk.resource.getText('KDL029_36'), key: 'granddate', width: 125 },
+					{ headerText: nts.uk.resource.getText('KDL029_35'), key: 'numbergrants', width: 110 },
+					{ headerText: nts.uk.resource.getText('KDL029_34'), key: 'numberuses', width: 110 },
+					{ headerText: nts.uk.resource.getText('KDL029_33'), key: 'remaining', width: 115 },
+					{ headerText: nts.uk.resource.getText('KDL029_32'), key: 'expirationdate', width: 135 }
+				],
+				features: [{ name: 'Resizing', type: 'local' }]
+			});
 
-    export interface EmployeeInfoImport {
-        sid: string;
-        scd: string;
-        bussinessName: string;
-    }
+			$("#grid-grand-2").ntsGrid({
+				height: '170px',
+				name: '#KDL029_30',
+				multiple: false,
+				dataSource: self.holidayData2(),
+				primaryKey: 'digestionday',
+				virtualization: true,
+				virtualizationMode: 'continuous',
+				// virtualizationMode: "fixed",
+				columns: [
+					{ headerText: '', key: 'annualHolidayStatus', width: 200,hidden: true } ,
+					{ headerText: nts.uk.resource.getText('KDL029_29'), key: 'digestionday', width: 150, formatter: function (digestionDate : any, record : any) {
+                        return "<div style='margin-left: 1px;display: flex;'><div style='width: 35px;' >"+record.annualHolidayStatus.toString()+"</div> <div style='width: 155px;float:right;'> " + digestionDate + " </div></div>"; 
+                	} },
+					{ headerText: nts.uk.resource.getText('KDL029_28'), key: 'digestionuse', width: 100 ,formatter: (v : any) => {
+                    	return '<div style="margin-left: 10px;">' + v + '</div>';
+                    } } 
+				],
+				features: [{ name: 'Resizing', type: 'local' }]
+			});
+		}
 
-    export interface RsvLeaManagerImport {
-        reserveLeaveInfo: RsvLeaveInfoImport;
-        grantRemainingList: RsvLeaGrantRemainingImport[];
-        tmpManageList: TmpRsvLeaveMngImport[];
-    }
+		getData(value: any): JQueryPromise<any> {
+			let self = this, dfd = $.Deferred<any>();
+			let param = self.paramData;
+			if (value != "") {
+				let idParam = _.filter(self.paramData, (x: any) => {
+					return _.includes(x.slice(-12), value)
+				})
 
-    export interface RsvLeaveInfoImport {
-        befRemainDay: number;
-        aftRemainDay: number;
-        grantDay: number;
-        remainingDays: number;
-    }
+				if (idParam.length > 0) {
+					param = idParam;
+				}
+			}
+			service.findSuspensionHoliday(param).done((data: any) => {
 
-    export interface RsvLeaGrantRemainingImport {
-        grantDate: string;
-        deadline: string;
-        grantNumber: number;
-        usedNumber: number;
-        remainingNumber: number;
-        expiredInCurrentMonth: boolean;
-    }
+				if (data.accHolidayDto != null) {
+					self.dataHoliday(data.accHolidayDto);
 
-    export interface TmpRsvLeaveMngImport {
-        ymd: string;
-        creatorAtr: string;
-        useDays: number;
-    }
+					self.currentRemainNum(data.accHolidayDto.currentRemainNum);
+					self.nextScheDate(data.accHolidayDto.nextScheDate);
+					self.annMaxTime(data.accHolidayDto.annMaxTime);
+					self.annLimitStart(data.accHolidayDto.annLimitStart);
+					self.annLimitEnd(data.accHolidayDto.annLimitEnd);
+
+					// ※2 , ※1
+					if (!data.accHolidayDto.annAccManaAtr) {
+						self.changeMode(true);
+						self.showGrid(false);
+					}
+					else {
+						self.showGrid(true);
+						self.changeMode(false);
+					}
+
+				} else {
+					self.changeMode(true);
+					self.showGrid(false);
+				}
+				if (!self.checkSub()) {
+					_.forEach(data.employeeImports, (a: any, ind) => {
+						self.employeeList.push({ id: ind, code: a.employeeCode, name: a.employeeName, workplaceName: 'HN' })
+					});
+				}
+
+				self.bindDataToGrid();
+				if (!self.checkSub())
+					self.listComponentOption.selectedCode(self.employeeList()[0].code);
+
+				let name = null;
+				name = _.filter(self.employeeList(), (x: any) => {
+					return _.isEqual(x.code, value == "" ? self.employeeList()[0].code : value);
+				});
+
+				if (name.length > 0)
+					self.employeeCodeName(name[0].code + " " + name[0].name);
+
+				$("#cancel-btn").focus();
+
+				nts.uk.ui.block.clear();
+				dfd.resolve();
+			});
+			return dfd.promise();
+		}
+
+		bindDataToGrid(): JQueryPromise<any> {
+			let self = this, dfd = $.Deferred<any>();
+			self.holidayData([]);
+			self.holidayData2([]);
+			if (_.isNil(self.dataHoliday())) return;
+
+			_.forEach(self.dataHoliday().lstRemainAnnAccHoliday, (x: AnnualAccumulatedHoliday /**  */, index) => {
+				self.holidayData.push(new HolidayInfo(x.grandDate, x.numberGrants, x.numberOfUse, x.numberOfRemain, x.dateOfExpiry));
+			})
+			_.forEach(self.dataHoliday().lstAnnAccHoliday, (x: DetailsAnnuaAccumulatedHoliday, index) => {
+				self.holidayData2.push(new HolidayInfo2(x.annualHolidayStatus , x.digestionDate, x.numberOfUse));
+			})
+			
+			return dfd.promise();
+		}
+
+		bindDataToText(z: any, index: number) {
+
+		}
+
+		showHideItem(data: any) {
+
+		}
+
+		findData(data: any) {
+			let self = this;
+
+			let text = $("input.ntsSearchBox.nts-editor.ntsSearchBox_Component").val()
+			if (text == "") {
+				nts.uk.ui.dialog.info({ messageId: "MsgB_24" });
+			} else {
+				let lstFil = _.filter(self.employeeList(), (z: any) => {
+					return _.includes(z.code, text);
+				})
+
+				if (lstFil.length > 0) {
+					let index = _.findIndex(lstFil, (z: any) => _.isEqual(z.code, self.listComponentOption.selectedCode()));
+					if (index == -1 || index == lstFil.length - 1) {
+						self.listComponentOption.selectedCode(lstFil[0].code);
+					} else {
+						self.listComponentOption.selectedCode(lstFil[index + 1].code);
+					}
+					let scroll: any = _.findIndex(self.employeeList(), (z: any) => _.isEqual(z.code, self.listComponentOption.selectedCode())),
+						id = _.filter($("table > tbody > tr > td > div"), (x: any) => {
+							return _.includes(x.id, "_scrollContainer") && !_.includes(x.id, "single-list");
+						})
+					$("#" + id[0].id).scrollTop(scroll * 24);
+				} else {
+					nts.uk.ui.dialog.info({ messageId: "MsgB_25" });
+				}
+			}
+		}
+
+		cancel() {
+			nts.uk.ui.windows.close();
+		}
+	}
+
+	export interface IEmployeeParam {
+		employeeIds: Array<string>;
+		baseDate: string;
+	}
+
+	export class ListType {
+		static EMPLOYMENT = 1;
+		static Classification = 2;
+		static JOB_TITLE = 3;
+		static EMPLOYEE = 4;
+	}
+
+	export interface UnitModel {
+		id?: string;
+		code: string;
+		name?: string;
+		workplaceName?: string;
+		isAlreadySetting?: boolean;
+		optionalColumn?: any;
+	}
+
+	export class SelectType {
+		static SELECT_BY_SELECTED_CODE = 1;
+		static SELECT_ALL = 2;
+		static SELECT_FIRST_ITEM = 3;
+		static NO_SELECT = 4;
+	}
+
+	export interface UnitAlreadySettingModel {
+		code: string;
+		isAlreadySetting: boolean;
+	}
+
+	/** 年休・積休残数詳細情報DTO */
+	export class InforAnnualHolidaysAccHolidayDto {
+		/** 年休・積休残数一覧  (年休・積休残数詳細) */
+		lstRemainAnnAccHoliday: KnockoutObservableArray<AnnualAccumulatedHoliday>;
+		/** 年休・積休消化一覧  (年休・積休消化詳細) */
+		lstAnnAccHoliday: KnockoutObservableArray<DetailsAnnuaAccumulatedHoliday>;
+		/** 年休・積休管理区分 */
+		annAccManaAtr: KnockoutObservable<boolean>;
+		/** 時間年休の年間上限時間 */
+		annMaxTime: KnockoutObservable<string>;
+		/** 時間年休の年間上限開始日 */
+		annLimitStart: KnockoutObservable<string>;
+		/** 時間年休の年間上限終了日 */
+		annLimitEnd: KnockoutObservable<string>;
+		/** 時間年休管理区分 */
+		annManaAtr: KnockoutObservable<boolean>;
+		/** 次回付与予定日 */
+		nextScheDate: KnockoutObservable<string>;
+		/** 現時点残数 */
+		currentRemainNum: KnockoutObservable<string>;
+		constructor(
+			lstRemainAnnAccHoliday: Array<AnnualAccumulatedHoliday>,
+			lstAnnAccHoliday: Array<DetailsAnnuaAccumulatedHoliday>,
+			annAccManaAtr: boolean,
+			annMaxTime: string,
+			annLimitStart: string,
+			annLimitEnd: string,
+			annManaAtr: boolean,
+			nextScheDate: string,
+			currentRemainNum: string
+		) {
+			let self = this;
+			self.lstRemainAnnAccHoliday = ko.observableArray(lstRemainAnnAccHoliday);
+			self.lstAnnAccHoliday = ko.observableArray(lstAnnAccHoliday);
+			self.annAccManaAtr = ko.observable(annAccManaAtr);
+			self.annMaxTime = ko.observable(annMaxTime);
+			self.annLimitStart = ko.observable(annLimitStart);
+			self.annLimitEnd = ko.observable(annLimitEnd);
+			self.annManaAtr = ko.observable(annManaAtr);
+			self.nextScheDate = ko.observable(nextScheDate);
+			self.currentRemainNum = ko.observable(currentRemainNum);
+		}
+	}
+
+	export class AnnualAccumulatedHoliday {
+		/** 付与数 */
+		numberGrants: string;
+		/** 付与日 */
+		grandDate: string;
+		/** 使用数 */
+		numberOfUse: string;
+		/** 有効期限 */
+		dateOfExpiry: string;
+		/** 残数 */
+		numberOfRemain: string;
+
+		constructor(
+			numberGrants: string,
+			grandDate: string,
+			numberOfUse: string,
+			dateOfExpiry: string,
+			numberOfRemain: string
+		) {
+			let self = this;
+			self.numberGrants = (numberGrants);
+			self.grandDate = (grandDate);
+			self.numberOfUse = (numberOfUse);
+			self.dateOfExpiry = (dateOfExpiry);
+			self.numberOfRemain = (numberOfRemain);
+		}
+	}
+
+	export class DetailsAnnuaAccumulatedHoliday {
+		/** 使用数 */
+		numberOfUse: string;
+		/** 年休消化状況 */
+		annualHolidayStatus: string;
+		/** 消化日 */
+		digestionDate: string;
+
+		constructor(
+			numberOfUse: string,
+			annualHolidayStatus: string,
+			digestionDate: string
+		) {
+			let self = this;
+			self.numberOfUse = (numberOfUse);
+			self.annualHolidayStatus = (annualHolidayStatus);
+			self.digestionDate = (digestionDate);
+		}
+	}
+
+	class HolidayInfo {
+		granddate: string;
+		numbergrants: string;
+		numberuses: string;
+		remaining: string;
+		expirationdate: string;
+		constructor(granddate: string, numbergrants: string, numberuses: string, remaining: string, expirationdate: string) {
+			this.granddate = granddate;
+			this.numbergrants = numbergrants;
+			this.numberuses = numberuses;
+			this.remaining = remaining;
+			this.expirationdate = expirationdate;
+		}
+	}
+
+	class HolidayInfo2 {
+		digestionday: string;
+		digestionuse: string;
+		annualHolidayStatus: string;
+		constructor(annualHolidayStatus: string, digestionday: string, digestionuse: string) {
+			this.annualHolidayStatus = annualHolidayStatus;
+			this.digestionday = digestionday;
+			this.digestionuse = digestionuse;
+		}
+	}
+
+	export class ItemModel {
+		code: number;
+		name: string;
+		displayName?: string;
+		constructor(code: number, name: string, displayName?: string) {
+			this.code = code;
+			this.name = name;
+			this.displayName = displayName;
+		}
+	}
+
 }

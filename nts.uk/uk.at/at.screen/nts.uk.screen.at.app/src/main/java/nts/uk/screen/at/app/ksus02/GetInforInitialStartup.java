@@ -31,12 +31,12 @@ import nts.uk.ctx.at.schedule.dom.shift.management.shifttable.WorkAvailabilityPe
 import nts.uk.ctx.at.schedule.dom.shift.management.workavailability.AssignmentMethod;
 import nts.uk.ctx.at.shared.app.find.workrule.shiftmaster.ShiftMasterOrgFinder;
 import nts.uk.ctx.at.shared.dom.WorkInformation;
-import nts.uk.ctx.at.shared.dom.common.EmployeeId;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.BasicScheduleService;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.SetupType;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.WorkStyle;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.GetTargetIdentifiInforService;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.TargetOrgIdenInfor;
+import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.EmpAffiliationInforAdapter;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.EmpOrganizationImport;
 import nts.uk.ctx.at.shared.dom.workrule.shiftmaster.GetCombinationrAndWorkHolidayAtrService;
 import nts.uk.ctx.at.shared.dom.workrule.shiftmaster.ShiftMaster;
@@ -55,8 +55,6 @@ import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSetting;
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSettingRepository;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeRepository;
-import nts.uk.ctx.bs.employee.pub.workplace.export.EmpOrganizationPub;
-import nts.uk.ctx.bs.employee.pub.workplace.workplacegroup.EmpOrganizationExport;
 import nts.uk.screen.at.app.kdl045.query.WorkAvailabilityDisplayInfoDto;
 import nts.uk.screen.at.app.kdl045.query.WorkAvailabilityOfOneDayDto;
 import nts.uk.shr.com.context.AppContexts;
@@ -70,9 +68,6 @@ import nts.uk.shr.com.enumcommon.NotUseAtr;
  */
 @Stateless
 public class GetInforInitialStartup {
-	@Inject
-    private EmpOrganizationPub empOrganizationPub;
-	
 	@Inject
 	private ShiftTableRuleForOrganizationRepo shiftTableRuleForOrganizationRepo;
 
@@ -109,10 +104,13 @@ public class GetInforInitialStartup {
 	@Inject
 	private GetHolidaysByPeriod getHolidaysByPeriod;
 	
+	@Inject
+	private EmpAffiliationInforAdapter empAffiliationInforAdapter;
+	
 	public FirstInformationDto get(GeneralDate baseDate) {
 		
 		String employeeId = AppContexts.user().employeeId();
-		GetTargetIdentifiInforService.Require requireGetTargetIdentifiInforService = new RequireGetTargetIdentifiInforServiceImpl(empOrganizationPub);
+		GetTargetIdentifiInforService.Require requireGetTargetIdentifiInforService = new RequireGetTargetIdentifiInforServiceImpl();
 		//1:
 		TargetOrgIdenInfor targetOrgIdenInfor = GetTargetIdentifiInforService.get(requireGetTargetIdentifiInforService, baseDate, employeeId);
 		
@@ -215,23 +213,15 @@ public class GetInforInitialStartup {
 						));
 	}
 	
-	@AllArgsConstructor
-    private class RequireGetTargetIdentifiInforServiceImpl implements GetTargetIdentifiInforService.Require {
+	private class RequireGetTargetIdentifiInforServiceImpl implements GetTargetIdentifiInforService.Require {
 
-        @Inject
-        private EmpOrganizationPub empOrganizationPub;
+		@Override
+		public List<EmpOrganizationImport> getEmpOrganization(GeneralDate referenceDate, List<String> listEmpId) {
 
-        @Override
-        public List<EmpOrganizationImport> getEmpOrganization(GeneralDate referenceDate, List<String> listEmpId) {
+			return empAffiliationInforAdapter.getEmpOrganization(referenceDate, listEmpId);
+		}
 
-            List<EmpOrganizationExport> exports = empOrganizationPub.getEmpOrganiztion(referenceDate, listEmpId);
-            List<EmpOrganizationImport> data = exports.stream().map(i -> {
-                return new EmpOrganizationImport(new EmployeeId(i.getEmpId()), i.getBusinessName(), i.getEmpCd(), i.getWorkplaceId(), i.getWorkplaceGroupId());
-            }).collect(Collectors.toList());
-            return data;
-        }
-
-    }
+	}
 	
 	@AllArgsConstructor
 	private static class RequireGetShiftTableRuleForOrganizationServiceImpl implements GetShiftTableRuleForOrganizationService.Require {

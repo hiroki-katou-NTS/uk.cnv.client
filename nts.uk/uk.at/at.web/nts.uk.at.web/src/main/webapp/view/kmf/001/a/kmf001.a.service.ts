@@ -5,12 +5,8 @@ module nts.uk.at.view.kmf001.a.service {
 
     //export excel
     export function exportExcel(): JQueryPromise<any> {
-        let program = nts.uk.ui._viewModel.kiban.programName().split(" ");
-        let domainType = "KMF001";
-        if (program.length > 1) {
-            program.shift();
-            domainType = domainType + program.join(" ");
-        }
+        let program = __viewContext.program.programName;
+        let domainType = "KMF001_" + program;
         let _params = {
             domainId: "EmployeeSystem",
             domainType: domainType,

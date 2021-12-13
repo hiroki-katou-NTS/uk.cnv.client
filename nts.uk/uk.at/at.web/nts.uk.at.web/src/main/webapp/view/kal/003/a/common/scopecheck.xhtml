@@ -19,7 +19,7 @@
 		<button data-bind="click: openCDL004Dialog, enable: filterByJobTitle">#{i18n.getText('KAL003_19')}</button>
 		<input data-bind="ntsTextEditor: {name: '#{i18n.getText('KAL003_19')}', value: displayTargetJobTitle, required: filterByJobTitle,readonly: true, enable: filterByJobTitle, option: {width: '300px'}}" />
 	</div>
-	<div class="valign-center control-group">
+	<div class="valign-center control-group" hidden ="true">
 		<div data-bind="ntsCheckBox: { checked: filterByBusinessType, enable: true }"></div>
 		<button data-bind="click: openCDL024Dialog, enable: filterByBusinessType">#{i18n.getText('KAL003_20')}</button>
 		<input data-bind="ntsTextEditor: {name: '#{i18n.getText('KAL003_20')}', value: displayTargetBusinessType, required: filterByBusinessType,readonly: true, enable: filterByBusinessType, option: {width: '300px'}}" />

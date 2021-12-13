@@ -215,7 +215,7 @@ public class EstimatedSalaryAggregationServiceTest {
 			val stepResult = byEmpId.getValue();
 			val stepExpected = Helper.getStepOfCriterionAmount( req4Test, isNeedMonthly, stepResult.getSalary().intValue() );
 			assertThat( stepResult.getSalary() ).isEqualTo( salaries.get(byEmpId.getKey()) );
-			assertThat( stepResult.getCriterion() ).isEqualTo( stepExpected.getExceeded() );
+			assertThat( stepResult.getCriterion() ).isEqualTo( stepExpected.getCriterionAmount() );
 			assertThat( stepResult.getBackground() ).isEqualTo( stepExpected.getBackground() );
 
 		} );

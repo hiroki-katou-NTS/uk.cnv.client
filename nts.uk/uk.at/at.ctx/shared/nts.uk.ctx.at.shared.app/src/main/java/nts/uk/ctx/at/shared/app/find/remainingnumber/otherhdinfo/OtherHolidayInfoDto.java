@@ -10,8 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.employee.carryForwarddata.PublicHolidayCarryForwardData;
 import nts.uk.ctx.at.shared.dom.remainingnumber.excessleave.ExcessLeaveInfo;
-import nts.uk.ctx.at.shared.dom.remainingnumber.publicholiday.PublicHolidayRemain;
 import nts.uk.shr.pereg.app.PeregItem;
 import nts.uk.shr.pereg.app.find.dto.PeregDomainDto;
 
@@ -49,11 +49,11 @@ public class OtherHolidayInfoDto extends PeregDomainDto{
 	@PeregItem("IS00374")
 	private String extraHours;
 	
-	public static OtherHolidayInfoDto createFromDomain(Optional<PublicHolidayRemain> pubHDRemain, Optional<ExcessLeaveInfo> exLeavInfo){
+	public static OtherHolidayInfoDto createFromDomain(Optional<PublicHolidayCarryForwardData> pubHDRemain, Optional<ExcessLeaveInfo> exLeavInfo){
 		OtherHolidayInfoDto dto = new OtherHolidayInfoDto();
 		if (pubHDRemain.isPresent()){
-			dto.pubHdremainNumber = pubHDRemain.get().getRemainNumber().v();
-			dto.setRecordId(pubHDRemain.get().getSID());
+			dto.pubHdremainNumber = BigDecimal.valueOf(pubHDRemain.get().getNumberCarriedForward().v());
+			dto.setRecordId(pubHDRemain.get().getEmployeeId());
 		}
 		if (exLeavInfo.isPresent()){
 			dto.useAtr = exLeavInfo.get().getUseAtr().value;
@@ -66,11 +66,11 @@ public class OtherHolidayInfoDto extends PeregDomainDto{
 		return dto;
 	}
 	
-	public static OtherHolidayInfoDto createFromDomainCPS013(Optional<PublicHolidayRemain> pubHDRemain, Optional<ExcessLeaveInfo> exLeavInfo, Map<String, Object> enums){
+	public static OtherHolidayInfoDto createFromDomainCPS013(Optional<PublicHolidayCarryForwardData> publicHolidayCarryForwardData, Optional<ExcessLeaveInfo> exLeavInfo, Map<String, Object> enums){
 		OtherHolidayInfoDto dto = new OtherHolidayInfoDto();
-		if (pubHDRemain.isPresent()){
-			dto.pubHdremainNumber = pubHDRemain.get().getRemainNumber().v();
-			dto.setRecordId(pubHDRemain.get().getSID());
+		if (publicHolidayCarryForwardData.isPresent()){
+			dto.pubHdremainNumber = BigDecimal.valueOf(publicHolidayCarryForwardData.get().getNumberCarriedForward().v());
+			dto.setRecordId(publicHolidayCarryForwardData.get().getEmployeeId());
 		}
 		if (exLeavInfo.isPresent()){
 			

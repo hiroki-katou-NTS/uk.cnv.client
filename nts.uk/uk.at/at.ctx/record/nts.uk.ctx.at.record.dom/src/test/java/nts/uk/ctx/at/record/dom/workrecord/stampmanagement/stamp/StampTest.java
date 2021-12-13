@@ -43,7 +43,7 @@ public class StampTest {
 		RefectActualResult refActualResults = StampHelper.getRefectActualResultDefault();
 		Optional<GeoCoordinate> locationInfor = Optional.ofNullable(StampHelper.getGeoCoordinateDefault()) ;
 		ContractCode contactCode = new ContractCode("DUMMY");
-		Stamp stamp = new Stamp(contactCode, cardNumber, stampDateTime, relieve, type, refActualResults, locationInfor, "DUMMY");
+		Stamp stamp = new Stamp(contactCode, cardNumber, stampDateTime, relieve, type, refActualResults, locationInfor);
 		assertThat(stamp.getImprintReflectionStatus().isReflectedCategory()).isFalse();
 		NtsAssert.invokeGetters(stamp);
 	}
@@ -71,7 +71,7 @@ public class StampTest {
 		GeneralDateTime stampDateTime = GeneralDateTime.ymdhms(2021, 1, 3, 0, 0, 10);
 		
 		Relieve relieve =  StampHelper.getRelieveDefault();
-		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null, "DUMMY");
+		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null);
 		
 		// result
 		WorkTimeInformation wt = stamp.convertToAttendanceStamp(dateInput);
@@ -92,7 +92,7 @@ public class StampTest {
 		GeneralDateTime stampDateTime = GeneralDateTime.ymdhms(2021, 1, 3, 8, 20, 10);
 		
 		Relieve relieve =  StampHelper.getRelieveDefault();
-		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null, "DUMMY");
+		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null);
 		
 		// result
 		WorkTimeInformation wt = stamp.convertToAttendanceStamp(dateInput);
@@ -113,7 +113,7 @@ public class StampTest {
 		GeneralDateTime stampDateTime = GeneralDateTime.ymdhms(2021, 1, 3, 8, 20, 10);
 		
 		Relieve relieve =  StampHelper.getRelieveDefault();
-		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null, "DUMMY");
+		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null);
 		
 		// result
 		WorkTimeInformation wt = stamp.convertToAttendanceStamp(dateInput);
@@ -134,7 +134,7 @@ public class StampTest {
 		GeneralDateTime stampDateTime = GeneralDateTime.ymdhms(2021, 1, 3, 2, 0, 0);
 		
 		Relieve relieve =  StampHelper.getRelieveDefault();
-		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null, "DUMMY");
+		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null);
 		
 		// result
 		WorkTimeInformation wt = stamp.convertToAttendanceStamp(dateInput);
@@ -155,7 +155,7 @@ public class StampTest {
 		GeneralDateTime stampDateTime = GeneralDateTime.ymdhms(2021, 1, 3, 2, 30, 0);
 		
 		Relieve relieve =  StampHelper.getRelieveDefault();
-		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null, "DUMMY");
+		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null);
 		
 		// result
 		WorkTimeInformation wt = stamp.convertToAttendanceStamp(dateInput);
@@ -176,7 +176,7 @@ public class StampTest {
 		GeneralDateTime stampDateTime = GeneralDateTime.ymdhms(2021, 1, 4, 8, 20, 0);
 		
 		Relieve relieve =  StampHelper.getRelieveDefault();
-		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null, "DUMMY");
+		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null);
 		
 		// result
 		WorkTimeInformation wt = stamp.convertToAttendanceStamp(dateInput);
@@ -197,7 +197,7 @@ public class StampTest {
 		GeneralDateTime stampDateTime = GeneralDateTime.ymdhms(2021, 1, 4, 0, 30, 0);
 		
 		Relieve relieve =  StampHelper.getRelieveDefault();
-		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null, "DUMMY");
+		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null);
 		
 		// result
 		WorkTimeInformation wt = stamp.convertToAttendanceStamp(dateInput);
@@ -218,7 +218,7 @@ public class StampTest {
 		GeneralDateTime stampDateTime = GeneralDateTime.ymdhms(2021, 1, 3, 0, 0, 0);
 		
 		Relieve relieve =  StampHelper.getRelieveDefault();
-		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null, "DUMMY");
+		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null);
 		
 		// result
 		WorkTimeInformation wt = stamp.convertToAttendanceStamp(dateInput);
@@ -239,7 +239,7 @@ public class StampTest {
 		GeneralDateTime stampDateTime = GeneralDateTime.ymdhms(2021, 1, 3, 22, 0, 0);
 		
 		Relieve relieve =  StampHelper.getRelieveDefault();
-		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null, "DUMMY");
+		Stamp stamp = new Stamp(null, null, stampDateTime, relieve, null, null, null);
 		
 		// result
 		WorkTimeInformation wt = stamp.convertToAttendanceStamp(dateInput);
@@ -259,8 +259,7 @@ public class StampTest {
 		Optional<GeoCoordinate> locationInfor = Optional.ofNullable(StampHelper.getGeoCoordinateDefault()) ;
 		ContractCode contactCode = new ContractCode("DUMMY");
 		StampTypeDisplay stampTypeDisplay = new StampTypeDisplay("DUMMY");
-		StampRecord stampRecord = new StampRecord(contactCode, cardNumber, stampDateTime, stampTypeDisplay);
-		Stamp stamp = new Stamp(stampRecord, relieve, type, refActualResults, locationInfor);
+		Stamp stamp = new Stamp(contactCode, cardNumber, stampDateTime, relieve, type, refActualResults, locationInfor);
 		//assertThat(stamp.isReflectedCategory()).isFalse();
 		NtsAssert.invokeGetters(stamp);
 	}

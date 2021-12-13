@@ -6,21 +6,21 @@ module nts.uk.at.view.kal003.share.model {
 
     export function getListCategory(): Array<ItemModel> {
         return [
-            new ItemModel(0, nts.uk.resource.getText("KAL010_1000")), //スケジュール日次
+            // new ItemModel(0, nts.uk.resource.getText("KAL010_1000")), //スケジュール日次
             //            new ItemModel(1, nts.uk.resource.getText("KAL010_1500")), //スケジュール週次
             new ItemModel(2, nts.uk.resource.getText("KAL010_200")), //スケジュール４週
             new ItemModel(3, nts.uk.resource.getText("KAL010_1100")), //スケジュール月次
-            new ItemModel(4, nts.uk.resource.getText("KAL010_1200")),//スケジュール年間
+            // new ItemModel(4, nts.uk.resource.getText("KAL010_1200")),//スケジュール年間
             new ItemModel(5, nts.uk.resource.getText("KAL010_1")), //日次
-            new ItemModel(6, nts.uk.resource.getText("KAL010_1300")), //週次
-            new ItemModel(7, nts.uk.resource.getText("KAL010_100")), //月次
-            new ItemModel(8, nts.uk.resource.getText("KAL010_500")), //申請承認
-            new ItemModel(9, nts.uk.resource.getText("KAL010_250")), //複数月
+            // new ItemModel(6, nts.uk.resource.getText("KAL010_1300")), //週次
+            new ItemModel(7, nts.uk.resource.getText("KAL010_100")) //月次
+            // new ItemModel(8, nts.uk.resource.getText("KAL010_500")), //申請承認
+            // new ItemModel(9, nts.uk.resource.getText("KAL010_250")), //複数月
             //            new ItemModel(10, nts.uk.resource.getText("KAL010_607")), //任意期間
-            new ItemModel(11, nts.uk.resource.getText("KAL010_400")), //年休
-            new ItemModel(12, nts.uk.resource.getText("KAL010_117")), //３６協定
+            // new ItemModel(11, nts.uk.resource.getText("KAL010_400")), //年休
+            // new ItemModel(12, nts.uk.resource.getText("KAL010_117")), //３６協定
             //            new ItemModel(13, nts.uk.resource.getText("KAL010_1400")) //工数チェック
-            new ItemModel(14, nts.uk.resource.getText("KAL010_550")) //マスタチェック
+            // new ItemModel(14, nts.uk.resource.getText("KAL010_550")) //マスタチェック
         ];
     }
     //日次の抽出するデータの条件

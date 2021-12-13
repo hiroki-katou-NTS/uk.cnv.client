@@ -36,9 +36,9 @@
 					<span class="title">#{i18n.getText('Com_Company')}</span>
 					<button class="proceed" data-bind="click: function(){submitCalendar(0)}, enable: $root.errors.isEmpty">#{i18n.getText('KSM004_1')}</button>
 					<button data-bind="click: function(){openDialogD(0)}, enable: $root.errors.isEmpty">#{i18n.getText('KSM004_2')}</button>
-					<button data-bind="click: openDialogC, enable: $root.errors.isEmpty">#{i18n.getText('KSM004_3')}</button>
+					<button data-bind="click: openDialogKdl058, enable: $root.errors.isEmpty">#{i18n.getText('KSM004_3')}</button>
 					<button class="danger" data-bind="click: function(){removeCalendar(0)}, enable: Boolean(isUpdate()&#38;$root.errors.isEmpty()),visible : removeFlg">#{i18n.getText('KSM004_4')}</button>
-					<!--<button id="print-button_1" data-bind="click: opencdl028Dialog">#{i18n.getText('KSM004_100')}</button>-->
+					<button id="print-button_1" data-bind="click: opencdl028Dialog, enable: false">#{i18n.getText('KSM004_100')}</button>
 					<button data-bind="click:  function(){openDialogF(0)}">#{i18n.getText('KSM004_117')}</button>
 				</div>
 				<div class="contents-area">

@@ -30,7 +30,7 @@ public class KfnmtAlstPtnDeftmyear extends ContractUkJpaEntity implements Serial
 	public int year;
 	
 	@Column(name = "THIS_YEAR")
-	public int thisYear;
+	public boolean thisYear;
 	
 	@OneToOne(mappedBy = "extractRangeYear", orphanRemoval = true)
 	public KfnmtAlstPtnDeftm checkCondition;
@@ -41,13 +41,13 @@ public class KfnmtAlstPtnDeftmyear extends ContractUkJpaEntity implements Serial
 	}
 	
 	public AYear toDomain() {
-		return new AYear(this.pk.extractionId, this.pk.extractionRange, year, thisYear==1);
+		return new AYear(this.pk.extractionId, this.pk.extractionRange, year, thisYear);
 	}
 	
 	public KfnmtAlstPtnDeftmyear(AYear domain) {
 		this.pk = new KfnmtExtractRangeYearPK(domain.getExtractionId(), domain.getExtractionRange().value);
 		this.year = domain.getYear();
-		this.thisYear = domain.isToBeThisYear() ? 1: 0;
+		this.thisYear = domain.isToBeThisYear();
 	}
 	public static KfnmtAlstPtnDeftmyear toEntity(AYear domain) {
 		return new KfnmtAlstPtnDeftmyear(domain);

@@ -1,5 +1,14 @@
 package nts.uk.ctx.at.shared.infra.entity.agreement.management;
 
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,11 +28,7 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.management.time
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.management.timesetting.AgreementOneYear;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.management.timesetting.AgreementOverMaxTimes;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.management.timesetting.BasicAgreementSetting;
-import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
-
-import javax.persistence.*;
-import java.io.Serializable;
 
 /**
  * entity: 雇用３６協定時間
@@ -131,7 +136,7 @@ public class Ksrmt36AgrMgtCls extends ContractUkJpaEntity implements Serializabl
     public static Ksrmt36AgrMgtCls toEntity(AgreementTimeOfClassification domain){
         // TODO wait change domain from Nittsu
         return new Ksrmt36AgrMgtCls(
-                new Ksrmt36AgrMgtClsPk(domain.getCompanyId(),domain.getClassificationCode().v(),domain.getLaborSystemAtr().value),
+                new Ksrmt36AgrMgtClsPk(domain.getCompanyId(),domain.getClassificationCode().v(),BooleanUtils.toBoolean(domain.getLaborSystemAtr().value)),
 
                 // basicMAllTime ->分類３６協定時間.３６協定基本設定.1ヶ月.基本設定.エラーアラーム時間
                 domain.getSetting().getOneMonth().getBasic().getErAlTime().getAlarm().v(),
@@ -178,7 +183,7 @@ public class Ksrmt36AgrMgtCls extends ContractUkJpaEntity implements Serializabl
     public static AgreementTimeOfClassification toDomain(Ksrmt36AgrMgtCls entity){
         val companyId = entity.getKsrmt36AgrMgtClsPk().getCompanyID();
         val classificationCode = new ClassificationCode(entity.getKsrmt36AgrMgtClsPk().getClassificationCode()) ;
-        val laborSystemAtr = EnumAdaptor.valueOf(entity.getKsrmt36AgrMgtClsPk().getLaborSystemAtr(),LaborSystemtAtr.class);
+        val laborSystemAtr = EnumAdaptor.valueOf(BooleanUtils.toInteger(entity.getKsrmt36AgrMgtClsPk().isLaborSystemAtr()),LaborSystemtAtr.class);
 
         val erAlTime =  OneMonthErrorAlarmTime.of(new AgreementOneMonthTime((int) entity.getBasicMArlTime()), new AgreementOneMonthTime((int) entity.getBasicMAllTime()));
         val upperLimit = new AgreementOneMonthTime((int) entity.getBasicMLimitTime());

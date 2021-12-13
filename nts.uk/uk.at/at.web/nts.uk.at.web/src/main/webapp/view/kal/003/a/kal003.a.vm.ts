@@ -139,19 +139,15 @@ module nts.uk.at.view.kal003.a.viewmodel {
             });
 
             self.tabAnnualHolidaySubCon.narrowUntilNext.subscribe(function(data: any) {
-                //               if (data == true) {
-                //                   $("#check-sub-period").trigger("validate");
-                //               } else {
-                //                   $("#check-sub-period").ntsError("clear");
-                //               }
+                if (!data) {
+                   $("#check-sub-period").ntsError("clear");
+                }
             });
 
             self.tabAnnualHolidaySubCon.narrowLastDay.subscribe(function(data: any) {
-                //               if (data == true) {
-                //                   $("#check-sub-last").trigger("validate");
-                //               } else {
-                //                   $("#check-sub-last").ntsError("clear");
-                //               }
+                if (!data) {
+                   $("#check-sub-last").ntsError("clear");
+                }
             });
 
         }
@@ -434,6 +430,18 @@ module nts.uk.at.view.kal003.a.viewmodel {
                 $("#con_usage_obli_day").trigger("validate");
                 $("#A3_2").trigger("validate");
                 $("#A3_4").trigger("validate");
+                if (self.tabAnnualHolidaySubCon.narrowUntilNext()) {
+                    $("#check-sub-period").trigger("validate");
+                    if ($("#check-sub-period").ntsError("hasError")) {
+                        return;
+                    }
+                }
+                if (self.tabAnnualHolidaySubCon.narrowLastDay()) {
+                    $("#check-sub-last").trigger("validate");
+                    if ($("#check-sub-last").ntsError("hasError")) {
+                        return;
+                    }
+                }
                 if ($("#con_usage_obli_day").ntsError("hasError") || $("#A3_2").ntsError("hasError") || $("#A3_4").ntsError("hasError")) {
                     return;
                 }
@@ -621,7 +629,8 @@ module nts.uk.at.view.kal003.a.viewmodel {
         openKAL003dDialog() {
             let self = this;
             nts.uk.ui.errors.clearAll();
-
+            
+            nts.uk.ui.windows.setShared("inputKAL003d", self.selectedAlarmCheckCondition().category());
             modal("/view/kal/003/d/index.xhtml").onClosed(() => {
 
                 var output = getShared("outputKAL003d");

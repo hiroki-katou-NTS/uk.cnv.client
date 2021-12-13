@@ -10,8 +10,8 @@ import lombok.Getter;
 import nts.uk.ctx.at.schedule.dom.adapter.employmentstatus.EmploymentInfoImported;
 import nts.uk.ctx.at.schedule.dom.executionlog.ScheduleErrorLog;
 import nts.uk.ctx.at.schedule.dom.schedule.workschedule.ProcessingStatus;
-import nts.uk.ctx.at.schedule.dom.schedule.workschedule.ScheManaStatuTempo;
 import nts.uk.ctx.at.schedule.dom.schedule.workschedule.WorkSchedule;
+import nts.uk.ctx.at.shared.dom.employeeworkway.EmployeeWorkingStatus;
 @AllArgsConstructor
 @Getter
 public class DataProcessingStatusResult {
@@ -31,6 +31,6 @@ public class DataProcessingStatusResult {
 	private WorkCondItemDto workingCondition;
 	
 	/** 社員の当日在職状態 */
-	private ScheManaStatuTempo statusImported;
+	private EmployeeWorkingStatus statusImported;
 }
 

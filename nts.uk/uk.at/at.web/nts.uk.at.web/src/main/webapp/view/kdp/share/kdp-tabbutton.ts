@@ -35,8 +35,8 @@ module nts.uk.at.view.kdp.share {
 
 	const DEFAULT_GRAY = '#E8E9EB';
 
-	export const getIcon = (changeClockArt: any, changeCalArt: any, setPreClockArt: any, changeHalfDay: any, reservationArt: any) => {
-		switch (checkType(changeClockArt, changeCalArt, setPreClockArt, changeHalfDay, reservationArt)) {
+	export const getIcon = (changeClockArt: any, changeCalArt: any, setPreClockArt: any, changeHalfDay: any) => {
+		switch (checkType(changeClockArt, changeCalArt, setPreClockArt, changeHalfDay)) {
 			case 1:
 				return 205;
 			case 2:
@@ -80,8 +80,8 @@ module nts.uk.at.view.kdp.share {
 		}
 	}
 
-	export const checkType = (changeClockArt: any, changeCalArt: any, setPreClockArt: any, changeHalfDay: any, reservationArt: any) => {
-		if (changeCalArt == 0 && setPreClockArt == 0 && (changeHalfDay == false || changeHalfDay == 0) && reservationArt == 0) {
+	export const checkType = (changeClockArt: any, changeCalArt: any, setPreClockArt: any, changeHalfDay: any) => {
+		if (changeCalArt == 0 && setPreClockArt == 0 && (changeHalfDay == false || changeHalfDay == 0)) {
 			if (changeClockArt == 0)
 				return 1;
 
@@ -115,10 +115,10 @@ module nts.uk.at.view.kdp.share {
 			if (changeClockArt == 12)
 				return 16;
 		}
-		if (changeClockArt == 0 && changeCalArt == 0 && setPreClockArt == 1 && (changeHalfDay == false || changeHalfDay == 0) && reservationArt == 0)
+		if (changeClockArt == 0 && changeCalArt == 0 && setPreClockArt == 1 && (changeHalfDay == false || changeHalfDay == 0))
 			return 2;
 
-		if (changeCalArt == 1 && setPreClockArt == 0 && (changeHalfDay == false || changeHalfDay == 0) && reservationArt == 0) {
+		if (changeCalArt == 1 && setPreClockArt == 0 && (changeHalfDay == false || changeHalfDay == 0)) {
 			if (changeClockArt == 0)
 				return 3;
 
@@ -126,7 +126,7 @@ module nts.uk.at.view.kdp.share {
 				return 17;
 		}
 
-		if (changeCalArt == 3 && setPreClockArt == 0 && (changeHalfDay == false || changeHalfDay == 0) && reservationArt == 0) {
+		if (changeCalArt == 3 && setPreClockArt == 0 && (changeHalfDay == false || changeHalfDay == 0)) {
 			if (changeClockArt == 0)
 				return 4;
 
@@ -134,16 +134,16 @@ module nts.uk.at.view.kdp.share {
 				return 18;
 		}
 
-		if (changeClockArt == 1 && changeCalArt == 0 && setPreClockArt == 2 && (changeHalfDay == false || changeHalfDay == 0) && reservationArt == 0)
+		if (changeClockArt == 1 && changeCalArt == 0 && setPreClockArt == 2 && (changeHalfDay == false || changeHalfDay == 0))
 			return 6;
 
-		if (changeClockArt == 1 && changeCalArt == 2 && setPreClockArt == 0 && (changeHalfDay == false || changeHalfDay == 0) && reservationArt == 0)
+		if (changeClockArt == 1 && changeCalArt == 2 && setPreClockArt == 0 && (changeHalfDay == false || changeHalfDay == 0))
 			return 7;
 
-		if ((changeClockArt == "" || changeClockArt == null) && (changeCalArt == "" || changeCalArt == null) && (setPreClockArt == "" || setPreClockArt == null) && (changeHalfDay == "" || changeHalfDay == null) && reservationArt == 1)
+		if ((changeClockArt == "" || changeClockArt == null) && (changeCalArt == "" || changeCalArt == null) && (setPreClockArt == "" || setPreClockArt == null) && (changeHalfDay == "" || changeHalfDay == null))
 			return 19;
 
-		if ((changeClockArt == "" || changeClockArt == null) && (changeCalArt == "" || changeCalArt == null) && (setPreClockArt == "" || setPreClockArt == null) && (changeHalfDay == "" || changeHalfDay == null) && reservationArt == 2)
+		if ((changeClockArt == "" || changeClockArt == null) && (changeCalArt == "" || changeCalArt == null) && (setPreClockArt == "" || setPreClockArt == null) && (changeHalfDay == "" || changeHalfDay == null))
 			return 20;
 	}
 
@@ -157,15 +157,15 @@ module nts.uk.at.view.kdp.share {
 
 			const icon = document.createElement('i');
 
-			ko.applyBindingsToNode(icon, { ntsIcon: { no: getIcon(data.changeClockArt, data.changeCalArt, data.setPreClockArt, data.changeHalfDay, data.btnReservationArt), 'width': '68', 'height': '68' } });
+			ko.applyBindingsToNode(icon, { ntsIcon: { no: getIcon(data.changeClockArt, data.changeCalArt, data.setPreClockArt, data.changeHalfDay), 'width': '68', 'height': '68' } });
 
 			const text = document.createElement('div');
 
-			const { supportUse, temporaryUse } = data;
+			const { supportUse, temporaryUse, entranceExitUse } = data;
 
 			ko.applyBindingsToNode(text, { text: data.btnName });
 
-			let btnType = checkType(data.changeClockArt, data.changeCalArt, data.setPreClockArt, data.changeHalfDay, data.btnReservationArt);
+			let btnType = checkType(data.changeClockArt, data.changeCalArt, data.setPreClockArt, data.changeHalfDay);
 
 			$(element)
 				.append(icon)
@@ -174,7 +174,7 @@ module nts.uk.at.view.kdp.share {
 					'color': data.btnTextColor,
 					'background-color': data.btnBackGroundColor,
 					'visibility': data.btnPositionNo === -1 || data.usrArt === 0 || (supportUse === false && _.includes([14, 15, 16, 17, 18], btnType)) 
-					|| (temporaryUse === false && _.includes([12, 13], btnType)) ? 'hidden' : 'visible'
+					|| (temporaryUse === false && _.includes([12, 13], btnType)) || (entranceExitUse === false && _.includes([10, 11], btnType)) ? 'hidden' : 'visible'
 				});
 			changeHeightBtn(true);
 			if (data.btnPositionNo === 1 || data.btnPositionNo === 2) {
@@ -220,6 +220,8 @@ module nts.uk.at.view.kdp.share {
 		supportUse: KnockoutObservable<boolean> = ko.observable(false);
 
 		temporaryUse: KnockoutObservable<boolean> = ko.observable(false);
+
+		entranceExitUse: KnockoutObservable<boolean> = ko.observable(false);
 		
 		constructor(public params: StampParam) {
 			super();
@@ -328,6 +330,7 @@ module nts.uk.at.view.kdp.share {
 					};
 					const supportUsed = ko.unwrap(vm.supportUse);
 					const temporaryUsed = ko.unwrap(vm.temporaryUse);
+					const entranceExitUse = ko.unwrap(vm.entranceExitUse);
 
 					const filters: TabLayout[] = [];
 
@@ -374,6 +377,7 @@ module nts.uk.at.view.kdp.share {
 									btn.height = Math.max(buttonSize, 70) * constance + (buttonLayoutType === SMALL_8 ? 7 : 0);
 									btn.supportUse = supportUsed;
 									btn.temporaryUse = temporaryUsed;
+									btn.entranceExitUse = entranceExitUse;
 
 									buttons.push(btn);
 								} else {
@@ -393,7 +397,8 @@ module nts.uk.at.view.kdp.share {
 										usrArt: -1,
 										height: buttonSize,
 										supportUse: supportUsed,
-										temporaryUse: temporaryUsed
+										temporaryUse: temporaryUsed,
+										entranceExitUse: entranceExitUse
 									});
 								}
 							}
@@ -419,6 +424,7 @@ module nts.uk.at.view.kdp.share {
 				.done((data: ISettingsStampCommon) => {
 					vm.supportUse(!!data.supportUse);
 					vm.temporaryUse(!!data.temporaryUse);
+					vm.entranceExitUse(!!data.entranceExitUse);
 				});
 			window.onresize = function() {vm.setSize();params.reCalGridWidthHeight();}
 		}
@@ -541,6 +547,8 @@ module nts.uk.at.view.kdp.share {
 		height: number;
 		supportUse: boolean;
 		temporaryUse: boolean;
+		entranceExitUse: boolean;
+		taskChoiceArt: number;
 	}
 
 	export enum NotUseAtr {
@@ -599,6 +607,8 @@ module nts.uk.at.view.kdp.share {
 		supportUse: boolean;
 		temporaryUse: boolean;
 		workUse: boolean;
+		entranceExitUse: boolean;
+
 	}
 	let changeFontSize = function(element: HTMLButtonElement, type : number){
 		let text = element.innerText.replace(/(\r\n|\n|\r)/gm,"");

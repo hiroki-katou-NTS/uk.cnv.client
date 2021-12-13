@@ -10,3 +10,46 @@ div#grid_container_container.ui-widget.ui-helper-clearfix.ui-corner-all.ui-iggri
 	{
 	margin: auto !important
 }
+
+#combo-box2 {
+	vertical-align: middle;
+}
+
+.control-group {
+	margin-bottom: 9px;
+}
+
+#searchButton {
+	vertical-align: top;
+}
+
+div.control-group-2 {
+	margin-left: 55px;
+}
+
+.caret-background:not(.deprecate).caret-bottom, .caret-background:not(.deprecate).caret-top, .caret-background:not(.deprecate).caret-left, .caret-background:not(.deprecate).caret-right {
+	margin: -25px;
+}
+.pad_left_5px {
+	padding-left: 5px;
+}
+.ntsSearchBox {
+	width: 451px;
+}
+.cas013-b{
+	float: left;
+	margin-top: 5px;
+	padding-left: 5px;
+}
+
+#kcp005 {
+	margin-left: 7%;
+    margin-top: 20px;
+}
+
+#B3{
+	margin-left: 34px;
+}
+.nts-gridlist.ui-iggrid table th.ui-widget-header {
+	text-align: inherit;
+}

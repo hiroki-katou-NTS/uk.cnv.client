@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.layer.infra.data.DbConsts;
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.gul.collection.CollectionUtil;
@@ -83,7 +85,7 @@ public class JpaWorkRecorExtraConRepository extends JpaRepository implements Wor
 		CollectionUtil.split(listErrorAlarmID, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subIdList ->{
 			workRecord.addAll(this.queryProxy().query(SELECT_FROM_WORK_RECORD_BY_ID_USE, KrcmtWorkRecordExtraCon.class)
 					.setParameter("listErrorAlarmID", listErrorAlarmID)
-					.setParameter("useAtr", use)
+					.setParameter("useAtr", BooleanUtils.toBoolean(use))
 					.getList(c->c.toDomain()));
 		});
 		

@@ -1,0 +1,36 @@
+.ui-area {
+    margin-left: 20px;
+}
+.set-row {
+    margin-left: 0px;
+    margin-top: -10px;
+    width: 429px;
+}
+
+.row { margin-bottom: 6px;}
+
+.col {
+    width: 150px;
+}
+
+.content-setting {
+    margin-left: 48px;
+}
+
+#combo-box {
+    width: 75px;
+    margin-bottom: 4px;
+}
+
+.ui-igcombo-wrapper {
+    padding-bottom: 4px;
+}
+
+.content-setting .table .cell.valign-center span.unit {
+    padding-left: 10px;
+}
+
+/*.switchbox-wrappers.radio-wrappers label input+span {*/
+    /*width: 60px;*/
+    /*text-align: center;*/
+/*}*/

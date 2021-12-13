@@ -225,44 +225,37 @@ public class DumData {
             new AffAtWorkplaceExport(
                     "sya001",
                     "S001",
-                    "H01",
-                    "n01"
+                    "H01"
             ),
             new AffAtWorkplaceExport(
                     "sya002",
                     "S001",
-                    "H02",
-                    "n02"
+                    "H02"
             ),
             new AffAtWorkplaceExport(
                     "sya003",
                     "S001",
-                    "H03",
-                    "n03"
+                    "H03"
             ),
             new AffAtWorkplaceExport(
                     "sya004",
                     "S002",
-                    "H04",
-                    "n04"
+                    "H04"
             ),
             new AffAtWorkplaceExport(
                     "sya005",
                     "S002",
-                    "H05",
-                    "n05"
+                    "H05"
             ),
             new AffAtWorkplaceExport(
                     "del001",
                     "S002",
-                    "H01",
-                    "n05"
+                    "H01"
             ),
             new AffAtWorkplaceExport(
                     "del002",
                     "S002",
-                    "H02",
-                    "n02"
+                    "H02"
             )
     );
 
@@ -270,32 +263,27 @@ public class DumData {
             new AffAtWorkplaceExport(
                     "sya001",
                     "S001",
-                    "H01",
-                    "n01"
+                    "H01"
             ),
             new AffAtWorkplaceExport(
                     "sya002",
                     "S001",
-                    "H02",
-                    "n02"
+                    "H02"
             ),
             new AffAtWorkplaceExport(
                     "sya003",
                     "S001",
-                    "H03",
-                    "n03"
+                    "H03"
             ),
             new AffAtWorkplaceExport(
                     "sya004",
                     "S002",
-                    "H04",
-                    "n04"
+                    "H04"
             ),
             new AffAtWorkplaceExport(
                     "sya005",
                     "S002",
-                    "H05",
-                    "n05"
+                    "H05"
             )
     );
 
@@ -375,14 +363,12 @@ public class DumData {
             new AffAtWorkplaceExport(
                     "sya004",
                     "S002",
-                    "H04",
-                    "n04"
+                    "H04"
             ),
             new AffAtWorkplaceExport(
                     "sya005",
                     "S002",
-                    "H05",
-                    "n05"
+                    "H05"
             )
     );
 }

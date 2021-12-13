@@ -31,10 +31,6 @@ public class ManageAnnualSetting extends DomainObject implements Serializable{
     // 半日年休管理
     private HalfDayManage halfDayManage;
 
-    /** The work day calculate. */
-    // 年休を出勤日数として加算する
-    private boolean isWorkDayCalculate;
-
     /** The remaining number setting. */
     // 残数設定
     private RemainingNumberSetting remainingNumberSetting;
@@ -57,7 +53,6 @@ public class ManageAnnualSetting extends DomainObject implements Serializable{
         super();
 //        this.maxGrantDay = memento.getMaxGrantDay();
         this.halfDayManage = memento.getHalfDayManage();
-        this.isWorkDayCalculate = memento.getIsWorkDayCalculate();
         this.remainingNumberSetting = memento.getRemainingNumberSetting();
         this.yearlyOfNumberDays = memento.getYearLyOfDays();
     }
@@ -69,7 +64,6 @@ public class ManageAnnualSetting extends DomainObject implements Serializable{
      */
     public void saveToMemento(ManageAnnualSettingSetMemento memento) {
         memento.setHalfDayManage(this.halfDayManage);
-        memento.setWorkDayCalculate(this.isWorkDayCalculate);
         if(this.remainingNumberSetting == null){
         	memento.setRemainingNumberSetting(new RemainingNumberSetting(new RetentionYear(2)));
         }else{

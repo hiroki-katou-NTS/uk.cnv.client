@@ -118,12 +118,9 @@ module nts.uk.at.view.kaf011.b.viewmodel {
 
 		openKDL009() {
 			const vm = this;
-			nts.uk.ui.windows.setShared('KDL009_DATA', {
-				employeeIds: [vm.appDispInfoStartupOutput().appDetailScreenInfo.application.employeeID],
-				baseDate: moment(new Date()).format("YYYYMMDD")
-			});
+			nts.uk.ui.windows.setShared('KDL009_DATA', [vm.appDispInfoStartupOutput().appDetailScreenInfo.application.employeeID]);
 			
-			nts.uk.ui.windows.sub.modal( '/view/kdl/009/a/single.xhtml');
+			nts.uk.ui.windows.sub.modal("/view/kdl/009/a/index.xhtml",{width: 770, height: 650});
 			
 			
 		}

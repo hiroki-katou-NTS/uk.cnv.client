@@ -8,8 +8,10 @@ import nts.uk.ctx.at.function.dom.alarm.extractionrange.PreviousClassification;
 import nts.uk.ctx.at.function.dom.alarm.extractionrange.StartDate;
 import nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.EndSpecify;
 import nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.ExtractionPeriodDaily;
-import nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.SpecifiedMonth;
+import nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.DailyClosingDateSpecifiedMonth;
 import nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.StartSpecify;
+import nts.uk.ctx.at.function.dom.alarm.extractionrange.month.MonthlyClosingMonthSpecifiedMonth;
+
 @Data
 public class ExtractionPeriodDailyCommand {
 	
@@ -44,18 +46,33 @@ public class ExtractionPeriodDailyCommand {
 		
 		StartDate startDate = new StartDate(strSpecify);
 		
-		if(strSpecify == StartSpecify.DAYS.value){
-			startDate.setStartDay(EnumAdaptor.valueOf(strPreviousDay, PreviousClassification.class), (int)strDay, (int)strDay==0?true:false);
-		}else if(strSpecify == StartSpecify.MONTH.value){
-			startDate.setStartMonth(EnumAdaptor.valueOf(strPreviousMonth, PreviousClassification.class), (int)strMonth, (int)strMonth==SpecifiedMonth.CURRENTMONTH.value?true:false);
+		if (strSpecify == StartSpecify.DAYS.value) {
+			startDate.setStartDay(
+					EnumAdaptor.valueOf(strPreviousDay, PreviousClassification.class),
+					strDay,
+					strDay == 0
+			);
+		} else if (strSpecify == StartSpecify.MONTH.value) {
+			startDate.setStartMonth(
+					EnumAdaptor.valueOf(strPreviousMonth, PreviousClassification.class),
+					strMonth,
+					strMonth == MonthlyClosingMonthSpecifiedMonth.CURRENT_MONTH.value
+			);
 		}
 		
 		EndDate endDate = new EndDate(endSpecify);
 		
-		if(endSpecify == EndSpecify.DAYS.value){
-			endDate.setEndDay(EnumAdaptor.valueOf(endPreviousDay, PreviousClassification.class), (int)endDay, (int)endDay==0?true:false);
-		}else if(endSpecify == EndSpecify.MONTH.value){
-			endDate.setEndMonth(EnumAdaptor.valueOf(endPreviousMonth, PreviousClassification.class), (int)endMonth, (int)endMonth==SpecifiedMonth.CURRENTMONTH.value?true:false);
+		if (endSpecify == EndSpecify.DAYS.value) {
+			endDate.setEndDay(
+					EnumAdaptor.valueOf(endPreviousDay, PreviousClassification.class),
+					endDay,
+					endDay == 0);
+		} else if (endSpecify == EndSpecify.MONTH.value) {
+			endDate.setEndMonth(
+					EnumAdaptor.valueOf(endPreviousMonth, PreviousClassification.class),
+					endMonth,
+					endMonth == MonthlyClosingMonthSpecifiedMonth.CURRENT_MONTH.value
+			);
 		}
 		
 		return new ExtractionPeriodDaily(extractionId, extractionRange, startDate, endDate);

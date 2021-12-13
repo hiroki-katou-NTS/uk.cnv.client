@@ -175,7 +175,7 @@ public class UpdateAllDomainMonthServiceImpl implements UpdateAllDomainMonthServ
 		remains.setMonthMergeKey(key);
 		remains.setRsvLeaRemNumEachMonth(d.getReserveLeaveRemain().orElse(null));
 		remains.setSpecialHolidayRemainData(d.getSpecialLeaveRemain());
-		
+		remains.setMonPublicHoliday(d.getPublicHolidayLeaveRemain().orElse(null));
 		return remains;
 	}
 

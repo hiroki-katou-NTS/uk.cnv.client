@@ -12,6 +12,8 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.layer.infra.data.DbConsts;
 import nts.arc.layer.infra.data.JpaRepository;
@@ -44,7 +46,7 @@ public class JpaShortTimeOfDailyPerformanceRepo extends JpaRepository implements
 
 	private ShortWorkingTimeSheet shortWorkTime(KrcdtDaiShortWorkTime c) {
 		return new ShortWorkingTimeSheet(new ShortWorkTimFrameNo(c.krcdtDaiShortWorkTimePK.shortWorkTimeFrameNo),
-				EnumAdaptor.valueOf(c.childCareAtr, ChildCareAtr.class), new TimeWithDayAttr(c.startTime),
+				EnumAdaptor.valueOf(BooleanUtils.toInteger(c.childCareAtr), ChildCareAtr.class), new TimeWithDayAttr(c.startTime),
 				new TimeWithDayAttr(c.endTime));
 	}
 

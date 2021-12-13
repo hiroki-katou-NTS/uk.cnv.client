@@ -22,18 +22,20 @@
 
 		<ui:define name="content">
 			<div id="functions-area">
-				<button id="A_BTN_NEW" data-bind="click : createNewLayout">#{i18n.getText('CPS008_3')}</button>
-				<button id="A_BTN_REGISTER" class="proceed"
+				<a tabindex="1" class="goback" 
+					data-bind="ntsLinkButton: { jump: '/view/cps/018/a/index.xhtml' }, visible: $vm.isFromCPS018">#{i18n.getText('CPS008_52')}</a>
+				<button tabindex="2" id="A_BTN_NEW" data-bind="click : createNewLayout">#{i18n.getText('CPS008_3')}</button>
+				<button tabindex="3" id="A_BTN_REGISTER" class="proceed"
 					data-bind="click: saveDataLayout, enable: enaBtnSave()">#{i18n.getText('CPS008_4')}</button>
-				<button id="A_BTN_COPPY"
+				<button tabindex="4" id="A_BTN_COPPY"
 					data-bind="click: copyDataLayout, enable: enaBtnCoppy()">#{i18n.getText('CPS008_5')}</button>
-				<button id="A_BTN_DELETE" class="danger"
+				<button tabindex="5" id="A_BTN_DELETE" class="danger"
 					data-bind="click: removeDataLayout, enable: enaBtnDel()">#{i18n.getText('CPS008_6')}</button>
 					
 				<button id="print-button" data-bind="click: exportExcel">#{i18n.getText('KMK007_4')}</button> 
 				
-				<a class="goout" id="A_BTN_JUMP"
-					data-bind="ntsLinkButton:  { jump: '../../007/a/index.xhtml' }">#{i18n.getText('CPS008_7')}</a>
+				<a tabindex="6" class="goout" id="A_BTN_JUMP"
+					data-bind="ntsLinkButton:  { jump: '../../007/a/index.xhtml' }, style: { marginLeft: $vm.isFromCPS018() ? '353px' : '475px' }">#{i18n.getText('CPS008_7')}</a>
 					
 				 
 			</div>
@@ -43,7 +45,7 @@
 					<i class="icon icon-searchbox"></i>
 					<div class="cf">
 						<div style="float: left">
-							<div style="width: 300px"
+							<div style="width: 300px" tabindex="7"
 								data-bind="ntsSearchBox: {
 									searchMode :'highlight',
 									targetKey: 'id', 
@@ -53,7 +55,7 @@
 									selected: 'id',
 									selectedKey: 'id', 
 									fields: ['name', 'code'] }" />
-							<table id="multi-list"
+							<table id="multi-list" tabindex="8"
 								data-bind="ntsGridList: {
 									height: window.screen.height - 400,
 									options: layouts,
@@ -92,7 +94,7 @@
 								<td class="valign-center">
 									<div>
 										<div class="input_002 input_code">
-											<input id="A_INP_CODE" style="width: 80px"
+											<input id="A_INP_CODE" style="width: 80px" tabindex="9"
 												data-bind="ntsTextEditor: {
 															value: code,
 															name: '#[CPS008_12]',
@@ -102,7 +104,7 @@
 										</div>
 
 										<div class="input_002 input_name">
-											<input id="A_INP_NAME" style="width: 180px"
+											<input id="A_INP_NAME" style="width: 180px" tabindex="10"
 												data-bind="ntsTextEditor: {
 															value: name,
 															name: '#[CPS008_13]',
@@ -116,7 +118,7 @@
 							</tr>
 						</table>
 						<div>
-							<button class="x-large"
+							<button class="x-large" tabindex="11"
 								data-bind="click: $parent.showDialogB.bind($parent), enable: !!id()">#{i18n.getText('CPS008_42')}</button>
 						</div>
 						<com:ko tag="if" bind="action() == LAYOUT_ACTION.INSERT">

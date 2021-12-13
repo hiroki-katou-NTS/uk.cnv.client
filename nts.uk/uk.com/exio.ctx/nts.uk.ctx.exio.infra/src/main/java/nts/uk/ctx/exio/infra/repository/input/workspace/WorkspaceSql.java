@@ -12,19 +12,22 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.val;
+import nts.arc.layer.infra.data.database.DatabaseProduct;
 import nts.arc.layer.infra.data.jdbc.JdbcProxy;
 import nts.arc.layer.infra.data.jdbc.NtsResultSet.NtsResultRecord;
 import nts.arc.layer.infra.data.jdbc.NtsStatement;
 import nts.uk.ctx.exio.dom.input.DataItem;
 import nts.uk.ctx.exio.dom.input.DataItemList;
 import nts.uk.ctx.exio.dom.input.ExecutionContext;
-import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalItem;
-import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalizedDataRecord;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalItem;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalizedDataRecord;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomain;
 import nts.uk.ctx.exio.dom.input.setting.assembly.RevisedDataRecord;
 import nts.uk.ctx.exio.dom.input.workspace.ExternalImportWorkspaceRepository.Require;
 import nts.uk.ctx.exio.dom.input.workspace.TemporaryTable;
 import nts.uk.ctx.exio.dom.input.workspace.WorkspaceTableName;
+import nts.uk.ctx.exio.dom.input.workspace.builder.CreateTableBuilder;
+import nts.uk.ctx.exio.dom.input.workspace.datatype.DataType;
 import nts.uk.ctx.exio.dom.input.workspace.datatype.DataTypeConfiguration;
 import nts.uk.ctx.exio.dom.input.workspace.domain.DomainWorkspace;
 import nts.uk.ctx.exio.dom.input.workspace.item.WorkspaceItem;
@@ -42,13 +45,18 @@ public class WorkspaceSql {
 	private final ImportingDomain domain;
 	private final DomainWorkspace workspace;
 	private final JdbcProxy jdbcProxy;
-	
-	public static WorkspaceSql create(Require require, ExecutionContext context, JdbcProxy jdbcProxy) {
+	private final DatabaseProduct database;	//this.database().product();
+
+	static final Column ROW_NO = new Column("ROW_NO", new DataTypeConfiguration(DataType.INT, 10,0), "rowno");
+	static final Column CONTRACT_CD = new Column("CONTRACT_CD", new DataTypeConfiguration(DataType.STRING, 12,0), "contract");
+	static final Column CID = new Column("CID", new DataTypeConfiguration(DataType.STRING, 17,0), "cid");
+
+	public static WorkspaceSql create(Require require, ExecutionContext context, JdbcProxy jdbcProxy, DatabaseProduct database) {
 
 		val domain = require.getImportingDomain(context.getDomainId());
 		val workspace = require.getDomainWorkspace(context.getDomainId());
 		
-		return new WorkspaceSql(context, domain, workspace, jdbcProxy);
+		return new WorkspaceSql(context, domain, workspace, jdbcProxy, database);
 	}
 	
 	/**
@@ -58,61 +66,50 @@ public class WorkspaceSql {
 	 * @param jdbcProxy
 	 */
 	public static void cleanOldTables(Require require, ExecutionContext context, JdbcProxy jdbcProxy) {
-		
-		require.getAllImportingDomains().forEach(domain -> {
-			val tableName = tableName(context, domain);
-			TemporaryTable.dropTable(jdbcProxy, tableName.asRevised());
-			TemporaryTable.dropTable(jdbcProxy, tableName.asCanonicalized());
-		});
+		val domain = require.getImportingDomain(context.getDomainId());		
+		val tableName = tableName(context, domain);
+		TemporaryTable.dropTable(jdbcProxy, tableName.asRevised());
+		TemporaryTable.dropTable(jdbcProxy, tableName.asCanonicalized());
 	}
 	
 	/**
 	 * 編集済み用のCREATE TABLEを実行する
-	 * @param require
 	 * @return
 	 */
 	public void createTableRevised() {
-		String sql = createTable(tableName().asRevised());
-		jdbcProxy.query(sql).execute();
+		createTable(tableName().asRevised());
 	}
 
 	/**
 	 * 正準化済み用のCREATE TABLEを実行する
-	 * @param require
 	 * @return
 	 */
 	public void createTableCanonicalized() {
-		String sql = createTable(tableName().asCanonicalized());
-		jdbcProxy.query(sql).execute();
+		createTable(tableName().asCanonicalized());
 	}
 
-	private String createTable(String tableName) {
-		val sql = new StringBuilder();
-		val createTable = new CreateTable(sql);
-		
-		sql.append("create table ").append(tableName).append(" (");
-		
-		createTable.columnCommonColumns();
-		workspace.getAllItemsSortedByItemNo().forEach(
-				item -> createTable.column(item, workspace.isPrimaryKey(item)));
-		
-		createTable.primaryKey(tableName, workspace);
-		
-		sql.append(");");
-		
-		return sql.toString();
+	private void createTable(String tableName) {
+		TemporaryTable.createTable(jdbcProxy, database, tableName, b -> {
+			// 正準化時にうまれる項目を主キーに指定できない（編集時にはNULLである）ので、一旦ROW_NOを固定で主キーとする
+			// 必要なら主キーではなくインデックスにすることを検討する
+			b = b.columnPK(ROW_NO.name, ROW_NO.type)
+					.column(CONTRACT_CD.name, CONTRACT_CD.type)
+					.column(CID.name, CID.type);
+			for (WorkspaceItem item : workspace.getItemsPk()){
+				b = b.column(item.getName(), item.getDataTypeConfig());
+			}
+			for (WorkspaceItem item : workspace.getItemsNotPk()){
+				b = b.column(item.getName(), item.getDataTypeConfig());
+			}
+		});
 	}
 	
 	static class CommonColumns {
-		static final Column ROW_NO = new Column("ROW_NO", "int not null", "rowno");
-		static final Column CONTRACT_CD = new Column("CONTRACT_CD", "char(12) not null", "contract");
-		static final Column CID = new Column("CID", "char(17) not null", "cid");
-
-		static final List<Column> LIST = Arrays.asList(ROW_NO, CONTRACT_CD, CID);
+		static final List<String> LIST = Arrays.asList(ROW_NO.paramName, CONTRACT_CD.paramName, CID.paramName);
 		
 		static String sqlParams() {
 			return LIST.stream()
-					.map(c -> "@" + c.paramName)
+					.map(paramName -> "@" + paramName)
 					.collect(Collectors.joining(","));
 		}
 		
@@ -130,74 +127,12 @@ public class WorkspaceSql {
 	@Value
 	static class Column {
 		String name;
-		String type;
+		DataTypeConfiguration type;
 		String paramName;
-		
-		public String sqlDefine() {
-			return name + " " + type;
-		}
 	}
-	
-	@RequiredArgsConstructor
-	class CreateTable {
-		
-		private final StringBuilder sql;
-		
-		void primaryKey(String tableName, DomainWorkspace workspace) {
-			
-			String pkName = "PK_" + tableName;
-			
-			// 正準化時にうまれる項目を主キーに指定できない（編集時にはNULLである）ので、一旦ROW_NOを固定で主キーとする
-			// 必要なら主キーではなくインデックスにすることを検討する
-			
-			//String keys = workspace.getItemsPk().stream()
-			//		.map(item -> item.getName())
-			//		.collect(Collectors.joining(", "));
-			
-			sql.append("constraint ").append(pkName).append(" primary key nonclustered (").append(CommonColumns.ROW_NO.name).append(")");
-		}
-		
-		void columnCommonColumns() {
-			// ROW_NO列はdecimal使わなくても良いんじゃないかな、さすがにintで足りると思う
-			sql.append(CommonColumns.ROW_NO.sqlDefine() + ",");
-			sql.append(CommonColumns.CONTRACT_CD.sqlDefine() + ",");
-			sql.append(CommonColumns.CID.sqlDefine() + ",");
-		}
-		
-		void column(WorkspaceItem item, boolean isPK) {
-			
-			sql.append(item.getName()).append(" ");
-			
-			dataType(item.getDataTypeConfig());
-			sql.append(" null,");
-		}
-		
-		void dataType(DataTypeConfiguration config) {
-			
-			switch (config.getType()) {
-			case DATE:
-			case DATETIME:
-				sql.append("datetime2");
-				break;
-			case STRING:
-				sql.append("nvarchar(").append(config.getLength()).append(")");
-				break;
-			case INT:
-			case AUTONUMBER:
-				sql.append("decimal(").append(config.getLength()).append(")");
-				break;
-			case REAL:
-				sql.append("decimal(").append(config.getLength()).append(",").append(config.getScale()).append(")");
-				break;
-			default:
-				throw new RuntimeException("error: " + config);
-			}
-		}
-	}
-	
+
 	/**
 	 * 編集済み用のINSERT文を実行する
-	 * @param require
 	 * @param record
 	 * @return
 	 */
@@ -210,7 +145,7 @@ public class WorkspaceSql {
 	
 	/**
 	 * 正準化済み用のINSERT文を実行する
-	 * @param require
+	 * @param record
 	 */
 	public void insert(CanonicalizedDataRecord record) {
 		insert(
@@ -280,7 +215,7 @@ public class WorkspaceSql {
 	}
 	
 	public int getMaxRowNumberOfRevisedData() {
-		String sql = "select max(" + CommonColumns.ROW_NO.name + ") from " + tableName().asRevised();
+		String sql = "select max(" + ROW_NO.name + ") from " + tableName().asRevised();
 		return jdbcProxy.query(sql).getSingle(rec -> rec.getInt(1)).get();
 	}
 	
@@ -291,7 +226,7 @@ public class WorkspaceSql {
 	
 	public Optional<RevisedDataRecord> findRevisedByRowNo(int rowNo) {
 		String sql = "select * from " + tableName().asRevised()
-				+ " where " + CommonColumns.ROW_NO.name + " = " + rowNo;
+				+ " where " + ROW_NO.name + " = " + rowNo;
 		return jdbcProxy.query(sql).getSingle(rec -> toRevised(rec));
 	}
 	
@@ -316,7 +251,7 @@ public class WorkspaceSql {
 	
 	private RevisedDataRecord toRevised(NtsResultRecord record) {
 		
-		int rowNo = record.getInt(CommonColumns.ROW_NO.name);
+		int rowNo = record.getInt(ROW_NO.name);
 		
 		val items = workspace.getAllItemsSortedByItemNo().stream()
 				.map(wi -> toDataItem(record, wi))

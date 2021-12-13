@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="../../../../master/base.xhtml">
+		<ui:define name="htmlHead">
+			<com:scriptfile set="IGNITE" />
+      <com:scriptfile path="cmm052.a.vm.js" />
+      <com:stylefile path="cmm052.a.style.css" />
+		</ui:define>
+    
+    <ui:define name="content">
+      <div id="contents-area">
+        <div id="A1" class="panel panel-frame">
+          <div class="panel panel-gray-bg">
+            <label id="A1_1">#{i18n.getText("CMM052_10")}</label>
+          </div>
+          <div>
+            <label id="A1_2">#{i18n.getText("CMM052_11")}</label>
+          </div>
+          <div class="btn-with-caret">
+            <button id="A1_3" class="setting_caret caret-right" data-bind="click: openScreenCas003" tabindex="1">#{i18n.getText("CMM052_12")}</button>
+          </div>
+        </div>
+
+        <div id="A2" class="panel panel-frame">
+          <div class="panel panel-gray-bg">
+            <label id="A2_1">#{i18n.getText("CMM052_13")}</label>
+          </div>
+          <div>
+            <label id="A2_2">#{i18n.getText("CMM052_14")}</label>
+          </div>
+          <div class="btn-with-caret">
+            <button id="A2_3" data-bind="click: openDialogCdl011" tabindex="2">#{i18n.getText("CMM052_15")}</button>
+          </div>
+        </div>
+
+      </div>
+    </ui:define>
+    </ui:composition>
+</body>
+</html>

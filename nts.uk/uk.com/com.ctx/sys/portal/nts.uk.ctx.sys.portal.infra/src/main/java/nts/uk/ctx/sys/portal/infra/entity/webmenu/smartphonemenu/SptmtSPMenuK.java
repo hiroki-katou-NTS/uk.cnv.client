@@ -32,7 +32,7 @@ public class SptmtSPMenuK extends ContractUkJpaEntity implements Serializable {
 	public String companyId;
 	
 	@Column(name = "DISP_ATR")
-	public int dispAtr;
+	public boolean dispAtr;
 
 	@Override
 	protected Object getKey() {

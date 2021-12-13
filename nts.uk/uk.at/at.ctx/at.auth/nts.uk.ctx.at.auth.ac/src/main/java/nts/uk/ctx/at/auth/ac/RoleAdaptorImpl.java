@@ -49,4 +49,10 @@ public class RoleAdaptorImpl implements RoleAdaptor {
 		return result;
 	}
 
+	@Override
+	public Integer getEmployeeReferenceRange(String userId, int roleType, GeneralDate baseDate) {
+		// TODO Auto-generated method stub
+		return roleExportRepo.getEmployeeReferenceRange(userId, roleType, baseDate);
+	}
+
 }

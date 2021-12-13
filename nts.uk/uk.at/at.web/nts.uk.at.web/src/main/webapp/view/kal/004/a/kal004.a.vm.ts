@@ -33,6 +33,8 @@ module nts.uk.at.view.kal004.a.model {
 
         // Tab 3: SetPermission
         setPermissionModel: any = new nts.uk.at.view.kal004.tab3.viewmodel.ScreenModel();
+        
+        processingYm: KnockoutObservable<string>; 
 
         constructor() {
             let self = this;
@@ -66,6 +68,7 @@ module nts.uk.at.view.kal004.a.model {
             self.currentCodeListSwap = ko.observableArray([]);
             self.currentCode = ko.observable(null);
             self.currentAlarm = null;
+            self.processingYm = ko.observable(null);
         }
 
         public startPage(): JQueryPromise<any> {
@@ -75,6 +78,10 @@ module nts.uk.at.view.kal004.a.model {
                 self.alarmCategoryArr = enumRes;
             }).fail((enumErr) => {
                 alertError(enumErr);
+            });
+            service.getProcessingYm().done((ym) => {
+                self.processingYm(ym);
+            }).fail((err) => {
             });
             block.grayout();
             service.getCheckConditionCode().done((res) => {
@@ -169,6 +176,9 @@ module nts.uk.at.view.kal004.a.model {
                         }
                         let yearly = categoryInputed.extractionYear == null ? null : new share.ExtractionRangeYearCommand(categoryInputed.extractionYear);
                         let averMonth = categoryInputed.extractionAverMonth == null ? null : new share.ExtractionAverageMonthCommand(categoryInputed.extractionAverMonth);
+                        if (categoryInputed.extractionScheYear) {
+                            categoryInputed.extractionScheYear.processingYm = self.processingYm();
+                        }
                         let scheYear = categoryInputed.extractionScheYear == null ? null : new share.ExtractionPeriodECommand(categoryInputed.extractionScheYear);
                         shareTab2.push(new share.CheckConditionCommand(category, checkConditionCodes, daily, unit, listMonthly, yearly, averMonth, scheYear));
                     } else {

@@ -28,12 +28,12 @@ public class GetListWorkInforUsedDailyAttendanceRecordTest {
 		WorkInformation recordInfo5 = new WorkInformation("ty2", "ti2");
 		WorkInformation recordInfo6 = new WorkInformation("ty3", "ti2");
 		List<WorkInfoOfDailyAttendance> lstWorkInfoOfDailyAttendance = Arrays.asList(
-				WorkInfoOfDailyAttendanceHelper.getData(recordInfo1),
-				WorkInfoOfDailyAttendanceHelper.getData(recordInfo2),
-				WorkInfoOfDailyAttendanceHelper.getData(recordInfo3),
-				WorkInfoOfDailyAttendanceHelper.getData(recordInfo4),
-				WorkInfoOfDailyAttendanceHelper.getData(recordInfo5),
-				WorkInfoOfDailyAttendanceHelper.getData(recordInfo6));
+				WorkInfoOfDailyAttendanceHelper.createByWorkInformation(recordInfo1),
+				WorkInfoOfDailyAttendanceHelper.createByWorkInformation(recordInfo2),
+				WorkInfoOfDailyAttendanceHelper.createByWorkInformation(recordInfo3),
+				WorkInfoOfDailyAttendanceHelper.createByWorkInformation(recordInfo4),
+				WorkInfoOfDailyAttendanceHelper.createByWorkInformation(recordInfo5),
+				WorkInfoOfDailyAttendanceHelper.createByWorkInformation(recordInfo6));
 		
 		List<WorkInformation> listWorkInformation= GetWorkInforUsedDailyAttenRecordService.getListWorkInfo(lstWorkInfoOfDailyAttendance);
 		assertThat(listWorkInformation).extracting(d->d.getWorkTypeCode(), d->d.getWorkTimeCode())

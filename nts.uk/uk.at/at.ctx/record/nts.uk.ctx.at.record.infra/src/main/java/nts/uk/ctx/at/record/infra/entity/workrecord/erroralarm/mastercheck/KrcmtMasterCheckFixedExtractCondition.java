@@ -7,6 +7,8 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,14 +35,14 @@ public class KrcmtMasterCheckFixedExtractCondition extends UkJpaEntity {
 	private String message;
 	
 	@Column(name = "USE_ATR")
-	private int useAtr;
+	private boolean useAtr;
 	
 	public KrcmtMasterCheckFixedExtractCondition(KrcmtMasterCheckFixedExtractConditionPK pk, String contractCode,
 			String message, int useAtr) {
 		this.pk = pk;
 		this.contractCode = contractCode;
 		this.message = message;
-		this.useAtr = useAtr;
+		this.useAtr = BooleanUtils.toBoolean(useAtr);
 	}
 	
 	@Override
@@ -62,7 +64,7 @@ public class KrcmtMasterCheckFixedExtractCondition extends UkJpaEntity {
 					this.pk.getErAlId(),
 					EnumAdaptor.valueOf(this.pk.getNo(), MasterCheckFixedCheckItem.class),
 					Optional.ofNullable(new ErrorAlarmMessageMSTCHK(this.message)),
-					this.useAtr==1?true:false
+					this.useAtr
 				);
 	}
 }

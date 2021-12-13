@@ -1,6 +1,7 @@
 package nts.uk.shr.com.context.loginuser;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -199,9 +200,12 @@ public class DefaultLoginUserContextManager implements LoginUserContextManager {
 	}
 
 	@Override
-	public String toBase64() {
+	public Optional<String> toBase64() {
 		val context = SessionContextProvider.get().get(LoginUserContext.KEY_SESSION_SCOPED);
-		return ObjectSerializer.toBase64((Serializable) context);
+		if (context == null) {
+			return Optional.empty();
+		}
+		return Optional.of(ObjectSerializer.toBase64((Serializable) context));
 	}
 
 	@Override

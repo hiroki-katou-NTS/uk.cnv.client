@@ -5,6 +5,7 @@ module cps007.a.vm {
     import text = nts.uk.resource.getText;
     import lv = nts.layout.validate;
     import warning = nts.uk.ui.dialog.caution;
+    import getShared = nts.uk.ui.windows.getShared;
 
     let __viewContext: any = window['__viewContext'] || {},
         block = window["nts"]["uk"]["ui"]["block"]["grayout"],
@@ -14,9 +15,15 @@ module cps007.a.vm {
     export class ViewModel {
         layout: KnockoutObservable<Layout> = ko.observable(new Layout({ id: '', code: '', name: '' }));
 
+        isFromCPS018: KnockoutObservable<boolean> = ko.observable(false); 
+
         constructor() {
             let self = this,
                 layout = self.layout();
+
+            let params = getShared("CPS007A_PARAMS") || { isFromCPS018: false };
+            self.isFromCPS018(params.isFromCPS018);
+            nts.uk.sessionStorage.removeItem(nts.uk.request.STORAGE_KEY_TRANSFER_DATA);
 
             self.start();
             let styles = '';

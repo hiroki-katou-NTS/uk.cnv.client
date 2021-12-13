@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="../../../../master/dialog.xhtml">
+		<ui:define name="htmlHead">
+			<!-- <script>var dialogSize = { width: 770, height: 650 };</script> -->
+			<com:scriptfile set="IGNITE" />
+			<!-- KCP005 -->
+			<com:scriptfile path="/view/kcp/share/list.js" of="/nts.uk.com.web"/>
+			<com:scriptfile path="kdl051.a.start.js" />
+			<com:scriptfile path="kdl051.a.vm.js" />
+			<com:scriptfile path="kdl051.a.service.js" />
+			<com:stylefile path="kdl051.a.main.css" />
+		</ui:define>	
+
+		<ui:define name="content">
+			 <div id="contents-area">
+			 <div style="display : flex;">
+				 <!-- Search Box -->
+				<div id="area-right" style="float: left;">
+					<div>
+						<div class="input-wrapper">
+							<span class="nts-editor-wrapped ntsControl"> 
+							<input id = "input-search"
+								data-bind="text:searchText"
+								class="ntsSearchBox nts-editor ntsSearchBox_Component"
+								type="text" placeholder="コード・名称で検索・・・" data-name="検索テキストボックス"
+								tabindex="-1" style="width: 187px;"></input>
+							</span> 
+							<i id="search-icon-new" class="img-icon"></i>
+						</div>
+						<button id="search-btn" data-bind=" click: findData" class="caret-bottom " tabindex="-1">検索</button>
+					</div>
+					<!-- KCP005 -->
+					<div tabindex="-1" id="kcp005"></div>
+				</div>
+				<div id="area-left">
+				 	<div style="margin-left: 5vw;margin-bottom: 1vh;">
+				 			<!-- A2_1 --><!-- A2_2 -->
+				 			<div>#{i18n.getText('Com_Person')} <span style="padding-left: 5vw;" data-bind="text : employeeNameSelect"></span></div>
+			 		</div>
+				 	<com:ko-if bind="managementCheck() == 1">
+					 	<div>
+						 	<table id="table-top" style="margin-left: 5vw;width: 554px;">
+						 		<tr>
+						 			<!-- A2_3 -->
+						 			<td colspan="2" style="font-size: 18px;">#{i18n.getText('KDL051_18')}</td>
+						 			<!-- A2_4 -->
+						 			<td> 
+						 				<span data-bind="text : dataOneEmp().maxNumberOfYear" style="font-size: 18px;"></span>
+						 			</td>
+						 		</tr>
+						 		<tr>
+						 			<td colspan="2"></td>
+						 			<!-- A2_14 -->
+						 			<td>#{i18n.getText('KDL051_28')}</td>
+						 		</tr>
+						 		<tr>
+						 			<!-- A2_5 -->
+						 			<td>#{i18n.getText('KDL051_19')}</td>
+						 			<!-- A2_6 A2_7 A2_8 -->
+						 			<td> 
+						 				<span data-bind="text : dataOneEmp().upperLimitStartDate"></span>#{i18n.getText('KDL051_20')}<span data-bind="text : dataOneEmp().upperLimitEndDate"></span>
+						 			</td>
+						 			<td></td>
+						 		</tr>
+						 		<tr>
+						 			<!-- A2_9 -->
+						 			<td>#{i18n.getText('KDL051_21')}</td>
+						 			<!-- A2_10 -->
+						 			<td> 
+						 				<span data-bind="text : dataOneEmp().maxNumberOfDays"></span>
+						 			</td>
+						 			<td></td>
+						 		</tr>
+						 		<tr>
+						 			<!-- A2_11 -->
+						 			<td>#{i18n.getText('KDL051_22')}</td>
+						 			<!-- A2_12 -->
+						 			<td> 
+						 				<span data-bind="text : dataOneEmp().numberOfUse"></span>
+						 			</td>
+						 			<td></td>
+						 		</tr>
+						 	</table>
+						 	<!-- A2_13 -->
+						 	<div style="margin-left: 5vw;margin-top: 2vh;margin-bottom: 2vh;"> #{i18n.getText('KDL051_23')}</div>
+						 	<div style="margin-left: 5vw;">
+							 	<table id="single-list" data-bind="ntsGridList: {								
+									height: 350,
+									dataSource: items,
+									primaryKey: 'digestionDate',
+									columns: columns,
+									multiple: false,
+									value: currentCode,
+									rows:5
+								}"></table>
+							</div> 
+						</div>
+					</com:ko-if>
+					<com:ko-if bind="managementCheck() == 0">
+						<div style="margin-left: 5vw;font-size: 23px">#{i18n.getText('KDL051_27')}</div>
+					</com:ko-if>
+				</div>
+			</div>
+			</div>
+			<div id="functions-area-bottom">
+					<button tabindex="1"  id ="closeDialog-id" data-bind="click: cancel">#{i18n.getText('KDL051_15')}</button>
+			</div>
+		</ui:define> 
+	</ui:composition>
+</body>
+</html>

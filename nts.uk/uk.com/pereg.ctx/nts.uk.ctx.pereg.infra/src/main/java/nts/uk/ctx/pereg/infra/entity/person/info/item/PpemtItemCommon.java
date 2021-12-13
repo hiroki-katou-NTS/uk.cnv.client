@@ -156,7 +156,7 @@ public class PpemtItemCommon extends UkJpaEntity implements Serializable, Copied
 
 	@Override
 	public void changeContractCode(String newContractCode) {
-		ppemtPerInfoItemCmPK.categoryCd = newContractCode;
+		ppemtPerInfoItemCmPK.contractCd = newContractCode;
 	}
 
 }

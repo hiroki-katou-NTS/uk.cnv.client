@@ -47,7 +47,7 @@
     margin-left: 129px;
     margin-top: -15px;
     width: 269px;
-    height: 88px;
+    height: 90px;
 }
 
 #label12{
@@ -58,4 +58,9 @@
 #label11{
 	margin-left: 22px;
     margin-top: 5px;
+}
+
+#D1_7 {
+  margin-left: 100px;
+  color: red;
 }

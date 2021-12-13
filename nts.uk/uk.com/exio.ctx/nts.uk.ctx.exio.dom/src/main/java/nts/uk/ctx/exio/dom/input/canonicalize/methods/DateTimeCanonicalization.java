@@ -4,7 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Value;
 import lombok.val;
 import nts.arc.time.GeneralDateTime;
-import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalItem;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalItem;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.IntermediateResult;
 import nts.uk.ctx.exio.dom.input.setting.assembly.RevisedDataRecord;
 import nts.uk.ctx.exio.dom.input.workspace.domain.DomainWorkspace;
 
@@ -50,6 +51,6 @@ public class DateTimeCanonicalization {
 		val datetime = GeneralDateTime.ymdhms(date.year(), date.month(), date.day(), hour, minute, 0);
 		val item = CanonicalItem.of(itemNoDateTime, datetime);
 		
-		return IntermediateResult.create(revisedData, item, itemNoDate, itemNoTime);
+		return IntermediateResult.create(revisedData).addCanonicalized(item);
 	}
 }

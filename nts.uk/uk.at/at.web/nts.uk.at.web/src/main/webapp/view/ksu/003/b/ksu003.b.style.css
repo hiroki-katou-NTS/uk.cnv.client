@@ -1,0 +1,82 @@
+.container-custom {	
+	display: flex;
+	margin: 20px;
+	width: 950px;
+	overflow: hidden;;
+}
+
+.caret-background.caret-bottom:after {
+    left: 10px !important;
+    top: 70% !important;
+    border-width: 20px 30px !important;
+}
+
+.color-gray {
+	color: gray;
+	cursor: default;
+	text-decoration: none;
+}
+
+.ntsContextMenu {
+	width: 90px !important;
+	min-width: 90px !important;
+}
+
+.ntsContextMenu li {
+	padding: 0px 0px 0 19px !important;
+}
+
+/* ul {
+	width: 90px !important;
+} */
+#line {
+	width: 930px;
+	margin-left: 20px;	
+	border:none;
+	height: 1px;
+	background:#9A9A9A;	
+    position: absolute !important;
+}
+
+#remarks {
+	width: 790px;
+}
+
+#group-link-button {
+	height: 30px;
+	width: 350px;
+	margin-top: 20px;
+	margin-left: 20px;
+	white-space: nowrap;
+}
+
+#group-link-button a {
+	font-size: 13px;
+	margin-top: 5px;
+	margin-left: 20px;
+	display: inline-block;
+}
+
+#task {
+	background-color: #FBE5D6;
+	width: 806px;
+	padding: 3px;
+	display: inline-block;
+	margin-left: 8px;
+}
+
+#task button {
+	width: 155px !important;
+	height: 25px !important;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#task table td {
+	padding: 3px 3px !important;
+}
+
+#contents-area {
+	overflow: hidden;
+}
+

@@ -30,4 +30,10 @@ public class ShiftMasterDto {
 		this.workTypeCode = domain.getWorkTypeCode().v();
 		this.workTimeCode = domain.getWorkTimeCode() == null ? null : domain.getWorkTimeCode().v();
 	}
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		ShiftMasterDto other = (ShiftMasterDto) obj;
+		return other.getShiftMasterCode().equals(this.shiftMasterCode);
+	}
 }

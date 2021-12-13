@@ -55,4 +55,12 @@ public interface AnnLeaveRemainingAdapter {
 	 * @return 年休利用状況リスト
 	 */
 	 public List<AnnualLeaveUsageImported> getYearHdMonthlyVer2(String employeeId, YearMonthPeriod period);
+
+	/**
+	 * 社員の当月の年休付与数を取得する
+	 * @param employeeId 社員ID
+	 * @return 年休付与数
+	 * RequestList281 V2
+	 */
+	public List<AnnLeaGrantNumberImported> getAnnLeaGrantNumberImporteds(String employeeId);
 }

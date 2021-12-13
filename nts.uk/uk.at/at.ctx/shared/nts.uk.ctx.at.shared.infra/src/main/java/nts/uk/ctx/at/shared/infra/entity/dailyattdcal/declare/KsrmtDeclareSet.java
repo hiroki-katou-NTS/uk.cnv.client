@@ -30,7 +30,7 @@ public class KsrmtDeclareSet extends UkJpaEntity implements Serializable{
 	
 	/** 申告利用区分 */
 	@Column(name = "USAGE_ATR")
-	public int usageAtr;
+	public boolean usageAtr;
 	
 	/** 枠設定 */
 	@Column(name = "FRAME_SET")

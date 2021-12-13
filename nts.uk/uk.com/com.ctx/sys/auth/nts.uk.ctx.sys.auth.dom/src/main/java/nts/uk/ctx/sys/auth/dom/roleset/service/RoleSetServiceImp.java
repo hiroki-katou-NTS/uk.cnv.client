@@ -17,12 +17,12 @@ import nts.uk.ctx.sys.auth.dom.adapter.employee.employeeinfo.EmpInfoByCidSidImpo
 import nts.uk.ctx.sys.auth.dom.adapter.employee.employeeinfo.EmployeeInfoAdapter;
 import nts.uk.ctx.sys.auth.dom.adapter.jobtitle.SyJobTitleAdapter;
 import nts.uk.ctx.sys.auth.dom.grant.rolesetjob.RoleSetGrantedJobTitle;
-import nts.uk.ctx.sys.auth.dom.grant.rolesetjob.RoleSetGrantedJobTitleDetail;
 import nts.uk.ctx.sys.auth.dom.grant.rolesetjob.RoleSetGrantedJobTitleRepository;
 import nts.uk.ctx.sys.auth.dom.grant.rolesetperson.RoleSetGrantedPerson;
 import nts.uk.ctx.sys.auth.dom.grant.rolesetperson.RoleSetGrantedPersonRepository;
 import nts.uk.ctx.sys.auth.dom.roleset.DefaultRoleSetRepository;
 import nts.uk.ctx.sys.auth.dom.roleset.RoleSet;
+import nts.uk.ctx.sys.auth.dom.roleset.RoleSetCode;
 import nts.uk.ctx.sys.auth.dom.roleset.RoleSetRepository;
 import nts.uk.ctx.sys.shared.dom.user.User;
 import nts.uk.ctx.sys.shared.dom.user.UserRepository;
@@ -123,7 +123,7 @@ public class RoleSetServiceImp implements RoleSetService{
         }
 
         // ドメインモデル「既定のロールセット」を取得する
-        if (isDefault(roleSetDom.getCompanyId(), roleSetCd)) {
+        if (isDefault(roleSetDom.getCompanyId(),roleSetCd)) {
             throw new BusinessException("Msg_585");
         }
 
@@ -135,8 +135,10 @@ public class RoleSetServiceImp implements RoleSetService{
      * Check setting default of Role set
      * @return
      */
-    private boolean isDefault(String companyId, String roleSetCd) {
-        return defaultRoleSetRepository.find(companyId, roleSetCd).isPresent();
+    private boolean isDefault(String companyId,String roleSetCd ) {
+        val defaultRoleSet = defaultRoleSetRepository.find(companyId);
+        return defaultRoleSet.map(defaultRoleSet1 -> defaultRoleSet1.getRoleSetCd().v().equals(roleSetCd)).orElse(false);
+
     }
 
     /**
@@ -154,7 +156,7 @@ public class RoleSetServiceImp implements RoleSetService{
      */
     private boolean isGrantedForPosition(String companyId, String roleSetCd) {
         /** check from CAS014 */
-        return roleSetGrantedJobTitleRepository.checkRoleSetCdExist(roleSetCd, companyId);
+        return roleSetGrantedJobTitleRepository.checkRoleSetCdExist(companyId, new RoleSetCode(roleSetCd));
     }
 
 	/* (non-Javadoc)
@@ -188,16 +190,17 @@ public class RoleSetServiceImp implements RoleSetService{
 		// Get RoleSet granted for JobTitle
 		val optSysJobTitle = syJobTitleAdapter.gerBySidAndBaseDate(importEmployee.getSid(), baseDate);
 		if (optSysJobTitle.isPresent()) {
-			String jobTitleId = optSysJobTitle.get().jobTitleId;
-			RoleSetGrantedJobTitle roleSetGrantedJobTitle = roleSetGrantedJobTitleRepository.getOneByCompanyId(companyId).get();
-	    	Optional<RoleSetGrantedJobTitleDetail> optJobTitleInCompany = roleSetGrantedJobTitle.getDetails().stream().filter(c -> c.getJobTitleId().equals(jobTitleId)).findFirst();
-	    	if (optJobTitleInCompany.isPresent()) {
-	    		return roleSetRepository.findByRoleSetCdAndCompanyId(optJobTitleInCompany.get().getRoleSetCd().v(), companyId);
+			
+			Optional<RoleSetGrantedJobTitle> roleSetGrantedJobTitle = roleSetGrantedJobTitleRepository.getByJobTitleId(companyId, optSysJobTitle.get().jobTitleId);
+			
+	    	if (roleSetGrantedJobTitle.isPresent()) {
+	    		return roleSetRepository.findByRoleSetCdAndCompanyId(roleSetGrantedJobTitle.get().getRoleSetCd().v(), companyId);
 	    	}
 		}
 		
     	// Get Default RoleSet
-    	String defaultRoleSetCD = defaultRoleSetRepository.findByCompanyId(companyId).get().getRoleSetCd().v();
+        val defaultOpt  = defaultRoleSetRepository.findByCompanyId(companyId);
+    	String defaultRoleSetCD = defaultOpt.isPresent()? defaultOpt.get().getRoleSetCd().v() : null;
     	return roleSetRepository.findByRoleSetCdAndCompanyId(defaultRoleSetCD, companyId);
 	}
 }

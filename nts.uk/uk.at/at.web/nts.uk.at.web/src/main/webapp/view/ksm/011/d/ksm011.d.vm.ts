@@ -123,7 +123,7 @@ module nts.uk.at.view.ksm011.d {
           vm._28DayCycle(data.display28days);
           vm.lastDayDisplay(data.display1month);
           vm.displayByDate(data.openDispByDate);
-          vm.completionFunction(data.useCompletion);
+          // vm.completionFunction(data.useCompletion);
           vm.completionExecutionMethod(data.completionMethod);
           vm.confirm(data.confirmUsage);
           vm.alarmCheck(data.alarmCheckUsage);

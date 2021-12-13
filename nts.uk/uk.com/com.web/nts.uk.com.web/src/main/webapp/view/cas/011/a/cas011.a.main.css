@@ -1,16 +1,15 @@
 @CHARSET "UTF-8";
 
 #left-content {
-	margin-left: 30px;
-	margin-top: 20px;
-	padding: 25px;
+	margin-left: 15px;
 	float: left;
 	max-height: 300px;
 }
 
 #right-content {
-	margin-left: 30px;
+	margin-left: 60px;
 	float: left;
+	margin-top: -12px;
 }
 
 .line {
@@ -22,7 +21,7 @@
 }
 
 .row {
-	height: 55px;
+	height: 56px;
 }
 
 #single-list-dataSource tr td {
@@ -38,15 +37,15 @@
 }
 
 .lab_txt_width {
-	width: 256px;
+	width: 260px;
 }
 
 .pad_left_5px {
 	padding-left: 5px;
 }
 
-.pad_left_10px {
-	padding-left: 10px;
+.pad_left_40px {
+	padding-left: 40px;
 }
 
 .pad_top_12px {
@@ -57,15 +56,45 @@
 	width: 80px;
 }
 
-#content-left.fixed-flex-layout-left {
-	float: left;
-	margin-top: 5px;
-	margin-left: 40px;
-}
 tr.row.display{
 	display: none;
 }
 
 #inpRoleSetName {
 	width: 195px !important;
+	margin-left: 4px;
+}
+.cssI {
+	background:
+			url('/nts.uk.com.web/view/ccg/025/component/icon78.png');
+	width: 18px;
+	height: 18px;
+	background-size: 20px 20px;
+}
+
+.cssDiv {
+	text-align: center;
+	max-height: 18px;
+}
+.ntsMoveDataArea .move-button {
+	margin: 10px 13px !important;
+}
+
+#swap-list-grid1_displayContainer{
+	width: 251px !important;
+	max-width: 231px !important;
+}
+#swap-list-grid2_displayContainer{
+	width: 251px !important;
+	max-width: 231px !important;
+}
+#defaultRoleSet{
+	margin-left: 6px;
+	margin-top: 3px;
+}
+#swap-list{
+	margin-top: -14px;
+}
+.text{
+	margin-top: -2px;
 }

@@ -36,7 +36,9 @@
 										options: controlSetItems,
 										optionsValue: 'id',
 										optionsText: 'name',
-										value: selectedControlSetItem}, hasFocus: true"></div>
+										value: selectedControlSetItem,
+										enable: false
+									}, hasFocus: true"></div>
 								</div>
 							</td>
 						</tr>
@@ -50,7 +52,9 @@
 										options: calculationMethod,
 										optionsValue: 'id',
 										optionsText: 'name',
-										value: selectedCalculationMethod}, hasFocus: true"></div>
+										value: selectedCalculationMethod,
+										enable: false
+									}, hasFocus: true"></div>
 								</div>
 							</td>
 						</tr>
@@ -84,16 +88,7 @@
 						<tr>
 							<td>
 								<div data-id="J8_1" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KMK013_313')}</div>
-								<div id="J8_2">#{i18n.getText('KMK013_314')}</div>
-								<div>
-									<div tabindex="7" id="J8_3" class="group-radio"
-										 data-bind="ntsRadioBoxGroup: {
-										name:'#{i18n.getText('KMK013_315')}',
-										options: nonCalculationMethod,
-										optionsValue: 'id',
-										optionsText: 'name',
-										value:selectedNonCalculationMethod}, hasFocus: true"></div>
-								</div>
+								<label id="J8_15">#{i18n.getText('KMK013_567')}</label>
 							</td>
 						</tr>
                         <tr>
@@ -113,7 +108,7 @@
                                 </div>
                                 <div class="control-group valign-center">
                                     <span id="J8_11" class="label">#{i18n.getText('KMK013_321')}</span>
-                                    <div tabindex="9" data-bind="ntsSwitchButton: {
+                                    <div tabindex="7" data-bind="ntsSwitchButton: {
                                         name: 'Sample Switch',
                                         options: useAtrItems,
                                         optionsValue: 'code',
@@ -125,6 +120,20 @@
                                 </div>
                             </td>
                         </tr>
+            <tr>
+              <td>
+                <div id="J8_2">#{i18n.getText('KMK013_314')}</div>
+								<div>
+									<div tabindex="9" id="J8_3" class="group-radio"
+										 data-bind="ntsRadioBoxGroup: {
+										name:'#{i18n.getText('KMK013_315')}',
+										options: nonCalculationMethod,
+										optionsValue: 'id',
+										optionsText: 'name',
+										value:selectedNonCalculationMethod}, hasFocus: true"></div>
+								</div>
+              </td>
+            </tr>
 					</TBODY>
 				</table>
 			</div>

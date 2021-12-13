@@ -1,6 +1,8 @@
 package nts.uk.file.at.infra.schedule.filemanagement;
 
 import java.io.InputStream;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +40,7 @@ public class AsposeWorkScheFileCheck implements CheckFileService {
     @Inject
     private StoredFileStreamService fileStreamService;
     
-    private final String[] dateFormats = {"yyyy/MM/dd", "yyyy-MM-dd'T'HH:mm:ss"};
+    private final String[] dateFormats = {"yyyy/MM/dd", "yyyy/M/d","yyyy-MM-dd'T'HH:mm:ss", "yyyy年M月d日", "yyyy年MM月dd日"};
 
     public CapturedRawData processingFile(WorkPlaceScheCheckFileParam checkFileParam, EmployeeCodeEditSettingExport setting)
             throws Exception {
@@ -106,6 +108,7 @@ public class AsposeWorkScheFileCheck implements CheckFileService {
         // loop for header
         int countHead = 0;
         for (int i = columnStart + (isColumnNameExist ? 2 : 1); i < columnStart + (isColumnNameExist ? 66 : 61); i++) {
+            String formatTmp = "";
             Cell cellDate = cells.get(rowStart, i);
 
             if (cellDate.getValue() == null) {
@@ -126,12 +129,13 @@ public class AsposeWorkScheFileCheck implements CheckFileService {
                 try {
                     date = GeneralDate.fromString(cellValueDisplay, format);
                     isValid = true;
+                    formatTmp = format;
                     break;
                 } catch (Exception e) {
                     isValid = false;
                 }
             }
-            if (!isValidDate(cellValueDisplay, isValid)) {
+            if (!isValidDate(cellValueDisplay, isValid, formatTmp)) {
                 throw new BusinessException("Msg_1796");
             }
 
@@ -270,17 +274,40 @@ public class AsposeWorkScheFileCheck implements CheckFileService {
         }
     }
     
-    public static boolean isValidDate(String dateStr, boolean isValid) {
+    public static boolean isValidDate(String dateStr, boolean isValid, String format) {
         if (!isValid) {
             return false;
         }
         
-        String[] pattern = dateStr.split("T")[0].split("-");
-        GeneralDate generalDate = GeneralDate.fromString(dateStr, "yyyy-MM-dd'T'HH:mm:ss");
-        if (pattern[2].equals(generalDate.toString("dd"))) {
-            return true;
+        switch (format) {
+        case "yyyy/MM/dd":
+        case "yyyy/M/d":
+        case "yyyy年M月d日":
+        case "yyyy年MM月dd日":
+            String lastDayOfMonth = getLastDayOfMonth(dateStr, format);
+            if (dateStr.length() < lastDayOfMonth.length()) {
+                return true;
+            } else {
+                return dateStr.compareTo(lastDayOfMonth) < 1;
+            }
+
+        case "yyyy-MM-dd'T'HH:mm:ss":
+            String[] pattern = dateStr.split("T")[0].split("-");
+            GeneralDate generalDate = GeneralDate.fromString(dateStr, "yyyy-MM-dd'T'HH:mm:ss");
+            if (pattern[2].equals(generalDate.toString("dd"))) {
+                return true;
+            }
+            
+            return false;
+        default:
+            return false;
         }
         
-        return true;
+    }
+    
+    public static String getLastDayOfMonth(String date, String format) {
+        return GeneralDate.fromString(date, format).localDate()
+                .with(TemporalAdjusters.lastDayOfMonth())
+                .format(DateTimeFormatter.ofPattern(format));
     }
 }

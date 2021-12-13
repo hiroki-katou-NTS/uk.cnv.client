@@ -1,20 +1,8 @@
 package nts.uk.ctx.sys.auth.pubimp.employee;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-
-
 import lombok.AllArgsConstructor;
 import nts.arc.time.GeneralDate;
+import nts.uk.ctx.bs.employee.pub.workplace.master.WorkplacePub;
 import nts.uk.ctx.sys.auth.dom.adapter.employee.EmployeeAdapter;
 import nts.uk.ctx.sys.auth.dom.adapter.employee.JobTitleAdapter;
 import nts.uk.ctx.sys.auth.dom.adapter.employee.employeeinfo.EmpInfoImport;
@@ -24,11 +12,7 @@ import nts.uk.ctx.sys.auth.dom.adapter.person.PersonAdapter;
 import nts.uk.ctx.sys.auth.dom.adapter.workplace.AffWorkplaceHistImport;
 import nts.uk.ctx.sys.auth.dom.adapter.workplace.AffiliationWorkplace;
 import nts.uk.ctx.sys.auth.dom.adapter.workplace.WorkplaceAdapter;
-import nts.uk.ctx.sys.auth.dom.algorithm.AcquireListWorkplaceByEmpIDService;
-import nts.uk.ctx.sys.auth.dom.algorithm.AcquireUserIDFromEmpIDService;
-import nts.uk.ctx.sys.auth.dom.algorithm.CanApprovalOnBaseDateService;
-import nts.uk.ctx.sys.auth.dom.algorithm.DetermineEmpCanReferService;
-import nts.uk.ctx.sys.auth.dom.algorithm.EmpReferenceRangeService;
+import nts.uk.ctx.sys.auth.dom.algorithm.*;
 import nts.uk.ctx.sys.auth.dom.employee.dto.EmployeeImport;
 import nts.uk.ctx.sys.auth.dom.employee.dto.JobTitleValueImport;
 import nts.uk.ctx.sys.auth.dom.grant.roleindividual.RoleIndividualGrant;
@@ -37,23 +21,16 @@ import nts.uk.ctx.sys.auth.dom.grant.rolesetjob.RoleSetGrantedJobTitleRepository
 import nts.uk.ctx.sys.auth.dom.grant.rolesetperson.RoleSetGrantedPerson;
 import nts.uk.ctx.sys.auth.dom.grant.rolesetperson.RoleSetGrantedPersonRepository;
 import nts.uk.ctx.sys.auth.dom.grant.service.RoleIndividualService;
-import nts.uk.ctx.sys.auth.dom.role.EmployeeReferenceRange;
-import nts.uk.ctx.sys.auth.dom.role.Role;
-import nts.uk.ctx.sys.auth.dom.role.RoleAtr;
-import nts.uk.ctx.sys.auth.dom.role.RoleRepository;
-import nts.uk.ctx.sys.auth.dom.role.RoleType;
+import nts.uk.ctx.sys.auth.dom.role.*;
 import nts.uk.ctx.sys.auth.dom.roleset.RoleSet;
 import nts.uk.ctx.sys.auth.dom.roleset.RoleSetRepository;
+import nts.uk.ctx.sys.auth.dom.roleset.service.RoleSetService;
 import nts.uk.ctx.sys.auth.dom.wkpmanager.EmpInfoAdapter;
 import nts.uk.ctx.sys.auth.dom.wkpmanager.WorkplaceManager;
 import nts.uk.ctx.sys.auth.dom.wkpmanager.WorkplaceManagerRepository;
 import nts.uk.ctx.sys.auth.dom.wplmanagementauthority.WorkPlaceAuthority;
 import nts.uk.ctx.sys.auth.dom.wplmanagementauthority.WorkPlaceAuthorityRepository;
-import nts.uk.ctx.sys.auth.pub.employee.EmpWithRangeLogin;
-import nts.uk.ctx.sys.auth.pub.employee.EmployeePublisher;
-import nts.uk.ctx.sys.auth.pub.employee.NarrowEmpByReferenceRange;
-import nts.uk.ctx.sys.auth.pub.employee.WorkPlaceAuthorityDto;
-import nts.uk.ctx.sys.auth.pub.employee.WorkplaceManagerDto;
+import nts.uk.ctx.sys.auth.pub.employee.*;
 import nts.uk.ctx.sys.auth.pub.role.RoleExportRepo;
 import nts.uk.ctx.sys.auth.pub.user.UserExport;
 import nts.uk.ctx.sys.auth.pub.user.UserPublisher;
@@ -61,6 +38,12 @@ import nts.uk.ctx.sys.auth.pub.workplace.WorkplaceListPub;
 import nts.uk.ctx.sys.shared.dom.user.User;
 import nts.uk.ctx.sys.shared.dom.user.UserRepository;
 import nts.uk.shr.com.context.AppContexts;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Stateless
 public class EmployeePublisherImpl implements EmployeePublisher {
@@ -136,7 +119,7 @@ public class EmployeePublisherImpl implements EmployeePublisher {
 	
 	@Inject 
 	private GetEmfromWkpidAndBDate getEmfromWkpidAndBDate;
-	
+
 	@Inject
 	private ObtainWkpListAndWkpManager obtainWkpListAndWkpManager;
 	
@@ -145,6 +128,15 @@ public class EmployeePublisherImpl implements EmployeePublisher {
 	
 	@Inject
 	private WorkplaceManagerRepository workplaceManagerRepo;
+
+	@Inject
+	private RoleSetService roleSetService;
+
+	@Inject
+	private RoleRepository roleRepository;
+
+	@Inject
+	private WorkplacePub wkplacePub;
 	
 	@Override
 	public Optional<NarrowEmpByReferenceRange> findByEmpId(List<String> sID, int roleType, GeneralDate referenceDate) {
@@ -460,6 +452,100 @@ public class EmployeePublisherImpl implements EmployeePublisher {
 		});
 		// 重複するものを排除した「Map<職場ID、社員ID>」を返す
 		return result;
+	}
+
+	@Override
+	public Map<String, List<String>> getManagersByWorkplaceIds(List<String> workplaceIds) {
+		// Map <WorkplaceID, List<ManagerID>>
+		Map<String, List<String>> workplaceEmployeeMap = new HashMap<>();
+		GeneralDate baseDate = GeneralDate.today();
+        String empLoginId = AppContexts.user().employeeId();
+
+		for (String workplaceId : workplaceIds) {
+			List<String> employeeIds = new ArrayList<>();
+
+			// [No.218]
+			List<String> adminIds = getListEmployeeId(workplaceId, baseDate);
+
+			// 自分自身を省く
+			if (adminIds.stream().anyMatch(x -> x.contains(empLoginId))) {
+				adminIds.remove(empLoginId);
+			}
+
+			adminIds.forEach(adminId -> {
+				// 職場管理者IDからロールを取得する
+				Optional<Role> roleOpt = getRoleFromEmployeeId(adminId);
+				roleOpt.ifPresent(role -> {
+					// 参照範囲と担当区分をチェックする: 「自分のみ」以外　＆＆　担当区分　！＝　担当の場合
+					if (role.getEmployeeReferenceRange() != EmployeeReferenceRange.ONLY_MYSELF &&
+							role.getAssignAtr() != RoleAtr.INCHARGE) {
+						employeeIds.add(adminId);
+					}
+				});
+
+			});
+
+			// [No.571]の上位職場を基準職場を含めて取得する
+			List<String> upperWorkplaceIds = wkplacePub.getWorkplaceIdAndUpper(AppContexts.user().companyId(), baseDate, workplaceId);
+			upperWorkplaceIds.forEach(upperWkpId -> {
+				// [No.218] アルゴリズム「職場から職場管理者社員を取得する」を実行する。
+				List<String> administratorList = getListEmployeeId(upperWkpId, baseDate);
+
+                // 自分自身を省く
+                if (administratorList.stream().anyMatch(x -> x.contains(empLoginId))) {
+                    administratorList.remove(empLoginId);
+                }
+
+				administratorList.forEach(admin -> {
+					//職場管理者IDからロールを取得する
+					Optional<Role> roleOpt = getRoleFromEmployeeId(admin);
+
+					roleOpt.ifPresent(role -> {
+						// 参照範囲と担当区分をチェックする: 「参照範囲＝部門・職場（配下含む）＆＆　担当区分　！＝担当」の場合
+						if (role.getEmployeeReferenceRange() == EmployeeReferenceRange.DEPARTMENT_AND_CHILD &&
+								role.getAssignAtr() != RoleAtr.INCHARGE) {
+							employeeIds.add(admin);
+						}
+					});
+				});
+			});
+
+			// Map＜職場ID、List＜管理者ID＞＞を作成する。
+			if (!employeeIds.isEmpty()) {
+				workplaceEmployeeMap.put(workplaceId, employeeIds.stream().distinct().collect(Collectors.toList()));
+			}
+		}
+
+		return workplaceEmployeeMap;
+	}
+
+	/**
+	 * 職場管理者IDからロールを取得する
+	 * @param employeeId
+	 * @return
+	 */
+	private Optional<Role> getRoleFromEmployeeId(String employeeId) {
+		GeneralDate baseDate = GeneralDate.today();
+
+		// 社員IDからユーザIDを取得する
+		Optional<String> userID = acquireUserIDFromEmpIDService.getUserIDByEmpID(employeeId);
+		if (!userID.isPresent()) return Optional.empty();
+
+		// ユーザIDからロールセットを取得する
+		Optional<RoleSet> roleSetOpt = roleSetService.getRoleSetFromUserId(userID.get(), baseDate);
+
+		// ロール個人別付与を取得する
+		Optional<RoleIndividualGrant> roleIndividualGrantOpt = roleIndividualGrantRepository.findByUserCompanyRoleTypeDate(userID.get(),
+				AppContexts.user().companyId(), 3, baseDate);
+
+		if (roleIndividualGrantOpt.isPresent()) {
+			return Optional.empty();
+		} else {
+			if (!roleSetOpt.isPresent() || !roleSetOpt.get().getEmploymentRoleId().isPresent())
+				return Optional.empty();
+			else
+				return roleRepository.findByRoleId(roleSetOpt.get().getEmploymentRoleId().get());
+		}
 	}
 
 	@AllArgsConstructor

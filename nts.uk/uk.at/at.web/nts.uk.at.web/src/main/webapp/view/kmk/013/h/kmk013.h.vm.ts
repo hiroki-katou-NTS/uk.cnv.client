@@ -19,6 +19,16 @@ module nts.uk.at.view.kmk013.h {
             
             itemListH9_2: KnockoutObservableArray<any>;
             selectedIdH9_2: KnockoutObservable<number>;
+
+            itemListH4_6: KnockoutObservableArray<any>;
+            selectedIdH4_6: KnockoutObservable<number>;
+
+            goOutMaxUsage: KnockoutObservable<number>;
+            selectedReasonGoOut: KnockoutObservable<number>;
+            goOutReasonOptions: KnockoutObservableArray<any>;
+            tempMaxUsage: KnockoutObservable<number>;
+            timeTreatTemporarySame: KnockoutObservable<number>;
+            isEnabledTempMaxUsage: KnockoutObservable<boolean>;
             
             constructor() {
                 const self = this;
@@ -49,21 +59,45 @@ module nts.uk.at.view.kmk013.h {
                     new BoxModel(0, nts.uk.resource.getText('KMK013_305'))
                 ]);
                 self.selectedIdH9_2 = ko.observable(0);
+
+                self.itemListH4_6 = ko.observableArray([
+                  new BoxModel(0, nts.uk.resource.getText("KMK013_576")),
+                  new BoxModel(1, nts.uk.resource.getText("KMK013_577"))
+                ]);
+                self.selectedIdH4_6 = ko.observable(0);
+
+                self.goOutMaxUsage = ko.observable(3);
+                self.selectedReasonGoOut = ko.observable(0);
+                self.goOutReasonOptions = ko.observableArray(__viewContext.enums.GoingOutReason);
+                self.tempMaxUsage = ko.observable(0);
+                self.timeTreatTemporarySame = ko.observable(0);
+                self.isEnabledTempMaxUsage = ko.observable(true);
             }
             
             startPage(): JQueryPromise<any> {
                 const self = this;
                 const dfd = $.Deferred();
                 blockUI.invisible();
-                service.findByCompanyId().done((data: any) => {
-                    if (data) {
-                        self.selectedIdH3_2(data.autoStampReflectionClass);
-                        self.selectedIdH4_2(data.autoStampForFutureDayClass);
-                        self.selectedIdH7_2(data.goBackOutCorrectionClass == 1);
-                        self.selectedIdH5_2(data.reflectWorkingTimeClass == 1);
-                        self.selectedIdH8_2(data.actualStampOfPriorityClass);
-                        self.selectedIdH9_2(data.breakSwitchClass);
+                $.when(service.findByCompanyId(), service.findUsageData(), service.getCreatingDailyResultsCondition())
+                .done((stampData: any, usageData: any, isCreatingFutureDay: boolean) => {
+                    if (stampData) {
+                        self.selectedIdH3_2(stampData.autoStampReflectionClass);
+                        self.selectedIdH4_2(stampData.autoStampForFutureDayClass);
+                        self.selectedIdH7_2(stampData.goBackOutCorrectionClass == 1);
+                        self.selectedIdH5_2(stampData.reflectWorkingTimeClass == 1);
+                        self.selectedIdH8_2(stampData.actualStampOfPriorityClass);
+                        self.selectedIdH9_2(stampData.breakSwitchClass);
                     }
+                    if (usageData.outManage) {
+                      self.goOutMaxUsage(usageData.outManage.maxUsage);
+                      self.selectedReasonGoOut(usageData.outManage.initValueReasonGoOut);
+                    }
+                    if (usageData.tempWorkManage) {
+                      self.tempMaxUsage(usageData.tempWorkManage.maxUsage);
+                      self.timeTreatTemporarySame(usageData.tempWorkManage.timeTreatTemporarySame);
+                    }
+                    self.selectedIdH4_6(isCreatingFutureDay ? 1 : 0);
+                    self.isEnabledTempMaxUsage(usageData.tempWorkUseManageAtr === 1);
                     dfd.resolve();
                 }).fail(error => {
                     dfd.reject();
@@ -90,7 +124,7 @@ module nts.uk.at.view.kmk013.h {
                     actualStampOfPriorityClass: self.selectedIdH8_2(),
                     breakSwitchClass: self.selectedIdH9_2()
                 };
-                service.save(data).done(() => {
+                $.when(service.save(data), self.saveUsageData(), service.saveCreatingFutureDay(self.selectedIdH4_6())).done(() => {
                     nts.uk.ui.dialog.info({messageId: 'Msg_15'}).then(() => {
                         $("#h3_2").focus();
                     });
@@ -100,6 +134,19 @@ module nts.uk.at.view.kmk013.h {
                     blockUI.clear();
                 });
                 
+            }
+
+            saveUsageData(): JQueryPromise<any> {
+              const self = this;
+              const goOutData = {
+                maxUsage: self.goOutMaxUsage(),
+                initValueReasonGoOut: self.selectedReasonGoOut()
+              };
+              const tempWorkData = {
+                maxUsage: self.tempMaxUsage(),
+                timeTreatTemporarySame: self.timeTreatTemporarySame()
+              };
+              return $.when(service.saveGoOutManage(goOutData), service.saveTempWorkManage(tempWorkData));
             }
         }
         

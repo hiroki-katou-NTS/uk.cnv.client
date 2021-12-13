@@ -48,4 +48,6 @@ public interface EmployeeInfoPub {
 	 */
 	Optional<EmployeeInfoDto> getEmployeeInfoByCidPid(String companyId, String personId);
 
+	List<EmployeeInfoDto> findEmployeesMatchingName(List<String> pid, String companyId);
+
 }

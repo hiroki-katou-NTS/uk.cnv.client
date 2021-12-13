@@ -1,8 +1,14 @@
 package nts.uk.screen.at.app.kaf022.command;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+
+import org.apache.commons.lang3.BooleanUtils;
 
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.error.BusinessException;
@@ -22,6 +28,7 @@ import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.appl
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.DisplayReasonRepository;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.appovertime.OvertimeAppSetRepository;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.approvallistsetting.ApprovalListDispSetRepository;
+import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.businesstrip.AppTripRequestSetRepository;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.hdworkapplicationsetting.HolidayWorkAppSetRepository;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.stampsetting.ApplicationStampSettingRepository;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.substituteapplicationsetting.SubstituteHdWorkAppSetRepository;
@@ -29,28 +36,17 @@ import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.vaca
 import nts.uk.ctx.at.request.dom.setting.company.appreasonstandard.AppReasonStandard;
 import nts.uk.ctx.at.request.dom.setting.company.appreasonstandard.AppReasonStandardRepository;
 import nts.uk.ctx.at.request.dom.setting.company.emailset.AppEmailSetRepository;
-import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.businesstrip.AppTripRequestSetRepository;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.directgoback.GoBackReflect;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.directgoback.GoBackReflectRepository;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.lateearlycancellation.LateEarlyCancelReflect;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.timeleaveapplication.TimeLeaveAppReflectRepository;
 import nts.uk.ctx.workflow.app.command.approvermanagement.setting.ApprovalSettingCommand_New;
-import nts.uk.ctx.workflow.app.command.approvermanagement.setting.JobAssignSettingCommand;
 import nts.uk.ctx.workflow.app.command.approvermanagement.setting.UpdateApprovalSettingCommandHandler;
-import nts.uk.ctx.workflow.app.command.approvermanagement.setting.UpdateJobAssignSettingCommandHandler;
 import nts.uk.shr.com.context.AppContexts;
-import org.apache.commons.lang3.BooleanUtils;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Stateless
 @Transactional
 public class UpdateKaf022AddCommandHandler extends CommandHandler<Kaf022AddCommand>{
-
-	@Inject
-	private UpdateJobAssignSettingCommandHandler updateJobAssign;
 	
 	@Inject
 	private UpdateApprovalSettingCommandHandler updateAppro;
@@ -117,7 +113,6 @@ public class UpdateKaf022AddCommandHandler extends CommandHandler<Kaf022AddComma
 		applicationSettingRepo.save(applicationSetting, reasonDisplaySettings, kaf022.getNightOvertimeReflectAtr());
 		displayReasonRepo.saveHolidayAppReason(companyId, reasonDisplaySettings);
 
-		updateJobAssign.handle(new JobAssignSettingCommand(BooleanUtils.toBoolean(kaf022.getIncludeConcurrentPersonel())));
 		updateAppro.handle(new ApprovalSettingCommand_New(kaf022.getApprovalByPersonAtr()));
 		appReflectConditionRepo.save(kaf022.getAppReflectCondition().toDomain(companyId));
 

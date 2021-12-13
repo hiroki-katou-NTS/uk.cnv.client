@@ -79,7 +79,7 @@ public class JpaAppApprovalFixedExtractConditionRepository extends JpaRepository
 				new KrqmtAppApprovalFixedExtractConditionPK(domain.getErrorAlarmCheckId(), domain.getNo().value),
 				KrqmtAppApprovalFixedExtractCondition.class).get();
 		entity.setMessage(domain.getMessage().isPresent() ? domain.getMessage().get().v() : "");
-		entity.setUseAtr(domain.isUseAtr() == true ? 1 : 0);
+		entity.setUseAtr(domain.isUseAtr());
 		this.commandProxy().update(entity);
 	}
 
@@ -105,7 +105,7 @@ public class JpaAppApprovalFixedExtractConditionRepository extends JpaRepository
 				entity.getPk().getErAlId(),
 				EnumAdaptor.valueOf(entity.getPk().getNo(), AppApprovalFixedCheckItem.class), 
 				Optional.ofNullable(new ErrorAlarmMessage(entity.getMessage())), 
-				entity.getUseAtr() == 0 ? false : true);
+				entity.isUseAtr());
 	}
 
 

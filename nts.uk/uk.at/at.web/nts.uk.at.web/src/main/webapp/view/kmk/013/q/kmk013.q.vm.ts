@@ -95,7 +95,8 @@ module nts.uk.at.view.kmk013.q {
                     _.forEach(dataOvertimeworkframe, function(value: any, index) {
                         self.overtimeList.push({ overtimeNo: nts.uk.resource.getText('KMK013_152') + value.overtimeWorkFrNo,
                             overtimeName: value.overtimeWorkFrName,
-                            otWorkRoleSelect: ko.observable(value.role)
+                            otWorkRoleSelect: ko.observable(value.role),
+                            useAtr: ko.observable(value.useAtr)
                             });
                     });
 
@@ -103,6 +104,7 @@ module nts.uk.at.view.kmk013.q {
                         self.roleFrameList.push({ HDFrameNo: nts.uk.resource.getText('KMK013_157') + value.workdayoffFrNo,
                             HDFrameName: value.workdayoffFrName,
                             roleFrameSelect: ko.observable(value.role),
+                            useAtr: ko.observable(value.useAtr)
                             });
                     });
 

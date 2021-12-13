@@ -20,9 +20,9 @@
 			<com:scriptfile path="ksu003.a.start.js" />
 			<com:scriptfile path="ksu003.a.model.js" />
 
-			<!-- <com:stylefile path="../ab/ksu003.ab.main.css" />
+			<com:stylefile path="../ab/ksu003.ab.main.css" />
 			<com:scriptfile path="../ab/ksu003.ab.vm.js" />
-			<com:scriptfile path="../ab/ksu003.ab.service.js" /> -->
+			<com:scriptfile path="../ab/ksu003.ab.service.js" />
 
 			<com:scriptfile path="../../../kcp/013/shared/kcp013.vm.js" />
 			<com:ValidatorScript>
@@ -35,95 +35,98 @@
 		</ui:define>
 		<!-- PAGE CONTENT -->
 		<ui:define name="content">
-		<div id="contents-area">
-			<div id="ui-area" data-bind="with: viewmodelA" style="display: none;">
-				<div id="functions-area">
-					<button tabindex="1" id="A1_1" class="proceed"
-						data-bind="click: saveData, enable: enableSave">#{i18n.getText('KSU003_2')}</button>
-					<button tabindex="2" id="A1_2" class=" marginleft15px">#{i18n.getText('KSU003_3')}</button>
-					<button tabindex="3" id="A1_3" class="create  marginleft15px"
-						data-bind="click: checkOpenG">#{i18n.getText('KSU003_4')}</button>
-					<button tabindex="4" id="A1_4" class="close"
-						data-bind="click: closeDialog">#{i18n.getText('KSU003_5')}</button>
-				</div>
-				<div id="functon-area-row2">
-					<div id="functon-area-row2-left" style="margin-top: 10px">
-						<!-- A2_1 -->
-						<div tabindex="-1" id="period-setting" class="panel panel-frame">
-							<!-- A2_1_1 -->
-							<div id="prev-button">
-								<button tabindex="5" id="prev-all" class="small"
-									data-bind=" click: prevAllDay, enable:checkPrv()">
-									<i id="icon-prev-all"
-										data-bind="ntsIcon: { no: 57, width: 22, height: 22 }"></i>
-								</button>
-								<button tabindex="6" id="prev-one" class="small"
-									data-bind=" click: prevDay, enable:checkPrv()">
-									<i id="icon-prev-one"
-										data-bind="ntsIcon: { no: 9 , width: 22, height: 22 }"></i>
-								</button>
-							</div>
-							<!-- A2_1_3 -->
-							<div id="targetDate" style="margin-left: 10px; margin-top: 5px;"
-								class="cf">
-								<label data-bind="html:targetDateDay"></label>
-							</div>
-							<div id="next-button" style="margin-left: 10px">
-								<button tabindex="7" id="next-one" class="small"
-									data-bind=" click: nextDay, enable:checkNext()">
-									<i id="icon-next-one"
-										data-bind="ntsIcon: { no: 10, width: 22, height: 22 }"></i>
-								</button>
-								<button tabindex="8" id="next-all" class="small"
-									data-bind=" click: nextAllDay, enable:checkNext()">
-									<i id="icon-next-all"
-										data-bind="ntsIcon: { no: 58, width: 22, height: 22 }"></i>
-								</button>
-							</div>
-							<!-- A2_1_6 -->
-							<div class="event-button">
-								<button tabindex="9" id="event" title=""
-									style="margin-left: 10px" class="small">#{i18n.getText('KSU003_6')}
-								</button> 
+			<div id="contents-area">
+				<div id="ui-area" data-bind="with: viewmodelA"
+					style="display: none;">
+					<div id="functions-area">
+						<button tabindex="1" id="A1_1" class="proceed"
+							data-bind="click: saveData, enable: enableSave">#{i18n.getText('KSU003_2')}</button>
+						<button tabindex="2" id="A1_2" class=" marginleft15px"
+								data-bind="click: openKSU003D" >#{i18n.getText('KSU003_3')}</button>
+						<button tabindex="3" id="A1_3" class="create  marginleft15px"
+							data-bind="click: checkOpenG">#{i18n.getText('KSU003_4')}</button>
+						<button tabindex="4" id="A1_4" class="close"
+							data-bind="click: closeDialog">#{i18n.getText('KSU003_5')}</button>
+					</div>
+					<div id="functon-area-row2">
+						<div id="functon-area-row2-left" style="margin-top: 10px">
+							<!-- A2_1 -->
+							<div tabindex="-1" id="period-setting" class="panel panel-frame">
+								<!-- A2_1_1 -->
+								<div id="prev-button">
+									<button tabindex="5" id="prev-all" class="small"
+										data-bind=" click: prevAllDay">
+										<i id="icon-prev-all"
+											data-bind="ntsIcon: { no: 57, width: 22, height: 22 }"></i>
+									</button>
+									<button tabindex="6" id="prev-one" class="small"
+										data-bind=" click: prevDay">
+										<i id="icon-prev-one"
+											data-bind="ntsIcon: { no: 9 , width: 22, height: 22 }"></i>
+									</button>
+								</div>
+								<!-- A2_1_3 -->
+								<div id="targetDate" style="margin-left: 10px; margin-top: 5px;"
+									class="cf">
+									<label data-bind="html:targetDateDay"></label>
+								</div>
+								<div id="next-button" style="margin-left: 10px">
+									<button tabindex="7" id="next-one" class="small"
+										data-bind=" click: nextDay">
+										<i id="icon-next-one"
+											data-bind="ntsIcon: { no: 10, width: 22, height: 22 }"></i>
+									</button>
+									<button tabindex="8" id="next-all" class="small"
+										data-bind=" click: nextAllDay">
+										<i id="icon-next-all"
+											data-bind="ntsIcon: { no: 58, width: 22, height: 22 }"></i>
+									</button>
+								</div>
+								<!-- A2_1_6 -->
+								<div class="event-button">
+									<button tabindex="9" id="event" title=""
+										style="margin-left: 10px" class="small" data-bind="enable: false">#{i18n.getText('KSU003_6')}
+									</button>
+								</div>
 							</div>
 						</div>
-					</div>
-					<div id="functon-area-row2-center">
-						<!-- A2_2 -->
-						<label id="org-name" data-bind="text:organizationName"></label>
-					</div>
-					<div id="functon-area-row2-right">
-						<!-- A2_5 -->
-						<label id="label-display">#{i18n.getText('KSU003_7')}</label> <label
-							id="hai-cham">#{i18n.getText('KSU003_8')}</label>
-						<div tabindex="10" id="display-format" class="cf"
-							style="margin-left: 5px"
-							data-bind="ntsSwitchButton: {
+						<div id="functon-area-row2-center">
+							<!-- A2_2 -->
+							<label id="org-name" data-bind="text:organizationName"></label>
+						</div>
+						<div id="functon-area-row2-right">
+							<!-- A2_5 -->
+							<label id="label-display">#{i18n.getText('KSU003_7')}</label> <label
+								id="hai-cham">#{i18n.getText('KSU003_8')}</label>
+							<div tabindex="10" id="display-format" class="cf"
+								style="margin-left: 5px"
+								data-bind="ntsSwitchButton: {
+										enable : true,
 										options: [{id: 1, name: '#{i18n.getText('KSU003_10')}'}, {id: 2, name: '#{i18n.getText('KSU003_11')}'}] ,
 										optionsValue: 'id',
 										optionsText: 'name',
 										value: selectedDisplayPeriod}">
+							</div>
+							<!-- new UI display: change 1 -->
 						</div>
+						<!-- A12 -->
 						<!-- new UI display: change 1 -->
-					</div>
-					<!-- A12 -->
-					<!-- new UI display: change 1 -->
-					<div id="note-color">
+						<div id="note-color">
 							<button id="note" class="small ml-2 size-image-button1">
 								<i data-bind="ntsIcon: { no: 139, width: 22, height: 22 }"></i>
 							</button>
 						</div>
-				</div>
+					</div>
 
-				<hr id='hr-row2' />
-				<!-- A3_1 -->
-				<div id="screen-ab">
-					<div id="functon-area-row3-left">
-						<div>
-							<label id="operation-unit">#{i18n.getText('KSU003_12')}</label>
-						</div>
-						<div tabindex="11" id="combo-box"
-							data-bind="ntsComboBox: {
+					<hr id='hr-row2' />
+					<!-- A3_1 -->
+					<div id="screen-ab">
+						<div id="functon-area-row3-left">
+							<div>
+								<label id="operation-unit">#{i18n.getText('KSU003_12')}</label>
+							</div>
+							<div tabindex="11" id="combo-box"
+								data-bind="ntsComboBox: {
 					name: '#KSU003_12',
 					options: itemList,
 					optionsValue: 'code',
@@ -133,110 +136,102 @@
 					columns: [
 						{ prop: 'name', length: 5 },
 					]}">
-						</div>
-						<div>
-							<!-- A3_3 -->
-							<div tabindex="12" id="check-name"
-								data-bind="ntsCheckBox: { checked: checkedName, enable: true}">#{i18n.getText('KSU003_19')}</div>
-						</div>
-						<button tabindex="13" id="note-sort" class="small">#{i18n.getText('KSU003_18')}</button>
-					</div>
-				</div>
-
-				<!-- ver 4 - comment -->
-				<!-- <div id="contain-view-right-ksu003" class="inline">
-					<div id="ab1-viewModel">
-						<div data-bind="with: $parent.viewmodelAb">
-							<ui:include src="../ab/index.xhtml" />
+							</div>
+							<div>
+								<!-- A3_3 -->
+								<div tabindex="12" id="check-name" 
+									data-bind="ntsCheckBox: { checked: checkedName, enable: false}, enable: false">#{i18n.getText('KSU003_19')}</div>
+							</div>
+							<button tabindex="13" id="note-sort" class="small">#{i18n.getText('KSU003_18')}</button>
 						</div>
 					</div>
-				</div> -->
-				<!-- ver 4 - comment -->
 
-				<div id="extable-area">
-					<div id="side-menu" class="cf"></div>
-					<div id="content" class="cf">
-						<div id="row-left">
-							<button tabindex="-1" class="toLeft inline"
-								data-bind="click : toLeft">
-								<com:ko-if bind="indexBtnToLeft() % 2 == 0">
-									<div id="left-button">
-										<i data-bind="ntsIcon: { no: 152, width: 21, height: 11 }"></i>
-									</div>
-								</com:ko-if>
-								<com:ko-if bind="indexBtnToLeft() % 2 != 0">
-									<div id="left-button2">
-										<i data-bind="ntsIcon: { no: 153, width: 21, height: 11 }"></i>
-									</div>
-								</com:ko-if>
-							</button>
+					<!-- ver 4 - comment -->
+					<div id="contain-view-right-ksu003" class="ab-view">
+						<div id="ab1-viewModel">
+							<div data-bind="with: $parent.viewmodelAb">
+								<ui:include src="../ab/index.xhtml" />
+							</div>
 						</div>
-						<div style="clear: left"></div>
-						<!-- <div id="gc" style="position: absolute; border: 1px solid #000; width: 1000px; height: 400px; overflow: scroll;"></div> -->
-						<div style="float: left">
-							<button tabindex="-1" class="toDown inline"
-								data-bind="click : toDown">
-								<com:ko-if bind="indexBtnToDown() % 2 == 0">
-									<div id="down-button">
-										<i data-bind="ntsIcon: { no: 150, width:11, height: 22 }"></i>
-									</div>
-								</com:ko-if>
-								<com:ko-if bind="indexBtnToDown() % 2 != 0">
-									<div id="down-button2">
-										<i data-bind="ntsIcon: { no: 151, width:11, height: 22 }"></i>
-									</div>
-								</com:ko-if>
-							</button>
-						</div>
-
-						<div id="extable-ksu003" style="height: 400px; float: left"></div>
-
-						<!-- ver 4 - comment -->
-						<!-- <div id="setting-time-grid">
-							<button id="settingTimeGrid">
-								<i style="margin-left: -6px;"
-									data-bind="ntsIcon: { no: 3,width: 14, height: 14 }"></i>
-							</button>
-						</div> -->
-						<!-- ver 4 - comment -->
 					</div>
-				</div>
-				<div id="A14" class="popup-area popup-panel">
-					<div>
-						<div data-bind="ntsFormLabel: {required: true}">
-							#{i18n.getText('KSU003_98')}</div>
-						<div tabindex="10" id="display-range" class="cf"
-							data-bind="ntsSwitchButton: {
+					<!-- ver 4 - comment -->
+
+					<div id="extable-area">
+						<div id="side-menu" class="cf"></div>
+						<div id="content" class="cf">
+							<div id="row-left">
+								<button tabindex="-1" class="toLeft inline"
+									data-bind="click : toLeft">
+									<com:ko-if bind="indexBtnToLeft() % 2 == 0">
+										<div id="left-button">
+											<i data-bind="ntsIcon: { no: 152, width: 21, height: 11 }"></i>
+										</div>
+									</com:ko-if>
+									<com:ko-if bind="indexBtnToLeft() % 2 != 0">
+										<div id="left-button2">
+											<i data-bind="ntsIcon: { no: 153, width: 21, height: 11 }"></i>
+										</div>
+									</com:ko-if>
+								</button>
+							</div>
+							<div style="clear: left"></div>
+							<!-- <div id="gc" style="position: absolute; border: 1px solid #000; width: 1000px; height: 400px; overflow: scroll;"></div> -->
+							<div style="float: left">
+								<button tabindex="-1" class="toDown inline"
+									data-bind="click : toDown">
+									<com:ko-if bind="indexBtnToDown() % 2 == 0">
+										<div id="down-button">
+											<i data-bind="ntsIcon: { no: 150, width:11, height: 22 }"></i>
+										</div>
+									</com:ko-if>
+									<com:ko-if bind="indexBtnToDown() % 2 != 0">
+										<div id="down-button2">
+											<i data-bind="ntsIcon: { no: 151, width:11, height: 22 }"></i>
+										</div>
+									</com:ko-if>
+								</button>
+							</div>
+
+							<div id="extable-ksu003" style="height: 400px; float: left"></div>
+
+							<!-- ver 4 - comment -->
+							<div id="setting-time-grid">
+								<button id="settingTimeGrid">
+									<i style="margin-left: -6px;"
+										data-bind="ntsIcon: { no: 3,width: 14, height: 14 }"></i>
+								</button>
+							</div>
+							<!-- ver 4 - comment -->
+						</div>
+					</div>
+					<div id="A14" class="popup-area popup-panel">
+						<table>
+							<tr>
+								<td>
+									<div data-bind="ntsFormLabel: {required: true}">
+										#{i18n.getText('KSU003_98')}</div>
+								</td>
+								<td>
+									<div tabindex="10" id="display-range" class="cf"
+										data-bind="ntsSwitchButton: {
+											name : '#KSU003_99',
 											options: [{id: 1, name: '#{i18n.getText('KSU003_100')}'}, {id: 2, name: '#{i18n.getText('KSU003_101')}'}] ,
 											optionsValue: 'id',
 											optionsText: 'name',
 											value: selectedTimeRange}">
-						</div>
-					</div>
-					<div>
-						<div id="start-time-label"
-							data-bind="ntsFormLabel: {required: true}">
-							#{i18n.getText('KSU003_102')}</div>
-						<div id="combo-box-start"
-							data-bind="ntsComboBox: {
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div id="start-time-label"
+										data-bind="ntsFormLabel: {required: true}">
+										#{i18n.getText('KSU003_102')}</div>
+								</td>
+								<td>
+									<div id="combo-box-start"
+										data-bind="ntsComboBox: {
 					name: '#KSU001_103',
-					options: rangeList,
-					optionsValue: 'code',
-					value: initDispStartChecked,
-					optionsText: 'name',
-					enable: true,
-					columns: [
-						{ prop: 'name', length: 5 },
-					]}">
-						</div>
-					</div>
-					<div>
-						<div id="start-time-label"
-							data-bind="ntsFormLabel: {required: true}">
-							#{i18n.getText('KSU003_105')}</div>
-						<div id="combo-box-start-2"
-							data-bind="ntsComboBox: {
-					name: '#KSU003_106',
 					options: rangeList,
 					optionsValue: 'code',
 					value: dispStartChecked,
@@ -245,20 +240,50 @@
 					columns: [
 						{ prop: 'name', length: 5 },
 					]}">
-						</div>
+									</div>
+								</td>
+								<td>
+									<p style="margin-left: -50px; margin-top: 8px;">#{i18n.getText('KSU003_104')}</p>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div id="start-time-label"
+										data-bind="ntsFormLabel: {required: true}">
+										#{i18n.getText('KSU003_105')}</div>
+								</td>
+								<td>
+									<div id="combo-box-start-2"
+										data-bind="ntsComboBox: {
+					name: '#KSU003_106',
+					options: rangeList,
+					optionsValue: 'code',
+					value: initDispStartChecked,
+					optionsText: 'name',
+					enable: true,
+					columns: [
+						{ prop: 'name', length: 5 },
+					]}">
+									</div>
+								</td>
+								<td>
+									<p style="margin-left: -50px; margin-top: 8px;">#{i18n.getText('KSU003_107')}</p>
+								</td>
+							</tr>
+						</table>
+						<hr />
+						<button tabindex="-1" id="A14_11" class="proceed"
+							data-bind="click : closePopupA14">#{i18n.getText('KSU003_108')}</button>
 					</div>
-					<button tabindex="-1" id="A14_11" class="proceed"
-						data-bind="click : closePopupA14">#{i18n.getText('KSU003_108')}</button>
-				</div>
-				<!-- ver 4 -->
+					<!-- ver 4 -->
 
-				<div id="A3_4" class="popup-area popup-panel">
-					<div>
-						<label id="sort-label">#{i18n.getText('KSU003_56')}</label><label
-							id="sort-label">#{i18n.getText('KSU003_57')}</label>
-					</div>
-					<div id="combo-box-sort"
-						data-bind="ntsComboBox: {
+					<div id="A3_4" class="popup-area popup-panel">
+						<div>
+							<label id="sort-label">#{i18n.getText('KSU003_56')}</label><label
+								id="sort-label">#{i18n.getText('KSU003_57')}</label>
+						</div>
+						<div id="combo-box-sort"
+							data-bind="ntsComboBox: {
 					name: '#KSU003_58',
 					options: sortList,
 					optionsValue: 'code',
@@ -268,127 +293,127 @@
 					columns: [
 						{ prop: 'name', length: 5 },
 					]}">
+						</div>
+						<div id="sort-label-note">
+							<label>#{i18n.getText('KSU003_61')}</label>
+						</div>
 					</div>
-					<div id="sort-label-note">
-						<label>#{i18n.getText('KSU003_61')}</label>
+
+					<div id="A5_1" class="popup-area popup-panel">
+						<!-- Support color -->
+						<span id="A12_2">#{i18n.getText('KSU003_35')}</span>
+						<!-- A12_2_1 -->
+						<div style="margin-top: 18px;"></div>
+						<hr />
+						<div class="ml-2">
+							<div>
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #c3d69b !important;"></div>
+									<!-- Go support all day -->
+									<span id="A12_2_2">#{i18n.getText('KSU003_36')}</span>
+								</div>
+								<div class="popup-div">
+									<div id="" class="square bg-schedule-support"
+										style="background-color: #fedfe6 !important;"></div>
+									<!-- Come support all day -->
+									<span id="A12_2_3">#{i18n.getText('KSU003_37')}</span>
+								</div>
+							</div>
+							<div>
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #ebf1de !important;"></div>
+									<!-- Go support by time -->
+									<span id="A12_2_4">#{i18n.getText('KSU003_38')}</span>
+								</div>
+
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #ffccff !important;"></div>
+									<!-- Come support by time -->
+									<span id="A12_2_5">#{i18n.getText('KSU003_39')}</span>
+								</div>
+							</div>
+						</div>
+						<br /> <span id="A12_3">#{i18n.getText('KSU003_40')}</span>
+						<hr />
+						<div class="ml-2">
+							<div>
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #ddddd2 !important;"></div>
+									<span id="A12_3_2">#{i18n.getText('KSU003_41')}</span>
+								</div>
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #94b7fe !important;"></div>
+									<span id="A12_3_3">#{i18n.getText('KSU003_42')}</span>
+								</div>
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #cee6ff !important;"></div>
+									<span id="A12_3_4">#{i18n.getText('KSU003_43')}</span>
+								</div>
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #eccefb !important;"></div>
+									<span id="A12_3_5">#{i18n.getText('KSU003_44')}</span>
+								</div>
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #bfea60 !important;"></div>
+									<span id="A12_3_6">#{i18n.getText('KSU003_45')}</span>
+								</div>
+							</div>
+						</div>
+						<br /> <span id="A12_4">#{i18n.getText('KSU003_46')}</span>
+						<hr />
+						<div class="ml-2">
+							<div>
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #ccccff !important;"></div>
+									<span id="A12_4_2">#{i18n.getText('KSU003_47')}</span>
+								</div>
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #ffc000 !important;"></div>
+									<span id="A12_4_3">#{i18n.getText('KSU003_48')}</span>
+								</div>
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #ffff00 !important;"></div>
+									<span id="A12_4_4">#{i18n.getText('KSU003_49')}</span>
+								</div>
+							</div>
+							<div>
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #ff9999 !important;"></div>
+									<span id="A12_4_5">#{i18n.getText('KSU003_50')}</span>
+								</div>
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #00ffcc !important;"></div>
+									<span id="A12_4_6">#{i18n.getText('KSU003_51')}</span>
+								</div>
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #c4bd97 !important;"></div>
+									<span id="A12_4_7">#{i18n.getText('KSU003_52')}</span>
+								</div>
+							</div>
+							<div>
+								<div class="popup-div">
+									<div id="" class="square"
+										style="background-color: #6fa527 !important;"></div>
+									<span id="A12_4_8">#{i18n.getText('KSU003_53')}</span>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
-
-				<div id="A5_1" class="popup-area popup-panel">
-					<!-- Support color -->
-					<span id="A12_2">#{i18n.getText('KSU003_35')}</span>
-					<!-- A12_2_1 -->
-					<div style="margin-top: 18px;"></div>
-					<hr />
-					<div class="ml-2">
-						<div>
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #c3d69b !important;"></div>
-								<!-- Go support all day -->
-								<span id="A12_2_2">#{i18n.getText('KSU003_36')}</span>
-							</div>
-							<div class="popup-div">
-								<div id="" class="square bg-schedule-support"
-									style="background-color: #fedfe6 !important;"></div>
-								<!-- Come support all day -->
-								<span id="A12_2_3">#{i18n.getText('KSU003_37')}</span>
-							</div>
-						</div>
-						<div>
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #ebf1de !important;"></div>
-								<!-- Go support by time -->
-								<span id="A12_2_4">#{i18n.getText('KSU003_38')}</span>
-							</div>
-
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #ffccff !important;"></div>
-								<!-- Come support by time -->
-								<span id="A12_2_5">#{i18n.getText('KSU003_39')}</span>
-							</div>
-						</div>
-					</div>
-					<br /> <span id="A12_3">#{i18n.getText('KSU003_40')}</span>
-					<hr />
-					<div class="ml-2">
-						<div>
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #ddddd2 !important;"></div>
-								<span id="A12_3_2">#{i18n.getText('KSU003_41')}</span>
-							</div>
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #94b7fe !important;"></div>
-								<span id="A12_3_3">#{i18n.getText('KSU003_42')}</span>
-							</div>
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #cee6ff !important;"></div>
-								<span id="A12_3_4">#{i18n.getText('KSU003_43')}</span>
-							</div>
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #eccefb !important;"></div>
-								<span id="A12_3_5">#{i18n.getText('KSU003_44')}</span>
-							</div>
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #bfea60 !important;"></div>
-								<span id="A12_3_6">#{i18n.getText('KSU003_45')}</span>
-							</div>
-						</div>
-					</div>
-					<br /> <span id="A12_4">#{i18n.getText('KSU003_46')}</span>
-					<hr />
-					<div class="ml-2">
-						<div>
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #ccccff !important;"></div>
-								<span id="A12_4_2">#{i18n.getText('KSU003_47')}</span>
-							</div>
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #ffc000 !important;"></div>
-								<span id="A12_4_3">#{i18n.getText('KSU003_48')}</span>
-							</div>
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #ffff00 !important;"></div>
-								<span id="A12_4_4">#{i18n.getText('KSU003_49')}</span>
-							</div>
-						</div>
-						<div>
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #ff9999 !important;"></div>
-								<span id="A12_4_5">#{i18n.getText('KSU003_50')}</span>
-							</div>
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #00ffcc !important;"></div>
-								<span id="A12_4_6">#{i18n.getText('KSU003_51')}</span>
-							</div>
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #c4bd97 !important;"></div>
-								<span id="A12_4_7">#{i18n.getText('KSU003_52')}</span>
-							</div>
-						</div>
-						<div>
-							<div class="popup-div">
-								<div id="" class="square"
-									style="background-color: #6fa527 !important;"></div>
-								<span id="A12_4_8">#{i18n.getText('KSU003_53')}</span>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
 			</div>
 		</ui:define>
 	</ui:composition>

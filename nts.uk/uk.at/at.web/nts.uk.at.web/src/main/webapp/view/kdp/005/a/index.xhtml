@@ -1,9 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:com="http://xmlns.jcp.org/jsf/component"
-	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
 
 <body>
 	<ui:composition template="/master/freelayout.xhtml">
@@ -48,18 +46,18 @@
 						}">
 						</div>
 
-						<!-- stamp -->						
-					<!-- <div data-bind="if:isUsed" class="panel" style="padding: 0 10px 0px 10px">
+						<!-- stamp -->
+						<!-- <div data-bind="if:isUsed" class="panel" style="padding: 0 10px 0px 10px">
 						<div class="explanatoryText" data-bind="style: {'color': stampTab().stampPageCommentColor }">
 							<span data-bind="text: stampTab().stampPageComment"></span>
 						</div>
 						<ui:include src="stamp-tab.xhtml" />
 					</div> -->
-					<com:ko-if bind="ko.toJS($vm.errorMessage) === '' &amp;&amp;  pageComment() != ''">
-		          		<div class="pageComent" data-bind="html: pageComment, style: {color: commentColor}"></div>
-		          </com:ko-if>
-					<com:ko-if bind="ko.toJS($vm.errorMessage) === ''">
-						<div data-bind="kdp-tab-button-panel: { 
+						<com:ko-if bind="ko.toJS($vm.errorMessage) === '' &amp;&amp;  pageComment() != ''">
+							<div class="pageComent" data-bind="html: pageComment, style: {color: commentColor}"></div>
+						</com:ko-if>
+						<com:ko-if bind="ko.toJS($vm.errorMessage) === ''">
+							<div data-bind="kdp-tab-button-panel: { 
 							tabs: $vm.stampTab().tabs,
 							stampToSuppress: null,
 							pageComment: pageComment,
@@ -68,10 +66,8 @@
 							marginBottom: 0
 							}"></div>
 						</com:ko-if>
-					<com:ko-if bind="isUsed">
-						<com:ko-if bind="ko.toJS($vm.fingerStampSetting).noticeSetDto">
-							<com:ko-if bind="ko.toJS($vm.fingerStampSetting).noticeSetDto.displayAtr == 1">
-							<div class= "kdp-message-error" data-bind="component: {
+						<com:ko-if bind="isUsed">
+							<div class="kdp-message-error" data-bind="component: {
 									name: 'kdp-message-error',
 									params:{
 										events: {
@@ -83,15 +79,14 @@
 											}
 										},
 										notiSet: fingerStampSetting,
-										messageNoti: messageNoti
+										messageNoti: messageNoti,
+										showMessage: $vm.showMessage
 									}
 								}"></div>
-							</com:ko-if>
 						</com:ko-if>
-					</com:ko-if>
-					<com:ko-if bind="!isUsed()">
-						<div class="not_used_label" data-bind="text:errorMessage"></div>
-					</com:ko-if>
+						<com:ko-if bind="!isUsed()">
+							<div class="not_used_label" data-bind="text:errorMessage"></div>
+						</com:ko-if>
 					</div>
 
 				</div>

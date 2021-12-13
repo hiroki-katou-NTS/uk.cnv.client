@@ -92,7 +92,7 @@ public class ScWorkplaceAdapterImpl implements ScWorkplaceAdapter {
 	@Override
 	public AffWorkplaceHistoryItem getAffWkpHistItemByEmpDate(String employeeID, GeneralDate date) {
 		AffWorkplaceHistoryItemExport affWorkplace = this.workplacePub.getAffWkpHistItemByEmpDate(employeeID, date);
-		return new AffWorkplaceHistoryItem(affWorkplace.getHistoryId(), affWorkplace.getWorkplaceId(), affWorkplace.getNormalWorkplaceId());
+		return new AffWorkplaceHistoryItem(affWorkplace.getHistoryId(), affWorkplace.getWorkplaceId());
 	}
 	
 

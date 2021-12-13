@@ -24,27 +24,14 @@ public class RoleSetCommandBase {
     /** ロールセット名称*/
     private String roleSetName;
 
-    /** 承認権限*/
-    private boolean approvalAuthority;
-
-    /** ロールID: オフィスヘルパーロール */
-    private String officeHelperRoleId;
-
-    /** ロールID: マイナンバーロール */
-    private String myNumberRoleId;
-
-    /** ロールID: 人事ロール */
-    private String humanResourceRoleId;
-
     /** ロールID: 個人情報ロール */
     private String personInfRoleId;
 
     /** ロールID: 就業ロール */
     private String employmentRoleId;
 
-    /** ロールID: 給与ロール */
-    private String salaryRoleId;
-    
+    private Boolean defaultRoleSet;
+
     /** List of web menu code **/
     private List<WebMenuCommand> webMenus;
 }

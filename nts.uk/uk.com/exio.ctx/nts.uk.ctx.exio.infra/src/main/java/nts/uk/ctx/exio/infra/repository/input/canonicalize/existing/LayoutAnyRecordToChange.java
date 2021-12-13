@@ -34,10 +34,11 @@ public class LayoutAnyRecordToChange {
 		return TemporaryTable.createTableName(context, TABLE_NAME);
 	}
 	
-	public void createTable() {
-		
+	public void dropTable() {
 		TemporaryTable.dropTable(jdbcProxy, tableName());
-		
+	}
+	
+	public void createTable() {		
 		String sql = "create table " + tableName() + "("
 				+ " ID char(36) not null,"
 				+ " ITEM_NO decimal(5) not null,"

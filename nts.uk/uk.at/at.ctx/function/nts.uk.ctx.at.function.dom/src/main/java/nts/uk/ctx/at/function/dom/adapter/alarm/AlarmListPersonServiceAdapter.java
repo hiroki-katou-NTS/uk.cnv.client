@@ -86,7 +86,8 @@ public interface AlarmListPersonServiceAdapter {
 			List<WorkPlaceHistImport> lstWplHist,
 			List<ResultOfEachCondition> lstResultCondition,
 			List<AlarmListCheckInfor> lstCheckInfor, List<AlarmEmployeeList> alarmEmployeeList,
-			 List<AlarmExtractionCondition> alarmExtractConditions, String alarmCheckConditionCode);
+			 List<AlarmExtractionCondition> alarmExtractConditions, String alarmCheckConditionCode, Consumer<Integer> counter,
+				Supplier<Boolean> shouldStop);
 	
 	/**
 	 * スケジュール日

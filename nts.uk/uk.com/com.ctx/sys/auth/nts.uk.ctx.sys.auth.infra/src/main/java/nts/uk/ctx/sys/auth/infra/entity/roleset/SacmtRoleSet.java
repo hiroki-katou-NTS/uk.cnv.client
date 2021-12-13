@@ -37,10 +37,6 @@ public class SacmtRoleSet extends ContractUkJpaEntity implements Serializable {
     public String roleSetName;
 
     @Basic(optional = false)
-    @Column(name = "APPROVAL_AUTHORITY")
-    public int approvalAuthority;
-
-    @Basic(optional = false)
     @Column(name = "OFFICE_HELPER_ROLE")
     public String officeHelperRole;
 
@@ -70,20 +66,18 @@ public class SacmtRoleSet extends ContractUkJpaEntity implements Serializable {
     }
 
     /**
-     * Build Entity
+     *  Build entity
      * @param roleSetPK
      * @param roleSetName
-     * @param approvalAuthority
-     * @param officeHelperRole
-     * @param myNumberRole
-     * @param hRRole
-     * @param personInfRole
-     * @param employmentRole
-     * @param salaryRole
+     * @param officeHelperRoleCd
+     * @param myNumberRoleCd
+     * @param hRRoleCd
+     * @param personInfRoleCd
+     * @param employmentRoleCd
+     * @param salaryRoleCd
      */
     public void buildEntity(SacmtRoleSetPK roleSetPK
             , String roleSetName
-            , int approvalAuthority
             , String officeHelperRoleCd
             , String myNumberRoleCd
             , String hRRoleCd
@@ -92,7 +86,6 @@ public class SacmtRoleSet extends ContractUkJpaEntity implements Serializable {
             , String salaryRoleCd) {
         this.roleSetPK          = roleSetPK;
         this.roleSetName        = roleSetName;
-        this.approvalAuthority  = approvalAuthority;
         this.officeHelperRole   = officeHelperRoleCd;
         this.myNumberRole       = myNumberRoleCd;
         this.hRRole             = hRRoleCd;

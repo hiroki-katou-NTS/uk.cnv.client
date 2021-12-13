@@ -43,13 +43,13 @@ module nts.uk.at.view.kaf006.shr.component1.viewmodel {
                     <!-- ko if: $parent.condition19ChildNursing -->
                     <div class="row-underline" style="display: flex; justify-content: space-between">
                         <div data-bind="ntsFormLabel: {}, text: $i18n('Com_ChildNurseHoliday')"></div>
-                        <span data-bind="text: $parent.childNursingRemain"></span>
+                        <a class="hyperlink" href="" data-bind="text: $parent.childNursingRemain, click: openKDL051"></a>
                     </div>
                     <!-- /ko -->
                     <!-- ko if: $parent.condition19Nursing -->
                     <div class="row-underline" style="display: flex; justify-content: space-between">
                         <div data-bind="ntsFormLabel: {}, text: $i18n('Com_CareHoliday')"></div>
-                        <span data-bind="text: $parent.nursingRemain"></span>
+                        <a class="hyperlink" href="" data-bind="text: $parent.nursingRemain, click: openKDL052"></a>
                     </div>
                     <!-- /ko -->
                 </div>

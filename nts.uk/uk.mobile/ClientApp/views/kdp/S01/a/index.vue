@@ -43,7 +43,7 @@
               'background-color': button.buttonDisSet.displayBackGroundColor
             }"
             v-click:500="() => stampClick(button)"
-            class="btn-block btn-stamp btn btn-secondary "
+            class="btn-block btn-stamp btn btn-secondary btn-kdps01a "
           >
             <img v-bind:src="'/nts.uk.mobile.web/dist/resources/' + button.icon" height="50" width="50"/> 
             <br>

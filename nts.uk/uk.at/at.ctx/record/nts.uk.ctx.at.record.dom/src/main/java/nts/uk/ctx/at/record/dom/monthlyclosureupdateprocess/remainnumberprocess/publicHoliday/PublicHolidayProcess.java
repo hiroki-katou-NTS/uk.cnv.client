@@ -2,10 +2,12 @@ package nts.uk.ctx.at.record.dom.monthlyclosureupdateprocess.remainnumberprocess
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.task.tran.AtomTask;
+import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.record.dom.monthlycommon.aggrperiod.AggrPeriodEachActualClosure;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.export.query.publicholiday.param.AggrResultOfPublicHoliday;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.interimdata.TempPublicHolidayManagement;
@@ -20,7 +22,7 @@ import nts.uk.shr.com.context.AppContexts;
 public class PublicHolidayProcess {
 
 	public static AtomTask process(Require require, CacheCarrier cacheCarrier,
-			AggrPeriodEachActualClosure period, String employeeId, List<DailyInterimRemainMngData> interimRemainMngMap){
+			AggrPeriodEachActualClosure period, Optional<DatePeriod> periodForOverWrite ,String employeeId, List<DailyInterimRemainMngData> interimRemainMngMap){
 		
 		//ログイン社員の会社ID取得
 		String companyId = AppContexts.user().companyId();
@@ -30,7 +32,7 @@ public class PublicHolidayProcess {
 		
 		//公休残数計算
 		AggrResultOfPublicHoliday output = CalculatePublicHoliday.calculateRemain(
-				require, cacheCarrier, companyId, period, employeeId,interimPublicData);
+				require, cacheCarrier, companyId, period, periodForOverWrite,employeeId,interimPublicData);
 		
 		//公休残数更新
 		return AtomTask.of(RemainPublicHolidayUpdating.updateRemain(require, cacheCarrier, period, employeeId, output))

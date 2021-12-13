@@ -50,7 +50,8 @@
                                 text: $i18n('KDL055_11'), 
                                 enable: isEnable }"></div>
                                 <!-- A3_3 -->
-                            <input style="width: 190px;" tabindex="6" data-bind="ntsTextEditor: {
+                            <input id="captureSheet" style="width: 190px;" tabindex="6" data-bind="ntsTextEditor: {
+                                required: scheduleImport.captureCheckSheet,
                                 value: scheduleImport.captureSheet, 
                                 enable: isEnable &amp;&amp; scheduleImport.captureCheckSheet, 
                                 constraint: 'CaptureSheetName', 
@@ -78,7 +79,8 @@
                                 text: $i18n('KDL055_15'), 
                                 enable: isEnable }"></div>
                                 <!-- A4_3 -->
-                            <input style="width: 40px;" tabindex="8" data-bind="ntsTextEditor: {
+                            <input id="captureCell" style="width: 40px;" tabindex="8" data-bind="ntsTextEditor: {
+                                required: scheduleImport.captureCheckCell,
                                 value: scheduleImport.captureCell, 
                                 enable: isEnable &amp;&amp; scheduleImport.captureCheckCell, 
                                 name: $i18n('KDL055_17'), 

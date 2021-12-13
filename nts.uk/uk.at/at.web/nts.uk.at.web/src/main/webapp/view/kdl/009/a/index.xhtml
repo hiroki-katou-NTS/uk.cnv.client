@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="../../../../master/dialog.xhtml">
+		<ui:define name="htmlHead">
+			<!-- <script>var dialogSize = { width: 770, height: 650 };</script> -->
+			<com:scriptfile set="IGNITE" />
+			<!-- KCP005 -->
+			<com:scriptfile path="/view/kcp/share/list.js" of="/nts.uk.com.web"/>
+			<com:scriptfile path="kdl009.a.start.js" />
+			<com:scriptfile path="kdl009.a.vm.js" />
+			<com:scriptfile path="kdl009.a.service.js" />
+			<com:stylefile path="kdl009.a.main.css" />
+		</ui:define>	
+
+		<ui:define name="content">
+			 <div id="contents-area">
+			 <div style="display : flex;">
+				 <!-- Search Box -->
+				<div id="area-right" style="float: left;">
+					<div>
+						<div class="input-wrapper">
+							<span class="nts-editor-wrapped ntsControl"> 
+							<input id = "input-search"
+								data-bind="text:searchText"
+								class="ntsSearchBox nts-editor ntsSearchBox_Component"
+								type="text" placeholder="コード・名称で検索・・・" data-name="検索テキストボックス"
+								tabindex="-1" style="width: 187px;"></input>
+							</span> 
+							<i id="search-icon-new" class="img-icon"></i>
+						</div>
+						<button id="search-btn" data-bind=" click: findData" class="caret-bottom " tabindex="-1">検索</button>
+					</div>
+					<!-- KCP005 -->
+					<div tabindex="-1" id="kcp005"></div>
+				</div>
+				<div id="area-left">
+				 	<div style="margin-left: 5vw;">
+				 			<!-- A2_1 --><!-- A2_2 -->
+				 			<div>#{i18n.getText('Com_Person')} <span style="padding-left: 5vw;" data-bind="text : employeeNameSelect"></span></div>
+			 		</div>
+				 	<com:ko-if bind="managementCheck() == 1">
+					 	<div>
+					 	<table id="table-top" style="margin-left: 5vw;width: 654px;">
+					 		<tr>
+					 			<!-- A2_3 -->
+					 			<td style="font-size: 18px;">#{i18n.getText('KDL009_33')}</td>
+					 			<!-- A2_4 A2_5 -->
+					 			<td> 
+					 				<button tabindex="-1" data-bind="ntsHelpButton: {textId: 'KDL009_32' , position: 'right top' }">？</button>
+					 				<span data-bind="text : currentRemainNumberSelect()" style="padding-left: 3vw;font-size: 18px;"></span>
+					 			</td>
+					 			<!-- A2_23 -->
+					 			<td colspan="2" style="padding-left: 10px;">#{i18n.getText('KDL009_41')}</td>
+					 		</tr>
+					 		<tr>
+					 			<!-- A2_6 -->
+					 			<td style="font-size: 18px;">#{i18n.getText('KDL009_34')}</td>
+					 			<!-- A2_7 -->
+					 			<td colspan="3"> 
+					 				<button tabindex="-1"  data-bind="ntsHelpButton: {textId: 'KDL009_35' , position: 'right top' }">？</button>
+					 			</td>
+					 		</tr>
+					 		<tr>
+					 			<!-- A2_8 -->
+					 			<td  style="padding-left: 30px;">#{i18n.getText('KDL009_36')}</td>
+					 			<!-- A2_9 -->
+					 			<td><span data-bind="text : expiredWithinMonthSelect()" ></span></td>
+					 			<com:ko-if bind="dayCloseDeadlineSelect() != ''">
+						 			<!-- A2_10 -->
+						 			<td style="padding-left: 10px;">#{i18n.getText('KDL009_37')}</td>
+						 			<!-- A2_21 -->
+						 			<td><span data-bind="text : dayCloseDeadlineSelect()" ></span></td>
+					 			</com:ko-if>
+					 			<com:ko-if bind="dayCloseDeadlineSelect() == ''">
+						 			<!-- <td colspan="2"></td> -->
+						 			<!-- A2_10 -->
+						 			<td style="padding-left: 10px;"></td>
+						 			<!-- A2_21 -->
+						 			<td><span ></span></td>
+					 			</com:ko-if>
+					 		</tr>
+					 		<tr>
+					 			<!-- A2_22 -->
+					 			<td colspan="4">
+					 				<div tabindex="2" data-bind="ntsComboBox: {
+						                name: '#[KDL045_38]',
+						                options: itemList,
+						                optionsValue: 'code',
+						                visibleItemsCount: 3,
+						                value: selectcombobox,
+						                optionsText: 'name',
+						                columns: [{ prop: 'name', length: 10 }],
+						              }" class="combo-box"></div>
+					 			</td>
+					 		</tr>
+					 	</table>
+					 	<div style="margin-left: 5vw;">
+						 	<table id= "table-bottom" style="max-width: 690px; min-width: 690px; border: solid 1px #ccc;" >
+								<thead>
+						 			<tr>
+										<!-- A3_1 -->
+										<td class ="color-grid">#{i18n.getText('KDL009_43')}</td>
+										<!-- A3_2 -->
+										<td class ="color-grid">#{i18n.getText('KDL009_44')}</td>
+										<!-- A3_3 -->
+										<td class ="color-grid">#{i18n.getText('KDL009_45')}</td>
+										<!-- A3_4 -->
+										<td class ="color-grid">#{i18n.getText('KDL009_46')}</td>
+									</tr>
+								</thead>
+						 		<tbody>
+						 			<com:ko bind="listDataInfo" tag="foreach">
+					 					<tr data-bind="css:  { 'border-solid' : isLastPast() }  " >
+						 					<td>
+						 						<table>
+						 							<tr>
+						 								<!-- A13_11 -->
+						 								<td class="icon-default"><span data-bind = "text : occurrenceDateStatus"></span></td>
+						 								<!-- A13_12 -->
+						 								<td style="width: 130px;"><span data-bind="text : accrualDate"></span></td>
+						 								<!-- A13_13 -->
+						 								<td><span data-bind="text : numberOccurrences"></span></td>
+						 							</tr>
+						 						</table>
+						 					</td>
+											<td>
+												<!-- A3_21 -->
+												<span style="padding-left: 5px" data-bind="text : digestionStatus"></span>
+											</td>
+											<td>
+												<table>
+						 							<tr>
+						 								<!-- A3_31 -->
+						 								<td class="icon-default-1" ><span style="color: red;" data-bind="text : dueDateStatus"></span></td>
+						 								<!-- A3_32 -->
+						 								<td style="width: 130px;"><span data-bind="text : deadline"></span></td>
+						 							</tr>
+						 						</table>
+											</td>
+											<td>
+												<table>
+						 							<tr>
+						 								<!-- A3_41 -->
+						 								<td class="icon-default-2" ><span data-bind="text : digestionDateStatus"></span></td>
+						 								<!-- A3_42 -->
+						 								<td style="width: 130px;"><span data-bind="text : digestionDate"></span></td>
+						 								<!-- A3_43 -->
+						 								<td><span data-bind="text : digestionCount"></span></td>
+						 							</tr>
+						 						</table>
+											</td>
+										</tr>
+										<com:ko bind="listDigestionItem" tag="foreach">
+											<tr>
+												<td>
+													<table>
+														<tr>
+															<td class="icon-default"></td>
+															<td style="width: 130px;"></td>
+															<td></td>
+														</tr>
+													</table>
+												</td>
+											   <td>
+												   <span style="padding-left: 5px"></span>
+											   </td>
+											   <td>
+												   <table>
+														<tr>
+															<td class="icon-default-1" ></td>
+															<td style="width: 130px;"></td>
+														</tr>
+													</table>
+											   </td>
+											   <td>
+												   <table>
+														<tr>
+															<!-- A3_41 -->
+															<td class="icon-default-2" ><span data-bind="text : digestionDateStatus"></span></td>
+															<!-- A3_42 -->
+															<td style="width: 130px;"><span data-bind="text : digestionDate"></span></td>
+															<!-- A3_43 -->
+															<td><span data-bind="text : digestionCount"></span></td>
+														</tr>
+													</table>
+											   </td>
+										   </tr>
+										</com:ko>
+									</com:ko>
+						 		</tbody>
+							</table>
+						</div>
+						<div style="padding-left: 5vw;padding-top: 5px;">#{i18n.getText('KDL005_55')}</div>
+					</div>
+					</com:ko-if>
+					<com:ko-if bind="managementCheck() == 0">
+						<div style="margin-left: 5vw;font-size: 23px">#{i18n.getText('KDL009_31')}</div>
+					</com:ko-if>
+				</div>
+			</div>
+			</div>
+			<div id="functions-area-bottom">
+					<button tabindex="1"  id ="closeDialog-id" data-bind="click: cancel">#{i18n.getText('KDL009_2')}</button>
+			</div>
+		</ui:define> 
+	</ui:composition>
+</body>
+</html>

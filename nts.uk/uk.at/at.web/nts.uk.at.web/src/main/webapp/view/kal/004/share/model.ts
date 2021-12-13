@@ -173,6 +173,7 @@ module nts.uk.at.view.kal004.share.model {
         endCurrentMonth?: number;
         endMonth?: number;
         endFromStrMonth?: number;
+        processingYm?: string;
     }
 
     //Command
@@ -522,6 +523,7 @@ module nts.uk.at.view.kal004.share.model {
         endCurrentMonth: number;
         endMonth: number;
         endFromStrMonth: number;
+        processingYm: string;
 
         constructor(extractionDailyDto: ExtractionEDto) {
             this.extractionId = extractionDailyDto.extractionId;
@@ -537,6 +539,7 @@ module nts.uk.at.view.kal004.share.model {
             this.endCurrentMonth = extractionDailyDto.endCurrentMonth;
             this.endMonth = extractionDailyDto.endMonth;
             this.endFromStrMonth = extractionDailyDto.endFromStrMonth;
+            this.processingYm = extractionDailyDto.processingYm;
         }
     }
     

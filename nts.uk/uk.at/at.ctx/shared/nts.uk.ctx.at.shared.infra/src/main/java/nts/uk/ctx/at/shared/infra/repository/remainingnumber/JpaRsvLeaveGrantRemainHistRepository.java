@@ -23,7 +23,7 @@ public class JpaRsvLeaveGrantRemainHistRepository extends JpaRepository implemen
 	public void addOrUpdate(ReserveLeaveGrantRemainHistoryData domain, String cid) {
 		KrcdtReserveLeaveRemainHistPK krcdtReserveLeaveRemainHistPK = new KrcdtReserveLeaveRemainHistPK(domain.getEmployeeId(),
 				domain.getYearMonth().v(), domain.getClosureId().value, domain.getClosureDate().getClosureDay().v(),
-				domain.getClosureDate().getLastDayOfMonth() ? 1 : 0, domain.getGrantDate());
+				domain.getClosureDate().getLastDayOfMonth(), domain.getGrantDate());
 		Optional<KrcdtReserveLeaveRemainHist> entityOpt = this.queryProxy().find(krcdtReserveLeaveRemainHistPK,
 				KrcdtReserveLeaveRemainHist.class);
 		if (entityOpt.isPresent()) {

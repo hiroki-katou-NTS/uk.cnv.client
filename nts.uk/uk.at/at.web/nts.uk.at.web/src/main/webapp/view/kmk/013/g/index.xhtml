@@ -8,9 +8,7 @@
 	<ui:composition template="../../../../master/base.xhtml">
 		<ui:define name="htmlHead">
 			<com:ValidatorScript>
-				nts.uk.ctx.at.record.dom.workrecord.temporarywork.MaxUsage
-				nts.uk.ctx.at.shared.dom.common.time.AttendanceTime
-				nts.uk.ctx.at.record.dom.workrecord.goout.MaxGoOut
+				nts.uk.shr.com.time.TimeWithDayAttr
 			</com:ValidatorScript>
 			<com:scriptfile set="IGNITE" />
 			<com:scriptfile path="kmk013.g.start.js" />
@@ -27,138 +25,32 @@
 				<button class="proceed save" tabindex="2" data-bind="enable: $root.errors.isEmpty, click:saveData">#{i18n.getText('KMK013_205')}</button>
 			</div>
 			<div id="contents-area">
-				<div class="control-group valign-center">
-					<div data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KMK013_486')}</div>
+				<div class="control-group valign-center mt-10">
+					<div id="G3_1" class="setting-label" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KMK013_487')}</div>
+					<input id="G3_2" data-bind="ntsTimeWithDayEditor: {
+            name: '#[KMK013_365]',
+            constraint: 'TimeWithDayAttr',
+            value: midNightStartTime,
+            required: true }" tabindex="9" />
+					<label id="G3_3">#{i18n.getText('KAF012_30')}</label>
+					<input id="G3_4" data-bind="ntsTimeWithDayEditor: {
+            name: '#[KMK013_367]',
+            constraint: 'TimeWithDayAttr',
+            value: midNightEndTime,
+            required: true }" tabindex="10" />
 				</div>
 				<div class="control-group valign-center">
-					<span class="label child-lb">#{i18n.getText('KMK013_207')}</span>
-					<div data-bind="ntsSwitchButton: {
-										name:'#{i18n.getText('KMK013_208')}',
-										options: settingOptions,
-										optionsValue: 'id',
-										optionsText: 'name',
-										value: flexSetting}, hasFocus: true"/>
-				</div>
-				<div class="control-group valign-center">
-					<span class="label child-lb">#{i18n.getText('KMK013_211')}</span>
-					<div data-bind="ntsSwitchButton: {
-										name:'#{i18n.getText('KMK013_212')}',
-										options: settingOptions,
-										optionsValue: 'id',
-										optionsText: 'name',
-										value: aggWorkSet}"/>
-				</div>
-				<div class="control-group valign-center">
-					<span class="label child-lb">#{i18n.getText('KMK013_216')}</span>
-					<div data-bind="ntsSwitchButton: {
-										name:'#{i18n.getText('KMK013_217')}',
-										options: settingOptions,
-										optionsValue: 'id',
-										optionsText: 'name',
-										value: multipleWorkSet}"/>
-				</div>
-				<div class="control-group valign-center">
-					<span class="label child-lb">#{i18n.getText('KMK013_220')}</span>
-					<div data-bind="ntsSwitchButton: {
-										name:'#{i18n.getText('KMK013_221')}',
-										options: settingOptions,
-										optionsValue: 'id',
-										optionsText: 'name',
-										value: tempWorkSet}"/>
-				</div>
-				<div class="control-group valign-center">
-					<span class="label" style="margin-left: 235px;">#{i18n.getText('KMK013_348')}</span>
-					<input id="tempmaxuse" style="width: 20px;"
-						   data-bind="ntsNumberEditor: {
-											name: '#{i18n.getText('KMK013_423')}',
-											value: tempMaxUsage,
-											constraint: 'MaxUsage',
-											option: {unitID: 'TIMES'},
-											enable: tempMaxUsageRequired,
-											required: tempMaxUsageRequired}"/>
-					<span class="label">#{i18n.getText('KMK013_349')}</span>
-					<input id="temptime" style="width: 44px;"
-						   data-bind="ntsTimeEditor: {
-											name: '#{i18n.getText('KMK013_350')}',
-											constraint: 'AttendanceTime',
-											value: timeTreatTemporarySame,
-											inputFormat: 'time',
-											mode: 'time',
-											enable: tempMaxUsageRequired,
-											required: tempMaxUsageRequired}"/>
-				</div>
-				<div class="control-group valign-center">
-					<div style="width: 143px;" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KMK013_487')}</div>
-					<input id="midnightstart" style="width: 70px;"
-						   data-bind="ntsTimeWithDayEditor: {
-											name: '#{i18n.getText('KMK013_365')}',
-											constraint:'TimeWithDayAttr',
-											value: midNightStartTime,
-											required: true }" />
-					<span class="label">#{i18n.getText('KAF012_30')}</span>
-					<input id="midnightend" style="width: 70px;"
-						   data-bind="ntsTimeWithDayEditor: {
-											name: '#{i18n.getText('KMK013_367')}',
-											constraint:'TimeWithDayAttr',
-											value: midNightEndTime,
-											required: true }" />
-				</div>
-				<div class="control-group valign-center">
-					<div style="width: 143px;" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KMK013_488')}</div>
-					<div style="width: 92px;"
-						 data-bind="ntsComboBox: {
-										name:'#{i18n.getText('KMK013_488')}',
-										options: daysOfWeekOptions,
-										optionsValue: 'id',
-										value: startOfWeek,
-										visibleItemsCount: 7,
-										optionsText: 'name',
-										columns: [
-											{ prop: 'name', length: 2 }
-										]}"/>
-				</div>
-				<div class="control-group valign-center">
-					<div data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KMK013_489')}</div>
-				</div>
-				<div class="control-group valign-center">
-					<span class="label child-lb">#{i18n.getText('KMK013_289')}</span>
-					<div data-bind="ntsSwitchButton: {
-										options: settingOptions,
-										optionsValue: 'id',
-										optionsText: 'name',
-										value: goOutUsage }"/>
-				</div>
-				<div class="control-group valign-center">
-					<span class="label" style="margin-left: 235px;">#{i18n.getText('KMK013_290')}</span>
-					<input id="gooutmaxuse" style="width: 20px;"
-						   data-bind="ntsNumberEditor: {
-											name: '#{i18n.getText('KMK013_291')}',
-											value: goOutMaxUsage,
-											constraint: 'MaxGoOut',
-											option: {unitID: 'TIMES'},
-											enable: goOutMaxUsageRequired,
-											required: goOutMaxUsageRequired }"/>
-					<span class="label">#{i18n.getText('KMK013_292')}</span>
-					<div style="width: 92px;"
-						 data-bind="ntsComboBox: {
-										name:'#{i18n.getText('KMK013_293')}',
-										options: goOutReasonOptions,
-										optionsValue: 'id',
-										value: initValueReasonGoOut,
-										visibleItemsCount: 7,
-										enable: goOutUsage() == 1,
-										optionsText: 'name',
-										columns: [
-											{ prop: 'name', length: 2 }
-										]}"/>
-				</div>
-				<div class="control-group valign-center">
-					<span class="label child-lb">#{i18n.getText('KMK013_227')}</span>
-					<div data-bind="ntsSwitchButton: {
-										options: settingOptions,
-										optionsValue: 'id',
-										optionsText: 'name',
-										value: entranceExitUse}"/>
+					<div id="G4_1" class="setting-label" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KMK013_488')}</div>
+					<div id="G4_2" data-bind="ntsComboBox: {
+            name: '#[KMK013_488]',
+            options: daysOfWeekOptions,
+            optionsValue: 'id',
+            value: startOfWeek,
+            visibleItemsCount: 7,
+            optionsText: 'name',
+            columns: [
+              { prop: 'name', length: 2 }
+            ]}" tabindex="11"></div>
 				</div>
 			</div>
 		</ui:define>

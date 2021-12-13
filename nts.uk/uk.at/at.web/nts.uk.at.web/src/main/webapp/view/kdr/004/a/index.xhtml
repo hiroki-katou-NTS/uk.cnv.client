@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:com="http://xmlns.jcp.org/jsf/component"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+>
+<body>
+<ui:composition template="../../../../master/base.xhtml">
+    <ui:define name="htmlHead">
+        <com:scriptfile set="IGNITE" />
+        <com:stylefile path="/view/ccg/share/style.css" of="/nts.uk.com.web" />
+        <com:scriptfile path="/view/kcp/share/list.js" of="/nts.uk.com.web" />
+        <com:scriptfile path="/view/kcp/share/tree.js" of="/nts.uk.com.web" />
+        <com:scriptfile
+                path="/view/ccg/share/ccg.service.js"
+                of="/nts.uk.com.web"
+        />
+        <com:scriptfile path="/view/ccg/share/ccg.vm.js" of="/nts.uk.com.web" />
+
+        <com:stylefile path="kdr004.a.main.css" />
+        <com:scriptfile path="kdr004.a.common.js" />
+        <com:scriptfile path="kdr004.a.vm.js" />
+    </ui:define>
+
+    <ui:define name="content">
+        <div id="functions-area">
+            <!-- A1_1 -->
+            <button
+                    tabindex="1"
+                    id="btnExportExcel"
+                    class="proceed"
+                    data-bind="enable: $root.errors.isEmpty, text: $i18n('KDR004_1'), click: function() { exportExcelPDF(1) }"
+            />
+        </div>
+        <!-- A2_1-->
+        <div id="contents-area" class="kdr-004">
+            <!-- A2_2-->
+            <div id="CCG001"></div>
+            <div class="pull-left fixed-flex-layout-left">
+                <div class="employees-list">
+                    <div tabindex="2" id="kcp005" class="panel panel-frame"></div>
+                </div>
+            </div>
+            <div class="pull-left fixed-flex-layout-right">
+                <!-- A3_1-->
+                <div class="panel panel-frame">
+                    <div class="panel-row" style="display: flex;">
+                        <div style="flex-shrink: 0;" data-bind="ntsFormLabel: {text: $i18n('KDR004_110')}">
+                        </div>
+                        <div style="display: inline-block">
+                            <!-- A3_6_1 --> <!-- A3_6_2 -->
+                            <div tabindex="3"
+                                 data-bind="ntsCheckBox: { checked: haveMoreHolidayThanDrawOut }"
+                            >#{i18n.getText('KDR004_11')}</div>
+                            <div tabindex="3"
+                                 data-bind="ntsCheckBox: { checked: haveMoreDrawOutThanHoliday }"
+                            >#{i18n.getText('KDR004_12')}</div>
+                        </div>
+                    </div>
+                    <div class="panel-row valign-center" style="display: flex;">
+                        <div data-bind="ntsFormLabel: {text: $i18n('KDR004_13')}">
+                        </div>
+                        <!-- A4_2 -->
+                        <div tabindex="5" style="display: inline-flex;"
+                            data-bind="ntsSwitchButton: {
+                                                name: '#[KDR004_13]',
+                                                options: [
+                                                  { code: 1, name: $i18n('KDR004_14')},
+                                                  { code: 0, name: $i18n('KDR004_15')}
+                                                ],
+                                                optionsValue: 'code',
+                                                optionsText: 'name',
+                                                value: zeroDisplayClassification
+                                              }">
+                        </div>
+                    </div>
+                    <div class="panel-row valign-center" style="display: flex">
+                        <!-- A5_1-->
+                        <div data-bind="ntsFormLabel: {text: $i18n('KDR004_16')}">
+                        </div>
+                        <!-- A5_2 -->
+                        <div tabindex="6" style="display: inline-flex;"
+                             data-bind="ntsSwitchButton: {
+                                                name: '#[KDR004_16]',
+                                                options: [
+                                                  { code: 0, name: $i18n('KDR004_17')},
+                                                  { code: 1, name: $i18n('KDR004_18')},
+                                                  { code: 2, name: $i18n('KDR004_19')}
+                                                ],
+                                                optionsValue: 'code',
+                                                optionsText: 'name',
+                                                value: pageBreakSpecification
+                                              }">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+</body>
+</html>

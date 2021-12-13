@@ -63,7 +63,8 @@ module nts.uk.at.view.kdl003.a {
             currentWorkHours: KnockoutObservableArray<WorkTimeSet> = ko.observableArray([]);
             isWorkTimeSettingNeeded: KnockoutObservable<number> = ko.observable(0);
 
-
+			paramKsu003 : any;
+			
             constructor(parentData: CallerParameter) {
                 super();
 
@@ -160,7 +161,9 @@ module nts.uk.at.view.kdl003.a {
                 });
                 //parent data
                 self.callerParameter = parentData;
-
+				
+				// param 表示可能勤務種類リスト 
+				self.paramKsu003 = nts.uk.ui.windows.getShared("paramKsu003Kdl003");
             }
 
             /**
@@ -176,7 +179,25 @@ module nts.uk.at.view.kdl003.a {
                         // Set initial selection.
                         //self.initWorkTypeSelection();
                         //self.setWorkTimeSelection();
-
+						
+						if (!_.isNil(self.paramKsu003)){
+							if (self.paramKsu003.disWkTypeCon == 1){
+								_.remove(self.listWorkType(), (wt : any) => {
+									let check = _.find(self.paramKsu003.disAbleWkTypeCodeLst, (fd : any) => {
+										return _.isEqual(wt.workTypeCode, fd);
+									})
+									if (_.isNil(check))
+								  	return true;
+							
+								return false;
+								});
+							} 
+							/*else {
+								self.listWorkType().length = 0;
+							}*/
+							
+						}
+						
                         // On selectedWorkTypeCode changed event.
                         self.selectedWorkTypeCode.subscribe(code => {
                             if (nts.uk.util.isNullOrEmpty(self.listWorkTime())) {

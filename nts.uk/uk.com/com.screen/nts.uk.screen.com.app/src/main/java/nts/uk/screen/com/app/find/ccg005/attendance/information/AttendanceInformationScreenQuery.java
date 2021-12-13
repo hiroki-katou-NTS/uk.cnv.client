@@ -153,7 +153,7 @@ public class AttendanceInformationScreenQuery {
 
 		// 8: 申請情報を取得する(社員IDリスト, 期間, 反映状態リスト): Map<社員ID、List<申請>>
 		List<Integer> listReflecInfor = new ArrayList<>();
-		listReflecInfor.add(ReflectedState.REFLECTED.value);
+		listReflecInfor.add(ReflectedState.CANCELED.value);
 		listReflecInfor.add(ReflectedState.REMAND.value);
 		listReflecInfor.add(ReflectedState.DENIAL.value);
 		Map<String, List<Application>> mapListApplication = appRepo.getMapListApplicationNew(sids,

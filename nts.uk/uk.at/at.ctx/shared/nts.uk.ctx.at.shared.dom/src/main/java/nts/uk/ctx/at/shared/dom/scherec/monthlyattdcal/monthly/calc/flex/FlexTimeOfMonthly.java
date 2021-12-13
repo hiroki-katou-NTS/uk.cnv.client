@@ -2211,6 +2211,14 @@ public class FlexTimeOfMonthly implements SerializableWithOptional{
 				this.flexCarryforwardTime.getFlexCarryforwardWorkTime().v());
 	}
 	
+	/** フレックス時間の再計算 */
+	public void recalcFlexTime() {
+		
+		/**　フレックス時間を計算する　*/
+		val flexTime = this.flexExcessTime.valueAsMinutes() - this.flexShortageTime.valueAsMinutes();
+		this.flexTime.getFlexTime().setTime(new AttendanceTimeMonthWithMinus(flexTime));
+	}
+	
 	/**
 	 * 合算する
 	 * @param target 加算対象

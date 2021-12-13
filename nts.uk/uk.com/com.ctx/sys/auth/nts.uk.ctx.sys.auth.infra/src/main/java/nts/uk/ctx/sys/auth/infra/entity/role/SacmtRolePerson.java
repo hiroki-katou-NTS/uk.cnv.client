@@ -13,7 +13,7 @@ import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 @Entity
 @Getter
 @Setter
-@Table(name = "SACMT_ROLE_PERSON")
+@Table(name = "SACMT_ROLE_PERSONAL")
 public class SacmtRolePerson extends ContractUkJpaEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -24,6 +24,9 @@ public class SacmtRolePerson extends ContractUkJpaEntity implements Serializable
 
 	@Column(name = "REFER_FUTURE_DATE")
 	private boolean referFutureDate;
+
+	@Column(name = "CID")
+	public String companyId;
 
 	@Override
 	protected Object getKey() {

@@ -1,5 +1,7 @@
 package nts.uk.ctx.at.schedule.infra.repository.workschedules;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,28 +14,53 @@ import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import lombok.val;
+import nts.arc.layer.infra.data.DbConsts;
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.arc.layer.infra.data.jdbc.NtsResultSet;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.schedule.dom.schedule.schedulemaster.requestperiodchange.AffInfoForWorkSchedule;
 import nts.uk.ctx.at.schedule.dom.schedule.workschedule.ConfirmedATR;
 import nts.uk.ctx.at.schedule.dom.schedule.workschedule.EmployeeAndYmd;
 import nts.uk.ctx.at.schedule.dom.schedule.workschedule.WorkSchedule;
 import nts.uk.ctx.at.schedule.dom.schedule.workschedule.WorkScheduleRepository;
 import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchAtdLvwTime;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchAtdLvwTimePK;
 import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchBasicInfo;
 import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchBasicInfoPK;
 import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchBonusPay;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchBonusPayPK;
 import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchBreakTs;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchBreakTsPK;
 import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchComeLate;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchComeLatePK;
 import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchEditState;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchEditStatePK;
 import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchGoingOut;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchGoingOutPK;
 import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchGoingOutTs;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchGoingOutTsPK;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchHolidayWork;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchHolidayWorkPK;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchLeaveEarly;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchLeaveEarlyPK;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchOvertimeWork;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchOvertimeWorkPK;
 import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchLeaveEarly;
 import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchPremium;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchPremiumPK;
 import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchShortTime;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchShortTimePK;
 import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchShortTimeTs;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchShortTimeTsPK;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchTask;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchTaskPK;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchTime;
+import nts.uk.ctx.at.schedule.infra.entity.schedule.workschedule.KscdtSchTimePK;
 import nts.uk.shr.com.context.AppContexts;
 
 @Stateless
@@ -49,9 +76,6 @@ public class JpaWorkScheduleRepository extends JpaRepository implements WorkSche
 
 	private static final String DELETE_BY_LIST_DATE = "WHERE a.pk.sid = :sid AND a.pk.ymd IN :ymds";
 	
-	private static final String SELECT_CONFIRMATR = "SELECT DECISION_STATUS FROM KSCDT_SCH_BASIC_INFO WHERE SID = @employeeID AND YMD = @ymd";
-
-
 	private static final List<String> DELETE_TABLES = Arrays.asList(
 				"DELETE FROM KscdtSchTime a ",
 				"DELETE FROM KscdtSchOvertimeWork a ",
@@ -70,7 +94,6 @@ public class JpaWorkScheduleRepository extends JpaRepository implements WorkSche
 			);
 
 
-
 	public KscdtSchBasicInfo toEntity(WorkSchedule workSchedule, String cID) {
 		return KscdtSchBasicInfo.toEntity(workSchedule, cID);
 	}
@@ -85,28 +108,11 @@ public class JpaWorkScheduleRepository extends JpaRepository implements WorkSche
 		return workSchedule;
 	}
 
-	@Override
-	public List<WorkSchedule> getList(List<String> sids, DatePeriod period) {
-		if (sids.isEmpty())
-			return new ArrayList<>();
-
-		List<WorkSchedule> result = this.queryProxy().query(SELECT_BY_LIST, KscdtSchBasicInfo.class)
-				.setParameter("sids", sids).setParameter("startDate", period.start())
-				.setParameter("endDate", period.end()).getList(c -> c.toDomain(c.pk.sid, c.pk.ymd));
-		return result;
-	}
 
 	@Override
 	public List<WorkSchedule> getListBySid(String sid, DatePeriod period) {
 
-		List<WorkSchedule> result = this.queryProxy()
-				.query("SELECT a FROM KscdtSchBasicInfo a " + WHERE_PK, KscdtSchBasicInfo.class)
-				.setParameter("sid", sid)
-				.setParameter("ymdStart", period.start())
-				.setParameter("ymdEnd", period.end())
-				.getList(c -> c.toDomain(c.pk.sid, c.pk.ymd));
-
-		return result;
+		return this.getList(Arrays.asList(sid), period);
 	}
 
 	@Override
@@ -463,60 +469,20 @@ public class JpaWorkScheduleRepository extends JpaRepository implements WorkSche
 				}
 			}
 
-//			if (!oldData.get().kscdtSchTime.kscdtSchTask.isEmpty()) {
-//				// get list insert and update data exist
-//				List<KscdtSchTask> listInsert = new ArrayList<>();
-//				for (KscdtSchTask task : newData.kscdtSchTime.kscdtSchTask) {
-//					List<KscdtSchTask> checkLst = new ArrayList<>();
-//					oldData.get().kscdtSchTime.kscdtSchTask.forEach(x -> {
-//						if(task.pk.sid.equals(x.pk.sid)
-//								&& task.pk.ymd.equals(x.pk.ymd)
-//								&& task.pk.serialNo == x.pk.serialNo) {
-//							x.taskCode = task.taskCode;
-//							x.startClock = task.startClock;
-//							x.endClock = task.endClock;
-//							checkLst.add(x);
-//						}
-//					});
-//					if(checkLst.isEmpty()) {
-//						listInsert.add(task);
-//					}
-//				}
+			// List<KscdtSchTask> kscdtSchTask;
+			if (!oldData.get().kscdtSchTime.kscdtSchTask.isEmpty()) {
+				// remove
+				String delete = "delete from KscdtSchTask o " + " where o.pk.sid = :sid " + " and o.pk.ymd = :ymd";
+				this.getEntityManager().createQuery(delete).setParameter("sid", newData.pk.sid)
+									.setParameter("ymd", newData.pk.ymd)
+									.executeUpdate();
+				
+				oldData.get().kscdtSchTime.kscdtSchTask = new ArrayList<KscdtSchTask>();
+				this.commandProxy().insertAll(newData.kscdtSchTime.kscdtSchTask);
 
-//				List<KscdtSchTask> listRemove = new ArrayList<>();
-//				for (KscdtSchTask taskOld : oldData.get().kscdtSchTime.kscdtSchTask) {
-//					boolean checkExist = false;
-//					for (KscdtSchTask task : newData.kscdtSchTime.kscdtSchTask) {
-//						if(task.pk.serialNo == taskOld.pk.serialNo
-//								&& task.pk.sid.equals(taskOld.pk.sid)
-//								&& task.pk.ymd.equals(taskOld.pk.ymd)
-//								) {
-//							checkExist = true;
-//							break;
-//						}
-//					}
-//					if(!checkExist) {
-//						listRemove.add(taskOld);
-//					}
-//				}
-//
-//				//remove
-//				String delete = "delete from KscdtSchTask o " + " where o.pk.sid = :sid "
-//						+ " and o.pk.ymd = :ymd " + " and o.pk.serialNo = :serialNo";
-//				for(KscdtSchTask sle : listRemove) {
-//					this.getEntityManager().createQuery(delete).setParameter("sid", sle.pk.sid)
-//					.setParameter("ymd", sle.pk.ymd)
-//					.setParameter("serialNo", sle.pk.serialNo).executeUpdate();
-//				}
-//				//add
-//				for(KscdtSchTask sle : listInsert) {
-//					this.commandProxy().insert(sle);
-//				}
-//
-//			} else {
-//				oldData.get().kscdtSchTime.kscdtSchTask = newData.kscdtSchTime.kscdtSchTask;
-//			}
-//
+			} else {
+				oldData.get().kscdtSchTime.kscdtSchTask = newData.kscdtSchTime.kscdtSchTask;
+			}
 
 			// List<KscdtSchEditState> editStates;
 			if (!oldData.get().editStates.isEmpty()) {
@@ -548,17 +514,19 @@ public class JpaWorkScheduleRepository extends JpaRepository implements WorkSche
 							break;
 						}
 					}
+
 					if (!checkExist) {
 						listRemove.add(editOld);
 					}
 				}
 
 				// remove
-				String delete = "delete from KscdtSchEditState o " + " where o.pk.sid = :sid "
-						+ " and o.pk.ymd = :ymd " + " and o.pk.atdItemId = :atdItemId";
+				String delete = "delete from KscdtSchEditState o " + " where o.pk.sid = :sid " + " and o.pk.ymd = :ymd "
+						+ " and o.pk.atdItemId = :atdItemId";
 				for (KscdtSchEditState sle : listRemove) {
 					this.getEntityManager().createQuery(delete).setParameter("sid", sle.pk.sid)
-							.setParameter("ymd", sle.pk.ymd).setParameter("atdItemId", sle.pk.atdItemId).executeUpdate();
+							.setParameter("ymd", sle.pk.ymd).setParameter("atdItemId", sle.pk.atdItemId)
+							.executeUpdate();
 				}
 
 				// add
@@ -822,25 +790,80 @@ public class JpaWorkScheduleRepository extends JpaRepository implements WorkSche
 			return Optional.empty();
 		return Optional.of(data.get(0));
 	}
-
-//	private static final String SELECT_MAX = "SELECT MAX(c.startDate) FROM KscdtSchBasicInfo c WHERE c.pk.sid IN :employeeIDs";
-//	@Override
-//	public Optional<GeneralDate> getMaxDate(List<String> employeeIDs, GeneralDate ymd) {
-//		GeneralDate date = this.queryProxy().query(SELECT_MAX, GeneralDate.class)
-//				.setParameter("employeeIDs", employeeIDs)
-//				.getSingleOrNull();
-//		return Optional.ofNullable(date);
-//	}
-
-
+	
 	@Override
-	public List<AffInfoForWorkSchedule> getAffiliationInfor(String sid, DatePeriod period) {
-		List<WorkSchedule>  data = this.getListBySid(sid, period);
-		List<AffInfoForWorkSchedule> result = data.stream().map(c->new AffInfoForWorkSchedule(c.getEmployeeID(), c.getYmd(), c.getAffInfo()) ).collect(Collectors.toList());
+	public List<WorkSchedule> getList(List<String> sids, DatePeriod period) {
+		if (sids.isEmpty() || period == null)
+			return new ArrayList<>();
+		
+		List<WorkSchedule> result = new ArrayList<>();
+		CollectionUtil.split(sids, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subList -> {
+			String listEmp = "(";
+			for (int i = 0; i < subList.size(); i++) {
+				listEmp += "'" + subList.get(i) + "',";
+			}
+			// remove last , in string and add )
+			listEmp = listEmp.substring(0, listEmp.length() - 1) + ")";
+			
+			// ActualWorkingTimeOfDaily
+			Map<Pair<String, GeneralDate>, KscdtSchTime> mapPairSchTime = this.getKscdtSchTimes(listEmp, period);
+			Map<Pair<String, GeneralDate>, List<KscdtSchOvertimeWork>> mapPairOvertimeWork = this.getOvertimeWorks(listEmp, period);
+			Map<Pair<String, GeneralDate>, List<KscdtSchHolidayWork>> mapPairHolidayWork = this.getHolidayWorks(listEmp, period);
+			Map<Pair<String, GeneralDate>, List<KscdtSchBonusPay>> mapPairBonusPay = this.getBonusPays(listEmp, period);
+			Map<Pair<String, GeneralDate>, List<KscdtSchPremium>> mapPairSchPremium = this.getPremiums(listEmp, period);
+			Map<Pair<String, GeneralDate>, List<KscdtSchShortTime>> mapPairShortTime = this.getShortTimes(listEmp, period);
+			Map<Pair<String, GeneralDate>, List<KscdtSchComeLate>> mapPairComeLate = this.getKscdtSchComeLates(listEmp, period);
+			Map<Pair<String, GeneralDate>, List<KscdtSchGoingOut>> mapPairGoingOut = this.getKscdtSchGoingOuts(listEmp, period);
+			Map<Pair<String, GeneralDate>, List<KscdtSchLeaveEarly>> mapPairLeaveEarly = this.getKscdtSchLeaveEarlys(listEmp, period);
+			 Map<Pair<String, GeneralDate>, List<KscdtSchTask>> mapPairKscdtSchTask =  this.getKscdtSchTasks(listEmp, period);
+			
+			// WorkSchedule
+			Map<Pair<String, GeneralDate>, KscdtSchBasicInfo> mapPairSchBasicInfo = this.getSchBasicInfo(listEmp, period);
+			Map<Pair<String, GeneralDate>, List<KscdtSchEditState>> mapPairSchEditState = this.getSchEditState(listEmp, period);
+			Map<Pair<String, GeneralDate>, List<KscdtSchAtdLvwTime>> mapPairSchAtdLvwTime = this.getSchAtdLvwTime(listEmp, period);
+			Map<Pair<String, GeneralDate>, List<KscdtSchShortTimeTs>> mapPairSchShortTimeTs = this.getSchShortTimeTs(listEmp, period);
+			Map<Pair<String, GeneralDate>, List<KscdtSchBreakTs>> mapPairSchBreakTs = this.getKscdtSchBreakTs(listEmp, period);
+			Map<Pair<String, GeneralDate>, List<KscdtSchGoingOutTs>> mapPairGoingOutTs = this.getKscdtSchGoingOutTs(listEmp, period);
+			
+			for (int i = 0; i < subList.size(); i++) {
+				String sid = subList.get(i);
+				period.datesBetween().forEach(ymd -> {
+					Pair<String, GeneralDate> key = Pair.of(sid, ymd);
+					
+					if (mapPairSchBasicInfo.containsKey(key)) {
+						
+						KscdtSchBasicInfo basicInfo = mapPairSchBasicInfo.get(key);
+						basicInfo.editStates = mapPairSchEditState.getOrDefault(key, new ArrayList<>()); 
+						basicInfo.atdLvwTimes = mapPairSchAtdLvwTime.getOrDefault(key, new ArrayList<>()); 
+						basicInfo.schShortTimeTs = mapPairSchShortTimeTs.getOrDefault(key, new ArrayList<>()); 
+						basicInfo.breakTs = mapPairSchBreakTs.getOrDefault(key, new ArrayList<>()); 
+						basicInfo.kscdtSchGoingOutTs = mapPairGoingOutTs.getOrDefault(key, new ArrayList<>()); 
+						
+						if(mapPairSchTime.containsKey(key)){
+							KscdtSchTime scheTime = mapPairSchTime.get(key);
+							
+							scheTime.overtimeWorks = mapPairOvertimeWork.getOrDefault(key, new ArrayList<>()); 
+							scheTime.holidayWorks = mapPairHolidayWork.getOrDefault(key, new ArrayList<>());
+							scheTime.bonusPays = mapPairBonusPay.getOrDefault(key, new ArrayList<>());
+							scheTime.premiums = mapPairSchPremium.getOrDefault(key, new ArrayList<>());
+							scheTime.shortTimes = mapPairShortTime.getOrDefault(key, new ArrayList<>());
+							scheTime.kscdtSchComeLate = mapPairComeLate.getOrDefault(key, new ArrayList<>());
+							scheTime.kscdtSchGoingOut = mapPairGoingOut.getOrDefault(key, new ArrayList<>());
+							scheTime.kscdtSchLeaveEarly = mapPairLeaveEarly.getOrDefault(key, new ArrayList<>());
+							scheTime.kscdtSchTask = mapPairKscdtSchTask.getOrDefault(key, new ArrayList<>());
+							
+							basicInfo.kscdtSchTime = scheTime;
+						}
+						
+						result.add(basicInfo.toDomain(sid, ymd));
+					}
+				});
+			}
+		});
 		return result;
+
 	}
-
-
+	
 	@Override
 	public Map<EmployeeAndYmd, ConfirmedATR> getConfirmedStatus(List<String> employeeIds, DatePeriod period) {
 
@@ -863,6 +886,651 @@ public class JpaWorkScheduleRepository extends JpaRepository implements WorkSche
 
 	}
 	
+	// KSCDT_SCH_BASIC_INFO
+	private Map<Pair<String, GeneralDate>, KscdtSchBasicInfo> getSchBasicInfo(String listEmp, DatePeriod period) {
+
+		List<KscdtSchBasicInfo> listSchBasicInfo = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_BASIC_INFO.SID, KSCDT_SCH_BASIC_INFO.YMD, KSCDT_SCH_BASIC_INFO.CID, KSCDT_SCH_BASIC_INFO.DECISION_STATUS, KSCDT_SCH_BASIC_INFO.EMP_CD, "
+				+ " KSCDT_SCH_BASIC_INFO.JOB_ID, KSCDT_SCH_BASIC_INFO.WKP_ID, KSCDT_SCH_BASIC_INFO.CLS_CD, KSCDT_SCH_BASIC_INFO.BUSTYPE_CD, KSCDT_SCH_BASIC_INFO.NURSE_LICENSE, "
+				+ " KSCDT_SCH_BASIC_INFO.WKTP_CD, KSCDT_SCH_BASIC_INFO.WKTM_CD, KSCDT_SCH_BASIC_INFO.GO_STRAIGHT_ATR, KSCDT_SCH_BASIC_INFO.BACK_STRAIGHT_ATR, "
+				+ " KSCDT_SCH_BASIC_INFO.TREAT_AS_SUBSTITUTE_ATR, KSCDT_SCH_BASIC_INFO.TREAT_AS_SUBSTITUTE_DAYS"
+				+ " FROM KSCDT_SCH_BASIC_INFO" 
+				+ " WHERE KSCDT_SCH_BASIC_INFO.SID IN " + listEmp + " AND KSCDT_SCH_BASIC_INFO.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listSchBasicInfo = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Boolean confirmedATR = rs.getBoolean("DECISION_STATUS");
+				String empCd = rs.getString("EMP_CD");
+				String jobId = rs.getString("JOB_ID");
+				String wkpId = rs.getString("WKP_ID");
+				String clsCd = rs.getString("CLS_CD");
+				String busTypeCd = rs.getString("BUSTYPE_CD");
+				String nurseLicense = rs.getString("NURSE_LICENSE");
+				String wktpCd = rs.getString("WKTP_CD");
+				String wktmCd = rs.getString("WKTM_CD");
+				Boolean goStraightAtr = rs.getBoolean("GO_STRAIGHT_ATR");
+				Boolean backStraightAtr = rs.getBoolean("BACK_STRAIGHT_ATR");
+				Integer treatAsSubstituteAtr = rs.getInt("TREAT_AS_SUBSTITUTE_ATR");
+				Double treatAsSubstituteDays = rs.getDouble("TREAT_AS_SUBSTITUTE_DAYS");
+
+				return new KscdtSchBasicInfo(new KscdtSchBasicInfoPK(sid, ymd), cid, confirmedATR,
+						empCd, jobId, wkpId, clsCd, busTypeCd, nurseLicense, wktpCd, wktmCd,
+						goStraightAtr, backStraightAtr, treatAsSubstituteAtr,
+						treatAsSubstituteDays, null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+						new ArrayList<>(), new ArrayList<>());
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, KscdtSchBasicInfo> mapPairSchBasicInfo = listSchBasicInfo.stream()
+				.collect(Collectors.toMap(x -> Pair.of(x.pk.sid, x.pk.ymd), x -> x));
+
+		return mapPairSchBasicInfo;
+	}
+
+	// KSCDT_SCH_EDIT_STATE
+	private Map<Pair<String, GeneralDate>, List<KscdtSchEditState>> getSchEditState(String listEmp, DatePeriod period) {
+
+		List<KscdtSchEditState> listSchEditState = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_EDIT_STATE.SID, KSCDT_SCH_EDIT_STATE.YMD, KSCDT_SCH_EDIT_STATE.CID,"
+				+ " KSCDT_SCH_EDIT_STATE.ATD_ITEM_ID, KSCDT_SCH_EDIT_STATE.EDIT_STATE" 
+				+ " FROM KSCDT_SCH_EDIT_STATE"
+				+ " WHERE KSCDT_SCH_EDIT_STATE.SID IN " + listEmp + " AND KSCDT_SCH_EDIT_STATE.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listSchEditState = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer atdItemId = rs.getInt("ATD_ITEM_ID");
+				Integer editState = rs.getInt("EDIT_STATE");
+
+				return new KscdtSchEditState(new KscdtSchEditStatePK(sid, ymd, atdItemId), cid, editState);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, List<KscdtSchEditState>> mapPairSchEditState = listSchEditState.stream()
+				.collect(Collectors.groupingBy(x -> Pair.of(x.pk.sid, x.pk.ymd)));
+
+		return mapPairSchEditState;
+	}
+
+	// KSCDT_SCH_ATD_LVW_TIME
+	private Map<Pair<String, GeneralDate>, List<KscdtSchAtdLvwTime>> getSchAtdLvwTime(String listEmp,
+			DatePeriod period) {
+
+		List<KscdtSchAtdLvwTime> listSchAtdLvwTime = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_ATD_LVW_TIME.SID, KSCDT_SCH_ATD_LVW_TIME.YMD, KSCDT_SCH_ATD_LVW_TIME.CID,"
+				+ " KSCDT_SCH_ATD_LVW_TIME.WORK_NO, "
+				+ " KSCDT_SCH_ATD_LVW_TIME.ATD_CLOCK, KSCDT_SCH_ATD_LVW_TIME.ATD_HOURLY_HD_TS_START, KSCDT_SCH_ATD_LVW_TIME.ATD_HOURLY_HD_TS_END,"
+				+ " KSCDT_SCH_ATD_LVW_TIME.LVW_CLOCK, KSCDT_SCH_ATD_LVW_TIME.LVW_HOURLY_HD_TS_START, KSCDT_SCH_ATD_LVW_TIME.LVW_HOURLY_HD_TS_END"
+				+ " FROM KSCDT_SCH_ATD_LVW_TIME" 
+				+ " WHERE KSCDT_SCH_ATD_LVW_TIME.SID IN " + listEmp + " AND KSCDT_SCH_ATD_LVW_TIME.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listSchAtdLvwTime = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer workNo = rs.getInt("WORK_NO");
+				Integer atdClock = rs.getInt("ATD_CLOCK");
+				Integer atdHourlyHDTSStart = rs.getInt("ATD_HOURLY_HD_TS_START");
+				Integer atdHourlyHDTSEnd = rs.getInt("ATD_HOURLY_HD_TS_END");
+				Integer lwkClock = rs.getInt("LVW_CLOCK");
+				Integer lvwHourlyHDTSStart = rs.getInt("LVW_HOURLY_HD_TS_START");
+				Integer lvwHourlyHDTSEnd = rs.getInt("LVW_HOURLY_HD_TS_END");
+				return new KscdtSchAtdLvwTime(new KscdtSchAtdLvwTimePK(sid, ymd, workNo), cid, atdClock,
+						atdHourlyHDTSStart, atdHourlyHDTSEnd, lwkClock, lvwHourlyHDTSStart, lvwHourlyHDTSEnd);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+		
+		Map<Pair<String, GeneralDate>, List<KscdtSchAtdLvwTime>> mapPairSchAtdLvwTime = listSchAtdLvwTime.stream()
+				.collect(Collectors.groupingBy(x -> Pair.of(x.pk.sid, x.pk.ymd)));
+
+		return mapPairSchAtdLvwTime;
+	}
+
+	// KSCDT_SCH_SHORTTIME_TS
+	private Map<Pair<String, GeneralDate>, List<KscdtSchShortTimeTs>> getSchShortTimeTs(String listEmp,
+			DatePeriod period) {
+
+		List<KscdtSchShortTimeTs> listSchShortTimeTs = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_SHORTTIME_TS.SID, KSCDT_SCH_SHORTTIME_TS.YMD, KSCDT_SCH_SHORTTIME_TS.CID,"
+				+ " KSCDT_SCH_SHORTTIME_TS.CHILD_CARE_ATR, KSCDT_SCH_SHORTTIME_TS.FRAME_NO, KSCDT_SCH_SHORTTIME_TS.SHORTTIME_TS_START, KSCDT_SCH_SHORTTIME_TS.SHORTTIME_TS_END"
+				+ " FROM KSCDT_SCH_SHORTTIME_TS" 
+				+ " WHERE KSCDT_SCH_SHORTTIME_TS.SID IN " + listEmp + " AND KSCDT_SCH_SHORTTIME_TS.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listSchShortTimeTs = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer childCareAtr = rs.getInt("CHILD_CARE_ATR");
+				Integer frameNo = rs.getInt("FRAME_NO");
+				Integer shortTimeTsStart = rs.getInt("SHORTTIME_TS_START");
+				Integer shortTimeTsEnd = rs.getInt("SHORTTIME_TS_END");
+				return new KscdtSchShortTimeTs(new KscdtSchShortTimeTsPK(sid, ymd, childCareAtr, frameNo), cid, shortTimeTsStart, shortTimeTsEnd);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, List<KscdtSchShortTimeTs>> mapPairSchShortTimeT = listSchShortTimeTs.stream()
+				.collect(Collectors.groupingBy(x -> Pair.of(x.pk.sid, x.pk.ymd)));
+
+		return mapPairSchShortTimeT;
+
+	}
+
+	// KSCDT_SCH_BREAK_TS
+	private Map<Pair<String, GeneralDate>, List<KscdtSchBreakTs>> getKscdtSchBreakTs(String listEmp,
+			DatePeriod period) {
+
+		List<KscdtSchBreakTs> listSchBreakTs = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_BREAK_TS.SID, KSCDT_SCH_BREAK_TS.YMD, KSCDT_SCH_BREAK_TS.CID,"
+				+ " KSCDT_SCH_BREAK_TS.FRAME_NO, KSCDT_SCH_BREAK_TS.BREAK_TS_START, KSCDT_SCH_BREAK_TS.BREAK_TS_END"
+				+ " FROM KSCDT_SCH_BREAK_TS" 
+				+ " WHERE KSCDT_SCH_BREAK_TS.SID IN " + listEmp + " AND KSCDT_SCH_BREAK_TS.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listSchBreakTs = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer frameNo = rs.getInt("FRAME_NO");
+				Integer breakTsStart = rs.getInt("BREAK_TS_START");
+				Integer breakTsEnd = rs.getInt("BREAK_TS_END");
+				return new KscdtSchBreakTs(new KscdtSchBreakTsPK(sid, ymd, frameNo), cid, breakTsStart, breakTsEnd);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, List<KscdtSchBreakTs>> mapPairSchBreakTs = listSchBreakTs.stream()
+				.collect(Collectors.groupingBy(x -> Pair.of(x.pk.sid, x.pk.ymd)));
+
+		return mapPairSchBreakTs;
+	}
+
+	// KSCDT_SCH_GOING_OUT_TS
+	private Map<Pair<String, GeneralDate>, List<KscdtSchGoingOutTs>> getKscdtSchGoingOutTs(String listEmp,
+			DatePeriod period) {
+
+		List<KscdtSchGoingOutTs> listSchGoingOutTs = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_GOING_OUT_TS.SID, KSCDT_SCH_GOING_OUT_TS.YMD, KSCDT_SCH_GOING_OUT_TS.CID,"
+				+ " KSCDT_SCH_GOING_OUT_TS.FRAME_NO, KSCDT_SCH_GOING_OUT_TS.REASON_ATR, KSCDT_SCH_GOING_OUT_TS.GOING_OUT_CLOCK, KSCDT_SCH_GOING_OUT_TS.GOING_BACK_CLOCK"
+				+ " FROM KSCDT_SCH_GOING_OUT_TS" 
+				+ " WHERE KSCDT_SCH_GOING_OUT_TS.SID IN " + listEmp+ " AND KSCDT_SCH_GOING_OUT_TS.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listSchGoingOutTs = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer frameNo = rs.getInt("FRAME_NO");
+				Integer reasonAtr = rs.getInt("REASON_ATR");
+				Integer goingOutClock = rs.getInt("GOING_OUT_CLOCK");
+				Integer goingBackClock = rs.getInt("GOING_BACK_CLOCK");
+				return new KscdtSchGoingOutTs(new KscdtSchGoingOutTsPK(sid, ymd, frameNo), cid, reasonAtr, goingOutClock, goingBackClock);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, List<KscdtSchGoingOutTs>> mapPairGoingOutTs = listSchGoingOutTs.stream()
+				.collect(Collectors.groupingBy(x -> Pair.of(x.pk.sid, x.pk.ymd)));
+
+		return mapPairGoingOutTs;
+	}
+
+	@Override
+	public void updateConfirmedState(WorkSchedule workSchedule) {
+		Optional<KscdtSchBasicInfo> entity = this.queryProxy().find(new KscdtSchBasicInfoPK(workSchedule.getEmployeeID(), workSchedule.getYmd()), KscdtSchBasicInfo.class);
+		if(entity.isPresent()){
+			entity.get().confirmedATR = workSchedule.getConfirmedATR().value == 1 ? true : false;
+			this.commandProxy().update(entity.get());
+		}
+	}
+	
+	@Override	
+	public List<AffInfoForWorkSchedule> getAffiliationInfor(String sid, DatePeriod period) {
+		List<WorkSchedule>  data = this.getListBySid(sid, period);
+		List<AffInfoForWorkSchedule> result = data.stream().map(c->new AffInfoForWorkSchedule(c.getEmployeeID(), c.getYmd(), c.getAffInfo()) ).collect(Collectors.toList());
+		return result;
+	}
+	// KSCDT_SCH_TIME
+	private Map<Pair<String, GeneralDate>, KscdtSchTime> getKscdtSchTimes(String listEmp, DatePeriod period) {
+
+		List<KscdtSchTime> listKscdtSchTime = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_TIME.SID, KSCDT_SCH_TIME.YMD, KSCDT_SCH_TIME.CID, KSCDT_SCH_TIME.COUNT, KSCDT_SCH_TIME.TOTAL_TIME, KSCDT_SCH_TIME.TOTAL_TIME_ACT,"
+				+ " KSCDT_SCH_TIME.PRS_WORK_TIME, KSCDT_SCH_TIME.PRS_WORK_TIME_ACT, KSCDT_SCH_TIME.PRS_PRIME_TIME, KSCDT_SCH_TIME.PRS_MIDNITE_TIME, KSCDT_SCH_TIME.EXT_BIND_TIME_OTW,"
+				+ " KSCDT_SCH_TIME.EXT_BIND_TIME_HDW, KSCDT_SCH_TIME.EXT_VARWK_OTW_TIME_LEGAL, KSCDT_SCH_TIME.EXT_FLEX_TIME, KSCDT_SCH_TIME.EXT_FLEX_TIME_PREAPP,"
+				+ " KSCDT_SCH_TIME.EXT_MIDNITE_OTW_TIME, KSCDT_SCH_TIME.EXT_MIDNITE_HDW_TIME_LGHD, KSCDT_SCH_TIME.EXT_MIDNITE_HDW_TIME_ILGHD, KSCDT_SCH_TIME.EXT_MIDNITE_HDW_TIME_PUBHD,"
+				+ " KSCDT_SCH_TIME.EXT_MIDNITE_TOTAL, KSCDT_SCH_TIME.EXT_MIDNITE_TOTAL_PREAPP, KSCDT_SCH_TIME.INTERVAL_ATD_CLOCK, KSCDT_SCH_TIME.INTERVAL_TIME,"
+				+ " KSCDT_SCH_TIME.BRK_TOTAL_TIME, KSCDT_SCH_TIME.USE_DAYLY_HD_PAID, KSCDT_SCH_TIME.USE_HOURLY_HD_PAID, KSCDT_SCH_TIME.USE_DAYLY_HD_COM, KSCDT_SCH_TIME.USE_HOURLY_HD_COM,"
+				+ " KSCDT_SCH_TIME.USE_DAYLY_HD_60H, KSCDT_SCH_TIME.USE_HOURLY_HD_60H, KSCDT_SCH_TIME.USE_DAYLY_HD_SP, KSCDT_SCH_TIME.USE_HOURLY_HD_SP, KSCDT_SCH_TIME.USE_DAYLY_HD_STK,"
+				+ " KSCDT_SCH_TIME.HOURLY_HD_USETIME, KSCDT_SCH_TIME.HOURLY_HD_SHORTAGETIME, KSCDT_SCH_TIME.ABSENCE_TIME, KSCDT_SCH_TIME.VACATION_ADD_TIME, KSCDT_SCH_TIME.STAGGERED_WH_TIME,"
+				+ " KSCDT_SCH_TIME.PRS_WORK_TIME_AMOUNT, KSCDT_SCH_TIME.PREMIUM_WORK_TIME_TOTAL , KSCDT_SCH_TIME.PREMIUM_AMOUNT_TOTAL, KSCDT_SCH_TIME.USE_DAILY_HD_SUB "
+				+ " FROM KSCDT_SCH_TIME" 
+				+ " WHERE KSCDT_SCH_TIME.SID IN " + listEmp + " AND KSCDT_SCH_TIME.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listKscdtSchTime = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer count = rs.getInt("COUNT");
+				Integer totalTime = rs.getInt("TOTAL_TIME");
+				Integer totalTimeAct = rs.getInt("TOTAL_TIME_ACT");
+				Integer prsWorkTime = rs.getInt("PRS_WORK_TIME");
+				Integer prsWorkTimeAct = rs.getInt("PRS_WORK_TIME_ACT");
+				Integer prsPrimeTime = rs.getInt("PRS_PRIME_TIME");
+				Integer prsMidniteTime = rs.getInt("PRS_MIDNITE_TIME");
+				Integer extBindTimeOtw = rs.getInt("EXT_BIND_TIME_OTW");
+				Integer extBindTimeHw = rs.getInt("EXT_BIND_TIME_HDW");
+				Integer extVarwkOtwTimeLegal = rs.getInt("EXT_VARWK_OTW_TIME_LEGAL");
+				Integer extFlexTime = rs.getInt("EXT_FLEX_TIME");
+				Integer extFlexTimePreApp = rs.getInt("EXT_FLEX_TIME_PREAPP");
+				Integer extMidNiteOtwTime = rs.getInt("EXT_MIDNITE_OTW_TIME");
+				Integer extMidNiteHdwTimeLghd = rs.getInt("EXT_MIDNITE_HDW_TIME_LGHD");
+				Integer extMidNiteHdwTimeIlghd = rs.getInt("EXT_MIDNITE_HDW_TIME_ILGHD");
+				Integer extMidNiteHdwTimePubhd = rs.getInt("EXT_MIDNITE_HDW_TIME_PUBHD");
+				Integer extMidNiteTotal = rs.getInt("EXT_MIDNITE_TOTAL");
+				Integer extMidNiteTotalPreApp = rs.getInt("EXT_MIDNITE_TOTAL_PREAPP");
+				Integer intervalAtdClock = rs.getInt("INTERVAL_ATD_CLOCK");
+				Integer intervalTime = rs.getInt("INTERVAL_TIME");
+				Integer brkTotalTime = rs.getInt("BRK_TOTAL_TIME");
+				
+				Integer hdPaidTime = rs.getInt("USE_DAYLY_HD_PAID");
+				Integer hdPaidHourlyTime = rs.getInt("USE_HOURLY_HD_PAID");
+				Integer hdComTime = rs.getInt("USE_DAYLY_HD_COM");
+				Integer hdComHourlyTime = rs.getInt("USE_HOURLY_HD_COM");
+				Integer hd60hTime = rs.getInt("USE_DAYLY_HD_60H");
+				Integer hd60hHourlyTime = rs.getInt("USE_HOURLY_HD_60H");
+				Integer hdspTime = rs.getInt("USE_DAYLY_HD_SP");
+				Integer hdspHourlyTime = rs.getInt("USE_HOURLY_HD_SP");
+				Integer hdstkTime = rs.getInt("USE_DAYLY_HD_STK");
+				Integer hdHourlyTime = rs.getInt("HOURLY_HD_USETIME");
+				Integer hdHourlyShortageTime = rs.getInt("HOURLY_HD_SHORTAGETIME");
+				
+				Integer absenceTime = rs.getInt("ABSENCE_TIME");
+				Integer vacationAddTime = rs.getInt("VACATION_ADD_TIME");
+				Integer staggeredWhTime = rs.getInt("STAGGERED_WH_TIME");
+				Integer prsWorkTimeAmount = rs.getInt("PRS_WORK_TIME_AMOUNT");
+				Integer premiumWorkTimeTotal = rs.getInt("PREMIUM_WORK_TIME_TOTAL");
+				Integer premiumAmountTotal = rs.getInt("PREMIUM_AMOUNT_TOTAL");
+				Integer useDailyHDSub = rs.getInt("USE_DAILY_HD_SUB");
+				
+				return new KscdtSchTime(new KscdtSchTimePK(sid, ymd), cid, count, totalTime, totalTimeAct, prsWorkTime,
+						prsWorkTimeAct, prsPrimeTime, prsMidniteTime, extBindTimeOtw, extBindTimeHw,
+						extVarwkOtwTimeLegal, extFlexTime, extFlexTimePreApp, extMidNiteOtwTime, extMidNiteHdwTimeLghd,
+						extMidNiteHdwTimeIlghd, extMidNiteHdwTimePubhd, extMidNiteTotal, extMidNiteTotalPreApp,
+						intervalAtdClock, intervalTime, brkTotalTime, hdPaidTime, hdPaidHourlyTime, hdComTime,
+						hdComHourlyTime, hd60hTime, hd60hHourlyTime, hdspTime, hdspHourlyTime, hdstkTime, hdHourlyTime,
+						hdHourlyShortageTime, absenceTime, vacationAddTime, staggeredWhTime,
+						new ArrayList<>(),new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 
+						new ArrayList<>(), new ArrayList<>(),new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+						prsWorkTimeAmount, premiumWorkTimeTotal, premiumAmountTotal, useDailyHDSub);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, KscdtSchTime> mapPairSchTime = listKscdtSchTime.stream()
+				.collect(Collectors.toMap(x -> Pair.of(x.pk.sid, x.pk.ymd), x -> x));
+
+		return mapPairSchTime;
+	}
+
+	// KSCDT_SCH_OVERTIME_WORK
+	private Map<Pair<String, GeneralDate>, List<KscdtSchOvertimeWork>> getOvertimeWorks(String listEmp,
+			DatePeriod period) {
+
+		List<KscdtSchOvertimeWork> listKscdtSchOvertimeWork = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_OVERTIME_WORK.SID, KSCDT_SCH_OVERTIME_WORK.YMD, KSCDT_SCH_OVERTIME_WORK.CID, KSCDT_SCH_OVERTIME_WORK.FRAME_NO,"
+				+ " KSCDT_SCH_OVERTIME_WORK.OVERTIME_WORK_TIME, KSCDT_SCH_OVERTIME_WORK.OVERTIME_WORK_TIME_TRANS, KSCDT_SCH_OVERTIME_WORK.OVERTIME_WORK_TIME_PREAPP"
+				+ " FROM KSCDT_SCH_OVERTIME_WORK" 
+				+ " WHERE KSCDT_SCH_OVERTIME_WORK.SID IN " + listEmp + " AND KSCDT_SCH_OVERTIME_WORK.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listKscdtSchOvertimeWork = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer frameNo = rs.getInt("FRAME_NO");
+				Integer overtimeWorkTime = rs.getInt("OVERTIME_WORK_TIME");
+				Integer overtimeWorkTimeTrans = rs.getInt("OVERTIME_WORK_TIME_TRANS");
+				Integer overtimeWorkTimePreApp = rs.getInt("OVERTIME_WORK_TIME_PREAPP");
+				return new KscdtSchOvertimeWork(new KscdtSchOvertimeWorkPK(sid, ymd, frameNo), cid, overtimeWorkTime,
+						overtimeWorkTimeTrans, overtimeWorkTimePreApp);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, List<KscdtSchOvertimeWork>> mapPairOvertimeWork = listKscdtSchOvertimeWork
+				.stream().collect(Collectors.groupingBy(x -> Pair.of(x.pk.sid, x.pk.ymd)));
+
+		return mapPairOvertimeWork;
+	}
+
+	// KSCDT_SCH_HOLIDAY_WORK
+	private Map<Pair<String, GeneralDate>, List<KscdtSchHolidayWork>> getHolidayWorks(String listEmp,
+			DatePeriod period) {
+
+		List<KscdtSchHolidayWork> listKscdtSchHolidayWork = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_HOLIDAY_WORK.SID, KSCDT_SCH_HOLIDAY_WORK.YMD, KSCDT_SCH_HOLIDAY_WORK.CID, KSCDT_SCH_HOLIDAY_WORK.FRAME_NO,"
+				+ " KSCDT_SCH_HOLIDAY_WORK.HOLIDAY_WORK_TS_START, KSCDT_SCH_HOLIDAY_WORK.HOLIDAY_WORK_TS_END, KSCDT_SCH_HOLIDAY_WORK.HOLIDAY_WORK_TIME,"
+				+ " KSCDT_SCH_HOLIDAY_WORK.HOLIDAY_WORK_TIME_TRANS, KSCDT_SCH_HOLIDAY_WORK.HOLIDAY_WORK_TIME_PREAPP"
+				+ " FROM KSCDT_SCH_HOLIDAY_WORK" 
+				+ " WHERE KSCDT_SCH_HOLIDAY_WORK.SID IN " + listEmp + " AND KSCDT_SCH_HOLIDAY_WORK.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listKscdtSchHolidayWork = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer frameNo = rs.getInt("FRAME_NO");
+				Integer holidayWorkTsStart = rs.getInt("HOLIDAY_WORK_TS_START");
+				Integer holidayWorkTsEnd = rs.getInt("HOLIDAY_WORK_TS_END");
+				Integer holidayWorkTime = rs.getInt("HOLIDAY_WORK_TIME");
+				Integer holidayWorkTimeTrans = rs.getInt("HOLIDAY_WORK_TIME_TRANS");
+				Integer holidayWorkTimePreApp = rs.getInt("HOLIDAY_WORK_TIME_PREAPP");
+
+				return new KscdtSchHolidayWork(new KscdtSchHolidayWorkPK(sid, ymd, frameNo), cid, holidayWorkTsStart,
+						holidayWorkTsEnd, holidayWorkTime, holidayWorkTimeTrans, holidayWorkTimePreApp);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, List<KscdtSchHolidayWork>> mapPairHolidayWork = listKscdtSchHolidayWork.stream()
+				.collect(Collectors.groupingBy(x -> Pair.of(x.pk.sid, x.pk.ymd)));
+
+		return mapPairHolidayWork;
+	}
+
+	// KSCDT_SCH_BONUSPAY
+	private Map<Pair<String, GeneralDate>, List<KscdtSchBonusPay>> getBonusPays(String listEmp, DatePeriod period) {
+
+		List<KscdtSchBonusPay> listKscdtSchBonusPay = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_BONUSPAY.SID, KSCDT_SCH_BONUSPAY.YMD,KSCDT_SCH_BONUSPAY.CID,"
+				+ " KSCDT_SCH_BONUSPAY.BONUSPAY_TYPE, KSCDT_SCH_BONUSPAY.FRAME_NO,"
+				+ " KSCDT_SCH_BONUSPAY.PREMIUM_TIME, KSCDT_SCH_BONUSPAY.PREMIUM_TIME_WITHIN, KSCDT_SCH_BONUSPAY.PREMIUM_TIME_WITHOUT"
+				+ " FROM KSCDT_SCH_BONUSPAY" 
+				+ " WHERE KSCDT_SCH_BONUSPAY.SID IN " + listEmp + " AND KSCDT_SCH_BONUSPAY.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listKscdtSchBonusPay = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer frameNo = rs.getInt("FRAME_NO");
+				Integer bonuspayType = rs.getInt("BONUSPAY_TYPE");
+				Integer premiumTime = rs.getInt("PREMIUM_TIME");
+				Integer premiumTimeWithIn = rs.getInt("PREMIUM_TIME_WITHIN");
+				Integer premiumTimeWithOut = rs.getInt("PREMIUM_TIME_WITHOUT");
+
+				return new KscdtSchBonusPay(new KscdtSchBonusPayPK(sid, ymd, bonuspayType, frameNo), cid, premiumTime,
+						premiumTimeWithIn, premiumTimeWithOut);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, List<KscdtSchBonusPay>> mapPairBonusPay = listKscdtSchBonusPay.stream()
+				.collect(Collectors.groupingBy(x -> Pair.of(x.pk.sid, x.pk.ymd)));
+
+		return mapPairBonusPay;
+	}
+
+	// KSCDT_SCH_PREMIUM
+	private Map<Pair<String, GeneralDate>, List<KscdtSchPremium>> getPremiums(String listEmp, DatePeriod period) {
+
+		List<KscdtSchPremium> listKscdtSchPremium = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_PREMIUM.SID, KSCDT_SCH_PREMIUM.YMD, KSCDT_SCH_PREMIUM.CID,  "
+				+ " KSCDT_SCH_PREMIUM.FRAME_NO, KSCDT_SCH_PREMIUM.PREMIUM_TIME, KSCDT_SCH_PREMIUM.PREMIUM_TIME_AMOUNT , KSCDT_SCH_PREMIUM.PREMIUM_TIME_UNIT_COST" 
+				+ " FROM KSCDT_SCH_PREMIUM"
+				+ " WHERE KSCDT_SCH_PREMIUM.SID IN " + listEmp + " AND KSCDT_SCH_PREMIUM.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listKscdtSchPremium = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer frameNo = rs.getInt("FRAME_NO");
+				Integer premiumTime = rs.getInt("PREMIUM_TIME");
+				Integer premiumTimeAmount = rs.getInt("PREMIUM_TIME_AMOUNT");
+				Integer premiumTimeUnitCost = rs.getInt("PREMIUM_TIME_UNIT_COST");
+
+				return new KscdtSchPremium(new KscdtSchPremiumPK(sid, ymd, frameNo), cid, premiumTime, premiumTimeAmount, premiumTimeUnitCost);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, List<KscdtSchPremium>> mapPairPremium = listKscdtSchPremium.stream()
+				.collect(Collectors.groupingBy(x -> Pair.of(x.pk.sid, x.pk.ymd)));
+
+		return mapPairPremium;
+	}
+
+	// KSCDT_SCH_SHORTTIME
+	private Map<Pair<String, GeneralDate>, List<KscdtSchShortTime>> getShortTimes(String listEmp, DatePeriod period) {
+
+		List<KscdtSchShortTime> listKscdtSchShortTime = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_SHORTTIME.SID, KSCDT_SCH_SHORTTIME.YMD, KSCDT_SCH_SHORTTIME.CID,  "
+				+ " KSCDT_SCH_SHORTTIME.CHILD_CARE_ATR, "
+				+ " KSCDT_SCH_SHORTTIME.COUNT, KSCDT_SCH_SHORTTIME.TOTAL_TIME, KSCDT_SCH_SHORTTIME.TOTAL_TIME_WITHIN, KSCDT_SCH_SHORTTIME.TOTAL_TIME_WITHOUT "
+				+ " FROM KSCDT_SCH_SHORTTIME" 
+				+ " WHERE KSCDT_SCH_SHORTTIME.SID IN " + listEmp + " AND KSCDT_SCH_SHORTTIME.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listKscdtSchShortTime = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer childCareAtr = rs.getInt("CHILD_CARE_ATR");
+				Integer count = rs.getInt("COUNT");
+				Integer totalTime = rs.getInt("TOTAL_TIME");
+				Integer totalTimeWithIn = rs.getInt("TOTAL_TIME_WITHIN");
+				Integer totalTimeWithOut = rs.getInt("TOTAL_TIME_WITHOUT");
+
+				return new KscdtSchShortTime(new KscdtSchShortTimePK(sid, ymd, childCareAtr), cid, count, totalTime,
+						totalTimeWithIn, totalTimeWithOut);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, List<KscdtSchShortTime>> mapPairShortTime = listKscdtSchShortTime.stream()
+				.collect(Collectors.groupingBy(x -> Pair.of(x.pk.sid, x.pk.ymd)));
+
+		return mapPairShortTime;
+	}
+
+	// KSCDT_SCH_COME_LATE
+	private Map<Pair<String, GeneralDate>, List<KscdtSchComeLate>> getKscdtSchComeLates(String listEmp,
+			DatePeriod period) {
+
+		List<KscdtSchComeLate> listKscdtSchComeLate = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_COME_LATE.SID, KSCDT_SCH_COME_LATE.YMD, KSCDT_SCH_COME_LATE.CID,  "
+				+ " KSCDT_SCH_COME_LATE.WORK_NO, "
+				+ " KSCDT_SCH_COME_LATE.USE_HOURLY_HD_PAID, KSCDT_SCH_COME_LATE.USE_HOURLY_HD_COM, "
+				+ " KSCDT_SCH_COME_LATE.USE_HOURLY_HD_60H, KSCDT_SCH_COME_LATE.USE_HOURLY_HD_SP_NO, "
+				+ " KSCDT_SCH_COME_LATE.USE_HOURLY_HD_SP_TIME, KSCDT_SCH_COME_LATE.USE_HOURLY_HD_CHILDCARE, "
+				+ " KSCDT_SCH_COME_LATE.USE_HOURLY_HD_NURSECARE" 
+				+ " FROM KSCDT_SCH_COME_LATE"
+				+ " WHERE KSCDT_SCH_COME_LATE.SID IN " + listEmp + " AND KSCDT_SCH_COME_LATE.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listKscdtSchComeLate = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer workNo = rs.getInt("WORK_NO");
+				Integer useHourlyHdPaid = rs.getInt("USE_HOURLY_HD_PAID");
+				Integer useHourlyHdCom = rs.getInt("USE_HOURLY_HD_COM");
+				Integer useHourlyHd60h = rs.getInt("USE_HOURLY_HD_60H");
+				Integer useHourlyHdSpNO = rs.getInt("USE_HOURLY_HD_SP_NO");
+				Integer useHourlyHdSpTime = rs.getInt("USE_HOURLY_HD_SP_TIME");
+				Integer useHourlyHdChildCare = rs.getInt("USE_HOURLY_HD_CHILDCARE");
+				Integer useHourlyHdNurseCare = rs.getInt("USE_HOURLY_HD_NURSECARE");
+
+				return new KscdtSchComeLate(new KscdtSchComeLatePK(sid, ymd, workNo), cid, useHourlyHdPaid,
+						useHourlyHdCom, useHourlyHd60h, useHourlyHdSpNO, useHourlyHdSpTime, useHourlyHdChildCare,
+						useHourlyHdNurseCare);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, List<KscdtSchComeLate>> mapPairComeLate = listKscdtSchComeLate.stream()
+				.collect(Collectors.groupingBy(x -> Pair.of(x.pk.sid, x.pk.ymd)));
+
+		return mapPairComeLate;
+	}
+
+	// KSCDT_SCH_GOING_OUT
+	private Map<Pair<String, GeneralDate>, List<KscdtSchGoingOut>> getKscdtSchGoingOuts(String listEmp,
+			DatePeriod period) {
+
+		List<KscdtSchGoingOut> listKscdtSchGoingOut = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_GOING_OUT.SID, KSCDT_SCH_GOING_OUT.YMD, KSCDT_SCH_GOING_OUT.CID,  "
+				+ " KSCDT_SCH_GOING_OUT.REASON_ATR,"
+				+ " KSCDT_SCH_GOING_OUT.USE_HOURLY_HD_PAID, KSCDT_SCH_GOING_OUT.USE_HOURLY_HD_COM, "
+				+ " KSCDT_SCH_GOING_OUT.USE_HOURLY_HD_60H, KSCDT_SCH_GOING_OUT.USE_HOURLY_HD_SP_NO, "
+				+ " KSCDT_SCH_GOING_OUT.USE_HOURLY_HD_SP_TIME, KSCDT_SCH_GOING_OUT.USE_HOURLY_HD_CHILDCARE, "
+				+ " KSCDT_SCH_GOING_OUT.USE_HOURLY_HD_NURSECARE" 
+				+ " FROM KSCDT_SCH_GOING_OUT"
+				+ " WHERE KSCDT_SCH_GOING_OUT.SID IN " + listEmp + " AND KSCDT_SCH_GOING_OUT.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listKscdtSchGoingOut = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer reasonAtr = rs.getInt("REASON_ATR");
+				Integer useHourlyHdPaid = rs.getInt("USE_HOURLY_HD_PAID");
+				Integer useHourlyHdCom = rs.getInt("USE_HOURLY_HD_COM");
+				Integer useHourlyHd60h = rs.getInt("USE_HOURLY_HD_60H");
+				Integer useHourlyHdSpNO = rs.getInt("USE_HOURLY_HD_SP_NO");
+				Integer useHourlyHdSpTime = rs.getInt("USE_HOURLY_HD_SP_TIME");
+				Integer useHourlyHdChildCare = rs.getInt("USE_HOURLY_HD_CHILDCARE");
+				Integer useHourlyHdNurseCare = rs.getInt("USE_HOURLY_HD_NURSECARE");
+
+				return new KscdtSchGoingOut(new KscdtSchGoingOutPK(sid, ymd, reasonAtr), cid, useHourlyHdPaid,
+						useHourlyHdCom, useHourlyHd60h, useHourlyHdSpNO, useHourlyHdSpTime, useHourlyHdChildCare,
+						useHourlyHdNurseCare);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, List<KscdtSchGoingOut>> mapPairGoingOut = listKscdtSchGoingOut.stream()
+				.collect(Collectors.groupingBy(x -> Pair.of(x.pk.sid, x.pk.ymd)));
+
+		return mapPairGoingOut;
+	}
+
+	// KSCDT_SCH_LEAVE_EARLY
+	private Map<Pair<String, GeneralDate>, List<KscdtSchLeaveEarly>> getKscdtSchLeaveEarlys(String listEmp,
+			DatePeriod period) {
+
+		List<KscdtSchLeaveEarly> listKscdtSchLeaveEarly = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_LEAVE_EARLY.SID, KSCDT_SCH_LEAVE_EARLY.YMD, KSCDT_SCH_LEAVE_EARLY.CID,  "
+				+ " KSCDT_SCH_LEAVE_EARLY.WORK_NO, "
+				+ " KSCDT_SCH_LEAVE_EARLY.USE_HOURLY_HD_PAID, KSCDT_SCH_LEAVE_EARLY.USE_HOURLY_HD_COM, "
+				+ " KSCDT_SCH_LEAVE_EARLY.USE_HOURLY_HD_60H, KSCDT_SCH_LEAVE_EARLY.USE_HOURLY_HD_SP_NO, "
+				+ " KSCDT_SCH_LEAVE_EARLY.USE_HOURLY_HD_SP_TIME, KSCDT_SCH_LEAVE_EARLY.USE_HOURLY_HD_CHILDCARE, "
+				+ " KSCDT_SCH_LEAVE_EARLY.USE_HOURLY_HD_NURSECARE" 
+				+ " FROM KSCDT_SCH_LEAVE_EARLY"
+				+ " WHERE KSCDT_SCH_LEAVE_EARLY.SID IN " + listEmp + " AND KSCDT_SCH_LEAVE_EARLY.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listKscdtSchLeaveEarly = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer workNo = rs.getInt("WORK_NO");
+				Integer useHourlyHdPaid = rs.getInt("USE_HOURLY_HD_PAID");
+				Integer useHourlyHdCom = rs.getInt("USE_HOURLY_HD_COM");
+				Integer useHourlyHd60h = rs.getInt("USE_HOURLY_HD_60H");
+				Integer useHourlyHdSpNO = rs.getInt("USE_HOURLY_HD_SP_NO");
+				Integer useHourlyHdSpTime = rs.getInt("USE_HOURLY_HD_SP_TIME");
+				Integer useHourlyHdChildCare = rs.getInt("USE_HOURLY_HD_CHILDCARE");
+				Integer useHourlyHdNurseCare = rs.getInt("USE_HOURLY_HD_NURSECARE");
+
+				return new KscdtSchLeaveEarly(new KscdtSchLeaveEarlyPK(sid, ymd, workNo), cid, useHourlyHdPaid,
+						useHourlyHdCom, useHourlyHd60h, useHourlyHdSpNO, useHourlyHdSpTime, useHourlyHdChildCare,
+						useHourlyHdNurseCare);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, List<KscdtSchLeaveEarly>> mapPairLeaveEarly = listKscdtSchLeaveEarly.stream()
+				.collect(Collectors.groupingBy(x -> Pair.of(x.pk.sid, x.pk.ymd)));
+
+		return mapPairLeaveEarly;
+	}
+	
+	// KSCDT_SCH_TASK
+	private Map<Pair<String, GeneralDate>, List<KscdtSchTask>> getKscdtSchTasks(String listEmp, DatePeriod period) {
+
+		List<KscdtSchTask> listKscdtSchTask = new ArrayList<>();
+
+		String QUERY = "SELECT KSCDT_SCH_TASK.SID, KSCDT_SCH_TASK.YMD, KSCDT_SCH_TASK.CID,  "
+				+ " KSCDT_SCH_TASK.SERIAL_NO, KSCDT_SCH_TASK.TASK_CODE, KSCDT_SCH_TASK.START_CLOCK, "
+				+ " KSCDT_SCH_TASK.END_CLOCK" 
+				+ " FROM KSCDT_SCH_TASK" + " WHERE KSCDT_SCH_TASK.SID IN " + listEmp
+				+ " AND KSCDT_SCH_TASK.YMD BETWEEN " + "'" + period.start() + "' AND '" + period.end() + "' ";
+
+		try (PreparedStatement stmt = this.connection().prepareStatement(QUERY)) {
+			listKscdtSchTask = new NtsResultSet(stmt.executeQuery()).getList(rs -> {
+				String sid = rs.getString("SID");
+				GeneralDate ymd = GeneralDate.fromString(rs.getString("YMD"), "yyyy-MM-dd");
+				String cid = rs.getString("CID");
+				Integer serialNo = rs.getInt("SERIAL_NO");
+				String taskCode = rs.getString("TASK_CODE");
+				Integer startClock = rs.getInt("START_CLOCK");
+				Integer endClock = rs.getInt("END_CLOCK");
+
+				return new KscdtSchTask(new KscdtSchTaskPK(sid, ymd, serialNo), taskCode, startClock, endClock, cid);
+			});
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		Map<Pair<String, GeneralDate>, List<KscdtSchTask>> mapPairKscdtSchTask = listKscdtSchTask.stream()
+				.collect(Collectors.groupingBy(x -> Pair.of(x.pk.sid, x.pk.ymd)));
+
+		return mapPairKscdtSchTask;
+	}
+
 	private <V> List<V> removeInsertData(List<V> oldDatas, List<V> newDatas, BiFunction<V, V, Boolean> keyCheck) {
 		oldDatas.forEach(x -> {
 			if(!newDatas.stream().anyMatch(y -> keyCheck.apply(x, y))) {

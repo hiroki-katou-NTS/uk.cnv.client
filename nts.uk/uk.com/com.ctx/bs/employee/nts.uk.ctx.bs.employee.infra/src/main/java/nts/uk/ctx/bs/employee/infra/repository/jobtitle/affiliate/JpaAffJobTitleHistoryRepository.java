@@ -23,8 +23,6 @@ import nts.arc.time.GeneralDateTime;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.bs.employee.dom.jobtitle.affiliate.AffJobTitleHistory;
 import nts.uk.ctx.bs.employee.dom.jobtitle.affiliate.AffJobTitleHistoryRepository;
-import nts.uk.ctx.bs.employee.infra.entity.classification.affiliate.BsymtAffClassHist;
-import nts.uk.ctx.bs.employee.infra.entity.employment.history.BsymtAffEmpHist;
 import nts.uk.ctx.bs.employee.infra.entity.jobtitle.affiliate.BsymtAffJobTitleHist;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.history.DateHistoryItem;
@@ -60,6 +58,16 @@ public class JpaAffJobTitleHistoryRepository extends JpaRepository implements Af
 	private static final String GET_BY_DATE = "select h from BsymtAffJobTitleHist h"
 			+ " where h.strDate <= :date and h.endDate >= :date "
 			+ " AND h.cid = :cid ";
+	
+	private static final String GET_SIDS_BY_SIDS_DATE = "SELECT m FROM BsymtAffJobTitleHist m"
+			+ " WHERE m.sid IN :sids "
+			+ "	AND m.strDate = :baseDate";
+	
+	private static final String GET_SIDS_BY_PERIOD = "SELECT m FROM BsymtAffJobTitleHist m"
+			+ " WHERE m.cid = :cid "
+			+ " AND m.strDate >= :startDate "
+			+ "	AND m.strDate <= :endDate";
+	
 	/**
 	 * Convert from domain to entity
 	 * @param employeeId
@@ -168,6 +176,9 @@ public class JpaAffJobTitleHistoryRepository extends JpaRepository implements Af
 
 	@Override
 	public Optional<AffJobTitleHistory> getByEmpIdAndStandardDate(String employeeId, GeneralDate standardDate) {
+		if (standardDate == null) {
+			return Optional.empty();
+		}
 		Optional<BsymtAffJobTitleHist> optionaData = this.queryProxy()
 				.query(GET_BY_SID_DATE, BsymtAffJobTitleHist.class)
 				.setParameter("sid", employeeId).setParameter("standardDate", standardDate).getSingle();
@@ -578,5 +589,38 @@ public class JpaAffJobTitleHistoryRepository extends JpaRepository implements Af
 		});
 		int  records = this.getEntityManager().createNativeQuery(sb.toString()).executeUpdate();
 		System.out.println(records);
+	}
+
+	@Override
+	public List<String> getBySidsAndBaseDate(List<String> sids, GeneralDate baseDate) {
+		
+		if (sids.isEmpty()) {
+			return Collections.emptyList();
+		}
+		
+		List<String> returnList = new ArrayList<>();
+		
+		CollectionUtil.split(sids, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subSids -> {
+			
+			List<String> subResults = this.queryProxy()
+					.query(GET_SIDS_BY_SIDS_DATE, BsymtAffJobTitleHist.class)
+					.setParameter("sids", subSids)
+					.setParameter("baseDate", baseDate)
+					.getList(item -> item.sid);
+			
+			returnList.addAll(subResults);
+		});
+		
+		return returnList;
+	}
+
+	@Override
+	public List<String> getByDatePeriod(String cid, DatePeriod datePeriod) {
+		return this.queryProxy()
+				.query(GET_SIDS_BY_PERIOD, BsymtAffJobTitleHist.class)
+				.setParameter("cid", cid)
+				.setParameter("startDate", datePeriod.start())
+				.setParameter("endDate", datePeriod.end())
+				.getList(item -> item.sid);
 	}
 }

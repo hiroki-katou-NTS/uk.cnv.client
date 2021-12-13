@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
-import nts.uk.shr.com.context.AppContexts;
 
 /**
  * DS: 打刻カード未登録の最新打刻データを取得する
@@ -30,7 +29,7 @@ public class GetNewestStampNotRegisteredService {
 	public static List<StampInfoDisp> get(Require require, DatePeriod period, String contractCode) {
 				
 		// $打刻情報リスト = 打刻カード未登録の打刻データを取得する#取得する(require, 期間)
-		List<StampInfoDisp> list = RetrieveNoStampCardRegisteredService.get(require, period, contractCode);
+		List<StampInfoDisp> list = RetrieveNoStampCardRegisteredService.get(require, period);
 
 		if (list.isEmpty()) {
 			return new ArrayList<StampInfoDisp>();

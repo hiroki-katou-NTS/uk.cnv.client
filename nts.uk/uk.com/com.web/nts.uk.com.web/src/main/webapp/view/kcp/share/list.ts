@@ -915,15 +915,11 @@ module kcp.share.list {
             }
             var alreadySettingColSize = data.isShowAlreadySet ? 70 : 0;
             var multiSelectColSize = data.isMultiSelect ? 55 : 0;
-            var totalColumnSize: number = data.maxWidth ? data.maxWidth : codeColumnSize + 170 + companyColumnSize
-                + alreadySettingColSize + multiSelectColSize;
             var minTotalSize = 280;
             var totalRowsHeight = heightOfRow * this.maxRows + 20;
             var totalHeight: number = self.calcTotalHeightRev(data);
-            
 
             var optionalColumnSize: any = 0;
-
             if (this.showOptionalColumn) {
                 codeColumnSize = data.maxWidth ? '15%': codeColumnSize;
                 var nameColumnSize = data.maxWidth ? '30%' : 170;
@@ -936,6 +932,10 @@ module kcp.share.list {
                 var workplaceColumnSize = data.maxWidth ? '30%' : 150;
                 var alreadySetColumnSize = data.maxWidth ? '15%' : 40;
             }
+
+            var totalColumnSize: number = data.maxWidth ? data.maxWidth : codeColumnSize + 170 + companyColumnSize
+                + alreadySettingColSize + multiSelectColSize + optionalColumnSize;
+
             this.gridStyle = {
                 codeColumnSize: codeColumnSize,
                 totalColumnSize: Math.max(minTotalSize, totalColumnSize),

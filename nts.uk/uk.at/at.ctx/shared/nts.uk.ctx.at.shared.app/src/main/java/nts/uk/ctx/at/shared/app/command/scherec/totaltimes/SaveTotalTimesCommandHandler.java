@@ -59,6 +59,12 @@ public class SaveTotalTimesCommandHandler extends CommandHandler<TotalTimesComma
 		// Convert to domain
 		TotalTimes totalTimes = command.toDomain(companyId);
 
+		if (totalTimes.getTotalCondition().getAtdItemId().isPresent()
+				&& totalTimes.getTotalCondition().getUpperLimitSettingAtr() == UseAtr.NotUse
+				&& totalTimes.getTotalCondition().getLowerLimitSettingAtr() == UseAtr.NotUse) {
+			throw new BusinessException("Msg_2217");
+		}
+
 		// Alway has 30 items and allow update only
 		this.totalTimesRepo.update(totalTimes);
 	}

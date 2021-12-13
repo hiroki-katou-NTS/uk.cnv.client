@@ -89,10 +89,9 @@
 					<button  id="A1_1"  class="proceed"  tabindex="1" data-bind="enable: enableBtnReg , click: saveData ">#{i18n.getText('KSU001_1')}</button>
 					<button  id="A1_2"  class="proceed marginleft15px" tabindex="2">#{i18n.getText('KSU001_2')}</button>
 					<button  id="A1_3"  class="create  marginleft15px" tabindex="3">#{i18n.getText('KSU001_3')}</button>
-					<button  id="A1_4"  class="check   marginleft15px" tabindex="4">#{i18n.getText('KSU001_4')}</button>
 					<button  id="A1_5"  class="confirm marginleft15px" tabindex="5" data-bind="click: openDialogU">#{i18n.getText('KSU001_5')}</button>
-					<button  id="A1_6"  class="release marginleft15px" tabindex="6" >#{i18n.getText('KSU001_6')}</button>
-					
+					<button  id="A1_6"  class="release marginleft15px" tabindex="6" data-bind="click: openDialogK">#{i18n.getText('KSU001_6')}</button>
+
 					<button  id="A1_7" tabindex="7">#{i18n.getText('KSU001_7')}</button>
 					<button  id="A1_8" tabindex="10" class="hope     marginleft15px" >#{i18n.getText('KSU001_8')}</button>
 					<button  id="A1_9" tabindex="11" class="vacation marginleft15px" data-bind="click: btnOpenKDL055">#{i18n.getText('KSU001_9')}</button>
@@ -133,47 +132,16 @@
 
 				<!-- event when click btn KSU001_12 -->
 				<div id="A1_12_1" class="popup-area popup-panel">
-					<div id="A1_12_2" tabindex="15" data-bind="ntsFormLabel: {}">#{i18n.getText('KSU001_23')}</div>
-					<hr id="A1_12_3"></hr>
-					<div id="work-setting">
-						<div>
-							<button id="A1_12_4" tabindex="16">#{i18n.getText('KSU001_24')}</button>
-							<span id="A1_12_5">#{i18n.getText('KSU001_25')}</span>
-						</div>
-
-						<div>
-							<button id="A1_12_6" tabindex="17">#{i18n.getText('KSU001_129')}</button>
-							<span id="A1_12_7">#{i18n.getText('KSU001_130')}</span>
-						</div>
-
-						<div>
-							<button id="A1_12_8" tabindex="18" data-bind="click: openQDialog" >#{i18n.getText('KSU001_131')}</button>
-							<span id="A1_12_9">#{i18n.getText('KSU001_132')}</span>
-						</div>
-
-					</div>
-					<div id="A1_12_10" tabindex="19" data-bind="ntsFormLabel: {}">#{i18n.getText('KSU001_26')}</div>
-					<hr id="A1_12_11"></hr>
-					<div id="person-setting">
-						<div>
-							<button id="A1_12_12" tabindex="20">#{i18n.getText('KSU001_27')}</button>
-							<span id="A1_12_13">#{i18n.getText('KSU001_28')}</span>
-						</div>
-					</div>
-					
-					<div id="A1_12_14" tabindex="21" data-bind="ntsFormLabel: {}">#{i18n.getText('KSU001_30')}</div>
-					<hr id="A1_12_15"></hr>
-					
 					<div id="sort-order-setting">
-						<div>
+						<div id="A1_12_1617">
 							<button id="A1_12_16" tabindex="22" data-bind="click: openSDialog" >#{i18n.getText('KSU001_31')}</button>
 							<span id="A1_12_17">#{i18n.getText('KSU001_32')}</span>
 						</div>
-						<div>
+						<div id="A1_12_1819">
 							<button id="A1_12_18" tabindex="23" data-bind="click: openLDialog" >#{i18n.getText('KSU001_36')}</button>
 							<span id="A1_12_19">#{i18n.getText('KSU001_33')}</span>
 						</div>
-						<div>
+						<div id="A1_12_2021">
 							<button id="A1_12_20" tabindex="24" data-bind="click: openMDialog" >#{i18n.getText('KSU001_34')}</button>
 							<span id="A1_12_21">#{i18n.getText('KSU001_35')}</span>
 						</div>
@@ -183,22 +151,20 @@
 				<!-- popup khi click btn A4 Screen-display-settings -->
 				<div id="A4_1_popup" class="popup-area popup-panel A4_1A">
 					<div style="margin-left: 0px">
-						<div>
+						<div data-bind="visible: visibleA4_234">
 							<div class="area6-left">
 								<span id="A4_2">#{i18n.getText('KSU001_42')}</span>
 								<span id="A4_3">：</span>
 							</div>
 							<div id="A4_4" tabindex="30" class="cf area6-right"
 								data-bind="ntsSwitchButton: {
- 									options: [{id: 'time', name: '#{i18n.getText('KSU001_43')}'}, 
-		 									 {id: 'shortName', name: '#{i18n.getText('KSU001_44')}'}, 
-		 									 {id: 'shift', name: '#{i18n.getText('KSU001_45')}'}] , 
+ 									options: modeDisplayList, 
 									optionsValue: 'id', 
  									optionsText: 'name', 
  									value: selectedModeDisplayInBody , 
  									enable: true }"></div> 
 						</div>
-						<div>
+						<div data-bind="visible: visibleA4_567">
 							<div class="area6-left" >
 								<span id="A4_5">#{i18n.getText('KSU001_133')}</span>
 								<span id="A4_6">：</span>
@@ -212,8 +178,8 @@
  									enable: true }"></div> 
 						</div>
 					</div>
-					<div id="A4_8">#{i18n.getText('KSU001_125')}</div>
-					<hr id="A4_9" data-bind="visible: showComboboxA4_12"></hr>
+					<div id="A4_8" data-bind="visible: visibleA4_8">#{i18n.getText('KSU001_125')}</div>
+					<hr id="A4_9" data-bind="visible: visibleA4_9"></hr>
 					<div style="margin-left: 0px" data-bind="visible: showComboboxA4_12">
 						<table>
 							<tr>
@@ -224,7 +190,7 @@
 									</div>
 								</td>
 								<td>
-									<div id="combo-box10" class="area6-right"  style="width: 100px" tabindex="32" 
+									<div id="combo-box10" class="area6-right"  style="width: 110px" tabindex="32" 
 										data-bind="ntsComboBox: {
 										options: [{id: 0, name: '#{i18n.getText('KSU001_143')}'}, {id: 1, name: '#{i18n.getText('KSU001_144')}'}]  ,
 										optionsValue: 'id',
@@ -378,7 +344,7 @@
 										</div>
 									<div id="A3_2" tabindex="28" class="cf"
 										data-bind="ntsSwitchButton: {
-										options: [{id: 1, name: '#{i18n.getText('KSU001_39')}'}, {id: 2, name: '#{i18n.getText('KSU001_40')}'}, {id: 3, name: '#{i18n.getText('KSU001_41')}'}] ,
+										options: disPeriodSelectionList,
 										optionsValue: 'id',
 										optionsText: 'name',
 										value: selectedDisplayPeriod}">
@@ -415,7 +381,7 @@
 											data-bind="click: undoData, enable: enableBtnUndo , visible : visibleBtnUndo , timeClick: -1"><i data-bind="ntsIcon: { no: 44 }"></i></button>
 										<button id="redo" class="size-image-button2 A7_5" tabindex="40" 
 											data-bind="click: redoData, enable: enableBtnRedo , visible : visibleBtnRedo , timeClick: -1"><i data-bind="ntsIcon: { no: 154 }"></i></button>
-										<button tabindex="41"  data-bind="ntsHelpButton: {textId: '', textParams:[], position: 'right center' ,enable: enableHelpBtn}"
+										<button tabindex="41"  data-bind="ntsHelpButton: {textId: '', textParams:[], position: 'right center' ,enable: false}"
 											style="margin-top: 13px;">？</button>
 									</div>
 									<div data-bind="ifnot: visibleShiftPalette" style="width: 100%;margin-left: 140px; margin-top: 5px;">
@@ -437,13 +403,17 @@
 							<div style="clear: left"></div>
 							<div style="width: fit-content;">
 								<div id = "btnControlLeftRight">
-									<button class="toLeft inline" data-bind="click : toLeft"> <i class="iconToLeft" data-bind="ntsIcon : { no: 152, width: 15, height: 20 }"></i></button>
-									<button class="toRight inline" data-bind="click: toRight"><i class="iconToRight " data-bind="ntsIcon: { no: 153, width: 15, height: 20 }"></i></button>
+									<button id = "A13" class="toLeft inline" data-bind="click : toLeft"> <i class="iconToLeft" data-bind="ntsIcon : { no: 152, width: 15, height: 20 }"></i></button>
+									<div style="display: inline-block;" data-bind="if: showA11">
+										<button id = "A14" class="toRight inline" data-bind="click: toRight"><i class="iconToRight " data-bind="ntsIcon: { no: 153, width: 15, height: 20 }"></i></button>
+									</div>
 								</div>
 								<div style="clear: left"></div>
 								<div id = "sub-content-main">
-									<div style="float: left">
-										<button class="toDown inline" data-bind="click : toDown"><i class="iconToDown" data-bind="ntsIcon : { no: 150,width: 18, height: 20 }"></i></button>
+									<div style="float: left;width: 28px; height: 349px;">
+										<div data-bind="if: showA12">
+											<button class="toDown inline" data-bind="click : toDown"><i class="iconToDown" data-bind="ntsIcon : { no: 150,width: 15, height: 20 }"></i></button>
+										</div>
 									</div>
 									<div id="extable-outside" style="float: left">
 										<div id="extable"></div>
@@ -453,6 +423,29 @@
 									</div>
 								</div>
 							</div>
+						</div>
+					</div>
+				</div>
+				<div id="cacheDiv">
+					<div id="vertDiv" style="display: none; text-align: left;">
+						<div id="vertComboBox" data-bind="ntsComboBox: {
+										options: useCategoriesPersonal,
+										optionsValue: 'value',
+										optionsText: 'localizedName',
+										value: useCategoriesPersonalValue,
+										visibleItemsCount: 10 }">
+						</div>
+					</div>
+					<div id="horzDiv" style="display: none; text-align: left;">
+						<div id="horzComboBox" style="width: 145px;" data-bind="ntsComboBox: {
+										options: useCategoriesWorkplace,
+										optionsValue: 'value',
+										optionsText: 'localizedName',
+										value: useCategoriesWorkplaceValue,
+										visibleItemsCount: 6 }">
+						</div>
+						<div style="display: inline-block; vertical-align: top;" class="small" data-bind="if: showA12_2">
+							<button data-bind="click: clickA12_2">#{i18n.getText('KSU001_323')}</button>
 						</div>
 					</div>
 				</div>

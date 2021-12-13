@@ -12,11 +12,6 @@ import nts.uk.shr.com.context.AppContexts;
  * The Class JpaFourWeekFourHolidayNumberSettingSetMemento.
  */
 public class JpaFourWeekFourHolidayNumberSettingSetMemento implements FourWeekFourHolidayNumberSettingSetMemento{
-	/** The Constant TRUE_VALUE. */
-	private final static int TRUE_VALUE = 1;
-	
-	/** The Constant FALSE_VALUE. */
-	private final static int FALSE_VALUE = 0;
 	
 	/** The kshmt fourweekfour hd numb set. */
 	private Kshmt4w4dNumSet kshmtFourweekfourHdNumbSet;
@@ -40,11 +35,7 @@ public class JpaFourWeekFourHolidayNumberSettingSetMemento implements FourWeekFo
 	 */
 	@Override
 	public void setIsOneWeekHoliday(boolean isOneWeekHoliday) {
-		if(isOneWeekHoliday){
-			this.kshmtFourweekfourHdNumbSet.setIsOneWeekHd(TRUE_VALUE);
-		} else {
-			this.kshmtFourweekfourHdNumbSet.setIsOneWeekHd(FALSE_VALUE);
-		}
+		this.kshmtFourweekfourHdNumbSet.setOneWeekHd(isOneWeekHoliday);
 	}
 
 	/**
@@ -67,11 +58,7 @@ public class JpaFourWeekFourHolidayNumberSettingSetMemento implements FourWeekFo
 	 */
 	@Override
 	public void setIsFourWeekHoliday(boolean isFourWeekHoliday) {
-		if(isFourWeekHoliday){
-			this.kshmtFourweekfourHdNumbSet.setIsFourWeekHd(TRUE_VALUE);
-		} else {
-			this.kshmtFourweekfourHdNumbSet.setIsFourWeekHd(FALSE_VALUE);
-		}
+		this.kshmtFourweekfourHdNumbSet.setFourWeekHd(isFourWeekHoliday);
 	}
 
 	/**

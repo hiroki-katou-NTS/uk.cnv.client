@@ -1,0 +1,66 @@
+.view-l .working{
+    padding-left: 63px;
+}
+
+.view-l .title {
+    font-weight: bold;
+    font-size: 16px;
+    padding-left: 54px;
+    padding-bottom: 5px;
+    color: #C6C6D1;
+}
+
+.view-l .content {
+    margin-top: 20px;
+}
+
+.view-l .content .btn-back {
+    float: left;
+    padding-top: 125px;
+    padding-bottom: 143px;
+    width: 52.97px;
+}
+
+.view-l .content .btn-next {
+    padding-top: 125px;
+    width: 0;
+}
+
+.view-l .content .task {
+    float: left;
+    height: 288px;
+    width: 511px;
+    padding-left: 10px;
+}
+
+.view-l .content .task .column {
+    width: calc((100% - 20px) / 2);
+    float: left;
+}
+
+.view-l .content .task .column:not(:first-child) {
+    margin-left: 10px;
+}
+
+.view-l .content .task .column button {
+    width: 100%;
+    box-sizing: border-box;
+    height: 85px;
+    white-space: normal;
+    overflow: hidden;
+    font-size: 16px;
+    vertical-align: middle;
+    border-radius: 8px;
+}
+
+.view-l .content .task .column button:not(:first-child) {
+    margin-top: 10px;
+}
+
+.functions-area button {
+	margin-left: 0 !important;
+}
+
+#contents-area {
+    height: auto !important;
+}

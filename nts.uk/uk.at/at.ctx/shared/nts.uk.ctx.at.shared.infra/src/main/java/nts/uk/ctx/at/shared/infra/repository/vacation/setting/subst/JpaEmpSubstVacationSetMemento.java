@@ -4,12 +4,12 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.infra.repository.vacation.setting.subst;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.subst.EmpSubstVacationSetMemento;
-import nts.uk.ctx.at.shared.dom.vacation.setting.subst.SubstVacationSetting;
 import nts.uk.ctx.at.shared.infra.entity.vacation.setting.subst.KsvstEmpSubstVacation;
 import nts.uk.ctx.at.shared.infra.entity.vacation.setting.subst.KsvstEmpSubstVacationPK;
-import nts.uk.ctx.at.shared.infra.entity.vacation.setting.subst.KsvstSubstVacationSetting;
 
 /**
  * The Class JpaEmpSubstVacationSetMemento.
@@ -67,7 +67,7 @@ public class JpaEmpSubstVacationSetMemento implements EmpSubstVacationSetMemento
 
 	@Override
 	public void setManageDistinct(ManageDistinct manageDistinct) {
-		this.typeValue.setManageAtr(manageDistinct.value);
+		this.typeValue.setManageAtr(BooleanUtils.toBoolean(manageDistinct.value));
 		
 	}
 

@@ -2,12 +2,14 @@ package nts.uk.ctx.at.function.infra.repository.processexecution;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
 import javax.ejb.Stateless;
 
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.arc.layer.infra.data.database.DatabaseProduct;
 import nts.arc.time.GeneralDateTime;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.function.dom.processexecution.executionlog.ProcessExecutionLogHistory;
@@ -91,7 +93,7 @@ public class JpaProcessExecutionLogHistRepository extends JpaRepository implemen
 		try {
 			String updateTableSQL = " UPDATE KFNDT_AUTOEXEC_LOG_HIST SET"
 					+ " OVERALL_STATUS = ?" 
-					+ " ,ERROR_DETAIL = ? "
+					+ " ,ERROR_DETAIL = CAST(? as numeric) "
 					+ " ,LAST_EXEC_DATETIME = ? " 
 					+ " ,SCH_CREATE_START = ?" 
 					+ " ,SCH_CREATE_END = ?"
@@ -102,13 +104,17 @@ public class JpaProcessExecutionLogHistRepository extends JpaRepository implemen
 					+ " ,RFL_APPR_START = ?"
 					+ " ,RFL_APPR_END = ?"
 					+ " ,LAST_END_EXEC_DATETIME = ?"
-					+ " ,ERROR_SYSTEM = ?"
-					+ " ,ERROR_BUSINESS = ?"
+					+ " ,ERROR_SYSTEM = CAST(? as numeric)"
+					+ " ,ERROR_BUSINESS = CAST(? as numeric)"
 					+ " WHERE CID = ? AND EXEC_ITEM_CD = ? AND EXEC_ID = ?";
 			try (PreparedStatement ps = this.connection().prepareStatement(JDBCUtil.toUpdateWithCommonField(updateTableSQL))) {
 				ps.setInt(1, newEntity.overallStatus);
 				ps.setString(2, newEntity.overallError == null ? null : newEntity.overallError.toString());
-				ps.setString(3, newEntity.lastExecDateTime.toString());
+				if (this.database().is(DatabaseProduct.POSTGRESQL)) {
+					ps.setTimestamp(3, newEntity.lastExecDateTime == null ? null : Timestamp.valueOf(newEntity.lastExecDateTime.localDateTime()));
+				} else {
+					ps.setString(3, newEntity.lastExecDateTime == null ? null : newEntity.lastExecDateTime.toString());
+				}
 				ps.setDate(4, newEntity.schCreateStart ==null?null: Date.valueOf(newEntity.schCreateStart.localDate()));
 				ps.setDate(5, newEntity.schCreateEnd ==null?null: Date.valueOf(newEntity.schCreateEnd.localDate()));
 				ps.setDate(6, newEntity.dailyCreateStart ==null?null: Date.valueOf(newEntity.dailyCreateStart.localDate()));
@@ -117,7 +123,11 @@ public class JpaProcessExecutionLogHistRepository extends JpaRepository implemen
 				ps.setDate(9, newEntity.dailyCalcEnd ==null?null: Date.valueOf(newEntity.dailyCalcEnd.localDate()));
 				ps.setDate(10, newEntity.reflectApprovalResultStart ==null?null: Date.valueOf(newEntity.reflectApprovalResultStart.localDate()));
 				ps.setDate(11, newEntity.reflectApprovalResultEnd ==null?null: Date.valueOf(newEntity.reflectApprovalResultEnd.localDate()));
-				ps.setString(12, newEntity.lastEndExecDateTime ==null?null:newEntity.lastEndExecDateTime.toString());
+				if (this.database().is(DatabaseProduct.POSTGRESQL)) {
+					ps.setTimestamp(12, newEntity.lastEndExecDateTime == null ? null : Timestamp.valueOf(newEntity.lastEndExecDateTime.localDateTime()));
+				} else {
+					ps.setString(12, newEntity.lastEndExecDateTime == null ? null : newEntity.lastEndExecDateTime.toString());
+				}
 				ps.setString(13, newEntity.errorSystem == null?null:(newEntity.errorSystem ==1?"1":"0"));
 				ps.setString(14, newEntity.errorBusiness == null?null:(newEntity.errorBusiness ==1?"1":"0"));
 				ps.setString(15, domain.getCompanyId());
@@ -132,15 +142,19 @@ public class JpaProcessExecutionLogHistRepository extends JpaRepository implemen
 		try {
 			for(KfnmtExecutionTaskLog kfnmtExecutionTaskLog : newEntity.taskLogList) {
 				String updateTableSQL = " UPDATE KFNDT_AUTOEXEC_TASK_LOG SET"
-						+ " STATUS = ?"
+						+ " STATUS = CAST(? as numeric)"
 						+ " ,LAST_END_EXEC_DATETIME = ?"
-						+ " ,ERROR_SYSTEM = ?"
-						+ " ,ERROR_BUSINESS = ?"
+						+ " ,ERROR_SYSTEM = CAST(? as numeric)"
+						+ " ,ERROR_BUSINESS = CAST(? as numeric)"
 						+ " , ERROR_SYSTEM_CONT = ?"
 						+ " WHERE CID = ? AND EXEC_ITEM_CD = ? AND EXEC_ID = ? AND TASK_ID = ? ";
 				try (PreparedStatement ps = this.connection().prepareStatement(JDBCUtil.toUpdateWithCommonField(updateTableSQL))) {
 					ps.setString(1, kfnmtExecutionTaskLog.status ==null?null:kfnmtExecutionTaskLog.status.toString());
-					ps.setString(2, kfnmtExecutionTaskLog.lastEndExecDateTime ==null?null:kfnmtExecutionTaskLog.lastEndExecDateTime.toString());
+					if (this.database().is(DatabaseProduct.POSTGRESQL)) {
+						ps.setTimestamp(2, kfnmtExecutionTaskLog.lastEndExecDateTime == null ? null : Timestamp.valueOf(kfnmtExecutionTaskLog.lastEndExecDateTime.localDateTime()));
+					} else {
+						ps.setString(2, kfnmtExecutionTaskLog.lastEndExecDateTime == null ? null : kfnmtExecutionTaskLog.lastEndExecDateTime.toString());
+					}
 					ps.setString(3, kfnmtExecutionTaskLog.errorSystem == null?null:(kfnmtExecutionTaskLog.errorSystem ==1?"1":"0"));
 					ps.setString(4, kfnmtExecutionTaskLog.errorBusiness == null?null:(kfnmtExecutionTaskLog.errorBusiness ==1?"1":"0"));
 					ps.setString(5, kfnmtExecutionTaskLog.errorSystemDetail == null?null:(kfnmtExecutionTaskLog.errorSystemDetail));

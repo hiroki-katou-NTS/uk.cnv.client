@@ -42,5 +42,9 @@ public class ScheduleOfShiftDto {
 	
 	//để check điều kiện ※Aa2
 	public boolean isActive;
-
+	
+	// chưa bao gồm điều kiện 対象の日 < A画面パラメータ. 修正可能開始日　の場合 => check dưới UI
+	public boolean conditionAa1; 
+	public boolean conditionAa2;
+	
 }

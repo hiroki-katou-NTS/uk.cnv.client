@@ -165,7 +165,7 @@ public class KscdtSchBasicInfo extends ContractUkJpaEntity {
 		// 勤務予定.勤務情報.勤務実績の勤務情報
 		WorkInformation workInformation = workInfoOfDaily.getRecordInfo();
 
-		KscdtSchTime kscdtSchTimes = workSchedule.getOptAttendanceTime().isPresent() ? KscdtSchTime.toEntity(workSchedule.getOptAttendanceTime().get().getActualWorkingTimeOfDaily(), sID, yMD, cID) : null;
+		KscdtSchTime kscdtSchTimes = workSchedule != null ? KscdtSchTime.toEntity(workSchedule, cID) : null;
 
 		// 勤務予定.休憩時間帯
 		List<KscdtSchEditState> kscdtEditStates = workSchedule.getLstEditState().stream()
@@ -263,7 +263,7 @@ public class KscdtSchBasicInfo extends ContractUkJpaEntity {
 			breakTimeSheets.add(timeSheet);
 
 		});
-		BreakTimeOfDailyAttd dailyAttd = new BreakTimeOfDailyAttd(breakTimeSheets);
+		BreakTimeOfDailyAttd breakTime = new BreakTimeOfDailyAttd(breakTimeSheets);
 
 		// create List<EditStateOfDailyAttd>
 		List<EditStateOfDailyAttd> lstEditState = editStates.stream().map(mapper-> new EditStateOfDailyAttd(mapper.getPk().getAtdItemId(),EnumAdaptor.valueOf(mapper.getSditState(), EditStateSetting.class))).collect(Collectors.toList());
@@ -300,16 +300,23 @@ public class KscdtSchBasicInfo extends ContractUkJpaEntity {
 					new TimeWithDayAttr(x.getShortTimeTsStart()), new TimeWithDayAttr(x.getShortTimeTsEnd()));
 			shortWorkingTimeSheets.add(shortWorkingTimeSheet);
 		});
-
-		ActualWorkingTimeOfDaily actualWorkingTimeOfDaily = kscdtSchTime != null ? kscdtSchTime.toDomain(sID, yMD) : null;
+		WorkSchedule workSch = kscdtSchTime != null ? kscdtSchTime.toDomain(sID, yMD) : null;
+		ActualWorkingTimeOfDaily actualWorkingTimeOfDaily = workSch.getOptAttendanceTime().isPresent() ? workSch.getOptAttendanceTime().get().getActualWorkingTimeOfDaily() : null;
 		WorkScheduleTimeOfDaily scheduleTimeOfDaily = new WorkScheduleTimeOfDaily(new WorkScheduleTime(new AttendanceTime(0), new AttendanceTime(0), new AttendanceTime(0)), new AttendanceTime(0));
+		
 		AttendanceTimeOfDailyAttendance attendance = null;
+		TaskSchedule taskSchedule = TaskSchedule.createWithEmptyList();
 		StayingTimeOfDaily stayingTime = new StayingTimeOfDaily(new AttendanceTimeOfExistMinus(0), new AttendanceTimeOfExistMinus(0), new AttendanceTimeOfExistMinus(0), new AttendanceTime(0), new AttendanceTimeOfExistMinus(0));
 		MedicalCareTimeOfDaily medicalCareTime = new MedicalCareTimeOfDaily(WorkTimeNightShift.DAY_SHIFT, new AttendanceTime(0), new AttendanceTime(0), new AttendanceTime(0));
+		
 		if(actualWorkingTimeOfDaily != null) {
 		attendance = new AttendanceTimeOfDailyAttendance(
 				scheduleTimeOfDaily, actualWorkingTimeOfDaily,
 				stayingTime, new AttendanceTimeOfExistMinus(0), new AttendanceTimeOfExistMinus(0), medicalCareTime);
+		}
+		
+		if(workSch != null) {
+			taskSchedule = workSch.getTaskSchedule();
 		}
 
 		optSortTimeWork = new ShortTimeOfDailyAttd(shortWorkingTimeSheets);
@@ -320,18 +327,19 @@ public class KscdtSchBasicInfo extends ContractUkJpaEntity {
 			List<OutingTimeSheet> outingTimeSheets = kscdtSchGoingOutTs.stream().map(c-> c.toDomain()).collect(Collectors.toList());
 			outingTime = new OutingTimeOfDailyAttd(outingTimeSheets);
 		}
+		
 		return new WorkSchedule(
-				sID,
-				yMD,
-				EnumAdaptor.valueOf(confirmedATR ? 1 : 0, ConfirmedATR.class),
-				workInfo,
-				affInfo,
-				dailyAttd,
-				lstEditState,
-				TaskSchedule.createWithEmptyList(), //TODO Cチームに修正してもらいます。
-				Optional.ofNullable(optTimeLeaving),
-				Optional.ofNullable(attendance),
-				Optional.ofNullable(optSortTimeWork),
+				sID, 
+				yMD, 
+				EnumAdaptor.valueOf(confirmedATR ? 1 : 0 ,ConfirmedATR.class),
+				workInfo, 
+				affInfo, 
+				breakTime, 
+				lstEditState, 
+				taskSchedule, 
+				Optional.ofNullable(optTimeLeaving), 
+				Optional.ofNullable(attendance), 
+				Optional.ofNullable(optSortTimeWork), 
 				Optional.ofNullable(outingTime));
 	}
 

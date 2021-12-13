@@ -104,10 +104,9 @@ public class AppReflectManagerImpl implements AppReflectManager {
 			GeneralDate loopDate = appInfor.getOpAppStartDate().get().getApplicationDate().addDays(i);
 
             Boolean isCalWhenLock = this.executionLogRequestImport.isCalWhenLock(excLogId, 2);
-          //TODO: new Process
 			Pair<Optional<OneDayReflectStatusOutput>, Optional<AtomTask>> resultAfterReflect = ReflectionProcess
 					.process(createRequireReflectionProcess.createImpl(), companyID, appInfor,
-							isCalWhenLock == null ? false : isCalWhenLock, loopDate, sEmpHistImport);
+							isCalWhenLock == null ? false : isCalWhenLock, loopDate, sEmpHistImport, excLogId);
 			
 			resultAfterReflect.getRight().ifPresent(x -> {
 				x.run();

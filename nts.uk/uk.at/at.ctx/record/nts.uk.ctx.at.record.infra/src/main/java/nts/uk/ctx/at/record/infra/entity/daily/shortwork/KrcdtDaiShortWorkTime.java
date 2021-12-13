@@ -21,6 +21,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.record.dom.actualworkinghours.AttendanceTimeOfDailyPerformance;
 //import nts.uk.ctx.at.record.infra.entity.daily.actualworktime.KrcdtDayAttendanceTime;
@@ -68,22 +70,9 @@ public class KrcdtDaiShortWorkTime extends ContractUkJpaEntity implements Serial
     @Basic(optional = false)
     @NotNull
     @Column(name = "CHILD_CARE_ATR")
-    public int childCareAtr;
-//    @Basic(optional = false)
-//    @NotNull
-//    @Column(name = "TIME")
-//    public int time;
-//    @Basic(optional = false)
-//    @NotNull
-//    @Column(name = "DEDUCTION_TIME")
-//    public int deductionTime;
-    
-//    @ManyToOne
-//	@JoinColumns(value = {
-//			@JoinColumn(name = "SID", referencedColumnName = "SID", insertable = false, updatable = false),
-//			@JoinColumn(name = "YMD", referencedColumnName = "YMD", insertable = false, updatable = false) })
-//	public KrcdtDayAttendanceTime krcdtDayAttendanceTime;
-	@ManyToOne(fetch = FetchType.LAZY)
+    public boolean childCareAtr;
+
+    @ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumns(value = {
 			@JoinColumn(name = "SID", referencedColumnName = "SID", insertable = false, updatable = false),
 			@JoinColumn(name = "YMD", referencedColumnName = "YMD", insertable = false, updatable = false) })
@@ -101,7 +90,7 @@ public class KrcdtDaiShortWorkTime extends ContractUkJpaEntity implements Serial
         this.krcdtDaiShortWorkTimePK = krcdtDaiShortWorkTimePK;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.childCareAtr = childCareAtr;
+        this.childCareAtr = BooleanUtils.toBoolean(childCareAtr);
     }
 
     public KrcdtDaiShortWorkTime(String sid, GeneralDate ymd, int shortWorkTimeFrameNo) {

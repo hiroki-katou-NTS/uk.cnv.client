@@ -4,6 +4,8 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.infra.repository.vacation.setting.compensatoryleave;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensatoryAcquisitionUse;
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensatoryLeaveEmSettingGetMemento;
@@ -57,7 +59,7 @@ public class JpaCompensLeaveEmSettingGetMemento implements CompensatoryLeaveEmSe
      */
     @Override
     public ManageDistinct getIsManaged() {
-        return ManageDistinct.valueOf(this.entity.getManageAtr());
+        return ManageDistinct.valueOf(BooleanUtils.toInteger(this.entity.isManageAtr()));
     }
 
 	@Override

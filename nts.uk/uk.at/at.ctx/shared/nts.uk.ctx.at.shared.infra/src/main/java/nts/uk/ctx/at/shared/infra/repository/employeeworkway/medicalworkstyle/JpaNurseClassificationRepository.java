@@ -75,13 +75,13 @@ public class JpaNurseClassificationRepository extends JpaRepository implements N
 	private NurseClassification toDomain(KscmtNurseLicense ent) {
 		return new NurseClassification(new CompanyId(ent.getKscmtNurseLicensePK().getCompanyId()),
 				new NurseClassifiCode(ent.getKscmtNurseLicensePK().getCode()), new NurseClassifiName(ent.getName()),
-				LicenseClassification.valueOf(ent.getLicenseAtr()), ent.getOfficeWork() == 1);
+				LicenseClassification.valueOf(ent.getLicenseAtr()), ent.isOfficeWork());
 	}
 
 	private KscmtNurseLicense toEntity(NurseClassification domain) {
 		return new KscmtNurseLicense(
 				new KscmtNurseLicensePK(domain.getCompanyId().v(), domain.getNurseClassifiCode().v()),
-				domain.getNurseClassifiName().v(), domain.getLicense().value, domain.isOfficeWorker() ? 1 : 0);
+				domain.getNurseClassifiName().v(), domain.getLicense().value, domain.isOfficeWorker());
 	}
 
 }

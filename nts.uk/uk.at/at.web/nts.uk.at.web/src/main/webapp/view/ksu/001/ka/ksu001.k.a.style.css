@@ -1,0 +1,11 @@
+#preview-frame table {
+    margin: 0 auto;
+}
+
+#preview-frame table td span {
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    font-style: inherit;
+    font-family: inherit;
+}

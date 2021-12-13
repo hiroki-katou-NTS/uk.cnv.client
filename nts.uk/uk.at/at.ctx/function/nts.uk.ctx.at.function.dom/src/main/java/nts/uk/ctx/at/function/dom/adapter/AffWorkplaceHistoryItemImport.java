@@ -15,15 +15,14 @@ public class AffWorkplaceHistoryItemImport {
 	// 職場ID
 	private String  workplaceId;
 	
-	/** The normalWorkplaceCode. */
-	// 通常職場コード
-	private String  normalWorkplaceId;
+//	/** The normalWorkplaceCode. */
+//	// 通常職場コード
+//	private String  normalWorkplaceId;
 
-	public AffWorkplaceHistoryItemImport(String historyId, String workplaceId, String normalWorkplaceId) {
+	public AffWorkplaceHistoryItemImport(String historyId, String workplaceId) {
 		super();
 		this.historyId = historyId;
 		this.workplaceId = workplaceId;
-		this.normalWorkplaceId = normalWorkplaceId;
 	}
 	
 }

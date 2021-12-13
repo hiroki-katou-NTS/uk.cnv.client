@@ -16,7 +16,7 @@ import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.re
  */
 public class AcquireAppReflectHistForCancel {
 
-	public static Optional<ApplicationReflectHistory> process(Require require, ApplicationShare app,
+	public static Optional<AcquireAppReflectHistForCancelOutput> process(Require require, ApplicationShare app,
 			GeneralDate baseDate, ScheduleRecordClassifi classification) {
 
 		// 取消す申請の最新の反映履歴を取得
@@ -27,20 +27,20 @@ public class AcquireAppReflectHistForCancel {
 
 		// 取得した1件目の申請反映履歴を変数にセットする
 		ApplicationReflectHistory appHistLastest = appHists.get(0);
-		ApplicationReflectHistory appHistPrev = appHists.get(0);
+		ApplicationReflectHistory appHistOldestPrev = appHists.get(0);
 
 		// 最新の申請反映履歴より前の申請反映履歴を取得する
 		List<ApplicationReflectHistory> appHistsBeforeLastest = require.findAppReflectHistDateCond(app.getEmployeeID(),
-				baseDate, classification, false, appHistLastest.getReflectionTime());
+				baseDate, classification, false, appHistLastest.getAppExecInfo().getReflectionTime());
 		for (ApplicationReflectHistory appHistBLast : appHistsBeforeLastest) {
 			// 申請IDをチェック
 			if (!appHistBLast.getApplicationId().equals(app.getAppID()))
 				continue;
 			// 処理中の申請反映履歴を変数[反映前の情報を持つ申請反映履歴]にセット
-			appHistPrev = appHistBLast;
+			appHistOldestPrev = appHistBLast;
 		}
 		// [最新の申請反映履歴]と[反映前の情報を持つ申請反映履歴]を返す
-		return Optional.of(appHistPrev);
+		return Optional.of(new AcquireAppReflectHistForCancelOutput(appHistLastest, appHistOldestPrev));
 	}
 
 	public static interface Require {

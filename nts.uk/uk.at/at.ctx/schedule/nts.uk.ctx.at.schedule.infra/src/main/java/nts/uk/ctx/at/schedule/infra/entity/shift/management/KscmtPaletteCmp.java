@@ -12,15 +12,15 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.aspose.pdf.PKCS1;
+import org.apache.commons.lang3.BooleanUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPalette;
+import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPaletteCom;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPaletteDisplayInfor;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPaletteName;
-import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPaletteCom;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftRemarks;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
@@ -48,7 +48,7 @@ public class KscmtPaletteCmp extends ContractUkJpaEntity {
 
 	/** 使用区分 */
 	@Column(name = "USE_ATR")
-	public int useAtr;
+	public boolean useAtr;
 
 	/** 備考 */
 	@Column(name = "NOTE")
@@ -66,7 +66,7 @@ public class KscmtPaletteCmp extends ContractUkJpaEntity {
 	public static KscmtPaletteCmp fromDomain(ShiftPaletteCom shiftPalletsCom) {
 		KscmtPaletteCmpPk pk = new KscmtPaletteCmpPk(AppContexts.user().companyId(), shiftPalletsCom.getPage());
 		return new KscmtPaletteCmp(pk, shiftPalletsCom.getShiftPallet().getDisplayInfor().getShiftPalletName().v(),
-				shiftPalletsCom.getShiftPallet().getDisplayInfor().getShiftPalletAtr().value,
+				BooleanUtils.toBoolean(shiftPalletsCom.getShiftPallet().getDisplayInfor().getShiftPalletAtr().value),
 				shiftPalletsCom.getShiftPallet().getDisplayInfor().getRemarks().v(),
 				shiftPalletsCom.getShiftPallet().getCombinations().stream()
 						.map(x -> KscmtPaletteCmpCombi.fromDomain(x, pk)).collect(Collectors.toList()));
@@ -75,7 +75,7 @@ public class KscmtPaletteCmp extends ContractUkJpaEntity {
 
 	public void toEntity(ShiftPaletteCom shiftPalletsCom) {
 		this.pageName = shiftPalletsCom.getShiftPallet().getDisplayInfor().getShiftPalletName().v();
-		this.useAtr = shiftPalletsCom.getShiftPallet().getDisplayInfor().getShiftPalletAtr().value;
+		this.useAtr = BooleanUtils.toBoolean(shiftPalletsCom.getShiftPallet().getDisplayInfor().getShiftPalletAtr().value);
 		this.note = shiftPalletsCom.getShiftPallet().getDisplayInfor().getRemarks().v();
 
 		cmpCombis.stream().forEach(x -> {
@@ -93,7 +93,7 @@ public class KscmtPaletteCmp extends ContractUkJpaEntity {
 		return new ShiftPaletteCom(AppContexts.user().companyId(), pk.page,
 				new ShiftPalette(
 						new ShiftPaletteDisplayInfor(new ShiftPaletteName(pageName),
-								EnumAdaptor.valueOf(useAtr, NotUseAtr.class), new ShiftRemarks(note)),
+								EnumAdaptor.valueOf(BooleanUtils.toInteger(useAtr), NotUseAtr.class), new ShiftRemarks(note)),
 						cmpCombis.stream().map(x -> x.toDomain()).collect(Collectors.toList())));
 	}
 

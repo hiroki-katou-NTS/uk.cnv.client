@@ -108,10 +108,9 @@ public interface ComDayOffManaDataRepository {
 	 * @return
 	 */
 	List<CompensatoryDayOffManaData> getListComdayOffId(List<String> comDayOffId);
-	
+
 	/** 当月以降の管理データを削除 */
 	void deleteAfter(String sid, boolean unknownDateFlag, GeneralDate target);
 	
 	Optional<CompensatoryDayOffManaData> findBySidAndDate(String sid, GeneralDate date);
-
 }

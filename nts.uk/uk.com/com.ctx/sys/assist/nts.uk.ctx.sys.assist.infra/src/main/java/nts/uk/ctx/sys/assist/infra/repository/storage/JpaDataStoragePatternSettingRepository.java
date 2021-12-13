@@ -7,6 +7,8 @@ import javax.ejb.Stateless;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.sys.assist.dom.storage.DataStoragePatternSetting;
 import nts.uk.ctx.sys.assist.dom.storage.DataStoragePatternSettingRepository;
@@ -30,7 +32,7 @@ public class JpaDataStoragePatternSettingRepository extends JpaRepository
 	@Transactional(value = TxType.REQUIRES_NEW)
 	public Optional<DataStoragePatternSetting> findByContractCdAndPatternCdAndPatternAtr(String contractCd,
 			String patternCd, int patternAtr) {
-		return this.queryProxy().find(new SspmtDataStoragePatternSettingPk(contractCd, patternAtr, patternCd),
+		return this.queryProxy().find(new SspmtDataStoragePatternSettingPk(contractCd, BooleanUtils.toBoolean(patternAtr), patternCd),
 				SspmtDataStoragePatternSetting.class).map(DataStoragePatternSetting::createFromMemento);
 	}
 
@@ -67,7 +69,7 @@ public class JpaDataStoragePatternSettingRepository extends JpaRepository
 	@Override
 	public void delete(String contractCd, String patternCd, int patternAtr) {
 		this.commandProxy().remove(SspmtDataStoragePatternSetting.class,
-								   new SspmtDataStoragePatternSettingPk(contractCd, patternAtr, patternCd));
+								   new SspmtDataStoragePatternSettingPk(contractCd, BooleanUtils.toBoolean(patternAtr), patternCd));
 	}
 
 	private SspmtDataStoragePatternSetting toEntity(DataStoragePatternSetting domain) {

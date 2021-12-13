@@ -3,6 +3,7 @@ package nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnum
 import java.util.Optional;
 
 import nts.arc.time.GeneralDate;
+import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.rsvleamanager.rsvimport.RsvLeaCriterialDate;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.rsvleamanager.rsvimport.RsvLeaManagerImport;
 
 public interface ReserveLeaveManagerApdater {
@@ -13,4 +14,6 @@ public interface ReserveLeaveManagerApdater {
 	 * @return
 	 */
 	Optional<RsvLeaManagerImport> getRsvLeaveManager(String employeeID, GeneralDate referDate);
+
+	Optional<RsvLeaCriterialDate> getRsvLeaveManagerData(String employeeID, GeneralDate referDate);
 }

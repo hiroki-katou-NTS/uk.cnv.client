@@ -6,7 +6,6 @@ import nts.uk.ctx.at.function.dom.alarm.extractionrange.EndDate;
 import nts.uk.ctx.at.function.dom.alarm.extractionrange.PreviousClassification;
 import nts.uk.ctx.at.function.dom.alarm.extractionrange.StartDate;
 import nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.EndSpecify;
-import nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.SpecifiedMonth;
 import nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.StartSpecify;
 import nts.uk.ctx.at.function.dom.alarmworkplace.ExtractionPeriodDaily;
 

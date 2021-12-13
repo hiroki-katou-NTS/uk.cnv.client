@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import lombok.Getter;
 import nts.arc.layer.dom.objecttype.DomainAggregate;
 import nts.arc.task.tran.AtomTask;
@@ -17,11 +15,6 @@ import nts.uk.ctx.at.record.dom.reservation.bento.ReservationDate;
 import nts.uk.ctx.at.record.dom.reservation.bento.ReservationRegisterInfo;
 import nts.uk.ctx.at.record.dom.reservation.bentomenu.closingtime.ReservationClosingTimeFrame;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.ContractCode;
-import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampTypeDisplay;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonType;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ReservationArt;
 import nts.uk.shr.com.net.Ipv4Address;
 
 /**
@@ -106,20 +99,19 @@ public class EmpInfoTerminal implements DomainAggregate {
 		this.empInfoTerMemo = builder.empInfoTerMemo;
 	}
 
+
 	// [２] 予約
-	public Pair<StampRecord, AtomTask> createReservRecord(ConvertTimeRecordReservationService.Require require,
+	public AtomTask createReservRecord(ConvertTimeRecordReservationService.Require require,
 			ReservationReceptionData reservReceptData) {
-		StampRecord stampRecord = createStampRecord(reservReceptData);
-		AtomTask createReserv = createReserv(require, reservReceptData);
-		return Pair.of(stampRecord, createReserv);
+		return createReserv(require, reservReceptData);
 	}
 
 	// [pvt-2] 予約の打刻記録を作成
-	private StampRecord createStampRecord(ReservationReceptionData reservReceptData) {
-		ButtonType bt = new ButtonType(ReservationArt.RESERVATION, Optional.empty());
-		return new StampRecord(new ContractCode(contractCode.v()), new StampNumber(reservReceptData.getIdNumber()),
-				reservReceptData.getDateTime(), new StampTypeDisplay(bt.getStampTypeDisplay()));
-	}
+//	private StampRecord createStampRecord(ReservationReceptionData reservReceptData) {
+//		ButtonType bt = new ButtonType(ReservationArt.RESERVATION, Optional.empty());
+//		return new StampRecord(new ContractCode(contractCode.v()), new StampNumber(reservReceptData.getIdNumber()),
+//				reservReceptData.getDateTime(), new StampTypeDisplay(bt.getStampTypeDisplay()));
+//	}
 
 	// [pvt-3] 弁当予約を作成
 	private AtomTask createReserv(ConvertTimeRecordReservationService.Require require,

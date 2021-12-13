@@ -1,12 +1,16 @@
 package nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import nts.arc.diagnose.stopwatch.concurrent.ConcurrentStopwatches;
 import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.layer.dom.AggregateRoot;
 import nts.arc.time.GeneralDate;
@@ -16,16 +20,21 @@ import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.shared.dom.common.days.AttendanceDaysMonth;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.OuenWorkTimeOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.OuenWorkTimeSheetOfDailyAttendance;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.MonthlyAggregationErrorInfo;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.roundingset.RoundingSetOfMonthly;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.work.MonAggrCompanySettings;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.work.MonAggrEmployeeSettings;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.work.MonthlyCalculatingDailys;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.work.MonthlyOldDatas;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.work.excessoutside.ExcessOutsideWorkMng;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.calc.MonthlyAggregateAtr;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.calc.MonthlyCalculation;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.excessoutside.ExcessOutsideWorkOfMonthly;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.ouen.OuenTimeOfMonthly;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.ouen.aggframe.OuenAggregateFrameSetOfMonthly;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.totalcount.TotalCountByPeriod;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.verticaltotal.VerticalTotalOfMonthly;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.weekly.AttendanceTimeOfWeekly;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingConditionItem;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureId;
 import nts.uk.shr.com.context.AppContexts;
@@ -213,6 +222,148 @@ public class AttendanceTimeOfMonthly extends AggregateRoot implements Serializab
 		});
 		
 		this.ouenTime = ouen;
+	}
+	
+	/**
+	 * 月別実績の勤怠時間を集計
+	 *
+	 * @param monthPeriod 月の期間
+	 * @param anyItemCustomizeValue 任意項目カスタマイズ値
+	 */
+	public List<AttendanceTimeOfWeekly> aggregateAttendanceTime(RequireM3 require, CacheCarrier cacheCarrier,
+			String cid, DatePeriod datePeriod, WorkingConditionItem workingConditionItem,
+			MonAggrCompanySettings companySets, MonAggrEmployeeSettings employeeSets,
+			MonthlyCalculatingDailys monthlyCalculatingDailys, MonthlyOldDatas monthlyOldDatas,
+			Map<String, MonthlyAggregationErrorInfo> errorInfos) {
+
+		List<AttendanceTimeOfWeekly> attendanceTimeWeeks = new ArrayList<>();
+
+		// 週Noを確認する
+		Map<YearMonth, Integer> weekNoMap = new HashMap<>();
+		weekNoMap.putIfAbsent(this.yearMonth, 0);
+		val startWeekNo = weekNoMap.get(this.yearMonth) + 1;
+
+		// 労働制を確認する
+		val workingSystem = workingConditionItem.getLaborSystem();
+
+		ConcurrentStopwatches.start("12210:集計準備：");
+
+		// 月別実績の勤怠時間 初期設定
+		this.prepareAggregation(require, cacheCarrier, cid, datePeriod,
+				workingConditionItem, startWeekNo, companySets, employeeSets, monthlyCalculatingDailys,
+				monthlyOldDatas);
+		if (this.monthlyCalculation.getErrorInfos().size() > 0) {
+			for (val errorInfo : this.monthlyCalculation.getErrorInfos()) {
+				errorInfos.putIfAbsent(errorInfo.getResourceId(), errorInfo);
+			}
+			return attendanceTimeWeeks;
+		}
+
+		ConcurrentStopwatches.stop("12210:集計準備：");
+		ConcurrentStopwatches.start("12220:月の計算：");
+
+		// 月の計算
+		this.monthlyCalculation.aggregate(require, cacheCarrier, datePeriod, MonthlyAggregateAtr.MONTHLY, Optional.empty(),
+				Optional.empty(), Optional.empty());
+
+		ConcurrentStopwatches.stop("12220:月の計算：");
+		ConcurrentStopwatches.start("12230:縦計：");
+
+		// 縦計
+		{
+			// 週単位の期間を取得
+			for (val attendanceTimeWeek : this.monthlyCalculation.getAttendanceTimeWeeks()) {
+				DatePeriod weekPeriod = attendanceTimeWeek.getPeriod();
+
+				// 週の縦計
+				val verticalTotalWeek = attendanceTimeWeek.getVerticalTotal();
+				verticalTotalWeek.verticalTotal(require, cid, this.employeeId, weekPeriod,
+						workingSystem, companySets, employeeSets, monthlyCalculatingDailys);
+			}
+
+			// 月の縦計
+			this.verticalTotal.verticalTotal(require, cid, this.employeeId, datePeriod, workingSystem,
+					companySets, employeeSets, monthlyCalculatingDailys);
+		}
+
+		ConcurrentStopwatches.stop("12230:縦計：");
+		ConcurrentStopwatches.start("12240:時間外超過：");
+
+		// 時間外超過
+		ExcessOutsideWorkMng excessOutsideWorkMng = new ExcessOutsideWorkMng(monthlyCalculation);
+		excessOutsideWorkMng.aggregate(require, cacheCarrier);
+		if (excessOutsideWorkMng.getErrorInfos().size() > 0) {
+			for (val errorInfo : excessOutsideWorkMng.getErrorInfos()) {
+				errorInfos.putIfAbsent(errorInfo.getResourceId(), errorInfo);
+			}
+		}
+		this.setExcessOutsideWork(excessOutsideWorkMng.getExcessOutsideWork());
+
+		ConcurrentStopwatches.stop("12240:時間外超過：");
+		ConcurrentStopwatches.start("12250:回数集計：");
+
+		// 回数集計
+		{
+			// 週単位の期間を取得
+			for (val attendanceTimeWeek : this.monthlyCalculation.getAttendanceTimeWeeks()) {
+				DatePeriod weekPeriod = attendanceTimeWeek.getPeriod();
+
+				// 週の回数集計
+				val totalCountWeek = attendanceTimeWeek.getTotalCount();
+				totalCountWeek.totalize(require, cid, this.employeeId, weekPeriod, companySets,
+						monthlyCalculatingDailys);
+				if (totalCountWeek.getErrorInfos().size() > 0) {
+					for (val errorInfo : totalCountWeek.getErrorInfos()) {
+						errorInfos.putIfAbsent(errorInfo.getResourceId(), errorInfo);
+					}
+				}
+			}
+
+			// 月の回数集計
+			this.totalCount.totalize(require, cid, this.employeeId, datePeriod, companySets,
+					monthlyCalculatingDailys);
+			if (this.totalCount.getErrorInfos().size() > 0) {
+				for (val errorInfo : totalCount.getErrorInfos()) {
+					errorInfos.putIfAbsent(errorInfo.getResourceId(), errorInfo);
+				}
+			}
+		}
+
+		ConcurrentStopwatches.stop("12250:回数集計：");
+
+		// 集計結果を返す
+		for (val attendanceTimeWeek : this.monthlyCalculation.getAttendanceTimeWeeks()) {
+			val nowWeekNo = weekNoMap.get(this.yearMonth);
+			if (nowWeekNo < attendanceTimeWeek.getWeekNo()) {
+				weekNoMap.put(this.yearMonth, attendanceTimeWeek.getWeekNo());
+			}
+			attendanceTimeWeeks.add(attendanceTimeWeek);
+		}
+		return attendanceTimeWeeks;
+	}
+	
+	/** 計算必要な項目を再度計算 */
+	public void recalcSomeItem() {
+
+		// 残業合計時間を集計する
+		this.monthlyCalculation.getAggregateTime().getOverTime().recalcTotal();
+
+		// 休出合計時間を集計する
+		this.monthlyCalculation.getAggregateTime().getHolidayWorkTime().recalcTotal();
+
+		// 総労働時間と36協定時間の再計算
+		this.monthlyCalculation.recalcTotal();
+		
+		/** フレックス時間の再計算 */
+		this.monthlyCalculation.getFlexTime().recalcFlexTime();
+		
+		/** 縦計項目の再集計 */
+		this.verticalTotal.getWorkDays().recalcSomeItem();
+	}
+
+	public static interface RequireM3 extends RequireM1, TotalCountByPeriod.RequireM1,
+		MonthlyCalculation.RequireM4, VerticalTotalOfMonthly.RequireM1, ExcessOutsideWorkMng.RequireM5, RoundingSetOfMonthly.Require {
+
 	}
 	
 	public static interface RequireM2 extends OuenTimeOfMonthly.RequireM1 {

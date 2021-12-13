@@ -1,5 +1,6 @@
 package nts.uk.ctx.at.request.dom.applicationreflect.algorithm.checkprocess;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,7 @@ import nts.uk.ctx.at.request.dom.application.common.adapter.workplace.Employment
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.checkprocess.CheckAchievementConfirmation.ConfirmClsStatus;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.checkprocess.PreCheckProcessWorkSchedule.PreCheckProcessResult;
 import nts.uk.ctx.at.request.dom.applicationreflect.object.ReflectStatusResult;
+import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 
 /**
@@ -28,11 +30,13 @@ public class PreCheckProcessWorkRecord {
 	public static PreCheckProcessResult preCheck(Require require, String companyId, Application application,
 			int closureId, boolean isCalWhenLock, ReflectStatusResult reflectStatus, GeneralDate targetDate, List<SEmpHistImport> empHist) {
 
+
 		// ロック中処理のチェック
 		List<DatePeriod> periodLst = require.getPeriodProcess(application.getEmployeeID(),
 				new DatePeriod(targetDate, targetDate),
 				empHist.stream().map(x -> new EmploymentHistoryImported(x.getEmployeeId(), x.getEmploymentCode(),
 						x.getPeriod())).collect(Collectors.toList()),
+
 				isCalWhenLock ? IgnoreFlagDuringLockImport.CAN_CAL_LOCK : IgnoreFlagDuringLockImport.CANNOT_CAL_LOCK,
 				AchievementAtrImport.DAILY);
 		if (periodLst.isEmpty()) {
@@ -43,7 +47,7 @@ public class PreCheckProcessWorkRecord {
 
 		// 事前の残業申請かどうかチェック
 		if (application.getAppType() == ApplicationType.OVER_TIME_APPLICATION
-				&& application.getPrePostAtr() == PrePostAtr.PREDICT) {
+				&& application.getPrePostAtr() == PrePostAtr.PREDICT  && AppContexts.optionLicense().customize().ootsuka()) {
 			return new PreCheckProcessResult(NotUseAtr.USE, reflectStatus);
 		}
 

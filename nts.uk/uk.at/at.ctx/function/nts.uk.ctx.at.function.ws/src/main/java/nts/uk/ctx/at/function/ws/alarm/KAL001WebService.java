@@ -87,6 +87,12 @@ public class KAL001WebService {
 	}
 	
 	@POST
+	@Path("processingym")
+	public int getProcessingym(){
+		return checkConditionFinder.getProcessingYm();
+	}
+	
+	@POST
 	@Path("extract/alarm")
 	public AsyncTaskInfo extractAlarm(ErrorAlarmListCommand command) {
 		return extractAlarmHandler.handle(command);

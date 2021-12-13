@@ -23,11 +23,19 @@ public class XimmtReviseItemPK implements Serializable{
 	
 	@Column(name = "SETTING_CODE")
 	private String settingCode;
+
+	/* 受入グループID */
+	@Column(name = "DOMAIN_ID")
+	private int domainId;
 	
 	@Column(name = "ITEM_NO")
 	private int itemNo;
 	
 	public static XimmtReviseItemPK of(ReviseItem domain) {
-		return new XimmtReviseItemPK(domain.getCompanyId(), domain.getSettingCode().v(), domain.getItemNo());
+		return new XimmtReviseItemPK(
+				domain.getCompanyId(),
+				domain.getSettingCode().v(),
+				domain.getDomainId().value,
+				domain.getItemNo());
 	}
 }

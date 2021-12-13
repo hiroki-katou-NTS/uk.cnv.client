@@ -10,6 +10,8 @@ import nts.uk.ctx.sys.auth.dom.role.RoleGetMemento;
 import nts.uk.ctx.sys.auth.dom.role.RoleName;
 import nts.uk.ctx.sys.auth.dom.role.RoleType;
 
+import java.util.Optional;
+
 @Data
 public class SavePersonRoleCommand  {
 	
@@ -91,6 +93,11 @@ public class SavePersonRoleCommand  {
 		public String getCompanyId() {
 			return this.companyId;		
 		}
-		
+
+		@Override
+		public Optional<Boolean> getApprovalAuthority() {
+			return Optional.empty();
+		}
+
 	}
 }

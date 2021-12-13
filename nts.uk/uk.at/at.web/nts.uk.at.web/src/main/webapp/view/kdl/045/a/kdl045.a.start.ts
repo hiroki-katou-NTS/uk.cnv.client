@@ -35,7 +35,7 @@ module nts.uk.at.view.kdl045.a {
                 dismissible: true
             });
 
-            $('.show-popup-atwork1').click(function() {
+            $('.show-popup-atwork1').hover(function() {
                 $('.popup-atwork1').ntsPopup("toggle");
             });
 
@@ -50,7 +50,7 @@ module nts.uk.at.view.kdl045.a {
                 dismissible: true
             });
 
-            $('.show-popup-atwork2').click(function() {
+            $('.show-popup-atwork2').hover(function() {
                 $('.popup-atwork2').ntsPopup("toggle");
             });
 
@@ -65,7 +65,7 @@ module nts.uk.at.view.kdl045.a {
                 dismissible: true
             });
 
-            $('.show-popup-offwork1').click(function() {
+            $('.show-popup-offwork1').hover(function() {
                 $('.popup-offwork1').ntsPopup("toggle");
             });
 
@@ -80,7 +80,7 @@ module nts.uk.at.view.kdl045.a {
                 dismissible: true
             });
 
-            $('.show-popup-offwork2').click(function() {
+            $('.show-popup-offwork2').hover(function() {
                 $('.popup-offwork2').ntsPopup("toggle");
             });
 
@@ -95,7 +95,7 @@ module nts.uk.at.view.kdl045.a {
                 dismissible: true
             });
 
-            $('.show-popup-privatetime').click(function() {
+            $('.show-popup-privatetime').hover(function() {
                 $('.popup-privatetime').ntsPopup("toggle");
             });
 
@@ -110,37 +110,37 @@ module nts.uk.at.view.kdl045.a {
                 dismissible: true
             });
 
-            $('.show-popup-uniontime').click(function() {
+            $('.show-popup-uniontime').hover(function() {
                 $('.popup-uniontime').ntsPopup("toggle");
             });
 
             //privatetime A8_6_7
             $(".popup-privatetimea867").ntsPopup({
                 position: {
-                    my: "left top",
-                    at: "left bottom",
+                    my: "right top",
+                    at: "right bottom",
                     of: ".show-popup-privatetimea867"
                 },
                 showOnStart: false,
                 dismissible: true
             });
 
-            $('.show-popup-privatetimea867').click(function() {
+            $('.show-popup-privatetimea867').hover(function() {
                 $('.popup-privatetimea867').ntsPopup("toggle");
             });
 
             //uniontime A8_6_7
             $(".popup-uniontimea867").ntsPopup({
                 position: {
-                    my: "left top",
-                    at: "left bottom",
+                    my: "right top",
+                    at: "right bottom",
                     of: ".show-popup-uniontimea867"
                 },
                 showOnStart: false,
                 dismissible: true
             });
 
-            $('.show-popup-uniontimea867').click(function() {
+            $('.show-popup-uniontimea867').hover(function() {
                 $('.popup-uniontimea867').ntsPopup("toggle");
             });
             setTimeout(function() {

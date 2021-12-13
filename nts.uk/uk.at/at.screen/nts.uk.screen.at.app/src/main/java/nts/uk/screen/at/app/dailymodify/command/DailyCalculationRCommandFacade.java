@@ -27,6 +27,7 @@ import nts.uk.ctx.at.record.app.command.dailyperform.month.UpdateMonthDailyParam
 import nts.uk.ctx.at.record.app.find.dailyperform.DailyRecordDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyRecordWorkDto;
 import nts.uk.ctx.at.record.dom.daily.itemvalue.DailyItemValue;
+import nts.uk.ctx.at.shared.app.command.scherec.monthlyattendanceitem.RegisterPastMonthTotalResult;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.AttendanceItemUtil;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.AttendanceItemUtil.AttendanceItemType;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
@@ -84,6 +85,9 @@ public class DailyCalculationRCommandFacade {
 	
 	@Inject
 	private ProcessMonthScreen processMonthScreen;
+	
+	@Inject
+	private RegisterPastMonthTotalResult registerPastMonthTotalResult;
 	
 	public static final int MINUTES_OF_DAY = 24 * 60;
 
@@ -183,7 +187,7 @@ public class DailyCalculationRCommandFacade {
 					new DailyCalcParam(mapSidDate, dataParent.getLstNotFoundWorkType(), resultOlds,
 							dataParent.getDateRange(), dataParent.getDailyEdits(), dataParent.getItemValues()),
 					editedDtos, domainOld, dailyItems, querys, monthParam, dataParent.getShowDialogError(),
-					executionType);
+					executionType,dataParent.getCheckUnLock());
 			if (dailyCalcResult.getResultUI() == null) {
 				return new DailyPerformanceCalculationDto(editedKeep, new ArrayList<>(),
 						new DataResultAfterIU(dailyCalcResult.getDataResultAfterIU().getErrorMap(), flexShortage, false,
@@ -239,28 +243,36 @@ public class DailyCalculationRCommandFacade {
 		// check format display = individual
 		if (dataParent.getMode() == 0 && monthParam != null && monthParam.getNeedCallCalc() != null
 				&& monthParam.getNeedCallCalc()) {
+			
 			// kiem tra co can tinh toan monthly khong, neu can thi tinh lai
 			// 月次集計を実施する必要があるかチェックする
 			// 月別実績の集計
 			DailyCalcResult resultCalcMonth = processMonthlyCalc.processMonthCalc(commandNew, commandOld, editedDomains,
 					dailyItems, monthParam, dataParent.getMonthValue(), errorMonthHoliday, dataParent.getDateRange(),
-					dataParent.getMode(), editFlex);
+					dataParent.getMode(), editFlex,dataParent.getCheckUnLock());
 
 			RCDailyCorrectionResult resultMonth = resultCalcMonth.getResultUI();
 			monthlyResults.addAll(resultMonth.getLstMonthDomain());
-			ErrorAfterCalcDaily errorMonth = resultCalcMonth.getErrorAfterCheck();
-			// map error holiday into result
-			List<DPItemValue> lstItemErrorMonth = errorMonth.getResultErrorMonth().get(TypeError.ERROR_MONTH.value);
-			if (lstItemErrorMonth != null) {
-				List<DPItemValue> itemErrorMonth = resultErrorMonth.get(TypeError.ERROR_MONTH.value);
-				if (itemErrorMonth == null) {
-					resultErrorMonth.put(TypeError.ERROR_MONTH.value, lstItemErrorMonth);
-				} else {
-					lstItemErrorMonth.addAll(itemErrorMonth);
-					resultErrorMonth.put(TypeError.ERROR_MONTH.value, lstItemErrorMonth);
+			if(resultCalcMonth.getErrorAfterCheck() !=null  && resultCalcMonth.getListAggregatePastMonthResult().isEmpty()) {
+				ErrorAfterCalcDaily errorMonth = resultCalcMonth.getErrorAfterCheck();
+				// map error holiday into result
+				List<DPItemValue> lstItemErrorMonth = errorMonth.getResultErrorMonth().get(TypeError.ERROR_MONTH.value);
+				if (lstItemErrorMonth != null) {
+					List<DPItemValue> itemErrorMonth = resultErrorMonth.get(TypeError.ERROR_MONTH.value);
+					if (itemErrorMonth == null) {
+						resultErrorMonth.put(TypeError.ERROR_MONTH.value, lstItemErrorMonth);
+					} else {
+						lstItemErrorMonth.addAll(itemErrorMonth);
+						resultErrorMonth.put(TypeError.ERROR_MONTH.value, lstItemErrorMonth);
+					}
 				}
+				flexShortage = errorMonth.getFlexShortage();
 			}
-			flexShortage = errorMonth.getFlexShortage();
+			
+			//過去月集計結果を登録する
+			if(resultCalcMonth.getErrorAfterCheck() ==null && !resultCalcMonth.getListAggregatePastMonthResult().isEmpty()) {
+				registerPastMonthTotalResult.register(resultCalcMonth.getListAggregatePastMonthResult());
+			}
 		}
 		
 

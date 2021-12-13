@@ -16,6 +16,7 @@ import nts.uk.ctx.sys.auth.dom.grant.roleindividual.RoleIndividualGrantRepositor
 import nts.uk.ctx.sys.auth.dom.role.RoleType;
 import nts.uk.ctx.sys.auth.infra.entity.grant.roleindividualgrant.SacmtRoleIndiviGrant;
 import nts.uk.ctx.sys.auth.infra.entity.grant.roleindividualgrant.SacmtRoleIndiviGrantPK;
+import nts.uk.shr.com.context.AppContexts;
 
 @Stateless
 public class JpaRoleIndividualGrantRepository extends JpaRepository implements RoleIndividualGrantRepository {
@@ -124,10 +125,17 @@ public class JpaRoleIndividualGrantRepository extends JpaRepository implements R
 	private static final String SELECT_BY_ROLETYPE = "SELECT c FROM SacmtRoleIndiviGrant c"
 			+ " WHERE c.sacmtRoleIndiviGrantPK.roleType = :roleType";
 
+	private static final String SELECT_BY_ROLETYPE_AND_CONTRACTCD = "SELECT c FROM SacmtRoleIndiviGrant c"
+			+ " WHERE c.sacmtRoleIndiviGrantPK.roleType = :roleType"
+			+ " AND c.contractCd = :contractCd ";
+
 	@Override
 	public List<RoleIndividualGrant> findByRoleType(int roleType) {
-		return this.queryProxy().query(SELECT_BY_ROLETYPE, SacmtRoleIndiviGrant.class)
-				.setParameter("roleType", roleType).getList(c -> c.toDomain());
+		String contractCode = AppContexts.user().contractCode();
+		return this.queryProxy().query(SELECT_BY_ROLETYPE_AND_CONTRACTCD,SacmtRoleIndiviGrant.class)
+				.setParameter("roleType",roleType)
+				.setParameter("contractCd",contractCode)
+				.getList(SacmtRoleIndiviGrant::toDomain);
 	}
 
 	private static final String SELECT_BY_COMPANYID_AND_ROLETYPE = "SELECT c FROM SacmtRoleIndiviGrant c"

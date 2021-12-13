@@ -61,6 +61,7 @@ import nts.uk.ctx.bs.employee.pub.employee.EmployeeExport;
 import nts.uk.ctx.bs.employee.pub.employee.EmployeeInfoExport;
 import nts.uk.ctx.bs.employee.pub.employee.JobClassification;
 import nts.uk.ctx.bs.employee.pub.employee.MailAddress;
+import nts.uk.ctx.bs.employee.pub.employee.PersonalEmployeeInfoExport;
 import nts.uk.ctx.bs.employee.pub.employee.PersonInfoJhn001Export;
 import nts.uk.ctx.bs.employee.pub.employee.ResultRequest596Export;
 import nts.uk.ctx.bs.employee.pub.employee.ResultRequest600Export;
@@ -111,7 +112,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 
 //	@Inject
 //	private SyWorkplacePub syWorkplacePub;
-
+	
 	@Inject
 	private WorkplacePub workplacePub;
 
@@ -123,22 +124,25 @@ public class SyEmployeePubImp implements SyEmployeePub {
 
 	@Inject
 	private TempAbsHistRepository tempAbsHistRepository;
-
+	
 	@Inject
 	private TempAbsenceRepositoryFrame tempAbsenceRepoFrame;
-
+	
 	@Inject
 	private PersonRepository personRepo;
-
+	
 	@Inject
 	private EmploymentStatusPub employmentStatusPub;
-
+	
 	@Inject
 	private IPersonInfoPub personInfoPub;
 
+	@Inject
+	private EmployeeDataMngInfoRepository getEmpDataMngRepo;
+	
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see nts.uk.ctx.basic.pub.company.organization.employee.EmployeePub#
 	 * findByWpkIds(java.lang.String, java.util.List, nts.arc.time.GeneralDate)
 	 */
@@ -193,7 +197,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see nts.uk.ctx.bs.employee.pub.employee.SyEmployeePub#getConcurrentEmployee(
 	 * java.lang.String, java.lang.String, nts.arc.time.GeneralDate)
 	 */
@@ -233,7 +237,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see nts.uk.ctx.bs.employee.pub.employee.SyEmployeePub#findByEmpId(java.lang.
 	 * String)
 	 */
@@ -250,7 +254,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 
 
 		val require = new RequireImpl(cacheCarrier);
-
+		
 		EmployeeBasicInfoExport result = new EmployeeBasicInfoExport();
 		// Get Employee
 		Optional<EmployeeDataMngInfo> empOpt = require.findByEmpId(sId);
@@ -302,7 +306,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 
 	/*
 	 * (non-Javadoc) req 126
-	 *
+	 * 
 	 * @see nts.uk.ctx.bs.employee.pub.employee.SyEmployeePub#findBySIds(java.util.
 	 * List)
 	 */
@@ -348,6 +352,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 			}
 
 			Optional<AffCompanyHistItem> affCompanyHistItem = mapAffComHistItem.get(employee.getEmployeeId());
+			if (affCompanyHistItem == null) affCompanyHistItem = Optional.empty();
 
 			if (affCompanyHistItem.isPresent()) {
 				result.setEntryDate(affCompanyHistItem.get().getDatePeriod().start());
@@ -423,7 +428,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * nts.uk.ctx.bs.employee.pub.employee.SyEmployeePub#getSdataMngInfo(java.lang.
 	 * String)
@@ -446,7 +451,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 				.stream()
 				.map(e -> toExport(e)).collect(Collectors.toList());
 	}
-
+	
 	private static EmployeeDataMngInfoExport toExport(EmployeeDataMngInfo mngInfo) {
 		return new EmployeeDataMngInfoExport(
 				mngInfo.getCompanyId(),
@@ -458,7 +463,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 				mngInfo.getRemoveReason().v(),
 				mngInfo.getExternalCode() == null ? null : mngInfo.getExternalCode().v());
 	}
-
+	
 
 	@Override
 	public List<EmployeeInfoExport> getByListSid(List<String> sIds) {
@@ -529,21 +534,21 @@ public class SyEmployeePubImp implements SyEmployeePub {
 		if (lstSidFromAffComHist.isEmpty()) {
 			return Collections.emptyList();
 		}
-		// (Lấy danh sách sid từ domain 「休職休業履歴」)
+		// (Lấy danh sách sid từ domain 「休職休業履歴」) 		
 		List<String> lstSidAbsHist_NoCheckDate = tempAbsHistRepository.getByListSid(lstSidFromAffComHist);
-
+		
 		//(lưu employeeID  ko lấy được ở domain 「休職休業履歴」 vào list nhân viên đương nhiệm)
 		List<String> result = lstSidFromAffComHist.stream().filter(i -> !lstSidAbsHist_NoCheckDate.contains(i))
 				.collect(Collectors.toList());
-
+		
 		// lây list sid từ list sid và dateperiod
 		List<String> lstTempAbsenceHistory = tempAbsHistRepository.getLstSidByListSidAndDatePeriod(lstSidAbsHist_NoCheckDate,
 				dateperiod);
-
+		
 		if(!lstTempAbsenceHistory.isEmpty()) {
 			result.addAll(lstTempAbsenceHistory);
 		}
-
+		
 		if (result.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -588,7 +593,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 		});
 		return lstresult;
 	}
-
+	
 	@Override
 	public EmployeeBasicExport getEmpBasicBySId(String sId) {
 
@@ -705,7 +710,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * nts.uk.ctx.bs.employee.pub.employee.SyEmployeePub#findBySIdAndCompanyId(java.
 	 * lang.String, java.lang.String)
@@ -768,7 +773,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 		String cid = AppContexts.user().companyId();
 		List<AffCompanyHist> listAffComHist = new ArrayList<>();
 		List<String> employee = new ArrayList<>();
-
+		
 		// (Lấy domain [AffJobHistoryItem])
 		List<AffJobTitleHistoryItem> listAffItem = jobTitleHistoryItemRepository.findHistJob(cid, baseDate, jobTitleIds);
 
@@ -797,7 +802,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 		}
 		return new ArrayList<>();
 	}
-
+	
 	@Override
 	public List<EmployeeDataMngInfoExport> findBySidNotDel(List<String> sids) {
 		return this.empDataMngRepo.findBySidNotDel(sids).stream().map(mngInfo -> EmployeeDataMngInfoExport.builder()
@@ -824,34 +829,34 @@ public class SyEmployeePubImp implements SyEmployeePub {
 				.getAffEmployeeHistory(Arrays.asList(empData.get().getEmployeeId()));
 		if (affComHist.isEmpty())
 			return Optional.empty();
-
+		
 		List<AffCompanyHistItem> lstAffComHisItem = affComHist.get(0).items();
-
+		
 		for (int i = 0; i < lstAffComHisItem.size(); i++) {
 			if (!lstAffComHisItem.get(i).afterOrEqualsStandardDate(systemDate) && !lstAffComHisItem.get(i).beforeOrEqualsStandardDate(systemDate)) {
 				check = true;
 				break;
 			}
 		}
-
+		
 		if(!check)
 			return Optional.empty();
-
+		
 		Optional<Person> personOpt = this.personRepository.getByPersonId(empData.get().getPersonId());
-
+		
 		if(!personOpt.isPresent())
 			return Optional.empty();
-
+		
 		EmpInfoRegistered result = new EmpInfoRegistered(
 				cid,
 				empData.get().getEmployeeCode().v(),
 				empData.get().getEmployeeId(),
 				personOpt.get().getPersonNameGroup().getBusinessName()!= null ? personOpt.get().getPersonNameGroup().getBusinessName().v() : null,
 				pid);
-
+		
 		return Optional.of(result);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see nts.uk.ctx.bs.employee.pub.employee.SyEmployeePub#getSidCdPnameBySIds(java.util.List)
 	 */
@@ -939,7 +944,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 					}
 				});
 			}
-
+			
 			if(!param.includeRetirement) {
 				findListOfEmployee.removeIf(c->{
 					if(c.getEmploymentInfo().isEmpty()) {
@@ -949,7 +954,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 					}
 				});
 			}
-
+			
 			if(!param.includeAbsence) {
 				findListOfEmployee.removeIf(c->{
 					if(c.getEmploymentInfo().isEmpty()) {
@@ -959,7 +964,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 					}
 				});
 			}
-
+			
 			if(!param.includeClosed) {
 				findListOfEmployee.removeIf(c->{
 					if(c.getEmploymentInfo().isEmpty()) {
@@ -968,13 +973,13 @@ public class SyEmployeePubImp implements SyEmployeePub {
 						return false;
 					}
 				});
-			}
+			} 
 			List<String> employeeIdResult = findListOfEmployee.stream().map(c->c.getEmployeeId()).collect(Collectors.toList());
 			allEmployee.removeIf( c-> !employeeIdResult.contains(c.getEmployeeId()));
 			return allEmployee;
 		}
 	}
-
+	
 	@Override
 	public List<ResultRequest596Export> getEmpDeletedLstBySids(List<String> sids) {
 		List<ResultRequest596Export> result = new ArrayList<>();
@@ -991,7 +996,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 		});
 		return result;
 	}
-
+	
 	@Override
 	public List<ResultRequest596Export> getEmpNotDeletedLstBySids(List<String> sids) {
 		List<ResultRequest596Export> result = new ArrayList<>();
@@ -1014,7 +1019,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 		List<EmployeeDataMngInfo> emps = new ArrayList<>();
 		List<ResultRequest600Export> result = new ArrayList<>();
 		List<String> sidsDistinct = sids.stream().distinct().collect(Collectors.toList());
-
+		
 		//Input「削除社員を取り除く」をチェックする
 		if(isDelete == true) {
 			//ドメインモデル「社員データ管理情報」を取得する
@@ -1023,7 +1028,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 			//ドメインモデル「社員データ管理情報」を全て取得する
 			emps.addAll(this.empDataMngRepo.findByListEmployeeId(sidsDistinct));
 		}
-
+		
 		if(!CollectionUtil.isEmpty(emps)) {
 			//Input「会社に所属していない社員を取り除く」をチェックする
 			if(isGetAffCompany == true) {
@@ -1032,11 +1037,11 @@ public class SyEmployeePubImp implements SyEmployeePub {
 				if(!CollectionUtil.isEmpty(affComHist)) {
 					personIds.addAll(affComHist.stream().map(c -> c.getPId()).collect(Collectors.toList()));
 				}
-
+				
 			}else {
 				personIds.addAll(emps.stream().map(c -> c.getPersonId()).collect(Collectors.toList()));
 			}
-
+			
 			//ドメインモデル「個人基本情報」を全て取得する
 			List<Person> personLst = personRepo.getPersonByPersonIds(personIds);
 			emps.stream().forEach(c ->{
@@ -1060,25 +1065,25 @@ public class SyEmployeePubImp implements SyEmployeePub {
 		if (lstSidFromAffComHist.isEmpty()) {
 			return Collections.emptyList();
 		}
-		// ドメインモデル「休職休業履歴」を取得する
+		// ドメインモデル「休職休業履歴」を取得する		
 		List<String> lstSidAbsHist_NoCheckDate = tempAbsHistRepository.getByListSid(lstSidFromAffComHist);
-
+		
 		//ドメインモデル「休職休業履歴」が取得できなかった社員は、在職者として社員IDをリストに保持する
 		//(lưu employeeID  ko lấy được ở domain 「休職休業履歴」 vào list nhân viên đương nhiệm)
 		List<String> result = lstSidFromAffComHist.stream().filter(i -> !lstSidAbsHist_NoCheckDate.contains(i))
 				.collect(Collectors.toList());
-
+		
 		// 「休職休業履歴」．期間をチェックし、１日でも在職している社員を取得する
 		//(Check 「休職休業履歴」．期間, lấy employee đang tồn tại dù chỉ 1 ngày)
 		List<String> lstTempAbsenceHistory = tempAbsHistRepository.getLstSidByListSidAndDatePeriod(lstSidAbsHist_NoCheckDate,
 				period);
-
+		
 		//１日でも在職している社員は在職者として社員IDをリストに保持する
 		//(Lưu employee ở trên vào list employee đương nhiệm)
 		if(!lstTempAbsenceHistory.isEmpty()) {
 			result.addAll(lstTempAbsenceHistory);
 		}
-
+		
 		if (result.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -1086,7 +1091,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 		//(return list employeeID của nhân viên đương nhiệm)
 		return result;
 	}
-
+	
 	@Override
 	public List<String> filterSidByCidAndPeriod(String cid, DatePeriod period) {
 		//ドメインモデル「社員データ管理情報」を取得する
@@ -1114,7 +1119,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 		if (rersonInfoExport == null) {
 			return null;
 		}
-
+		
 		PersonInfoJhn001Export result = PersonInfoJhn001Export.builder()
 				.pid(rersonInfoExport.getPid())
 				.businessName(rersonInfoExport.getBusinessName())
@@ -1135,7 +1140,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 				.deleteDateTemporary(mngInfo.getDeleteDateTemporary()).removeReason(mngInfo.getRemoveReason().v())
 				.externalCode(mngInfo.getExternalCode() == null ? null : mngInfo.getExternalCode().v()).build());
 	}
-
+	
 	public static interface Require{
 //		this.empDataMngRepo.findByEmpId(sId);
 		Optional<EmployeeDataMngInfo> findByEmpId(String sId);
@@ -1143,6 +1148,12 @@ public class SyEmployeePubImp implements SyEmployeePub {
 		AffCompanyHist getAffCompanyHistoryOfEmployee(String employeeId);
 //		this.personRepository.getByPersonId(emp.getPersonId());
 		Optional<Person> getByPersonId(String personId);
+
+		// 	[2] 個人リストを取得する
+		List<Person> getIndividualList(List<String> personIdList);
+
+		//  [3] 個人IDリストから社員を取得する
+		List<EmployeeDataMngInfo> getListEmployeeDataInfo(List<String> personIdList);
 	}
 
 	@RequiredArgsConstructor
@@ -1152,7 +1163,7 @@ public class SyEmployeePubImp implements SyEmployeePub {
 
 		@Override
 		public Optional<EmployeeDataMngInfo> findByEmpId(String sId) {
-//			EmployeeDataMngInfoCache cache = cacheCarrier.get(EmployeeDataMngInfoCache.DOMAIN_NAME);
+//			EmployeeDataMngInfoCache cache = cacheCarrier.get(EmployeeDataMngInfoCache.DOMAIN_NAME); 
 //			return cache.get(sId);
 			return empDataMngRepo.findByEmpId(sId);
 		}
@@ -1172,6 +1183,44 @@ public class SyEmployeePubImp implements SyEmployeePub {
 			return personRepository.getByPersonId(personId);
 		}
 
-	}
+		@Override
+		public List<Person> getIndividualList(List<String> personIdList) {
+			return personRepository.getPersonByPersonIds(personIdList);
+		}
 
+		@Override
+		public List<EmployeeDataMngInfo> getListEmployeeDataInfo(List<String> personIdList) {
+			return getEmpDataMngRepo.getByPersonIdList(personIdList);
+		}
+	}
+	@Override
+	public List<PersonalEmployeeInfoExport> getPersonEmployeeInfosByPersonId(List<String> personIds) {
+		List<PersonalEmployeeInfoExport> rs = new ArrayList<>();
+		val cacheCarrier = new CacheCarrier();
+		val require = new RequireImpl(cacheCarrier);
+		val listPerSon = require.getIndividualList(personIds);
+		val listEmployeeData = require.getListEmployeeDataInfo(personIds);
+		for (val per:listPerSon) {
+			val employeeInfos = listEmployeeData.stream()
+					.filter(e->e.getPersonId().equals(per.getPersonId()))
+					.map(e->new  EmployeeDataMngInfoExport(
+						e.getCompanyId(),
+						e.getPersonId(),
+						e.getEmployeeId(),
+						e.getEmployeeCode().v(),
+						e.getDeletedStatus().value,
+						e.getDeleteDateTemporary(),
+							e.getRemoveReason()!=null?e.getRemoveReason().v():"",
+							e.getExternalCode()!=null?e.getExternalCode().v():""
+					))
+					.collect(Collectors.toList());
+			rs.add( new PersonalEmployeeInfoExport(
+					per.getPersonId(),
+					per.getPersonNameGroup().getPersonName().getFullName().v(),
+					per.getPersonNameGroup().getBusinessName().v(),
+					employeeInfos
+			));
+		}
+		return rs;
+	}
 }

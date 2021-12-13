@@ -33,6 +33,8 @@ import nts.uk.ctx.sys.gateway.app.find.login.CompanyInformationFinder;
 import nts.uk.ctx.sys.gateway.app.find.login.EmployeeLoginSettingFinder;
 import nts.uk.ctx.sys.gateway.app.find.login.dto.CheckContractDto;
 import nts.uk.ctx.sys.gateway.app.find.login.dto.EmployeeLoginSettingDto;
+import nts.uk.ctx.sys.gateway.dom.login.password.authenticate.InspectionResultDto;
+import nts.uk.ctx.sys.gateway.dom.login.password.authenticate.QrVerifyEmployeeCodeAndPassword;
 import nts.uk.ctx.sys.shared.dom.company.CompanyInformationImport;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.infra.application.auth.WindowsAccount;
@@ -60,6 +62,9 @@ public class LoginWs extends WebService {
 	/** The employee login setting finder. */
 	@Inject
 	private EmployeeLoginSettingFinder employeeLoginSettingFinder;
+	
+	@Inject
+	private QrVerifyEmployeeCodeAndPassword qrVerifyEmployeeCodeAndPassword;
 	
 	/** The Constant SIGN_ON. */
 	private static final String SIGN_ON = "on";
@@ -203,5 +208,11 @@ public class LoginWs extends WebService {
 	@Path("emlogsettingform3/{contractCode}")
 	public EmployeeLoginSettingDto getEmployeeLoginSettingForm3(@PathParam("contractCode") String contractCode) {
 		return this.employeeLoginSettingFinder.findByContractCodeForm3(contractCode);
+	}
+	
+	@POST
+	@Path("verify_employeecode_and_password")
+	public InspectionResultDto verifiLogin(VerifyEmployeeCodeAndPasswordInput param) {
+		return this.qrVerifyEmployeeCodeAndPassword.verifyEmployeeCodeAndPassword(param.getCid(), param.getEmployeeCode(), param.getPassword());
 	}
 }

@@ -37,7 +37,7 @@
 				
 					<div class="tab-content-1 cf tab-size" >					
 						<div class="valign-center control-group start">
-							<span >#{i18n.getText('KAL004_74')}</span>
+							<div class="flabel" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KAL004_74')}</div>
 							<div class="day">
 								<div 
 									data-bind="ntsRadioButton: {checked: strSelected, enable: true, option: dateSpecify()[0], optionValue: 'value', optionText: 'name', group: 'strRadio'}"></div>
@@ -68,7 +68,7 @@
 						<div class="centerSys">#{i18n.getText('KAL004_30')}</div>
 						
 						<div class="valign-center control-group end">
-							<span >#{i18n.getText('KAL004_76')}</span>
+							<div class="flabel" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KAL004_76')}</div>
 							<div class="day">
 								<div
 									data-bind="ntsRadioButton: {checked: endSelected, enable: true, option: dateSpecify()[0], optionValue: 'value', optionText: 'name', group: 'endRadio'}"></div>
@@ -100,7 +100,7 @@
 					
 					<div class="tab-content-2 tab-size"  >
 						<div class="valign-center control-group start2">
-							<div><span >#{i18n.getText('KAL004_87')}</span></div>
+							<div><div class="flabel" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KAL004_87')}</div></div>
 							<div id="start-tab-2"  class='comboboxMonth2'
 								data-bind="ntsComboBox: {
 										options: strComboMonth2,
@@ -115,7 +115,7 @@
 						</div>
 						<div class="centerSys2">#{i18n.getText('KAL004_88')}</div>
 						<div class="valign-center control-group end2">
-							<div><span >#{i18n.getText('KAL004_89')}</span> </div>
+							<div><div class="flabel" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KAL004_89')}</div> </div>
 							<div  class='comboboxMonth2'
 								data-bind="ntsComboBox: {
 										options: endComboMonth2,
@@ -133,7 +133,7 @@
 					
 					<div class="tab-content-3 tab-size"  >
 						<div class="valign-center control-group start3">
-							<div><span >#{i18n.getText('KAL004_92')}</span></div>
+							<div><div class="flabel" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KAL004_92')}</div></div>
 							<div class = 'month3'>
 								<div class ='checkMonth3'
 									data-bind="ntsRadioButton: {checked: strSelected3, enable: true, option: yearSpecify()[0], optionValue: 'value', optionText: 'name', group: 'strRadio3'}"></div>
@@ -160,7 +160,7 @@
 						</div>
 						<div class="centerSys3">#{i18n.getText('KAL004_93')}</div>
 						<div class="valign-center control-group end3">
-							<div><span >#{i18n.getText('KAL004_94')}</span> </div>
+							<div><div class="flabel" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KAL004_94')}</div> </div>
 							<div class = 'month3'>
 								<div  class='comboboxMonth3'
 									data-bind="ntsComboBox: {
@@ -178,7 +178,7 @@
 					</div>
 					<div class="tab-content-4 tab-size"  >
 						<div class="valign-center control-group start4">
-							<div><span >#{i18n.getText('KAL004_100')}</span></div>
+							<div><div class="flabel" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KAL004_100')}</div></div>
 							<div class = 'month4'>
 								<div  class ='checkMonth4'
 									data-bind="ntsRadioButton: {checked: strSelected4, enable: true, option: yearSpecify()[0], optionValue: 'value', optionText: 'name', group: 'strRadio4'}"></div>
@@ -205,7 +205,7 @@
 						</div>
 						<div class="centerSys4">#{i18n.getText('KAL004_101')}</div>
 						<div class="valign-center control-group end4">
-							<div><span >#{i18n.getText('KAL004_102')}</span> </div>
+							<div><div class="flabel" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KAL004_102')}</div> </div>
 							<div class = 'month4'>
 								<div  class='comboboxMonth4'
 									data-bind="ntsComboBox: {

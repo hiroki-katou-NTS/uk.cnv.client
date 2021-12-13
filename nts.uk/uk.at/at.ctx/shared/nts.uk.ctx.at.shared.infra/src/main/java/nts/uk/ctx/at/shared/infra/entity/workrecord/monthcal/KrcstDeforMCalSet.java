@@ -9,6 +9,8 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.MappedSuperclass;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.Getter;
 import lombok.Setter;
 import nts.uk.ctx.at.shared.dom.common.Month;
@@ -16,7 +18,6 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.calcmethod.calcmetho
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.calcmethod.calcmethod.other.DeforLaborSettlementPeriod;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.calcmethod.calcmethod.other.DeforWorkTimeAggrSet;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.calcmethod.calcmethod.other.ExcessOutsideTimeSetReg;
-import nts.uk.ctx.at.shared.infra.repository.workrecord.monthcal.BooleanGetAtr;
 import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 
 /**
@@ -30,35 +31,35 @@ public abstract class KrcstDeforMCalSet extends ContractUkJpaEntity {
 
 	/** The include legal ot. */
 	@Column(name = "INCLUDE_LEGAL_OT")
-	private int includeLegalOt;
+	private boolean includeLegalOt;
 
 	/** The include holiday ot. */
 	@Column(name = "INCLUDE_HOLIDAY_OT")
-	private int includeHolidayOt;
+	private boolean includeHolidayOt;
 
 	/** The include extra ot. */
 	@Column(name = "INCLUDE_EXTRA_OT")
-	private int includeExtraOt;
+	private boolean includeExtraOt;
 
 	/** The except legal holidaywork ot. */
 	@Column(name = "EXC_LEGAL_HDWK_OT")
-	private int exceptLegalHdwkOt;
+	private boolean exceptLegalHdwkOt;
 	
 	/** The include legal aggr. */
 	@Column(name = "INCLUDE_LEGAL_AGGR")
-	private int includeLegalAggr;
+	private boolean includeLegalAggr;
 
 	/** The include holiday aggr. */
 	@Column(name = "INCLUDE_HOLIDAY_AGGR")
-	private int includeHolidayAggr;
+	private boolean includeHolidayAggr;
 
 	/** The include extra aggr. */
 	@Column(name = "INCLUDE_EXTRA_AGGR")
-	private int includeExtraAggr;
+	private boolean includeExtraAggr;
 
 	/** The is ot irg. */
 	@Column(name = "IS_OT_IRG")
-	private int isOtIrg;
+	private boolean isOtIrg;
 
 	/** The period. */
 	@Column(name = "PERIOD")
@@ -66,7 +67,7 @@ public abstract class KrcstDeforMCalSet extends ContractUkJpaEntity {
 
 	/** The repeat atr. */
 	@Column(name = "REPEAT_ATR")
-	private int repeatAtr;
+	private boolean repeatAtr;
 
 	/** The str month. */
 	@Column(name = "STR_MONTH")
@@ -75,27 +76,27 @@ public abstract class KrcstDeforMCalSet extends ContractUkJpaEntity {
 	public void transfer(DeforWorkTimeAggrSet domain) {
 		
 		includeLegalAggr = (
-				BooleanGetAtr.getAtrByBoolean(domain.getAggregateTimeSet().isLegalOverTimeWork()));
+				BooleanUtils.toBoolean(domain.getAggregateTimeSet().isLegalOverTimeWork()));
 		includeHolidayAggr = (
-				BooleanGetAtr.getAtrByBoolean(domain.getAggregateTimeSet().isLegalHoliday()));
+				BooleanUtils.toBoolean(domain.getAggregateTimeSet().isLegalHoliday()));
 		includeExtraAggr = (
-				BooleanGetAtr.getAtrByBoolean(domain.getAggregateTimeSet().isSurchargeWeekMonth()));
+				BooleanUtils.toBoolean(domain.getAggregateTimeSet().isSurchargeWeekMonth()));
 		
 		includeLegalOt = (
-				BooleanGetAtr.getAtrByBoolean(domain.getExcessOutsideTimeSet().isLegalOverTimeWork()));
+				BooleanUtils.toBoolean(domain.getExcessOutsideTimeSet().isLegalOverTimeWork()));
 		includeHolidayOt = (
-				BooleanGetAtr.getAtrByBoolean(domain.getExcessOutsideTimeSet().isLegalHoliday()));
+				BooleanUtils.toBoolean(domain.getExcessOutsideTimeSet().isLegalHoliday()));
 		includeExtraOt = (
-				BooleanGetAtr.getAtrByBoolean(domain.getExcessOutsideTimeSet().isSurchargeWeekMonth()));
+				BooleanUtils.toBoolean(domain.getExcessOutsideTimeSet().isSurchargeWeekMonth()));
 		
 		exceptLegalHdwkOt = (
-				BooleanGetAtr.getAtrByBoolean(domain.getExcessOutsideTimeSet().isExceptLegalHdwk()));
+				BooleanUtils.toBoolean(domain.getExcessOutsideTimeSet().isExceptLegalHdwk()));
 		
-		isOtIrg = (BooleanGetAtr.getAtrByBoolean(domain.getDeforLaborCalSetting().isOtTransCriteria()));
+		isOtIrg = (BooleanUtils.toBoolean(domain.getDeforLaborCalSetting().isOtTransCriteria()));
 		
 		period = (domain.getSettlementPeriod().getPeriod().v());
 		strMonth = (domain.getSettlementPeriod().getStartMonth().v());
-		repeatAtr = (BooleanGetAtr.getAtrByBoolean(domain.getSettlementPeriod().isRepeat()));
+		repeatAtr = (BooleanUtils.toBoolean(domain.getSettlementPeriod().isRepeat()));
 	}
 	
 
@@ -103,31 +104,31 @@ public abstract class KrcstDeforMCalSet extends ContractUkJpaEntity {
 	public ExcessOutsideTimeSetReg getAggregateTimeSet() {
 		
 		return new ExcessOutsideTimeSetReg(
-				BooleanGetAtr.getAtrByInteger(includeLegalAggr),
-				BooleanGetAtr.getAtrByInteger(includeHolidayAggr), 
-				BooleanGetAtr.getAtrByInteger(includeExtraAggr),
+				BooleanUtils.toBoolean(includeLegalAggr),
+				BooleanUtils.toBoolean(includeHolidayAggr), 
+				BooleanUtils.toBoolean(includeExtraAggr),
 				false);
 	}
 	
 	public ExcessOutsideTimeSetReg getExcessOutsideTimeSet() {
 		
 		return new ExcessOutsideTimeSetReg(
-				BooleanGetAtr.getAtrByInteger(includeLegalOt),
-				BooleanGetAtr.getAtrByInteger(includeHolidayOt), 
-				BooleanGetAtr.getAtrByInteger(includeExtraOt),
-				BooleanGetAtr.getAtrByInteger(exceptLegalHdwkOt));
+				BooleanUtils.toBoolean(includeLegalOt),
+				BooleanUtils.toBoolean(includeHolidayOt), 
+				BooleanUtils.toBoolean(includeExtraOt),
+				BooleanUtils.toBoolean(exceptLegalHdwkOt));
 	}
 	
 	public DeforLaborCalSetting deforLaborCalSetting() {
 		
-		return new DeforLaborCalSetting(isOtIrg == 1);
+		return new DeforLaborCalSetting(isOtIrg);
 	}
 	
 	public DeforLaborSettlementPeriod deforLaborSettlementPeriod() {
 		
 		return new DeforLaborSettlementPeriod(new Month(strMonth),
 												new Month(period), 
-												repeatAtr == 1);
+												repeatAtr);
 	}
 
 }

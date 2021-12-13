@@ -43,8 +43,14 @@ Vue.directive('float-action', {
                             dom.removeAttr(ul, 'style');
                             dom.removeClass(el, 'active');
                         });
-
-                    dom.setAttr(ul, 'style', `height: ${57 * [].slice.call(ul.querySelectorAll('li.btn-floating')).length}px`);
+                    let displaySelect = [];
+                    ul.querySelectorAll('li.btn-floating').forEach((item: any) => {
+                        if (item.style.display == 'none') {
+                            return;
+                        }
+                        displaySelect.push(item);
+                    });
+                    dom.setAttr(ul, 'style', `height: ${57 * [].slice.call(displaySelect).length}px`);
                 }
             });
 

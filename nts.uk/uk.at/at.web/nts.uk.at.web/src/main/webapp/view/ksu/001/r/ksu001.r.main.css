@@ -1,0 +1,127 @@
+#setting-workplace {
+	float: right;
+	margin-right: 20px
+}
+
+#set-work-type, #set-work-time {
+	margin-bottom: 10px;
+	margin-left: 10px
+}
+
+#time-edit1, #time-edit2 {
+	text-align: center !important;
+	width: 43px !important;
+}
+
+#time-edit1 {
+	margin-left: 16px
+}
+
+.reserved, #table-worktime {
+	margin-left: 10px;
+}
+
+#switch-o1 {
+	margin-left: 27px
+}
+
+#combo-box1 {
+	vertical-align: middle;
+	margin-left: 30px
+}
+
+#paste {
+	background: url(../image/image102.png) no-repeat center;
+	min-width: 30px !important;
+	margin-left: 250px !important;
+}
+
+#copy {
+	background: url(../image/image104.png) no-repeat center;
+	min-width: 30px !important;
+	margin-left: 5px !important;
+}
+
+#undo {
+	background: url(../image/image030.png) no-repeat center;
+	min-width: 30px !important;
+	margin-left: 5px !important;
+}
+
+.size-image-button {
+	background-size: 25px 25px !important;
+	height: 30px;
+}
+
+#functions-area button:FIRST-CHILD {
+	vertical-align: top
+}
+
+table {
+	border: 1px solid black;
+	width: 100%;
+	border-style: double;
+	border-color: darkgrey;
+	border-left: none;
+	width: 263px;
+	border-bottom: none;
+}
+
+th, td {
+	width: 122px;
+	border: 1px solid black;
+	border-color: darkgrey;
+	padding-right: 0px;
+	height: 24px;
+}
+
+thead {
+	background-color: #E9E9E9;
+}
+
+thead>tr {
+	position: relative;
+	display: block;
+}
+
+thead>tr>th {
+	box-sizing: border-box;
+	background-color: lightgreen;
+	border-top: none;
+}
+
+input {
+	box-sizing: border-box;
+	border: 1px solid black;
+	border-color: darkgrey;
+}
+
+tbody {
+	display: block;
+	max-height: 251px;
+	overflow: scroll;
+	overflow-x: hidden;
+	height: auto;
+}
+tbody>tr>td{
+	box-sizing: border-box;
+	width: 122px;
+}
+hr {
+	border-color: E0FFFF;
+	width: 390px;
+	margin: 9px 9px 9px 25px;
+}
+
+span {
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	overflow-y: hidden; /* Hide scrollbars */
+}
+
+.ntsControl.symbol:after {
+    top: 2px !important;
+}

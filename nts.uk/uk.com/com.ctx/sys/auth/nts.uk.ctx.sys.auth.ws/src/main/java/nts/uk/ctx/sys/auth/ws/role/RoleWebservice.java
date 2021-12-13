@@ -8,6 +8,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import nts.uk.ctx.sys.auth.app.query.role.DtoRole;
+import nts.uk.ctx.sys.auth.app.query.role.GetRoleListQuery;
+import nts.uk.ctx.sys.auth.app.query.role.RolesParam;
 import org.apache.logging.log4j.util.Strings;
 
 import nts.arc.enums.EnumAdaptor;
@@ -46,6 +49,8 @@ public class RoleWebservice extends WebService {
 	private I18NResourcesForUK i18n;
 	@Inject
 	private PermissionSettingMenuAdapter permissionSettingMenuAdapter;
+	@Inject
+	private GetRoleListQuery getRoleListQuery;
 	
 	@POST
 	@Path("getlistrolebytype/{roleType}")
@@ -133,6 +138,11 @@ public class RoleWebservice extends WebService {
 	@Path("getListWorkplaceId")
 	public List<String> findListWorkplaceId(WorkplaceParam param){
 		return roleWorkplaceIDFinder.findListWorkplaceId(param);
+	}
+	@POST
+	@Path("get-list-role-new")
+	public List<DtoRole> getListRoles(RolesParam param) {
+		return this.getRoleListQuery.getListRole(param);
 	}
 	
 }

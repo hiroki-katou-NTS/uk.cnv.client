@@ -56,7 +56,7 @@ public class KrcdtEmployeeMonthlyPerError extends ContractUkJpaEntity implements
 		if (!update) {
 			this.krcdtEmployeeMonthlyPerErrorPK =  new KrcdtEmployeeMonthlyPerErrorPK(domain.getNo(), domain.getErrorType().value, domain.getYearMonth().v(),
 					domain.getEmployeeID(), domain.getClosureId().value, domain.getClosureDate().getClosureDay().v(),
-					domain.getClosureDate().getLastDayOfMonth() ? 1 : 0);
+					domain.getClosureDate().getLastDayOfMonth());
 		}
 		
 		this.flex = domain.getFlex().isPresent() ? domain.getFlex().get().value : null;
@@ -70,7 +70,7 @@ public class KrcdtEmployeeMonthlyPerError extends ContractUkJpaEntity implements
 		val key = this.krcdtEmployeeMonthlyPerErrorPK;
 		EmployeeMonthlyPerError domain = new EmployeeMonthlyPerError(key.no, ErrorType.valueOf(key.errorType),
 				new YearMonth(key.yearMonth), key.employeeID, ClosureId.valueOf(key.closureId),
-				new ClosureDate(key.closeDay, key.isLastDay == 1), flex == null ? null : Flex.valueOf(flex),
+				new ClosureDate(key.closeDay, key.isLastDay), flex == null ? null : Flex.valueOf(flex),
 				annualHoliday == null ? null : EnumAdaptor.valueOf(annualHoliday, AnnualLeaveError.class),
 				yearlyReserved == null ? null : EnumAdaptor.valueOf(yearlyReserved, ReserveLeaveError.class));
 		return domain;

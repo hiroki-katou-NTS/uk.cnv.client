@@ -1,0 +1,77 @@
+.tab-content-1 .title {padding:70px 0 40px 70px;}
+
+.switchbox-wrappers.radio-wrappers label input+span {
+    text-align: center;
+    width: 60px;
+}
+
+.setMail {
+    margin: 0 0 30px 70px;
+}
+
+.setMail .left {
+    float: left;
+    width: 50%;
+}
+
+.setMail .right {
+    float: left;
+    padding-left: 60px;
+}
+
+.setMail .option .person-admin {
+    margin-right: 3px;
+}
+
+.setMail .option .configured {
+    margin-left: 26px;
+}
+
+.setMail .option {
+    margin-bottom: 20px;
+}
+
+.setMail .option span {
+    width: 70px;
+    display: inline-block;
+}
+
+.setMail .option button {
+    padding: 3px 18px;
+}
+
+.custom-table {
+    padding: 15px 0px 15px 0px;
+    width: 100%;
+}
+
+.custom-cell {
+    width: 17%;
+}
+
+.tab-2 {
+    margin: 0 0 30px 70px;
+}
+
+.tabs-panel.has-content {
+    width: 60%;
+    overflow: hidden;
+}
+
+.tab-content-2 .custom-table button {
+    padding: 3px 18px;
+    margin-left: 25px;
+}
+
+.mail-dest-setting {
+  margin: 20px 0px 50px 70px;
+}
+.mail-dest-setting > * {
+  margin-bottom: 30px;
+}
+#B5_2 {
+  width: 465px;
+}
+#B5_3 {
+  padding: 3px 18px;
+}

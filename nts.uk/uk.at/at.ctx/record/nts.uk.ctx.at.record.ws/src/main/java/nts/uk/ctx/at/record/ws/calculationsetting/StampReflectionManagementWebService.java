@@ -9,6 +9,7 @@ import nts.uk.ctx.at.record.app.command.calculationsetting.StampReflectionManage
 import nts.uk.ctx.at.record.app.command.calculationsetting.StampReflectionManagementCommandHandler;
 import nts.uk.ctx.at.record.app.find.calculationsetting.StampReflectionManagementDto;
 import nts.uk.ctx.at.record.app.find.calculationsetting.StampReflectionManagementFinder;
+import nts.uk.ctx.at.record.app.find.calculationsetting.UsageDataDto;
 
 /**
  * The Class StampReflectionManagementWebService.
@@ -34,6 +35,12 @@ public class StampReflectionManagementWebService {
 	@Path("findByCode")
 	public StampReflectionManagementDto getStampReflection(){
 		return this.finder.findByCode();
+	}
+	
+	@POST
+	@Path("findUsageData")
+	public UsageDataDto findUsageData() {
+		return this.finder.findUsageData();
 	}
 	
 	/**

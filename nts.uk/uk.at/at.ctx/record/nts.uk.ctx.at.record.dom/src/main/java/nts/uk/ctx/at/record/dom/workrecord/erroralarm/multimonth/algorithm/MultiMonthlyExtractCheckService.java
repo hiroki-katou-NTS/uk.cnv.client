@@ -1,6 +1,8 @@
 package nts.uk.ctx.at.record.dom.workrecord.erroralarm.multimonth.algorithm;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import nts.arc.time.calendar.period.YearMonthPeriod;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.mastercheck.algorithm.WorkPlaceHistImportAl;
@@ -25,5 +27,6 @@ public interface MultiMonthlyExtractCheckService {
 			List<WorkPlaceHistImportAl> getWplByListSidAndPeriod,
 			List<ResultOfEachCondition> lstResultCondition, List<AlarmListCheckInfor> lstCheckType,
 			List<AlarmEmployeeList> alarmEmployeeList, List<AlarmExtractionCondition> alarmExtractConditions,
-			String alarmCheckConditionCode);
+			String alarmCheckConditionCode,Consumer<Integer> counter,
+			  Supplier<Boolean> shouldStop);
 }

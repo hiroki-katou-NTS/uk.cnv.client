@@ -5,11 +5,15 @@
 package nts.uk.ctx.at.function.infra.entity.statement;
 
 import java.io.Serializable;
-import javax.persistence.*;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import lombok.Getter;
 import lombok.Setter;
 import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
-import java.math.BigDecimal;
 
 
 /**
@@ -30,31 +34,31 @@ public class KfnmtStampOutpItem extends ContractUkJpaEntity implements Serializa
 
 	/** The output emboss method. */
 	@Column(name="OUTPUT_EMBOSS_METHOD")
-	private BigDecimal outputEmbossMethod;
+	private boolean outputEmbossMethod;
 
 	/** The output night time. */
 	@Column(name="OUTPUT_NIGHT_TIME")
-	private BigDecimal outputNightTime;
+	private boolean outputNightTime;
 
 	/** The output ot. */
 	@Column(name="OUTPUT_OT")
-	private BigDecimal outputOt;
+	private boolean outputOt;
 
 	/** The output pos infor. */
 	@Column(name="OUTPUT_POS_INFOR")
-	private BigDecimal outputPosInfor;
+	private boolean outputPosInfor;
 
 	/** The output set location. */
 	@Column(name="OUTPUT_SET_LOCATION")
-	private BigDecimal outputSetLocation;
+	private boolean outputSetLocation;
 
 	/** The output support card. */
 	@Column(name="OUTPUT_SUPPORT_CARD")
-	private BigDecimal outputSupportCard;
+	private boolean outputSupportCard;
 
 	/** The output work hours. */
 	@Column(name="OUTPUT_WORK_HOURS")
-	private BigDecimal outputWorkHours;
+	private boolean outputWorkHours;
 
 	/** The stamp output set name. */
 	@Column(name="STAMP_OUTPUT_SET_NAME")

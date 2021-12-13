@@ -9,6 +9,14 @@ import org.junit.Test;
 import nts.uk.ctx.at.record.dom.employmentinfoterminal.infoterminal.receive.StampReceptionData.StampDataBuilder;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.AuthcMethod;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeCalArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.SetPreClockArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampType;
+import nts.uk.ctx.at.shared.dom.common.WorkplaceId;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkLocationCD;
+import nts.uk.ctx.at.shared.dom.workrule.goingout.GoingOutReason;
+import nts.uk.shr.com.enumcommon.NotUseAtr;
+import nts.uk.shr.com.net.Ipv4Address;
 
 /**
  * @author ThanhNX
@@ -195,6 +203,7 @@ public class StampReceptionDataTest {
 //		dataNRA = new StampDataBuilder("1", "B", "1", "9", "200303", "01").time("0101").overTimeHours("1101")
 //				.midnightTime(" ").build();
 //		assertEquals(ChangeClockArt.TEMPORARY_LEAVING, dataNRA.convertChangeClockArt(empInfoTerminal));
+
 
 	}
 

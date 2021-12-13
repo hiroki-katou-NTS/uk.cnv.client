@@ -58,15 +58,18 @@ public class JpaLoginPasswordOfUserRepository extends JpaRepository implements L
 	@Override
 	public void delete(String userId) {
 		
-		String query 	= " delete "
+		String query1 	= " delete "
 						+ " from SGWDT_USER_LOGIN_PASSWORD "
-						+ " where USER_ID = @userId1 "
-						+ " delete "
+						+ " where USER_ID = @userId1 ";
+		new NtsStatement(query1, this.jdbcProxy())
+			.paramString("userId1", userId)
+			.execute();
+		
+		String query2 	= " delete "
 						+ " from SGWDT_USER_LOGIN_PASSWORD_CHANGE_LOG "
 						+ " where USER_ID = @userId2 ";
-		new NtsStatement(query, this.jdbcProxy())
-		.paramString("userId1", userId)
-		.paramString("userId2", userId)
-		.execute();
+		new NtsStatement(query2, this.jdbcProxy())
+			.paramString("userId2", userId)
+			.execute();
 	}
 }

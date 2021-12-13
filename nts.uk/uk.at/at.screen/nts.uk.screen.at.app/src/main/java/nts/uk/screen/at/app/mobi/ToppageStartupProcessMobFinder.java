@@ -48,6 +48,7 @@ import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumb
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualleave.AnnualLeaveGrantImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualleave.AnnualLeaveRemainingNumberImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualleave.ReNumAnnLeaReferenceDateImport;
+import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualleave.ReNumAnnLeaveImport;
 import nts.uk.ctx.at.shared.dom.adapter.employee.EmpEmployeeAdapter;
 import nts.uk.ctx.at.shared.dom.adapter.employee.EmployeeImport;
 import nts.uk.ctx.at.shared.dom.adapter.employment.BsEmploymentHistoryImport;
@@ -978,24 +979,13 @@ public class ToppageStartupProcessMobFinder {
 			}
 		}
 		// lấy request 198
-		ReNumAnnLeaReferenceDateImport reNumAnnLeaReferenceDate = annLeaveRemainNumberAdapter
-				.getReferDateAnnualLeaveRemainNumber(employeeId, date);
+		ReNumAnnLeaveImport reNumAnnLeaReferenceDate = annLeaveRemainNumberAdapter
+				.getReferDateAnnualLeaveRemain(employeeId, date);
 
-		Double yearDays = 0d;
-		int yearHours = 0;
-		List<AnnualLeaveGrantImport> annualLeaveGrantExports = reNumAnnLeaReferenceDate.getAnnualLeaveGrantExports();
-		for (int i = 0; i < annualLeaveGrantExports.size(); i++) {
-		    yearHours += annualLeaveGrantExports.get(i).getRemainMinutes();
-        }
-		
-		AnnualLeaveRemainingNumberImport remainingNumber = reNumAnnLeaReferenceDate.getAnnualLeaveRemainNumberExport();
-		yearDays = remainingNumber == null ? 0 : remainingNumber.getAnnualLeaveGrantDay();
-		yearlyHoliday.setNextTimeInfo(new YearlyHolidayInfo(yearDays,
-				new TimeOT(yearHours / 60,
-				        yearHours % 60),
-				remainingNumber.getNumberOfRemainGrantPre(),
-				new TimeOT(remainingNumber.getTimeAnnualLeaveWithMinusGrantPre().intValue() / 60,
-						remainingNumber.getTimeAnnualLeaveWithMinusGrantPre().intValue() % 60)));
+		yearlyHoliday.setNextTimeInfo(new YearlyHolidayInfo(reNumAnnLeaReferenceDate.getRemainingDays(),
+				new TimeOT(reNumAnnLeaReferenceDate.getRemainingTime() / 60,
+				        reNumAnnLeaReferenceDate.getRemainingTime() % 60),
+				0, new TimeOT(0, 0)));
 		/*
 		 * yearlyHoliday.setNextGrantDateInfo(new
 		 * YearlyHolidayInfo(remainingNumber.getAnnualLeaveGrantPreDay(), new

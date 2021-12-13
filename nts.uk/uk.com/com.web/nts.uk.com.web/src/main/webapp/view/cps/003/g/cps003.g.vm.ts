@@ -18,9 +18,10 @@ module cps003.g.vm {
             var dfd = $.Deferred();
             let paramA = getShared("CPS003G_ERROR_LIST"), paramC: GridDtoError = getShared("CPS003G_ERROR_LIST"),
                 paramSorted = _.sortBy(paramA, ['no']);
+            let count = 0;
             self.data = _.map(paramSorted, a => {
                 return {
-                    id : a.employeeId + a.itemName + a.no,
+                    id : a.employeeId + a.itemName + a.no + (count++),
                     empCd: a.empCd, empName: a.empName,
                     employeeId: a.employeeId, errorType: a.errorType == 0 ? text("CPS003_127") : text("CPS003_128"),
                     isDisplayRegister: a.displayRegister, itemName: a.itemName, message: a.message, no: a.no,
@@ -44,7 +45,7 @@ module cps003.g.vm {
                     { headerText: text("CPS003_102"), key: "no", dataType: "string",width: "50px" },
                     { headerText: text("CPS003_103"), key: "resultRegister", dataType: "string",width: "50px", hidden: isDisplayRegiter.length > 0? false: true},
                     { headerText: text("CPS003_104"), key: "errorType", dataType: "string",width: "50px" },
-                    { headerText: text("CPS003_105"), key: "itemName", dataType: "string",width: "200px" },
+                    { headerText: text("CPS003_105"), key: "itemName", dataType: "string",width: isDisplayRegiter.length > 0 ? "150px" : "200px" },
                     { headerText: text("CPS003_106"), key: "message", dataType: "string",width: "500px" }
                 ],
                 features: [

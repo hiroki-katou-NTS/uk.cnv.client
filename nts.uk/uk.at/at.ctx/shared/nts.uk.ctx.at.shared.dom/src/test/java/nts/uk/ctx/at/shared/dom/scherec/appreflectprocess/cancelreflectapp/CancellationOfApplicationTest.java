@@ -24,6 +24,7 @@ import nts.uk.ctx.at.shared.dom.scherec.application.common.ApplicationShare;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.PrePostAtrShare;
 import nts.uk.ctx.at.shared.dom.scherec.application.reflectprocess.common.ReflectApplicationHelper;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
+import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.AppReflectExecInfo;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.ApplicationReflectHistory;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.AttendanceBeforeApplicationReflect;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.condition.DailyAfterAppReflectResult;
@@ -88,10 +89,12 @@ public class CancellationOfApplicationTest {
 		new Expectations() {
 			{
 				AcquireAppReflectHistForCancel.process(require, app, (GeneralDate) any, (ScheduleRecordClassifi) any);
-				result = Optional.of(createAppReflectHist("1", null, Pair.of(28, "002")));// 取得した[元に戻すための申請反映履歴].反映前（List）
+				result = Optional.of(
+						new AcquireAppReflectHistForCancelOutput(createAppReflectHist("1", null, Pair.of(28, "002")),
+								createAppReflectHist("1", null, Pair.of(28, "002"))));// 取得した[元に戻すための申請反映履歴].反映前（List）
 			}
 		};
-		val actualResult = CancellationOfApplication.process(require, app, GeneralDate.ymd(2021, 4, 21),
+		DailyAfterAppReflectResult actualResult = CancellationOfApplication.process(require, app, GeneralDate.ymd(2021, 4, 21),
 				ScheduleRecordClassifi.RECORD, createDomain(31, 34));// 日別勤怠(work）.編集状態
 
 		assertThat(actualResult.getLstItemId()).isEmpty();
@@ -117,19 +120,24 @@ public class CancellationOfApplicationTest {
 	 */
 
 	@Test
-	public void test3(@Mocked AcquireAppReflectHistForCancel appHist) {
+	public void test3(@Mocked AcquireAppReflectHistForCancel appHist, @Mocked ReturnStateBeforeReflectApp beforeState) {
 
 		ApplicationShare app = ReflectApplicationHelper.createAppShare(PrePostAtrShare.PREDICT);
 
 		new Expectations() {
 			{
 				AcquireAppReflectHistForCancel.process(require, app, (GeneralDate) any, (ScheduleRecordClassifi) any);
-				result = Optional.of(createAppReflectHist("1", null, Pair.of(28, "002"), Pair.of(29, "003")));// 取得した[元に戻すための申請反映履歴].反映前（List）
+				result = Optional.of(
+						new AcquireAppReflectHistForCancelOutput(createAppReflectHist("1", null, Pair.of(28, "002"), Pair.of(29, "003")),
+								createAppReflectHist("1", null, Pair.of(28, "002"), Pair.of(29, "003"))));// 取得した[元に戻すための申請反映履歴].反映前（List）
 
 				require.findAppReflectHistAfterMaxTime(anyString, (GeneralDate) any, (ScheduleRecordClassifi) any,
 						anyBoolean, (GeneralDateTime) any);
 				result = Arrays.asList(
 						createAppReflectHist("2", null, Pair.of(28, "002"), Pair.of(34, "600")));
+				
+				ReturnStateBeforeReflectApp.process(require, (IntegrationOfDaily)any, (ApplicationReflectHistory)any, (ScheduleRecordClassifi)any, anyInt);
+				result = createDomain(28, 29);
 				
 			}
 		};
@@ -157,19 +165,22 @@ public class CancellationOfApplicationTest {
 	 * 
 	 */
 	@Test
-	public void test4(@Mocked AcquireAppReflectHistForCancel appHist) {
+	public void test4(@Mocked AcquireAppReflectHistForCancel appHist, @Mocked ReturnStateBeforeReflectApp beforeState) {
 
 		ApplicationShare app = ReflectApplicationHelper.createAppShare(PrePostAtrShare.PREDICT);
 
 		new Expectations() {
 			{
 				AcquireAppReflectHistForCancel.process(require, app, (GeneralDate) any, (ScheduleRecordClassifi) any);
-				result = Optional.of(createAppReflectHist("1", null, Pair.of(28, "002")));// 取得した[元に戻すための申請反映履歴].反映前（List）
+				result = Optional.of(new AcquireAppReflectHistForCancelOutput(createAppReflectHist("1", null, Pair.of(28, "002")),
+						createAppReflectHist("1", null, Pair.of(28, "002")) ));// 取得した[元に戻すための申請反映履歴].反映前（List）
 				
 				require.findAppReflectHistAfterMaxTime(anyString, (GeneralDate) any, (ScheduleRecordClassifi) any,
 						anyBoolean, (GeneralDateTime) any);
 				result = Arrays.asList();
 				
+				ReturnStateBeforeReflectApp.process(require, (IntegrationOfDaily)any, (ApplicationReflectHistory)any, (ScheduleRecordClassifi)any, anyInt);
+				result = createDomain(28, 29);
 			}
 		};
 		
@@ -205,8 +216,9 @@ public class CancellationOfApplicationTest {
 			{
 				AcquireAppReflectHistForCancel.process(require, app, (GeneralDate) any, (ScheduleRecordClassifi) any);
 				result = Optional.of(
-						createAppReflectHistAll("1", EditStateSetting.HAND_CORRECTION_MYSELF, //処理中の反映前.編集状態をチェックがある
-								null, Pair.of(28, "002")));// 取得した[元に戻すための申請反映履歴].反映前（List）
+						new AcquireAppReflectHistForCancelOutput(createAppReflectHistAll("1", EditStateSetting.HAND_CORRECTION_MYSELF, //処理中の反映前.編集状態をチェックがある
+								null, Pair.of(28, "002")), createAppReflectHistAll("1", EditStateSetting.HAND_CORRECTION_MYSELF, //処理中の反映前.編集状態をチェックがある
+										null, Pair.of(28, "002"))));// 取得した[元に戻すための申請反映履歴].反映前（List）
 				
 				require.findAppReflectHistAfterMaxTime(anyString, (GeneralDate) any, (ScheduleRecordClassifi) any,
 						anyBoolean, (GeneralDateTime) any);
@@ -252,8 +264,8 @@ public class CancellationOfApplicationTest {
 		new Expectations() {
 			{
 				AcquireAppReflectHistForCancel.process(require, app, (GeneralDate) any, (ScheduleRecordClassifi) any);
-				result = Optional.of(
-						createAppReflectHistAll("1", null, null, Pair.of(28, "002")));// 処理中の反映前.編集状態をチェックがない
+				result = Optional.of(new AcquireAppReflectHistForCancelOutput(
+						createAppReflectHistAll("1", null, null, Pair.of(28, "002")), createAppReflectHistAll("1", null, null, Pair.of(28, "002"))));// 処理中の反映前.編集状態をチェックがない
 				
 				require.findAppReflectHistAfterMaxTime(anyString, (GeneralDate) any, (ScheduleRecordClassifi) any,
 						anyBoolean, (GeneralDateTime) any);
@@ -308,7 +320,7 @@ public class CancellationOfApplicationTest {
 				.map(x -> new AttendanceBeforeApplicationReflect(x.getKey(), Optional.of(x.getValue()),
 						editState == null ? Optional.empty() : Optional.of(new EditStateOfDailyAttd(x.getKey(), editState))))
 				.collect(Collectors.toList());
-		return new ApplicationReflectHistory("1",  GeneralDate.ymd(2021, 4, 21) , appId,
-				maxDate == null ? GeneralDateTime.now() : maxDate, ScheduleRecordClassifi.RECORD, true, lstAttBeforeAppReflect);
+		return new ApplicationReflectHistory("1",  GeneralDate.ymd(2021, 4, 21) , appId
+				, ScheduleRecordClassifi.RECORD, true, lstAttBeforeAppReflect, new AppReflectExecInfo(false, "1", maxDate == null ? GeneralDateTime.now() : maxDate));
 	}
 }

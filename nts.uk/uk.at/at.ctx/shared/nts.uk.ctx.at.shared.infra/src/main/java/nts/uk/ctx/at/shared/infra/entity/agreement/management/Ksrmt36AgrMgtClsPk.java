@@ -32,5 +32,5 @@ public class Ksrmt36AgrMgtClsPk implements Serializable {
     //1：変形労働時間制
     //分類３６協定時間
     @Column(name = "LABOR_SYSTEM_ATR")
-    public int laborSystemAtr;
+    public boolean laborSystemAtr;
 }

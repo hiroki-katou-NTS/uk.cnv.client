@@ -43,8 +43,8 @@ module nts.uk.com.view.kal004.b.viewmodel {
             self.txtEndMonth = ko.observable(getText("KAL004_43"));
             self.strComboDay = ko.observableArray(__viewContext.enums.PreviousClassification);
             self.endComboDay = ko.observableArray(__viewContext.enums.PreviousClassification);
-            self.strComboMonth = ko.observableArray(__viewContext.enums.SpecifiedMonth);
-            self.endComboMonth = ko.observableArray(__viewContext.enums.SpecifiedMonth);
+            self.strComboMonth = ko.observableArray(__viewContext.enums.DailyClosingDateSpecifiedMonth);
+            self.endComboMonth = ko.observableArray(__viewContext.enums.DailyClosingDateSpecifiedMonth);
             // QA#115367
             if (categoryId == model.AlarmCategory.SCHEDULE_DAILY || categoryId == model.AlarmCategory.APPLICATION_APPROVAL) {
                 self.strComboMonth = ko.observableArray(__viewContext.enums.ScheSpecifiedMonth);
@@ -192,7 +192,7 @@ module nts.uk.com.view.kal004.b.viewmodel {
             var self = this;
             
             // check period category schedule daily
-            if (self.getCategoryId() == model.AlarmCategory.SCHEDULE_DAILY) {
+            if (self.getCategoryId() == model.AlarmCategory.SCHEDULE_DAILY || self.getCategoryId() == model.AlarmCategory.APPLICATION_APPROVAL) {
                 let checkResult = self.checkPatternScheduleDaily();
                 // if exist error then show alert error
                 if (!_.isNil(checkResult)) {
@@ -215,19 +215,6 @@ module nts.uk.com.view.kal004.b.viewmodel {
                     return false;
                 } else {
                     return true;     
-                }
-            } else if(self.getCategoryId() == 8){
-                if(self.strSelected() == 0 && self.strPreviousDay() == 1 && self.endPreviousDay() == 0 ){
-                    nts.uk.ui.dialog.alertError({ messageId: "Msg_812"});
-                    return false;
-                } else if (self.strSelected() == 0 && self.strPreviousDay() == 0 && self.endPreviousDay() == 0 && (Number(self.strDay()) < Number(self.endDay()))){
-                    nts.uk.ui.dialog.alertError({ messageId: "Msg_812"});
-                    return false;   
-                } else if(self.strSelected() == 0 && self.strPreviousDay() == 1 && self.endPreviousDay() == 1 && (Number(self.strDay()) > Number(self.endDay()))){
-                    nts.uk.ui.dialog.alertError({ messageId: "Msg_812"});
-                    return false;  
-                } else {
-                    return true;    
                 }
             }
         }

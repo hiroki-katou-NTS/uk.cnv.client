@@ -75,7 +75,6 @@ public class JpaUserInformationUseMethodRepository extends JpaRepository impleme
 		oldEntity.setOtherContact4Use(entity.getOtherContact4Use());
 		oldEntity.setOtherContact5Name(entity.getOtherContact5Name());
 		oldEntity.setOtherContact5Use(entity.getOtherContact5Use());
-		oldEntity.setEmailDestinationFunctions(entity.getEmailDestinationFunctions());
 		
 		/**
 		 * Step persist()

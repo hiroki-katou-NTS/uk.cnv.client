@@ -29,6 +29,8 @@ import nts.uk.ctx.at.record.dom.daily.attendanceleavinggate.repo.AttendanceLeavi
 import nts.uk.ctx.at.record.dom.daily.attendanceleavinggate.repo.PCLogOnInfoOfDailyRepo;
 import nts.uk.ctx.at.record.dom.daily.optionalitemtime.AnyItemValueOfDaily;
 import nts.uk.ctx.at.record.dom.daily.optionalitemtime.AnyItemValueOfDailyRepo;
+import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeOfDaily;
+import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeOfDailyRepo;
 import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDaily;
 import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDailyRepo;
 import nts.uk.ctx.at.record.dom.daily.remarks.RemarksOfDailyPerform;
@@ -132,6 +134,9 @@ public class IntegrationOfDailyGetterImpl implements IntegrationOfDailyGetter {
 	
 	@Inject
 	private OuenWorkTimeSheetOfDailyRepo ouenSheetRepo;
+	
+	@Inject
+	private OuenWorkTimeOfDailyRepo ouenWorkTimeOfDailyRepo;
 	
 	
 	/**
@@ -273,7 +278,12 @@ public class IntegrationOfDailyGetterImpl implements IntegrationOfDailyGetter {
 				daily.setOuenTimeSheet(x.getOuenTimeSheet());
 			});
 			
-			
+			OuenWorkTimeOfDaily OuenTime = ouenWorkTimeOfDailyRepo.find(employeeId, attendanceTime.getYmd()); 
+
+			if (OuenTime != null) {
+				daily.setOuenTime(OuenTime.getOuenTimes());
+			}
+
 			returnList.add(daily);
 		}
 		return returnList;
@@ -408,8 +418,7 @@ public class IntegrationOfDailyGetterImpl implements IntegrationOfDailyGetter {
 			ouenSheets.stream().filter(x -> x.getYmd().equals(ymd) && x.getEmpId().equals(attendanceTime.getEmployeeId())).findFirst().ifPresent(x -> {
 				daily.setOuenTimeSheet(x.getOuenTimeSheet());
 			});
-			
-			
+						
 			returnList.add(daily);
 		}
 		return returnList;

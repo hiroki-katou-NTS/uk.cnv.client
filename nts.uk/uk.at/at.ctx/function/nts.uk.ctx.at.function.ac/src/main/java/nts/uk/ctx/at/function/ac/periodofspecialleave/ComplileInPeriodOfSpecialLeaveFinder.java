@@ -1,25 +1,27 @@
 package nts.uk.ctx.at.function.ac.periodofspecialleave;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-
+import lombok.val;
 import nts.arc.layer.app.cache.CacheCarrier;
+import nts.arc.primitive.PrimitiveValueBase;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.function.dom.adapter.periodofspecialleave.ComplileInPeriodOfSpecialLeaveAdapter;
 import nts.uk.ctx.at.function.dom.adapter.periodofspecialleave.SpecialHolidayImported;
 import nts.uk.ctx.at.function.dom.adapter.periodofspecialleave.SpecialVacationImported;
+import nts.uk.ctx.at.function.dom.adapter.periodofspecialleave.SpecialVacationImportedKdr;
 import nts.uk.ctx.at.record.dom.monthly.vacation.specialholiday.monthremaindata.export.SpecialHolidayRemainDataOutput;
 import nts.uk.ctx.at.record.dom.monthly.vacation.specialholiday.monthremaindata.export.SpecialHolidayRemainDataSevice;
 import nts.uk.ctx.at.record.dom.remainingnumber.specialleave.empinfo.grantremainingdata.ComplileInPeriodOfSpecialLeaveParam;
 import nts.uk.ctx.at.record.dom.remainingnumber.specialleave.empinfo.grantremainingdata.InPeriodOfSpecialLeaveResultInfor;
 import nts.uk.ctx.at.record.dom.remainingnumber.specialleave.export.SpecialLeaveManagementService;
 import nts.uk.ctx.at.record.dom.require.RecordDomRequireService;
+
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Stateless
 public class ComplileInPeriodOfSpecialLeaveFinder implements ComplileInPeriodOfSpecialLeaveAdapter {
@@ -167,4 +169,107 @@ public class ComplileInPeriodOfSpecialLeaveFinder implements ComplileInPeriodOfS
 		return lstSpecHd;
 	}
 
+	@Override
+	public SpecialVacationImportedKdr get273New(String cid, String sid, DatePeriod complileDate,
+												boolean mode, GeneralDate baseDate, int specialLeaveCode, boolean mngAtr) {
+		// requestList273
+		ComplileInPeriodOfSpecialLeaveParam param = new ComplileInPeriodOfSpecialLeaveParam(
+				cid,
+				sid,
+				complileDate,
+				mode,
+				baseDate,
+				specialLeaveCode,
+				mngAtr,
+				false,
+				new ArrayList<>(),
+				Optional.empty());
+		InPeriodOfSpecialLeaveResultInfor specialLeave = SpecialLeaveManagementService
+				.complileInPeriodOfSpecialLeave(
+						recordDomRequireService.createRequire(),
+						new CacheCarrier(), param);
+		if (specialLeave == null)
+			return null;
+		Double grantDays = null;
+		Integer grantTime = null;
+		if(!specialLeave.getAsOfPeriodEnd().getGrantRemainingDataList().isEmpty()){
+			 grantDays = specialLeave.getAsOfPeriodEnd().getGrantRemainingDataList().stream()
+					.mapToDouble(e->e.getDetails().getGrantNumber().getDays().v()).sum();
+
+			 grantTime = specialLeave.getAsOfPeriodEnd().getGrantRemainingDataList().stream()
+					.mapToInt(e->e.getDetails().getGrantNumber().getMinutes().isPresent()?
+							e.getDetails().getGrantNumber().getMinutes().get().v():0).sum();
+		}
+		Double usedDate =  specialLeave.getAsOfPeriodEnd()
+				.getRemainingNumber().getSpecialLeaveWithMinus().getUsedNumberInfo()
+				.getUsedNumber().getUseDays().map(PrimitiveValueBase::v).orElse(null);
+		Double usedDateBf = specialLeave.getAsOfPeriodEnd()
+				.getRemainingNumber().getSpecialLeaveWithMinus().getUsedNumberInfo()
+				.getUsedNumberBeforeGrant().getUseDays().map(x -> x.v()).orElse(null);
+
+		val usedDateAfOpt = specialLeave.getAsOfPeriodEnd()
+				.getRemainingNumber().getSpecialLeaveWithMinus().getUsedNumberInfo()
+				.getUsedNumberAfterGrantOpt();
+
+		Double usedDateAf = usedDateAfOpt.isPresent()?
+				(usedDateAfOpt.get().getUseDays().isPresent()?usedDateAfOpt.get().getUseDays().get().v():null):null;
+
+
+		Double remainDate =  specialLeave.getAsOfPeriodEnd()
+				.getRemainingNumber().getSpecialLeaveWithMinus().getRemainingNumberInfo()
+				.getRemainingNumber().dayNumberOfRemain.v();
+
+		Double remainDateBf =  specialLeave.getAsOfPeriodEnd()
+				.getRemainingNumber().getSpecialLeaveWithMinus().getRemainingNumberInfo()
+				.getRemainingNumberBeforeGrant().dayNumberOfRemain.v();
+
+		val remainDateAfOpt =  specialLeave.getAsOfPeriodEnd()
+				.getRemainingNumber().getSpecialLeaveWithMinus().getRemainingNumberInfo()
+				.getRemainingNumberAfterGrantOpt();
+
+		Double remainDateAf =  remainDateAfOpt.isPresent()?remainDateAfOpt
+				.get().dayNumberOfRemain.v() : null;
+
+
+		val usedHoursOpt =  specialLeave.getAsOfPeriodEnd()
+				.getRemainingNumber().getSpecialLeaveWithMinus().getUsedNumberInfo()
+				.getUsedNumber().getUseTimes();
+		Integer usedHours =  usedHoursOpt.isPresent()?usedHoursOpt.get().getUseTimes().v():null;
+
+		val usedHoursBfOpt = specialLeave.getAsOfPeriodEnd()
+				.getRemainingNumber().getSpecialLeaveWithMinus().getUsedNumberInfo()
+				.getUsedNumberBeforeGrant().getUseTimes();
+		Integer usedHoursBf = usedHoursBfOpt.isPresent()? usedHoursBfOpt.get().getUseTimes().v() :null;
+
+
+		val usedHoursAfOpt = specialLeave.getAsOfPeriodEnd()
+				.getRemainingNumber().getSpecialLeaveWithMinus().getUsedNumberInfo()
+				.getUsedNumberAfterGrantOpt();
+
+		Integer usedHoursAf = usedHoursAfOpt.isPresent()?
+				(usedHoursAfOpt.get().getUseTimes().isPresent()? (usedHoursAfOpt.get().getUseTimes().isPresent()?
+						usedHoursAfOpt.get().getUseTimes().get().getUseTimes().v():null):null):null;
+
+
+		val  remainHoursOpt =  specialLeave.getAsOfPeriodEnd()
+				.getRemainingNumber().getSpecialLeaveWithMinus().getRemainingNumberInfo()
+				.getRemainingNumber().timeOfRemain;
+		Integer remainHours = remainHoursOpt.isPresent()?remainHoursOpt.get().v():null;
+
+		val remainHoursBfOpt =  specialLeave.getAsOfPeriodEnd()
+				.getRemainingNumber().getSpecialLeaveWithMinus().getRemainingNumberInfo()
+				.getRemainingNumberBeforeGrant().timeOfRemain;
+		Integer remainHoursBf = remainHoursBfOpt.isPresent()?remainHoursBfOpt.get().v():null;
+
+		val remainHoursAfOpt =  specialLeave.getAsOfPeriodEnd()
+				.getRemainingNumber().getSpecialLeaveWithMinus().getRemainingNumberInfo()
+				.getRemainingNumberAfterGrantOpt();
+
+		Integer remainHoursAf =  remainHoursAfOpt.isPresent()? (remainHoursAfOpt
+				.get().getTimeOfRemain().isPresent()?remainHoursAfOpt
+				.get().getTimeOfRemain().get().v():null) : null;
+
+		return new SpecialVacationImportedKdr( grantDays,grantTime,usedDate, usedDateBf,usedDateAf,remainDate
+				,remainDateBf, remainDateAf, usedHours, usedHoursBf, usedHoursAf,remainHours,remainHoursBf,remainHoursAf);
+	}
 }

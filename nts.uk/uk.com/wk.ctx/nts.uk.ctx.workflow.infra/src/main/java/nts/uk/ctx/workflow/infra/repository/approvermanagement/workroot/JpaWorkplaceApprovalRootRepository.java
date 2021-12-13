@@ -120,6 +120,11 @@ public class JpaWorkplaceApprovalRootRepository extends JpaRepository implements
 			   + " AND c.busEventId = :busEventId"
 			   + " AND c.employmentRootAtr = :employmentRootAtr";
 	
+	private static final String GET_WKPS_AS_APPROVERS = "SELECT m.wwfmtWpApprovalRootPK.workplaceId"
+			+ " FROM WwfmtApprovalRouteWp m JOIN WwfmtAppover d"
+			+ " ON m.wwfmtWpApprovalRootPK.approvalId = d.wwfmtAppoverPK.approvalId AND d.employeeId = :sid"
+			+ " WHERE m.startDate <= :referDate AND m.endDate >= :referDate";
+	
 	private static final String FIND_COMMON;
 	private static final String FIND_APPLICATION;
 	private static final String FIND_CONFIRMATION;
@@ -617,5 +622,13 @@ public class JpaWorkplaceApprovalRootRepository extends JpaRepository implements
 				.paramInt("rootAtr", lstRootAtr)
 				.getList(x -> convertNtsResult(x));
 		return lstResult;
+	}
+
+	@Override
+	public List<String> getWkpsAsApprovers(String sid, GeneralDate referDate) {
+		return this.queryProxy().query(GET_WKPS_AS_APPROVERS, String.class)
+				.setParameter("sid", sid)
+				.setParameter("referDate", referDate)
+				.getList();
 	}
 }

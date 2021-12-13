@@ -256,7 +256,7 @@ module nts.uk.at.view.kmk013.b_ref {
 
                 self.itemListB3_8 = ko.observableArray([
                     new BoxModel(0, nts.uk.resource.getText('KMK013_255')),
-                    new BoxModel(1, nts.uk.resource.getText('KMK013_256'))
+                    new BoxModel(1, nts.uk.resource.getText('KMK013_574'))
                 ]);
                 self.selectedIdB3_8 = ko.observable(0);
                 self.enableB3_8 = ko.observable(true);
@@ -472,6 +472,18 @@ module nts.uk.at.view.kmk013.b_ref {
                     return self.checkedB151() == true && self.selectedB164() == 1 && self.checkedB149() == true && self.checkedB1491() == false && self.enableB164() == true;
                 });
 
+                // Init B4_9
+                $("#B4_10").ntsPopup({
+                  trigger: "#B4_9",
+                  position: {
+                    my: "left top",
+                    at: "left bottom",
+                    of: "#B4_9"
+                  },
+                  showOnStart: false,
+                  dismissible: true
+                });
+
                 self.changeTabPanel();
                 
             }
@@ -525,6 +537,15 @@ module nts.uk.at.view.kmk013.b_ref {
                         
                         // condition 26
                         self.conditionDisplay26(dataDomainSet.useAggDeformedSetting == 1? true : false);
+
+                        // #120188
+                        if (!self.conditionDisplay15()) {
+                          _.remove(self.tabs(), { id: 'tab-3' });
+                        }
+                        if (!self.conditionDisplay26()) {
+                          _.remove(self.tabs(), { id: 'tab-4' });
+                        }
+                        self.tabs.valueHasMutated();
                     }
                     
                     if (data[0] == null) {

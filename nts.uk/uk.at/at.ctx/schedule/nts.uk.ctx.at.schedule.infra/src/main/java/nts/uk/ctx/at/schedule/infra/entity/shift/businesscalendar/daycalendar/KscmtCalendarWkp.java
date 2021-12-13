@@ -10,14 +10,14 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
+import nts.uk.shr.infra.data.entity.ContractCompanyUkJpaEntity;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "KSCMT_CALENDAR_WKP")
+@Table(name = "KSCMT_BUSINESS_CALENDAR_WKP")
 @Setter
-public class KscmtCalendarWkp extends ContractUkJpaEntity implements Serializable {
+public class KscmtCalendarWkp extends ContractCompanyUkJpaEntity implements Serializable {
 	
 	/**
 	 * 

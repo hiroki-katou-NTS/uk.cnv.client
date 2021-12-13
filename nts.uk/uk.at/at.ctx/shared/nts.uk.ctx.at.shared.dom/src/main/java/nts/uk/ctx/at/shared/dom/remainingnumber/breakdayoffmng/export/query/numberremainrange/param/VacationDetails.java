@@ -65,8 +65,9 @@ public class VacationDetails {
 	//[7] 指定した期間内に未消化となる情報を取得する
 	public List<AccumulationAbsenceDetail> getUndigestInfoInPeriod(DatePeriod dateperiod) {
 		return getOccurrenceNotDateUnknown().stream()
-				.filter(x -> ((UnbalanceVacation) x).getDigestionCate() == DigestionAtr.UNUSED
-						&& dateperiod.contains(((UnbalanceVacation) x).getDeadline()))
+				.filter(x -> (((LeaveOccurrDetail) x).getDigestionCate() == DigestionAtr.UNUSED
+						|| ((LeaveOccurrDetail) x).judgeDigestiveStatus(GeneralDate.today()) == DigestionAtr.UNUSED) //
+						&& dateperiod.contains(((LeaveOccurrDetail) x).getDeadline()))
 				.collect(Collectors.toList());
 	}
 	

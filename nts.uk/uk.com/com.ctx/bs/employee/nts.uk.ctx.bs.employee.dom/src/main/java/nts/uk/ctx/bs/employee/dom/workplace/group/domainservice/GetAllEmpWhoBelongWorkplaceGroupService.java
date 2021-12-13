@@ -1,76 +1,85 @@
 package nts.uk.ctx.bs.employee.dom.workplace.group.domainservice;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import nts.arc.time.GeneralDate;
+import lombok.val;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.bs.employee.dom.employeeinfo.EmployeeCode;
 import nts.uk.ctx.bs.employee.dom.workplace.EmployeeAffiliation;
 
 /**
  * 職場グループに所属する社員をすべて取得する
+ * UKDesign.ドメインモデル.NittsuSystem.UniversalK.基幹.社員.職場.職場グループ.職場グループに所属する社員をすべて取得する
  * @author HieuLt
- *
  */
 public class GetAllEmpWhoBelongWorkplaceGroupService {
-	
+
 	/**
-	 * [1] 取得する	
-	 * @param require
-	 * @param baseDate
-	 * @param workplaceGroupId
+	 * 取得する
+	 * @param require Require
+	 * @param period 期間
+	 * @param workplaceGroupId 職場グループID
 	 * @return
 	 */
-	public static List<EmployeeAffiliation> getAllEmp(Require require ,GeneralDate baseDate , String workplaceGroupId ){
-		//$対象期間 = 期間( 基準日, 基準日 ) 
-		DatePeriod targetDatePeriod = new DatePeriod(baseDate, baseDate);
-		//$職場IDリスト = require.職場グループに所属する職場を取得する( 職場グループID )
-		List<String> lstWorkplaceGroupId = require.getWorkplaceBelongsWorkplaceGroup(workplaceGroupId);
-		List<EmployeeAffiliation> result = new ArrayList<>();
-		 lstWorkplaceGroupId.stream().map(c -> result.addAll(createListEmpOrganizations(require, targetDatePeriod ,workplaceGroupId,c)))
-		.collect(Collectors.toList());
-		return result;
+	public static List<EmployeeAffiliation> getAllEmp(Require require, DatePeriod period, String workplaceGroupId) {
+
+		// 職場グループに所属する職場を取得
+		val workplaceIds = require.getWorkplaceBelongsWorkplaceGroup(workplaceGroupId);
+		// 職場に所属する社員を取得
+		return workplaceIds.stream()
+			.map( e -> GetAllEmpWhoBelongWorkplaceGroupService.createListEmpOrganizations(require, period, workplaceGroupId, e) )
+			.flatMap( List::stream )
+			.collect(Collectors.toList());
+
 	}
+
+
 	/**
-	 * [prv-1] 社員の所属組織リストを作成する
-	 * @param require
-	 * @param datePeriod
-	 * @param workplaceGroupId
-	 * @param workplaceId
-	 * @return
+	 * 社員の所属組織リストを作成する
+	 * @param require Require
+	 * @param period 対象期間
+	 * @param workplaceGroupId 職場グループID
+	 * @param workplaceId 職場ID
+	 * @return 社員の所属組織リスト
 	 */
-	private static List<EmployeeAffiliation> createListEmpOrganizations(Require require, DatePeriod datePeriod ,String workplaceGroupId , String workplaceId){
-		//	$社員情報リスト = require.職場の所属社員を取得する( 職場ID, 対象期間 )		
-		List<EmployeeInfoData> data = require.getEmployeesWhoBelongWorkplace(workplaceId, datePeriod);
-		List<EmployeeAffiliation> result = data.stream().map(x -> new EmployeeAffiliation(
-				x.getEmpId(),
-				Optional.ofNullable(new EmployeeCode(x.getEmpCd())),
-				Optional.ofNullable(x.getEmpName()),
-				workplaceId,
-				Optional.ofNullable(workplaceGroupId))).collect(Collectors.toList());
-		return result;
+	private static List<EmployeeAffiliation> createListEmpOrganizations(
+			Require require, DatePeriod period, String workplaceGroupId, String workplaceId
+	){
+
+		// 対象期間中に指定職場に所属している社員を取得
+		val empInfoDatas = require.getEmployeesWhoBelongWorkplace(workplaceId, period);
+		// 『社員の所属組織』に変換する
+		return empInfoDatas.stream()
+				.map(x -> EmployeeAffiliation.create(
+						x.getEmpId()
+					,	new EmployeeCode(x.getEmpCd())
+					,	x.getEmpName()
+					,	workplaceId
+					,	workplaceGroupId
+				) ).collect(Collectors.toList());
+
 	}
-	
+
+
+
 	public static interface Require {
+
 		/**
-		 * [R-1] 職場グループに所属する職場を取得する
-		 * 職場グループ所属情報Repository.職場グループに所属する職場を取得する( 会社ID, 職場グループID )		
-		 * @param workplaceGroupId
-		 * @return
+		 * 職場グループに所属する職場を取得する
+		 * @param workplaceGroupId 職場グループID
+		 * @return 職場IDリスト
 		 */
 		List<String> getWorkplaceBelongsWorkplaceGroup(String workplaceGroupId);
-		
+
 		/**
-		 * [R-2] 職場の所属社員を取得する	
-		 * アルゴリズム.職場の所属社員を取得する( 職場ID, 期間 )		
-		 * @param workplaceId
-		 * @param datePeriod
-		 * @return
+		 * 職場の所属社員を取得する
+		 * @param workplaceId 職場ID
+		 * @param datePeriod 期間
+		 * @return 社員情報リスト
 		 */
 		List<EmployeeInfoData> getEmployeesWhoBelongWorkplace(String workplaceId, DatePeriod datePeriod);
+
 	}
 
 }

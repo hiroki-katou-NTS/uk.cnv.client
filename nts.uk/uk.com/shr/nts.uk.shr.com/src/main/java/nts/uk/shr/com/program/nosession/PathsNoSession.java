@@ -19,6 +19,7 @@ public class PathsNoSession implements PathsToCheckCsrf {
 			"/ntscommons/arc/filegate/.*",
 			"/ntscommons/arc/diagnose/.*",
 			"/nts/jobdstributor/worker/.*",
+			"/nts/tenantlocator/client/.*",
 			"/shr/infra/file/storage/.*",
 			"/operation/stop/.*",
 			"/i18n/.*",

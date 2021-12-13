@@ -29,7 +29,7 @@ public class KfnmtRptWkAtdOutframePK implements Serializable {
 	@Column(name = "OUTPUT_ATR")
 	private long outputAtr;
 
-	@Column(name = "[POSITION]")
+	@Column(name = "POSITION")
 	private long position;
 
 	public long getColumnIndex() {

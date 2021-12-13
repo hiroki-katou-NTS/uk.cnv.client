@@ -7,13 +7,11 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import nts.arc.time.GeneralDate;
-import nts.gul.text.StringUtil;
 import nts.uk.ctx.bs.company.dom.company.CompanyRepository;
 import nts.uk.ctx.bs.employee.dom.employee.employeelicense.EmployeeLicense;
 import nts.uk.ctx.bs.employee.dom.employee.employeelicense.EmployeeLicenseRepository;
 import nts.uk.ctx.bs.employee.pub.employment.IEmployeeDataMngInfoPub;
 import nts.uk.ctx.sys.auth.app.find.person.role.GetWhetherLoginerCharge;
-import nts.uk.ctx.sys.auth.app.find.person.role.RoleWhetherLoginDto;
 import nts.uk.shr.com.context.AppContexts;
 
 @Stateless
@@ -91,12 +89,17 @@ public class LicenseCheckFinder {
 		// システム管理者、グループ会社管理者、会社管理者のいずれかに該当する（ロールIDが設定されている）場合
 		// (trong t/h thỏa mãn 1 trong: người quản lý system, người quản lý
 		// company group, người quản lý company)
-		if (!StringUtil.isNullOrEmpty(sysAdminID, true) || !StringUtil.isNullOrEmpty(groupAdminID, true) || !StringUtil.isNullOrEmpty(companyAdminID, true)) {
-			return true;
-		} else {
-			RoleWhetherLoginDto checkLogin = getWhether.getWhetherLoginerCharge();
-			return checkLogin.checkRole();
-		}
+		
+		//ライセンス仕様がちゃんと決まらないまま2021年の12月納品を迎えようとしているため
+		//ライセンスを強制的に表示させないようにする。
+		//仕様が固まり次第、99-104行目までのコードを復活させてください。
+		return false;
+//		if (!StringUtil.isNullOrEmpty(sysAdminID, true) || !StringUtil.isNullOrEmpty(groupAdminID, true) || !StringUtil.isNullOrEmpty(companyAdminID, true)) {
+//			return true;
+//		} else {
+//			RoleWhetherLoginDto checkLogin = getWhether.getWhetherLoginerCharge();
+//			return checkLogin.checkRole();
+//		}
 	}
 	
 	// ライセンス上限をチェックする - thuật toán: check license upper limit

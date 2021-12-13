@@ -77,6 +77,18 @@
 					</table>
           <div class="setting-zone" data-bind="with: settingModel">
             <div class="flex valign-center">
+              <div class="col-label">#{i18n.getText('KMF001_327')}</div>
+              <div tabindex="60" id="h3_2"
+                data-bind="ntsRadioBoxGroup: {
+                name: '#[KMF001_327]',
+                options: $parent.h32,
+                optionsValue: 'value',
+                optionsText: 'localizedName',
+                value: manageDeadline,
+                enable:$parent.isComManaged }">
+              </div>
+            </div>
+            <div class="flex valign-center">
               <div class="col-label">#{i18n.getText('KMF001_94')}</div>
               <div tabindex="5"
                 data-bind="ntsComboBox: {
@@ -89,7 +101,7 @@
                 enable: $parent.isComManaged,
                 columns: [
                   { prop: 'localizedName', length: 10 }
-                ]}">
+                ]}" style="width: 120px">
               </div>
             </div>
             <div class="flex valign-center">
@@ -106,18 +118,6 @@
             <div class="flex valign-center">
               <div class="col-label"></div>
               <label>#{i18n.getText('KMF001_346')}</label>
-            </div>
-            <div class="flex valign-center">
-              <div class="col-label">#{i18n.getText('KMF001_327')}</div>
-              <div tabindex="60" id="h3_2"
-                data-bind="ntsRadioBoxGroup: {
-                name: '#[KMF001_327]',
-                options: $parent.h32,
-                optionsValue: 'value',
-                optionsText: 'localizedName',
-                value: manageDeadline,
-                enable:$parent.isComManaged }">
-              </div>
             </div>
             <div class="flex valign-center">
               <label class="col-label">#{i18n.getText('KMF001_330')}</label>

@@ -1,0 +1,58 @@
+#left-content {
+	padding: 10px 0px 0px 7px;
+    margin-left: 20px;
+	float: left;
+	width: 400px;
+    height: 450px;
+    
+	border-radius: 7px;
+    box-sizing: border-box;
+}
+#right-content {
+	margin-left: 55px;
+	float: left;
+	margin-top: 8px;
+}
+
+#line {
+	width: 862px;
+	margin-left: 20px;	
+	border:none;
+	height: 1px;
+	background:#9A9A9A
+}
+
+#component-items-list {
+    padding: -10px !important;
+}
+
+.container-custom {	
+	display: flex;
+	margin-top: 15px;
+    margin-bottom: 15px;
+    margin-left: 10px;
+	width: 400px;
+}
+
+.ui-igcombo-wrapper {
+    width: 294px !important;
+}
+
+.custom {
+	position: relative;
+	width: 40px;
+	top: 17px;
+	left: 16px;
+}
+
+.nts-searchbbox-wrapper {
+    margin-bottom: -10px !important;
+    margin-left: 10px !important;
+}
+
+/* .nts-editor-wrapped {
+    width: 30px !important;
+} */
+i {
+	background-size: auto !important;
+}

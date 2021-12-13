@@ -25,13 +25,6 @@ public interface ManageAnnualSettingSetMemento {
     void setHalfDayManage(HalfDayManage halfDayManage);
 
     /**
-     * Sets the work day calculate.
-     *
-     * @param isWorkDayCalculate the new work day calculate
-     */
-    void setWorkDayCalculate(boolean isWorkDayCalculate);
-
-    /**
      * Sets the remaining number setting.
      *
      * @param remainingNumberSetting the new remaining number setting

@@ -4,13 +4,14 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.infra.repository.vacation.setting.subst;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.uk.ctx.at.shared.dom.vacation.setting.ApplyPermission;
 import nts.uk.ctx.at.shared.dom.vacation.setting.ExpirationTime;
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.subst.ManageDeadline;
 import nts.uk.ctx.at.shared.dom.vacation.setting.subst.SubstVacationSettingGetMemento;
 import nts.uk.ctx.at.shared.infra.entity.vacation.setting.subst.KsvstComSubstVacation;
-import nts.uk.ctx.at.shared.infra.entity.vacation.setting.subst.KsvstSubstVacationSetting;
 
 /**
  * The Class JpaSubstVacationSettingGetMemento.
@@ -55,7 +56,7 @@ public class JpaSubstVacationSettingGetMemento<T extends KsvstComSubstVacation>
 	@Override
 	public ManageDistinct getManageDistinct() {
 		
-		return ManageDistinct.valueOf(this.typeValue.getManageAtr());
+		return ManageDistinct.valueOf(BooleanUtils.toInteger(this.typeValue.isManageAtr()));
 	}
 
 	@Override

@@ -245,11 +245,18 @@ module nts.uk.ui.ktg001.a {
 		dayDisplayAtrList: KnockoutObservableArray<IApprovedDataDetail> = ko.observableArray([]);
 		monthDisplayAtrList: KnockoutObservableArray<IApprovedDataDetail> = ko.observableArray([]);
 
-        constructor(private params: { currentOrNextMonth: 1 | 2; }) {
+        constructor(private params: { closureId: number; currentOrNextMonth: 1 | 2; }) {
             super();
 
             if (this.params === undefined) {
-                this.params = { currentOrNextMonth: 1 };
+                this.params = {
+                    closureId: 1,
+                    currentOrNextMonth: 1
+                };
+            }
+
+            if (this.params.closureId === undefined) {
+                this.params.closureId = 1;
             }
 
             if (this.params.currentOrNextMonth === undefined) {

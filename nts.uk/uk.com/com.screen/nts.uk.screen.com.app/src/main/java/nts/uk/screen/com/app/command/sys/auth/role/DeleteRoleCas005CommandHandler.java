@@ -101,12 +101,12 @@ public class DeleteRoleCas005CommandHandler extends CommandHandler<DeleteRoleCas
 			deleteEmploymentRoleCmd.setRoleId(roleId);
 			
 			deleteEmploymentRoleCmdHandler.handle(deleteEmploymentRoleCmd);
-			
-			//delete WorkPlaceAuthority
-			DeleteWorkPlaceAuthorityCmd deleteWorkPlaceAuthorityCmd = new DeleteWorkPlaceAuthorityCmd();
-			deleteWorkPlaceAuthorityCmd.setCompanyId(companyId);
-			deleteWorkPlaceAuthorityCmd.setRoleId(roleId);
-			deleteWorkPlaceAuthorityCmdHandler.handle(deleteWorkPlaceAuthorityCmd);
+			// Comment note ea: 2021/5/24の発注にこの部分処理をとばす。
+//			//delete WorkPlaceAuthority
+//			DeleteWorkPlaceAuthorityCmd deleteWorkPlaceAuthorityCmd = new DeleteWorkPlaceAuthorityCmd();
+//			deleteWorkPlaceAuthorityCmd.setCompanyId(companyId);
+//			deleteWorkPlaceAuthorityCmd.setRoleId(roleId);
+//			deleteWorkPlaceAuthorityCmdHandler.handle(deleteWorkPlaceAuthorityCmd);
 		}
 		
 	}

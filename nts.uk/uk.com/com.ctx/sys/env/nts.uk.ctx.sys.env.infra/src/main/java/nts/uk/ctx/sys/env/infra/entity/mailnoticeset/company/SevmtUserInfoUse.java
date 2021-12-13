@@ -1,19 +1,27 @@
 package nts.uk.ctx.sys.env.infra.entity.mailnoticeset.company;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import nts.arc.enums.EnumAdaptor;
-import nts.uk.ctx.sys.env.dom.mailnoticeset.FunctionId;
-import nts.uk.ctx.sys.env.dom.mailnoticeset.company.*;
-import nts.uk.shr.com.enumcommon.NotUseAtr;
-import nts.uk.shr.infra.data.entity.UkJpaEntity;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import nts.arc.enums.EnumAdaptor;
+import nts.uk.ctx.sys.env.dom.mailnoticeset.company.ContactName;
+import nts.uk.ctx.sys.env.dom.mailnoticeset.company.ContactSetting;
+import nts.uk.ctx.sys.env.dom.mailnoticeset.company.ContactUsageSetting;
+import nts.uk.ctx.sys.env.dom.mailnoticeset.company.OtherContact;
+import nts.uk.ctx.sys.env.dom.mailnoticeset.company.SettingContactInformation;
+import nts.uk.ctx.sys.env.dom.mailnoticeset.company.UserInformationUseMethod;
+import nts.uk.shr.com.enumcommon.NotUseAtr;
+import nts.uk.shr.infra.data.entity.UkJpaEntity;
 
 /**
  * Entity ユーザー情報の使用方法
@@ -32,10 +40,6 @@ public class SevmtUserInfoUse extends UkJpaEntity
 	@Id
 	@Column(name = "CID")
 	public String cId;
-
-	@OneToMany(targetEntity = SevmtMailDestination.class, cascade = CascadeType.ALL, mappedBy = "sevmtUserInfoUse", orphanRemoval = true, fetch = FetchType.LAZY)
-	@JoinTable(name = "SEVMT_MAIL_DESTINATION")
-	public List<SevmtMailDestination> sevmtMailDestinations;
 
 	// column 排他バージョン
 	@Column(name = "EXCLUS_VER")
@@ -262,31 +266,6 @@ public class SevmtUserInfoUse extends UkJpaEntity
 	@Override
 	public void setCompanyId(String companyId) {
 		this.setCId(companyId);
-	}
-
-	@Override
-	public List<EmailDestinationFunction> getEmailDestinationFunctions() {
-		List<EmailDestinationFunction> emailDestinationFunctions = new ArrayList<>();
-		for (int i = 0; i < 4; i++) {
-			emailDestinationFunctions.add(filterListMailDestination(i));
-		}
-		return emailDestinationFunctions;
-	}
-
-	@Override
-	public void setEmailDestinationFunctions(List<EmailDestinationFunction> emailDestinationFunctions) {
-		List<SevmtMailDestination> list = new ArrayList<>();
-		emailDestinationFunctions.forEach(item -> list.addAll(SevmtMailDestination.toListEntity(item, this.cId)));
-		this.sevmtMailDestinations = list;
-	}
-
-	private EmailDestinationFunction filterListMailDestination(int mailClassification) {
-		List<FunctionId> list = this.sevmtMailDestinations.stream()
-				.filter(item -> item.getPk().getMailClassification() == mailClassification)
-				.map(item -> new FunctionId(item.getPk().getFuncId())).collect(Collectors.toList());
-		return EmailDestinationFunction.builder()
-				.emailClassification(EnumAdaptor.valueOf(mailClassification, EmailClassification.class))
-				.functionIds(list).build();
 	}
 
 	@Override

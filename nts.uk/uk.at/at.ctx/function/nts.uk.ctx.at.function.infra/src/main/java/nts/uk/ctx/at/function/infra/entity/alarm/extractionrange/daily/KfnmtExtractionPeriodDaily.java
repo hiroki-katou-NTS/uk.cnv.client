@@ -42,7 +42,7 @@ public class KfnmtExtractionPeriodDaily extends ContractUkJpaEntity implements S
 	public Integer strPreviousDay;
 
 	@Column(name = "STR_MAKE_TO_DAY", nullable = true)
-	public Integer strMakeToDay;
+	public boolean strMakeToDay;
 
 	@Column(name = "STR_DAY", nullable = true)
 	public Integer strDay;
@@ -51,7 +51,7 @@ public class KfnmtExtractionPeriodDaily extends ContractUkJpaEntity implements S
 	public Integer strPreviousMonth;
 
 	@Column(name = "STR_CURRENT_MONTH", nullable = true)
-	public Integer strCurrentMonth;
+	public boolean strCurrentMonth;
 
 	@Column(name = "STR_MONTH", nullable = true)
 	public Integer strMonth;
@@ -63,7 +63,7 @@ public class KfnmtExtractionPeriodDaily extends ContractUkJpaEntity implements S
 	public Integer endPreviousDay;
 
 	@Column(name = "END_MAKE_TO_DAY", nullable = true)
-	public Integer endMakeToDay;
+	public boolean endMakeToDay;
 
 	@Column(name = "END_DAY", nullable = true)
 	public Integer endDay;
@@ -72,7 +72,7 @@ public class KfnmtExtractionPeriodDaily extends ContractUkJpaEntity implements S
 	public Integer endPreviousMonth;
 
 	@Column(name = "END_CURRENT_MONTH", nullable = true)
-	public Integer endCurrentMonth;
+	public boolean endCurrentMonth;
 
 	@Column(name = "END_MONTH", nullable = true)
 	public Integer endMonth;
@@ -86,10 +86,10 @@ public class KfnmtExtractionPeriodDaily extends ContractUkJpaEntity implements S
 		StartSpecify strPrev = EnumAdaptor.valueOf(strSpecify, StartSpecify.class);
 		if (strPrev == StartSpecify.DAYS) {
 			startDate.setStartDay(EnumAdaptor.valueOf(strPreviousDay, PreviousClassification.class), strDay,
-					strMakeToDay == 0 ? false : true);
+					strMakeToDay);
 		} else if (strPrev == StartSpecify.MONTH) {
 			startDate.setStartMonth(EnumAdaptor.valueOf(strPreviousMonth, PreviousClassification.class), strMonth,
-					strCurrentMonth == 0 ? false : true);
+					strCurrentMonth);
 		}
 
 		// EndDate
@@ -97,10 +97,10 @@ public class KfnmtExtractionPeriodDaily extends ContractUkJpaEntity implements S
 		EndSpecify endPrev = EnumAdaptor.valueOf(endSpecify, EndSpecify.class);
 		if (endPrev == EndSpecify.DAYS) {
 			endDate.setEndDay(EnumAdaptor.valueOf(endPreviousDay, PreviousClassification.class), endDay,
-					endMakeToDay == 0 ? false : true);
+					endMakeToDay);
 		} else if (endPrev == EndSpecify.MONTH) {
 			endDate.setEndMonth(EnumAdaptor.valueOf(endPreviousMonth, PreviousClassification.class), endMonth,
-					endCurrentMonth == 0 ? false : true);
+					endCurrentMonth);
 		} 
 
 		ExtractionPeriodDaily periodDaily = new ExtractionPeriodDaily(this.kfnmtExtractionPeriodDailyPK.extractionId,
@@ -120,11 +120,11 @@ public class KfnmtExtractionPeriodDaily extends ContractUkJpaEntity implements S
 		this.strSpecify = startDate.getStartSpecify().value;
 		if (strPrev == StartSpecify.DAYS) {
 			this.strPreviousDay = startDate.getStrDays().get().getDayPrevious().value;
-			this.strMakeToDay = startDate.getStrDays().get().isMakeToDay() == true ? 1 : 0;
+			this.strMakeToDay = startDate.getStrDays().get().isMakeToDay();
 			this.strDay = startDate.getStrDays().get().getDay().v();
 		} else if (strPrev == StartSpecify.MONTH) {
 			this.strPreviousMonth = startDate.getStrMonth().get().getMonthPrevious().value;
-			this.strCurrentMonth = startDate.getStrMonth().get().isCurentMonth() == true ? 1 : 0;
+			this.strCurrentMonth = startDate.getStrMonth().get().isCurentMonth();
 			this.strMonth = startDate.getStrMonth().get().getMonth();
 		}
 
@@ -133,11 +133,11 @@ public class KfnmtExtractionPeriodDaily extends ContractUkJpaEntity implements S
 		this.endSpecify = endDate.getEndSpecify().value;
 		if (endPrev == EndSpecify.DAYS) {
 			this.endPreviousDay = endDate.getEndDays().get().getDayPrevious().value;
-			this.endMakeToDay = endDate.getEndDays().get().isMakeToDay() == true ? 1 : 0;
+			this.endMakeToDay = endDate.getEndDays().get().isMakeToDay();
 			this.endDay = endDate.getEndDays().get().getDay().v();
 		} else if (endPrev == EndSpecify.MONTH) {
 			this.endPreviousMonth = endDate.getEndMonth().get().getMonthPrevious().value;
-			this.endCurrentMonth = endDate.getEndMonth().get().isCurentMonth() == true ? 1 : 0;
+			this.endCurrentMonth = endDate.getEndMonth().get().isCurentMonth();
 			this.endMonth = endDate.getEndMonth().get().getMonth();
 		}
 	}

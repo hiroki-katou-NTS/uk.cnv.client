@@ -232,6 +232,8 @@ module nts.uk.com.view.ccg026.component {
                                         input.checked = true;
                                     }
 
+                                    input.disabled = row && row['disabled'] == true ? true : false;
+
                                     $(input)
                                         .on('change', (evt) => {
                                             // change
@@ -275,6 +277,7 @@ module nts.uk.com.view.ccg026.component {
         functionName: string;
         functionNo: number;
         orderNumber: number;
+        disabled: boolean;
     }
 
     interface IComponentInfo {

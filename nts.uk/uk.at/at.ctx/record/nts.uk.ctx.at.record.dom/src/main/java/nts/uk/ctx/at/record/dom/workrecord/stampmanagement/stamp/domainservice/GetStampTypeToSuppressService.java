@@ -10,7 +10,7 @@ import javax.ejb.Stateless;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.PortalStampSettings;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampSettingPerson;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.settingforsmartphone.SettingsSmartphoneStamp;
@@ -139,10 +139,10 @@ public class GetStampTypeToSuppressService {
 	private static StampToSuppress judgmentStampToSuppress(List<Stamp> listStamp) {
 
 		Optional<Stamp> oStamp = listStamp.stream()
-				.filter(c -> c.getType().getChangeClockArt() == ChangeClockArt.GOING_TO_WORK
-						|| c.getType().getChangeClockArt() == ChangeClockArt.GO_OUT
-						|| c.getType().getChangeClockArt() == ChangeClockArt.RETURN
-						|| c.getType().getChangeClockArt() == ChangeClockArt.WORKING_OUT)
+				.filter(c -> c.getType().getChangeClockArt() == ChangeClockAtr.GOING_TO_WORK
+						|| c.getType().getChangeClockArt() == ChangeClockAtr.GO_OUT
+						|| c.getType().getChangeClockArt() == ChangeClockAtr.RETURN
+						|| c.getType().getChangeClockArt() == ChangeClockAtr.WORKING_OUT)
 				.sorted((x, y) -> y.getStampDateTime().compareTo(x.getStampDateTime()))
 				.findFirst();
 
@@ -152,11 +152,11 @@ public class GetStampTypeToSuppressService {
 
 		Stamp stamp = oStamp.get();
 
-		if(stamp.getType().getChangeClockArt() == ChangeClockArt.GOING_TO_WORK || stamp.getType().getChangeClockArt() == ChangeClockArt.RETURN) {
+		if(stamp.getType().getChangeClockArt() == ChangeClockAtr.GOING_TO_WORK || stamp.getType().getChangeClockArt() == ChangeClockAtr.RETURN) {
 			return new StampToSuppress(true, false, false, true);
 		}
 
-		if(stamp.getType().getChangeClockArt() == ChangeClockArt.GO_OUT) {
+		if(stamp.getType().getChangeClockArt() == ChangeClockAtr.GO_OUT) {
 			return new StampToSuppress(true, true, true, false);
 		}
 

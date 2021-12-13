@@ -3,7 +3,6 @@ package nts.uk.ctx.at.shared.infra.entity.worktime.common;
 import java.io.Serializable;
 
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -11,7 +10,6 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
-import nts.uk.shr.infra.data.entity.UkJpaEntity;
 
 @Getter
 @Setter
@@ -28,27 +26,27 @@ public class KshmtWtComStmp extends ContractUkJpaEntity implements Serializable{
 
 	/** The piority atr attendance. */
 	@Column(name = "PIORITY_ATR_ATTENDANCE")
-	private int piorityAtrAttendance;
+	private boolean piorityAtrAttendance;
 
 	/** The piority atr leave. */
 	@Column(name = "PIORITY_ATR_LEAVE")
-	private int piorityAtrLeave;
+	private boolean piorityAtrLeave;
 
 	/** The piority atr attendance gate. */
 	@Column(name = "PIORITY_ATR_ATTENDANCE_GATE")
-	private int piorityAtrAttendanceGate;
+	private boolean piorityAtrAttendanceGate;
 
 	/** The piority atr leave gate. */
 	@Column(name = "PIORITY_ATR_LEAVE_GATE")
-	private int piorityAtrLeaveGate;
+	private boolean piorityAtrLeaveGate;
 
 	/** The piority atr log out. */
 	@Column(name = "PIORITY_ATR_LOGON")
-	private int piorityAtrLogOn;
+	private boolean piorityAtrLogOn;
 
 	/** The piority atr log off. */
 	@Column(name = "PIORITY_ATR_LOGOFF")
-	private int piorityAtrLogOff;
+	private boolean piorityAtrLogOff;
 
 	/** The attendance minute later*/
 	@Column(name = "ATTENDANCE_MINUTE_LATER")
@@ -60,7 +58,7 @@ public class KshmtWtComStmp extends ContractUkJpaEntity implements Serializable{
 
 	/** The front rear atr attendance */
 	@Column(name = "FRONT_REAR_ATR_ATTENDANCE")
-	private int frontRearAtrAttendance;
+	private boolean frontRearAtrAttendance;
 
 	/** The rounding time unit attendance */
 	@Column(name = "ROUNDING_TIME_UNIT_ATTENDANCE")
@@ -68,7 +66,7 @@ public class KshmtWtComStmp extends ContractUkJpaEntity implements Serializable{
 
 	/** The front rear atr leave */
 	@Column(name = "FRONT_REAR_ATR_LEAVE")
-	private int frontRearAtrLeave;
+	private boolean frontRearAtrLeave;
 
 	/** The rounding time unit leave */
 	@Column(name = "ROUNDING_TIME_UNIT_LEAVE")
@@ -76,7 +74,7 @@ public class KshmtWtComStmp extends ContractUkJpaEntity implements Serializable{
 
 	/** The front rear atr goout */
 	@Column(name = "FRONT_REAR_ATR_GOOUT")
-	private int frontRearAtrGoout;
+	private boolean frontRearAtrGoout;
 
 	/** The rounding time unit goout */
 	@Column(name = "ROUNDING_TIME_UNIT_GOOUT")
@@ -84,7 +82,7 @@ public class KshmtWtComStmp extends ContractUkJpaEntity implements Serializable{
 
 	/** The front rear atr turnback */
 	@Column(name = "FRONT_REAR_ATR_TURNBACK")
-	private int frontRearAtrTurnback;
+	private boolean frontRearAtrTurnback;
 
 	/** The rounding time unit turnback */
 	@Column(name = "ROUNDING_TIME_UNIT_TURNBACK")

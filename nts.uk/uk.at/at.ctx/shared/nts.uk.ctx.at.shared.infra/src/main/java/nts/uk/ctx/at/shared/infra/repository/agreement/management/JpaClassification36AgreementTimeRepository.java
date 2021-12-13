@@ -9,6 +9,9 @@ import nts.uk.ctx.at.shared.infra.entity.agreement.management.Ksrmt36AgrMgtCls;
 import nts.uk.ctx.at.shared.infra.entity.agreement.management.Ksrmt36AgrMgtClsPk;
 
 import javax.ejb.Stateless;
+
+import org.apache.commons.lang3.BooleanUtils;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -74,10 +77,10 @@ public class JpaClassification36AgreementTimeRepository extends JpaRepository im
     @Override
     public void delete(AgreementTimeOfClassification domain) {
         val entity = this.queryProxy().find(new Ksrmt36AgrMgtClsPk(domain.getCompanyId(),domain.getClassificationCode().v()
-                ,domain.getLaborSystemAtr().value),Ksrmt36AgrMgtCls.class);
+                ,BooleanUtils.toBoolean(domain.getLaborSystemAtr().value)),Ksrmt36AgrMgtCls.class);
         if(entity.isPresent()){
             this.commandProxy().remove(Ksrmt36AgrMgtCls.class,new Ksrmt36AgrMgtClsPk(domain.getCompanyId(),domain.getClassificationCode().v()
-                    ,domain.getLaborSystemAtr().value));
+                    ,BooleanUtils.toBoolean(domain.getLaborSystemAtr().value)));
 			this.getEntityManager().flush();
         }
     }
@@ -92,7 +95,7 @@ public class JpaClassification36AgreementTimeRepository extends JpaRepository im
         return this.queryProxy().query(FIND_BY_CID_AND_CLS_CD,Ksrmt36AgrMgtCls.class)
                 .setParameter("cid",cid)
                 .setParameter("classificationCode",classificationCode)
-                .setParameter("laborSystemAtr",laborSystemAtr.value)
+                .setParameter("laborSystemAtr",laborSystemAtr.value == 1)
                 .getSingle(Ksrmt36AgrMgtCls::toDomain);
 
     }
@@ -101,7 +104,7 @@ public class JpaClassification36AgreementTimeRepository extends JpaRepository im
     public List<String> findClassificationCodes(String cid,LaborSystemtAtr laborSystemAtr) {
         return this.queryProxy().query(FIND_BY_LABORSYSTEM, Ksrmt36AgrMgtCls.class)
                 .setParameter("cid",cid)
-                .setParameter("laborSystemAtr", laborSystemAtr.value)
+                .setParameter("laborSystemAtr", laborSystemAtr.value == 1)
                 .getList(f -> f.ksrmt36AgrMgtClsPk.classificationCode);
     }
 

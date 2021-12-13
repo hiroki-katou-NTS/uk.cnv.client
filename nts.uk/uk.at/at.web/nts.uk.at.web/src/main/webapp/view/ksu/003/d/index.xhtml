@@ -1,0 +1,171 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+<ui:composition template="../../../../master/base.xhtml">
+    <ui:define name="htmlHead">
+        <script>
+            var dialogSize = {
+                width : 480,
+                height : 630
+            };
+        </script>
+        <com:scriptfile set="IGNITE"/>
+        <com:stylefile path="ksu003.d.css"/>
+        <com:scriptfile path="ksu003.d.vm.js"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div id="functions-area">
+            <button tabindex="1" id="D1_1"
+                    data-bind="click: exportFile, enable: true">#{i18n.getText('KSU003_110')}</button>
+            <button tabindex="2" id="D1_2"
+                    data-bind="click: closeDialog">#{i18n.getText('KSU003_111')}</button>
+        </div>
+        <div id="contents-area">
+            <div class="ui-area">
+                <div class="D2_1">
+                    <div data-bind="ntsFormLabel: {}">#{i18n.getText('KSU003_112')}</div>
+                    <div class="set-row">
+                        <hr/>
+                    </div>
+                    <div class="content-setting">
+                        <!--D2_2-->
+                        <div class="table row">
+                            <div id="D2_2" class="cell valign-top col" data-bind="ntsFormLabel: {}">#{i18n.getText('KSU003_113')}</div>
+                            <div class="cell" tabindex="3" id="combo-box"
+                                 data-bind="ntsComboBox: {
+                            name: '#KSU003_113',
+                            options: graphTimeStartRange,
+                            optionsValue: 'code',
+                            value: selectedGraphStartTime,
+                            optionsText: 'name',
+                            enable: true,
+                            columns: [
+                                { prop: 'name', length: 2 },
+                            ]}">
+                            </div>
+                            <div class="cell valign-center">
+                                <span class="unit">#{i18n.getText('KSU003_192')}</span>
+                            </div>
+                        </div>
+                        <!--D2_3-->
+                        <div class="table row">
+                            <div id="D2_3" class="cell col" data-bind="ntsFormLabel: {}">#{i18n.getText('KSU003_114')}</div>
+                            <div id="D2_3_1" tabindex="4" class="cell valign-bottom"
+                                 data-bind="ntsSwitchButton: {
+										options: [{id: 1, name: '#{i18n.getText('KSU003_115')}'}, {id: 2, name: '#{i18n.getText('KSU003_116')}'}] ,
+										optionsValue: 'id',
+										optionsText: 'name',
+										value: selectedGraphVacationDisplay}">
+                            </div>
+                        </div>
+                        <!--D2_4-->
+                        <div id="display-actual" class="table row">
+                            <div id="D2_4" class="cell col" data-bind="ntsFormLabel: {}">#{i18n.getText('KSU003_117')}</div>
+                            <div id="D2_4_1" class="cell valign-bottom" tabindex="5"
+                                 data-bind="ntsCheckBox: { checked: actualDisplay, enable: true}">#{i18n.getText('KSU003_118')}</div>
+                        </div>
+                    </div>
+                </div>
+                <!--D3_1-->
+                <div class="D3_1">
+                    <div id="D3_1" class='' data-bind="ntsFormLabel: {}">#{i18n.getText('KSU003_119')}</div>
+                    <div class="set-row">
+                        <hr/>
+                    </div>
+                    <div class="content-setting">
+                        <!--D3_2-->
+                        <div class="table row">
+                            <div id="D3_2" class="cell col" data-bind="ntsFormLabel: {}">#{i18n.getText('KSU003_120')}</div>
+                            <div id="D3_2_1" tabindex="6" class="cell"
+                                 data-bind="ntsSwitchButton: {
+										options: [{id: 1, name: '#{i18n.getText('KSU003_121')}'}, {id: 2, name: '#{i18n.getText('KSU003_122')}'}] ,
+										optionsValue: 'id',
+										optionsText: 'name',
+										enable: false,
+										value: selectedWorkDisplay}">
+                            </div>
+                        </div>
+                        <!--D3_3-->
+                        <div id="double-work" class="table row">
+                            <div id="D3_3" class="cell col" data-bind="ntsFormLabel: {}">#{i18n.getText('KSU003_123')}</div>
+                            <div id="D3_3_1" tabindex="7" class="cell"
+                                 data-bind="ntsSwitchButton: {
+										options: [{id: 1, name: '#{i18n.getText('KSU003_124')}'}, {id: 2, name: '#{i18n.getText('KSU003_125')}'}] ,
+										optionsValue: 'id',
+										optionsText: 'name',
+										value: selected2WorkDisplay}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--D4_1-->
+                <div>
+                    <div id="D4_1" class='' data-bind="ntsFormLabel: {}">#{i18n.getText('KSU003_126')}</div>
+                    <div class="set-row">
+                        <hr/>
+                    </div>
+                    <div class="content-setting">
+                        <!--D4_2-->
+                        <div class="table row">
+                            <div id="D4_2" class="cell col" data-bind="ntsFormLabel: {}">#{i18n.getText('KSU003_127')}</div>
+                            <div id="D4_2_1" tabindex="8" class="cell"
+                                 data-bind="ntsSwitchButton: {
+										options: [{id: 1, name: '#{i18n.getText('KSU003_128')}'}, {id: 2, name: '#{i18n.getText('KSU003_129')}'}] ,
+										optionsValue: 'id',
+										optionsText: 'name',
+										enable: false,
+										value: selectedTotalTimeDisplay}">
+                            </div>
+                        </div>
+                        <!--D4_3-->
+                        <div class="table row">
+                            <div id="D4_3" class="cell col" data-bind="ntsFormLabel: {}">#{i18n.getText('KSU003_130')}</div>
+                            <div id="D4_3_1" tabindex="9" class="cell"
+                                 data-bind="ntsSwitchButton: {
+										options: [{id: 1, name: '#{i18n.getText('KSU003_131')}'}, {id: 2, name: '#{i18n.getText('KSU003_132')}'}] ,
+										optionsValue: 'id',
+										optionsText: 'name',
+										enable: false,
+										value: selectedTotalAmountDisplay}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--D5_1-->
+                <div>
+                    <div id="D5_1" class='' data-bind="ntsFormLabel: {}">#{i18n.getText('KSU003_133')}</div>
+                    <div class="set-row">
+                        <hr/>
+                    </div>
+                    <div class="content-setting">
+                        <!--D5_2-->
+                        <div class="table row">
+                            <div id="D5_2" class="cell col" data-bind="ntsFormLabel: {}">#{i18n.getText('KSU003_134')}</div>
+                            <div id="D5_2_1" tabindex="10" class="cell"
+                                 data-bind="ntsSwitchButton: {
+										options: [{id: 1, name: '#{i18n.getText('KSU003_135')}'}, {id: 2, name: '#{i18n.getText('KSU003_136')}'}] ,
+										optionsValue: 'id',
+										optionsText: 'name',
+										enable: false,
+										value: selectedSupportScheduleDisplay}">
+                            </div>
+                        </div>
+                        <!--D5_2_4-->
+                        <div class="table row">
+                            <div class="cell" style="width: 156px">    </div>
+                            <div id="D5_2_4" tabindex="11" class="cell"
+                                 data-bind="ntsCheckBox: { checked: wkpNameDispOfSupporter, enable: false}">#{i18n.getText('KSU003_137')}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+</body>
+</html>

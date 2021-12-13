@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import mockit.Expectations;
 import mockit.Injectable;
 import mockit.integration.junit4.JMockit;
+import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.createdailyoneday.imprint.reflect.StartAtr;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.ReasonTimeChange;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkTimeInformation;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.OuenWorkTimeSheetOfDailyAttendance;
@@ -36,8 +37,8 @@ public class GetSupportDataJudgedSameDSTest {
 	@Test
 	public void case1() {
 		List<OuenWorkTimeSheetOfDailyAttendance> supportDataList = new ArrayList<OuenWorkTimeSheetOfDailyAttendance>();
-		OuenWorkTimeSheetOfDailyAttendance targetSupportData = null;
-		boolean isStart = true;
+		TimeWithDayAttr targetSupportData = new TimeWithDayAttr(0);
+		StartAtr isStart = StartAtr.START_OF_SUPPORT;
 		new Expectations() {
 			{
 				required.getCriteriaSameStampOfSupport();
@@ -75,13 +76,9 @@ public class GetSupportDataJudgedSameDSTest {
 		supportDataList.add(ouenWorkTime1);
 		supportDataList.add(ouenWorkTime2);
 		supportDataList.add(ouenWorkTime3);
-		OuenWorkTimeSheetOfDailyAttendance targetSupportData = OuenWorkTimeSheetOfDailyAttendance.create(
-				1, null, TimeSheetOfAttendanceEachOuenSheet.create(
-							new WorkNo(1), 
-							Optional.of(new WorkTimeInformation(ReasonTimeChange.createByAutomaticSet(), new TimeWithDayAttr(20))), 
-							Optional.of(new WorkTimeInformation(ReasonTimeChange.createByAutomaticSet(), new TimeWithDayAttr(70)))));
+		TimeWithDayAttr targetSupportData = new TimeWithDayAttr(20);
 		
-		boolean isStart = true;
+		StartAtr isStart = StartAtr.START_OF_SUPPORT;
 		
 		JudgmentCriteriaSameStampOfSupport support = new JudgmentCriteriaSameStampOfSupport("cid", new RangeRegardedSupportStamp(10), new MaximumNumberOfSupport(20));
 		new Expectations() {
@@ -122,15 +119,9 @@ public class GetSupportDataJudgedSameDSTest {
 		supportDataList.add(ouenWorkTime2);
 		supportDataList.add(ouenWorkTime3);
 		
-		OuenWorkTimeSheetOfDailyAttendance targetSupportData = OuenWorkTimeSheetOfDailyAttendance.create(
-				1, 
-				null, 
-				TimeSheetOfAttendanceEachOuenSheet.create(
-						new WorkNo(1), 
-						Optional.of(new WorkTimeInformation(ReasonTimeChange.createByAutomaticSet(), new TimeWithDayAttr(120))), 
-						Optional.of(new WorkTimeInformation(ReasonTimeChange.createByAutomaticSet(), new TimeWithDayAttr(170)))));
+		TimeWithDayAttr targetSupportData = new TimeWithDayAttr(120);
 		
-		boolean isStart = true;
+		StartAtr isStart = StartAtr.START_OF_SUPPORT;
 		
 		JudgmentCriteriaSameStampOfSupport support = new JudgmentCriteriaSameStampOfSupport("cid", new RangeRegardedSupportStamp(10), new MaximumNumberOfSupport(20));
 		new Expectations() {
@@ -171,13 +162,9 @@ public class GetSupportDataJudgedSameDSTest {
 		supportDataList.add(ouenWorkTime2);
 		supportDataList.add(ouenWorkTime3);
 		
-		OuenWorkTimeSheetOfDailyAttendance targetSupportData = OuenWorkTimeSheetOfDailyAttendance.create(
-				1, null, TimeSheetOfAttendanceEachOuenSheet.create(
-							new WorkNo(1), 
-							Optional.of(new WorkTimeInformation(ReasonTimeChange.createByAutomaticSet(), new TimeWithDayAttr(5))), 
-							Optional.of(new WorkTimeInformation(ReasonTimeChange.createByAutomaticSet(), new TimeWithDayAttr(10))))); 
+		TimeWithDayAttr targetSupportData = new TimeWithDayAttr(10); 
 		
-		boolean isStart = false;
+		StartAtr isStart = StartAtr.END_OF_SUPPORT;
 
 		JudgmentCriteriaSameStampOfSupport support = new JudgmentCriteriaSameStampOfSupport("cid", new RangeRegardedSupportStamp(10), new MaximumNumberOfSupport(20));
 		new Expectations() {
@@ -218,15 +205,9 @@ public class GetSupportDataJudgedSameDSTest {
 		supportDataList.add(ouenWorkTime2);
 		supportDataList.add(ouenWorkTime3);
 		
-		OuenWorkTimeSheetOfDailyAttendance targetSupportData = OuenWorkTimeSheetOfDailyAttendance.create(
-				1, 
-				null, 
-				TimeSheetOfAttendanceEachOuenSheet.create(
-						new WorkNo(1), 
-						Optional.of(new WorkTimeInformation(ReasonTimeChange.createByAutomaticSet(), new TimeWithDayAttr(5))), 
-						Optional.of(new WorkTimeInformation(ReasonTimeChange.createByAutomaticSet(), new TimeWithDayAttr(10)))));
+		TimeWithDayAttr targetSupportData = new TimeWithDayAttr(10);
 		
-		boolean isStart = false;
+		StartAtr isStart = StartAtr.END_OF_SUPPORT;
 
 		JudgmentCriteriaSameStampOfSupport support = new JudgmentCriteriaSameStampOfSupport("cid", new RangeRegardedSupportStamp(10), new MaximumNumberOfSupport(20));
 		new Expectations() {
@@ -272,12 +253,9 @@ public class GetSupportDataJudgedSameDSTest {
 		supportDataList.add(ouenWorkTime2);
 		supportDataList.add(ouenWorkTime3);
 		
-		OuenWorkTimeSheetOfDailyAttendance targetSupportData = OuenWorkTimeSheetOfDailyAttendance.create(1, null,
-				TimeSheetOfAttendanceEachOuenSheet.create(new WorkNo(1),
-						Optional.of(new WorkTimeInformation(ReasonTimeChange.createByAutomaticSet(),new TimeWithDayAttr(20))),
-						Optional.of(new WorkTimeInformation(ReasonTimeChange.createByAutomaticSet(),new TimeWithDayAttr(70)))));
+		TimeWithDayAttr targetSupportData = new TimeWithDayAttr(20);
 
-		boolean isStart = true;
+		StartAtr isStart = StartAtr.START_OF_SUPPORT;
 
 		JudgmentCriteriaSameStampOfSupport support = new JudgmentCriteriaSameStampOfSupport("cid", new RangeRegardedSupportStamp(10), new MaximumNumberOfSupport(20));
 		new Expectations() {
@@ -321,12 +299,9 @@ public class GetSupportDataJudgedSameDSTest {
 		supportDataList.add(ouenWorkTime2);
 		supportDataList.add(ouenWorkTime3);
 		
-		OuenWorkTimeSheetOfDailyAttendance targetSupportData = OuenWorkTimeSheetOfDailyAttendance.create(1, null,
-				TimeSheetOfAttendanceEachOuenSheet.create(new WorkNo(1),
-						Optional.of(new WorkTimeInformation(ReasonTimeChange.createByAutomaticSet(),new TimeWithDayAttr(20))),
-						Optional.of(new WorkTimeInformation(ReasonTimeChange.createByAutomaticSet(),new TimeWithDayAttr(70)))));
+		TimeWithDayAttr targetSupportData = new TimeWithDayAttr(70);
 
-		boolean isStart = false;
+		StartAtr isStart = StartAtr.END_OF_SUPPORT;
 
 		JudgmentCriteriaSameStampOfSupport support = new JudgmentCriteriaSameStampOfSupport("cid", new RangeRegardedSupportStamp(10), new MaximumNumberOfSupport(20));
 		new Expectations() {

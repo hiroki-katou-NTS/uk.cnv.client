@@ -41,7 +41,7 @@ public class JpaMasterCheckFixedExtractConditionRepository extends JpaRepository
 					a.getPk().getErAlId(), 
 					EnumAdaptor.valueOf(a.getPk().getNo(), MasterCheckFixedCheckItem.class), 
 					Optional.ofNullable(new ErrorAlarmMessageMSTCHK(a.getMessage())), 
-					a.getUseAtr() == 0 ? false : true))
+					a.isUseAtr()))
 				.collect(Collectors.toList());
 	}
 
@@ -68,7 +68,7 @@ public class JpaMasterCheckFixedExtractConditionRepository extends JpaRepository
 						newEntity.getPk().getNo()),
 				KrcmtMasterCheckFixedExtractCondition.class).get();
 		updateEntity.setMessage(newEntity.getMessage());
-		updateEntity.setUseAtr(newEntity.getUseAtr());
+		updateEntity.setUseAtr(newEntity.isUseAtr());
 		this.commandProxy().update(updateEntity);
 	}
 
@@ -87,7 +87,7 @@ public class JpaMasterCheckFixedExtractConditionRepository extends JpaRepository
 				this.getEntityManager().persist(KrcmtMasterCheckFixedExtractCondition.toEntity(x));
 			} else {
 				entity.setMessage(x.getMessage().isPresent() ? x.getMessage().get().v() : "");
-				entity.setUseAtr(x.isUseAtr() ? 1 : 0);
+				entity.setUseAtr(x.isUseAtr());
 				this.commandProxy().update(entity);	
 			}
 		});		

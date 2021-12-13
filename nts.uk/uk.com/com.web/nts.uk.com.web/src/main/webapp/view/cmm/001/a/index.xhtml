@@ -44,7 +44,7 @@
 				<!-- A1_4 -->
 				<button id="masterLog" tabindex="4" class="group-button-1"
 				    data-bind="visible: false">#{i18n.getText('CMM001_4')}</button>
-				<button tabindex="5" class="group-button-1" id="print-button" data-bind="click: exportExcel">#{i18n.getText('KMK007_4')}</button>  
+				<button tabindex="5" class="group-button-1" id="print-button" data-bind="click: exportExcel" hidden= "false">#{i18n.getText('KMK007_4')}</button>  
 			</div>
 			<div id="contents-area" class="fixed-flex-layout" style="display: none" data-bind="visible: true">
 				<div class="fixed-flex-layout-left">
@@ -417,7 +417,7 @@
 										<table>
 											<tbody>
 												<!-- 1 -->
-												<tr style="margin-top: 5px;">
+												<tr style="margin-top: 5px;" hidden= "false">
 													<th colspan="1" class="th-col3">
 														<!-- D1_1 -->
 														<div class="form-label"
@@ -431,18 +431,20 @@
 														<div>
 															<!-- D1_2 -->
 															<!--  -->
+															<!--temporarily default default with redmin 121528: value: jinji, -->
 															<div class="cf1" tabindex="18"
 																data-bind="ntsSwitchButton: {
 																			options: $parent.roundingRules,
 																			optionsValue: 'code',
 																			optionsText: 'name',
-																			value: jinji }">
+																			value: 0
+																		 }">
 															</div>
 														</div>
 													</th>
 												</tr>
 												<!-- 2 -->
-												<tr style="margin-top: 5px;">
+												<tr style="margin-top: 5px;" hidden= "false">
 													<th colspan="1" class="th-col3">
 														<div class="form-label"
 															data-bind="ntsFormLabel:{required: true}">
@@ -454,19 +456,21 @@
 													<th colspan="2" class="th-col2">
 														<div>
 															<!-- D1_4 -->
+															<!--temporarily default default with redmin 121528: value: shugyo, -->
 															<div class="cf1" tabindex="19"
 																data-bind="ntsSwitchButton: {
 																			options: $parent.roundingRules,
 																			optionsValue: 'code',
 																			optionsText: 'name',
-																			value: shugyo }">
+																			value: 1
+																		 }">
 															</div>
 														</div>
 													</th>
 												</tr>
 												<!-- 3 -->
 												<!-- D1_5 -->
-												<tr style="margin-top: 5px;">
+												<tr style="margin-top: 5px;" hidden= "false">
 													<th colspan="1" class="th-col3">
 														<div class="form-label"
 															data-bind="ntsFormLabel:{required: true}">
@@ -476,18 +480,20 @@
 
 													<th colspan="2" class="th-col2">
 														<!-- D1_6 -->
+														<!--temporarily default default with redmin 121528: value: kyuyo, -->
 														<div>
 															<div class="cf1" tabindex="20"
 																data-bind="ntsSwitchButton: {
 																			options: $parent.roundingRules,
 																			optionsValue: 'code',
 																			optionsText: 'name',
-																			value: kyuyo }">
+																			value:0
+																		 }">
 															</div>
 														</div>
 													</th>
 												</tr>
-												<tr style="margin-top: 5px;">
+												<tr style="margin-top: 5px;" hidden= "false">
 													<th colspan="1" class="th-col3">
 														<div class="form-label"
 															data-bind="ntsFormLabel:{required: true}">
@@ -499,12 +505,14 @@
 													<th colspan="2" class="th-col2">
 														<div class="flex">
 															<!-- D1_8 -->
+															<!--temporarily default default with redmin 121528: value: regWorkDiv, -->
 															<div class="cf1" tabindex="21"
 																data-bind="ntsSwitchButton: {
 																			options: $parent.roundingRules3,
 																			optionsValue: 'code',
 																			optionsText: 'name',
-																			value: regWorkDiv }">
+																			value: 0
+																		 }">
 															</div>
 															<!-- d1_9 -->
 															<button id="switchhelpbtn" tabindex="-1"

@@ -15,6 +15,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -141,7 +143,7 @@ public class KfnmtRptWkDaiOutItem extends UkJpaEntity
 			entity.setId(key);
 			entity.setCid(this.cid);
 			entity.setContractCd(this.contractCd);
-			entity.setUseCls(obj.isUsedClassification() ? BigDecimal.ONE : BigDecimal.ZERO);
+			entity.setUseCls(obj.isUsedClassification());
 			return entity;
 		}).collect(Collectors.toList());
 	}
@@ -181,7 +183,7 @@ public class KfnmtRptWkDaiOutItem extends UkJpaEntity
 	@Override
 	public List<PrintRemarksContent> getLstRemarkContent() {
 		return this.lstKfnmtRptWkDaiOutnotes.stream()
-			.map(entity -> new PrintRemarksContent(entity.getUseCls().intValue(), entity.getId().getPrintItem().intValue()))
+			.map(entity -> new PrintRemarksContent(BooleanUtils.toInteger(entity.isUseCls()), entity.getId().getPrintItem().intValue()))
 			.collect(Collectors.toList());
 	}
 

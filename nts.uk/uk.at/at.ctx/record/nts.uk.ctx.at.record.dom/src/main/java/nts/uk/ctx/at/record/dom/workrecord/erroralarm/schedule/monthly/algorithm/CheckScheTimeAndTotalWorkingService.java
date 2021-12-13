@@ -48,10 +48,13 @@ public class CheckScheTimeAndTotalWorkingService {
 			boolean isBeforeThisMonth = monthIsBeforeThisMonthChecking.checkMonthIsBeforeThisMonth(ym,
 					presentClosingPeriod.getProcessingYm());
 			if (isBeforeThisMonth) {
+				// Input．月別実績　 ＝＝ Empty　の場合
 				if (attendanceTimeOfMonthly == null) {
+					// 総労働　＝　０
 					return 0;
 				}
 				
+				// Input．月別実績　 != Empty の場合　＃119013
 				// 総労働　を計算
 				// 総労働　＝　Input．月別実績．勤怠時間．月の計算．総労働時間
 				return attendanceTimeOfMonthly.getMonthlyCalculation().getTotalWorkingTime().v();

@@ -8,14 +8,11 @@ import java.util.List;
 public interface IMailDestinationPub {
 
 	/**
-	 * @author sonnlb
-	 * @param cID
-	 * @param sID
-	 * @param functionID
-	 * @return List<MailDestination> : List＜メール送信先＞
-	 * 社員のメールアドレスを取得する
-	 * Request List 419
+	 * RequestList 397
+	 * @param cid			会社ID
+	 * @param sids			社員ID(List) 
+	 * @param functionId	機能ID
+	 * @return メール送信先
 	 */
-	List<MailDestination> getEmpEmailAddress(String cID, List<String> sIDs, Integer functionID);
-
+	MailDestinationExport getEmployeeMails(String cid, List<String> sids, int functionId);
 }

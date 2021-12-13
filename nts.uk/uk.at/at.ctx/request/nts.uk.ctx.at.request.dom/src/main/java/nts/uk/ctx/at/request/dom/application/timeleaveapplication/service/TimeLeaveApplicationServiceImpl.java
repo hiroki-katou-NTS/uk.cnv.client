@@ -30,7 +30,7 @@ import nts.uk.ctx.at.request.dom.application.appabsence.apptimedigest.TimeDigest
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualholidaymanagement.AnnualHolidayManagementAdapter;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualholidaymanagement.NextAnnualLeaveGrantImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualleave.AnnLeaveRemainNumberAdapter;
-import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualleave.ReNumAnnLeaReferenceDateImport;
+import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualleave.ReNumAnnLeaveImport;
 import nts.uk.ctx.at.request.dom.application.common.service.other.OtherCommonAlgorithm;
 import nts.uk.ctx.at.request.dom.application.common.service.setting.CommonAlgorithm;
 import nts.uk.ctx.at.request.dom.application.timeleaveapplication.TimeDigestAppType;
@@ -58,9 +58,6 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.require.RemainNumberTe
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.basicinfo.AnnLeaEmpBasicInfoRepository;
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.export.InterimRemainMngMode;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.BreakDayOffMngInPeriodQuery;
-import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.NumberRemainVacationLeaveRangeQuery;
-import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.BreakDayOffRemainMngRefactParam;
-import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.SubstituteHolidayAggrResult;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.procwithbasedate.NumberConsecutiveVacation;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.interim.InterimBreakDayOffMngRepository;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.interim.InterimBreakMng;
@@ -79,7 +76,6 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveManagementData;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.timeleaveapplication.TimeLeaveAppReflectCondition;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.timeleaveapplication.TimeLeaveAppReflectRepository;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.timeleaveapplication.TimeLeaveApplicationReflect;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.breakinfo.FixedManagementDataMonth;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHoliday;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHolidayRepository;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.GrantDateTblRepository;
@@ -359,17 +355,9 @@ public class TimeLeaveApplicationServiceImpl implements TimeLeaveApplicationServ
 
         if (timeLeaveManagement.getTimeAnnualLeaveManagement().isTimeAnnualManagement()) {
             // 基準日時点の年休残数を取得する
-            ReNumAnnLeaReferenceDateImport reNumAnnLeave = leaveAdapter.getReferDateAnnualLeaveRemainNumber(employeeId, baseDate);
-            if (reNumAnnLeave != null && reNumAnnLeave.getAnnualLeaveRemainNumberExport() != null) {
-                if (reNumAnnLeave.getAnnualLeaveRemainNumberExport().getAnnualLeaveGrantDay() != null) {
-                    timeLeaveRemaining.setAnnualTimeLeaveRemainingDays(reNumAnnLeave.getAnnualLeaveRemainNumberExport().getAnnualLeaveGrantDay());
-                }
-                int yearHourRemain = 0;
-                for (int i = 0; i < reNumAnnLeave.getAnnualLeaveGrantExports().size(); i++) {
-                    yearHourRemain += reNumAnnLeave.getAnnualLeaveGrantExports().get(i).getRemainMinutes();
-                }
-                timeLeaveRemaining.setAnnualTimeLeaveRemainingTime(yearHourRemain);
-            }
+            ReNumAnnLeaveImport reNumAnnLeave = leaveAdapter.getReferDateAnnualLeaveRemain(employeeId, baseDate);
+            timeLeaveRemaining.setAnnualTimeLeaveRemainingDays(reNumAnnLeave.getRemainingDays());
+            timeLeaveRemaining.setAnnualTimeLeaveRemainingTime(reNumAnnLeave.getRemainingTime());
             // [No.210]次回年休付与日を取得する
             List<NextAnnualLeaveGrantImport> nextGrantHolidays = holidayAdapter.acquireNextHolidayGrantDate(companyId, employeeId, baseDate);
 

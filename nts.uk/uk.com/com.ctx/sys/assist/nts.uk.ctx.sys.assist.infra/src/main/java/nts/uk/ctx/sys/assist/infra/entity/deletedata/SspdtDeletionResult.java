@@ -53,7 +53,7 @@ public class SspdtDeletionResult extends ContractUkJpaEntity implements Serializ
 	/** 削除済みファイル */
 	@Basic(optional = false)
 	@Column(name = "IS_DELETED_FILES_FLG")
-	public int isDeletedFilesFlg;
+	public boolean isDeletedFilesFlg;
 	
 	/** The deletion code. */
 	/** 削除セットコード  */
@@ -145,7 +145,7 @@ public class SspdtDeletionResult extends ContractUkJpaEntity implements Serializ
 	}
 
 	public ResultDeletion toDomain() {
-		boolean isDeletedFilesFlg = this.isDeletedFilesFlg == 1;
+		boolean isDeletedFilesFlg = this.isDeletedFilesFlg;
 		return ResultDeletion.createFromJavatype
 				(
 				this.sspdtResultDeletionPK.delId, 
@@ -168,14 +168,13 @@ public class SspdtDeletionResult extends ContractUkJpaEntity implements Serializ
 	}
 
 	public static SspdtDeletionResult toEntity(ResultDeletion result) {
-		int isDeletedFilesFlg = result.isDeletedFilesFlg() ? 1 : 0;
 		return new SspdtDeletionResult
 			(
 			new SspdtResultDeletionPK(result.getDelId()),
 			result.getCompanyId(), 
 			result.getDelName().v(), 
 			result.getDelType().value,
-			isDeletedFilesFlg,
+			result.isDeletedFilesFlg(),
 			result.getDelCode().v(), 
 			result.getNumberEmployees(),
 			result.getSId(), 

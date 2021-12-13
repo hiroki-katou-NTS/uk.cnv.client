@@ -176,7 +176,7 @@ public class PasswordPolicy extends AggregateRoot {
 		}
 		
 		val latest = logs.get(0);
-		val olds = logs.subList(1, Math.max(historyCount.v().intValue(), logs.size()));
+		val olds = logs.subList(1, Math.min(historyCount.v().intValue(), logs.size()));
 		
 		return olds.stream().anyMatch(o -> o.getHashedPassword().equals(latest.getHashedPassword()));
 	}

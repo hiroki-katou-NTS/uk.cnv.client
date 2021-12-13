@@ -58,17 +58,6 @@ public class RetentionYearlyFindDto implements RetentionYearlySettingSetMemento 
 	/*
 	 * (non-Javadoc)
 	 * @see nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.
-	 * RetentionYearlySettingSetMemento#
-	 * setcanAddToCumulationYearlyAsNormalWorkDay(java.lang.Boolean)
-	 */
-	@Override
-	public void setLeaveAsWorkDays(Boolean leaveAsWorkDays) {
-		this.leaveAsWorkDays = leaveAsWorkDays;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.
 	 * RetentionYearlySettingSetMemento#setManagementCategory
 	 * (nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct)
 	 */

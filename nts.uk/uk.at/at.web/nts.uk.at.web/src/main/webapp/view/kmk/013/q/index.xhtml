@@ -40,7 +40,7 @@
 											<div id="Q4_5_label">#{i18n.getText('KMK013_560')}</div>
 										</th>
 										<th>
-											<button data-bind="ntsHelpButton: {image: 'img/IMG_KMK013_23.PNG', position: 'right center', enable: true }">?</button>
+											<button data-bind="ntsHelpButton: { textId: 'KMK013_572', position: 'right center', enable: true }">?</button>
 										</th>
 									</tr>
 									<com:ko-foreach bind="overtimeList">
@@ -52,7 +52,8 @@
 															options: $parent.itemListQ5_5,
 															optionsValue: 'id',
 															optionsText: 'name',
-															value: otWorkRoleSelect},
+															value: otWorkRoleSelect,
+                              enable: useAtr() === 1 },
 															attr: { 'posTab': $index }"></div>
 											</td>
 										</tr>
@@ -88,7 +89,7 @@
 											<div id="Q4_5_label">#{i18n.getText('KMK013_560')}</div>
 										</th>
 										<th>
-											<button data-bind="ntsHelpButton: {image: 'img/IMG_KMK013_23.PNG', position: 'right center', enable: true }">?</button>
+											<button data-bind="ntsHelpButton: { textId: 'KMK013_573', position: 'right center', enable: true }">?</button>
 										</th>
                                     </tr>
                                     <com:ko-foreach bind="roleFrameList">
@@ -100,7 +101,8 @@
 															options: $parent.itemListQ13_5,
 															optionsValue: 'id',
 															optionsText: 'name',
-															value: roleFrameSelect},
+															value: roleFrameSelect,
+                              enable: useAtr() === 1 },
 															attr: { 'posTab': $index }"></div>
                                             </td>
                                         </tr>
@@ -115,7 +117,7 @@
 						</div>
 						<div id="Q6_2">
 							<!-- Q6_2 -->
-							<div>#{i18n.getText('KMK013_561')}</div>
+							<div>#{i18n.getText('KMK013_563')}</div>
 						</div>
 						<div style="padding-left: 50px;">
 							<!-- Q6_3 -->

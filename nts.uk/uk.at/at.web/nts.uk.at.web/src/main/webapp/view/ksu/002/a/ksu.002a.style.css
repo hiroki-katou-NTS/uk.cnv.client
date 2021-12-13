@@ -1,9 +1,10 @@
 .ksu-002a {
     width: 903px;
+    margin-left: 20px!important;
 }
 
-#functions-area .ksu-002a {
-    padding-left: 5px;
+#functions-area .proceed{
+	margin-left: 0px!important;
 }
 
 .ksu-002a .btn-right {
@@ -29,3 +30,83 @@
     width: 100%;
     box-sizing: border-box;
 }
+
+#A5_1 {
+	border: solid 6px #fff !important;
+	border-radius: 3.5px !important;
+	box-shadow: 1px 1px 5px 2px #888 !important;
+	padding: 12px;
+	background-color: #F8EFD4 !important;
+	display: none;
+}
+
+#A5_1 {
+	width: 470px
+}
+
+.square {
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	vertical-align: text-top;
+}
+
+.popup-div {
+	width: 152px;
+	display: inline-block;
+	margin-bottom: 10px
+}
+
+.bg-schedule-that-day-color-schedule-sunday{
+	background-color: #ffff00 !important;
+	color: #ff0000 !important;
+}
+
+.bg-schedule-that-day-color-schedule-saturday{
+	background-color: #ffff00 !important;
+	color: #0000ff !important;
+}
+
+.bg-schedule-that-day-color-schedule-weekdays{
+	background-color: #ffff00 !important;
+	color: #404040 !important;
+}
+
+.bg-schedule-specific-date-color-schedule-sunday{
+	background-color: #ffc0cb !important;
+	color: #ff0000 !important;
+}
+
+.bg-schedule-specific-date-color-schedule-saturday{
+	background-color: #ffc0cb !important;
+	color: #0000ff !important;
+}
+
+.bg-schedule-specific-date-color-schedule-weekdays{
+	background-color: #ffc0cb !important;
+	color: #404040 !important;
+}
+
+.bg-schedule-sunday {
+	background-color: #fabf8f;
+	color: #ff0000 !important;
+}
+
+.bg-schedule-saturday{
+	background-color: #8bd8ff;
+	color: #0000ff !important;
+}
+
+.bg-weekdays{
+	background-color: #D9D9D9;
+	color: #404040 !important;
+}
+.background-attendance {background-color: #0000ff !important;}
+.background-holiday {background-color: #ff0000 !important;}
+.background-half-day-work {background-color: #FF7F27 !important; }
+.background-schedule-performance {background-color:#008000 !important;}
+.bg-daily-alter-self {background-color:#94B7FE;}
+.bg-daily-alter-other {background-color:#CEE6FF;}
+.background-white {background-color: white}
+.color-default {color : #000000;}
+.bg-schedule-uncorrectable-ksu001 {background-color:#ddddd2;}

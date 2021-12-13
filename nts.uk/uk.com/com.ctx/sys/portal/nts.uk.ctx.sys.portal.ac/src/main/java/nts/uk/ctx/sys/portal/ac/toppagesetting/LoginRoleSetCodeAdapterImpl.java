@@ -33,7 +33,6 @@ public class LoginRoleSetCodeAdapterImpl implements LoginRoleSetCodeAdapter {
 						dto.getRoleSetCd(),
 						dto.getCompanyId(),
 						dto.getRoleSetName(),
-						dto.getApprovalAuthority(),
 						dto.getOfficeHelperRoleId(),
 						dto.getMyNumberRoleId(),
 						dto.getHRRoleId(),

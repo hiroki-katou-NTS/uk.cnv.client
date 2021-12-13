@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="/master/base.xhtml">
+		<ui:define name="htmlHead">
+			<com:scriptfile set="IGNITE" />
+      <com:scriptfile path="/view/kcp/share/list.js" of="/nts.uk.com.web"/>
+			<com:scriptfile path="kdl051.test.start.js" />
+			<com:scriptfile path="kdl051.test.service.js" />
+			<com:scriptfile path="kdl051.test.vm.js" />
+		</ui:define>
+
+		<ui:define name="content">
+			<div id="functions-area"></div>
+			<div id="contents-area" class="cf">
+				<div class="div_line">
+					<button style="clear: both;" data-bind="click: openKDL051Dialog">Open
+						KDL 051</button>
+				</div>
+				<div style="display: inline-block;">
+					<div style="margin-top: 20px; font-weight: bold;">EmployeeIDs:</div>
+					<div style="margin-top: 20px;">
+						<textarea class="inputValue" rows="10" cols="40"
+							data-bind="ntsMultilineEditor: { value: selectedCodeList }" />
+					</div>
+				</div>
+
+				<div style="display: inline-block; vertical-align: top;">
+					<div style="margin-top: 20px; font-weight: bold;">Date:</div>
+					<div style="margin-top: 20px;"
+						data-bind="ntsDatePicker: {value:baseDate, dateFormat: 'YYYY/MM/DD'}"></div>
+
+
+				</div>
+			</div>
+
+
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

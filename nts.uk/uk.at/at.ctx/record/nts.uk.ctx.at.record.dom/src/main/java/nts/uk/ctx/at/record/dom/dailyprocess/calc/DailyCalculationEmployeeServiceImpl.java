@@ -30,6 +30,8 @@ import nts.uk.ctx.at.record.dom.approvalmanagement.ApprovalProcessingUseSetting;
 import nts.uk.ctx.at.record.dom.approvalmanagement.repository.ApprovalProcessingUseSettingRepository;
 import nts.uk.ctx.at.record.dom.daily.DailyRecordAdUpService;
 import nts.uk.ctx.at.record.dom.daily.optionalitemtime.AnyItemValueOfDaily;
+import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.CreatingDailyResultsCondition;
+import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.CreatingDailyResultsConditionRepository;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.getperiodcanprocesse.AchievementAtr;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.getperiodcanprocesse.GetPeriodCanProcesse;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.getperiodcanprocesse.IgnoreFlagDuringLock;
@@ -53,6 +55,8 @@ import nts.uk.ctx.at.record.dom.workrecord.workperfor.dailymonthlyprocessing.Emp
 import nts.uk.ctx.at.record.dom.workrecord.workperfor.dailymonthlyprocessing.EmpCalAndSumExeLogRepository;
 import nts.uk.ctx.at.record.dom.workrecord.workperfor.dailymonthlyprocessing.ErrMessageInfoRepository;
 import nts.uk.ctx.at.record.dom.workrecord.workperfor.dailymonthlyprocessing.TargetPersonRepository;
+import nts.uk.ctx.at.shared.dom.adapter.employee.EmpEmployeeAdapter;
+import nts.uk.ctx.at.shared.dom.adapter.employee.EmployeeImport;
 import nts.uk.ctx.at.shared.dom.adapter.employment.EmploymentHistShareImport;
 import nts.uk.ctx.at.shared.dom.adapter.employment.ShareEmploymentAdapter;
 import nts.uk.ctx.at.shared.dom.dailyattdcal.dailyattendance.IntegrationOfDailyGetter;
@@ -167,6 +171,10 @@ public class DailyCalculationEmployeeServiceImpl implements DailyCalculationEmpl
 	
 	@Inject
 	private ShareEmploymentAdapter employmentAdapterShare;
+	@Inject
+	private CreatingDailyResultsConditionRepository creatingDailyResultsConditionRepo;
+	@Inject
+	private EmpEmployeeAdapter employeeAdapter;
 	
 	@Inject
 	private TransactionService transactionService;
@@ -195,9 +203,10 @@ public class DailyCalculationEmployeeServiceImpl implements DailyCalculationEmpl
 			List<EmploymentHistShareImport> listEmploymentHis = this.employmentAdapterShare.findByEmployeeIdOrderByStartDate(employeeId);
 
 			GetPeriodCanProcesseRequireImpl require = new GetPeriodCanProcesseRequireImpl(closureStatusManagementRepo,
-					closureEmploymentRepo, closureRepository, actualLockRepository);
+					closureEmploymentRepo, closureRepository, actualLockRepository, employmentAdapter, 
+					creatingDailyResultsConditionRepo, employeeAdapter);
 			//実績処理できる期間を取得する
-			List<DatePeriod> listPeriod = GetPeriodCanProcesse.get(require, employeeId, datePeriod,
+			List<DatePeriod> listPeriod = GetPeriodCanProcesse.get(require, cid, employeeId, datePeriod,
 					listEmploymentHis.stream().map(c -> convert(c)).collect(Collectors.toList()),
 					isCalWhenLock? IgnoreFlagDuringLock.CAN_CAL_LOCK : IgnoreFlagDuringLock.CANNOT_CAL_LOCK,
 					AchievementAtr.DAILY);
@@ -400,17 +409,18 @@ public class DailyCalculationEmployeeServiceImpl implements DailyCalculationEmpl
 	private List<ClosureStatusManagement> getClosureList(List<String> employeeId, DatePeriod datePeriod) {
 		return closureStatusManagementRepository.getByIdListAndDatePeriod(employeeId, datePeriod);
 	}
-
-	public ProcessState calculateForOnePerson(String employeeId,DatePeriod datePeriod,Optional<Consumer<ProcessState>> counter,String executeLogId,boolean isCalWhenLock ) {
-		
+	
+	public ProcessState calculateForOnePerson(String companyId, String employeeId,
+			DatePeriod datePeriod, Optional<Consumer<ProcessState>> counter, String executeLogId, boolean isCalWhenLock ) {
 		
 		// Imported（就業）「所属雇用履歴」を取得する (Lấy dữ liệu)
 		List<EmploymentHistShareImport> listEmploymentHisShare = this.employmentAdapterShare.findByEmployeeIdOrderByStartDate(employeeId);
 		//実績処理できる期間を取得する
 		GetPeriodCanProcesseRequireImpl require = new GetPeriodCanProcesseRequireImpl(closureStatusManagementRepo,
-				closureEmploymentRepo, closureRepository, actualLockRepository);
+				closureEmploymentRepo, closureRepository, actualLockRepository, employmentAdapter, 
+				creatingDailyResultsConditionRepo, employeeAdapter);
 		
-		List<DatePeriod> listPeriod = GetPeriodCanProcesse.get(require, employeeId, datePeriod,
+		List<DatePeriod> listPeriod = GetPeriodCanProcesse.get(require, companyId, employeeId, datePeriod,
 				listEmploymentHisShare.stream().map(c -> convert(c)).collect(Collectors.toList()),
 				isCalWhenLock ? IgnoreFlagDuringLock.CAN_CAL_LOCK : IgnoreFlagDuringLock.CANNOT_CAL_LOCK,
 				AchievementAtr.DAILY);
@@ -517,17 +527,13 @@ public class DailyCalculationEmployeeServiceImpl implements DailyCalculationEmpl
 	
 	@AllArgsConstructor
 	private class GetPeriodCanProcesseRequireImpl implements GetPeriodCanProcesse.Require {
-		@Inject
 		private ClosureStatusManagementRepository closureStatusManagementRepo;
-
-		@Inject
 		private ClosureEmploymentRepository closureEmploymentRepo;
-
-		@Inject
 		private ClosureRepository closureRepository;
-
-		@Inject
 		private ActualLockRepository actualLockRepository;
+		private EmploymentAdapter employmentAdapter;
+		private CreatingDailyResultsConditionRepository creatingDailyResultsConditionRepo;
+		private EmpEmployeeAdapter employeeAdapter;
 
 		@Override
 		public DatePeriod getClosurePeriod(int closureId, YearMonth processYm) {
@@ -558,6 +564,21 @@ public class DailyCalculationEmployeeServiceImpl implements DailyCalculationEmpl
 		public Closure findClosureById(int closureId) {
 			String companyId = AppContexts.user().companyId();
 			return closureRepository.findById(companyId, closureId).get();
+		}
+
+		@Override
+		public Optional<CreatingDailyResultsCondition> creatingDailyResultsCondition(String cid) {
+			return creatingDailyResultsConditionRepo.findByCid(cid);
+		}
+
+		@Override
+		public EmployeeImport employeeInfo(CacheCarrier cacheCarrier, String empId) {
+			return employeeAdapter.findByEmpIdRequire(cacheCarrier, empId);
+		}
+
+		@Override
+		public List<EmploymentHistoryImported> getEmpHistBySid(String companyId, String employeeId) {
+			return employmentAdapter.getEmpHistBySid(companyId, employeeId);
 		}
 
 	}

@@ -8,6 +8,8 @@ import nts.arc.time.calendar.period.DatePeriod;
 
 public interface WorkplaceAdapter {
 	Optional<WorkplaceImport> getWorlkplaceHistory(String employeeId, GeneralDate baseDate);
+
+	List<WorkplaceImport> findWkpByWkpIdList(String companyId, GeneralDate baseDate, List<String> wkpIds);
 	
 	List<WorkplaceIdName> findWkpByWkpId(String companyId, GeneralDate baseDate, List<String> wkpIds);
 	

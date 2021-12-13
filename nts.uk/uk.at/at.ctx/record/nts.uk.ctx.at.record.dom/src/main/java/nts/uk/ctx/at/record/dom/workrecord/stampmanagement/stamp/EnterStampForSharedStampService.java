@@ -64,7 +64,7 @@ public class EnterStampForSharedStampService {
 		
 		// return 社員の打刻データを作成する#作成する(require, 契約コード, 社員ID, 打刻カード番号, 打刻日時, 打刻する方法, $ボタン詳細設定.ボタン種類, 実績への反映内容, empty)
 		return CreateStampDataForEmployeesService.create(require, cid, new ContractCode(contractCode), employeeID,
-				StampNumber, stmapDateTime, relieve, buttonSetting.get().getButtonType(), refActualResult, Optional.ofNullable(null));
+				StampNumber, stmapDateTime, relieve, buttonSetting.get().getType(), refActualResult, Optional.ofNullable(null));
 	
 	}
 	

@@ -27,7 +27,7 @@ module nts.uk.at.view.kal012.a {
     }
 
     goToScreenKAL002B() {
-      nts.uk.request.jump('/view/kal/002/b/index.xhtml');
+      nts.uk.request.jump('/view/kal/012/b/index.xhtml');
     }
   }
 }

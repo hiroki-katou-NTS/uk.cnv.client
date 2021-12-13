@@ -17,11 +17,11 @@ import javax.inject.Inject;
 import lombok.AllArgsConstructor;
 import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.at.schedule.dom.schedule.workschedule.ConfirmedATR;
-import nts.uk.ctx.at.schedule.dom.schedule.workschedule.ScheManaStatuTempo;
 import nts.uk.ctx.at.schedule.dom.schedule.workschedule.WorkSchedule;
 import nts.uk.ctx.at.schedule.dom.workschedule.domainservice.DeterEditStatusShiftService;
 import nts.uk.ctx.at.schedule.dom.workschedule.domainservice.ShiftEditState;
 import nts.uk.ctx.at.shared.dom.WorkInformation;
+import nts.uk.ctx.at.shared.dom.employeeworkway.EmployeeWorkingStatus;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.BasicScheduleService;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.SetupType;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.WorkStyle;
@@ -84,7 +84,7 @@ public class CreateWorkScheduleShift {
 
 
 	public WorkScheduleShiftResult getWorkScheduleShift(
-			Map<ScheManaStatuTempo, Optional<WorkSchedule>> mngStatusAndWScheMap,
+			Map<EmployeeWorkingStatus, Optional<WorkSchedule>> mngStatusAndWScheMap,
 			List<ShiftMasterMapWithWorkStyle> listShiftMasterNotNeedGetNew) {
 
 		// step 1
@@ -124,11 +124,11 @@ public class CreateWorkScheduleShift {
 		// call loop：entry(Map.Entry) in 管理状態と勤務予定Map
 		List<ScheduleOfShiftDto> listWorkScheduleShift = new ArrayList<>();
 		mngStatusAndWScheMap.forEach((k, v) -> {
-			ScheManaStatuTempo key = k;
+			EmployeeWorkingStatus key = k;
 			Optional<WorkSchedule> value = v;
 
 			// step 3.1
-			boolean needToWork = key.getScheManaStatus().needCreateWorkSchedule();
+			boolean needToWork = key.getWorkingStatus().needCreateWorkSchedule();
 			if (value.isPresent()) {
 				WorkSchedule workSchedule = value.get();
 				WorkInformation workInformation = workSchedule.getWorkInfo().getRecordInfo();
@@ -171,20 +171,36 @@ public class CreateWorkScheduleShift {
 						.workHolidayCls(workStyle.isPresent() ? workStyle.get().value : null)
 						.isEdit(true)
 						.isActive(true)
+						.conditionAa1(true)
+						.conditionAa2(true)
 						.build();
 
-				// ※Aa1
-				boolean isEdit = true;
+				/**※Aa1
+				勤務予定（シフト）dto．実績か == true	           achievements	        ×	
+				勤務予定（シフト）dto．確定済みか == true          confirmed		        ×	
+				勤務予定（シフト）dto．勤務予定が必要か == false	   needToWork		    ×	
+				勤務予定（シフト）dto．応援か == 時間帯応援先               supportCategory		×	
+				対象の日 < A画面パラメータ. 修正可能開始日　の場合    targetDate		    ×	=> check dưới UI
+				上記以外									   other                ○	
+				*/
 				if(dto.achievements == true || dto.confirmed == true || dto.needToWork == false || dto.supportCategory == SupportCategory.TimeSupport.value){
-					isEdit = false;
+					dto.setEdit(false);
+					dto.setConditionAa1(false);
 				}
-				// ※Aa2
-				boolean isActive = true;
+				
+				/**
+				 * ※Aa2			シフト確定																					
+				勤務予定（シフト）dto．実績か == true               achievements		×	
+				勤務予定（シフト）dto．勤務予定が必要か == false     needToWork	 		×	
+				勤務予定（シフト）dto．応援か == 時間帯応援先	    supportCategory		×	
+				対象の日 < A画面パラメータ. 修正可能開始日　の場合	targetDate			×	=> check dưới UI
+				上記以外										other				○	
+				 */
 				if(dto.achievements == true || dto.needToWork == false || dto.supportCategory == SupportCategory.TimeSupport.value){
-					isActive = false;
+					dto.setActive(false);
+					dto.setConditionAa2(false);
 				}
-				dto.setEdit(isEdit);
-				dto.setActive(isActive);
+				
 				listWorkScheduleShift.add(dto);
 
 			} else {
@@ -203,19 +219,20 @@ public class CreateWorkScheduleShift {
 						.workHolidayCls(null)
 						.isEdit(true)
 						.isActive(true)
+						.conditionAa1(true)
+						.conditionAa2(true)
 						.build();
 				// ※Aa1
-				boolean isEdit = true;
 				if(dto.achievements == true || dto.confirmed == true || dto.needToWork == false || dto.supportCategory == SupportCategory.TimeSupport.value){
-					isEdit = false;
+					dto.setEdit(false);
+					dto.setConditionAa1(false);
 				}
 				// ※Aa2
-				boolean isActive = true;
 				if(dto.achievements == true || dto.needToWork == false || dto.supportCategory == SupportCategory.TimeSupport.value){
-					isActive = false;
+					dto.setActive(false);
+					dto.setConditionAa2(false);
 				}
-				dto.setEdit(isEdit);
-				dto.setActive(isActive);
+				
 				listWorkScheduleShift.add(dto);
 			}
 		});

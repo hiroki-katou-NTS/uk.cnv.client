@@ -17,7 +17,7 @@ import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.ReflectDataStampDailyService;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeCalArt;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.SetPreClockArt;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampType;
 import nts.uk.ctx.at.shared.dom.scherec.application.stamp.AppRecordImageShare;
@@ -49,9 +49,8 @@ public class GetTargetDateRecordApplication {
 				new Relieve(AuthcMethod.ID_AUTHC, StampMeans.NAME_SELECTION),
 				new StampType(false,
 						applicaton.getAppStampGoOutAtr().map(x -> EnumAdaptor.valueOf(x.value, GoingOutReason.class)),
-						SetPreClockArt.NONE, ChangeClockArt.GOING_TO_WORK, ChangeCalArt.NONE),
-				new RefectActualResult(null, null, null), Optional.empty(),
-				lstCard.get(0).getStampCardId());
+						SetPreClockArt.NONE, ChangeClockAtr.GOING_TO_WORK, ChangeCalArt.NONE),
+				new RefectActualResult(null, null, null, null), Optional.empty());
 
 		Optional<GeneralDate> date = ReflectDataStampDailyService.getJudgment(require,
 				stamp).map(x -> x.getDate());

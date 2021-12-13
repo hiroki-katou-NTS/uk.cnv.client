@@ -22,7 +22,7 @@ import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 
 @NoArgsConstructor
 @Entity
-@Table(name = "SACMT_ROLESET_JOB_DETAIL")
+@Table(name = "SACMT_ROLESET_JOB")
 public class SacmtRoleSetGrantedJobTitleDetail extends ContractUkJpaEntity implements Serializable {
 	/**
 	 * 
@@ -35,13 +35,7 @@ public class SacmtRoleSetGrantedJobTitleDetail extends ContractUkJpaEntity imple
 	@Basic(optional = false)
 	@Column(name = "ROLESET_CD")
 	public String roleSetCd;
-	
-	@ManyToOne
-	@JoinColumns({
-        @JoinColumn(name = "CID", referencedColumnName = "CID", insertable = false, updatable = false)
-    })
-	public SacmtRoleSetGrantedJobTitle roleSetGrantedJobTitle;
-	
+
 	@Override
 	protected Object getKey() {
 		return this.roleSetGrantedJobTitleDetailPK;
@@ -52,5 +46,9 @@ public class SacmtRoleSetGrantedJobTitleDetail extends ContractUkJpaEntity imple
 		this.roleSetGrantedJobTitleDetailPK = new SacmtRoleSetGrantedJobTitleDetailPK(jobTitleId, companyId);
 		this.roleSetCd = roleSetCd;
 	}
-	
+
+	public void upEntity(String roleSetCd, String jobTitleId, String companyId) {
+		this.roleSetGrantedJobTitleDetailPK = new SacmtRoleSetGrantedJobTitleDetailPK(jobTitleId, companyId);
+		this.roleSetCd = roleSetCd;
+	}
 }

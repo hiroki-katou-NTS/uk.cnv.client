@@ -1,11 +1,13 @@
 package nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.premiumtime;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import nts.uk.ctx.at.shared.dom.common.amount.AttendanceAmountDaily;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.dailyattdcal.premiumitem.PriceUnit;
 
 @Getter
+@AllArgsConstructor
 /**　nts.uk.ctx.at.record.dom.premiumtime.PremiumTime　参照 */
 /** 割増時間 */
 public class PremiumTime {

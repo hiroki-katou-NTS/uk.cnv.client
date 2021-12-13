@@ -1,24 +1,33 @@
 package nts.uk.screen.at.app.ksu001.getsendingperiod;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 
 import nts.arc.time.GeneralDate;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.screen.at.app.ksu001.get28dateperiod.ScreenQuery28DayPeriod;
 
 /**
  * 	送る期間を取得する
- */
+ */	
 @Stateless
 public class GetSendingPeriodScreenQuery {
+	
+	@Inject
+	private ScreenQuery28DayPeriod scQuery28DayPeriod;
 	
     public DatePeriod getSendingPeriod(DatePeriod currentPeriod, boolean isNextMonth, boolean cycle28Day) {
     	DatePeriod result = null;
     	YearMonth yearMonth = YearMonth.of(currentPeriod.start().year(), currentPeriod.start().month());
     	
 		if (cycle28Day) {
-			// 28日周期か == true <call> 年月日 現在の期間．終了日+1
-			// result = currentPeriod.newSpan(currentPeriod.start(),currentPeriod.end().addDays(1));
+			if (isNextMonth) {
+				 result = scQuery28DayPeriod.get(currentPeriod.end().addDays(1), isNextMonth).toDomain();	
+			} else {
+				 result = scQuery28DayPeriod.get(currentPeriod.start().addDays(-1), isNextMonth).toDomain();	
+			}
+			
 		} else {
 			// 期間の開始日、終了日にそれぞれ「月を足す」を実行する
 			if (isNextMonth) {

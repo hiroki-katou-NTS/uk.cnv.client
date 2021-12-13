@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -86,6 +87,25 @@ public class EmployeeInfoPubImp implements EmployeeInfoPub {
 			return Optional.of(result);
 
 		}
+	}
+
+	@Override
+	public List<EmployeeInfoDto> findEmployeesMatchingName(List<String> pid, String companyId) {
+		return empDataMngRepo.findEmployeesMatchingName(pid,companyId).stream().map(emp->{
+				EmployeeInfoDto result = new EmployeeInfoDto();
+				result.setCompanyId(emp.getCompanyId());
+				result.setPersonId(emp.getPersonId());
+				result.setEmployeeId(emp.getEmployeeId());
+				result.setEmployeeCode(emp.getEmployeeCode().v());
+				result.setExternalCode(emp.getExternalCode() == null ? null : emp.getExternalCode().v());
+				result.setDeleteDateTemporary(emp.getDeleteDateTemporary());
+				/** 0 - NOTDELETED - 削除していない **/
+				/** 1 - TEMPDELETED - 一時削除 **/
+				/** 2 - PURGEDELETED - 完全削除 **/
+				result.setDeletedStatus(emp.getDeletedStatus() == null ? null : emp.getDeletedStatus().value);
+				result.setRemoveReason(emp.getRemoveReason() == null ? null : emp.getRemoveReason().v());
+				return result;
+		}).collect(Collectors.toList());
 	}
 
 	@Override

@@ -98,6 +98,9 @@ public class Ccg008WebService {
 	@POST
 	@Path("get-closure")
 	public Ccg008Dto closure(ClosureParams params) {
+		if (BuiltInUser.USER_ID.equals(AppContexts.user().userId())) {
+			return new Ccg008Dto(1, 0, null, null);
+		}
 		DatePeriod datePeriodClosure = ClosureService.getClosurePeriod(this.requireService.createRequire(), params.getClosureId(), YearMonth.of(params.getProcessDate()));
 		return new Ccg008Dto(params.getClosureId(), 0 , datePeriodClosure.start().toString(), datePeriodClosure.end().toString());
 				

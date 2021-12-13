@@ -45,6 +45,19 @@ module nts.uk.at.view.kmf002.g {
       });
     }
 
+    public openDialogH() {
+      const vm = this;
+      vm.$window.modal("/view/kmf/002/h/index.xhtml");
+    }
+
+    public openKDL058() {
+      const vm = this;
+      nts.uk.ui.windows.setShared("KDL058_A_PARAM", {
+        yearMonth: moment.utc().format("YYYYMM")
+      });
+      vm.$window.modal("/view/kdl/058/a/index.xhtml");
+    }
+
     public openSidebarScreen() {
       const vm = this;
       vm.$jump("/view/kmf/002/e/index.xhtml");

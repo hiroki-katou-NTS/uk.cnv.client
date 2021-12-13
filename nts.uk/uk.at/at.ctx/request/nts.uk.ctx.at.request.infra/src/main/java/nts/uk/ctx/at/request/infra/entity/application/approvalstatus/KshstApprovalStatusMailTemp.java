@@ -9,6 +9,8 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import nts.arc.enums.EnumAdaptor;
@@ -42,21 +44,21 @@ public class KshstApprovalStatusMailTemp extends ContractUkJpaEntity implements 
 	 */
 	@Basic(optional = true)
 	@Column(name = "URL_APPROVAL_EMBED")
-	public Integer urlApprovalEmbed;
+	public boolean urlApprovalEmbed;
 
 	/**
 	 * URL日別埋込
 	 */
 	@Basic(optional = true)
 	@Column(name = "URL_DAY_EMBED")
-	public Integer urlDayEmbed;
+	public boolean urlDayEmbed;
 
 	/**
 	 * URL月別埋込
 	 */
 	@Basic(optional = true)
 	@Column(name = "URL_MONTH_EMBED")
-	public Integer urlMonthEmbed;
+	public boolean urlMonthEmbed;
 
 	/**
 	 * メール件名
@@ -81,41 +83,23 @@ public class KshstApprovalStatusMailTemp extends ContractUkJpaEntity implements 
 		return new ApprovalStatusMailTemp(this.approvalStatusMailTempPk.cid,
 				EnumAdaptor.valueOf(this.approvalStatusMailTempPk.type, ApprovalStatusMailType.class),
 				Objects.isNull(this.urlApprovalEmbed) ? null
-						: EnumAdaptor.valueOf(this.urlApprovalEmbed, NotUseAtr.class),
-				Objects.isNull(this.urlDayEmbed) ? null : EnumAdaptor.valueOf(this.urlDayEmbed, NotUseAtr.class),
-				Objects.isNull(this.urlMonthEmbed) ? null : EnumAdaptor.valueOf(this.urlMonthEmbed, NotUseAtr.class),
+						: EnumAdaptor.valueOf(BooleanUtils.toInteger(this.urlApprovalEmbed), NotUseAtr.class),
+				Objects.isNull(this.urlDayEmbed) ? null : EnumAdaptor.valueOf(BooleanUtils.toInteger(this.urlDayEmbed), NotUseAtr.class),
+				Objects.isNull(this.urlMonthEmbed) ? null : EnumAdaptor.valueOf(BooleanUtils.toInteger(this.urlMonthEmbed), NotUseAtr.class),
 				new Subject(this.subject), new Content(this.text));
 	}
 
 	public static KshstApprovalStatusMailTemp toEntity(ApprovalStatusMailTemp domain) {
-		Integer urlApprovalEmbed = null;
-		Integer urlDayEmbed = null;
-		Integer urlMonthEmbed = null;
 
-		switch (domain.getMailType()) {
-		case APP_APPROVAL_UNAPPROVED:
-			urlApprovalEmbed = domain.getUrlApprovalEmbed().value;
-			break;
-		case DAILY_UNCONFIRM_BY_PRINCIPAL:
-			urlDayEmbed = domain.getUrlDayEmbed().value;
-			break;
-		case DAILY_UNCONFIRM_BY_CONFIRMER:
-			urlDayEmbed = domain.getUrlDayEmbed().value;
-			break;
-		case MONTHLY_UNCONFIRM_BY_CONFIRMER:
-			urlMonthEmbed = domain.getUrlMonthEmbed().value;
-			break;
-		case WORK_CONFIRMATION:
-			urlDayEmbed = domain.getUrlDayEmbed().value;
-			urlMonthEmbed = domain.getUrlMonthEmbed().value;
-			break;
-		case MONTHLY_UNCONFIRM_BY_PRINCIPAL:
-			urlMonthEmbed = domain.getUrlMonthEmbed().value;
-			break;
-		}
 		return new KshstApprovalStatusMailTemp(
-				new KshstApprovalStatusMailTempPk(domain.getCid(), domain.getMailType().value), urlApprovalEmbed,
-				urlDayEmbed, urlMonthEmbed, domain.getMailSubject().v(), domain.getMailContent().v());
+				new KshstApprovalStatusMailTempPk(
+						domain.getCid(), 
+						domain.getMailType().value), 
+				BooleanUtils.toBoolean(domain.getUrlApprovalEmbed().value),
+				BooleanUtils.toBoolean(domain.getUrlDayEmbed().value), 
+				BooleanUtils.toBoolean(domain.getUrlMonthEmbed().value), 
+				domain.getMailSubject().v(), 
+				domain.getMailContent().v());
 	}
 
 }

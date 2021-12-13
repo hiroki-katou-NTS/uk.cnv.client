@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.NoArgsConstructor;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
@@ -71,7 +73,7 @@ public class KrcdtMcloseLog extends ContractUkJpaEntity {
 
 	// 締め日
 	@Column(name = "IS_LAST_DAY")
-	public int isLastDay;
+	public boolean isLastDay;
 
 	@Override
 	protected Object getKey() {
@@ -93,7 +95,7 @@ public class KrcdtMcloseLog extends ContractUkJpaEntity {
 		this.targetYearMonth = targetYearMonth;
 		this.closureId = closureId;
 		this.closeDay = closeDay;
-		this.isLastDay = isLastDay;
+		this.isLastDay = BooleanUtils.toBoolean(isLastDay);
 	}
 
 	public static KrcdtMcloseLog fromDomain(MonthlyClosureUpdateLog domain) {
@@ -108,7 +110,7 @@ public class KrcdtMcloseLog extends ContractUkJpaEntity {
 		return new MonthlyClosureUpdateLog(this.id, this.companyId, this.executionStatus, this.completeStatus,
 				this.executionDateTime, new DatePeriod(this.executionStart, this.executionEnd), this.executeEmployeeId,
 				new YearMonth(this.targetYearMonth), this.closureId,
-				new ClosureDate(this.closeDay, this.isLastDay == 1));
+				new ClosureDate(this.closeDay, this.isLastDay));
 	}
 
 }

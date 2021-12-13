@@ -1,112 +1,203 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:com="http://xmlns.jcp.org/jsf/component"
-	xmlns:h="http://xmlns.jcp.org/jsf/html">
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
 <body>
-	<ui:composition template="../../../../master/base.xhtml">
-		<ui:define name="htmlHead">
-			<com:ValidatorScript>
-					nts.uk.ctx.sys.auth.dom.wkpmanager.EmployeeCode
-			</com:ValidatorScript>
-			<com:scriptfile set="IGNITE" />
-			<com:stylefile path="cmm051.a.main.css" />
-			<com:stylefile path="/view/ccg/026/component/component.css"
-				of="/nts.uk.com.web" />
-			<com:stylefile path="/view/kcp/010/style.css" of="/nts.uk.com.web" />
-			<com:scriptfile path="/view/kcp/010/kcp010.js" of="/nts.uk.com.web" />
-			<!-- 			<com:scriptfile path="/view/kcp/share/tree.js" of="/nts.uk.com.web"/> -->
-			<com:scriptfile path="../_base/cmm051.base.js" />
+<ui:composition template="../../../../master/base.xhtml">
+    <ui:define name="htmlHead">
 
-			<com:scriptfile path="/view/ccg/026/component/component.service.js"
-				of="/nts.uk.com.web" />
-			<com:scriptfile path="/view/ccg/026/component/component.vm.js"
-				of="/nts.uk.com.web" />
+        <com:scriptfile set="IGNITE"/>
+        <com:stylefile path="cmm051.a.main.css"/>
+        <com:scriptfile path="cmm051.a.vm.js"/>
+        <com:scriptfile path="/view/kcp/share/list.js" of="/nts.uk.com.web"/>
+        <com:ValidatorScript>
+            nts.uk.ctx.sys.auth.dom.wkpmanager.EmployeeCode
+        </com:ValidatorScript>
+    </ui:define>
+    <ui:define name="content">
+        <div id="functions-area">
+            <button  class="add" data-bind="click: createWkpManager, enable: $root.errors.isEmpty()" tabindex="1">#{i18n.getText('CMM051_1')}</button>
+            <button class="proceed" data-bind="click: saveWkpManager, enable: $root.errors.isEmpty() "
+                    tabindex="2">#{i18n.getText('CMM051_2')}</button>
+            <button class="danger" data-bind="click: remove, enable : isDelete() &amp;&amp; $root.errors.isEmpty"
+                    tabindex="3">#{i18n.getText('CMM051_3')}</button>
+        </div>
+        <div id="contents-area">
+            <div class="container cmm-051" style="width:1230px;">
+                <div  class="panel-row">
+                    <div class="row-left">
+                        <!-- A2_2 -->
+                        <div class="label"
+                             data-bind="ntsFormLabel: {}, text: $i18n('CMM051_38')">
+                        </div>
+                    </div>
+                    <div class="row-right row-switch-button cmm_051">
+                        <div id="swa_22" tabindex="4" data-bind="ntsSwitchButton: {
+                    name: $i18n('CMM051_38'),
+                    options: [
+                      { id: 1, name: $i18n('CMM051_39')},
+                      { id: 0, name: $i18n('CMM051_40')}
+                    ],
+                    optionsValue: 'id',
+                    value: mode,
+                    optionsText: 'name'}">
+                        </div>
+                    </div>
+                </div>
+                <div data-bind="if: mode() == 1" >
+                    <div class="valign-center control-group a_3">
+                        <!--A8_1-->
+                        <div data-bind="ntsFormLabel:{required:true} ">#{i18n.getText('CMM051_46')}</div>
+                        <!--A8_2-->
+                        <button tabindex="8" id = "a8_2" class="cmm_051" data-bind="click: openDialogA3282 ">#{i18n.getText('CMM051_47')}</button>
+                        <div class="divlabel">
+                        <!--A8_3-->
+                            <label class="ntsControl limited-label wp-code" id = "wpl_code" data-bind="text: workplaceCode(),required:true  "> </label>
+                        <!--A8_4-->
+                            <label class="ntsControl limited-label wp-name" data-bind="text: workplaceName()"> </label>
+                        </div>
+                    </div>
+                </div>
+                <div data-bind="if: mode() == 0">
+                    <div  class="valign-center control-group a_3">
+                        <!--A3_1-->
+                        <div data-bind="ntsFormLabel:{required:true} ">#{i18n.getText('CMM051_41')}</div>
+                        <!--A3_2-->
+                        <button tabindex="5" id = "a3_2" class="cmm_051" data-bind="click: openDialogA3282 ">#{i18n.getText('CMM051_42')}</button>
+                        <div class="divlabel2">
+                        <!--A3_3-->
+                            <label class="ntsControl limited-label wp-code " id = "wpa3-code" data-bind="text: employeeCode(),required:true  "> </label>
+                        <!--A3_3-->
+                            <label class="ntsControl limited-label wp-name " data-bind="text: employeeName()"> </label>
+                        </div>
+                    </div>
+                </div>
+                <div id="left-content">
+                    <!--A9-->
+                    <div data-bind="if: mode() == 1" class="kcp005">
+                        <div id="kcp005" tabindex="9">
+                        </div>
+                    </div>
+                    <!--A_4-->
+                    <div data-bind="if: mode() == 0" class="wkp_list">
+                        <!--A_5-->
+                        <table id="wkp_list" tabindex="6"
+                               data-bind="ntsGridList: {
+	                                            name:'#[CMM051_49]',
+	                                            width: 280,
+	                                            rows: 12,
+	                                            options: workPlaceList,
+	                                            optionsValue: workPlaceId,
+	                                            primaryKey: 'id',
+	                                            columns: columns,
+	                                            multiple: false,
+	                                            value: workPlaceId,
+	                                            showNumbering:false,
+	                                            selectFirstIfNull: false,
+	                                            enable: true}">
+                        </table>
+                    </div>
+                </div>
+                <div id="right-content">
+                    <!--A10-1-->
+                    <div data-bind="if: mode() == 1">
+                        <div  class="a_6">
+                            <!--A10_1-->
+                            <div data-bind="ntsFormLabel:{required:true}" id="idtext" >#{i18n.getText('CMM051_41')}</div>
+                            <!--A10_2-->
 
-			<com:scriptfile path="cmm051.a.start.js" />
-			<com:scriptfile path="cmm051.a.service.js" />
-			<com:scriptfile path="cmm051.a.vm.js" />
-		</ui:define>
-		<ui:define name="content">
-			<div id="functions-area">
-				<button class="add" data-bind="click: createWkpManager" tabindex="1">#{i18n.getText('CMM044_2')}</button>
-				<button class="proceed" data-bind="click: saveWkpManager"
-					tabindex="2">#{i18n.getText('CMM044_3')}</button>
-				<button class="danger"
-					data-bind="click: delWkpManager, enable: !isNewMode()" tabindex="3">#{i18n.getText('CMM044_6')}</button>
-				<!-- export excel -->
-				<button tabindex="3" id="print-button" data-bind="click: saveAsExcel">#{i18n.getText('CMM051_34')}</button>
-			</div> 
-			<div id="contents-area">
-				<div id="wkp-component"></div>
-				<div id="left-content">
-					<div id="left-content-bottom"
-						class="caret-right caret-background bg-green">
-						<table id="treegrid2" tabindex="0"
-							data-bind="ntsTreeGridView:{
-									width: 325,
-									height: 395,
-									dataSource: wkpManagerTree,
-									value: selectedCode,
-									primaryKey: 'wkpManagerId',
-									childDataKey: 'childs',
-									primaryText: 'nodeText',
+                            <button tabindex="10" class=" a_62" id = "a10_2"
+                                    data-bind="click: openDialogA62102, enable: isNewMode() ">#{i18n.getText('CMM051_42')}</button>
+
+                            <div class="divlabel">
+                            <!--A10_3-->
+                                <label class="ntsControl limited-label wp-code" id="empCode" data-bind="text: employeeCode(),required:true  "> </label>
+                            <!--A10_4-->
+                                <label class="ntsControl limited-label wp-name" id="empName" data-bind="text: employeeName() "> </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-bind="if: mode() == 0">
+                        <!--A6-->
+                        <div  class="a_10">
+                            <!--A6_1-->
+                            <div data-bind="ntsFormLabel:{required:true} " id="idtext2">#{i18n.getText('CMM051_46')}</div>
+                            <!--A6_2-->
+                            <button tabindex="7" class=" a_62" id = "a6_2"
+                                    data-bind="click: openDialogA62102, enable: isNewMode()">#{i18n.getText('CMM051_47')}</button>
+                            <div class="divlabel2">
+                            <!--A6_3-->
+                                <label class="ntsControl limited-label wp-code code" id="wpcode" data-bind="text:  workplaceCode(),required:true"> </label>
+                            <!--A6_4-->
+                                <label class="ntsControl limited-label wp-name name" id="wplName" data-bind="text:  workplaceName()"> </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="date-list">
+                        <table class="table_content">
+                            <colgroup>
+                                <col width="85px"/>
+                                <col width="256px"/>
+                                <col width="*"/>
+                            </colgroup>
+
+                            <tr>
+                                <!--A7_1-->
+                                <td style="vertical-align: top;">
+                                    <div data-bind="ntsFormLabel: {required:true}">#{i18n.getText('CMM051_48')}</div>
+                                </td>
+                                <!--A7_2-->
+                                <td >
+                                    <div id="list_box" tabindex="20"
+                                         data-bind="ntsListBox: {
+									name: '#[CMM051_49]',
+									options: dateHistoryList,
+									optionsValue: 'id',
+									optionsText: 'display',
 									multiple: false,
-									enable: true,
-									showCheckBox: false}"></table>
-					</div>
-				</div>
+									value: historyId,
+									rows: 5,
+									required:true,
+									columns: [
+										{ key: 'display', length: 15 }
+									]}">
+                                    </div>
+                                </td>
+                                <td style="vertical-align: top;">
+                                    <div>
+                                        <!--A7_3-->
+                                        <button tabindex="21" id = "new_date"
+                                                data-bind="click: openAddHistoryDialog, enable : isNewModeHist"
+                                                class="history-button">#{i18n.getText('CMM051_50')}</button>
+                                    </div>
+                                    <div>
+                                        <!--A7_4-->
+                                        <button tabindex="22"
+                                                data-bind="click: openUpdateHistoryDialog, enable : isUpdateModeHist()  &amp;&amp; !dateHistoryList.isEmpty"
+                                                class="history-button">#{i18n.getText('CMM051_51')}</button>
+                                    </div>
+                                    <div>
+                                        <!--A7_5-->
+                                        <button tabindex="23"
+                                                data-bind="click: removeHistory,enable : isDeleteModeHist() &amp;&amp; !dateHistoryList.isEmpty"
+                                                class="history-button danger">#{i18n.getText('CMM051_52')}</button>
+                                    </div>
+                                </td>
+                            </tr>
 
-				<div id="right-content">
-					<div class="input-row control-group">
-						<div class="label-group" id="label-a3-001"
-							data-bind="ntsFormLabel: {required: true}">#{i18n.getText('CMM051_9')}</div>
-						<div>
-							<div id="date-picker-label">
-								<span class="date-picker-span">#{i18n.getText('CMM051_10')}</span>
-								<span class="date-picker-span">#{i18n.getText('CMM051_11')}</span>
-							</div>
-							<div id="daterangepicker"
-								data-bind="ntsDateRangePicker: { 
-														enable: true, 
-														value: dateValue, 
-														maxRange: 'none',
-                            showNextPrevious: false,
-														required: true,startName: '#[CMM051_10]',endName: '#[CMM051_11]'}" />
-						</div>
-					</div>
-					<div class="input-row control-group">
-						<div class="label-group"
-							data-bind="ntsFormLabel: { required: true}">#{i18n.getText('CMM051_14')}</div>
-						<div id="employee-selection">
-							<button id="B5_1_1" style="margin-right: 10px;"
-								data-bind="click: openDialogCDL009">#{i18n.getText('CMM051_15')}</button>
-							<input id='selectionItemName' style="width: 320px;"
-								data-bind="ntsTextEditor: {
-									name: '#[CMM051_16]',
-									value: selectedWkpManager().employeeInfo().employeeCode,
-									constraint: 'EmployeeCode',
-									option: '',
-									required: true,
-									enable: true,
-									readonly: true}" />
-							<label
-								data-bind="text : selectedWkpManager().employeeInfo().namePerson"
-								style="padding-left: 15px; line-height: 29px;"></label>
-						</div>
-					</div>
-					<div class="label-group-1"
-							data-bind="ntsFormLabel: { required: true }">#{i18n.getText('CMM051_22')}</div>
-					<div class="control-group">
-						
-						<div data-bind="with: component">
-							<ui:include src="/view/ccg/026/component/index.xhtml" />
-						</div>
-					</div>
-				</div>
-			</div>
-		</ui:define>
-	</ui:composition>
+
+                        </table>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
 </body>
 </html>

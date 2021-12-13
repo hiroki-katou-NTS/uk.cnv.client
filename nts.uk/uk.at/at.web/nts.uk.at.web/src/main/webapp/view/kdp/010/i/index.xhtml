@@ -1,9 +1,8 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:com="http://xmlns.jcp.org/jsf/component"
-	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
 <body>
 	<ui:composition template="../../../../master/dialog.xhtml">
 		<ui:define name="htmlHead">
@@ -29,7 +28,7 @@
 						<td>
 							<div data-bind="ntsFormLabel: { required: true }">#{i18n.getText('KDP010_107')}</div>
 						</td>
-						<td>	
+						<td>
 							<!-- H1_2 -->
 							<div tabindex="1" data-bind="ntsRadioBoxGroup: {
 												name : '#[KDP010_107]',
@@ -65,7 +64,8 @@
 					<tr>
 						<td>
 							<!-- H3_1 -->
-							<div class="margin-left-20" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('KDP010_111')}</div>
+							<div class="margin-left-20" data-bind="ntsFormLabel: { required: true }">
+								#{i18n.getText('KDP010_111')}</div>
 						</td>
 						<td>
 							<!-- H3_2 -->
@@ -78,32 +78,58 @@
 												enable: selectedStampingEnable}"></div>
 						</td>
 					</tr>
-					<tr>
-						<td>
-							<!-- H8_1 -->
-							<div class="margin-left-20" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('KDP010_340')}</div>
-						</td>
-						<td class="rowHelpButton">
-							<!-- H8_2 -->
-							<div style="display: inline-block;" tabindex="3" data-bind="ntsRadioBoxGroup: {
+					<com:ko-if bind="$vm.isSupportUse">
+						<tr>
+							<td>
+								<!-- H8_1 -->
+								<div class="margin-left-20" data-bind="ntsFormLabel: { required: true }">
+									#{i18n.getText('KDP010_340')}</div>
+							</td>
+							<td class="rowHelpButton">
+								<!-- H8_2 -->
+								<div style="display: inline-block;" tabindex="3" data-bind="ntsRadioBoxGroup: {
 												name: '#[KDP010_340]',
 												options: supportWplSetOption,
 												optionsValue: 'id',
 												optionsText: 'name',
 												value: supportWplSet,
 												enable: supportWplSetEnable}"></div>
-							<button style="top: 5px;" data-bind="ntsHelpButton: {textId: 'KDP010_343', position: 'bottom center' }, enable: supportWplSetEnable">？</button>
-						</td>
-					</tr>
+								<button style="top: 5px;"
+									data-bind="ntsHelpButton: {textId: 'KDP010_343', position: 'bottom center' }, enable: supportWplSetEnable">？</button>
+							</td>
+						</tr>
+					</com:ko-if>
+					<!-- H9 -->
+					<com:ko-if bind="$vm.isUseWork">
+						<tr>
+							<td>
+								<!-- H9_1 -->
+								<div class="margin-left-20" data-bind="ntsFormLabel: { required: true }">
+									#{i18n.getText('KDP010_344')}</div>
+							</td>
+							<td class="rowHelpButton userWork">
+								<!-- H9_2 -->
+								<div style="display: inline-block;" tabindex="3" data-bind="ntsRadioBoxGroup: {
+												name: '#[KDP010_344]',
+												options: assignmentMethodOption,
+												optionsValue: 'id',
+												optionsText: 'name',
+												value: assignmentMethod,
+												enable: supportWorkPlaceEnable}"></div>
+							</td>
+						</tr>
+					</com:ko-if>
 					<tr>
 						<td>
 							<!-- H4_1 -->
-							<div data-bind="ntsFormLabel: { required: true, constraint: 'ButtonName'}">#{i18n.getText('KDP010_116')}</div>
+							<div data-bind="ntsFormLabel: { required: true, constraint: 'ButtonName'}">
+								#{i18n.getText('KDP010_116')}</div>
 						</td>
 						<td>
 							<!-- H4_2 -->
 							<div>
-								<input tabindex="4" data-bind="ntsTextEditor: {name: '#[KDP010_116]',required: true, value: simpleValue, constraint: 'ButtonName', enable: selectedHighlight() == 1, option: {width: '130'}}" />
+								<input tabindex="4"
+									data-bind="ntsTextEditor: {name: '#[KDP010_116]',required: true, value: simpleValue, constraint: 'ButtonName', enable: selectedHighlight() == 1, option: {width: '130'}}" />
 							</div>
 						</td>
 					</tr>
@@ -114,7 +140,8 @@
 						</td>
 						<td>
 							<!-- H5_2 -->
-							<div tabindex="5" class="colorpicker" data-bind="ntsColorPicker: {value: letterColors, width: 50, name:'#[KDP010_118]', enable: selectedHighlight() == 1 }" />
+							<div tabindex="5" class="colorpicker"
+								data-bind="ntsColorPicker: {value: letterColors, width: 50, name:'#[KDP010_118]', enable: selectedHighlight() == 1 }" />
 						</td>
 					</tr>
 					<tr>
@@ -124,14 +151,17 @@
 						</td>
 						<td>
 							<!-- H6_2 -->
-							<div tabindex="6" class="colorpicker" data-bind="ntsColorPicker: {value: backgroundColors, width: 50, name:'#[KDP010_119]', enable: selectedHighlight() == 1 }" />
+							<div tabindex="6" class="colorpicker"
+								data-bind="ntsColorPicker: {value: backgroundColors, width: 50, name:'#[KDP010_119]', enable: selectedHighlight() == 1 }" />
 						</td>
 					</tr>
-					<com:ko-if bind = "showSelectedAudio">
+
+					<com:ko-if bind="showSelectedAudio">
 						<tr>
 							<td>
 								<!-- H7_1 -->
-								<div data-bind="ntsFormLabel: { required: true }">#{i18n.getText('KDP010_122')}</div>
+								<div data-bind="ntsFormLabel: { required: true }">#{i18n.getText('KDP010_122')}
+								</div>
 							</td>
 							<!-- H7_2 -->
 							<td>
@@ -152,10 +182,12 @@
 				</table>
 			</div>
 			<div id="functions-area-bottom">
-				<button tabindex="8" class="proceed x-large" data-bind="click: passData">#{i18n.getText('KDP010_125')}</button>
+				<button tabindex="8" class="proceed x-large"
+					data-bind="click: passData">#{i18n.getText('KDP010_125')}</button>
 				<button tabindex="9" data-bind="click: closeDialog">#{i18n.getText('KDP010_126')}</button>
 			</div>
 		</ui:define>
 	</ui:composition>
 </body>
+
 </html>

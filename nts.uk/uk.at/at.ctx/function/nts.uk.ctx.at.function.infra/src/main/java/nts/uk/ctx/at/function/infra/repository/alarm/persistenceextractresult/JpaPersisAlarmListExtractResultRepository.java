@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Stateless
@@ -33,11 +34,21 @@ public class JpaPersisAlarmListExtractResultRepository extends JpaRepository imp
 
     @Override
     public Optional<PersistenceAlarmListExtractResult> getAlarmExtractResult(String runCode, String patternCode, List<String> empIds) {
-        return this.queryProxy().query("select distinct a from KfndtPersisAlarmExt a join a.extractResults b " +
+        val data = this.queryProxy().query("select distinct a from KfndtPersisAlarmExt a join a.extractResults b " +
                 "where a.autoRunCode = :runCode and a.patternCode = :patternCode and b.pk.sid in :empIds", KfndtPersisAlarmExt.class)
                 .setParameter("runCode", runCode)
                 .setParameter("patternCode", patternCode)
                 .setParameter("empIds", empIds).getSingle(KfndtPersisAlarmExt::toDomain);
+
+        if (!data.isPresent()) return Optional.empty();
+        val alarmEmpFiltered = data.get().getAlarmListExtractResults().stream().filter(x -> empIds.contains(x.getEmployeeID())).collect(Collectors.toList());
+        return Optional.of(new PersistenceAlarmListExtractResult(
+                data.get().getAlarmPatternCode(),
+                data.get().getAlarmPatternName(),
+                alarmEmpFiltered,
+                data.get().getCompanyID(),
+                data.get().getAutoRunCode()
+        ));
     }
 
     @Override
@@ -111,7 +122,7 @@ public class JpaPersisAlarmListExtractResultRepository extends JpaRepository imp
                             y.getAlarmCheckConditionCode().v(),
                             y.getAlarmListCheckType().value,
                             y.getAlarmCheckConditionNo(),
-                            z.getPeriodDate().getStartDate().isPresent() ? String.valueOf(z.getPeriodDate().getStartDate().get()) : String.valueOf(GeneralDate.min())));
+                            z.getPeriodDate().getStartDate().isPresent() ? String.valueOf(z.getPeriodDate().getStartDate().get()) : String.valueOf(GeneralDate.today())));
                 }
             }
         }

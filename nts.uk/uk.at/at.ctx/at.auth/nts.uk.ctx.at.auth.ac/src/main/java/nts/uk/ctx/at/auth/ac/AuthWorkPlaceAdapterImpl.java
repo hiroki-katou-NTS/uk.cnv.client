@@ -11,8 +11,11 @@ import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.auth.dom.adapter.workplace.AffWorkplaceHistoryItemImport;
 import nts.uk.ctx.at.auth.dom.adapter.workplace.AuthWorkPlaceAdapter;
 import nts.uk.ctx.at.auth.dom.adapter.workplace.WorkplaceInfoImport;
+import nts.uk.ctx.at.auth.dom.adapter.workplace.WorkplaceInforImport2;
 import nts.uk.ctx.at.auth.dom.adapter.workplace.WorkplaceManagerImport;
+import nts.uk.ctx.bs.employee.pub.workplace.AffWorkplaceHistoryItemExport;
 import nts.uk.ctx.bs.employee.pub.workplace.AffWorkplaceHistoryItemExport2;
+import nts.uk.ctx.bs.employee.pub.workplace.AffWorkplaceHistoryItemExport3;
 import nts.uk.ctx.bs.employee.pub.workplace.master.WorkplacePub;
 import nts.uk.ctx.sys.auth.pub.employee.EmployeePublisher;
 import nts.uk.ctx.sys.auth.pub.workplace.WorkplaceInfoExport;
@@ -55,8 +58,7 @@ public class AuthWorkPlaceAdapterImpl implements AuthWorkPlaceAdapter{
 		}
 		
 		List<AffWorkplaceHistoryItemImport> result = export.stream().map(item -> {
-			return new AffWorkplaceHistoryItemImport(item.getHistoryId(), item.getEmployeeId(), item.getWorkplaceId(),
-					item.getNormalWorkplaceId());
+			return new AffWorkplaceHistoryItemImport(item.getHistoryId(), item.getEmployeeId(), item.getWorkplaceId());
 		}).collect(Collectors.toList());
 
 		return result;
@@ -84,10 +86,43 @@ public class AuthWorkPlaceAdapterImpl implements AuthWorkPlaceAdapter{
 		return result;
 	}
 
+	@Override
+	public AffWorkplaceHistoryItemImport getAffWkpHistItemByEmpDate(String employeeID, GeneralDate date) {
+		
+		AffWorkplaceHistoryItemExport d = this.workplacePub.getAffWkpHistItemByEmpDate(employeeID, date);
+		
+		return new AffWorkplaceHistoryItemImport(d.getHistoryId(), employeeID, d.getWorkplaceId());
+	}
 
-	
+	@Override
+	public List<AffWorkplaceHistoryItemImport> getWorkHisItemfromWkpIdsAndBaseDate(List<String> workPlaceIds,
+			GeneralDate baseDate) {
+		List<AffWorkplaceHistoryItemExport3> export = workplacePub.getWorkHisItemfromWkpIdsAndBaseDate(workPlaceIds, baseDate);
+		if (export.isEmpty()) {
+			return new ArrayList<AffWorkplaceHistoryItemImport>();
+		}
+		
+		List<AffWorkplaceHistoryItemImport> result = export.stream().map(item -> {
+			return new AffWorkplaceHistoryItemImport(item.getHistoryId(), item.getEmployeeId(), item.getWorkplaceId());
+		}).collect(Collectors.toList());
 
+		return result;
+	}
 
-	
+	@Override
+	public List<WorkplaceInforImport2> getAllActiveWorkplaceInfor(String companyId, GeneralDate baseDate) {
+		// TODO Auto-generated method stub
+		return workplacePub.getAllActiveWorkplaceInfor(companyId, baseDate)
+				.stream().map(c -> 
+					new WorkplaceInforImport2(
+							c.getWorkplaceId(), 
+							c.getHierarchyCode(), 
+							c.getWorkplaceCode(), 
+							c.getWorkplaceName(), 
+							c.getWorkplaceDisplayName(), 
+							c.getWorkplaceGenericName(), 
+							c.getWorkplaceExternalCode())
+			).collect(Collectors.toList());
+	}
 
 }

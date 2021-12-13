@@ -12,6 +12,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.NoArgsConstructor;
 import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 
@@ -36,19 +38,19 @@ public class KfnmtAlarmCheckTargetCondition extends ContractUkJpaEntity implemen
 	
 	@Basic
 	@Column(name = "FILTER_BY_EMP")
-	public int filterByEmployment;
+	public boolean filterByEmployment;
 	
 	@Basic
 	@Column(name = "FILTER_BY_CLS")
-	public int filterByClassification;
+	public boolean filterByClassification;
 	
 	@Basic
 	@Column(name = "FILTER_BY_JOB")
-	public int filterByJobTitle;
+	public boolean filterByJobTitle;
 	
 	@Basic
 	@Column(name = "FILTER_BY_BUSINESSTYPE")
-	public int filterByBusinessType;
+	public boolean filterByBusinessType;
 	
 	@OneToOne(mappedBy = "targetCondition")
 	public KfnmtAlarmCheckConditionCategory alarmCheckConditionByCategory;
@@ -78,10 +80,10 @@ public class KfnmtAlarmCheckTargetCondition extends ContractUkJpaEntity implemen
 			List<KfnmtAlarmCheckTargetBusinessType> listBusinessType) {
 		super();
 		this.id = id;
-		this.filterByEmployment = filterByEmployment;
-		this.filterByClassification = filterByClassification;
-		this.filterByJobTitle = filterByJobTitle;
-		this.filterByBusinessType = filterByBusinessType;
+		this.filterByEmployment = BooleanUtils.toBoolean(filterByEmployment);
+		this.filterByClassification = BooleanUtils.toBoolean(filterByClassification);
+		this.filterByJobTitle = BooleanUtils.toBoolean(filterByJobTitle);
+		this.filterByBusinessType = BooleanUtils.toBoolean(filterByBusinessType);
 		this.listEmployment = listEmployment;
 		this.listClassification = listClassification;
 		this.listJobTitle = listJobTitle;

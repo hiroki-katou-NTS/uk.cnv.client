@@ -10,6 +10,8 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -58,7 +60,7 @@ public class SspmtDataStorageSelectionCategory extends UkJpaEntity implements Se
 	public void setPatternClassification(int patternClassification) {
 		if (pk == null)
 			pk = new SspmtDataStorageSelectionCategoryPk();
-		pk.patternClassification = patternClassification;
+		pk.patternClassification = BooleanUtils.toBoolean(patternClassification);
 	}
 
 	@Override
@@ -85,7 +87,7 @@ public class SspmtDataStorageSelectionCategory extends UkJpaEntity implements Se
 	@Override
 	public int getPatternClassification() {
 		if (pk != null)
-			return pk.patternClassification;
+			return BooleanUtils.toInteger(pk.patternClassification);
 		return 0;
 	}
 
