@@ -166,8 +166,11 @@ module nts.uk.at.view.kmk007.a.viewmodel {
                 }
              });
 
+            let lastOneDayCls: WorkTypeCls = null;
             self.currentWorkType().oneDayCls.subscribe(function(newOneDayCls) {
-                self.checkCalculatorMethod(newOneDayCls);
+                if (lastOneDayCls !== newOneDayCls) {
+                    self.checkCalculatorMethod(newOneDayCls);
+                }
 
                 if (newOneDayCls == self.currentOneDayCls() && !self.isCreated()) {
                     self.setWorkTypeSet(self.currentWorkType().oneDay(), ko.toJS(self.currentOneDay()));
@@ -183,6 +186,8 @@ module nts.uk.at.view.kmk007.a.viewmodel {
                 } else {
                   self.itemCalculatorMethod.remove(self.optionalItemCalculationMethod);
                 }
+
+                lastOneDayCls = newOneDayCls;
             });
 
             self.currentWorkType().morningCls.subscribe(function(newOneDayCls) {
@@ -541,7 +546,6 @@ module nts.uk.at.view.kmk007.a.viewmodel {
          * Check Calculator Method based on work type cls
          */
         private checkCalculatorMethod(workTypeSetCode: number): void {
-          console.log("TING")
             let self = this;
             if (self.langId() != 'ja') {
                 self.enableMethod(false);
@@ -591,7 +595,6 @@ module nts.uk.at.view.kmk007.a.viewmodel {
                     self.enableMethod(true);
                     self.setCalculatorMethod();
                 }
-
             }
         }
 
