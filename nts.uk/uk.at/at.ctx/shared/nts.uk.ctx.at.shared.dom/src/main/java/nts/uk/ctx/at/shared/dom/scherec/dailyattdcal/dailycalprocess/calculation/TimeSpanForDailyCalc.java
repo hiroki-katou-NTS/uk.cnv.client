@@ -124,6 +124,15 @@ public class TimeSpanForDailyCalc implements Cloneable {
 	}
 	
 	/**
+	 * 開始時刻だけを戻す（前にずらす）
+	 * @param minutesToShiftAhead
+	 * @return
+	 */
+	public TimeSpanForDailyCalc shiftStartBack(int minutesToShiftAhead) {
+		return new TimeSpanForDailyCalc(this.timeSpan.shiftStartBack(minutesToShiftAhead));
+	}
+	
+	/**
 	 * 比較元と比較したい時間帯の位置関係を判定する
 	 * @param other 比較したい時間帯
 	 * @return　重複状態区分
@@ -204,8 +213,7 @@ public class TimeSpanForDailyCalc implements Cloneable {
 		for (TimeSheetOfDeductionItem item : timeSheetOfDeductionItems) {
 			Optional<TimeSpanForDailyCalc> timeSpan = item.getTimeSheet().getDuplicatedWith(new TimeSpanForDailyCalc(startTime, endTime));
 			if (timeSpan.isPresent()) {
-				TimeSheetOfDeductionItem deductItem = item.reCreateOwn(timeSpan.get());
-				endTime = endTime.forwardByMinutes(deductItem.calcTotalTime().v());
+				endTime = endTime.forwardByMinutes(item.calcTotalTime().v());
 			}
 		}
 		return endTime;

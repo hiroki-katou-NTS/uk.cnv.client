@@ -275,7 +275,7 @@ public class OutingTimeOfDaily {
 	 */
 	public AttendanceTime calcVacationAddTime(
 			HolidayCalcMethodSet calcMethodSet,
-			Optional<HolidayAddtionSet> holidayAddtionSet,
+			HolidayAddtionSet holidayAddtionSet,
 			DeductionTimeSheet deductionTimeSheet,
 			WorkTimeForm workTimeForm) {
 		
@@ -289,7 +289,7 @@ public class OutingTimeOfDaily {
 		//計算計上用外出時間
 		AttendanceTime outCalcTime = deductionTimeSheet.getDeductionTotalTime(records, false).getTotalTime().getCalcTime();
 		
-		return holidayAddtionSet.get().getAddTime(this.timeVacationUseOfDaily, outCalcTime, workTimeForm);
+		return holidayAddtionSet.getAddTime(this.timeVacationUseOfDaily, outCalcTime, workTimeForm);
 	}
 	
 	public static OutingTimeOfDaily createDefaultWithReason(GoingOutReason reason) {

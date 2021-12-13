@@ -1006,20 +1006,15 @@ public class TotalWorkingTime {
 		Optional<IntegrationOfWorkTime> integrationOfWorkTime = recordClass.getIntegrationOfWorkTime();
 		// 休暇加算処理
 		vacationAddTime += withinWorkTimeSheet.vacationAddProcess(
-				integrationOfDaily,
 				integrationOfWorkTime,
 				PremiumAtr.RegularWork,
 				vacationClass,
 				workType,
 				recordClass.getAddSetting(),
 				recordClass.getHolidayAddtionSet().get(),
-				flexCalcMethod,
 				recordClass.getCalculationRangeOfOneDay().getPredetermineTimeSetForCalc(),
-				recordClass.getDailyUnit(),
-				commonSetting,
 				conditionItem,
-				predetermineTimeSetByPersonInfo,
-				NotUseAtr.NOT_USE).valueAsMinutes();
+				predetermineTimeSetByPersonInfo).valueAsMinutes();
 		// 時間枠毎の相殺による加算時間の合計を取得
 		vacationAddTime += withinWorkTimeSheet.getTotalAddTimeByOffset(
 				integrationOfDaily,

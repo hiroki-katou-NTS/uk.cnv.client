@@ -864,7 +864,7 @@ public class DeductionTimeSheet {
 		
 		/** ○終了時刻を休憩計算開始時刻とする */
 		return firstLateTime.map(c -> c.getForDeducationTimeSheet()
-							.map(t -> t.getTimeSheet().getEnd())
+							.map(t -> t.getAfterRoundingAsLate().getEnd())
 							.orElseGet(() -> new TimeWithDayAttr(0)))
 				.get();
 	}

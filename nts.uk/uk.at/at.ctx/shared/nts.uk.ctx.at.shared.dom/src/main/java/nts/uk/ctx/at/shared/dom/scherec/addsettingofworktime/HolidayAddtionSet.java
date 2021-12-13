@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,11 @@ import nts.arc.layer.dom.AggregateRoot;
 import nts.gul.serialize.binary.SerializableWithOptional;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.TimevacationUseTimeOfDaily;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.earlyleavetime.LeaveEarlyTimeOfDaily;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.latetime.LateTimeOfDaily;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.DeductionTimeSheet;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.timezone.withinworkinghours.WithinWorkTimeFrame;
 import nts.uk.ctx.at.shared.dom.worktime.service.WorkTimeForm;
 
 /**
@@ -104,6 +110,43 @@ public class HolidayAddtionSet extends AggregateRoot implements SerializableWith
         this.timeHolidayAddition = timeHolidayAddition;
         this.reference = reference;
     }
+
+	/**
+	 * 時間休暇加算時間を計算する
+	 * @param integrationOfDaily 日別勤怠(Work)
+	 * @param deductionTimeSheet 控除時間帯
+	 * @param calcMethodSet 休暇の計算方法の設定
+	 * @param frames 就業時間内時間枠
+	 * @param workTimeForm 就業時間帯の勤務形態
+	 * @return 時間休暇加算時間
+	 */
+	public AttendanceTime calcTimeVacationAddTime(IntegrationOfDaily integrationOfDaily, DeductionTimeSheet deductionTimeSheet,
+			HolidayCalcMethodSet calcMethodSet, List<WithinWorkTimeFrame> frames, WorkTimeForm workTimeForm) {
+		if(!integrationOfDaily.getAttendanceTimeOfDailyPerformance().isPresent()) {
+			return AttendanceTime.ZERO;
+		}
+		// 遅刻の時間休暇加算時間を取得する
+		List<LateTimeOfDaily> lateDailies = integrationOfDaily.getAttendanceTimeOfDailyPerformance().get().getLateTimeOfDaily();
+		AttendanceTime lateTime = new AttendanceTime(lateDailies.stream()
+				.map(l -> l.calcVacationAddTime(calcMethodSet, this, frames, workTimeForm))
+				.collect(Collectors.summingInt(a -> a.valueAsMinutes())));
+		// 早退の時間休暇加算時間を取得する
+		List<LeaveEarlyTimeOfDaily> leaveEarlyDailies = integrationOfDaily.getAttendanceTimeOfDailyPerformance().get().getLeaveEarlyTimeOfDaily();
+		AttendanceTime leaveEarlyTime = new AttendanceTime(leaveEarlyDailies.stream()
+				.map(l -> l.calcVacationAddTime(calcMethodSet, this, frames, workTimeForm))
+				.collect(Collectors.summingInt(a -> a.valueAsMinutes())));
+		// 外出の時間休暇加算時間を取得する
+		AttendanceTime outTime = new AttendanceTime(integrationOfDaily.getAttendanceTimeOfDailyPerformance().get().getOutingTimeOfDaily().stream()
+					.filter(o -> o.getReason().isPrivateOrUnion())
+					.map(o -> o.calcVacationAddTime(calcMethodSet, this, deductionTimeSheet, workTimeForm))
+					.collect(Collectors.summingInt(a -> a.valueAsMinutes())));
+		
+		AttendanceTime totalTime = AttendanceTime.ZERO;
+		return totalTime
+				.addMinutes(lateTime.valueAsMinutes())
+				.addMinutes(leaveEarlyTime.valueAsMinutes())
+				.addMinutes(outTime.valueAsMinutes());
+	}
 
 	/**
 	 * 時間休暇加算時間を取得する
