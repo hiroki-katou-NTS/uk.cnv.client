@@ -148,7 +148,12 @@ public class DailyModifyResCommandFacade {
                 val itemRow = lstItemEdits.stream()
                         .filter(it -> it.getEmployeeId().equals(data.getKey()) && it.getDate().equals(data.getValue()))
                         .map(x -> Pair.of(x.getEmployeeId(), x.getDate())).collect(Collectors.toSet());
-                detailEmployeeError.addAll(itemRow);
+                Set<String> listEmpError = monthPer.stream().map(x->x.getEmployeeID()).collect(Collectors.toSet());
+                itemRow.forEach(i ->{
+                	if(listEmpError.contains(i.getKey())) {
+                		detailEmployeeError.add(i);
+                	}
+                });
 		});
         }
 		return new LeaveDayErrorDto(onlyErrorOld, monthPer, detailEmployeeError);
