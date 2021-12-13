@@ -7,6 +7,7 @@ import nts.arc.layer.dom.DomainObject;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.WorkInformation;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
+import nts.uk.ctx.at.shared.dom.worktype.AttendanceDayAttr;
 import nts.uk.ctx.at.shared.dom.worktype.HolidayAtr;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeCode;
@@ -98,7 +99,7 @@ public class WorkByIndividualWorkDay extends DomainObject{
 						workTimeCode = this.workTime.getHolidayWork() == null ? Optional.empty(): this.workTime.getHolidayWork().getWorkTimeCode();
 					}
 				} else {
-					return inOtherCase(workTypeCode, workTimeCode);
+					return new WorkInformation(workTypeCode, inOtherCase().orElse(null));
 				}
 			}
 			break;
@@ -112,7 +113,7 @@ public class WorkByIndividualWorkDay extends DomainObject{
 						workTimeCode = this.workTime.getHolidayWork() == null ? Optional.empty() : this.workTime.getHolidayWork().getWorkTimeCode();
 					}
 				} else {
-					return inOtherCase(workTypeCode, workTimeCode);
+					return new WorkInformation(workTypeCode, inOtherCase().orElse(null));
 				}
 			}
 			break;
@@ -126,7 +127,7 @@ public class WorkByIndividualWorkDay extends DomainObject{
 						workTimeCode = this.workTime.getHolidayWork() == null ? Optional.empty() : this.workTime.getHolidayWork().getWorkTimeCode();
 					}
 				} else {
-					return inOtherCase(workTypeCode, workTimeCode);
+					return new WorkInformation(workTypeCode, inOtherCase().orElse(null));
 				}
 			}
 			break;
@@ -139,14 +140,27 @@ public class WorkByIndividualWorkDay extends DomainObject{
                 				   workTimeCode.isPresent() ? workTimeCode.get().v() : null);
 	}
 	
-	private WorkInformation inOtherCase( WorkTypeCode workTypeCode, Optional<WorkTimeCode> workTimeCode) {
-		workTypeCode = this.workType.getHolidayWorkWTypeCode();
-
-		if (this.workTime != null) {
-			workTimeCode = this.workTime.getHolidayWork() == null ? Optional.empty() : this.workTime.getHolidayWork().getWorkTimeCode();
-		}
-		return new WorkInformation(workTypeCode == null ? null : workTypeCode.v(),
-				                   workTimeCode.isPresent() ? workTimeCode.get().v() : null);
+	private Optional<WorkTimeCode> inOtherCase() {
+		return this.getWorkTime().getHolidayWork().getWorkTimeCode();
 	}
 	
+	// [5] 就業時間帯コードを取得する
+	public Optional<WorkInformation> getWorkInfoFromSetting(String companyId, String employeeId,
+			GeneralDate date, WorkType workType) {
+		
+		// 1日半日出勤・1日休日系の判定（休出判定あり）
+		AttendanceDayAttr attAtr = workType.chechAttendanceDay();
+		if (attAtr == AttendanceDayAttr.HOLIDAY_WORK) {
+			// 休出時の勤務情報を取得する
+			return Optional.of(this.getWorkinfoOnVacation(workType));
+		}
+
+		WorkInformation workInfo = this.getWorkInformationDayOfTheWeek(date);
+		if (workInfo.getWorkTimeCodeNotNull().isPresent()) {
+			return Optional.of(new WorkInformation(workType.getWorkTypeCode(), workInfo.getWorkTimeCode()));
+		}
+
+		return Optional.of(new WorkInformation(workType.getWorkTypeCode(), this.getWorkInformationWorkDay().getWorkTimeCode()));
+
+	}
 }

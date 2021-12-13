@@ -1,7 +1,6 @@
 package nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -595,12 +594,12 @@ public class TotalWorkingTime {
 				recordReGetClass.getCalculationRangeOfOneDay(),
 				DeductionAtr.Deduction,
 				GoingOutReason.PRIVATE,
-				recordReGetClass.getGoOutCalc()).getTotalTime().getCalcTime();
+				recordReGetClass.getGoOutCalc(), NotUseAtr.USE).getTotalTime().getCalcTime();
 		AttendanceTime unionOutTime = OutingTotalTime.calcOutingTime(
 				recordReGetClass.getCalculationRangeOfOneDay(),
 				DeductionAtr.Deduction,
 				GoingOutReason.UNION,
-				recordReGetClass.getGoOutCalc()).getTotalTime().getCalcTime();
+				recordReGetClass.getGoOutCalc(), NotUseAtr.USE).getTotalTime().getCalcTime();
 		//短時間
 		AttendanceTime shortWorkTime = ShortWorkTimeOfDaily.calcTotalShortWorkTime(
 				recordReGetClass,
@@ -689,15 +688,28 @@ public class TotalWorkingTime {
 		return totalOverTime + totalTransTime;
 	}
 
+	public void calcActualTimeForReCalc() {
+		this.actualTime = recalcActualTime();
+	}
+	
 	/**
 	 * 手修正後の再計算(実働時間)
 	 * @return
 	 */
 	public AttendanceTime recalcActualTime() {
 		//実働時間
-		//return recalcTotalWorkingTime();
-		//return this.getWithinStatutoryTimeOfDaily().getActualWorkTime();
-		return this.getActualTime();
+		int actualWorkTime = this.getWithinStatutoryTimeOfDaily().getActualWorkTime().v();
+		int overTime = this.getExcessOfStatutoryTimeOfDaily().calcOverTime().v();
+		int workHolidayTime = this.getExcessOfStatutoryTimeOfDaily().calcWorkHolidayTime().v();
+		int flexOverTime = this.getExcessOfStatutoryTimeOfDaily().getOverTimeWork()
+				.map(x -> x.getFlexTime().getFlexOverTime().v()).orElse(0);
+		int irregularWithinPrescribedOverTime = this.getExcessOfStatutoryTimeOfDaily().getOverTimeWork()
+				.map(x -> x.getIrregularWithinPrescribedOverTimeWork().v()).orElse(0);
+		int withinPrescribedPremiumTime = this.getWithinStatutoryTimeOfDaily().getWithinPrescribedPremiumTime().v();
+		int temporaryTime = this.getTemporaryTime().totalTemporaryFrameTime();
+		return new AttendanceTime(actualWorkTime + overTime + workHolidayTime + flexOverTime
+				+ irregularWithinPrescribedOverTime + withinPrescribedPremiumTime + temporaryTime);
+		//return this.getActualTime();
 						 //+変形基準内残業を足して返す;
 	}
 	/**
@@ -1247,6 +1259,13 @@ public class TotalWorkingTime {
 		this.holidayOfDaily = holidayOfDaily;
 		this.vacationAddTime = vacationAddTime;
 		this.intervalTime = intervalTime;
+	}
+	
+	public AttendanceTime getWorkHolidayTime() {
+		return this.getExcessOfStatutoryTimeOfDaily().calcWorkHolidayTime();
+	}
+	public AttendanceTime getOverTime() {
+		return this.getExcessOfStatutoryTimeOfDaily().calcOverTime();
 	}
 	
 }

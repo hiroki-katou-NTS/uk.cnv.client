@@ -63,7 +63,7 @@ public class DeclareErrorCheckServiceImpl implements DeclareErrorCheckService {
 		DeclareSet declareSet = declareSetOpt.get();
 		// 勤務種類を取得する
 		String workTypeCode = integrationOfDaily.getWorkInformation().getRecordInfo().getWorkTypeCode().v();
-		Optional<WorkType> workTypeOpt = this.workTypeRepo.findByDeprecated(companyId, workTypeCode);
+		Optional<WorkType> workTypeOpt = this.workTypeRepo.findByPK(companyId, workTypeCode);
 		if (!workTypeOpt.isPresent()) return result;
 		WorkType workType = workTypeOpt.get();
 		// 就業時間帯の設定を取得する

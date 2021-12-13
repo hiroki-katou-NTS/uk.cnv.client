@@ -32,7 +32,7 @@ public class StampReflectTimezonePolicyImpl implements StampReflectTimezonePolic
 		}
 
 		// Validate Msg_770
-		if (timezone.getStartTime().greaterThanOrEqualTo(timezone.getEndTime())) {
+		if (timezone.getStartTime().greaterThan(timezone.getEndTime())) {
 			if (isFlow) {
 				// J2_2, J2_4
 				if (timezone.isGoWork1()) {

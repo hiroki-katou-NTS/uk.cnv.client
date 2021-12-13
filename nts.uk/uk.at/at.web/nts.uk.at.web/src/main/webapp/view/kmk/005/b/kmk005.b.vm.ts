@@ -478,7 +478,7 @@ module nts.uk.at.view.kmk005.b {
                 $(".premiumName").trigger("validate");
                 if (!nts.uk.ui.errors.hasError()) {
                     let bonusPayTimeItemListCommand: Array<any> = [], bonusPayTimeItemSpecListCommand: Array<any> = [],
-                         lstUseArt: Array<boolean> = [];
+                         lstUseArt: Array<boolean> = [], lstUseSpecArt: Array<boolean> = [];
 
                     lstUseArt.push(self.useAtr1() == 1 ? true : false);
                     lstUseArt.push(self.useAtr2() == 1 ? true : false);
@@ -502,16 +502,16 @@ module nts.uk.at.view.kmk005.b {
                     bonusPayTimeItemListCommand.push({ timeItemName:self.timeItemName9(), useAtr: self.useAtr9(),timeItemNo: 9, timeItemTypeAtr: 0, timeItemId:self.timeItemId1() });
                     bonusPayTimeItemListCommand.push({ timeItemName:self.timeItemName10(), useAtr: self.useAtr10(),timeItemNo: 10, timeItemTypeAtr: 0, timeItemId:self.timeItemId1() });
                    
-                    lstUseArt.push(self.useSpecAtr1() == 1 ? true : false);
-                    lstUseArt.push(self.useSpecAtr2() == 1 ? true : false);
-                    lstUseArt.push(self.useSpecAtr3() == 1 ? true : false);
-                    lstUseArt.push(self.useSpecAtr4() == 1 ? true : false);
-                    lstUseArt.push(self.useSpecAtr5() == 1 ? true : false);
-                    lstUseArt.push(self.useSpecAtr6() == 1 ? true : false);
-                    lstUseArt.push(self.useSpecAtr7() == 1 ? true : false);
-                    lstUseArt.push(self.useSpecAtr8() == 1 ? true : false);
-                    lstUseArt.push(self.useSpecAtr9() == 1 ? true : false);
-                    lstUseArt.push(self.useSpecAtr10() == 1 ? true : false);                    
+                    lstUseSpecArt.push(self.useSpecAtr1() == 1 ? true : false);
+                    lstUseSpecArt.push(self.useSpecAtr2() == 1 ? true : false);
+                    lstUseSpecArt.push(self.useSpecAtr3() == 1 ? true : false);
+                    lstUseSpecArt.push(self.useSpecAtr4() == 1 ? true : false);
+                    lstUseSpecArt.push(self.useSpecAtr5() == 1 ? true : false);
+                    lstUseSpecArt.push(self.useSpecAtr6() == 1 ? true : false);
+                    lstUseSpecArt.push(self.useSpecAtr7() == 1 ? true : false);
+                    lstUseSpecArt.push(self.useSpecAtr8() == 1 ? true : false);
+                    lstUseSpecArt.push(self.useSpecAtr9() == 1 ? true : false);
+                    lstUseSpecArt.push(self.useSpecAtr10() == 1 ? true : false);                    
 
                     bonusPayTimeItemSpecListCommand.push({ timeItemName:self.timeItemSpecName1(), useAtr: self.useSpecAtr1(),timeItemNo: 1, timeItemTypeAtr: 1 });                    
                     bonusPayTimeItemSpecListCommand.push({ timeItemName:self.timeItemSpecName2(), useAtr: self.useSpecAtr2(),timeItemNo: 2, timeItemTypeAtr: 1 });
@@ -528,9 +528,21 @@ module nts.uk.at.view.kmk005.b {
                         service.getListBonusPTimeItem().done(function(res: Array<any>) {
                             if (res === undefined || res.length == 0) {
                                 service.addListBonusPayTimeItem(bonusPayTimeItemListCommand);
-                                service.addListBonusPayTimeItem(bonusPayTimeItemSpecListCommand);
                             } else {
                                 service.updateListBonusPayTimeItem(bonusPayTimeItemListCommand);
+                            }
+                            self.closeDialog();
+                        })
+
+                    }).fail(function(res) {
+                        nts.uk.ui.dialog.alertError({ messageId: res.messageId });
+                    });
+
+                    service.checkUseArt(lstUseSpecArt).done(function() {
+                        service.getListSpecialBonusPayTimeItem().done(function(res: Array<any>) {
+                            if (res === undefined || res.length == 0) {
+                                service.addListBonusPayTimeItem(bonusPayTimeItemSpecListCommand);
+                            } else {
                                 service.updateListBonusPayTimeItem(bonusPayTimeItemSpecListCommand);
                             }
                             self.closeDialog();

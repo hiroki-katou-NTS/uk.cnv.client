@@ -158,21 +158,32 @@ public class RemainingNumberCheckImp implements RemainingNumberCheck {
     private boolean checkSpecialHoliday(String cId, List<Integer> absenceFrameNo, List<Integer> specialHolidayFrame, DailyWork dailyWork){
     	
     	if(dailyWork.isAbsence()){
-        	return absenceFrameNo.stream().anyMatch(x ->{
+    		boolean checkAbsence = absenceFrameNo.stream().anyMatch(x ->{
         		List<Integer> absenceSpecialCd = specialHolidayRepo.findByAbsframeNo(cId, x);
         		if(!absenceSpecialCd.isEmpty()){
         			return true;
         		}
         		return false;
         	});
-    	}else if(dailyWork.isSpecHoliday()){
-	    	 return specialHolidayFrame.stream().anyMatch(x ->{
+    		
+    		if(checkAbsence){
+    			return checkAbsence;
+    		}
+    		
+    	}
+    	
+    	if(dailyWork.isSpecHoliday()){
+    		boolean checkSpecialHoliday =  specialHolidayFrame.stream().anyMatch(x ->{
 	    		List<Integer> holidaySpecialCd = specialHolidayRepo.findBySphdSpecLeave(cId, x);
 		    	if(!holidaySpecialCd.isEmpty()){
 		    		return true;
 		    	}
 		    	return false;
 	    	});
+	    	 
+	    	 if(checkSpecialHoliday){
+	    		 return checkSpecialHoliday;
+	    	 }
 
     	}
     	return false;

@@ -507,8 +507,7 @@ public class ScheduleCreatorExecutionService {
 		// 勤務種類情報を取得する ↓
 		// EA修正履歴 No2282
 		// ドメインモデル「勤務種類」を取得する
-		List<WorkType> lstWorkTypeInfo = workTypeRepository.findWorkByDeprecate(companyId,
-				DeprecateClassification.NotDeprecated.value);
+		List<WorkType> lstWorkTypeInfo = workTypeRepository.findByCompanyId(companyId);
 		// -----↑
 		// 勤務種別をテク定期間の社員情報を入れて返す (Comment theo luồng của bác Bình)
 		CreateScheduleMasterCache cache = new CreateScheduleMasterCache(empGeneralInfo, mapEmploymentStatus,

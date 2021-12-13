@@ -173,12 +173,14 @@ public class FactoryManagePerPersonDailySetImpl implements FactoryManagePerPerso
 			}
 			
 			/**　勤務種類 */
-			val workType = require.workType(companyId, nowWorkingItem.getWorkCategory().getWorkType().getWeekdayTimeWTypeCode().v())
-					.orElseThrow(() -> new RuntimeException("No WorkType"));
+			val workType = require.workType(companyId, nowWorkingItem.getWorkCategory().getWorkType().getWeekdayTimeWTypeCode().v());
+			if(!workType.isPresent()) {
+				return Optional.empty();
+			}
 		
 			/*平日時*/
 			PredetermineTimeSetForCalc predetermineTimeSetByPersonWeekDay = this.getPredByPersonInfo(
-					nowWorkingItem.getWorkCategory().getWorkTime().getWeekdayTime().getWorkTimeCode().get(), shareContainer, workType);
+					nowWorkingItem.getWorkCategory().getWorkTime().getWeekdayTime().getWorkTimeCode().get(), shareContainer, workType.get());
 			
 			/** 残業時間帯Require */
 			OverTimeSheet.TransProcRequire overTimeSheetRequire = new TransProcRequireImpl(

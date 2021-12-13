@@ -167,10 +167,10 @@ public class ShortWorkTimeOfDaily {
 			ConditionAtr conditionAtr = (careAtr.isChildCare() ? ConditionAtr.Child : ConditionAtr.Care);
 			// 所定内育児時間の計算
 			TimeWithCalculation withinTime = oneDay.getDeductionTime(
-					conditionAtr, dedAtr, StatutoryAtr.Statutory, TimeSheetRoundingAtr.ALL, Optional.empty());
+					conditionAtr, dedAtr, StatutoryAtr.Statutory, TimeSheetRoundingAtr.ALL, Optional.empty(), NotUseAtr.NOT_USE);
 			// 所定外育児時間の計算
 			TimeWithCalculation excessTime = oneDay.getDeductionTime(
-					conditionAtr, dedAtr, StatutoryAtr.Excess, TimeSheetRoundingAtr.ALL, Optional.empty());
+					conditionAtr, dedAtr, StatutoryAtr.Excess, TimeSheetRoundingAtr.ALL, Optional.empty(), NotUseAtr.NOT_USE);
 			// 合計時間の計算
 			result = DeductionTotalTime.of(
 					withinTime.addMinutes(excessTime.getTime(), excessTime.getCalcTime()),

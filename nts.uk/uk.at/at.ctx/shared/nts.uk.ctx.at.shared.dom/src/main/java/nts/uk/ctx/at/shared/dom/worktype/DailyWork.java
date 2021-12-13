@@ -527,4 +527,15 @@ public class DailyWork extends DomainObject implements Cloneable, Serializable{ 
 	    // return $休暇種類    
 	    return holiday;
 	}
+	
+	public WorkTypeClassification getWorkTypeClassification(WorkAtr atr) {
+		switch (atr) {
+		case Monring:
+			return this.morning;
+		case Afternoon:
+			return this.afternoon;
+		default:
+			return this.oneDay;
+		}
+	}
 }

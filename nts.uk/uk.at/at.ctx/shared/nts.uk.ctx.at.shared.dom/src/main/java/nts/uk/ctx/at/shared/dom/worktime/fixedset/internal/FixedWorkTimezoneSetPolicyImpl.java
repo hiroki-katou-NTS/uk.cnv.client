@@ -111,9 +111,9 @@ public class FixedWorkTimezoneSetPolicyImpl implements FixedWorkTimezoneSetPolic
 			List<EmTimeZoneSet> employmentTimezones = origin.getLstWorkingTimezone().stream()
 					.filter(timezone -> timezone.getTimezone().getStart().lessThanOrEqualTo(morningEndTime))
 					.map(item -> {
-						if (item.getTimezone().getStart().equals(morningEndTime)) {
-							return null;
-						}
+//						if (item.getTimezone().getStart().equals(morningEndTime)) {
+//							return null;
+//						}
 						if (item.getTimezone().getStart().lessThan(morningEndTime)
 								&& item.getTimezone().getEnd().greaterThan(morningEndTime)) {
 							item.getTimezone().setEnd(morningEndTime);
@@ -149,9 +149,9 @@ public class FixedWorkTimezoneSetPolicyImpl implements FixedWorkTimezoneSetPolic
 			List<EmTimeZoneSet> employmentTimezones = origin.getLstWorkingTimezone().stream()
 					.filter(timezone -> timezone.getTimezone().getEnd().greaterThanOrEqualTo(afternoonStartTime))
 					.map(item -> {
-						if (item.getTimezone().getEnd().equals(afternoonStartTime)) {
-							return null;
-						}
+//						if (item.getTimezone().getEnd().equals(afternoonStartTime)) {
+//							return null;
+//						}
 						if (item.getTimezone().getStart().lessThan(afternoonStartTime)
 								&& item.getTimezone().getEnd().greaterThan(afternoonStartTime)) {
 							item.getTimezone().setStart(afternoonStartTime);

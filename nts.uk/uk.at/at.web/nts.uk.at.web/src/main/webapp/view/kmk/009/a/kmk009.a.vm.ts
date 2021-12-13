@@ -808,13 +808,16 @@ module nts.uk.at.view.kmk009.a.viewmodel {
                 saveData.updateData(self.stash.toDto());
                 saveData.useAtr(0);
             }
-
-			if(self.selectUse() == SelectUseConst.Use) {
-				if(_.isNaN(_.toNumber(self.attendanceModel.attendanceItemId()))) {
-					saveData.totalCondition.attendanceItemId(null);	
+			if (self.selectUse() == SelectUseConst.Use) {
+				if(_.isNumber(self.attendanceModel.attendanceItemId())) {
+					saveData.totalCondition.attendanceItemId(self.attendanceModel.attendanceItemId());	
 				} else {
-					saveData.totalCondition.attendanceItemId(_.toNumber(self.attendanceModel.attendanceItemId()));	
-				}
+	                saveData.totalCondition.attendanceItemId(null);
+					saveData.totalCondition.upperLimitSettingAtr(0);
+			        saveData.totalCondition.lowerLimitSettingAtr(0);
+			        saveData.totalCondition.thresoldUpperLimit(null);
+			        saveData.totalCondition.thresoldLowerLimit(null);
+	            }
 			}
         }
 

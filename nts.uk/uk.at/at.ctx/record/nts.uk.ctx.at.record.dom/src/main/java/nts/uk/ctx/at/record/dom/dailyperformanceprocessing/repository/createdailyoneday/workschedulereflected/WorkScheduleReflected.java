@@ -100,7 +100,7 @@ public class WorkScheduleReflected {
 		}
 		
 		//ドメインモデル「勤務種類」を取得する-(Lấy domain 「WorkType」) // trả về list 1 phần tử or empty
-		List<WorkType> wkTypeOpt = wkTypeRepo.findNotDeprecatedByListCode(companyId,
+		List<WorkType> wkTypeOpt = wkTypeRepo.findAllByListCode(companyId,
 				Arrays.asList(workInformation.getRecordInfo().getWorkTypeCode().v()));
 		if(wkTypeOpt.isEmpty()) {
 			listErrorMessageInfo.add(new ErrorMessageInfo(companyId, employeeId, ymd, ExecutionContent.DAILY_CREATION,

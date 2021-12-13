@@ -30,7 +30,6 @@ import nts.uk.ctx.at.request.dom.adapter.record.remainingnumber.holidayover60h.A
 import nts.uk.ctx.at.request.dom.adapter.record.remainingnumber.holidayover60h.GetHolidayOver60hRemNumWithinPeriodAdapter;
 import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.ApplicationApprovalService;
-import nts.uk.ctx.at.request.dom.application.ApplicationDate;
 import nts.uk.ctx.at.request.dom.application.ApplicationRepository;
 import nts.uk.ctx.at.request.dom.application.EmploymentRootAtr;
 import nts.uk.ctx.at.request.dom.application.ReflectedState;
@@ -100,12 +99,8 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.interim.InterimAbsMng;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.interim.InterimRecAbasMngRepository;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.interim.InterimRecMng;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.AppRemainCreateInfor;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.ApplicationType;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.InterimRemainDataMngRegisterDateChange;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.PrePostAtr;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.TimeDigestionParam;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.TimeDigestionUsageInfor;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.require.RemainNumberTempRequireService;
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.export.InterimRemainMngMode;
 import nts.uk.ctx.at.shared.dom.remainingnumber.base.TargetSelectionAtr;
@@ -127,7 +122,6 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveComDayOffManaRepo
 import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveComDayOffManagement;
 import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveManaDataRepository;
 import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveManagementData;
-import nts.uk.ctx.at.shared.dom.remainingnumber.work.VacationTimeUseInfor;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.BasicScheduleService;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.SetupType;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.WorkStyle;
@@ -2583,52 +2577,6 @@ public class AbsenceServiceProcessImpl implements AbsenceServiceProcess {
 //        }
 //    }
     
-    public List<AppRemainCreateInfor> createAppRemain(ApplyForLeave application) {
-        List<AppRemainCreateInfor> result = new ArrayList<AppRemainCreateInfor>();
-        String workTypeCode = null;
-        String workTimeCode = null;
-        
-        if (application.getReflectFreeTimeApp().getWorkInfo() != null 
-                && application.getReflectFreeTimeApp().getWorkInfo().getWorkTypeCode() != null) {
-            workTypeCode = application.getReflectFreeTimeApp().getWorkInfo().getWorkTypeCode().v();
-        }
-        
-        if (application.getReflectFreeTimeApp().getWorkInfo() != null 
-                && application.getReflectFreeTimeApp().getWorkInfo().getWorkTimeCodeNotNull().isPresent()) {
-            workTimeCode = application.getReflectFreeTimeApp().getWorkInfo().getWorkTypeCode().v();
-        }
-        
-        TimeDigestionUsageInfor timeDigest = null;
-        Optional<TimeDigestApplication> timeDigestApplicationOpt = application.getReflectFreeTimeApp().getTimeDegestion();
-        if (timeDigestApplicationOpt.isPresent()) {
-            TimeDigestApplication timeDigestApplication = timeDigestApplicationOpt.get();
-            timeDigest = new TimeDigestionUsageInfor(
-                    timeDigestApplication.getTimeAnnualLeave() == null ? null : timeDigestApplication.getTimeAnnualLeave().v(), 
-                    timeDigestApplication.getTimeOff() == null ? null : timeDigestApplication.getTimeOff().v(), 
-                    timeDigestApplication.getOvertime60H() == null ? null : timeDigestApplication.getOvertime60H().v(), 
-                    timeDigestApplication.getChildTime() == null ? null : timeDigestApplication.getChildTime().v(), 
-                    timeDigestApplication.getNursingTime() == null ? null : timeDigestApplication.getNursingTime().v());
-        }
-        
-        AppRemainCreateInfor appRemainCreateInfor = new AppRemainCreateInfor(
-                application.getEmployeeID(), 
-                application.getAppID(), 
-                application.getInputDate(), 
-                application.getAppDate().getApplicationDate(), 
-                EnumAdaptor.valueOf(application.getPrePostAtr().value, PrePostAtr.class), 
-                EnumAdaptor.valueOf(application.getAppType().value, ApplicationType.class), 
-                Optional.ofNullable(workTypeCode), 
-                Optional.ofNullable(workTimeCode), 
-                new ArrayList<VacationTimeUseInfor>(), 
-                Optional.empty(), 
-                Optional.empty(), 
-                application.getOpAppStartDate().map(ApplicationDate::getApplicationDate),
-                application.getOpAppEndDate().map(ApplicationDate::getApplicationDate), 
-                new ArrayList<GeneralDate>(), 
-                Optional.of(timeDigest));
-        result.add(appRemainCreateInfor);
-        return result;
-    }
     
     @AllArgsConstructor
     private class RequireM11Imp implements BreakDayOffMngInPeriodQuery.RequireM11, AbsenceReruitmentMngInPeriodQuery.RequireM11 {

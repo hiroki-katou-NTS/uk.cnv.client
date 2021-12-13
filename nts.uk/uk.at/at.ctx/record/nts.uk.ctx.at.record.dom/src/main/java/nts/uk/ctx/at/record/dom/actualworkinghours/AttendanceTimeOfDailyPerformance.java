@@ -284,6 +284,7 @@ public class AttendanceTimeOfDailyPerformance extends AggregateRoot {
 			List<Integer> attendanceItemIdList, GeneralDate targetDate, PremiumAtr premiumAtr,
 			HolidayCalcMethodSet holidayCalcMethodSet, Optional<WorkTimezoneCommonSet> commonSetting,
 			ManageReGetClass recordReGetClass, List<PersonnelCostSettingImport> personalSetting) {
+		List<ItemValue> beforeItemValue = getBeforeItemValue(converter, calcResultIntegrationOfDaily);
 		// 乖離時間(AggregateRoot)取得
 		List<DivergenceTimeRoot> divergenceTimeList = companyCommonSetting.getDivergenceTime();
 		if (calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().isPresent()) {
@@ -340,43 +341,16 @@ public class AttendanceTimeOfDailyPerformance extends AggregateRoot {
 				scheActDiffTime = totalWorkTime.minusMinutes(scheTime.valueAsMinutes());
 			}
 		}
-		// 不就労時間
-		AttendanceTimeOfExistMinus alreadlyDedBindTime = new AttendanceTimeOfExistMinus(0);
-		// 総労働時間が編集している項目リストに含まれていなければ再計算
-		if (calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().isPresent()) {
-			alreadlyDedBindTime = calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().get()
-					.getUnEmployedTime();
-			if (calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().get().getActualWorkingTimeOfDaily()
-					.getTotalWorkingTime() != null
-					&& calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().get()
-					.getActualWorkingTimeOfDaily() != null
-					&& !attendanceItemIdList.contains(new Integer(559))) {
-				// ↓で総控除時間を引く
-				alreadlyDedBindTime = new AttendanceTimeOfExistMinus(
-						calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().get().getStayingTime()
-								.getStayingTime()
-								.minusMinutes(calcResultIntegrationOfDaily
-										.getAttendanceTimeOfDailyPerformance().get().getActualWorkingTimeOfDaily()
-										.getTotalWorkingTime().calcTotalDedTime(recordReGetClass, premiumAtr)
-										.valueAsMinutes())
-								.valueAsMinutes());
-				alreadlyDedBindTime = alreadlyDedBindTime.minusMinutes(calcResultIntegrationOfDaily
-						.getAttendanceTimeOfDailyPerformance().get().getActualWorkingTimeOfDaily().getTotalWorkingTime()
-						.recalcActualTime().valueAsMinutes());
-			}
-		}
-
+		
+		//実働時間
+		calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().get().getActualWorkingTimeOfDaily()
+				.getTotalWorkingTime().calcActualTimeForReCalc();
+	
 		// 乖離時間計算用 勤怠項目ID紐づけDto作成
 		DailyRecordToAttendanceItemConverter forCalcDivergenceDto = converter.setData(calcResultIntegrationOfDaily);
 
 		if (calcResultIntegrationOfDaily != null
 				&& calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().isPresent()) {
-
-			// 割増時間の計算
-			PremiumTimeOfDailyPerformance premiumTimeOfDailyPerformance = ActualWorkingTimeOfDaily
-					.createPremiumTimeOfDailyPerformance(
-							personalSetting,
-							Optional.of(forCalcDivergenceDto));
 
 			// 乖離時間を計算する
 			val reCalcDivergence = DivergenceTimeOfDaily.create(forCalcDivergenceDto,
@@ -387,6 +361,44 @@ public class AttendanceTimeOfDailyPerformance extends AggregateRoot {
 							recordReGetClass.getWorkTimeSetting(),
 							recordReGetClass.getWorkType());
 
+			if(!beforeItemValue.isEmpty()) {
+				calcResultIntegrationOfDaily = mergeValueEdited(forCalcDivergenceDto, beforeItemValue);
+				forCalcDivergenceDto = converter.setData(calcResultIntegrationOfDaily);
+			}
+
+			// 不就労時間
+			AttendanceTimeOfExistMinus alreadlyDedBindTime = new AttendanceTimeOfExistMinus(0);
+			// 総労働時間が編集している項目リストに含まれていなければ再計算
+			if (calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().isPresent()) {
+				alreadlyDedBindTime = calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().get()
+						.getUnEmployedTime();
+				if (calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().get().getActualWorkingTimeOfDaily()
+						.getTotalWorkingTime() != null
+						&& calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().get()
+						.getActualWorkingTimeOfDaily() != null
+						&& !attendanceItemIdList.contains(new Integer(559))) {
+					// ↓で総控除時間を引く
+					alreadlyDedBindTime = new AttendanceTimeOfExistMinus(
+							calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().get().getStayingTime()
+									.getStayingTime()
+									.minusMinutes(calcResultIntegrationOfDaily
+											.getAttendanceTimeOfDailyPerformance().get().getActualWorkingTimeOfDaily()
+											.getTotalWorkingTime().calcTotalDedTime(recordReGetClass, premiumAtr)
+											.valueAsMinutes())
+									.valueAsMinutes());
+					alreadlyDedBindTime = alreadlyDedBindTime.minusMinutes(calcResultIntegrationOfDaily
+							.getAttendanceTimeOfDailyPerformance().get().getActualWorkingTimeOfDaily().getTotalWorkingTime()
+							.getActualTime().valueAsMinutes());
+				}
+			}
+
+			
+			// 割増時間の計算
+			PremiumTimeOfDailyPerformance premiumTimeOfDailyPerformance = ActualWorkingTimeOfDaily
+					.createPremiumTimeOfDailyPerformance(
+							personalSetting,
+							Optional.of(forCalcDivergenceDto));
+			
 			val reCreateActual = ActualWorkingTimeOfDaily.of(
 					calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().get()
 						.getActualWorkingTimeOfDaily().getConstraintDifferenceTime(),
@@ -415,12 +427,26 @@ public class AttendanceTimeOfDailyPerformance extends AggregateRoot {
 		}
 		// 総労働の上限設定
 		Optional<UpperLimitTotalWorkingHour> upperControl = companyCommonSetting.getUpperControl();
-		upperControl.ifPresent(tc -> {
-			tc.controlUpperLimit(calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().get()
+		if(upperControl.isPresent()) {
+			upperControl.get().controlUpperLimit(calcResultIntegrationOfDaily.getAttendanceTimeOfDailyPerformance().get()
 					.getActualWorkingTimeOfDaily().getTotalWorkingTime());
-		});
+		};
 
 		return calcResultIntegrationOfDaily;
+	}
+	
+	private static List<ItemValue> getBeforeItemValue(DailyRecordToAttendanceItemConverter converter, IntegrationOfDaily domain) {
+		List<Integer> attendanceItemIdList = domain.getEditState().stream()
+				.map(editState -> editState.getAttendanceItemId()).distinct().collect(Collectors.toList());
+		DailyRecordToAttendanceItemConverter beforDailyRecordDto = converter.setData(domain);
+		List<ItemValue> itemValueList = beforDailyRecordDto.convert(attendanceItemIdList);
+		return itemValueList;
+	}
+
+	private static IntegrationOfDaily mergeValueEdited(DailyRecordToAttendanceItemConverter converter,
+			List<ItemValue> itemValueList) {
+		converter.merge(itemValueList);
+		return converter.toDomain();
 	}
 	
 	/**

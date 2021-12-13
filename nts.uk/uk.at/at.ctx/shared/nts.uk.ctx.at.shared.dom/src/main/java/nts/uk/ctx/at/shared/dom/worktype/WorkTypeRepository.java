@@ -112,6 +112,15 @@ public interface WorkTypeRepository {
 	List<WorkType> findNotDeprecatedByListCode(String companyId, List<String> codes);
 	
 	/**
+	 * Find all by list code.
+	 *
+	 * @param companyId the company id
+	 * @param codes the codes
+	 * @return the list
+	 */
+	List<WorkType> findAllByListCode(String companyId, List<String> codes);
+	
+	/**
 	 * Find work type.
 	 *
 	 * @param companyId the company id

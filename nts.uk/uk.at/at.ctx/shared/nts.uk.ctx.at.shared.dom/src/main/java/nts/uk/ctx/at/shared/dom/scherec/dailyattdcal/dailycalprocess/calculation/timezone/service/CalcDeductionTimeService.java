@@ -11,6 +11,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.timezone.CalculationRangeOfOneDay;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.timezone.deductiontime.DeductionAtr;
 import nts.uk.ctx.at.shared.dom.workrule.outsideworktime.StatutoryAtr;
+import nts.uk.shr.com.enumcommon.NotUseAtr;
 
 /**
  * ドメインサービス：控除時間計算
@@ -32,14 +33,15 @@ public class CalcDeductionTimeService {
 			ConditionAtr conditionAtr,
 			DeductionAtr dedAtr,
 			TimeSheetRoundingAtr roundAtr,
-			Optional<TimeRoundingSetting> sumRoundSet) {
+			Optional<TimeRoundingSetting> sumRoundSet,
+			NotUseAtr canOffset) {
 
 		// 所定内合計時間の計算
 		TimeWithCalculation withinDedTime = oneDay.getDeductionTime(
-				conditionAtr, dedAtr, StatutoryAtr.Statutory, roundAtr, sumRoundSet);
+				conditionAtr, dedAtr, StatutoryAtr.Statutory, roundAtr, sumRoundSet, canOffset);
 		// 所定外合計時間の計算
 		TimeWithCalculation excessDedTime = oneDay.getDeductionTime(
-				conditionAtr, dedAtr, StatutoryAtr.Excess, roundAtr, sumRoundSet);
+				conditionAtr, dedAtr, StatutoryAtr.Excess, roundAtr, sumRoundSet, canOffset);
 		// 控除区分を確認する
 		if (dedAtr.isAppropriate()){
 			// 勤務間休憩時間の計算

@@ -7,6 +7,7 @@ package nts.uk.ctx.at.schedule.dom.executionlog;
 import lombok.Getter;
 import nts.arc.layer.dom.AggregateRoot;
 import nts.arc.time.GeneralDate;
+import nts.uk.shr.infra.i18n.resource.I18NResourcesForUK;
 
 /**
  * The Class ScheduleErrorLog.
@@ -108,5 +109,16 @@ public class ScheduleErrorLog extends AggregateRoot {
 
 	public void setExecutionId(String executionId) {
 		this.executionId = executionId;
+	}
+	
+	public static ScheduleErrorLog createErrorLog(I18NResourcesForUK internationalization, String execId, String sid,
+			GeneralDate date, String message) {
+		return createErrorLog(internationalization, execId, sid, date, message, '#' + message);
+	}
+	
+	public static ScheduleErrorLog createErrorLog(I18NResourcesForUK internationalization, String execId, String sid,
+			GeneralDate date, String message, String... messageParam) {
+		String errorContent = internationalization.localize(message, messageParam).get();
+		return new ScheduleErrorLog(errorContent, execId, date, sid);
 	}
 }

@@ -464,10 +464,10 @@ public class OverTimeSheet {
 	 * @return 控除時間
 	 */
 	public AttendanceTime getDeductionTime(
-			ConditionAtr conditionAtr, DeductionAtr dedAtr, TimeSheetRoundingAtr roundAtr) {
+			ConditionAtr conditionAtr, DeductionAtr dedAtr, TimeSheetRoundingAtr roundAtr, nts.uk.shr.com.enumcommon.NotUseAtr canOffset) {
 		
 		return ActualWorkTimeSheetListService.calcDeductionTime(conditionAtr, dedAtr, roundAtr,
-				this.frameTimeSheets.stream().map(tc -> (ActualWorkingTimeSheet)tc).collect(Collectors.toList()));
+				this.frameTimeSheets.stream().map(tc -> (ActualWorkingTimeSheet)tc).collect(Collectors.toList()), canOffset);
 	}
 
 	/**

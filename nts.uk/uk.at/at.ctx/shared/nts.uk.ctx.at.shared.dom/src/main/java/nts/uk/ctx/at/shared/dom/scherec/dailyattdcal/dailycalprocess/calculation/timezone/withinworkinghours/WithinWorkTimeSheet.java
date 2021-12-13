@@ -1049,10 +1049,10 @@ public class WithinWorkTimeSheet implements LateLeaveEarlyManagementTimeSheet{
 	 * @return 控除時間
 	 */
 	public AttendanceTime getDeductionTime(
-			ConditionAtr conditionAtr, DeductionAtr dedAtr, TimeSheetRoundingAtr roundAtr) {
+			ConditionAtr conditionAtr, DeductionAtr dedAtr, TimeSheetRoundingAtr roundAtr, NotUseAtr canOffset) {
 		
 		return ActualWorkTimeSheetListService.calcDeductionTime(conditionAtr, dedAtr, roundAtr,
-				this.withinWorkTimeFrame.stream().map(tc -> (ActualWorkingTimeSheet)tc).collect(Collectors.toList()));
+				this.withinWorkTimeFrame.stream().map(tc -> (ActualWorkingTimeSheet)tc).collect(Collectors.toList()), canOffset);
 	}
 	
 	/**

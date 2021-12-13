@@ -89,7 +89,7 @@ public class InterimRemainOffPeriodCreateData {
 
 
 			//アルゴリズム「指定日の暫定残数管理データを作成する」
-			DailyInterimRemainMngData outPutdata = InterimRemainOffDateCreateData.createData(
+			Optional<DailyInterimRemainMngData> outPutdata = InterimRemainOffDateCreateData.createData(
 					require,
 					inputParam.getCid(),
 					inputParam.getSid(),
@@ -99,8 +99,8 @@ public class InterimRemainOffPeriodCreateData {
 					comHolidaySetting,
 					employmentHolidaySetting,
 					inputParam.getCallFunction());
-			if(outPutdata != null) {
-				dataOutput.put(loopDate, outPutdata);
+			if(outPutdata.isPresent()) {
+				dataOutput.put(loopDate, outPutdata.get());
 			}
 		}
 

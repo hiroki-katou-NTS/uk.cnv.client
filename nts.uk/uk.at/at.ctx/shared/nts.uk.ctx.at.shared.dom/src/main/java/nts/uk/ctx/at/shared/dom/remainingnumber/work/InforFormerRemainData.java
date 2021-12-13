@@ -3,7 +3,6 @@ import java.util.List;
 import java.util.Optional;
 
 import lombok.Getter;
-import nts.arc.error.BusinessException;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.primitive.CreateAtr;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeClassification;
@@ -51,7 +50,7 @@ public class InforFormerRemainData {
 	private void validate() {
 		if (workTypeRemain.isPresent() || dayOffTranfer.isPresent() || !vactionTime.isEmpty())
 			return;
-		throw new BusinessException("InforFormerRemainData validate");
+		throw new RuntimeException("InforFormerRemainData validate");
 	}
 	/**
 	 * 分類を指定して発生使用明細を取得する

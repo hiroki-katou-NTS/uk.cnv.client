@@ -146,7 +146,7 @@ public class CorrectionAfterChangeWorkInfo {
 			
 			@Override
 			public Optional<WorkType> getWorkType(String workTypeCd) {
-				return workTypeRepo.findNoAbolishByPK(companyId, workTypeCd);
+				return workTypeRepo.findByPK(companyId, workTypeCd);
 			}
 			
 			@Override

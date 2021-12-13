@@ -174,6 +174,7 @@ public class KrcdtMonRemain extends ContractUkJpaEntity implements Serializable 
 	/** 実使用回数 */
 	@Column(name = "AL_FACT_USED_TIMES")
 	public Integer annleaFactUsedTimes;
+	
 	/** 合計残日数付与前 */
 	@Column(name = "AL_REM_DAYS_BEFORE")
 	public double annleaRemainingDaysBefore;
@@ -1631,15 +1632,14 @@ public class KrcdtMonRemain extends ContractUkJpaEntity implements Serializable 
 		if (normalUsed.getUsedTime().isPresent()) {
 			this.annleaUsedMinutes = normalUsed.getUsedTime().get().v();
 		}
+		
 		this.annleaUsedDaysBefore = normalUsedBefore.getUsedDays().map(c -> c.v()).orElse(0d);
 		if (normalUsedBefore.getUsedTime().isPresent()){
 			this.annleaUsedMinutesBefore = normalUsedBefore.getUsedTime().get().v();
-//			if (normalUsedTime.getUsedTimeAfterGrant().isPresent()) {
-//				this.annleaUsedMinutesAfter = normalUsedTime.getUsedTimeAfterGrant().get().v();
-//			}
 		}
 
 		this.annleaUsedTimes = normal.getUsedNumberInfo().getAnnualLeaveUsedTimes().v();
+		
 		if (normalUsedAfterOpt.isPresent()) {
 			this.annleaUsedDaysAfter = normalUsedAfterOpt.get().getUsedDays().map(c -> c.v()).orElse(0d);
 			if (normalUsedAfterOpt.get().getUsedTime().isPresent()){
@@ -1661,6 +1661,9 @@ public class KrcdtMonRemain extends ContractUkJpaEntity implements Serializable 
 		if (realUsedBefore.getUsedTime().isPresent()) {
 			this.annleaFactUsedMinutesBefore = realUsedBefore.getUsedTime().get().v();
 		}
+		
+		this.annleaFactUsedTimes = real.getUsedNumberInfo().getAnnualLeaveUsedTimes().v();
+		
 		if (realUsedAfterOpt.isPresent()) {
 			this.annleaFactUsedDaysAfter = realUsedAfterOpt.get().getUsedDays().map(c -> c.v()).orElse(0d);
 			if (realUsedAfterOpt.get().getUsedTime().isPresent()) {

@@ -46,4 +46,7 @@ public class ScheRemainCreateInfor {
 				record.getWorkTimeCode(), record.getTransferTotal(), record.getTransferOvertimesTotal(),
 				record.getLstVacationTimeInfor(), record.getNumberDaySuspension(), record.getTimeDigestionUsageInfor());
 	}
+	
+	
+	
 }

@@ -314,7 +314,7 @@ public class NewBeforeRegisterImpl implements NewBeforeRegister {
 		                            application.getOpAppStartDate().map(ApplicationDate::getApplicationDate), 
 		                            application.getOpAppEndDate().map(ApplicationDate::getApplicationDate), 
 		                            lstDateHd, 
-		                            timeDigestionUsageInfor.map(TimeDigestionParam::toTimeDigestionUsageInfor));
+		                            timeDigestionUsageInfor.map(TimeDigestionParam::toTimeDigestionUsageInfor), Optional.empty());
 		            InterimRemainCheckInputParam param = new InterimRemainCheckInputParam(
 		                    companyID, 
 		                    application.getEmployeeID(), 

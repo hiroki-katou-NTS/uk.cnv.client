@@ -30,7 +30,7 @@ import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 @NoArgsConstructor
 @Entity
 @Table(name = "KRCDT_HDPAID_MAX_HIST")
-public class KrcdtAnnLeaMaxHist extends ContractCompanyUkJpaEntity {
+public class KrcdtAnnLeaMaxHist extends ContractUkJpaEntity {
 
 	private static final long serialVersionUID = 1L;
 

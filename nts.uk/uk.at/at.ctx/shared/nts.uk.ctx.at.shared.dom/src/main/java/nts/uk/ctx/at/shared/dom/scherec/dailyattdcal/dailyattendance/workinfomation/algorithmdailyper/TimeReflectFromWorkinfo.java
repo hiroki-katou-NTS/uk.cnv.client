@@ -78,7 +78,7 @@ public class TimeReflectFromWorkinfo {
 		OutputTimeReflectForWorkinfo outputTimeReflectForWorkinfo = new OutputTimeReflectForWorkinfo();
 
 		// ドメインモデル「勤務種類」を取得する get 1 or 0
-		List<WorkType> optWorkTypeData = workTypeRepo.findNotDeprecatedByListCode(companyId,
+		List<WorkType> optWorkTypeData = workTypeRepo.findAllByListCode(companyId,
 				Arrays.asList(workInformation.getRecordInfo().getWorkTypeCode().v()));
 		if(optWorkTypeData.isEmpty()) {
 			outputTimeReflectForWorkinfo.setEndStatus(EndStatus.NO_WORK_TYPE);
@@ -210,7 +210,7 @@ public class TimeReflectFromWorkinfo {
 		List<ErrMessageInfo> errMesInfos = new ArrayList<>();
 
 		// ドメインモデル「勤務種類」を取得する
-		Optional<WorkType> workTypeOpt = this.workTypeRepo.findByDeprecated(companyID, workTypeCode);
+		Optional<WorkType> workTypeOpt = this.workTypeRepo.findByPK(companyID, workTypeCode);
 
 		if (!workTypeOpt.isPresent()) {
 			ErrMessageInfo employmentErrMes = new ErrMessageInfo(employeeID, "",

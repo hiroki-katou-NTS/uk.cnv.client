@@ -79,7 +79,7 @@ public class TempAbsenceHistoryServiceImpl implements TempAbsenceHistoryService 
 					.map(Entry::getValue).findFirst();
 			if (workTypeCode.isPresent()) {
 				// ドメインモデル「勤務種類」を取得する
-				Optional<WorkType> optWorkType = this.workTypeRepository.findNoAbolishByPK(cid, workTypeCode.get());
+				Optional<WorkType> optWorkType = this.workTypeRepository.findByPK(cid, workTypeCode.get());
 				if (optWorkType.isPresent()) {
 					WorkType workType = optWorkType.get();
 					// 取得したドメインモデル「勤務種類」とINPUT「休職休業履歴項目」を比較する

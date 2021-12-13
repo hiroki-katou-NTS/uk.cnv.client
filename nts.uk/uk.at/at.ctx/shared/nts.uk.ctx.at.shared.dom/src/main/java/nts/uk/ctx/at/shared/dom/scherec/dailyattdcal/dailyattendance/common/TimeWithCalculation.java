@@ -71,4 +71,8 @@ public class TimeWithCalculation {
 	public static TimeWithCalculation convertFromTimeDivergence(TimeDivergenceWithCalculation time) {
 		return new TimeWithCalculation(time.getTime(), time.getCalcTime());
 	}
+	
+	public static TimeWithCalculation mergeTimeAndCalcTime(TimeWithCalculation time, TimeWithCalculation calcTime) {
+		return new TimeWithCalculation(time.getTime(), calcTime.getCalcTime());
+	}
 }

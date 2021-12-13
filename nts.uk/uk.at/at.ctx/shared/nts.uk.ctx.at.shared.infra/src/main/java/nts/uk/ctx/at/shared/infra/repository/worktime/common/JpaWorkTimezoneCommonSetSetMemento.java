@@ -249,7 +249,7 @@ public class JpaWorkTimezoneCommonSetSetMemento implements WorkTimezoneCommonSet
 	 */
 	@Override
 	public void setRaisingSalarySet(Optional<BonusPaySettingCode> set) {
-		this.entity.setRaisingSalarySet(set.isPresent() ? set.get().v() : null);
+		//this.entity.setRaisingSalarySet(set.isPresent() ? set.get().v() : null);
 	}
 
 }

@@ -215,7 +215,7 @@ public class CorrectionAttendanceRule implements ICorrectionAttendanceRule {
 			@Override
 			public Optional<WorkType> workType(String companyId, String workTypeCd) {
 
-				return workTypeRepo.findByDeprecated(companyId, workTypeCd);
+				return workTypeRepo.findByPK(companyId, workTypeCd);
 			}
 			
 			@Override

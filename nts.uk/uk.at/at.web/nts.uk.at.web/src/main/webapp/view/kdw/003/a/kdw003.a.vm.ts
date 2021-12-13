@@ -4685,6 +4685,12 @@ module nts.uk.at.view.kdw003.a.viewmodel {
                         //__viewContext.vm.lstDomainEdit = value.dailyEdits;
                         _.each(value.cellEdits, itemResult => {
                             $("#dpGrid").mGrid("updateCell", itemResult.id, itemResult.item, itemResult.value, true, true);
+							if (itemResult.id.indexOf("Code")) {
+								let data = __viewContext.vm.search(itemResult.item, itemResult.id, itemResult.value).done((v : any) => {
+									let name = "Name" + itemResult.item.substring(4)
+									$("#dpGrid").mGrid("updateCell", itemResult.id, name, v, true, true);
+								});
+							}
                         });
                         _.each(value.clearStates, itemResult => {
                             $("#dpGrid").mGrid("clearState", itemResult.rowId, itemResult.columnKey, itemResult.state);

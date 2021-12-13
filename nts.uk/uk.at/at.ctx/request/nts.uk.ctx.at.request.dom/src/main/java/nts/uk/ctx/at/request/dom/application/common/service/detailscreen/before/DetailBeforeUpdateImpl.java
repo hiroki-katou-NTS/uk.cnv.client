@@ -116,7 +116,7 @@ public class DetailBeforeUpdateImpl implements DetailBeforeUpdate {
                     application.getOpAppStartDate().map(ApplicationDate::getApplicationDate), 
                     application.getOpAppEndDate().map(ApplicationDate::getApplicationDate), 
                     holidays, 
-                    timeDigestionUsageInfor.map(TimeDigestionParam::toTimeDigestionUsageInfor));
+                    timeDigestionUsageInfor.map(TimeDigestionParam::toTimeDigestionUsageInfor), Optional.empty());
             InterimRemainCheckInputParam param = new InterimRemainCheckInputParam(
                     companyID, 
                     application.getEmployeeID(), 

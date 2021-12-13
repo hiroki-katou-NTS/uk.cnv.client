@@ -532,14 +532,14 @@ public class FlexWithinWorkTimeSheet extends WithinWorkTimeSheet{
 			boolean isWithin,
 			ConditionAtr conditionAtr,
 			DeductionAtr dedAtr,
-			TimeSheetRoundingAtr roundAtr) {
+			TimeSheetRoundingAtr roundAtr, NotUseAtr canOffset) {
 		
 		// コアタイムとの重複を判断して時間帯を作成
 		List<WithinWorkTimeFrame> targetFrameList = this.createSpanDuplicatedWithCoreTime(isWithin);
 		// 控除時間の計算
 		AttendanceTime goOutTime = ActualWorkTimeSheetListService.calcDeductionTime(
 				conditionAtr, dedAtr, roundAtr,
-				targetFrameList.stream().map(t -> (ActualWorkingTimeSheet)t).collect(Collectors.toList()));
+				targetFrameList.stream().map(t -> (ActualWorkingTimeSheet)t).collect(Collectors.toList()), canOffset);
 		// 外出時間を返す
 		return goOutTime;
 	}

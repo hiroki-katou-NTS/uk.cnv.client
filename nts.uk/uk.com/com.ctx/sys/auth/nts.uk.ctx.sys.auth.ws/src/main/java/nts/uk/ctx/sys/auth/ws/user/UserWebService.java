@@ -7,6 +7,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import nts.arc.layer.ws.WebService;
+import nts.uk.ctx.sys.auth.app.find.user.UserAuthDto;
 import nts.uk.ctx.sys.auth.app.find.user.UserDto;
 import nts.uk.ctx.sys.auth.app.find.user.UserFinder;
 import nts.uk.ctx.sys.auth.app.find.user.UserKeyDto;
@@ -20,7 +21,7 @@ public class UserWebService extends WebService {
 	
 	@POST
 	@Path("searchUser")
-	public List<UserDto> searchUser(String userNameID) {
+	public List<UserAuthDto> searchUser(String userNameID) {
 		return this.userFinder.searchUser(userNameID);
 	}
 	
