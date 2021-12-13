@@ -300,6 +300,7 @@ module nts.uk.at.view.kmk007.a.viewmodel {
             });
 
             self.currentWorkType().oneDay().closeAtr.subscribe((value) => {
+                if (self.currentWorkType().oneDayCls() !== WorkTypeCls.Closure) return;
                 self.setCalculatorMethod();
             });
         }
