@@ -213,8 +213,7 @@ public class TimeSpanForDailyCalc implements Cloneable {
 		for (TimeSheetOfDeductionItem item : timeSheetOfDeductionItems) {
 			Optional<TimeSpanForDailyCalc> timeSpan = item.getTimeSheet().getDuplicatedWith(new TimeSpanForDailyCalc(startTime, endTime));
 			if (timeSpan.isPresent()) {
-				TimeSheetOfDeductionItem deductItem = item.reCreateOwn(timeSpan.get());
-				endTime = endTime.forwardByMinutes(deductItem.calcTotalTime().v());
+				endTime = endTime.forwardByMinutes(item.calcTotalTime().v());
 			}
 		}
 		return endTime;
