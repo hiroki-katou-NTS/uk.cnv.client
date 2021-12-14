@@ -12,8 +12,6 @@ import javax.persistence.JoinColumns;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.exio.dom.exi.dataformat.ItemType;
 import nts.uk.ctx.exio.dom.exi.dataformat.NumDataFormatSet;
@@ -45,21 +43,21 @@ public class OiomtExAcFmNum extends ContractUkJpaEntity implements Serializable 
 	 */
 	@Basic(optional = false)
 	@Column(name = "FIXED_VALUE")
-	public boolean fixedValue;
+	public int fixedValue;
 
 	/**
 	 * 小数区分
 	 */
 	@Basic(optional = false)
 	@Column(name = "DECIMAL_DIVISION")
-	public boolean decimalDivision;
+	public int decimalDivision;
 
 	/**
 	 * 有効桁長
 	 */
 	@Basic(optional = false)
 	@Column(name = "EFFECTIVE_DIGIT_LENGTH")
-	public boolean effectiveDigitLength;
+	public int effectiveDigitLength;
 
 	/**
 	 * コード変換コード
@@ -101,7 +99,7 @@ public class OiomtExAcFmNum extends ContractUkJpaEntity implements Serializable 
 	 */
 	@Basic(optional = true)
 	@Column(name = "DECIMAL_POINT_CLS")
-	public boolean decimalPointCls;
+	public Integer decimalPointCls;
 
 	/**
 	 * 小数端数
@@ -127,15 +125,15 @@ public class OiomtExAcFmNum extends ContractUkJpaEntity implements Serializable 
 			Integer decimalFraction) {
 		super();
 		this.numDataFormatSetPk = new OiomtNumDataFormatSetPk(cid, conditionCode, acceptItemNum);
-		this.fixedValue = BooleanUtils.toBoolean(fixedValue);
-		this.decimalDivision = BooleanUtils.toBoolean(decimalDivision);
-		this.effectiveDigitLength = BooleanUtils.toBoolean(effectiveDigitLength);
+		this.fixedValue = fixedValue;
+		this.decimalDivision = decimalDivision;
+		this.effectiveDigitLength = effectiveDigitLength;
 		this.cdConvertCd = cdConvertCd;
 		this.valueOfFixedValue = valueOfFixedValue;
 		this.decimalDigitNum = decimalDigitNum;
 		this.startDigit = startDigit;
 		this.endDigit = endDigit;
-		this.decimalPointCls = BooleanUtils.toBoolean(decimalPointCls);
+		this.decimalPointCls = decimalPointCls;
 		this.decimalFraction = decimalFraction;
 	}
 
@@ -153,9 +151,9 @@ public class OiomtExAcFmNum extends ContractUkJpaEntity implements Serializable 
 	}
 
 	public NumDataFormatSet toDomain() {
-		return new NumDataFormatSet(ItemType.NUMERIC.value, BooleanUtils.toInteger(this.fixedValue), BooleanUtils.toInteger(this.decimalDivision),
-				BooleanUtils.toInteger(this.effectiveDigitLength), this.cdConvertCd, this.valueOfFixedValue, this.decimalDigitNum,
-				this.startDigit, this.endDigit, BooleanUtils.toInteger(this.decimalPointCls), this.decimalFraction);
+		return new NumDataFormatSet(ItemType.NUMERIC.value, this.fixedValue, this.decimalDivision,
+				this.effectiveDigitLength, this.cdConvertCd, this.valueOfFixedValue, this.decimalDigitNum,
+				this.startDigit, this.endDigit, this.decimalPointCls, this.decimalFraction);
 	}
 
 }

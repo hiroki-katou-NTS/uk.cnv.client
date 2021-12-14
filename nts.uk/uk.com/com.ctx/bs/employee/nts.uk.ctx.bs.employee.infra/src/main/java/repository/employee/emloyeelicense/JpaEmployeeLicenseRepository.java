@@ -3,14 +3,10 @@ package repository.employee.emloyeelicense;
 import java.util.Optional;
 
 import javax.ejb.Stateless;
-
+import entity.employee.employeelicense.BsymtLicense;
 import nts.arc.layer.infra.data.JpaRepository;
-import nts.uk.ctx.bs.employee.dom.employee.employeelicense.ContractCode;
 import nts.uk.ctx.bs.employee.dom.employee.employeelicense.EmployeeLicense;
 import nts.uk.ctx.bs.employee.dom.employee.employeelicense.EmployeeLicenseRepository;
-import nts.uk.ctx.bs.employee.dom.employee.employeelicense.LicenseKey;
-import nts.uk.ctx.bs.employee.dom.employee.employeelicense.MaxNumberLicenses;
-import nts.uk.ctx.bs.employee.dom.employee.employeelicense.WarningNumberLicenses;
 
 @Stateless
 public class JpaEmployeeLicenseRepository extends JpaRepository implements EmployeeLicenseRepository {
@@ -19,11 +15,14 @@ public class JpaEmployeeLicenseRepository extends JpaRepository implements Emplo
 
 	@Override
 	public Optional<EmployeeLicense> findByKey(String contractCD) {
-		return Optional.of(new EmployeeLicense(
-				new ContractCode(contractCD), 
-				new MaxNumberLicenses(99999), 
-				new WarningNumberLicenses(0), 
-				new LicenseKey("DJSRQVLSBTOGWW")));
+		Optional<BsymtLicense> entity = Optional.empty();
+		entity = this.queryProxy().query(SELECT_BY_KEY, BsymtLicense.class)
+				.setParameter("contractCD", contractCD).getSingle();
+		if (entity.isPresent()) {
+			return Optional.of(entity.get().toDomain());
+		} else {
+			return Optional.empty();
+		}
 	}
 
 }

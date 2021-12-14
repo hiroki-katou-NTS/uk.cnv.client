@@ -46,8 +46,7 @@ public class EmploymentRoleDataDto {
 	private RoleDto role;
 	
 	public static EmploymentRoleDataDto fromDomain(EmploymentRole domain ){
-		//TODO return は修正お願いいたします。
-		/*		return new EmploymentRoleDataDto(
+		return new EmploymentRoleDataDto(
 				domain.getCompanyId(),
 				domain.getRoleId(),
 				domain.getScheduleEmployeeRef().value,
@@ -55,8 +54,6 @@ public class EmploymentRoleDataDto {
 				domain.getEmployeeRefSpecAgent().value,
 				domain.getPresentInqEmployeeRef().value,
 				domain.getFutureDateRefPermit().value,
-				null);*/
-		
-		return new EmploymentRoleDataDto();
+				null);
 	}
 }

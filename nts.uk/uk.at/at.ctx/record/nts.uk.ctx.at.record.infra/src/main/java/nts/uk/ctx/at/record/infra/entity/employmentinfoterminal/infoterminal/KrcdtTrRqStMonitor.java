@@ -34,7 +34,7 @@ public class KrcdtTrRqStMonitor extends UkJpaEntity implements Serializable {
 	 * 通信中
 	 */
 	@Column(name = "CONNECTING_FLG")
-	public boolean connecting;
+	public int connecting;
 	
 	@Override
 	protected Object getKey() {
@@ -44,14 +44,14 @@ public class KrcdtTrRqStMonitor extends UkJpaEntity implements Serializable {
 	public static KrcdtTrRqStMonitor toEntity(ReqComStatusMonitoring domain) {
 		return new KrcdtTrRqStMonitor(
 				new KrcdtTrRqStMonitorPK(domain.getContractCode().v(), domain.getTerminalCode().v()),
-				domain.isConnecting());
+				domain.isConnecting() ? 1 : 0);
 	}
 	
 	public ReqComStatusMonitoring toDomain() {
 		return new ReqComStatusMonitoring(
 				new ContractCode(this.pk.contractCode),
 				new EmpInfoTerminalCode(String.valueOf(this.pk.timeRecordCode)),
-				this.connecting);
+				this.connecting == 1 ? true : false);
 	}
 
 }

@@ -12,8 +12,6 @@ import nts.uk.ctx.at.shared.dom.scherec.alarm.alarmlistactractionresult.MessageD
 import nts.uk.ctx.at.shared.dom.scherec.statutory.worktime.monunit.MonthlyWorkTimeSet;
 import nts.uk.ctx.at.shared.dom.scherec.statutory.worktime.monunit.MonthlyWorkTimeSetCom;
 import nts.uk.ctx.at.shared.dom.scherec.statutory.worktime.monunit.MonthlyWorkTimeSetRepo;
-import nts.uk.shr.com.company.CompanyAdapter;
-import nts.uk.shr.com.company.CompanyInfor;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.i18n.TextResource;
 
@@ -33,9 +31,6 @@ public class RefTimeSetCfmService {
     @Inject
     private MonthlyWorkTimeSetRepo mnthlyWorkTimeSetRepo;
 
-    @Inject
-    private CompanyAdapter companyAdapter;
-
     /**
      * 基準時間確認
      *
@@ -52,22 +47,19 @@ public class RefTimeSetCfmService {
         monthlySets.addAll(mnthlyWorkTimeSetRepo.findCompanyByPeriod(cid, MonthlyWorkTimeSet.LaborWorkTypeAttr.REGULAR_LABOR, ymPeriod));
         monthlySets.addAll(mnthlyWorkTimeSetRepo.findCompanyByPeriod(cid, MonthlyWorkTimeSet.LaborWorkTypeAttr.DEFOR_LABOR, ymPeriod));
         monthlySets.addAll(mnthlyWorkTimeSetRepo.findCompanyByPeriod(cid, MonthlyWorkTimeSet.LaborWorkTypeAttr.FLEX, ymPeriod));
-        Optional<CompanyInfor> companyInfor = companyAdapter.getCurrentCompany();
-        YearMonth loopYearMonth = ymPeriod.start();
-        while (loopYearMonth.lessThanOrEqualTo(ymPeriod.end())) {
+        int loopYear = ymPeriod.start().year();
+        while (loopYear <= ymPeriod.end().year()) {
             // ドメインモデル「会社別月単位労働時間」を取得する。
-            final YearMonth finalLoopYearMonth = loopYearMonth;
-            List<MonthlyWorkTimeSetCom> filteredSets = monthlySets.stream().filter(i -> i.getYm().equals(finalLoopYearMonth)).collect(Collectors.toList());
+            final int finalLoopYear = loopYear;
+            List<MonthlyWorkTimeSetCom> filteredSets = monthlySets.stream().filter(i -> i.getYm().year() == finalLoopYear).collect(Collectors.toList());
 
             if (CollectionUtil.isEmpty(filteredSets)) {
                 // 「アラーム値メッセージ」を作成します。
-                String message = TextResource.localize(
-                        "KAL020_6",
-                        loopYearMonth.year() + "/" + String.format("%02d", loopYearMonth.month()),
-                        AppContexts.user().companyCode() + "　" + companyInfor.map(CompanyInfor::getCompanyName).orElse(""));
+                String message = TextResource.localize("KAL020_6", String.valueOf(loopYear),
+                        AppContexts.user().companyCode());
                 // ドメインオブジェクト「抽出結果」を作成します。
                 ExtractResultDto result = new ExtractResultDto(new AlarmValueMessage(message),
-                        new AlarmValueDate(loopYearMonth.year() + "/" + String.format("%02d", loopYearMonth.month()), Optional.empty()),
+                        new AlarmValueDate(String.valueOf(loopYear), Optional.empty()),
                         name.v(),
                         Optional.ofNullable(TextResource.localize("KAL020_15")),
                         Optional.of(new MessageDisplay(displayMessage.v())),
@@ -78,7 +70,7 @@ public class RefTimeSetCfmService {
                 results.add(result);
             }
 
-            loopYearMonth = loopYearMonth.nextMonth();
+            loopYear += 1;
         }
 
         // リスト「抽出結果」を返す。

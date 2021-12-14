@@ -183,7 +183,6 @@ public class RCApplicationCancellationProcessTest {
 						NotUseAtr.NOT_USE));//勤務実績が確定状態でも反映する
 				PreCheckProcessWorkRecord.preCheck(require, "", (Application) any, anyInt, anyBoolean,
 						(ReflectStatusResult) any, (GeneralDate) any, (List<SEmpHistImport>)any);
-
 				result = new PreCheckProcessResult(NotUseAtr.USE, null);// 前申請の処理ができる
 
 			}

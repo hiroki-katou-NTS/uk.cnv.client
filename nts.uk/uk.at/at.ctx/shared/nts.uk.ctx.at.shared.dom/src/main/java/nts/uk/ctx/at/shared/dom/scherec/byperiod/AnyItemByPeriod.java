@@ -7,7 +7,7 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.val;
 import nts.arc.time.calendar.period.DatePeriod;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.work.AnyItemAggregateService;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.AggregateMonthlyRecordServiceProc;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.work.MonAggrCompanySettings;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.work.MonAggrEmployeeSettings;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.work.MonthlyCalculatingDailys;
@@ -74,7 +74,8 @@ public class AnyItemByPeriod implements Cloneable {
 			MonAggrCompanySettings companySets,
 			MonAggrEmployeeSettings employeeSets) {
 		
-		val result = AnyItemAggregateService.aggregateAnyItemAnyPeriod(period, calcDailys, companySets, employeeSets);
+		val result = AggregateMonthlyRecordServiceProc.aggregateAnyItemPeriod(period, false, true, 
+				null, calcDailys, companySets, employeeSets, (optionalItem) -> null, (anyItemAggrResult) -> {});
 		
 		result.entrySet().forEach(r -> {
 

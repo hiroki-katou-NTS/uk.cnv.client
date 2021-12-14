@@ -25,17 +25,17 @@ public class MailSettings extends DomainObject {
 	/**
 	 * BBCメールアドレス
 	 */
-	private List<MailAddress> mailAddressBCC;
+	private List<String> mailAddressBCC;
 	/**
 	 * CCメールアドレス
 	 */
-	private List<MailAddress> mailAddressCC;
+	private List<String> mailAddressCC;
 	/**
 	 * 返信用メールアドレス
 	 */
 	private Optional<MailAddress> mailRely;
 
-	public MailSettings(String subject, String text,  List<MailAddress> mailAddressCC, List<MailAddress> mailAddressBCC,
+	public MailSettings(String subject, String text,  List<String> mailAddressCC, List<String> mailAddressBCC,
 			String mailRely) {
 		super();
 		this.subject = Optional.ofNullable(new Subject(subject));

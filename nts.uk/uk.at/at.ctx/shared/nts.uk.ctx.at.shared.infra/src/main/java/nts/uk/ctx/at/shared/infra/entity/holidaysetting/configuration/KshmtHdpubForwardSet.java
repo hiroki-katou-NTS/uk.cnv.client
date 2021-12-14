@@ -39,7 +39,7 @@ public class KshmtHdpubForwardSet extends ContractUkJpaEntity implements Seriali
     
     /** The is public hd minus. */
     @Column(name = "IS_PUBLIC_HD_MINUS")
-    private boolean isPublicHdMinus;
+    private int isPublicHdMinus;
 
     /** The carry over deadline. */
     @Column(name = "CARRY_OVER_DEADLINE")

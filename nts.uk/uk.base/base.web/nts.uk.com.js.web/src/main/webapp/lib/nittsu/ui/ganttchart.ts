@@ -424,10 +424,10 @@ module nts.uk.ui.chart {
                         zIndex: self.pasteBand.zIndex || 1000
                     });
                     
-//                    if (self.mode === "paste") {
-//                        self.metaholder.tempStart = self.metaholder.start;
-//                        self.metaholder.tempEnd = self.metaholder.end;
-//                    }
+                    if (self.mode === "paste") {
+                        self.metaholder.tempStart = self.metaholder.start;
+                        self.metaholder.tempEnd = self.metaholder.end;
+                    }
                     
                     document.addEventListenerNS("mousemove.paste", manipulationMode.pasteMove.bind(self));
                     document.addEventListenerNS("mouseup.paste", manipulationMode.pasteUp.bind(self));
@@ -906,10 +906,10 @@ module nts.uk.ui.chart {
                         zIndex: self.pasteBand.zIndex || 1000
                     });
                     
-//                    if (self.mode === "paste") {
-//                        self.metaholder.tempStart = self.metaholder.start;
-//                        self.metaholder.tempEnd = self.metaholder.end;
-//                    }
+                    if (self.mode === "paste") {
+                        self.metaholder.tempStart = self.metaholder.start;
+                        self.metaholder.tempEnd = self.metaholder.end;
+                    }
                     
                     document.addEventListenerNS("mousemove.paste", manipulationMode.pasteMove.bind(self));
                     document.addEventListenerNS("mouseup.paste", manipulationMode.pasteUp.bind(self));
@@ -1371,10 +1371,6 @@ module nts.uk.ui.chart {
                 el = parent;
             }
         }
-        
-        export function isInvisible(el: HTMLElement) {
-            return el.style.display === "none" || el.style.width === "0px";
-        }
     }
     
     module manipulationMode {
@@ -1409,7 +1405,7 @@ module nts.uk.ui.chart {
         
         export function pasteMove() {
             let self: Ruler = this;
-            if (!self.metaholder.isPressed /*|| self.mode === "paste"*/) return;
+            if (!self.metaholder.isPressed || self.mode === "paste") return;
             let chart = self.metaholder.ancestorChart;
             let startLine = chart.start, endLine = chart.end;
             if (chart.parent) {
@@ -1555,7 +1551,7 @@ module nts.uk.ui.chart {
                     if (!self.metaresize.adjChart) {
                         let minStart = 9999;
                         _.forEach(parent.children, (child: GanttChart) => {
-                            if (support.isInvisible(child.html)) return;
+                            if (child.html.style.display === "none") return;
                             if (nearestLine >= child.start && self.metaresize.start < child.start && child.start < minStart
                                 && child.id !== chart.id && child.canPaste) {
                                 self.metaresize.adjChart = child;
@@ -1568,7 +1564,7 @@ module nts.uk.ui.chart {
                         });
                     } else {
                         _.forEach(parent.children, (child: GanttChart) => {
-                            if (support.isInvisible(child.html)) return;
+                            if (child.html.style.display === "none") return;
                             if (!child.canPaste && nearestLine >= child.start && nearestLine <= child.end) {
                                 cantPasteChart = child;
                                 return false;
@@ -1586,7 +1582,7 @@ module nts.uk.ui.chart {
                         self.metaresize.tempEnd = end;
                     } else if (self.metaresize.chart.definedType !== self.metaresize.adjChart.definedType) {
                         let adjChart = self.metaresize.adjChart;
-                        if (cantPasteChart && adjChart.start >= cantPasteChart.end) {
+                        if (cantPasteChart) {
                             chart.reposition({ end: cantPasteChart.start, width: (cantPasteChart.start - self.metaresize.start) * chart.unitToPx - 1 });
                             self.metaresize.tempEnd = cantPasteChart.start;
                             adjChart.reposition({ 
@@ -1621,14 +1617,14 @@ module nts.uk.ui.chart {
                 } else {
                     let minEnd, snatch = self._getSnatchInterval(chart), cantPasteChart;
                     _.forEach(parent.children, (child: GanttChart) => {
-                        if (support.isInvisible(child.html)) return;
+                        if (child.html.style.display === "none") return;
                         if (!child.canPaste && child.id !== chart.id && nearestLine >= child.start && nearestLine <= child.end) {
                             cantPasteChart = child;
                             return false;
                         }
                     });
                     
-                    if (!_.isNil(cantPasteChart) && chart.end <= cantPasteChart.start) {
+                    if (!_.isNil(cantPasteChart)) {
                         chart.reposition({ end: cantPasteChart.start, width: (cantPasteChart.start - self.metaresize.start) * chart.unitToPx - 1 });
                         self.metaresize.tempEnd = cantPasteChart.start;
                         if (self.metaresize.adjChart && self.metaresize.adjChart.id !== cantPasteChart.id) {
@@ -1665,7 +1661,7 @@ module nts.uk.ui.chart {
                     if (!self.metaresize.adjChart) {
                         let maxEnd = 0;
                         _.forEach(parent.children, (child: GanttChart) => {
-                            if (support.isInvisible(child.html)) return;
+                            if (child.html.style.display === "none") return;
                             if (nearestLine <= child.end && child.start < self.metaresize.start && child.end > maxEnd
                                 && child.id !== chart.id && child.canPaste) {
                                 self.metaresize.adjChart = child;
@@ -1678,7 +1674,7 @@ module nts.uk.ui.chart {
                         });
                     } else {
                         _.forEach(parent.children, (child: GanttChart) => {
-                            if (support.isInvisible(child.html)) return;
+                            if (child.html.style.display === "none") return;
                             if (!child.canPaste && nearestLine >= child.start && nearestLine <= child.end) {
                                 cantPasteChart = child;
                                 return false;
@@ -1701,7 +1697,7 @@ module nts.uk.ui.chart {
                         self.metaresize.tempStart = start;
                     } else if (self.metaresize.chart.definedType !== self.metaresize.adjChart.definedType) {
                         let minAdjEnd, adjChart = self.metaresize.adjChart, snatch = self._getSnatchInterval(chart);
-                        if (cantPasteChart && adjChart.end <= cantPasteChart.start) {
+                        if (cantPasteChart) {
                             chart.reposition({ 
                                 start: cantPasteChart.end, 
                                 left: self.metaresize.left - (self.metaresize.start - cantPasteChart.end) * chart.unitToPx,
@@ -1748,14 +1744,14 @@ module nts.uk.ui.chart {
                 } else {
                     let minStart, snatch = self._getSnatchInterval(chart), cantPasteChart;
                     _.forEach(parent.children, (child: GanttChart) => {
-                        if (support.isInvisible(child.html)) return;
+                        if (child.html.style.display === "none") return;
                         if (!child.canPaste && nearestLine >= child.start && nearestLine <= child.end) {
                             cantPasteChart = child;
                             return false;
                         }
                     });
                     
-                    if (cantPasteChart && chart.start >= cantPasteChart.end) {
+                    if (cantPasteChart) {
                         chart.reposition({
                             start: cantPasteChart.end,
                             left: self.metaresize.left + (cantPasteChart.end - self.metaresize.start) * chart.unitToPx,
@@ -1763,7 +1759,7 @@ module nts.uk.ui.chart {
                         });
                         
                         self.metaresize.tempStart = cantPasteChart.end;
-                        let adjChart = self.metaresize.adjChart;    
+                        let adjChart = self.metaresize.adjChart;
                         if (adjChart) {
                             adjChart.reposition({
                                 end: cantPasteChart.start,

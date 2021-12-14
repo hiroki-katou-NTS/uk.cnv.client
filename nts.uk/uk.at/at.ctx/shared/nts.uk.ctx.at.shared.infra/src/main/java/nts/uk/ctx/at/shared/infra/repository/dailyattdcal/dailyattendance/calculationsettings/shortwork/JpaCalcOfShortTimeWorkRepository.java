@@ -4,8 +4,6 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.calculationsettings.shorttimework.CalcOfShortTimeWork;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.calculationsettings.shorttimework.CalcOfShortTimeWorkRepository;
@@ -37,7 +35,7 @@ public class JpaCalcOfShortTimeWorkRepository extends JpaRepository implements C
 			entity.companyId = calcOfShortTimeWork.getCompanyId();
 		}
 
-		entity.calcMethod = BooleanUtils.toBoolean(calcOfShortTimeWork.getCalcMethod().value);
+		entity.calcMethod = calcOfShortTimeWork.getCalcMethod().value;
 		
 		if (entityOpt.isPresent()){
 			this.commandProxy().update(entity);
@@ -56,6 +54,6 @@ public class JpaCalcOfShortTimeWorkRepository extends JpaRepository implements C
 		
 		return CalcOfShortTimeWork.createFromJavaType(
 				entity.companyId,
-				BooleanUtils.toInteger(entity.calcMethod));
+				entity.calcMethod);
 	}
 }

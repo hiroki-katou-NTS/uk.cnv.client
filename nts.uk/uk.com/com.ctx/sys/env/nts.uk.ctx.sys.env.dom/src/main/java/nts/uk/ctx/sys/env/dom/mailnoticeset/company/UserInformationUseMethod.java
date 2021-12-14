@@ -55,6 +55,7 @@ public class UserInformationUseMethod extends AggregateRoot {
 
 	public void getMemento(MementoGetter memento) {
 		this.companyId = memento.getCompanyId();
+		this.emailDestinationFunctions = memento.getEmailDestinationFunctions();
 		this.settingContactInformation = Optional.ofNullable(memento.getSettingContactInformation());
 		this.useOfLanguage = NotUseAtr.valueOf(memento.getUseOfLanguage());
 		this.useOfNotice = NotUseAtr.valueOf(memento.getUseOfNotice());
@@ -64,6 +65,7 @@ public class UserInformationUseMethod extends AggregateRoot {
 
 	public void setMemento(MementoSetter memento) {
 		memento.setCompanyId(this.companyId);
+		memento.setEmailDestinationFunctions(this.emailDestinationFunctions);
 		memento.setSettingContactInformation(this.settingContactInformation.orElse(null));
 		memento.setUseOfLanguage(this.useOfLanguage.value);
 		memento.setUseOfNotice(this.useOfNotice.value);
@@ -83,6 +85,8 @@ public class UserInformationUseMethod extends AggregateRoot {
 
 		void setCompanyId(String companyId);
 
+		void setEmailDestinationFunctions(List<EmailDestinationFunction> emailDestinationFunctions);
+
 		void setSettingContactInformation(SettingContactInformation settingContactInformation);
 	}
 
@@ -96,6 +100,8 @@ public class UserInformationUseMethod extends AggregateRoot {
 		Integer getUseOfLanguage();
 
 		String getCompanyId();
+
+		List<EmailDestinationFunction> getEmailDestinationFunctions();
 
 		SettingContactInformation getSettingContactInformation();
 	}

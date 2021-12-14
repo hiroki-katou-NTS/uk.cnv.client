@@ -8,14 +8,14 @@ import lombok.Getter;
 import nts.gul.text.StringUtil;
 import nts.uk.ctx.exio.dom.input.errors.ErrorMessage;
 import nts.uk.ctx.exio.dom.input.setting.assembly.revise.ReviseValue;
-import nts.gul.util.Either;
+import nts.uk.ctx.exio.dom.input.util.Either;
 
 /**
  * 時間・時刻型編集
  */
 @AllArgsConstructor
 @Getter
-public abstract class TimeRevise implements ReviseValue {
+public class TimeRevise implements ReviseValue {
 	
 	/** 時分 */
 	private HourlySegment hourly;
@@ -44,7 +44,7 @@ public abstract class TimeRevise implements ReviseValue {
 		
 		if (baseNumber.get() == TimeBaseNumber.SEXAGESIMAL) {
 			// 60進数は、区切り文字を用いて時分→分変換
-			return toMinutes(target)
+			return delimiter.get().toMinutes(target)
 					.map(i -> (long) (int) i);
 		} else {
 			// 10進数は、分に変換して端数処理
@@ -53,11 +53,4 @@ public abstract class TimeRevise implements ReviseValue {
 					.map(min -> (long) rounding.get().round(min));
 		}
 	}
-
-	/**
-	 * ６０進表示を分の値に変換する処理
-	 * @param target
-	 * @return
-	 */
-	protected abstract Either<ErrorMessage, Integer> toMinutes(String target);
 }

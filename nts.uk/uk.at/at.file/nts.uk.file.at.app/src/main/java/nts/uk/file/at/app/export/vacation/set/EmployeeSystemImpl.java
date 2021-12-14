@@ -13,7 +13,6 @@ import nts.uk.file.at.app.export.vacation.set.compensatoryleave.TemHoliEmployeeR
 import nts.uk.file.at.app.export.vacation.set.compensatoryleave.TempHoliComImplRepository;
 import nts.uk.file.at.app.export.vacation.set.nursingleave.NursingLeaveSetRepository;
 import nts.uk.file.at.app.export.vacation.set.sixtyhours.Com60HourVacaRepository;
-import nts.uk.file.at.app.export.vacation.set.specialleave.SpecialLeaveSettingRepository;
 import nts.uk.file.at.app.export.vacation.set.subst.ComSubstVacatRepository;
 import nts.uk.file.at.app.export.vacation.set.subst.EmpSubstVacaRepository;
 import nts.uk.file.at.app.export.vacation.set.subst.EmplYearlyRetenSetRepository;
@@ -80,8 +79,7 @@ public class EmployeeSystemImpl implements MasterListData {
     public static final String KMF001_327 = TextResource.localize("KMF001_327");
     public static final String KMF001_330 = TextResource.localize("KMF001_330");
     
-    public static final String KMF001_350 = TextResource.localize("KMF001_350");
-    public static final String KMF001_351 = TextResource.localize("KMF001_351");
+
 
     public static final String IS_MANAGE = "管理する";
     public static final String IS_MANAGE_OF_HOLIDAYS = "管理する";
@@ -108,8 +106,6 @@ public class EmployeeSystemImpl implements MasterListData {
     private EmplYearlyRetenSetRepository mEmplYearlyRetenSetRepository;
     @Inject
     private EmpSubstVacaRepository mEmpSubstVacaRepository;
-    @Inject
-    private SpecialLeaveSettingRepository specialLeaveRepository;
     
     @Inject
     private SpecialHolidayExportClass specialHolidayExportClass; //KMF004
@@ -190,11 +186,13 @@ public class EmployeeSystemImpl implements MasterListData {
 
                 columns.add(new MasterHeaderColumn(KMF001_206, TextResource.localize("KMF001_206"),
                         ColumnTextAlign.LEFT, "", true));
-                columns.add(new MasterHeaderColumn(KMF001_327, TextResource.localize("KMF001_327"),
-                        ColumnTextAlign.LEFT, "", true));
                 columns.add(new MasterHeaderColumn(KMF001_207, TextResource.localize("KMF001_207"),
                         ColumnTextAlign.LEFT, "", true));
+                columns.add(new MasterHeaderColumn(KMF001_208, TextResource.localize("KMF001_208"),
+                        ColumnTextAlign.LEFT, "", true));
                 columns.add(new MasterHeaderColumn(KMF001_209, TextResource.localize("KMF001_209"),
+                        ColumnTextAlign.LEFT, "", true));
+                columns.add(new MasterHeaderColumn(KMF001_327, TextResource.localize("KMF001_327"),
                         ColumnTextAlign.LEFT, "", true));
                 columns.add(new MasterHeaderColumn(KMF001_330, TextResource.localize("KMF001_330"),
                         ColumnTextAlign.LEFT, "", true));
@@ -237,11 +235,11 @@ public class EmployeeSystemImpl implements MasterListData {
 
                 columns.add(new MasterHeaderColumn(KMF001_224, TextResource.localize("KMF001_224"),
                         ColumnTextAlign.LEFT, "", true));
-                columns.add(new MasterHeaderColumn(KMF001_327, TextResource.localize("KMF001_327"),
-                        ColumnTextAlign.LEFT, "", true));
                 columns.add(new MasterHeaderColumn(KMF001_225, TextResource.localize("KMF001_225"),
                         ColumnTextAlign.LEFT, "", true));
                 columns.add(new MasterHeaderColumn(KMF001_226, TextResource.localize("KMF001_226"),
+                        ColumnTextAlign.LEFT, "", true));
+                columns.add(new MasterHeaderColumn(KMF001_327, TextResource.localize("KMF001_327"),
                         ColumnTextAlign.LEFT, "", true));
                 columns.add(new MasterHeaderColumn(KMF001_330, TextResource.localize("KMF001_330"),
                         ColumnTextAlign.LEFT, "", true));
@@ -285,13 +283,6 @@ public class EmployeeSystemImpl implements MasterListData {
 
                 break;
             }
-            case SPECIAL_LEAVE_SETTING:
-            	columns.add(new MasterHeaderColumn(KMF001_166, TextResource.localize("KMF001_166"),
-                        ColumnTextAlign.LEFT, "", true));
-            	columns.add(new MasterHeaderColumn(KMF001_B01, "",
-                        ColumnTextAlign.LEFT, "", true));
-            	columns.add(new MasterHeaderColumn(KMF001_167, TextResource.localize("KMF001_167"),
-                        ColumnTextAlign.LEFT, "", true));
         }
         return columns;
     }
@@ -410,15 +401,7 @@ public class EmployeeSystemImpl implements MasterListData {
                 .sheetName(getSheetName(EmployeeSystem.NURSING_CARE))
                 .mode(MasterListMode.NONE)
                 .build();
-        sheetDatas.add(sheetData9);  
-        // 特別休暇の設定
-        SheetData sheetData10 = SheetData.builder()
-        		.mainData(this.specialLeaveRepository.getWorkDaysNumberOnLeaveCount(companyId))
-        		.mainDataColumns(this.getHeaderColumns(EmployeeSystem.SPECIAL_LEAVE_SETTING))
-        		.sheetName(this.getSheetName(EmployeeSystem.SPECIAL_LEAVE_SETTING))
-        		.mode(MasterListMode.NONE)
-        		.build();
-        sheetDatas.add(sheetData10);
+        sheetDatas.add(sheetData9);     
         return sheetDatas;
     }
 
@@ -455,8 +438,6 @@ public class EmployeeSystemImpl implements MasterListData {
             case NURSING_CARE: {
                 return TextResource.localize("KMF001_165");
             }
-            case SPECIAL_LEAVE_SETTING: 
-            	return TextResource.localize("KMF001_349");
         }
         return "";
     }

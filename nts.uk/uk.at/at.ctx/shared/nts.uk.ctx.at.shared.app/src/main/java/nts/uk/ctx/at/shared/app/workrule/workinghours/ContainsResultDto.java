@@ -25,6 +25,4 @@ public class ContainsResultDto {
 	private String timeInput;
 	
 	private boolean isWorkNo1;
-	
-	private Integer innerIdx;
 }

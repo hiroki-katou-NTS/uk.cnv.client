@@ -29,13 +29,13 @@ public class DefaultRoleSetFinder {
     private RoleSetRepository roleSetRepository;
 
     /**
-     * Get a Default Role Set by company id
-     * @param
+     * Get a Default Role Set by company id and role set code
+     * @param roleSetCd
      * @return
      */
-    public DefaultRoleSetDto find() {
+    public DefaultRoleSetDto find(String roleSetCd) {
         // get domain role set
-        Optional<DefaultRoleSet> defaultRoleSetOpt = defaultRoleSetRepository.find(AppContexts.user().companyId());
+        Optional<DefaultRoleSet> defaultRoleSetOpt = defaultRoleSetRepository.find(AppContexts.user().companyId(), roleSetCd);
         
         return buildDefaultRoleSetDto(defaultRoleSetOpt);            
     }

@@ -1,11 +1,15 @@
 package nts.uk.ctx.at.record.app.command.kdp.kdp002.a;
 
+import java.util.Optional;
+
 import nts.arc.time.GeneralDateTime;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.AuthcMethod;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Relieve;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonType;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeCalArt;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ReservationArt;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.SetPreClockArt;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampType;
 import nts.uk.ctx.at.shared.dom.workrule.goingout.GoingOutReason;
@@ -31,7 +35,7 @@ public class RegisterStampIndividualSampleCommand {
 	/**
 	 * ボタン種類
 	 */
-//	private Integer reservationArt;
+	private Integer reservationArt;
 	private boolean changeHalfDay;
 	private Integer goOutArt;
 	private Integer setPreClockArt;
@@ -61,11 +65,11 @@ public class RegisterStampIndividualSampleCommand {
 	 * ボタン種類
 	 * @return
 	 */
-	public StampType toStampType() {
+	public ButtonType toButtonType() {
 		StampType stampType = new StampType(changeHalfDay, GoingOutReason.valueOf(goOutArt),
-				SetPreClockArt.valueOf(setPreClockArt), ChangeClockAtr.valueOf(changeClockArt),
+				SetPreClockArt.valueOf(setPreClockArt), ChangeClockArt.valueOf(changeClockArt),
 				ChangeCalArt.valueOf(changeCalArt));
-		return stampType;
+		return new ButtonType(ReservationArt.valueOf(reservationArt), Optional.of(stampType));
 	}
 
 }

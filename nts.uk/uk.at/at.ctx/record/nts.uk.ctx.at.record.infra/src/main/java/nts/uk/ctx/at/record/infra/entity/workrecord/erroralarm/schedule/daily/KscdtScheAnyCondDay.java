@@ -22,9 +22,6 @@ import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import org.apache.commons.lang3.BooleanUtils;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -49,7 +46,7 @@ public class KscdtScheAnyCondDay extends ContractUkJpaEntity {
 
     /* 使用区分 */
     @Column(name = "USE_ATR")
-    public int useAtr;
+    public boolean useAtr;
 
     /* チェック項目種類 */
     @Column(name = "CHECK_TYPE")
@@ -86,7 +83,7 @@ public class KscdtScheAnyCondDay extends ContractUkJpaEntity {
 		super();
 		this.pk = pk;
 		this.condName = condName;
-		this.useAtr = BooleanUtils.toInteger(useAtr);
+		this.useAtr = useAtr;
 		this.checkType = checkType;
 		this.wrkTypeCondAtr = wrkTypeCondAtr;
 		this.conPeriod = conPeriod;
@@ -155,7 +152,7 @@ public class KscdtScheAnyCondDay extends ContractUkJpaEntity {
         val result = new ExtractionCondScheduleDay(
         		pk.checkId,scheduleCheckCond,
         		EnumAdaptor.valueOf(checkType,DaiCheckItemType.class),
-        		pk.sortBy,BooleanUtils.toBoolean(useAtr),new NameAlarmExtractCond(condName), 
+        		pk.sortBy,useAtr,new NameAlarmExtractCond(condName), 
         		EnumAdaptor.valueOf(wrkTypeCondAtr, RangeToCheck.class), 
         		wrkTimeCondAtr != null ? EnumAdaptor.valueOf(wrkTimeCondAtr, TimeZoneTargetRange.class) : null, 
         		Optional.ofNullable(message == null? null : new ErrorAlarmMessage(message)));

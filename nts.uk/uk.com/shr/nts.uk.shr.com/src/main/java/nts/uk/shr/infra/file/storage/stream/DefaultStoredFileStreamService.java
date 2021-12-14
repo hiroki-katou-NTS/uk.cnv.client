@@ -1,19 +1,6 @@
 package nts.uk.shr.infra.file.storage.stream;
 
-import lombok.val;
-import nts.arc.error.BusinessException;
-import nts.arc.error.RawErrorMessage;
-import nts.arc.layer.app.file.storage.StoredFileInfo;
-import nts.arc.layer.infra.file.storage.StoredFileInfoRepository;
-import nts.arc.layer.infra.file.storage.StoredFileStreamService;
-import nts.gul.error.FatalLog;
-import nts.gul.file.FileUtil;
-import nts.gul.security.crypt.commonkey.CommonKeyCrypt;
-import nts.uk.shr.com.context.AppContexts;
-import nts.uk.shr.infra.file.storage.info.StoredPackInfoRepository;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -21,7 +8,22 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 
-@ApplicationScoped
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+
+import lombok.val;
+import nts.arc.error.BusinessException;
+import nts.arc.error.RawErrorMessage;
+import nts.arc.layer.app.file.storage.StoredFileInfo;
+import nts.arc.layer.infra.file.storage.StoredFileInfoRepository;
+import nts.arc.layer.infra.file.storage.StoredFileStreamService;
+import nts.arc.system.ServerSystemProperties;
+import nts.gul.file.FileUtil;
+import nts.gul.security.crypt.commonkey.CommonKeyCrypt;
+import nts.uk.shr.com.context.AppContexts;
+import nts.uk.shr.infra.file.storage.info.StoredPackInfoRepository;
+
+@Stateless
 public class DefaultStoredFileStreamService implements StoredFileStreamService {
 	
 	@Inject
@@ -29,8 +31,6 @@ public class DefaultStoredFileStreamService implements StoredFileStreamService {
 	
 	@Inject
 	private StoredPackInfoRepository packInfoRepository;
-
-	private final FileStoragePath storagePath = new FileStoragePath();
 
 	@Override
 	public void store(StoredFileInfo fileInfo, InputStream streamToStore) {
@@ -113,7 +113,7 @@ public class DefaultStoredFileStreamService implements StoredFileStreamService {
 	 * @param fileId
 	 * @return
 	 */
-	private Path getExistingPathToTargetStoredFile(String fileId) {
+	private static Path getExistingPathToTargetStoredFile(String fileId) {
 
 		// テナントフォルダにあればそれを返す
 		String tenantCode = AppContexts.user().contractCode();
@@ -126,7 +126,7 @@ public class DefaultStoredFileStreamService implements StoredFileStreamService {
 		return pathToStorage(null).resolve(fileId);
 	}
 
-	private Path pathToTargetStoredFile(String fileId, String tenantCode) {
+	private static Path pathToTargetStoredFile(String fileId, String tenantCode) {
 		return pathToStorage(tenantCode).resolve(fileId);
 	}
 
@@ -155,23 +155,27 @@ public class DefaultStoredFileStreamService implements StoredFileStreamService {
 				.resolve(entryInfo.getOriginalName());
 	}
 
-	private Path pathToStorage(String tenantCode) {
+	private static Path pathToStorage(String tenantCode) {
+
+		val path = new File(ServerSystemProperties.fileStoragePath()).toPath();
 
 		// テナントコード別にフォルダを分ける対応をする以前に作った環境でも動作するように・・・
 		if (tenantCode == null) {
-			return storagePath.getSingleStoragePath();
+			return path;
 		}
 
-		val pathByTenant = storagePath.getPath(tenantCode).resolve(tenantCode);
+		val pathByTenant = path.resolve(tenantCode);
 
 		if (!Files.exists(pathByTenant)) {
 			try {
 				Files.createDirectory(pathByTenant);
 			} catch (IOException e) {
-				FatalLog.write(DefaultStoredFileStreamService.class, "フォルダ作成に失敗：" + pathByTenant.toString());
+				throw new RuntimeException("フォルダ作成に失敗：" + pathByTenant.toString());
 			}
 		}
 
-		return pathByTenant;
+		return path.resolve(tenantCode);
 	}
+
+
 }

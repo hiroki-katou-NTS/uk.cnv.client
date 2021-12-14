@@ -30,19 +30,19 @@ public class WwfmtApprovalSetting extends ContractUkJpaEntity implements Seriali
 
 	/** 本人による承認 */
 	@Column(name = "SELF_APPROVAL_ATR")
-	public boolean selfApprovalAtr;
+	public int selfApprovalAtr;
 	
 	// 会社単位
 	@Column(name = "CMP_UNIT_SET")
-	public boolean cmpUnitSet;
+	public int cmpUnitSet;
 	
 	// 職場単位
 	@Column(name = "WKP_UNIT_SET")
-	public boolean wkpUnitSet;
+	public int wkpUnitSet;
 	
 	// 社員単位
 	@Column(name = "SYA_UNIT_SET")
-	public boolean syaUnitSet;
+	public int syaUnitSet;
 	
 	@Override
 	protected Object getKey() {

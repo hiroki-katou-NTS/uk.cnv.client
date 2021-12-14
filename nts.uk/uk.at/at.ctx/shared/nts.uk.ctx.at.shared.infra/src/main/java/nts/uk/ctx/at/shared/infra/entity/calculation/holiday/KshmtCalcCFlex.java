@@ -42,7 +42,7 @@ public class KshmtCalcCFlex  extends ContractUkJpaEntity implements Serializable
 	
 	/** 法定労働控除時間計算 */
 	@Column(name="FLEX_DEDUCT_CALC")
-	public boolean flexDeductCalc;
+	public int flexDeductCalc;
 
 	/** 非勤務日計算 */
 	@Column(name="FLEX_NONWKING_CALC")

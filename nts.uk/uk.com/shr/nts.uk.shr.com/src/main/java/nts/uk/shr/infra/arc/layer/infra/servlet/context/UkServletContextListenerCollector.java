@@ -11,8 +11,6 @@ import nts.arc.layer.infra.servlet.context.listener.ServletContextListenerCollec
 import nts.arc.system.ServerSystemProperties;
 import nts.arc.task.schedule.internal.config.CdiJobFactoryInitializer;
 import nts.arc.task.schedule.internal.config.CustomQuartzInitializerListener;
-import nts.jobdistributor.common.JobDistributorServerSystemProperties;
-import nts.uk.shr.com.system.property.UKServerSystemProperties;
 
 @ApplicationScoped
 public class UkServletContextListenerCollector implements ServletContextListenerCollector {
@@ -24,10 +22,9 @@ public class UkServletContextListenerCollector implements ServletContextListener
 	
 	@Override
 	public List<ServletContextListener> collect() {
-
-		if (UKServerSystemProperties.usesJobDistributor()
-			|| JobDistributorServerSystemProperties.isWorker()) {
-			// JobDistributorを使う場合、UK上でQuartzSchedulerが動き出してはまずい
+		
+		if ("cloud".equals(ServerSystemProperties.get("nts.installtype"))) {
+			// クラウドの場合、QuartzSchedulerが動くのはJobDistributorのみ
 			return Collections.emptyList();
 		}
 		

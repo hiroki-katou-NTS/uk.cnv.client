@@ -59,14 +59,6 @@ public interface RoleSetRepository {
     void delete(String roleSetCd, String companyId);
 
     /**
-     * exists
-     * @param roleSetCd
-     * @param companyId
-     * @return
-     */
-    boolean exists(String roleSetCd, String companyId);
-
-    /**
      * find by company id and person role id
      * 
      * @param companyId
@@ -92,7 +84,7 @@ public interface RoleSetRepository {
      */
     List<RoleSet> findByCidEmploymentRoleId(String companyId,String employmentRoleId);
     
-    Optional<RoleSet> findByCidRollSetCDAuthor (String companyId , String roleSetCd );
+    Optional<RoleSet> findByCidRollSetCDAuthor (String companyId , String roleSetCd , int approvalAuthority );
     
     List<RoleSet> findByCIDAndEmpRoleLst(String companyID, List<String> empRoleLst);
 

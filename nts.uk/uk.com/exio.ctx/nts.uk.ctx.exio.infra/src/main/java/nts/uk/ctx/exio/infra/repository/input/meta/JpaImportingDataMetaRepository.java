@@ -17,14 +17,11 @@ import nts.uk.ctx.exio.dom.input.workspace.TemporaryTable;
 public class JpaImportingDataMetaRepository extends JpaRepository implements ImportingDataMetaRepository {
 
 	@Override
-	public void cleanOldTables(ExecutionContext context) {
-		String tableName = tableName(context);
-		TemporaryTable.dropTable(jdbcProxy(), tableName);
-	}
-	
-	@Override
 	public void setup(ExecutionContext context) {
+		
 		String tableName = tableName(context);
+		
+		TemporaryTable.dropTable(jdbcProxy(), tableName);
 
 		String sql = "create table " + tableName + " ("
 				+ "ITEM_NAME varchar(100) not null"

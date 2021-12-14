@@ -4,8 +4,6 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.at.shared.dom.common.CompanyId;
@@ -45,7 +43,7 @@ public class JpaAggDeformedLaborSetting extends JpaRepository implements AggDefo
 
 	private AggDeformedLaborSetting convertToDomain(KshmtDeformedLaborMng aggLaborSet) {
 		return new AggDeformedLaborSetting(new CompanyId(aggLaborSet.getId().getCid()), 
-				EnumAdaptor.valueOf(BooleanUtils.toInteger(aggLaborSet.isUseDeformLabor()), UseAtr.class));
+				EnumAdaptor.valueOf((int) aggLaborSet.getUseDeformLabor(), UseAtr.class));
 	}
 
 	/**
@@ -59,7 +57,7 @@ public class JpaAggDeformedLaborSetting extends JpaRepository implements AggDefo
 		KshstAggLaborSetPK primaryKey = new KshstAggLaborSetPK();
 		primaryKey.setCid(aggLaborSet.getCompanyId().v());
 		setting.setId(primaryKey);
-		setting.setUseDeformLabor(BooleanUtils.toBoolean(aggLaborSet.getUseDeformedLabor().value));
+		setting.setUseDeformLabor(aggLaborSet.getUseDeformedLabor().value);
 		return setting;
 	}
 	

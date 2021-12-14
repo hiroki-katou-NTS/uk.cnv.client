@@ -63,7 +63,8 @@ public class AutoCreateStampCardNumberServiceHelper {
 				new Relieve(AuthcMethod.ID_AUTHC, StampMeans.INDIVITION),
 				null,
 				null, 
-				null);
+				null, 
+				"DUMMY");
 
 		return Optional.of(stamp);
 	}

@@ -44,14 +44,11 @@ public class CreateAlarmDataTopPageServiceTest {
                 require.getWorkplaceId(employeeIds, GeneralDate.today());
                 result = affAtWorkplaceExports;
 
-//                require.getAdminReceiveAlarmMailByWorkplaceIds(Collections.singletonList("S001"));
-//                result = Collections.singletonMap("S001", Arrays.asList("sya001", "sya002", "sya003","sya004", "sya005"));
+                require.getListEmployeeId("S001", GeneralDate.today());
+                result = Arrays.asList("sya001", "sya002", "sya003","sya004", "sya005");
 
-                require.getAdminReceiveAlarmMailByWorkplaceIds(Arrays.asList("S001", "S002"));
-                Map<String, List<String>> infoMap = new HashMap<>();
-                infoMap.put("S001",Arrays.asList("sya001", "sya002", "sya003"));
-                infoMap.put("S002", Arrays.asList("sya004", "sya005"));
-                result = infoMap;
+                require.getListEmployeeId("S002", GeneralDate.today());
+                result = Arrays.asList("del001", "del002");
             }
         };
 
@@ -82,11 +79,11 @@ public class CreateAlarmDataTopPageServiceTest {
                 require.getWorkplaceId(employeeIds, GeneralDate.today());
                 result = affAtWorkplaceExports;
 
-                require.getAdminReceiveAlarmMailByWorkplaceIds(Collections.singletonList("S002"));
-                result = Collections.singletonMap("S002", Arrays.asList("sya004", "sya005"));
+                require.getListEmployeeId("S002", GeneralDate.today());
+                result = Arrays.asList("sya004", "sya005");
 
-                require.getAdminReceiveAlarmMailByWorkplaceIds(Collections.singletonList("S001"));
-                result = Collections.singletonMap("S001", Arrays.asList("sya001", "sya002", "sya003"));
+                require.getListEmployeeId("S001", GeneralDate.today());
+                result = Arrays.asList("sya001", "sya002", "sya003");
             }
         };
 
@@ -142,8 +139,8 @@ public class CreateAlarmDataTopPageServiceTest {
                 require.getWorkplaceId(employeeIds, GeneralDate.today());
                 result = affAtWorkplaceExports;
 
-                require.getAdminReceiveAlarmMailByWorkplaceIds(Collections.singletonList("S001"));
-                result = Collections.singletonMap("S001", Arrays.asList("sya001", "sya002", "sya003"));
+                require.getListEmployeeId("S001", GeneralDate.today());
+                result = Arrays.asList("sya001", "sya002", "sya003");
             }
         };
 
@@ -172,8 +169,8 @@ public class CreateAlarmDataTopPageServiceTest {
                 require.getWorkplaceId(employeeIds, GeneralDate.today());
                 result = affAtWorkplaceExports;
 
-                require.getAdminReceiveAlarmMailByWorkplaceIds(Collections.singletonList("S002"));
-                result = Collections.singletonMap("S002", Arrays.asList("sya004", "sya005"));
+                require.getListEmployeeId("S002", GeneralDate.today());
+                result = Arrays.asList("sya004", "sya005");
             }
         };
 

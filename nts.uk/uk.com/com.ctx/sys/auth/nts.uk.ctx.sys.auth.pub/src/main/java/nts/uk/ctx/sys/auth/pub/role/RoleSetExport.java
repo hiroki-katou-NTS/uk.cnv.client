@@ -16,6 +16,8 @@ public class RoleSetExport {
 
     private String roleSetName;
 
+    private int approvalAuthority;
+
     private String officeHelperRoleId;
 
     private String myNumberRoleId;

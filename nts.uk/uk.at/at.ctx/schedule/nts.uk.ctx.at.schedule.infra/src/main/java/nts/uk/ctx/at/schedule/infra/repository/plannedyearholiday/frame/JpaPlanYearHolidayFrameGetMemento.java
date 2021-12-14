@@ -51,7 +51,7 @@ public class JpaPlanYearHolidayFrameGetMemento implements PlanYearHolidayFrameGe
 	 */
 	@Override
 	public NotUseAtr getUseClassification() {
-		return NotUseAtr.valueOf(this.kscstPlanYearHdFrame.isUseAtr());
+		return NotUseAtr.valueOf((int) this.kscstPlanYearHdFrame.getUseAtr());
 	}
 
 	/* (non-Javadoc)

@@ -7,14 +7,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
-import nts.arc.task.AsyncTaskInfo;
-import nts.gul.text.IdentifierUtil;
-import nts.uk.ctx.at.schedule.app.command.budget.external.actualresult.dto.ExecutionInfor;
+import nts.arc.layer.app.command.CommandHandlerContext;
+import nts.arc.layer.app.command.CommandHandlerWithResult;
 import nts.uk.ctx.at.schedule.app.command.schedule.workschedule.RegisWorkScheduleCommandHandler;
+import nts.uk.ctx.at.schedule.app.command.schedule.workschedule.ResultRegisWorkSchedule;
 import nts.uk.ctx.at.schedule.app.command.schedule.workschedule.WorkInformationDto;
 import nts.uk.ctx.at.schedule.app.command.schedule.workschedule.WorkScheduleSaveCommand;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.dto.RegisterWorkScheduleInputCommand;
@@ -28,15 +26,15 @@ import nts.uk.shr.com.time.TimeWithDayAttr;
  */
 
 @Stateless
-@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-public class RegisterWorkSceduleCommandHandler<T> {
+public class RegisterWorkSceduleCommandHandler extends CommandHandlerWithResult<RegisterWorkScheduleInputCommand, ResultRegisWorkSchedule> {
 
 	@Inject
 	private RegisWorkScheduleCommandHandler<TimeWithDayAttr> regisWorkSchedule;
 
-	public ExecutionInfor handle(RegisterWorkScheduleInputCommand param) {
+	@Override
+	protected ResultRegisWorkSchedule handle(CommandHandlerContext<RegisterWorkScheduleInputCommand> context) {
+		RegisterWorkScheduleInputCommand param = context.getCommand();
 		String sid = param.sid;
-		String executeId = IdentifierUtil.randomUniqueId();
 
 		List<WorkScheduleSaveCommand<TimeWithDayAttr>> commands = param.registerDates.stream().map(m -> {
 			Map<Integer, TimeWithDayAttr> map = new HashMap<Integer, TimeWithDayAttr>();
@@ -54,10 +52,7 @@ public class RegisterWorkSceduleCommandHandler<T> {
 			return new WorkScheduleSaveCommand<TimeWithDayAttr>(sid, m.getDate(), wif, map, new ArrayList<>(), false);
 		}).collect(Collectors.toList());
 		
-		AsyncTaskInfo taskInfor = regisWorkSchedule.handle(commands);
-		return ExecutionInfor.builder()
-                .taskInfor(taskInfor)
-                .executeId(executeId)
-                .build();
+		
+		return this.regisWorkSchedule.handle(commands);
 	}
 }

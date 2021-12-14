@@ -4,7 +4,6 @@ import setShared = nts.uk.ui.windows.setShared;
 module nts.uk.ui.at.kcp015.shared {
 
     export interface Parameters {
-		enable: KnockoutObservable<boolean>;
         hasParams : KnockoutObservable<boolean>;
         visibleA31: KnockoutObservable<boolean>;
         visibleA32: KnockoutObservable<boolean>;
@@ -26,7 +25,6 @@ module nts.uk.ui.at.kcp015.shared {
             const name = COMPONENT_NAME;
 
             const selected = valueAccessor();
-			const enable = allBindingsAccessor.get('enable');
             const visibleA31 = allBindingsAccessor.get('visibleA31');
             const visibleA32 = allBindingsAccessor.get('visibleA32');
             const visibleA33 = allBindingsAccessor.get('visibleA33');
@@ -36,7 +34,7 @@ module nts.uk.ui.at.kcp015.shared {
             const sids = allBindingsAccessor.get('sids');
             const baseDate = allBindingsAccessor.get('baseDate');
 
-            const params = { enable, visibleA31, visibleA32, visibleA33, visibleA34, visibleA35, visibleA36, sids, baseDate };
+            const params = { visibleA31, visibleA32, visibleA33, visibleA34, visibleA35, visibleA36, sids, baseDate };
             const component = { name, params };
 
             ko.applyBindingsToNode(element, { component }, bindingContext);
@@ -48,7 +46,7 @@ module nts.uk.ui.at.kcp015.shared {
     @component({
         name: COMPONENT_NAME,
         template: `<!-- ko let: {text: nts.uk.resource.getText } -->
-             <button tabindex="12" id="showPopup" data-bind="text: text('KCP015_1'), visible: visibleA1, enable: enable"></button>
+             <button tabindex="12" id="showPopup" data-bind="text: text('KCP015_1'), visible: visibleA1 "></button>
              <div id="A1" class="popup-area popup-panel btn10">
                 <div id="button-top">
                     <button tabindex="1" class="small compensation" data-bind="text: text('Com_CompensationHoliday'), click: openKDL005, visible: visibleA31Com "></button>
@@ -58,7 +56,7 @@ module nts.uk.ui.at.kcp015.shared {
                 <div id="button-bot">
                     <button tabindex="2" class="small substitute"     data-bind="text: text('Com_SubstituteHoliday'), click: openKDL009, visible: visibleA32Com "></button>
                     <button tabindex="4" class="small fundedPaid"     data-bind="text: text('Com_FundedPaidHoliday'), click: openKDL029, visible: visibleA34Com "></button>
-                    <button tabindex="6" class="small supportsetting" data-bind="text: text('KCP015_2'),          click: openKDL039, visible: false "></button>
+                    <button tabindex="6" class="small supportsetting" data-bind="text: text('KCP015_2'),          click: openKDL039, visible: visibleA36Com "></button>
                 </div>
              </div><!-- /ko -->`
     })
@@ -72,9 +70,6 @@ module nts.uk.ui.at.kcp015.shared {
         visibleA34Com: KnockoutObservable<boolean> = ko.observable(true);
         visibleA35Com: KnockoutObservable<boolean> = ko.observable(true);
         visibleA36Com: KnockoutObservable<boolean> = ko.observable(true);
-
-		// biến này phục vụ enable trên màn KSU002- Nếu ko có param thì mặc định là true
-		enable:KnockoutObservable<boolean>;
 
         // Nếu đã khai báo model data ở đây thì các model từ dòng 65 đến dòng 71 để làm gì???
         constructor(private data: Parameters) {
@@ -97,12 +92,7 @@ module nts.uk.ui.at.kcp015.shared {
             });
             
             // Không thấy sử dụng gì với các biến này???
-            const {enable, visibleA31, visibleA32, visibleA33, visibleA34, visibleA35, visibleA36, sids, baseDate } = vm.data;
-			if(enable != undefined){
-				vm.enable = enable;
-			}else{
-				vm.enable = ko.observable(true);
-			}
+            const { visibleA31, visibleA32, visibleA33, visibleA34, visibleA35, visibleA36, sids, baseDate } = vm.data;
             
             vm.getSetting();
         }
@@ -206,12 +196,12 @@ module nts.uk.ui.at.kcp015.shared {
                 baseDate: baseDate
             };
 
-            nts.uk.ui.windows.setShared('KDL005_DATA', empIds);
+            nts.uk.ui.windows.setShared('KDL005_DATA', param);
             $('#A1_10_1').ntsPopup('hide');
-            if (empIds.length > 1) {
-                nts.uk.ui.windows.sub.modal("/view/kdl/005/a/index.xhtml", {  width: 1160, height: 640 });
+            if (param.employeeIds.length > 1) {
+                nts.uk.ui.windows.sub.modal("/view/kdl/005/a/multi.xhtml");
             } else {
-                nts.uk.ui.windows.sub.modal("/view/kdl/005/a/index.xhtml",{  width: 860, height: 640 });
+                nts.uk.ui.windows.sub.modal("/view/kdl/005/a/single.xhtml");
             }
         }
 
@@ -235,43 +225,49 @@ module nts.uk.ui.at.kcp015.shared {
              *        const { employeeIds } = param;
              * 
              *        if(employeeIds.length > 1){
-             *            vm.$window.modal("/view/kdl/009/a/index.xhtml",{width: 1100, height: 650});
+             *            vm.$window.modal('/view/kdl/009/a/multi.xhtml');
              *        } else {
-             *            vm.$window.modal("/view/kdl/009/a/index.xhtml",{width: 770, height: 650});
+             *            vm.$window.modal('/view/kdl/009/a/single.xhtml');
              *        }
              *    });
              * Những đoạn code dùng cấu trúc cũ thay tương tự.
              */
-            nts.uk.ui.windows.setShared('KDL009_DATA', param.employeeIds);
+            nts.uk.ui.windows.setShared('KDL009_DATA', param);
             $('#A1_10_1').ntsPopup('hide');
             if (param.employeeIds.length > 1) {
-                nts.uk.ui.windows.sub.modal("/view/kdl/009/a/index.xhtml",{width: 1100, height: 650});
+                nts.uk.ui.windows.sub.modal("/view/kdl/009/a/multi.xhtml");
             } else {
-                nts.uk.ui.windows.sub.modal("/view/kdl/009/a/index.xhtml",{width: 770, height: 650});
+                nts.uk.ui.windows.sub.modal("/view/kdl/009/a/single.xhtml");
             }
         }
 
         // A1_10_4
         openKDL020() {
             let vm = this;
+            var param: any = {
+                employeeIds: vm.data.sids(),
+                baseDate: new Date()
+            };
+            setShared('KDL020A_PARAM', param );
             $('#A1_10_1').ntsPopup('hide');
-
-			setShared('KDL020_DATA', vm.data.sids());
-			if (vm.data.sids().length > 1)
-				nts.uk.ui.windows.sub.modal("/view/kdl/020/a/index.xhtml",{  width: 1040, height: 660 });
-			else
-				nts.uk.ui.windows.sub.modal("/view/kdl/020/a/index.xhtml",{  width: 730, height: 660 });
+            if (param.employeeIds.length == 1) {
+                nts.uk.ui.windows.sub.modal('/view/kdl/020/a/single.xhtml').onClosed(function(): any { });
+            } else {
+                nts.uk.ui.windows.sub.modal('/view/kdl/020/a/multi.xhtml').onClosed(function(): any { });
+            }
         }
 
         // A1_10_5
         openKDL029() {
             let vm = this;
+            let param = {
+                employeeIds: vm.data.sids(),
+                baseDate: moment(new Date()).format("YYYY/MM/DD")
+            }
+            setShared('KDL029_PARAM', param);
             $('#A1_10_1').ntsPopup('hide');
-			nts.uk.ui.windows.setShared('KDL029_DATA', vm.data.sids());
-			if (vm.data.sids().length > 1)
-				nts.uk.ui.windows.sub.modal("/view/kdl/029/a/index.xhtml",{  width: 1060, height: 600 });
-			else
-				nts.uk.ui.windows.sub.modal("/view/kdl/029/a/index.xhtml",{  width: 710, height: 600 });
+            nts.uk.ui.windows.sub.modal('/view/kdl/029/a/index.xhtml').onClosed(function(): any {
+            });
         }
         
         openKDL017() {

@@ -25,11 +25,11 @@ public class KscmtWorkplaceWorkSetPK implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/** The workplace id. */
-	@Column(name = "WKP_ID")
+	@Column(name = "WKPID")
 	private String workplaceId;
 	
 	/** The workday division. */
-	@Column(name = "WORKING_DAY_ATR")
+	@Column(name = "WORK_DAY_ATR")
 	private Integer workdayDivision;
 
 	/* (non-Javadoc)

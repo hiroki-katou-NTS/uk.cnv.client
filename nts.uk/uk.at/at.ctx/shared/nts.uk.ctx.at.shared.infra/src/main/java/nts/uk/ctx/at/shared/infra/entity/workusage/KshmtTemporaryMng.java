@@ -29,7 +29,7 @@ public class KshmtTemporaryMng extends ContractUkJpaEntity implements Serializab
 	private KshstTempWkUseManagePK id;
 
 	@Column(name="USE_CLASSIFICATION")
-	private boolean useClassification;
+	private int useClassification;
 
 	@Override
 	protected Object getKey() {

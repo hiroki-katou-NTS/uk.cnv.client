@@ -5,16 +5,11 @@ import java.util.Optional;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import org.apache.commons.codec.binary.StringUtils;
-
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.sys.auth.dom.employee.dto.EmJobTitleHisImport;
-import nts.uk.ctx.sys.auth.dom.grant.rolesetjob.RoleSetGrantedJobTitle;
 import nts.uk.ctx.sys.auth.dom.grant.rolesetjob.RoleSetGrantedJobTitleRepository;
 import nts.uk.ctx.sys.auth.dom.grant.rolesetperson.RoleSetGrantedPerson;
 import nts.uk.ctx.sys.auth.dom.grant.rolesetperson.RoleSetGrantedPersonRepository;
-import nts.uk.ctx.sys.auth.dom.role.Role;
-import nts.uk.ctx.sys.auth.dom.role.RoleRepository;
 import nts.uk.ctx.sys.auth.dom.roleset.ApprovalAuthority;
 import nts.uk.ctx.sys.auth.dom.roleset.RoleSet;
 import nts.uk.ctx.sys.auth.dom.roleset.RoleSetRepository;
@@ -37,9 +32,6 @@ public class CanApprovalOnBaseDateServiceImpl implements CanApprovalOnBaseDateSe
 
 	@Inject
 	private RoleSetRepository roleSetRepo;
-	
-	@Inject
-	private RoleRepository roleRepository;
 
 	@Override
 	public boolean canApprovalOnBaseDate(String companyId, String employeeID, GeneralDate date) {
@@ -57,28 +49,17 @@ public class CanApprovalOnBaseDateServiceImpl implements CanApprovalOnBaseDateSe
 				//基準日で職位が取得できない場合、falseを返したいです
 				return false;
 			}
-			Optional<RoleSetGrantedJobTitle> roleJobTitle = roleSetGrantedJobTitleRepo.getByJobTitleId(companyId, jobTitle.get().getJobTitleID());
+			Optional<String> roleJobTitle = roleSetGrantedJobTitleRepo.getRoleSetCd(companyId, jobTitle.get().getJobTitleID());
 			if (roleJobTitle.isPresent()) {
-				roleSetCode = roleJobTitle.get().getRoleSetCd().v();
+				roleSetCode = roleJobTitle.get();
 			}
 		} else {
 			roleSetCode = roleSetGrand.get().getRoleSetCd().toString();
 		}
 		// Acquire domain model "Roll set"
-		Optional<RoleSet> roleSet = roleSetRepo.findByRoleSetCdAndCompanyId(roleSetCode.toString(), companyId);
+		Optional<RoleSet> roleSet = roleSetRepo.findByCidRollSetCDAuthor(companyId, roleSetCode.toString(), ApprovalAuthority.HasRight.value);
 		if (roleSet.isPresent()) {
-			RoleSet rs = roleSet.get();
-			
-			if (!rs.getEmploymentRoleId().isPresent()) {
-				return false;
-			} else {
-				// 就業ロールIDから承認権限がある就業ロールを取得する
-				Optional<Role> role = roleRepository.getRoleWorks(companyId, rs.getEmploymentRoleId().get());
-				
-				
-				return role.flatMap(x -> x.getApprovalAuthority()).orElse(false);
-			}
-			
+			return true;
 		} else {
 			return false;
 		}

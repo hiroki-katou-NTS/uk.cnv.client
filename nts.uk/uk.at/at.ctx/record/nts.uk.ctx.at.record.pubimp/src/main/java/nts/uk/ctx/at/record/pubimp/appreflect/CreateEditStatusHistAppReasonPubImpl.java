@@ -7,15 +7,12 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import lombok.AllArgsConstructor;
-import nts.arc.enums.EnumAdaptor;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
-import nts.uk.ctx.at.record.dom.adapter.request.application.state.RCReflectedState;
 import nts.uk.ctx.at.record.dom.applicationcancel.CreateEditStatusHistAppReason;
 import nts.uk.ctx.at.record.dom.editstate.EditStateOfDailyPerformance;
 import nts.uk.ctx.at.record.dom.editstate.repository.EditStateOfDailyPerformanceRepository;
 import nts.uk.ctx.at.record.pub.appreflect.CreateEditStatusHistAppReasonPub;
-import nts.uk.ctx.at.record.pub.appreflect.export.RCReflectedStateExport;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.ApplicationReflectHistory;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.ApplicationReflectHistoryRepo;
@@ -32,9 +29,9 @@ public class CreateEditStatusHistAppReasonPubImpl implements CreateEditStatusHis
 
 	@Override
 	public void process(String employeeId, GeneralDate date, String appId, ScheduleRecordClassifi classification,
-			Map<Integer, String> mapValue, GeneralDateTime reflectTime, String execId, RCReflectedStateExport state) {
+			Map<Integer, String> mapValue, GeneralDateTime reflectTime) {
 		RequireImpl impl = new RequireImpl(editStateOfDailyRepo);
-		CreateEditStatusHistAppReason.process(impl, employeeId, date, appId, classification, mapValue, reflectTime, execId, EnumAdaptor.valueOf(state.value, RCReflectedState.class));
+		CreateEditStatusHistAppReason.process(impl, employeeId, date, appId, classification, mapValue, reflectTime);
 
 	}
 

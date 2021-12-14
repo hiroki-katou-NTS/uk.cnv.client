@@ -31,7 +31,7 @@ public class KshmtDeformedLaborMng extends ContractUkJpaEntity implements Serial
 	
 	/** 変形労働を使用する */
 	@Column(name="USE_DEFORM_LABOR")
-	private boolean useDeformLabor;
+	private long useDeformLabor;
 
 	@Override
 	protected Object getKey() {

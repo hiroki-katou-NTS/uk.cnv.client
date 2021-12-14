@@ -12,5 +12,8 @@ import lombok.Value;
 
 @Value
 public class RoleSetGrantedJobTitleCommand {
+
+	private boolean applyToConcurrentPerson;
 	private List<RoleSetGrantedJobTitleDetailCommand> details;
+	
 }

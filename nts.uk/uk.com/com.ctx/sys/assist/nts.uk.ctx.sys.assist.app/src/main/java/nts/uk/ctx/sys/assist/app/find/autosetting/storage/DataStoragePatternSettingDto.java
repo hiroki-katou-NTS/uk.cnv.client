@@ -100,16 +100,4 @@ public class DataStoragePatternSettingDto<X extends AbstractCategoryDto> impleme
 		domain.setMemento(dto);
 		return dto;
 	}
-
-	@Override
-	public void setWithoutPassword(boolean withoutPassword) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setPatternClassification(boolean patternClassification) {
-		// TODO Auto-generated method stub
-		
-	}
 }

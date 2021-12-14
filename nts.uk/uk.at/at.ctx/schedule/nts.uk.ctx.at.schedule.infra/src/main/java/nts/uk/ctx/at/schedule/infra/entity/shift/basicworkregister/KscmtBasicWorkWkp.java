@@ -13,7 +13,7 @@ import javax.persistence.Table;
 
 import lombok.Getter;
 import lombok.Setter;
-import nts.uk.shr.infra.data.entity.ContractCompanyUkJpaEntity;
+import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 
 /**
  * The Class KscmtBasicWorkWkp.
@@ -21,8 +21,8 @@ import nts.uk.shr.infra.data.entity.ContractCompanyUkJpaEntity;
 @Entity
 @Setter
 @Getter
-@Table(name = "KSCMT_STANDARD_WORK_WKP")
-public class KscmtBasicWorkWkp extends ContractCompanyUkJpaEntity implements Serializable {
+@Table(name = "KSCMT_BASIC_WORK_WKP")
+public class KscmtBasicWorkWkp extends ContractUkJpaEntity implements Serializable {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
@@ -32,11 +32,11 @@ public class KscmtBasicWorkWkp extends ContractCompanyUkJpaEntity implements Ser
 	protected KscmtWorkplaceWorkSetPK kscmtWorkplaceWorkSetPK;
 	
 	/** The worktype code. */
-	@Column(name = "WKTP_CD")
+	@Column(name = "WORK_TYPE_CD")
 	private String worktypeCode;
 
 	/** The working code. */
-	@Column(name = "WKTM_CD")
+	@Column(name = "WORKING_CD")
 	private String workingCode;
 
 

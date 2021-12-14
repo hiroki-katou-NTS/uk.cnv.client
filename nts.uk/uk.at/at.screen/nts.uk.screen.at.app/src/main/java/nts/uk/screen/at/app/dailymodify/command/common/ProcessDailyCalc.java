@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,7 +16,6 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.tuple.Pair;
 
 import lombok.val;
-import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.record.app.command.dailyperform.DailyRecordWorkCommand;
 import nts.uk.ctx.at.record.app.command.dailyperform.DailyRecordWorkCommandHandler;
@@ -25,14 +23,11 @@ import nts.uk.ctx.at.record.app.command.dailyperform.checkdata.RCDailyCorrection
 import nts.uk.ctx.at.record.app.command.dailyperform.month.UpdateMonthDailyParam;
 import nts.uk.ctx.at.record.app.find.dailyperform.DailyRecordDto;
 import nts.uk.ctx.at.record.dom.daily.itemvalue.DailyItemValue;
-import nts.uk.ctx.at.record.dom.require.RecordDomRequireService;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.AttendanceItemUtil;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.erroralarm.EmployeeMonthlyPerError;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItem;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemRepository;
 import nts.uk.ctx.at.shared.dom.workrecord.workperfor.dailymonthlyprocessing.enums.ExecutionType;
-import nts.uk.ctx.at.shared.dom.workrule.closure.service.GetClosureStartForEmployee;
 import nts.uk.screen.at.app.dailymodify.command.DailyModifyResCommandFacade;
 import nts.uk.screen.at.app.dailymodify.query.DailyModifyQuery;
 import nts.uk.screen.at.app.dailymodify.query.DailyModifyResult;
@@ -59,9 +54,6 @@ public class ProcessDailyCalc {
 	
 	@Inject
 	private OptionalItemRepository optionalMasterRepo;
-	
-	@Inject
-	private RecordDomRequireService requireService;
 
 	private Map<Pair<String, GeneralDate>, ResultReturnDCUpdateData> checkBeforeCalc(DailyCalcParam param,
 			List<DailyRecordDto> dailyEdits) {
@@ -124,7 +116,7 @@ public class ProcessDailyCalc {
 
 	private ErrorAfterCalcDaily checkErrorAfterCalcDaily(RCDailyCorrectionResult resultIU,
 			List<DailyModifyResult> resultOlds, DateRange range, List<DailyRecordDto> dailyDtoEditAll,
-			List<DPItemValue> lstItemEdits,Boolean checkUnLock) {
+			List<DPItemValue> lstItemEdits) {
 		Map<Integer, OptionalItem> optionalMaster = optionalMasterRepo
 				.findAll(AppContexts.user().companyId()).stream()
 				.collect(Collectors.toMap(c -> c.getOptionalItemNo().v(), c -> c));
@@ -132,37 +124,17 @@ public class ProcessDailyCalc {
 		Map<Integer, List<DPItemValue>> resultErrorMonth = new HashMap<>();
 		boolean hasError = false;
 		DataResultAfterIU dataResultAfterIU = new DataResultAfterIU();
-		
-		//EA修正履歴：No4151
-		Map<String,List<IntegrationOfDaily>> mapSid = resultIU.getLstDailyDomain().stream()
-				.collect(Collectors.groupingBy(x -> x.getEmployeeId()));
-		
-		List<IntegrationOfDaily> listDailyProcess = new ArrayList<>();
-		if(checkUnLock != null && checkUnLock) {
-			mapSid.entrySet().stream().forEach(c ->{
-				Optional<GeneralDate> result = GetClosureStartForEmployee.algorithm(
-						requireService.createRequire(), new CacheCarrier(), c.getKey());
-				for(IntegrationOfDaily daily : c.getValue()) {
-					if(result.isPresent() && result.get().beforeOrEquals(daily.getYmd())) {
-						listDailyProcess.add(daily);
-					}
-				}
-				
-			});
-		}else {
-			listDailyProcess.addAll(resultIU.getLstDailyDomain());
-		}
 
-		val errorDivergence = validatorDataDaily.errorCheckDivergence(listDailyProcess,
-				resultIU.getLstMonthDomain(),checkUnLock);
+		val errorDivergence = validatorDataDaily.errorCheckDivergence(resultIU.getLstDailyDomain(),
+				resultIU.getLstMonthDomain());
 		if (!errorDivergence.isEmpty()) {
 			resultErrorDaily.putAll(errorDivergence);
 			hasError = true;
 		}
 
 		// 残数系のエラーチェック（月次集計なし）
-		val sidChange = ProcessCommonCalc.itemInGroupChange(listDailyProcess, resultOlds, optionalMaster);
-		val pairError = resCommandFacade.mapDomainMonthChange(sidChange, listDailyProcess,
+		val sidChange = ProcessCommonCalc.itemInGroupChange(resultIU.getLstDailyDomain(), resultOlds, optionalMaster);
+		val pairError = resCommandFacade.mapDomainMonthChange(sidChange, resultIU.getLstDailyDomain(),
 				resultIU.getLstMonthDomain(), dailyDtoEditAll, range, lstItemEdits);
 		Map<Integer, List<DPItemValue>> errorMonth = validatorDataDaily.errorMonthNew(pairError.getErrorMonth());
 		// val errorMonth = validatorDataDaily.errorMonth(resultIU.getLstMonthDomain(),
@@ -182,7 +154,7 @@ public class ProcessDailyCalc {
 
 	public DailyCalcResult processDailyCalc(DailyCalcParam param, List<DailyRecordDto> dailyEdits,
 			List<DailyRecordDto> dailyOlds, List<DailyItemValue> dailyItemOlds, List<DailyModifyQuery> queryChange,
-			UpdateMonthDailyParam monthParam, boolean showErrorDialog, ExecutionType execType,Boolean checkUnLock) {
+			UpdateMonthDailyParam monthParam, boolean showErrorDialog, ExecutionType execType) {
 		DataResultAfterIU dataResultAfterIU = new DataResultAfterIU();
 		RCDailyCorrectionResult resultIU = new RCDailyCorrectionResult();
 		// 計算前エラーチェック
@@ -202,7 +174,7 @@ public class ProcessDailyCalc {
 			dataResultAfterIU.setMessageAlert("Msg_1489");
 			dataResultAfterIU.setErrorAllSidDate(true);
 			dataResultAfterIU.setShowErrorDialog(showErrorDialog);
-			return new DailyCalcResult(dataResultAfterIU, null, null, new HashMap<>(),new ArrayList<>());
+			return new DailyCalcResult(dataResultAfterIU, null, null, new HashMap<>());
 		}
 
 		String sid = AppContexts.user().employeeId();
@@ -219,10 +191,10 @@ public class ProcessDailyCalc {
 						.collect(Collectors.toList()),
 				param.getItemValues().stream()
 						.filter(x -> !lstResultReturnDailyError.containsKey(Pair.of(x.getEmployeeId(), x.getDate())))
-						.collect(Collectors.toList()),checkUnLock);
+						.collect(Collectors.toList()));
 
 		checkErrorAfterCalcDaily.getResultError().putAll(lstResultReturnDailyError);
-		return new DailyCalcResult(dataResultAfterIU, resultIU, checkErrorAfterCalcDaily, lstResultReturnDailyError,new ArrayList<>());
+		return new DailyCalcResult(dataResultAfterIU, resultIU, checkErrorAfterCalcDaily, lstResultReturnDailyError);
 	}
 
 	public RCDailyCorrectionResult calcDaily(List<DailyRecordDto> dtoNews, List<DailyRecordWorkCommand> commandNew,

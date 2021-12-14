@@ -21,6 +21,8 @@ import nts.uk.ctx.at.record.dom.stampmanagement.workplace.WorkLocation;
 import nts.uk.ctx.at.record.dom.stampmanagement.workplace.WorkLocationRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampDakokuRepository;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.EmployeeStampInfo;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.GetListStampEmployeeService;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.StampInfoDisp;
@@ -39,6 +41,9 @@ public class ReferToTheStampingResultsFinder {
 
 	@Inject
 	private StampCardRepository stampCardRepository;
+
+	@Inject
+	private StampRecordRepository stampRecordRepository;
 
 	@Inject
 	private StampDakokuRepository stampDakokuRepository;
@@ -82,7 +87,7 @@ public class ReferToTheStampingResultsFinder {
 	private List<String> step1(Kdl014EmpParamDto param, List<EmployeeStampInfo> listEmployeeStampInfo) {
 		List<String> employeeIds = param.getListEmp().stream().map(c -> c.getEmployeeId()).collect(Collectors.toList());
 		
-		GetListStampEmployeeService.Require require = new RequireImpl(stampCardRepository, stampDakokuRepository);
+		GetListStampEmployeeService.Require require = new RequireImpl(stampCardRepository, stampRecordRepository, stampDakokuRepository);
 		
 		DatePeriod period = new DatePeriod(param.getStart(), param.getEnd());
 		
@@ -202,11 +207,18 @@ public class ReferToTheStampingResultsFinder {
 		
 		private StampCardRepository stampCardRepository;
 		
+		private StampRecordRepository stampRecordRepository;
+		
 		private StampDakokuRepository stampDakokuRepository;
 
 		@Override
 		public List<StampCard> getListStampCard(String sid) {
 			return stampCardRepository.getListStampCard(sid);
+		}
+
+		@Override
+		public List<StampRecord> getStampRecord(List<StampNumber> stampNumbers, GeneralDate date) {
+			return stampRecordRepository.get(AppContexts.user().contractCode(), stampNumbers, date);
 		}
 
 		@Override

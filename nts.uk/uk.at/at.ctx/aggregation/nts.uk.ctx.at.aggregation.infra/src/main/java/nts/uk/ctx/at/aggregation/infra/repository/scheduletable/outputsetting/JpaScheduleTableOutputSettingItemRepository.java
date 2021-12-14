@@ -45,8 +45,8 @@ public class JpaScheduleTableOutputSettingItemRepository extends JpaRepository
 	
 	private static final String sql1 = "SELECT a FROM KagmtRptSchedule a WHERE a.pk.companyId = :companyId AND a.pk.code = :code";
 	private static final String sql2 = "SELECT a FROM KagmtRptScheduleItem a WHERE a.pk.companyId = :companyId AND a.pk.code = :code";	
-	private static final String sql3 = "SELECT a FROM KagmtRptScheduleTallyByPerson a WHERE a.pk.companyId = :companyId AND a.pk.code = :code ORDER BY a.displayOrder";
-	private static final String sql4 = "SELECT a FROM KagmtRptScheduleTallyByWkp a WHERE a.pk.companyId = :companyId AND a.pk.code = :code ORDER BY a.displayOrder";
+	private static final String sql3 = "SELECT a FROM KagmtRptScheduleTallyByPerson a WHERE a.pk.companyId = :companyId AND a.pk.code = :code";		
+	private static final String sql4 = "SELECT a FROM KagmtRptScheduleTallyByWkp a WHERE a.pk.companyId = :companyId AND a.pk.code = :code";
 
 	private ScheduleTableOutputSetting toDomainFromEntity(KagmtRptSchedule kagmtRptSchedule,
 			List<KagmtRptScheduleItem> kagmtRptScheduleItems, List<KagmtRptScheduleTallyByPerson> kagmtRptScheduleTallyByPersons,
@@ -98,7 +98,7 @@ public class JpaScheduleTableOutputSettingItemRepository extends JpaRepository
 			List<KagmtRptScheduleItem> kagmtRptScheduleItems, List<KagmtRptScheduleTallyByPerson> kagmtRptScheduleTallyByPersons,
 			List<KagmtRptScheduleTallyByWkp> kagmtRptScheduleTallyByWkps) {
 		
-		List<ScheduleTableOutputSetting> results = new ArrayList<>();
+		List<ScheduleTableOutputSetting> results = new ArrayList<ScheduleTableOutputSetting>();
 		
 		Map<String, List<KagmtRptScheduleItem>> listKagmtRptScheduleItem = kagmtRptScheduleItems.stream()
 				.collect(Collectors.groupingBy(KagmtRptScheduleItem::getCode));	
@@ -142,31 +142,25 @@ public class JpaScheduleTableOutputSettingItemRepository extends JpaRepository
 
 	private List<KagmtRptScheduleTallyByPerson> toKagmtRptScheduleTallyByPersonEntity(
 			ScheduleTableOutputSetting domain) {
-		List<KagmtRptScheduleTallyByPerson> results = new ArrayList<>();
-		String companyId = AppContexts.user().companyId();
+		List<KagmtRptScheduleTallyByPerson> results = new ArrayList<KagmtRptScheduleTallyByPerson>();
 		List<PersonalCounterCategory> list = domain.getPersonalCounterCategories();
 		if(!list.isEmpty()) {
-			for (int i = 0; i < list.size(); i++) {
-				results.add(new KagmtRptScheduleTallyByPerson(
-						new KagmtRptScheduleTallyByPersonPk(companyId, domain.getCode().v(), list.get(i).value),
-						i
-				));
-			}
+			list.stream().forEach(item -> {
+				results.add(new KagmtRptScheduleTallyByPerson(new KagmtRptScheduleTallyByPersonPk(
+						AppContexts.user().companyId(), domain.getCode().v(), item.value)));
+			});
 		}		
 		return results;
 	}
 
 	private List<KagmtRptScheduleTallyByWkp> toKagmtRptScheduleTallyByWkpEntity(ScheduleTableOutputSetting domain) {
-		List<KagmtRptScheduleTallyByWkp> results = new ArrayList<>();
-		String companyId = AppContexts.user().companyId();
+		List<KagmtRptScheduleTallyByWkp> results = new ArrayList<KagmtRptScheduleTallyByWkp>();
 		List<WorkplaceCounterCategory> list = domain.getWorkplaceCounterCategories();
 		if(!list.isEmpty()) {
-			for (int i = 0; i < list.size(); i++) {
-				results.add(new KagmtRptScheduleTallyByWkp(
-						new KagmtRptScheduleTallyByWkpPk(companyId, domain.getCode().v(), list.get(i).value),
-						i
-				));
-			}
+			list.stream().forEach(item -> {
+				results.add(new KagmtRptScheduleTallyByWkp(new KagmtRptScheduleTallyByWkpPk(AppContexts.user().companyId(),
+						domain.getCode().v(), item.value)));
+			});
 		}		
 		return results;
 	}
@@ -273,15 +267,15 @@ public class JpaScheduleTableOutputSettingItemRepository extends JpaRepository
 			KagmtRptSchedule kagmtRptSchedule = results1.get();
 			return Optional.of(this.toDomainFromEntity(kagmtRptSchedule, kagmtRptScheduleItems, kagmtRptScheduleTallyByPersons, kagmtRptScheduleTallyByWkps));
 		} else {
-			return Optional.empty();
+			return Optional.ofNullable(null);
 		}		
 	}
 	@Override
 	public List<ScheduleTableOutputSetting> getList(String companyId) {
 		String query1 = "SELECT a FROM KagmtRptSchedule a WHERE a.pk.companyId = :companyId";
 		String query2 = "SELECT a FROM KagmtRptScheduleItem a WHERE a.pk.companyId = :companyId ORDER BY a.pk.rowNo ASC";	
-		String query3 = "SELECT a FROM KagmtRptScheduleTallyByPerson a WHERE a.pk.companyId = :companyId ORDER BY a.displayOrder";
-		String query4 = "SELECT a FROM KagmtRptScheduleTallyByWkp a WHERE a.pk.companyId = :companyId ORDER BY a.displayOrder";
+		String query3 = "SELECT a FROM KagmtRptScheduleTallyByPerson a WHERE a.pk.companyId = :companyId";		
+		String query4 = "SELECT a FROM KagmtRptScheduleTallyByWkp a WHERE a.pk.companyId = :companyId";
 		
 		List<KagmtRptSchedule> kagmtRptSchedules = this.queryProxy().query(query1, KagmtRptSchedule.class).setParameter("companyId", companyId).getList();
 		

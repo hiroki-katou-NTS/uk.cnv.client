@@ -9,7 +9,8 @@ module nts.uk.at.kal014.a {
         ADD: 'alarmworkplace/patternsetting/add',
         DELETE: 'alarmworkplace/patternsetting/delete',
         GET_ROLENAME: "ctx/sys/auth/role/get/rolename/by/roleids"
-    };
+
+    }
 
     const SCREEN = {
         B: 'B',
@@ -251,12 +252,8 @@ module nts.uk.at.kal014.a {
                         return item;
                     });
 
-                    vm.alarmPatterSet().update(
-                        data.alarmPatternCD,
-                        data.alarmPatternName,
-                        checkCon,
-                        _.sortBy(listSelected, ['category', 'code'])
-                    );
+                    vm.alarmPatterSet().update(data.alarmPatternCD,data.alarmPatternName,checkCon,_.sortBy(listSelected,
+                            ['code','categoryName']));
                     dfd.resolve();
                 })
                 .fail((error: any)=>{
@@ -354,14 +351,14 @@ module nts.uk.at.kal014.a {
                 start = "当月";
             } else {
                 start = data.strMonth() + "ヶ月"
-                    + (data.strPreviousAtr() == 0? "後" : "先");
+                    + (data.strPreviousAtr() == 0? "前" : "先");
             }
             let end = "";
             if (data.endCurrentMonth()) {
                 end = "当月";
             } else {
                 end = data.endMonth() + "ヶ月"
-                    + (data.endPreviousAtr() == 0? "後" : "先");
+                    + (data.endPreviousAtr() == 0? "前" : "先");
             }
 
             return start + " "+ vm.$i18n('KAL014_42') + " " +  end;
@@ -392,11 +389,11 @@ module nts.uk.at.kal014.a {
                     start = "当月の" + vm.$i18n('KAL014_48');
                 } else {
                     start = data.strMonth() + "ヶ月"
-                        + (data.strPreviousMonth() == 0? vm.$i18n('Enum_FontRearSection_after') : "先") + "の"+ vm.$i18n('KAL014_48');
+                        + (data.strPreviousMonth() == 0? "前" : "先") + "の"+ vm.$i18n('KAL014_48');
                 }
             } else{
                 start = vm.$i18n('KAL014_44')
-                    + data.strDay()+  vm.$i18n('KAL014_46') + (data.strPreviousDay() == 0? vm.$i18n('Enum_FontRearSection_before') : vm.$i18n('Enum_FontRearSection_after'));
+                    + data.strDay()+  vm.$i18n('KAL014_46') + (data.strPreviousDay() == 0? "前" : "後");
             }
 
             let end = "";
@@ -406,11 +403,11 @@ module nts.uk.at.kal014.a {
                     end = "当月の" + vm.$i18n('KAL014_53');
                 } else {
                     end = data.endMonth() + "ヶ月"
-                        + (data.endPreviousMonth() == 0? vm.$i18n('Enum_FontRearSection_after') : "先") + "の" +vm.$i18n('KAL014_53');
+                        + (data.endPreviousMonth() == 0? "前" : "先") + "の" +vm.$i18n('KAL014_53');
                 }
             } else{
                 end = vm.$i18n('KAL014_44')
-                    + data.endDay() +  vm.$i18n('KAL014_46') + (data.endPreviousDay() == 0? vm.$i18n('Enum_FontRearSection_before') : vm.$i18n('Enum_FontRearSection_after'));
+                    + data.endDay() +  vm.$i18n('KAL014_46') + (data.endPreviousDay() == 0?"前" : "後");
             }
 
             return start + " "+ vm.$i18n('KAL014_42') + " " + end;

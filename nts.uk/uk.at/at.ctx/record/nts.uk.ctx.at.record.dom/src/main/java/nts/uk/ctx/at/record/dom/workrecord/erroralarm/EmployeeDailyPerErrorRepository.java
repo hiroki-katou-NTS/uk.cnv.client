@@ -57,6 +57,4 @@ public interface EmployeeDailyPerErrorRepository {
 	List<EmployeeDailyPerError> findsByCodeLst(List<String> employeeIDLst, DatePeriod period, List<String> codeLst);
 	
 	List<EmployeeDailyPerError> findsByCodeLstForCcg005(List<String> employeeIDLst, DatePeriod period, List<String> codeLst);
-	
-	void deleteByErrorCode(String sid, GeneralDate date, String errorCode);
 }

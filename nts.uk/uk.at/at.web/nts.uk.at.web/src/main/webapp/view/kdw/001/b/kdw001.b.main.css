@@ -3,7 +3,6 @@
 	position: relative;
 	display: flex;
 	flex-wrap: wrap;
-  flex-shrink: 0;
 }
 
 #button36Area {
@@ -26,7 +25,24 @@
 }
 
 #checkBox22 {
-	margin-left: 50px;
+	margin-left: 100px;
+	width: 100%;
+}
+
+#swButton34 {
+	margin-left: 101px;
+}
+
+#swButton33 {
+	margin-left: 74px;
+}
+
+#swButton32 {
+	margin-left: 102px;
+}
+
+#swButton31 {
+	margin-left: 20px;
 }
 
 .cbElement {
@@ -127,28 +143,4 @@
 
 .nts-wizard>.content>.body {
  padding: 0;
-}
-
-.setting-checkbox {
-  width: 180px;
-}
-
-.describe-label {
-  width: 100%;
-  color: #aaa;
-  padding-top: 10px;
-  white-space: break-spaces;
-  padding-left: 10px;
-}
-
-.step-2 .table {
-  width: 720px;
-}
-
-.step-2 #button36Area, .step-2 #button6Area {
-  margin-left: 120px;
-}
-
-.nts-wizard .steps+.contents {
-  width: inherit;
 }

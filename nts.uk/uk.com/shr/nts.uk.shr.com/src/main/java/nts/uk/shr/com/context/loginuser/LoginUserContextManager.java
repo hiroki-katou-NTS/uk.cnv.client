@@ -3,8 +3,6 @@ package nts.uk.shr.com.context.loginuser;
 import nts.arc.security.ticket.DataTicket;
 import nts.uk.shr.com.context.loginuser.role.LoginUserRoles;
 
-import java.util.Optional;
-
 /**
  * The class to update LoginUserContext
  * 
@@ -98,7 +96,7 @@ public interface LoginUserContextManager {
 	
 	void restore(DataTicket ticket);
 	
-	Optional<String> toBase64();
+	String toBase64();
 	
 	void restoreBase64(String base64);
 	

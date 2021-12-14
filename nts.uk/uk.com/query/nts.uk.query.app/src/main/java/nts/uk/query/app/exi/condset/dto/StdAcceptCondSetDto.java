@@ -74,4 +74,5 @@ public class StdAcceptCondSetDto{
 				domain.getDeleteExistDataMethod().isPresent() ? domain.getDeleteExistDataMethod().get().value : null);
 		return dto;
 	}
+
 }

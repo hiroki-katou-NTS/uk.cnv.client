@@ -8,8 +8,6 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.NoArgsConstructor;
 import lombok.val;
 import nts.arc.enums.EnumAdaptor;
@@ -114,7 +112,7 @@ public class KrcdtAnnLeaRemainHist extends ContractCompanyUkJpaEntity implements
 			Integer usedMinutes, Double stowageDays, double remainingDays, Integer remaningMinutes, double usedPercent,
 			Double prescribedDays, Double deductedDays, Double workingDays) {
 		super();
-		this.krcdtAnnLeaRemainHistPK = new KrcdtAnnLeaRemainHistPK(sid, yearMonth, closureId, closeDay, BooleanUtils.toBoolean(isLastDay), grantDate);
+		this.krcdtAnnLeaRemainHistPK = new KrcdtAnnLeaRemainHistPK(sid, yearMonth, closureId, closeDay, isLastDay, grantDate);
 		this.deadline = deadline;
 		this.expStatus = expStatus;
 		this.registerType = registerType;
@@ -171,7 +169,7 @@ public class KrcdtAnnLeaRemainHist extends ContractCompanyUkJpaEntity implements
 		return new AnnualLeaveRemainingHistory(annualLeaveGrantRemainingData, 
 				new YearMonth(krcdtAnnLeaRemainHistPK.yearMonth),
 				EnumAdaptor.valueOf(krcdtAnnLeaRemainHistPK.closureId, ClosureId.class),
-				new ClosureDate(krcdtAnnLeaRemainHistPK.closeDay, krcdtAnnLeaRemainHistPK.isLastDay));
+				new ClosureDate(krcdtAnnLeaRemainHistPK.closeDay, krcdtAnnLeaRemainHistPK.isLastDay == 1));
 	}
 
 }

@@ -137,11 +137,11 @@ module nts.uk.at.kal011.a {
                         index++;
                     })
                 }
-                vm.conditions(_.sortBy(conds, ["category"]));
+                vm.conditions(conds);
                 dfd.resolve();
             }).fail((err: any) => {
                 dfd.reject(err);
-            });
+            })
 
             return dfd.promise();
         }

@@ -18,6 +18,9 @@ public class JpaStampOutpItemSetGetMemento implements StampingOutputItemSetGetMe
 	/** The entity. */
 	private KfnmtStampOutpItem entity;
 	
+	/** The Constant VALUE_TRUE. */
+	private static final Integer VALUE_TRUE = 1;
+	
 	/**
 	 * Instantiates a new jpa kfnmt stamp outp item set get memento.
 	 *
@@ -57,7 +60,7 @@ public class JpaStampOutpItemSetGetMemento implements StampingOutputItemSetGetMe
 	 */
 	@Override
 	public boolean getOutputEmbossMethod() {
-		return this.entity.isOutputEmbossMethod();
+		return this.entity.getOutputEmbossMethod().intValue() == VALUE_TRUE ? true : false; 
 	}
 
 	/* (non-Javadoc)
@@ -65,7 +68,7 @@ public class JpaStampOutpItemSetGetMemento implements StampingOutputItemSetGetMe
 	 */
 	@Override
 	public boolean getOutputWorkHours() {
-		return this.entity.isOutputWorkHours();
+		return this.entity.getOutputWorkHours().intValue() == VALUE_TRUE ? true : false;
 	}
 
 	/* (non-Javadoc)
@@ -73,7 +76,7 @@ public class JpaStampOutpItemSetGetMemento implements StampingOutputItemSetGetMe
 	 */
 	@Override
 	public boolean getOutputSetLocation() {
-		return this.entity.isOutputSetLocation();
+		return this.entity.getOutputSetLocation().intValue() == VALUE_TRUE ? true : false;
 	}
 
 	/* (non-Javadoc)
@@ -81,7 +84,7 @@ public class JpaStampOutpItemSetGetMemento implements StampingOutputItemSetGetMe
 	 */
 	@Override
 	public boolean getOutputPosInfor() {
-		return this.entity.isOutputPosInfor();
+		return this.entity.getOutputPosInfor().intValue() == VALUE_TRUE	? true : false;
 	}
 
 	/* (non-Javadoc)
@@ -89,7 +92,7 @@ public class JpaStampOutpItemSetGetMemento implements StampingOutputItemSetGetMe
 	 */
 	@Override
 	public boolean getOutputOT() {
-		return this.entity.isOutputOt();
+		return this.entity.getOutputOt().intValue() == VALUE_TRUE ? true : false;
 	}
 
 	/* (non-Javadoc)
@@ -97,7 +100,7 @@ public class JpaStampOutpItemSetGetMemento implements StampingOutputItemSetGetMe
 	 */
 	@Override
 	public boolean getOutputNightTime() {
-		return this.entity.isOutputNightTime();
+		return this.entity.getOutputNightTime().intValue() == VALUE_TRUE ? true : false;
 	}
 
 	/* (non-Javadoc)
@@ -105,6 +108,6 @@ public class JpaStampOutpItemSetGetMemento implements StampingOutputItemSetGetMe
 	 */
 	@Override
 	public boolean getOutputSupportCard() {
-		return this.entity.isOutputSupportCard();
+		return this.entity.getOutputSupportCard().intValue() == VALUE_TRUE ? true : false;
 	}
 }

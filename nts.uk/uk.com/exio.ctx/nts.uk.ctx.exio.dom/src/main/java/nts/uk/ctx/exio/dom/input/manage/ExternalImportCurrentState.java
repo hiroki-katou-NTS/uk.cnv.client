@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 import nts.arc.error.BusinessException;
 import nts.arc.layer.dom.objecttype.DomainAggregate;
@@ -65,16 +66,17 @@ public class ExternalImportCurrentState implements DomainAggregate {
 		});
 	}
 	
-	private void handle(Require require, ExternalImportSetting externalImportSetting, Runnable mainProcess) {
-
-		ExecutionContext context = ExecutionContext.createForErrorTableName(companyId);
+	private void handle(Require require, ExternalImportSetting setting, Runnable mainProcess) {
+		
+		val context = ExecutionContext.create(setting);
+		
 		try {
 			
 			mainProcess.run();
 			
 		} catch (BusinessException ex) {
 			
-			require.add(ExternalImportError.execution(ex.getMessage()));
+			require.add(context, ExternalImportError.execution(ex.getMessage()));
 			abortedByBusinessError(require);
 			
 		} catch (Exception ex) {
@@ -85,7 +87,8 @@ public class ExternalImportCurrentState implements DomainAggregate {
 		}
 	}
 	
-	public static interface Require extends ExternalImportErrorsRequire {		
+	public static interface Require extends ExternalImportErrorsRequire {
+		
 		void update(ExternalImportCurrentState currentState);
 	}
 	

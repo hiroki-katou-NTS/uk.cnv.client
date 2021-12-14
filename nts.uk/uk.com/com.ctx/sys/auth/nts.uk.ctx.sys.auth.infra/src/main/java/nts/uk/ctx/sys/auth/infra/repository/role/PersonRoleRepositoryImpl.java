@@ -37,19 +37,18 @@ public class PersonRoleRepositoryImpl extends JpaRepository implements PersonRol
 	public Optional<PersonRole> find(String roleId) {
 		SacmtRolePerson entity = this.queryProxy().query(FIND_BY_ROLE_ID, SacmtRolePerson.class)
 				.setParameter("roleId", roleId).getSingleOrNull();
-		if ( entity == null ) {
-			return Optional.empty();
+		PersonRole domain = null;
+		if (entity != null) {
+			domain = toDomain(entity);
 		}
-		
-		return Optional.of(toDomain(entity));
+		return Optional.ofNullable(domain);
 	}
 
 	private static PersonRole toDomain(SacmtRolePerson entity) {
-		
-		return new PersonRole(
-				entity.getRoleId(), 
-				entity.getCompanyId(),
-				entity.isReferFutureDate());
+		PersonRole domain = new PersonRole();
+		domain.setRoleId(entity.getRoleId());
+		domain.setReferFutureDate(entity.isReferFutureDate());
+		return domain;
 	}
 
 	@Override
@@ -70,26 +69,20 @@ public class PersonRoleRepositoryImpl extends JpaRepository implements PersonRol
 
 	@Override
 	public void update(PersonRole personRole) {
-		Optional<SacmtRolePerson> entity = this.queryProxy().find(personRole.getRoleId(), SacmtRolePerson.class);
-		if (entity.isPresent()) {
-			SacmtRolePerson updateEntity = entity.get();
-			updateEntity.setReferFutureDate(personRole.getReferFutureDate());
-			this.commandProxy().update(updateEntity);
-		} else {
-			this.insert(personRole);
-		}
+		SacmtRolePerson updateEntity = this.queryProxy().find(personRole.getRoleId(), SacmtRolePerson.class).get();
+		updateEntity.setReferFutureDate(personRole.getReferFutureDate());
+		this.commandProxy().update(updateEntity);
 	}
 
 	@Override
 	public void remove(String roleId) {	
-		this.commandProxy().remove(SacmtRolePerson.class, roleId);
+			this.commandProxy().remove(SacmtRolePerson.class, roleId);
 	}
 
 	
 	private static SacmtRolePerson  toEntity(PersonRole personRole){
 		SacmtRolePerson entity = new SacmtRolePerson();
 		entity.setRoleId(personRole.getRoleId());
-		entity.setCompanyId(personRole.getCompanyId());
 		entity.setReferFutureDate(personRole.getReferFutureDate());
 		return entity;
 	}

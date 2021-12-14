@@ -10,16 +10,17 @@ import nts.arc.error.BusinessException;
 import nts.uk.ctx.at.shared.dom.shortworktime.SChildCareFrame;
 import nts.uk.ctx.at.shared.dom.shortworktime.ShortWorkTimeHistoryItem;
 import nts.uk.ctx.exio.dom.input.ExecutionContext;
+import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalItem;
+import nts.uk.ctx.exio.dom.input.canonicalize.domaindata.DomainDataColumn;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.DomainCanonicalization;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.ItemNoMap;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.generic.EmployeeHistoryCanonicalization;
 import nts.uk.ctx.exio.dom.input.canonicalize.history.HistoryKeyColumnNames;
 import nts.uk.ctx.exio.dom.input.canonicalize.history.HistoryType;
-import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalItem;
-import nts.uk.ctx.exio.dom.input.canonicalize.result.IntermediateResult;
+import nts.uk.ctx.exio.dom.input.canonicalize.methods.IntermediateResult;
 import nts.uk.ctx.exio.dom.input.errors.ErrorMessage;
 import nts.uk.ctx.exio.dom.input.errors.ExternalImportError;
-import nts.gul.util.Either;
+import nts.uk.ctx.exio.dom.input.util.Either;
 import nts.uk.shr.com.time.TimeWithDayAttr;
 
 /**
@@ -72,7 +73,7 @@ public class ShortWorkTimeCanonicalization extends EmployeeHistoryCanonicalizati
 					canonicalizeds.add(new Container(itm, container.getAddingHistoryItem()));
 				})
 				.ifLeft(e -> {
-					require.add(ExternalImportError.record(container.getInterm().getRowNo(), context.getDomainId(), e.getText()));
+					require.add(context, ExternalImportError.record(container.getInterm().getRowNo(), e.getText()));
 				});
 		}
 		
@@ -172,5 +173,12 @@ public class ShortWorkTimeCanonicalization extends EmployeeHistoryCanonicalizati
 	@Override
 	protected List<String> getChildTableNames() {
 		return Arrays.asList("KSHMT_SHORTTIME_HIST_ITEM", "KSHMT_SHORTTIME_TS");
+	}
+	
+	@Override
+	protected List<DomainDataColumn> getDomainDataKeys() {
+		return Arrays.asList(
+				DomainDataColumn.SID,
+				DomainDataColumn.HIST_ID);
 	}
 }

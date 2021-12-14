@@ -14,8 +14,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.function.dom.alarm.checkcondition.AlarmCheckConditionCode;
 import nts.uk.ctx.at.function.dom.alarm.checkcondition.daily.DailyAlarmCondition;
@@ -47,7 +45,7 @@ public class KrcmtDailyAlarmCondition extends ContractUkJpaEntity implements Ser
 	public int conExtractedDaily;
 
 	@Column(name = "ADD_APPLICATION")
-	public boolean addApplication;
+	public int addApplication;
 
 	@OneToOne
 	@JoinColumns({ @JoinColumn(name = "CID", referencedColumnName = "CID", insertable = false, updatable = false),
@@ -70,7 +68,7 @@ public class KrcmtDailyAlarmCondition extends ContractUkJpaEntity implements Ser
 		this.code = code;
 		this.category = category;
 		this.conExtractedDaily = conExtractedDaily;
-		this.addApplication = BooleanUtils.toBoolean(addApplication);
+		this.addApplication = addApplication;
 		this.listErrorAlarmCode = dailyErrorCode;
 //		this.listFixedExtractConditionWorkRecord = dailyFixExtra;
 		this.listExtractConditionWorkRecord = dailyWkRecord;
@@ -91,7 +89,7 @@ public class KrcmtDailyAlarmCondition extends ContractUkJpaEntity implements Ser
 
 	public DailyAlarmCondition toDomain() {
 		return new DailyAlarmCondition(this.dailyAlarmConID, this.conExtractedDaily,
-				this.addApplication,
+				this.addApplication == 1 ? true : false,
 				this.listExtractConditionWorkRecord.stream().map(c -> c.krcmtDailyWkRecordPK.errorAlarmID).collect(Collectors.toList()),
 				this.listErrorAlarmCode.stream().map(c -> c.krcmtDailyErrorCodePK.errorAlarmCode).collect(Collectors.toList()));
 	}

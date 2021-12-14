@@ -39,15 +39,15 @@ public class KshmtHdpubUnitSet extends ContractUkJpaEntity implements Serializab
     
     /** The is manage S pub hd. */
     @Column(name = "IS_MANAGE_S_PUB_HD")
-    private boolean isManageSPubHd;
+    private int isManageSPubHd;
    
     /** The is manage wkp pub hd. */
     @Column(name = "IS_MANAGE_WKP_PUB_HD")
-    private boolean isManageWkpPubHd;
+    private int isManageWkpPubHd;
    
     /** The is manage emp pub hd. */
     @Column(name = "IS_MANAGE_EMP_PUB_HD")
-    private boolean isManageEmpPubHd;
+    private int isManageEmpPubHd;
 
     /**
      * Instantiates a new kshmt pub hd mng unit set.

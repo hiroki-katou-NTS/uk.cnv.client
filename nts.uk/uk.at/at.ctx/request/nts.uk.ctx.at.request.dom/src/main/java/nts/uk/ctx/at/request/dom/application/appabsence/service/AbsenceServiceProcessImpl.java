@@ -54,7 +54,6 @@ import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumb
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualholidaymanagement.NextAnnualLeaveGrantImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualleave.AnnLeaveRemainNumberAdapter;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualleave.ReNumAnnLeaReferenceDateImport;
-import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualleave.ReNumAnnLeaveImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.rsvleamanager.ReserveLeaveManagerApdater;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.rsvleamanager.rsvimport.RsvLeaGrantRemainingImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.rsvleamanager.rsvimport.RsvLeaManagerImport;
@@ -789,10 +788,13 @@ public class AbsenceServiceProcessImpl implements AbsenceServiceProcess {
 		double grantDays = 0;
 		if(annualLeaveManageDistinct.equals(ManageDistinct.YES)){//output．年休管理区分が管理する
 			//基準日時点の年休残数を取得する - RQ198
-		    ReNumAnnLeaveImport year = annLeaRemNumberAdapter.getReferDateAnnualLeaveRemain(employeeID, baseDate);
+			ReNumAnnLeaReferenceDateImport year = annLeaRemNumberAdapter.getReferDateAnnualLeaveRemainNumber(employeeID, baseDate);
 			//年休残数 ← 年休残数.年休残数（付与前）日数 annualLeaveRemainNumberExport.annualLeaveGrantPreDay
-			yearDayRemain = year.getRemainingDays();
-			yearHourRemain = year.getRemainingTime();
+			yearDayRemain = year.getAnnualLeaveRemainNumberExport() == null ? 0 : 
+				year.getAnnualLeaveRemainNumberExport().getAnnualLeaveGrantDay();
+			for (int i = 0; i < year.getAnnualLeaveGrantExports().size(); i++) {
+			    yearHourRemain += year.getAnnualLeaveGrantExports().get(i).getRemainMinutes();
+			}
 			//次回年休付与日を取得する
 			List<NextAnnualLeaveGrantImport> nextYearHolidays = annualHolidayManagementAdapter.acquireNextHolidayGrantDate(companyID, employeeID, GeneralDate.today());
 			Optional<NextAnnualLeaveGrantImport> futureGrant = nextYearHolidays.stream()

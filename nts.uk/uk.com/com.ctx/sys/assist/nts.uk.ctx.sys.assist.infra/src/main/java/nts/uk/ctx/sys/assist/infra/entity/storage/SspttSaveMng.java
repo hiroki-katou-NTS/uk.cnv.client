@@ -8,8 +8,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import nts.arc.enums.EnumAdaptor;
@@ -41,7 +39,7 @@ public class SspttSaveMng extends ContractUkJpaEntity implements Serializable {
 	 */
 	@Basic(optional = false)
 	@Column(name = "DO_NOT_INTERRUPT")
-	public boolean doNotInterrupt;
+	public int doNotInterrupt;
 
 	/**
 	 * カテゴリカウント
@@ -77,14 +75,14 @@ public class SspttSaveMng extends ContractUkJpaEntity implements Serializable {
 	}
 
 	public DataStorageMng toDomain() {
-		return new DataStorageMng(this.storeProcessingId, EnumAdaptor.valueOf(BooleanUtils.toInteger(this.doNotInterrupt), NotUseAtr.class),
+		return new DataStorageMng(this.storeProcessingId, EnumAdaptor.valueOf(this.doNotInterrupt, NotUseAtr.class),
 				this.categoryCount, this.categoryTotalCount, this.errorCount,
 				EnumAdaptor.valueOf(this.operatingCondition, OperatingCondition.class));
 	}
 
 	public static SspttSaveMng toEntity(DataStorageMng domain) {
 		return new SspttSaveMng(domain.getStoreProcessingId(),
-				BooleanUtils.toBoolean(domain.getDoNotInterrupt().value), domain.getCategoryCount(), domain.getCategoryTotalCount(),
+				domain.getDoNotInterrupt().value, domain.getCategoryCount(), domain.getCategoryTotalCount(),
 				domain.getErrorCount(), domain.getOperatingCondition().value);
 	}
 }

@@ -15,7 +15,7 @@ public enum FuncCtrlDisplayFormat {
 	WorkInfo(1),
 	
 	/** シフト */
-	Shift(2);
+	Shift(0);
 
 	public int value;
 	

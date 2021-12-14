@@ -21,9 +21,6 @@ import nts.uk.ctx.at.function.infra.entity.alarmworkplace.checkcondition.KfnmtWk
 import nts.uk.shr.com.context.AppContexts;
 
 import javax.ejb.Stateless;
-
-import org.apache.commons.lang3.BooleanUtils;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -106,9 +103,9 @@ public class JpaAlarmWkpAlstchkConcatRepository extends JpaRepository implements
             List<String> optionalIDs = new ArrayList<>();
             if (mapEntitySub.containsKey(i.getPk().categoryItemCD)){
                 List<KfnmtCatMapEachType> subItems = mapEntitySub.get(i.getPk().categoryItemCD);
-                extractionIDs = subItems.stream().filter(x -> BooleanUtils.toBoolean(x.getPk().fixedOp))
+                extractionIDs = subItems.stream().filter(x -> x.getPk().fixedOp)
                         .map(x -> x.getPk().wkAlarmCheckId).collect(Collectors.toList());
-                optionalIDs = subItems.stream().filter(x -> !BooleanUtils.toBoolean(x.getPk().fixedOp))
+                optionalIDs = subItems.stream().filter(x -> !x.getPk().fixedOp)
                         .map(x -> x.getPk().wkAlarmCheckId).collect(Collectors.toList());
             }
 

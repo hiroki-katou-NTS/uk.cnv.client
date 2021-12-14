@@ -26,7 +26,7 @@ public class KrcmtUnitPrice  extends ContractUkJpaEntity implements Serializable
 	public KrcmtUnitPricePK pk;
 	
 	/** 会社ID */
-	@Column(name = "CID")
+	@Column(name = "会社ID")
 	public String cid;
 	
 	/** 開始日 */

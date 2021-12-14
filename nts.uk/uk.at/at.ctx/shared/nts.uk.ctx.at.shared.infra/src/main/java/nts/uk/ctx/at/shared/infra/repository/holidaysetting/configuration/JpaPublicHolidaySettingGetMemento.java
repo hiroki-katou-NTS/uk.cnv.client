@@ -12,6 +12,8 @@ import nts.uk.ctx.at.shared.infra.entity.holidaysetting.configuration.KshmtHdpub
 import nts.uk.shr.com.context.AppContexts;
 
 public class JpaPublicHolidaySettingGetMemento implements PublicHolidaySettingGetMemento {
+
+	private final static int TRUE_VALUE = 1;
 	
 	private KshmtHdpubSet kshmtPublicHdSet;
 	
@@ -26,7 +28,10 @@ public class JpaPublicHolidaySettingGetMemento implements PublicHolidaySettingGe
 
 	@Override
 	public boolean getIsManageComPublicHd() {
-		return this.kshmtPublicHdSet.isManageComPublicHd();
+		if(this.kshmtPublicHdSet.getIsManageComPublicHd() == TRUE_VALUE){
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -44,7 +49,10 @@ public class JpaPublicHolidaySettingGetMemento implements PublicHolidaySettingGe
 	
 	@Override
 	public boolean getIsWeeklyHdCheck() {
-		return this.kshmtPublicHdSet.isWeeklyHdCheck();
+		if(this.kshmtPublicHdSet.getIsWeeklyHdCheck() == TRUE_VALUE){
+			return true;
+		}
+		return false;
 	}
 
 	@Override

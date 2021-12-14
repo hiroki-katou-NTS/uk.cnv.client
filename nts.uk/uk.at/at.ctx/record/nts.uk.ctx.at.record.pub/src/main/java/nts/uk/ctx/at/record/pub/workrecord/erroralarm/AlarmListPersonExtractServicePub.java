@@ -76,8 +76,7 @@ public interface AlarmListPersonExtractServicePub {
 			List<WorkPlaceHistImportAl> getWplByListSidAndPeriod, 
 			List<ResultOfEachCondition> lstResultCondition, List<AlarmListCheckInfor> lstCheckType,
 			List<AlarmEmployeeList> alarmEmployeeList, List<AlarmExtractionCondition> alarmExtractConditions,
-			String alarmCheckConditionCode, Consumer<Integer> counter,
-			Supplier<Boolean> shouldStop);
+			String alarmCheckConditionCode);
 	
 	/**
 	 * スケジュール日次

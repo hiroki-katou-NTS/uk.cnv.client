@@ -160,7 +160,7 @@ public class OptionalWidgetImplementFinder implements OptionalWidgetAdapter {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public NumAnnLeaReferenceDateImport getReferDateAnnualLeaveRemainNumber(String employeeID, GeneralDate date) {
 		ReNumAnnLeaReferenceDateExport reNumAnnLeaReferenceDateExport = annLeaveRemainNumberPub.getReferDateAnnualLeaveRemainNumber(employeeID, date);
-		AnnualLeaveRemainingNumberExport remainNumber = reNumAnnLeaReferenceDateExport.getAnnualLeaveRemainNumberExport().getRemainNumberWithMinusExport();
+		AnnualLeaveRemainingNumberExport remainNumber = reNumAnnLeaReferenceDateExport.getAnnualLeaveRemainNumberExport();
 		List<AnnualLeaveGrantExport> AnnualLeaveGrant = reNumAnnLeaReferenceDateExport.getAnnualLeaveGrantExports();
 		List<AnnualLeaveManageInforExport> annualLeaveManageInforExports = reNumAnnLeaReferenceDateExport.getAnnualLeaveManageInforExports();
 		AnnualLeaveRemainingNumberImport annualLeaveRemainNumberImport = null;
@@ -168,16 +168,16 @@ public class OptionalWidgetImplementFinder implements OptionalWidgetAdapter {
 			annualLeaveRemainNumberImport = new AnnualLeaveRemainingNumberImport(0.0, 0, 0, 0, 0.0, 0, 0, 0, 0.0,0.0);
 		}else {
 			annualLeaveRemainNumberImport = new AnnualLeaveRemainingNumberImport(
-																				remainNumber.getAnnualLeaveGrantPreDay(),
+																				remainNumber.getAnnualLeaveGrantDay(),
 																				remainNumber.getAnnualLeaveGrantPreTime(),
 																				remainNumber.getNumberOfRemainGrantPre(),
-																				remainNumber.getTimeAnnualLeaveGrantPre(),
+																				remainNumber.getTimeAnnualLeaveWithMinusGrantPre(),
 																				remainNumber.getAnnualLeaveGrantPostDay(),
 																				remainNumber.getAnnualLeaveGrantPostTime(),
 																				remainNumber.getNumberOfRemainGrantPost(),
-																				remainNumber.getTimeAnnualLeaveGrantPost(),
-																				reNumAnnLeaReferenceDateExport.getAttendanceRate(),
-																				reNumAnnLeaReferenceDateExport.getWorkingDays());
+																				remainNumber.getTimeAnnualLeaveWithMinusGrantPost(),
+																				remainNumber.getAttendanceRate(),
+																				remainNumber.getWorkingDays());
 		}
 		List<AnnualLeaveGrantImport> annualLeaveGrantImport = AnnualLeaveGrant.stream().map(c->new AnnualLeaveGrantImport(c.getGrantDate(), c.getGrantNumber(), c.getDaysUsedNo(), c.getUsedMinutes(), c.getRemainDays(), c.getRemainMinutes(), c.getDeadline())).collect(Collectors.toList());
 		List<AnnualLeaveManageInforImport> annualLeaveManageInforImport = annualLeaveManageInforExports.stream().map(c->new AnnualLeaveManageInforImport(c.getYmd(), c.getDaysUsedNo(), c.getUsedMinutes(), c.getScheduleRecordAtr())).collect(Collectors.toList());

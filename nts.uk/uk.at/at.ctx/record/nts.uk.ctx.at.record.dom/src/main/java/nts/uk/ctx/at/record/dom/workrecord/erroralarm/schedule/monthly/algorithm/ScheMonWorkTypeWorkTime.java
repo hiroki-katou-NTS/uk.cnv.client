@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import lombok.Builder;
 import lombok.Data;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.WorkInfoOfDailyAttendance;
 
 /**
  * Output of 勤務種類コードを取得
@@ -22,9 +21,4 @@ public class ScheMonWorkTypeWorkTime {
 	 * Optional＜就業時間帯コード＞　＃115443
 	 */
 	private Optional<String> workTimeCode;
-	
-	/**
-	 * 勤務情報　＃117221
-	 */
-	private WorkInfoOfDailyAttendance workInfo;
 }

@@ -12,16 +12,13 @@ import nts.uk.ctx.exio.dom.input.workspace.ExternalImportWorkspaceRepository;
 @Stateless
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class JpaExternalImportWorkspaceRepository extends JpaRepository implements ExternalImportWorkspaceRepository {
-
-	@Override
-	public void cleanOldTables(Require require, ExecutionContext context) {
-		WorkspaceSql.cleanOldTables(require, context, jdbcProxy());
-	}
 	
 	@Override
 	public void setup(Require require, ExecutionContext context) {
 		
-		val workspace = WorkspaceSql.create(require, context, jdbcProxy(), this.database().product());
+		WorkspaceSql.cleanOldTables(require, context, jdbcProxy());
+		
+		val workspace = WorkspaceSql.create(require, context, jdbcProxy());
 		
 		// 編集済み一時テーブル
 		workspace.createTableRevised();

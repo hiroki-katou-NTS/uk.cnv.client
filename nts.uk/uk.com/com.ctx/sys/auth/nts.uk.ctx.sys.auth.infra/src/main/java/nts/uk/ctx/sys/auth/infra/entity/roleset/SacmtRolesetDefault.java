@@ -6,7 +6,11 @@ package nts.uk.ctx.sys.auth.infra.entity.roleset;
 
 import java.io.Serializable;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -25,12 +29,8 @@ public class SacmtRolesetDefault extends ContractUkJpaEntity implements Serializ
 
     private static final long serialVersionUID = 1L;
 
-
-    /** 会社ID */
-    @Basic(optional = false)
-    @Id
-    @Column(name = "CID")
-    public String companyId;
+    @EmbeddedId
+    public SacmtDefaultRoleSetPK defaultRoleSetPK;
 
     /**コード */
     @Basic(optional = false)
@@ -39,11 +39,10 @@ public class SacmtRolesetDefault extends ContractUkJpaEntity implements Serializ
 
     @Override
     protected Object getKey() {
-        return this.companyId;
+        return this.defaultRoleSetPK;
     }
 
-    public void buildEntity(String companyId, String roleSetCd) {
-        this.companyId = companyId;
+    public void buildEntity(SacmtDefaultRoleSetPK defaultRoleSetPK, String roleSetCd) {
         this.roleSetCd = roleSetCd;
     }
 }

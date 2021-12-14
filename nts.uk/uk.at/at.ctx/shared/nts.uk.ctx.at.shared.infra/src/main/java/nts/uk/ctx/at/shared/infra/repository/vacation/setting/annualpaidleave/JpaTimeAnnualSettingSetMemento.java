@@ -4,8 +4,6 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.infra.repository.vacation.setting.annualpaidleave;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.TimeAnnualRoundProcesCla;
 import nts.uk.ctx.at.shared.dom.vacation.setting.TimeDigestiveUnit;
@@ -99,7 +97,7 @@ public class JpaTimeAnnualSettingSetMemento implements TimeAnnualSettingSetMemen
      */
 	@Override
 	public void setRoundProcessClassific(TimeAnnualRoundProcesCla timeAnnualRoundProcesCla) {
-		this.entity.setRoundProcessCla(BooleanUtils.toBoolean(timeAnnualRoundProcesCla.value));
+		this.entity.setRoundProcessCla(timeAnnualRoundProcesCla.value);
 	}
 
 	@Override

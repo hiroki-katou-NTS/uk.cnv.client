@@ -38,7 +38,7 @@ module nts.uk.at.view.kal001.b {
                     {headerText: getText('KAL001_20'), key: 'workplaceName', width: 100},
                     {headerText: getText('KAL001_13'), key: 'employeeCode', width: 85},
                     {headerText: getText('KAL001_14'), key: 'employeeName', width: 130},
-                    {headerText: getText('KAL001_15'), key: 'alarmValueDate', width: 100},
+                    {headerText: getText('KAL001_15'), key: 'alarmValueDate', width: 125},
                     {headerText: getText('KAL001_16'), key: 'categoryName', width: 60},
                     {headerText: getText('KAL001_17'), key: 'alarmItem', width: 115},
                     {headerText: getText('KAL001_18'), key: 'alarmValueMessage', width: 245},
@@ -46,7 +46,7 @@ module nts.uk.at.view.kal001.b {
                     {headerText: getText('KAL001_19'), key: 'comment', width: 260}
                 ];
                 if (self.isTopPage) {
-                    self.columns.push({headerText: getText('KAL001_162'), key: 'menuDisplay', width: 225});
+                    self.columns.push({headerText: getText('KAL001_162'), key: 'menuDisplay', width: 200});
                 } else {
                     if (_.isEmpty(self.dataSource)) {
                         nts.uk.ui.dialog.info({ messageId: "Msg_835" });
@@ -116,8 +116,7 @@ module nts.uk.at.view.kal001.b {
                         {
                             name: "Tooltips",
                             columnSettings: [
-                                {columnKey: "workplaceName", allowTooltips: true},
-                                {columnKey: "menuDisplay", allowTooltips: false}
+                                {columnKey: "workplaceName", allowTooltips: true}
                             ]
                         },
                         {
@@ -154,14 +153,10 @@ module nts.uk.at.view.kal001.b {
                         if (selectedRow) {
                             const menu = _.find(selectedRow.menuItems, (i: any) => i.programId == programId);
                             if (menu) {
-                                const idx = menu.url.indexOf("/view");
-                                const path = _.isNil(menu.queryString) ? menu.url.substring(idx) : menu.url.substring(idx) + "?" + menu.queryString;
-                                const webApps = ["com", "at", "pr", "hr"];
-                                const webAppId = _.find(webApps, i => menu.url.indexOf(i + ".web") >= 0);
-                                if (webAppId)
-                                    nts.uk.request.jumpFromDialogOrFrame(webAppId, path);
-                                else
-                                    nts.uk.request.jumpFromDialogOrFrame(path);
+                                const url = _.isNil(menu.queryString) ? menu.url : menu.url + menu.queryString;
+                                if (url) {
+                                    nts.uk.request.jumpFromDialogOrFrame(url);
+                                }
                             }
                         }
                     } else {
@@ -210,14 +205,8 @@ module nts.uk.at.view.kal001.b {
             }
 
             handleClickLinkPopup(url: string, queryString?: string) {
-                const idx = url.indexOf("/view");
-                const path = _.isNil(queryString) ? url.substring(idx) : url.substring(idx) + "?" + queryString;
-                const webApps = ["com", "at", "pr", "hr"];
-                const webAppId = _.find(webApps,i => url.indexOf(i + ".web") >= 0);
-                if (webAppId)
-                    nts.uk.request.jumpFromDialogOrFrame(webAppId, path);
-                else
-                    nts.uk.request.jumpFromDialogOrFrame(path);
+                const placeToGo = _.isNil(queryString) ? url : url + queryString;
+                nts.uk.request.jumpFromDialogOrFrame(placeToGo);
             }
 
             exportExcel(): void {

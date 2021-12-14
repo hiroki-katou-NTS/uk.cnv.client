@@ -10,11 +10,7 @@ module nts.uk.at.view.kdp002.a {
 			stampInput: 'at/record/stamp/management/personal/stamp/input',
 			getError: 'at/record/stamp/management/personal/getDailyError',
 			workManagementMultiple: 'at/record/stamp/work_management_multiple',
-			createDaily: 'at/record/stamp/craeteDaily',
-			getHighlightSetting: 'at/record/stamp/management/personal/stamp/getHighlightSetting',
-			getSettingStampCommon: 'at/record/stamp/settings_stamp_common',
-			getEmployeeWorkByStamping: 'at/record/stamp/employee_work_by_stamping'
-
+			getHighlightSetting: 'at/record/stamp/management/personal/stamp/getHighlightSetting'
 		}
 
 		export function startPage(): JQueryPromise<any> {
@@ -44,14 +40,6 @@ module nts.uk.at.view.kdp002.a {
 
 		export function getHighlightSetting(): JQueryPromise<any> {
 			return ajax("at", url.getHighlightSetting);
-		}
-
-		export function getSettingStampCommon(): JQueryPromise<any> {
-			return ajax("at", url.getSettingStampCommon);
-		}
-
-		export function getEmployeeWorkByStamping(param: any): JQueryPromise<any> {
-			return ajax("at", url.getEmployeeWorkByStamping, param);
 		}
 	}
 

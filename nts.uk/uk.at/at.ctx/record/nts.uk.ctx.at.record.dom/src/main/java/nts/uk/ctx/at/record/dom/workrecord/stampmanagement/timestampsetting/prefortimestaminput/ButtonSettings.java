@@ -18,17 +18,17 @@ public class ButtonSettings {
 	@Getter
 	private ButtonPositionNo buttonPositionNo;
 	
-	/** 使用区分 */
-	@Getter
-	private NotUseAtr usrArt;
-	
 	/** ボタンの表示設定 */
 	@Getter
 	private ButtonDisSet buttonDisSet;
 	
-	/** 打刻種類 */
+	/** ボタン種類 */
 	@Getter
-	private StampType type;
+	private ButtonType buttonType;
+	
+	/** 使用区分 */
+	@Getter
+	private NotUseAtr usrArt;
 	
 	/** 音声使用方法 */
 	@Getter
@@ -36,10 +36,6 @@ public class ButtonSettings {
 	
 	/** 応援職場設定方法 */
 	@Getter
-	private Optional<SupportWplSet> supportWplSet;
-	
-	/** 作業指定方法 */
-	@Getter
-	private Optional<AssignmentMethod> taskChoiceArt;
-	
+	private Optional<SupportWplSet> supportWplSet; 
+
 }

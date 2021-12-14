@@ -23,6 +23,8 @@ import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.AnnualNumberDay
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureId;
 import nts.uk.ctx.at.shared.infra.entity.remainingnumber.annlea.KrcdtAnnLeaMaxHist;
 import nts.uk.ctx.at.shared.infra.entity.remainingnumber.annlea.KrcdtAnnLeaMaxHistPK;
+import nts.uk.ctx.at.shared.infra.entity.worktype.KshmtWorkType;
+import nts.uk.ctx.at.shared.infra.entity.worktype.KshmtWorkTypePK;
 import nts.uk.shr.com.time.calendar.date.ClosureDate;
 
 /**
@@ -70,7 +72,7 @@ public class JpaAnnualLeaveMaxHistRepository extends JpaRepository implements An
 				yearMonth.v(),
 				closureId.value,
 				closureDate.getClosureDay().v(),
-				closureDate.getLastDayOfMonth());
+				closureDate.getLastDayOfMonth()?1:0);
 
 		Optional<KrcdtAnnLeaMaxHist> data = this.queryProxy().find(pk, KrcdtAnnLeaMaxHist.class);
 		if (data.isPresent()) {
@@ -118,7 +120,7 @@ public class JpaAnnualLeaveMaxHistRepository extends JpaRepository implements An
 				timeAnnualLeaveMax,
 				new YearMonth(entity.PK.yearMonth),
 				EnumAdaptor.valueOf(entity.PK.closureId, ClosureId.class),
-				new ClosureDate(entity.PK.closeDay, entity.PK.isLastDay)
+				new ClosureDate(entity.PK.closeDay, entity.PK.isLastDay==1)
 				);
 
 	}

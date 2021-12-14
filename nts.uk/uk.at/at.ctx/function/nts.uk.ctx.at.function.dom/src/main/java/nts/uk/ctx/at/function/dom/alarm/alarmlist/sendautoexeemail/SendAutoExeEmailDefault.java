@@ -1,6 +1,10 @@
 package nts.uk.ctx.at.function.dom.alarm.alarmlist.sendautoexeemail;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -113,9 +117,7 @@ public class SendAutoExeEmailDefault implements SendAutoExeEmailService {
 						useAuthentication,
 						mailSetting,
 						mailSettingAdmins,
-						mailSettingAutomatic.get().getSenderAddress(),
-						Collections.emptyList(),
-						Collections.emptyList());
+						mailSettingAutomatic.get().getSenderAddress());
 			}
 		}
 		catch (Exception e) {

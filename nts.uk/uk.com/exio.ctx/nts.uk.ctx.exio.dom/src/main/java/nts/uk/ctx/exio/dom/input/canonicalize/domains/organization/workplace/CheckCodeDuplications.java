@@ -9,15 +9,14 @@ import java.util.stream.Collectors;
 import lombok.val;
 import nts.uk.ctx.exio.dom.input.errors.ExternalImportError;
 import nts.uk.ctx.exio.dom.input.errors.ItemError;
-import nts.uk.ctx.exio.dom.input.errors.RecordError;
-import nts.gul.util.Either;
+import nts.uk.ctx.exio.dom.input.util.Either;
 
 /**
  * 同一履歴内でのコードの重複をチェックし、正常レコードとエラーレコードに仕分ける
  */
 class CheckCodeDuplications {
 	
-	public static Either.Sequence<RecordError, RecordWithPeriod> check(
+	public static Either.Sequence<ExternalImportError, RecordWithPeriod> check(
 			List<RecordWithPeriod> records,
 			int itemNo) {
 
@@ -35,7 +34,7 @@ class CheckCodeDuplications {
 		return Either.Sequence.merge(results);
 	}
 
-	private static Either.Sequence<RecordError, RecordWithPeriod> checkInPeriod(
+	private static Either.Sequence<ExternalImportError, RecordWithPeriod> checkInPeriod(
 			List<RecordWithPeriod> records,
 			int itemNo) {
 		
@@ -50,7 +49,7 @@ class CheckCodeDuplications {
 		return Either.sequenceOf(records)
 				.mapEither(r -> {
 					if (duplicatedCodes.contains(getCode(r, itemNo))) {
-						return Either.left(new RecordError(r.getRowNo(), itemNo, "コードが重複しています。"));
+						return Either.left(ExternalImportError.of(r.getRowNo(), new ItemError(itemNo, "コードが重複しています。")));
 					} else {
 						return Either.right(r);
 					}

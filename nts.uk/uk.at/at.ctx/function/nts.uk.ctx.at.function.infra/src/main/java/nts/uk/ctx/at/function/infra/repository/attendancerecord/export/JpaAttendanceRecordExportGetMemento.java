@@ -82,9 +82,9 @@ public class JpaAttendanceRecordExportGetMemento implements AttendanceRecordExpo
 	public Boolean isUseAtr() {
 		if(this.upperEntity!=null) {
 			// ZERO = false, ONE = true
-			return this.upperEntity.isUseAtr();
+			return this.upperEntity.getUseAtr().compareTo(BigDecimal.ONE) == 0;
 		}else {
-			return this.lowerEntity.isUseAtr();
+			return this.lowerEntity.getUseAtr().compareTo(BigDecimal.ONE) == 0;
 		}
 	}
 

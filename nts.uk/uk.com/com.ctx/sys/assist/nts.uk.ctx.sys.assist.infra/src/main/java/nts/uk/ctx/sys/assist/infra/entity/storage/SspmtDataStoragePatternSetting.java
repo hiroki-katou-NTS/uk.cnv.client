@@ -15,8 +15,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -65,7 +63,7 @@ public class SspmtDataStoragePatternSetting extends UkJpaEntity
 	 */
 	@Basic(optional = false)
 	@Column(name = "WITHOUT_PASSWORD")
-	public boolean withoutPassword;
+	public int withoutPassword;
 
 	/**
 	 * 日次参照年
@@ -136,7 +134,7 @@ public class SspmtDataStoragePatternSetting extends UkJpaEntity
 	}
 
 	@Override
-	public void setPatternClassification(boolean patternClassification) {
+	public void setPatternClassification(int patternClassification) {
 		if (pk == null)
 			pk = new SspmtDataStoragePatternSettingPk();
 		this.pk.patternClassification = patternClassification;
@@ -168,7 +166,7 @@ public class SspmtDataStoragePatternSetting extends UkJpaEntity
 	@Override
 	public int getPatternClassification() {
 		if (pk != null)
-			return BooleanUtils.toInteger(pk.patternClassification);
+			return pk.patternClassification;
 		return 0;
 	}
 
@@ -183,16 +181,5 @@ public class SspmtDataStoragePatternSetting extends UkJpaEntity
 	public List<DataStorageSelectionCategory> getCategories() {
 		return this.categories.stream().map(DataStorageSelectionCategory::createFromMemento)
 				.collect(Collectors.toList());
-	}
-
-	@Override
-	public void setWithoutPassword(boolean withoutPassword) {
-		this.withoutPassword = withoutPassword;
-		
-	}
-
-	@Override
-	public int getWithoutPassword() {
-		return BooleanUtils.toInteger(withoutPassword);
 	}
 }

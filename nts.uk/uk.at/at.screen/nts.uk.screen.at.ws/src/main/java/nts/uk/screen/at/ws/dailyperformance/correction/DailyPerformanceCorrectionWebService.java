@@ -294,10 +294,10 @@ public class DailyPerformanceCorrectionWebService {
 				: (Optional<MonthlyRecordWorkDto>) objectCacheMonth;
 		dataParent.setDomainMonthOpt(domainMonthOpt);
 		DataResultAfterIU dataResultAfterIU =  dailyModifyRCommandFacade.insertItemDomain(dataParent);
-//		//TODO: set cache month
-//		if(dataResultAfterIU.getDomainMonthOpt().isPresent()) {
-			session.setAttribute("domainMonths", null);
-//		}
+		//TODO: set cache month
+		if(dataResultAfterIU.getDomainMonthOpt().isPresent()) {
+			session.setAttribute("domainMonths", dataResultAfterIU.getDomainMonthOpt());
+		}
 
 		session.setAttribute("lstSidDateErrorCalc", dataResultAfterIU.getLstSidDateDomainError());
 		session.setAttribute("errorAllCalc", dataResultAfterIU.isErrorAllSidDate());

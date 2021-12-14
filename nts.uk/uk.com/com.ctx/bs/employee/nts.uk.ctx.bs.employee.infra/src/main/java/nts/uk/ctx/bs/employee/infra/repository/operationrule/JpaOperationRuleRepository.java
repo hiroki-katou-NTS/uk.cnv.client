@@ -41,12 +41,7 @@ public class JpaOperationRuleRepository extends JpaRepository implements Operati
 	@Override
 	public void update(OperationRule operationRule) {
 		BsystOperationRule entity = BsystOperationRule.fromDomain(operationRule);
-		Optional<BsystOperationRule> oldOpt = this.queryProxy().find(entity.companyId, BsystOperationRule.class);
-		if (!oldOpt.isPresent()) {
-			insert(operationRule);
-			return;
-		}
-		BsystOperationRule oldEntity = oldOpt.get();
+		BsystOperationRule oldEntity = this.queryProxy().find(entity.companyId, BsystOperationRule.class).get();
 		 oldEntity.depWkpSynchAtr = entity.depWkpSynchAtr;
 		 this.commandProxy().update(oldEntity);
 	}

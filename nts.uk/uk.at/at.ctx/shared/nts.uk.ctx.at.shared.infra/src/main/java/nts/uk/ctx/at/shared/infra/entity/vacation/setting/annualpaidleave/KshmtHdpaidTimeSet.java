@@ -56,7 +56,7 @@ public class KshmtHdpaidTimeSet extends ContractUkJpaEntity implements Serializa
 
     /** The Round Processing Classification. */
     @Column(name = "ROUND_PROC_CLA")
-    private boolean roundProcessCla;
+    private Integer roundProcessCla;
 
     /** 1日の時間年休時間参照先**/
     @Column(name = "TIME_OF_DAY_REFERENCE")

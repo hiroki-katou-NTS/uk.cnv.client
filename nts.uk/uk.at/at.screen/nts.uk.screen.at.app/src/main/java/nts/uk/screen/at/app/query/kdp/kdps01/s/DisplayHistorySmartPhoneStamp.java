@@ -16,6 +16,8 @@ import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampCardRepository;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampDakokuRepository;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.EmployeeStampInfo;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.GetListStampEmployeeService;
 import nts.uk.screen.at.app.query.kdp.kdp001.a.EmployeeStampInfoDto;
@@ -35,6 +37,9 @@ public class DisplayHistorySmartPhoneStamp {
 	private StampCardRepository stampCardRepo;
 
 	@Inject
+	private StampRecordRepository stampRecordRepo;
+
+	@Inject
 	private StampDakokuRepository stampDakokuRepo;
 
 	/**
@@ -49,7 +54,8 @@ public class DisplayHistorySmartPhoneStamp {
 	public List<EmployeeStampInfoDto> displayHistorySmartPhoneStampList(DatePeriod period) {
 
 		List<EmployeeStampInfo> empDatas = new ArrayList<>();
-		EmpStampDataRequiredImpl empStampDataR = new EmpStampDataRequiredImpl(stampCardRepo, stampDakokuRepo);
+		EmpStampDataRequiredImpl empStampDataR = new EmpStampDataRequiredImpl(stampCardRepo, stampRecordRepo,
+				stampDakokuRepo);
 		List<GeneralDate> betweens = period.datesBetween();
 		betweens.sort((d1, d2) -> d2.compareTo(d1));
 		for (GeneralDate date : betweens) {
@@ -71,11 +77,19 @@ public class DisplayHistorySmartPhoneStamp {
 		protected StampCardRepository stampCardRepo;
 
 		@Inject
+		protected StampRecordRepository stampRecordRepo;
+
+		@Inject
 		protected StampDakokuRepository stampDakokuRepo;
 
 		@Override
 		public List<StampCard> getListStampCard(String sid) {
 			return stampCardRepo.getListStampCard(sid);
+		}
+
+		@Override
+		public List<StampRecord> getStampRecord(List<StampNumber> stampNumbers, GeneralDate date) {
+			return stampRecordRepo.get(AppContexts.user().contractCode(), stampNumbers, date);
 		}
 
 		@Override

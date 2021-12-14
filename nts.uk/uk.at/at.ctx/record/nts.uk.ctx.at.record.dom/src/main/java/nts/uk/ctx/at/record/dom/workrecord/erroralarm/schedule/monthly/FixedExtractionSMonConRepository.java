@@ -5,7 +5,9 @@ import java.util.List;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.schedule.daily.FixedExtractionSDailyCon;
 
 
-public interface FixedExtractionSMonConRepository {    
+public interface FixedExtractionSMonConRepository {
+    List<FixedExtractionSMonCon> getAll();
+    
     /**
      * Get Schedule fix condition month
      * @param contractCode contract code

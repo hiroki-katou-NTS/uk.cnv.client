@@ -47,7 +47,7 @@ public class KfnmtRptWkAtdOutframe extends ContractUkJpaEntity implements Serial
 
 	/** The use atr. */
 	@Column(name = "USE_ATR")
-	private boolean useAtr;
+	private BigDecimal useAtr;
 
 	/** The item name. */
 	@Column(name = "ITEM_NAME")

@@ -30,7 +30,7 @@ public class SptmtSPTopPage extends ContractUkJpaEntity implements Serializable 
 	public SptmtSPTopPagePK pk;
 
 	@Column(name = "DISP_ATR")
-	public boolean dispAtr;
+	public int dispAtr;
 
 	@Override
 	protected Object getKey() {

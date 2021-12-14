@@ -31,11 +31,8 @@ module nts.uk.at.kal014.b {
             vm.modalDTO.endMonth(endMonth);
             vm.isStartDateEnable = ko.observable(vm.checkStartDateISEnable());
             vm.isEndDateEnable = ko.observable(vm.checkEndDateISEnable());
-            vm.strComboMonth = ko.observableArray(params.alarmCategory === vm.workPalceCategory.MONTHLY
-                ? __viewContext.enums.MonthlySingleMonthSpecifiedMonth
-                : __viewContext.enums.MonthlyClosingMonthSpecifiedMonth
-            );
-            vm.endComboMonth = ko.observableArray(__viewContext.enums.MonthlyClosingMonthSpecifiedMonth);
+            vm.strComboMonth = ko.observableArray(__viewContext.enums.SpecifiedMonth);
+            vm.endComboMonth = ko.observableArray(__viewContext.enums.SpecifiedMonth);
         }
 
         created(params: any) {
@@ -108,7 +105,7 @@ module nts.uk.at.kal014.b {
             var vm = this;
             if ((vm.modalDTO.categoryId() === vm.workPalceCategory.MASTER_CHECK_BASIC
                     || vm.modalDTO.categoryId() === vm.workPalceCategory.MASTER_CHECK_WORKPLACE)
-                && vm.modalDTO.startMonth() > vm.modalDTO.endMonth()) {
+                && vm.modalDTO.startMonth() < vm.modalDTO.endMonth()) {
                 vm.$dialog.error({messageId: "Msg_812"}).then(() => {
                     return false;
                 });

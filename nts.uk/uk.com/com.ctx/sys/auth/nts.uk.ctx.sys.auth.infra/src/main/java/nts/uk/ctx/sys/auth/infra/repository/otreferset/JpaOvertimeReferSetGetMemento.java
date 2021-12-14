@@ -16,6 +16,9 @@ public class JpaOvertimeReferSetGetMemento implements OvertimeReferSetGetMemento
 	/** The sacmt ot refer set. */
 	private SacmtOtRefer sacmtOtReferSet;
 	
+	/** The Constant DO. */
+	private static final int DO = 1;
+	
 	/**
 	 * Instantiates a new jpa overtime refer set get memento.
 	 *
@@ -41,7 +44,7 @@ public class JpaOvertimeReferSetGetMemento implements OvertimeReferSetGetMemento
 	 */
 	@Override
 	public boolean getReferWkpAdmin() {
-		return this.sacmtOtReferSet.isReferWkpAdmin(); 
+		return this.sacmtOtReferSet.getReferWkpAdmin().intValue() == DO ? true : false; 
 	}
 
 }

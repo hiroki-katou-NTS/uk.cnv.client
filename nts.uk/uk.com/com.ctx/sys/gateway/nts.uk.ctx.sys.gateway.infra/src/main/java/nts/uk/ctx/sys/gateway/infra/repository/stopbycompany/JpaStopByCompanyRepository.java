@@ -89,10 +89,12 @@ public class JpaStopByCompanyRepository extends JpaRepository implements StopByC
 	  */
 	@Override
 	public Optional<StopByCompany> findByCdStt(String contractCd, String companyCd, int systemStatus) {
-		return this.queryProxy().query(FIND_BY_CD_STT, SgwdtStopByCompany.class)
-				.setParameter("contractCd", contractCd)
-				.setParameter("companyCd", companyCd)
-				.setParameter("systemStatus", systemStatus)
-				.getSingle(c -> toDomain(c));
+		return this.forTenantDatasource(contractCd, em ->{
+			return this.queryProxy(em).query(FIND_BY_CD_STT, SgwdtStopByCompany.class)
+					.setParameter("contractCd", contractCd)
+					.setParameter("companyCd", companyCd)
+					.setParameter("systemStatus", systemStatus)
+					.getSingle(c -> toDomain(c));
+		});
 	}
 }

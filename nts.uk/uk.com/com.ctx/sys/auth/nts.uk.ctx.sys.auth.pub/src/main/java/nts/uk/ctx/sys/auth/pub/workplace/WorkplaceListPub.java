@@ -5,7 +5,6 @@
 package nts.uk.ctx.sys.auth.pub.workplace;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import nts.arc.time.GeneralDate;
@@ -45,13 +44,5 @@ public interface WorkplaceListPub {
 	 * @return
 	 */
 	Optional<WorkPlaceAuthorityExport> getWorkPlaceAuthorityById(String companyId, String roleId, int functionNo);
-	
-	/**
-	 * @name 参照可能社員の所属職場を取得するPublish
-	 * @param userID ユーザID
-	 * @param employeeID 社員ID
-	 * @param date 基準日
-	 */
-	Map<String, String> getWorkPlace(String userID, String employeeID, GeneralDate date);
 }
 

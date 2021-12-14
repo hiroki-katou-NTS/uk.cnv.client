@@ -272,8 +272,6 @@ module nts.uk.at.view.kdw003.a.viewmodel {
         dateReferCCg: KnockoutObservable<any> = ko.observable(0);
         changeConditionExtract:  KnockoutObservable<boolean> = ko.observable(false);
 
-        checkUnLock: KnockoutObservable<boolean> = ko.observable(false);
-
         constructor(dataShare: any) {
             var self = this;
 
@@ -1267,7 +1265,6 @@ module nts.uk.at.view.kdw003.a.viewmodel {
             let checkDailyChange = (dataChangeProcess.length > 0 || dataCheckSign.length > 0 || dataCheckApproval.length > 0 || self.sprStampSourceInfo() != null) && checkDataCare;
             dataParent["checkDailyChange"] = (dataChangeProcess.length > 0 || self.sprStampSourceInfo()) ? true : false;
             dataParent["showFlex"] = self.showFlex();
-            dataParent["checkUnLock"] = self.checkUnLock();
             if (checkDailyChange || (self.valueUpdateMonth != null && !_.isEmpty(self.valueUpdateMonth.items)) || self.flagCalculation || !_.isEmpty(sprStampSourceInfo)) {
                 service.addAndUpdate(dataParent).done((dataAfter) => {
                     // alert("done");
@@ -1660,7 +1657,7 @@ module nts.uk.at.view.kdw003.a.viewmodel {
             let checkDailyChange = (dataChangeProcess.length > 0 || dataCheckSign.length > 0 || dataCheckApproval.length > 0 || self.sprStampSourceInfo() != null) && checkDataCare;
             dataParent["checkDailyChange"] = (dataChangeProcess.length > 0 || self.sprStampSourceInfo()) ? true : false;
             dataParent["showFlex"] = self.showFlex();
-            dataParent["checkUnLock"] = self.checkUnLock();
+
             //self.removeErrorRefer();
             let dfd = $.Deferred();
             service.calculation(dataParent).done((data) => {
@@ -3215,7 +3212,6 @@ module nts.uk.at.view.kdw003.a.viewmodel {
             //Msg_984
             nts.uk.ui.dialog.info({ messageId: "Msg_984" });
             if (!self.hasEmployee || self.hasErrorBuss) return;
-            self.checkUnLock(false);
             self.showLock(true);
             self.unLock(false);
             self.processLockButton(true);
@@ -3226,7 +3222,6 @@ module nts.uk.at.view.kdw003.a.viewmodel {
             //Msg_982
             nts.uk.ui.dialog.confirm({ messageId: "Msg_982" }).ifYes(() => {
                 if (!self.hasEmployee || self.hasErrorBuss) return;
-                self.checkUnLock(true);
                 self.showLock(false);
                 self.unLock(true);
                 self.processLockButton(false);
@@ -4767,11 +4762,12 @@ module nts.uk.at.view.kdw003.a.viewmodel {
 
         openKDL020Dialog() {
             let self = this;
-			setShared('KDL020_DATA', [self.selectedEmployee()]);
-			if ([self.selectedEmployee()].length > 1)
-				nts.uk.ui.windows.sub.modal("/view/kdl/020/a/index.xhtml",{  width: 1040, height: 660 });
-			else
-				nts.uk.ui.windows.sub.modal("/view/kdl/020/a/index.xhtml",{  width: 730, height: 660 });
+            setShared('KDL020A_PARAM', { baseDate: new Date(), employeeIds: [self.selectedEmployee()] });
+            if(self.selectedEmployee().length > 1 ) {
+              modal("/view/kdl/020/a/multi.xhtml");
+            } else {
+              modal("/view/kdl/020/a/single.xhtml");
+            }
         }
 
         openKDL009Dialog() {
@@ -4780,32 +4776,36 @@ module nts.uk.at.view.kdw003.a.viewmodel {
                 employeeIds: [self.selectedEmployee()],
                 baseDate: moment(new Date()).toISOString().split("T")[0].replace('-', '').replace('-', '')
             };
-            setShared('KDL009_DATA', param.employeeIds);
+            setShared('KDL009_DATA', param);
             if (param.employeeIds.length > 1) {
-                modal("/view/kdl/009/a/index.xhtml",{width: 1100, height: 650})
+                modal("/view/kdl/009/a/multi.xhtml");
             } else {
-                modal("/view/kdl/009/a/index.xhtml",{width: 770, height: 650});
+                modal("/view/kdl/009/a/single.xhtml");
             }
         }
 
         openkdl029Dialog() {
             let self = this;
-            setShared('KDL029_DATA', [self.selectedEmployee()]);
-			if ([self.selectedEmployee()].length > 1)
-				modal("/view/kdl/029/a/index.xhtml",{  width: 1060, height: 600 });
-			else
-				modal("/view/kdl/029/a/index.xhtml",{  width: 710, height: 600 });
+            let param = {
+                employeeIds: [self.selectedEmployee()],
+                baseDate: moment(new Date()).format("YYYY/MM/DD")
+            }
+            setShared('KDL029_PARAM', param);
+            modal('/view/kdl/029/a/index.xhtml');
         }
 
         openKDL005Dialog() {
             var self = this;
-            setShared('KDL005_DATA', [self.selectedEmployee()]);
-			if ([self.selectedEmployee()].length > 1){
-				 nts.uk.ui.windows.sub.modal("/view/kdl/005/a/index.xhtml", {  width: 1160, height: 640 });
+            var param = {
+                employeeIds: [self.selectedEmployee()],
+                baseDate: moment(new Date()).toISOString().split("T")[0].replace('-', '').replace('-', '')
+            };
+            setShared('KDL005_DATA', param);
+            if(param.employeeIds.length > 1) {
+                modal("/view/kdl/005/a/multi.xhtml");
             } else {
-                nts.uk.ui.windows.sub.modal("/view/kdl/005/a/index.xhtml",{  width: 860, height: 640 });
+                modal("/view/kdl/005/a/single.xhtml");
             }
-            
         }
 
 		openKDL051Dialog() {
@@ -4814,8 +4814,8 @@ module nts.uk.at.view.kdw003.a.viewmodel {
                 employeeIds: [self.selectedEmployee()],
                 baseDate: new Date()
             }
-            setShared('KDL051A_PARAM', param.employeeIds);
-            nts.uk.ui.windows.sub.modal("/view/kdl/051/a/index.xhtml",{width: 650, height: 530});
+            setShared('KDL051A_PARAM', param);
+            modal("/view/kdl/051/single.xhtml");
         }
 
 		openKDL052Dialog() {
@@ -4824,8 +4824,8 @@ module nts.uk.at.view.kdw003.a.viewmodel {
                 employeeIds: [self.selectedEmployee()],
                 baseDate: moment(new Date()).format("YYYY/MM/DD")
             }
-			setShared('KDL052A_PARAM', param);// nts.uk.characteristics.OPEN_WINDOWS_DATA
-            modal('/view/kdl/052/a/index.xhtml');
+			setShared('OPEN_WINDOWS_DATA', param);// nts.uk.characteristics.OPEN_WINDOWS_DATA
+            modal('/view/kdl/052/single.xhtml');
         }
 
     }

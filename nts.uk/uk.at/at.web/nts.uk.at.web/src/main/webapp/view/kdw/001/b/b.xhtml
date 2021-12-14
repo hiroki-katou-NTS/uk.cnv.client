@@ -9,87 +9,130 @@
 		<div id="label1" class="label">#{i18n.getText('KDW001_14')}</div>
 
 		<div id="area1">
-			<div id="checkBox1" class="setting-checkbox"
-				data-bind="ntsCheckBox: { checked: dailyCreatedCheck }" tabindex="1">#{i18n.getText('KDW001_9')}</div>
-			<div class="table">
-        <div class="row">
-          <div id="swButton31" class="cf cell"
-            data-bind="ntsSwitchButton: {
-          options: roundingRules1,
-          optionsValue: 'code',
-          optionsText: 'name',
-          value: selectedCreatDivisionCode,
-          enable: dailyCreatedCheck }" tabindex="2"></div>
-        </div>
-        <div class="row">
-          <label id="B4_1" class="describe-label cell">#{i18n.getText('KDW001_121')}</label>
-        </div>
-      </div>
+			<div id="checkBox1"
+				data-bind="ntsCheckBox: { checked: dailyCreatedCheck }">#{i18n.getText('KDW001_9')}</div>
+			<div id="swButton31" class="cf"
+				data-bind="ntsSwitchButton: {
+			options: roundingRules1,
+			optionsValue: 'code',
+			optionsText: 'name',
+			value: selectedCreatDivisionCode,
+			enable: dailyCreatedCheck }"></div>
+			<button id="helpButton"
+				data-bind="ntsHelpButton: {image: 'image/image25.png', position: 'right top', enable: enable1 }">?</button>
+			<br></br>
+		</div>
+
+		<div id="area2" class="panel panel-gray-bg">
+			<div id="radioArea">
+				<!-- 	<div data-bind="ntsRadioButton: {checked: selectedValue2, enable: enable2, option: option1, optionValue: 'value', optionText: 'text', group: 'ntsControl'}"></div><br></br>
+				<div id="radio2" data-bind="ntsRadioButton: {checked: selectedValue3, enable: enable2, option: option2, optionValue: 'value', optionText: 'text', group: 'ntsControl' }"></div>
+			 -->
+				<div
+					data-bind="ntsRadioBoxGroup: {
+					options: itemRecreateDevision,
+					optionsValue: 'id',
+					optionsText: 'name',
+					value: selectedRecreateDevision,
+					enable: recreateEnable
+					}">
+				</div>
+			</div>
+			<div style="margin-left: 15px;" id="checkBoxArea">
+				<div>
+					<div class="checkbox_container">
+						<div id="calDivision"
+							data-bind="ntsCheckBox: { checked: calDivisionCheck, enable: enableAll  }">#{i18n.getText('KDW001_58')}</div>
+					</div>
+					<div class="checkbox_container">
+						<div id="childCare"
+							data-bind="ntsCheckBox: { checked: childCareCheck, enable: enableAll }">#{i18n.getText('KDW001_61')}</div>
+					</div>
+				</div>
+				<div>
+					<div class="checkbox_container">
+						<div id="dateDivision"
+							data-bind="ntsCheckBox: { checked: dateDivisionCheck, enable: enableAll }">#{i18n.getText('KDW001_60')}</div>
+					</div>
+					<div class="checkbox_container">
+						<div id="closedReset"
+							data-bind="ntsCheckBox: { checked: closedResetCheck,enable: enableAll  }">#{i18n.getText('KDW001_63')}</div>
+					</div>
+				</div>
+				<div>
+					<div class="checkbox_container">
+						<div id="reflectEmbossing"
+							data-bind="ntsCheckBox: { checked: reflectEmbossingCheck, enable: enableAll }">#{i18n.getText('KDW001_62')}</div>
+					</div>
+					<div class="checkbox_container">
+						<div id="workingTime"
+							data-bind="ntsCheckBox: { checked: workingTimeCheck, enable: enableAll }">#{i18n.getText('KDW001_71')}</div>
+					</div>
+				</div>
+				<div>
+					<div class="checkbox_container">
+						<div id="masterInfor"
+							data-bind="ntsCheckBox: { checked: masterInforCheck, enable: enableAll }">#{i18n.getText('KDW001_59')}</div>
+					</div>
+					<div class="checkbox_container">
+						<div id="transferTime"
+							data-bind="ntsCheckBox: { checked: transferTimeCheck, enable: enableAll }">#{i18n.getText('KDW001_72')}</div>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<div id="area3">
-			<div id="checkBox2" class="setting-checkbox"
-				data-bind="ntsCheckBox: { checked: dailyCalCheck }" tabindex="3">#{i18n.getText('KDW001_10')}</div>
-			<div class="table">
-        <div class="row">
-          <div id="swButton32" class="cf cell"
-            data-bind="ntsSwitchButton: {
-          options: roundingRules3,
-          optionsValue: 'code',
-          optionsText: 'name',
-          value: selectedCalDivisionCode,
-          enable: dailyCalCheck }" tabindex="4"></div>
-        </div>
-        <div class="row">
-          <label id="B4_2" class="describe-label cell">#{i18n.getText('KDW001_122')}</label>
-        </div>
-      </div>
+			<div id="checkBox2"
+				data-bind="ntsCheckBox: { checked: dailyCalCheck }">#{i18n.getText('KDW001_10')}</div>
+			<div id="swButton32" class="cf"
+				data-bind="ntsSwitchButton: {
+			options: roundingRules3,
+			optionsValue: 'code',
+			optionsText: 'name',
+			value: selectedCalDivisionCode,
+			enable: dailyCalCheck }"></div>
+			<button id="helpButton"
+				data-bind="ntsHelpButton: {image: 'image/image26.png', position: 'right top', enable: enable1 }">?</button>
+			<br></br>
 		</div>
 
 		<div id="area4">
-			<div id="checkBox3" class="setting-checkbox"
-				data-bind="ntsCheckBox: { checked: approvalResultCheck }" tabindex="5">#{i18n.getText('KDW001_11')}</div>
-			<div class="table">
-        <div class="row flex valign-center">
-          <div id="swButton33" class="cf cell"
-            data-bind="ntsSwitchButton: {
-          options: roundingRules4,
-          optionsValue: 'code',
-          optionsText: 'name',
-          value: selectedReflectClassCode,
-          enable: approvalResultCheck }" tabindex="6"></div>
-          <div id="checkBox22" class="cell"
-            data-bind="ntsCheckBox: { checked: forciblyCommitCheck, enable: forciblyEnable }" tabindex="7">#{i18n.getText('KDW001_68')}</div>
-        </div>
-        <div class="row">
-          <label id="B4_3" class="describe-label cell">#{i18n.getText('KDW001_123')}</label>
-        </div>
-      </div>
+			<div id="checkBox3"
+				data-bind="ntsCheckBox: { checked: approvalResultCheck }">#{i18n.getText('KDW001_11')}</div>
+			<div id="swButton33" class="cf"
+				data-bind="ntsSwitchButton: {
+			options: roundingRules4,
+			optionsValue: 'code',
+			optionsText: 'name',
+			value: selectedReflectClassCode,
+			enable: approvalResultCheck }"></div>
+			<button id="helpButton"
+				data-bind="ntsHelpButton: {image: 'image/image35.png', position: 'right top', enable: enable1 }">?</button>
+			<br></br>
+			<div id="checkBox22"
+				data-bind="ntsCheckBox: { checked: forciblyCommitCheck, enable: forciblyEnable }">#{i18n.getText('KDW001_68')}</div>
 		</div>
 
-		<div id="area5">
-			<div id="checkBox4" class="setting-checkbox"
-				data-bind="ntsCheckBox: { checked: monthCountCheck }" tabindex="8">#{i18n.getText('KDW001_12')}</div>
-			<div class="table">
-        <div class="row">
-          <div id="swButton34" class="cf cell"
-            data-bind="ntsSwitchButton: {
-          options: roundingRules5,
-          optionsValue: 'code',
-          optionsText: 'name',
-          value: selectedAggregateClassCode,
-          enable: monthCountCheck }" tabindex="9"></div>
-        </div>
-        <div class="row">
-          <label id="B4_4" class="describe-label cell">#{i18n.getText('KDW001_124')}</label>
-        </div>
-      </div>
+		<div id="area5" style="margin-top: 0px;">
+			<div id="checkBox4"
+				data-bind="ntsCheckBox: { checked: monthCountCheck }">#{i18n.getText('KDW001_12')}</div>
+			<div id="swButton34" class="cf"
+				data-bind="ntsSwitchButton: {
+			options: roundingRules5,
+			optionsValue: 'code',
+			optionsText: 'name',
+			value: selectedAggregateClassCode,
+			enable: monthCountCheck }"></div>
+			<button id="helpButton"
+				data-bind="ntsHelpButton: {image: 'image/image27.png', position: 'right top', enable: enable1 }">?</button>
+			<br></br>
 		</div>
 		<div id="button36Area">
-			<button id="button36" data-bind="click: opendScreenC" tabindex="11">#{i18n.getText('KDW001_93')}</button>
+			<button id="button36" data-bind="click: opendScreenC">#{i18n.getText('KDW001_93')}</button>
 		</div>
 		<div id="button6Area">
-			<button id="button6" class="proceed" data-bind="click: opendScreenD" tabindex="10">#{i18n.getText('KDW001_13')}</button>
+			<button id="button6" class="proceed" data-bind="click: opendScreenD">#{i18n.getText('KDW001_13')}</button>
 		</div>
 
 	</ui:composition>

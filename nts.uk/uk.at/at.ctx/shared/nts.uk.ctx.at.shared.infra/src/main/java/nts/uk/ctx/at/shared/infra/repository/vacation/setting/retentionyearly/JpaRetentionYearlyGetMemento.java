@@ -4,8 +4,6 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.infra.repository.vacation.setting.retentionyearly;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.RetentionYearlySettingGetMemento;
 import nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.UpperLimitSetting;
@@ -48,6 +46,22 @@ public class JpaRetentionYearlyGetMemento implements RetentionYearlySettingGetMe
 		return new UpperLimitSetting(new JpaUpperLimitSettingGetMemento(this.typeValue));
 	}
 
+	
+	/*
+	 * (non-Javadoc)
+	 * @see nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.
+	 * RetentionYearlySettingGetMemento#getLeaveAsWorkDays()
+	 */
+	@Override
+	public Boolean getLeaveAsWorkDays() {
+		if(this.typeValue.getLeaveAsWorkDays() == 0) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.
@@ -55,6 +69,6 @@ public class JpaRetentionYearlyGetMemento implements RetentionYearlySettingGetMe
 	 */
 	@Override
 	public ManageDistinct getManagementCategory() {
-		return ManageDistinct.valueOf(BooleanUtils.toInteger(this.typeValue.isManagementYearlyAtr()));
+		return ManageDistinct.valueOf((int)this.typeValue.getManagementYearlyAtr());
 	}
 }

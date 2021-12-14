@@ -262,11 +262,14 @@ module nts.uk.at.view.kaf011.a.viewmodel {
 		
 		openKDL009() {
 			let self = this;
-			nts.uk.ui.windows.setShared('KDL009_DATA', (self.params ? self.params.employeeIds : [__viewContext.user.employeeId]));
+			nts.uk.ui.windows.setShared('KDL009_DATA', {
+				employeeIds: (self.params ? self.params.employeeIds : [__viewContext.user.employeeId]),
+				baseDate: moment(new Date()).format("YYYYMMDD")
+			});
 			if(self.params && self.params.employeeIds.length > 1){
-				nts.uk.ui.windows.sub.modal("/view/kdl/009/a/index.xhtml",{width: 1100, height: 650});	
+				nts.uk.ui.windows.sub.modal( '/view/kdl/009/a/multi.xhtml');	
 			}else{
-				nts.uk.ui.windows.sub.modal("/view/kdl/009/a/index.xhtml",{width: 770, height: 650});
+				nts.uk.ui.windows.sub.modal( '/view/kdl/009/a/single.xhtml');
 			}
 			
 		}

@@ -21,8 +21,7 @@ module nts.uk.at.view.kdp004.a {
 			R: '/view/kdp/003/r/index.xhtml',
 			F: '/view/kdp/003/f/index.xhtml',
 			M: '/view/kdp/003/m/index.xhtml',
-			P: '/view/kdp/003/p/index.xhtml',
-			KDP002_L: '/view/kdp/002/l/index.xhtml'
+			P: '/view/kdp/003/p/index.xhtml'
 		};
 
 		const API = {
@@ -33,7 +32,6 @@ module nts.uk.at.view.kdp004.a {
 
 		const KDP004_SAVE_DATA = 'loginKDP004';
 		const WORKPLACES_STORAGE = 'WORKPLACES_STORAGE';
-		const IS_RELOAD_VIEW = 'IS_RELOAD_VIEW_004';
 
 		export class ScreenModel {
 			stampSetting: KnockoutObservable<StampSetting> = ko.observable({} as StampSetting);
@@ -58,12 +56,6 @@ module nts.uk.at.view.kdp004.a {
 			fingerStampSetting: KnockoutObservable<FingerStampSetting> = ko.observable(DEFAULT_SETTING);
 
 			modeBasyo: KnockoutObservable<boolean> = ko.observable(false);
-			useWork: KnockoutObservable<boolean> = ko.observable(false);
-
-			showMessage: KnockoutObservable<boolean | null> = ko.observable(null);
-
-			totalOpenViewR: number = 0;
-			contractCode: string = '000000000000';
 
 			// get from basyo;
 			workplace: string[] | [] = [];
@@ -75,7 +67,6 @@ module nts.uk.at.view.kdp004.a {
 
 			pageComment: KnockoutObservable<string> = ko.observable('');
 			commentColor: KnockoutObservable<string> = ko.observable('');
-			saveDefault: Boolean = false;
 			saveSuccess = false;
 
 			constructor() {
@@ -88,165 +79,48 @@ module nts.uk.at.view.kdp004.a {
 				let dfd = $.Deferred<void>();
 				const vm = new ko.ViewModel;
 
-				ko.computed({
-					read: () => {
-						const mes = ko.unwrap(self.errorMessage);
-						const noti = ko.unwrap(self.fingerStampSetting).noticeSetDto;
-
-						var result = null;
-
-						if (mes === null) {
-							result = false;
-						}
-						if (noti) {
-							if (ko.unwrap(self.fingerStampSetting).noticeSetDto.displayAtr == 1) {
-								result = true;
-							} else {
-								result = false;
-							}
-						} else {
-							result = false;
-						}
-
-						if (mes) {
-							result = null;
-						}
-
-						self.showMessage(result);
-
-					}
-				});
-
-				vm.$ajax(API.SETTING_STAMP_COMMON)
-					.done((data: any) => {
-						self.useWork(data.workUse);
-					})
-
-				// Call step1: クラウド/オンプレの判断を行う
-				vm.$ajax("at", "at/record/stamp/finger/get-isCloud")
-					.then((data: boolean) => {
-						// Step2: 契約コードに関するlocalstrageに登録する
-						if (!data) {
-							self.saveDefault = true
-							vm.$window.storage("contractInfo", {
-								contractCode: "000000000000",
-								contractPassword: null
-							}).then(() => self.startScreen().then(() => dfd.resolve()));
-						} else {
-							// Step3: テナント認証する
-							vm.$window.storage("contractInfo")
-								.then((data: any) => {
-									if (!data) {
-										// Step4: CCG007_ログイン　A：契約認証を実行する
-										self.openDialogCCG007A().then(() => dfd.resolve())
-									} else {
-										self.contractCode = data.contractCode;
-										vm.$ajax("at", "at/record/stamp/finger/get-authenticate",
-											{ contactCode: data.contractCode, password: data.contractPassword })
-											.then((isSuccess: boolean) => {
-												// Step4: CCG007_ログイン　A：契約認証を実行する
-												if (!isSuccess) {
-													vm.$window.storage(IS_RELOAD_VIEW).then((data: boolean) => {
-														if (data || data == null) {
-															localStorage.removeItem("nts.uk.characteristics." + KDP004_SAVE_DATA)
-															self.openDialogCCG007A().then(() => dfd.resolve())
-														} else {
-															self.startScreen().then(() => dfd.resolve())
-														}
-													})
-												} else {
-													self.startScreen().then(() => dfd.resolve());
-												}
-											});
-									}
-								});
-						}
-					})
-				return dfd.promise();
-			}
-
-			openDialogCCG007A(): JQueryPromise<void> {
-				let dfd = $.Deferred<void>();
-				const self = this;
-				nts.uk.ui.windows.sub.modal("com", "/view/ccg/007/a/index.xhtml", {
-					height: 320,
-					width: 400,
-					title: nts.uk.resource.getText("CCG007_9"),
-					dialogClass: 'no-close'
-				}).onClosed(() => { self.startScreen().then(() => dfd.resolve()) });
-				return dfd.promise();
-			}
-
-			startScreen(): JQueryPromise<void> {
-				let self = this;
-				let dfd = $.Deferred<void>();
-				const vm = new ko.ViewModel();
-
-				vm.$window.storage(IS_RELOAD_VIEW, true)
-
 				self.getWorkPlacesInfo();
 				self.basyo().done(() => {
+					nts.uk.characteristics.restore(KDP004_SAVE_DATA).done(function (loginInfo: ILoginInfo) {
+
+						if (!loginInfo) {
+							self.setLoginInfo().done((loginResult) => {
+								if (!loginResult) {
+									self.isUsed(false);
+									dfd.resolve();
+									return;
+								}
+								$.when(self.doFirstLoad(), self.loadNotice(self.loginInfo)).done(() => {
+									dfd.resolve();
+									return;
+								});
+							});
+						} else {
+							self.loginInfo = loginInfo;
+							if (ko.unwrap(self.modeBasyo)) {
+								self.loginInfo.selectedWP = self.workplace;
+								nts.uk.characteristics.save(KDP004_SAVE_DATA, self.loginInfo);
+							}
+
+							$.when(self.doFirstLoad(), self.loadNotice(self.loginInfo)).done(() => {
+								dfd.resolve();
+							});
+						}
+					})
+				}).always(() => {
 					vm.$window.storage("contractInfo")
 						.then((data: any) => {
 							if (data) {
 								service.getLogginSetting(data.contractCode).done((res) => {
-									if (res.length == 0) {
-										// self.errorMessage(getMessage("Msg_1527"));
-										// self.isUsed(false);
-										// dfd.resolve();
-										if (self.saveDefault) {
-											self.openScreenF({
-												mode: 'admin'
-											}).then(() => {
-												self.errorMessage(getMessage("Msg_1527"));
-												self.isUsed(false);
-												self.saveDefault = false
-												dfd.resolve();
-												return;
-											})
-										} else {
-											self.errorMessage(getMessage("Msg_1527"));
-											self.isUsed(false);
-											self.saveDefault = false
-											dfd.resolve();
-											return;
-										}
-									} else {
-										self.listCompany(_.filter(res, 'fingerAuthStamp'));
-										nts.uk.characteristics.restore(KDP004_SAVE_DATA).done(function (loginInfo: ILoginInfo) {
-
-											if (!loginInfo) {
-												self.setLoginInfo().done((loginResult) => {
-													if (!loginResult) {
-														self.isUsed(false);
-														dfd.resolve();
-														return;
-													}
-													$.when(self.doFirstLoad(), self.loadNotice(self.loginInfo)).done(() => {
-														dfd.resolve();
-														return;
-													});
-												});
-											} else {
-												self.loginInfo = loginInfo;
-												if (ko.unwrap(self.modeBasyo)) {
-													self.loginInfo.selectedWP = self.workplace;
-													nts.uk.characteristics.save(KDP004_SAVE_DATA, self.loginInfo);
-												}
-
-												$.when(self.doFirstLoad(), self.loadNotice(self.loginInfo)).done(() => {
-													dfd.resolve();
-												});
-											}
-										}).always(() => {
-											self.modeBasyo(false);
-										});
-									}
+									self.listCompany(_.filter(res, 'fingerAuthStamp'));
 								});
 							}
-						})
-				})
+						});
+					self.modeBasyo(false);
+				});
+
 				return dfd.promise();
+
 			}
 
 			showButton() {
@@ -259,11 +133,6 @@ module nts.uk.at.view.kdp004.a {
 					}
 				}
 				return ButtonDisplayMode.ShowAll;
-			}
-
-			reloadView() {
-				const vm = new ko.ViewModel();
-				vm.$window.storage(IS_RELOAD_VIEW, false).then(() => location.reload())
 			}
 
 			getErrorNotUsed(errorType) {
@@ -286,77 +155,58 @@ module nts.uk.at.view.kdp004.a {
 
 			doFirstLoad(): JQueryPromise<any> {
 				let dfd = $.Deferred<any>(), self = this;
-				const vm = new ko.ViewModel();
-
-				let loginInfo = {
-					companyCode: self.loginInfo.companyCode,
-					employeeCode: self.loginInfo.employeeCode,
-					password: self.loginInfo.password
-				}
-
-				vm.$window.storage('contractInfo')
-					.done((data: any) => {
-						loginInfo.contractPassword = data.contractPassword;
-						loginInfo.contractCode = data.contractCode;
-					}).then(() => {
-						block.grayout();
-						service.confirmUseOfStampInput({ employeeId: null, stampMeans: 1 }).done((res) => {
-							self.isUsed(res.used == 0);
-							if (self.isUsed()) {
-								service.login(loginInfo).done((res) => {
-
-									block.grayout();
-									service.startPage()
-										.done((res: any) => {
-											if (!res.stampSetting || !res.stampResultDisplay || !res.stampSetting.pageLayouts.length) {
-												self.errorMessage(self.getErrorNotUsed(1));
-												self.isUsed(false);
-												dfd.resolve();
-												return;
-											}
-
-											self.alwaysLoadMessage(res.stampSetting.correctionInterval);
-											self.stampSetting(res.stampSetting);
-											self.stampTab().bindData(res.stampSetting.pageLayouts);
-											self.stampResultDisplay(res.stampResultDisplay);
-											self.fingerStampSetting(res);
-											dfd.resolve();
-										}).fail((res) => {
-											dialog.alertError({ messageId: res.messageId }).then(() => {
-												jump("com", "/view/ccg/008/a/index.xhtml");
-											});
-										}).always(() => {
-											dfd.resolve();
-											block.clear();
-
-										});
-
-									if (res.msgErrorId && res.msgErrorId !== '') {
-
-										self.errorMessage(getMessage(res.msgErrorId));
-
+				let loginInfo = self.loginInfo;
+				block.grayout();
+				service.confirmUseOfStampInput({ employeeId: null, stampMeans: 1 }).done((res) => {
+					self.isUsed(res.used == 0);
+					if (self.isUsed()) {
+						let isAdmin = true;
+						service.login(isAdmin, loginInfo).done((res) => {
+							block.grayout();
+							service.startPage()
+								.done((res: any) => {
+									
+									if (!res.stampSetting || !res.stampResultDisplay || !res.stampSetting.pageLayouts.length) {
+										self.errorMessage(self.getErrorNotUsed(1));
 										self.isUsed(false);
+										dfd.resolve();
+										return;
 									}
 
-									self.getStampToSuppress();
-
-								}).fail((res) => {
-									self.isUsed(false);
-									self.errorMessage(res.errorMessage);
+									self.alwaysLoadMessage(res.stampSetting.correctionInterval);
+									self.stampSetting(res.stampSetting);
+									self.stampTab().bindData(res.stampSetting.pageLayouts);
+									self.stampResultDisplay(res.stampResultDisplay);
+									self.fingerStampSetting(res);
 									dfd.resolve();
+								}).fail((res) => {
+									dialog.alertError({ messageId: res.messageId }).then(() => {
+										jump("com", "/view/ccg/008/a/index.xhtml");
+									});
 								}).always(() => {
+									dfd.resolve();
 									block.clear();
 								});
-							} else {
-								self.isUsed(false);
-								self.errorMessage(self.getErrorNotUsed(res.used));
-								dfd.resolve();
-							}
+
+							self.getStampToSuppress();
+
+						}).fail((res) => {
+							self.isUsed(false);
+							self.errorMessage(getMessage(res.messageId));
+							dfd.resolve();
 						}).always(() => {
+
 							block.clear();
 						});
-						return dfd.promise();
-					})
+					} else {
+						self.isUsed(false);
+						self.errorMessage(self.getErrorNotUsed(res.used));
+						dfd.resolve();
+					}
+				}).always(() => {
+					block.clear();
+				});
+				return dfd.promise();
 			}
 
 			public setLoginInfo(): JQueryPromise<any> {
@@ -366,11 +216,24 @@ module nts.uk.at.view.kdp004.a {
 				self.openScreenF({
 					mode: 'admin'
 				}).done((loginResult) => {
-
 					const exest = false;
+
+					if (loginResult !== undefined) {
+						if (!loginResult.result) {
+							loginResult = undefined;
+						}
+					} else {
+						loginResult = undefined;
+					}
 
 					if (loginResult == undefined) {
 						self.errorMessage(getMessage("Msg_1647"));
+						dfd.resolve();
+						return;
+					}
+
+					if (!loginResult || !loginResult.result) {
+						self.errorMessage(getMessage(!loginResult ? "Msg_1647" : loginResult.msgErrorId));
 						dfd.resolve();
 						return;
 					}
@@ -444,7 +307,6 @@ module nts.uk.at.view.kdp004.a {
 				let dfd = $.Deferred<any>();
 
 				service.fingerAuth({ fingerAuthCkb: this.fingerAuthCkb(), selectedMsg: this.selectedMsg() }).done((res) => {
-
 					dfd.resolve(res);
 				});
 
@@ -512,7 +374,6 @@ module nts.uk.at.view.kdp004.a {
 						.then(() => {
 							return vm.$window.modal('at', '/view/kdp/004/g/index.xhtml')
 								.then((result) => {
-
 									let redirect: "retry" | "loginPass" | "cancel" = result.actionName;
 
 									if (redirect === "retry") {
@@ -534,12 +395,12 @@ module nts.uk.at.view.kdp004.a {
 
 									if (res !== 'cancel' && !!res) {
 
-										if (!res.verificationSuccess) {
+										if (!res.result) {
 											errorMessage = 'Msg_301';
 											return process();
 										}
 
-										if (res.verificationSuccess) {
+										if (res.result) {
 											return { em: res.em, isSuccess: true, authType: res.em ? 0 : 2 };
 										}
 									} else {
@@ -553,17 +414,12 @@ module nts.uk.at.view.kdp004.a {
 			}
 
 			public clickBtn1(btn: any, layout: any) {
-
 				const vm = this;
 				vm.getWorkPlacesInfo();
 				nts.uk.ui.block.invisible();
-				let stampTime = moment(new Date()).format("HH:mm");
-				let stampDateTime = moment(new Date()).format();
-				
 				vm.doAuthent().done((res: IAuthResult) => {
-
 					if (res.isSuccess) {
-						vm.registerData(btn, layout, res, stampTime, stampDateTime);
+						vm.registerData(btn, layout, res);
 					}
 				});
 			}
@@ -573,10 +429,8 @@ module nts.uk.at.view.kdp004.a {
 				let dfd = $.Deferred<any>();
 
 				self.fingerAuth().done((res) => {
-
-					if (res.verificationSuccess) {
+					if (res.result) {
 						service.confirmUseOfStampInput({ employeeId: self.loginInfo.employeeId, stampMeans: 1 }).done((res) => {
-
 							self.isUsed(res.used == 0);
 							if (!self.isUsed()) {
 								self.errorMessage(getMessage(res.messageId));
@@ -634,7 +488,7 @@ module nts.uk.at.view.kdp004.a {
 					companyId: self.loginInfo.companyId
 				} : { mode: 'admin' };
 				self.openScreenF(param).done((loginResult) => {
-					if (loginResult) {
+					if (loginResult && loginResult.result) {
 						let result: any = loginResult.em;
 						result.selectedWP = self.loginInfo ? self.loginInfo.selectedWP : null;
 						self.loginInfo = loginResult.em;
@@ -644,14 +498,13 @@ module nts.uk.at.view.kdp004.a {
 								if (!ko.unwrap(self.modeBasyo)) {
 									self.openScreenK().done((result) => {
 										if (result) {
-
 											self.loginInfo.selectedWP = result;
 											self.saveSuccess = true;
 											nts.uk.characteristics.save(KDP004_SAVE_DATA, self.loginInfo).done(() => {
-												self.reloadView();
+												location.reload();
 											});
 										} else {
-											self.reloadView();
+											location.reload();
 											// if (self.saveSuccess) {
 											// 	location.reload();
 											// }
@@ -660,7 +513,7 @@ module nts.uk.at.view.kdp004.a {
 								} else {
 									self.loginInfo.selectedWP = self.workplace;
 									nts.uk.characteristics.save(KDP004_SAVE_DATA, self.loginInfo).done(() => {
-										self.reloadView();
+										location.reload();
 									});
 								}
 							})
@@ -677,18 +530,27 @@ module nts.uk.at.view.kdp004.a {
 				});
 			}
 
-			public registerData(button: any, layout: any, loginInfo: any, stampTime: any, stampDateTime: any) {
+			public registerData(button: any, layout: any, loginInfo: any) {
 				let self = this;
 				let vm = new ko.ViewModel();
 				block.invisible();
-				var showViewL = false;
-
-				if (ko.unwrap(self.useWork)) {
-					if (button.taskChoiceArt) {
-						showViewL = true;
-					}
-				}
-
+				let registerdata = {
+					employeeId: loginInfo && loginInfo.em ? loginInfo.em.employeeId : vm.$user.employeeId,
+					datetime: moment(vm.$date.now()).format('YYYY/MM/DD HH:mm:ss'),
+					stampNumber: null,
+					stampButton: {
+						pageNo: layout.pageNo,
+						buttonPositionNo: button.btnPositionNo
+					},
+					refActualResult: {
+						cardNumberSupport: null,
+						workPlaceId: self.workPlaceId,
+						workLocationCD: self.worklocationCode,
+						workTimeCode: null,
+						overtimeDeclaration: null
+					},
+					authcMethod: loginInfo.authType
+				};
 				const mode: number = 1;
 				const { employeeId, employeeCode } = loginInfo.em;
 
@@ -713,91 +575,43 @@ module nts.uk.at.view.kdp004.a {
 										if (result.notification !== null) {
 											self.workPlaceId = result;
 
-											service.getEmployeeWorkByStamping({ sid: employeeId, workFrameNo: 1, upperFrameWorkCode: '' })
-												.then((data: any) => {
-													if (data.task.length === 0) {
-														if (showViewL) {
-															showViewL = false;
-														}
-													}
+											let registerdata = {
+												employeeId: loginInfo && loginInfo.em ? loginInfo.em.employeeId : vm.$user.employeeId,
+												datetime: moment(vm.$date.now()).format('YYYY/MM/DD HH:mm:ss'),
+												stampNumber: null,
+												stampButton: {
+													pageNo: layout.pageNo,
+													buttonPositionNo: button.btnPositionNo
+												},
+												refActualResult: {
+													cardNumberSupport: null,
+													workPlaceId: self.workPlaceId,
+													workLocationCD: self.worklocationCode,
+													workTimeCode: null,
+													overtimeDeclaration: null
+												},
+												authcMethod: loginInfo.authType
+											};
 
-													if (showViewL) {
-														vm.$window.modal('at', DIALOG.KDP002_L, { employeeId: employeeId })
-															.then((data: any) => {
-																let registerdata = {
-																	employeeId: loginInfo && loginInfo.em ? loginInfo.em.employeeId : vm.$user.employeeId,
-																	datetime: stampDateTime,
-																	stampNumber: null,
-																	stampButton: {
-																		pageNo: layout.pageNo,
-																		buttonPositionNo: button.btnPositionNo
-																	},
-																	refActualResult: {
-																		cardNumberSupport: null,
-																		workPlaceId: self.workPlaceId,
-																		workLocationCD: self.worklocationCode,
-																		workTimeCode: null,
-																		overtimeDeclaration: null,
-																		workGroup: data
-																	},
-																	authcMethod: loginInfo.authType
-																};
+											service.stampInput(registerdata).done((res) => {
 
-																service.stampInput(registerdata).done((res) => {
-																	//phat nhac
-																	self.playAudio(button.audioType);
+												//phat nhac
+												self.playAudio(button.audioType);
+												// const employeeInfo = { mode, employeeId, employeeCode, workLocationName, workPlaceId };
 
-																	if (self.stampResultDisplay().notUseAttr == 1 && button.changeClockArt == 1) {
-																		self.openScreenC(button, layout, loginInfo.em);
-																	} else {
-																		self.openScreenB(button, layout, loginInfo.em, stampTime);
-																	}
 
-																}).fail((res) => {
-																	dialog.alertError({ messageId: res.messageId });
-																}).always(() => {
-																	self.getStampToSuppress();
-																	block.clear();
-																});
-															});
-													} else {
-														let registerdata = {
-															employeeId: loginInfo && loginInfo.em ? loginInfo.em.employeeId : vm.$user.employeeId,
-															datetime: stampDateTime,
-															stampNumber: null,
-															stampButton: {
-																pageNo: layout.pageNo,
-																buttonPositionNo: button.btnPositionNo
-															},
-															refActualResult: {
-																cardNumberSupport: null,
-																workPlaceId: self.workPlaceId,
-																workLocationCD: self.worklocationCode,
-																workTimeCode: null,
-																overtimeDeclaration: null
-															},
-															authcMethod: loginInfo.authType
-														};
+												if (self.stampResultDisplay().notUseAttr == 1 && button.changeClockArt == 1) {
+													self.openScreenC(button, layout, loginInfo.em);
+												} else {
+													self.openScreenB(button, layout, loginInfo.em);
+												}
 
-														service.stampInput(registerdata).done((res) => {
-															//phat nhac
-															self.playAudio(button.audioType);
-
-															if (self.stampResultDisplay().notUseAttr == 1 && button.changeClockArt == 1) {
-																self.openScreenC(button, layout, loginInfo.em);
-															} else {
-																self.openScreenB(button, layout, loginInfo.em, stampTime);
-															}
-
-														}).fail((res) => {
-															dialog.alertError({ messageId: res.messageId });
-														}).always(() => {
-															self.getStampToSuppress();
-															block.clear();
-														});
-													}
-												})
-
+											}).fail((res) => {
+												dialog.alertError({ messageId: res.messageId });
+											}).always(() => {
+												self.getStampToSuppress();
+												block.clear();
+											});
 										}
 									}
 								});
@@ -808,97 +622,48 @@ module nts.uk.at.view.kdp004.a {
 								self.workPlaceId = dataStorage.selectedWP[0];
 							}
 
-							service.getEmployeeWorkByStamping({ sid: employeeId, workFrameNo: 1, upperFrameWorkCode: '' })
-								.then((data: any) => {
-									if (data.task.length === 0) {
-										if (showViewL) {
-											showViewL = false;
-										}
-									}
+							let registerdata = {
+								employeeId: loginInfo && loginInfo.em ? loginInfo.em.employeeId : vm.$user.employeeId,
+								datetime: moment(vm.$date.now()).format('YYYY/MM/DD HH:mm:ss'),
+								stampNumber: null,
+								stampButton: {
+									pageNo: layout.pageNo,
+									buttonPositionNo: button.btnPositionNo
+								},
+								refActualResult: {
+									cardNumberSupport: null,
+									workPlaceId: self.workPlaceId,
+									workLocationCD: self.worklocationCode,
+									workTimeCode: null,
+									overtimeDeclaration: null
+								},
+								authcMethod: loginInfo.authType
+							};
 
-									if (showViewL) {
-										vm.$window.modal('at', DIALOG.KDP002_L, { employeeId: employeeId })
-											.then((data: any) => {
-												let registerdata = {
-													employeeId: loginInfo && loginInfo.em ? loginInfo.em.employeeId : vm.$user.employeeId,
-													datetime: stampDateTime,
-													stampNumber: null,
-													stampButton: {
-														pageNo: layout.pageNo,
-														buttonPositionNo: button.btnPositionNo
-													},
-													refActualResult: {
-														cardNumberSupport: null,
-														workPlaceId: self.workPlaceId,
-														workLocationCD: self.worklocationCode,
-														workTimeCode: null,
-														overtimeDeclaration: null,
-														workGroup: data
-													},
-													authcMethod: loginInfo.authType
-												};
+							service.stampInput(registerdata).done((res) => {
 
-												service.stampInput(registerdata).done((res) => {
-													//phat nhac
-													self.playAudio(button.audioType);
+								//phat nhac
+								self.playAudio(button.audioType);
+								// const employeeInfo = { mode, employeeId, employeeCode, workLocationName, workPlaceId };
 
-													if (self.stampResultDisplay().notUseAttr == 1 && button.changeClockArt == 1) {
-														self.openScreenC(button, layout, loginInfo.em);
-													} else {
-														self.openScreenB(button, layout, loginInfo.em, stampTime);
-													}
+								if (self.stampResultDisplay().notUseAttr == 1 && button.changeClockArt == 1) {
+									self.openScreenC(button, layout, loginInfo.em);
+								} else {
+									self.openScreenB(button, layout, loginInfo.em);
+								}
 
-												}).fail((res) => {
-													dialog.alertError({ messageId: res.messageId });
-												}).always(() => {
-													self.getStampToSuppress();
-													block.clear();
-												});
-											});
-									} else {
-										let registerdata = {
-											employeeId: loginInfo && loginInfo.em ? loginInfo.em.employeeId : vm.$user.employeeId,
-											datetime: stampDateTime,
-											stampNumber: null,
-											stampButton: {
-												pageNo: layout.pageNo,
-												buttonPositionNo: button.btnPositionNo
-											},
-											refActualResult: {
-												cardNumberSupport: null,
-												workPlaceId: self.workPlaceId,
-												workLocationCD: self.worklocationCode,
-												workTimeCode: null,
-												overtimeDeclaration: null
-											},
-											authcMethod: loginInfo.authType
-										};
-
-										service.stampInput(registerdata).done((res) => {
-
-											//phat nhac
-											self.playAudio(button.audioType);
-
-											if (self.stampResultDisplay().notUseAttr == 1 && button.changeClockArt == 1) {
-												self.openScreenC(button, layout, loginInfo.em);
-											} else {
-												self.openScreenB(button, layout, loginInfo.em, stampTime);
-											}
-
-										}).fail((res) => {
-											dialog.alertError({ messageId: res.messageId });
-										}).always(() => {
-											self.getStampToSuppress();
-											block.clear();
-										});
-									}
-								})
+							}).fail((res) => {
+								dialog.alertError({ messageId: res.messageId });
+							}).always(() => {
+								self.getStampToSuppress();
+								block.clear();
+							});
 						}
 					});
 
 			}
 
-			public openScreenB(button, layout, loginInfo, stampTime) {
+			public openScreenB(button, layout, loginInfo) {
 				let self = this;
 				let vm = new ko.ViewModel();
 
@@ -914,7 +679,8 @@ module nts.uk.at.view.kdp004.a {
 					screen: "KDP004"
 				});
 
-				vm.$window.modal('/view/kdp/002/b/index.xhtml', {stampTime: stampTime});
+				modal('/view/kdp/002/b/index.xhtml').onClosed(() => {
+				});
 			}
 
 			public openScreenC(button, layout, loginInfo) {
@@ -947,7 +713,6 @@ module nts.uk.at.view.kdp004.a {
 				const self = this;
 				let vm = new ko.ViewModel();
 				const param = { setting: ko.unwrap(self.fingerStampSetting).noticeSetDto, screen: 'KDP004' };
-
 				vm.$window.modal(DIALOG.R, param);
 			}
 
@@ -1004,21 +769,7 @@ module nts.uk.at.view.kdp004.a {
 
 								vm.$ajax(API.NOTICE, param)
 									.done((data: IMessage) => {
-
 										self.messageNoti(data);
-										self.messageNoti.valueHasMutated();
-
-										if (data.stopByCompany.systemStatus == 3 || data.stopBySystem.systemStatusType == 3) {
-											if (self.totalOpenViewR === 0) {
-
-												setTimeout(() => {
-													self.totalOpenViewR++;
-													const param = { setting: ko.unwrap(self.fingerStampSetting).noticeSetDto, screen: 'KDP004' };
-
-													vm.$window.modal(DIALOG.R, param);
-												}, 1000);
-											}
-										}
 									});
 							}
 						});
@@ -1039,23 +790,7 @@ module nts.uk.at.view.kdp004.a {
 						.then(() => {
 							vm.$ajax(API.NOTICE, param)
 								.done((data: IMessage) => {
-
 									self.messageNoti(data);
-									setTimeout(() => {
-										self.messageNoti(data);
-										self.messageNoti.valueHasMutated();
-									}, 1000);
-									if (data.stopByCompany.systemStatus == 3 || data.stopBySystem.systemStatusType == 3) {
-										if (self.totalOpenViewR === 0) {
-
-											setTimeout(() => {
-												self.totalOpenViewR++;
-												const param = { setting: ko.unwrap(self.fingerStampSetting).noticeSetDto, screen: 'KDP004' };
-
-												vm.$window.modal(DIALOG.R, param);
-											}, 1000);
-										}
-									}
 								});
 						})
 						.always(() => {
@@ -1097,6 +832,10 @@ module nts.uk.at.view.kdp004.a {
 
 				// URLOption basyoが存在している場合
 				if (locationCd) {
+					const param = {
+						contractCode: vm.$user.contractCode,
+						workLocationCode: locationCd
+					}
 
 					vm.$window.storage("contractInfo")
 						.then((data: any) => {
@@ -1169,22 +908,6 @@ module nts.uk.at.view.kdp004.a {
 
 	export interface IMessage {
 		messageNotices: IMessageNotice[];
-		stopBySystem: IStopBySystem;
-		stopByCompany: IStopByCompany;
-	}
-
-	export interface IStopBySystem {
-		systemStatusType: number;
-		stopMode: number;
-		stopMessage: String;
-		usageStopMessage: String
-	}
-
-	export interface IStopByCompany {
-		systemStatus: number;
-		stopMessage: String;
-		stopMode: number;
-		usageStopMessage: String
 	}
 
 	interface IMessageNotice {

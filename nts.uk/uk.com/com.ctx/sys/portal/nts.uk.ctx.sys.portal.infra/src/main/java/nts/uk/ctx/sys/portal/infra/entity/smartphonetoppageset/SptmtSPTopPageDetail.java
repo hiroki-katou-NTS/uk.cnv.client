@@ -32,7 +32,7 @@ public class SptmtSPTopPageDetail extends ContractUkJpaEntity implements Seriali
 	public SptmtSPTopPageDetailPK pk;
 	
 	@Column(name = "DISP_ATR")
-	public boolean dispAtr;
+	public int dispAtr;
 
 	@Override
 	protected Object getKey() {

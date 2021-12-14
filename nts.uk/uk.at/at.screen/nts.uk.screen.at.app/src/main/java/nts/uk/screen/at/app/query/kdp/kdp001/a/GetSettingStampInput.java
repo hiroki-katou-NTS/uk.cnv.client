@@ -21,6 +21,8 @@ import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampDakokuRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.EmployeeStampInfo;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.GetListStampEmployeeService;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.GetStampTypeToSuppressService;
@@ -64,6 +66,9 @@ public class GetSettingStampInput {
 	private PortalStampSettingsRepository portalStampSettingsrepo;
 
 	@Inject
+	private StampRecordRepository stampRecordRepo;
+
+	@Inject
 	private StampDakokuRepository stampRepo;
 
 	@Inject
@@ -101,8 +106,8 @@ public class GetSettingStampInput {
 
 		DatePeriod period = new DatePeriod(GeneralDate.today(), GeneralDate.today().addDays(-3));
 
-		GetListStampEmployeeServiceRequireImpl empRequire = new GetListStampEmployeeServiceRequireImpl(stampRepo,
-				stampCardRepo);
+		GetListStampEmployeeServiceRequireImpl empRequire = new GetListStampEmployeeServiceRequireImpl(stampRecordRepo,
+				stampRepo, stampCardRepo);
 
 		List<EmpInfoPotalStampDto> empInfos = new ArrayList<EmpInfoPotalStampDto>();
 		period.datesBetween().forEach(date -> {
@@ -119,7 +124,7 @@ public class GetSettingStampInput {
 
 			if (settingOpt.get().isButtonEmphasisArt()) {
 				GetStampTypeToSuppressServiceRequireImpl stampTypeRequire = new GetStampTypeToSuppressServiceRequireImpl(
-						stampSetPerRepo, settingsSmartphoneStampRepo, portalStampSettingsrepo,
+						stampSetPerRepo, settingsSmartphoneStampRepo, portalStampSettingsrepo, stampRecordRepo,
 						stampRepo, stampCardRepo, preRepo, workingService);
 				if (infoPotal == null) {
 					infoPotal = new EmpInfoPotalStampDto();
@@ -142,10 +147,18 @@ public class GetSettingStampInput {
 	private class GetListStampEmployeeServiceRequireImpl implements GetListStampEmployeeService.Require {
 
 		@Inject
+		private StampRecordRepository stampRecordRepo;
+
+		@Inject
 		private StampDakokuRepository stampRepo;
 
 		@Inject
 		private StampCardRepository stampCardRepo;
+
+		@Override
+		public List<StampRecord> getStampRecord(List<StampNumber> stampNumbers, GeneralDate date) {
+			return this.stampRecordRepo.get(AppContexts.user().contractCode(), stampNumbers, date);
+		}
 
 		@Override
 		public List<Stamp> getStamp(List<StampNumber> stampNumbers, GeneralDate date) {
@@ -175,6 +188,9 @@ public class GetSettingStampInput {
 		private PortalStampSettingsRepository portalStampSettingsrepo;
 
 		@Inject
+		private StampRecordRepository stampRecordRepo;
+
+		@Inject
 		private StampDakokuRepository stampRepo;
 
 		@Inject
@@ -190,6 +206,11 @@ public class GetSettingStampInput {
 		@Override
 		public List<StampCard> getListStampCard(String sid) {
 			return this.stampCardRepo.getListStampCard(sid);
+		}
+
+		@Override
+		public List<StampRecord> getStampRecord(List<StampNumber> stampNumbers, GeneralDate date) {
+			return this.stampRecordRepo.get(AppContexts.user().contractCode(), stampNumbers, date);
 		}
 
 		@Override

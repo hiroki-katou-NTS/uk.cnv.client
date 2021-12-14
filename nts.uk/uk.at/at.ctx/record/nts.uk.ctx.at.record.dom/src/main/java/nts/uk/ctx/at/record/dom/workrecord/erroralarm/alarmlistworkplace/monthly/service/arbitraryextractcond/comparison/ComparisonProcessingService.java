@@ -8,7 +8,6 @@ import nts.uk.ctx.at.record.dom.workrecord.erroralarm.alarmlistworkplace.monthly
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.alarmlistworkplace.monthly.enums.AverageNumberOfTimes;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.alarmlistworkplace.monthly.enums.AverageRatio;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.alarmlistworkplace.monthly.enums.AverageTime;
-import nts.uk.ctx.at.record.dom.workrecord.erroralarm.enums.ConvertCompareTypeToText;
 import nts.uk.ctx.at.shared.dom.scherec.alarm.alarmlistactractionresult.AlarmValueDate;
 import nts.uk.ctx.at.shared.dom.scherec.alarm.alarmlistactractionresult.AlarmValueMessage;
 import nts.uk.ctx.at.shared.dom.scherec.alarm.alarmlistactractionresult.MessageDisplay;
@@ -19,7 +18,6 @@ import nts.uk.shr.com.i18n.TextResource;
 import nts.uk.shr.com.time.TimeWithDayAttr;
 
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 import java.text.DecimalFormat;
 import java.util.Optional;
 
@@ -33,9 +31,6 @@ import static nts.uk.ctx.at.record.dom.workrecord.erroralarm.alarmlistworkplace.
  */
 @Stateless
 public class ComparisonProcessingService {
-
-    @Inject
-    private ConvertCompareTypeToText convertCompareTypeToText;
 
     /**
      * 比較処理
@@ -70,7 +65,7 @@ public class ComparisonProcessingService {
             message = TextResource.localize(
                     "KAL020_402",
                     averageTimeName,
-                    convertCompareTypeToText.convertCompareType(compareSingleValue.getCompareOpertor().value).getCompareLeft(),
+                    compareSingleValue.getCompareOpertor().nameId,
                     timeToCompare,
                     averageTime
             );
@@ -78,7 +73,12 @@ public class ComparisonProcessingService {
             CompareRange compareRange = ((CompareRange) checkConditions);
             if (!check) return null;
 
-            message = getFormula(averageTimeName, compareRange, condition, averageTime);
+            message = TextResource.localize(
+                    "KAL020_403",
+                    averageTimeName,
+                    getFormula(compareRange, condition),
+                    averageTime
+            );
         }
 
         // 抽出結果を作成
@@ -91,7 +91,7 @@ public class ComparisonProcessingService {
                 workplaceId);
     }
 
-    private String getFormula(String averageTimeName, CompareRange compareRange,ExtractionMonthlyCon condition, String averageTime) {
+    private String getFormula(CompareRange compareRange,ExtractionMonthlyCon condition) {
         String formula = "";
         String timeStart = compareRange.getStartValue().toString();
         String timeEnd = compareRange.getEndValue().toString();
@@ -103,16 +103,20 @@ public class ComparisonProcessingService {
         }
         switch (compareRange.getCompareOperator()) {
             case BETWEEN_RANGE_OPEN:
-                formula = TextResource.localize("KAL020_404", timeStart, averageTimeName, timeEnd, averageTime);
+                formula = TextResource.localize("KAL020_404", compareRange.getCompareOperator().nameId,
+                        timeStart, timeEnd);
                 break;
             case BETWEEN_RANGE_CLOSED:
-                formula = TextResource.localize("KAL020_405", timeStart, averageTimeName, timeEnd, averageTime);
+                formula = TextResource.localize("KAL020_405", compareRange.getCompareOperator().nameId,
+                        timeStart, timeEnd);
                 break;
             case OUTSIDE_RANGE_OPEN:
-                formula = TextResource.localize("KAL020_406", timeStart, averageTimeName, timeEnd, averageTime);
+                formula = TextResource.localize("KAL020_406", compareRange.getCompareOperator().nameId,
+                        timeStart, timeEnd);
                 break;
             case OUTSIDE_RANGE_CLOSED:
-                formula = TextResource.localize("KAL020_407", timeStart, averageTimeName, timeEnd, averageTime);
+                formula = TextResource.localize("KAL020_407", compareRange.getCompareOperator().nameId,
+                        timeStart, timeEnd);
                 break;
         }
 

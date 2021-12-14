@@ -3,7 +3,7 @@ module cps001.a {
     
     let __viewContext: any = window['__viewContext'] || {};
     __viewContext.ready(() => {
-        __viewContext.transferred.ifPresent((data: any) => {
+        __viewContext.transferred.ifPresent(data => {
             setShared("CPS001A_PARAMS", data);
         });
 

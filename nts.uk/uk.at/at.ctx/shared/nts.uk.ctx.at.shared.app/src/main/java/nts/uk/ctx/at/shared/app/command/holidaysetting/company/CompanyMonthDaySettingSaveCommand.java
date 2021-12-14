@@ -54,7 +54,7 @@ public class CompanyMonthDaySettingSaveCommand implements CompanyMonthDaySetting
 	@Override
 	public List<PublicHolidayMonthSetting> getPublicHolidayMonthSettings() {
 		return this.publicHolidayMonthSettings.stream().map(e -> {
-			PublicHolidayMonthSetting domain = new PublicHolidayMonthSetting(new Year(e.getPublicHdManagementYear()),
+			PublicHolidayMonthSetting domain = new PublicHolidayMonthSetting(new Year(this.year),
 																			new Integer(e.getMonth()),
 																			new MonthlyNumberOfDays(e.getInLegalHoliday()));
 			return domain;

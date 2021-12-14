@@ -2,45 +2,22 @@ package nts.uk.ctx.at.record.pub.remainnumber.annualleave.export;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import nts.arc.time.GeneralDate;
 
 /**
  * @author loivt
- * 年休管理情報Export
+ * 年休管理情報(仮)
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class AnnualLeaveManageInforExport {
-	
-	/**
-	 * 社員ID
-	 */
-	private String sID;
-	
-	/**
-	 * 残数管理データID
-	 */
-	private String remainManaID;
-	
 	/**
 	 * 年月日
 	 */
 	private GeneralDate ymd;
 	
-	/**
-	 * 残数種類
-	 */
-	private int remainType;
-	
-	/**
-	 * 作成元区分
-	 */
-	private int scheduleRecordAtr;
-	
-	/**
-	 * 勤務種類
-	 */
-	private String workTypeCode;
 	/**
 	 * 使用日数
 	 */
@@ -52,12 +29,12 @@ public class AnnualLeaveManageInforExport {
 	private Integer usedMinutes;
 	
 	/**
-	 * 時間消化休暇かどうか
+	 * 予定実績区分
 	 */
-	private boolean hourlyTimeType;
-	/**
-	 * 時間休暇種類
-	 */
-	private int appTimeType;
+	private int scheduleRecordAtr;
 	
+	/**
+	 * 勤務種類
+	 */
+	private String workTypeCode;
 }

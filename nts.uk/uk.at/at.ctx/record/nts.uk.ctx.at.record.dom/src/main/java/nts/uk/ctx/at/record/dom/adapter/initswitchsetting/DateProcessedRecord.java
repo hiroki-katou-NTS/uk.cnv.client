@@ -13,7 +13,7 @@ import nts.arc.time.calendar.period.DatePeriod;
 @Data
 @AllArgsConstructor
 public class DateProcessedRecord {
-	private Integer closureID;
+	private int closureID;
 	private YearMonth targetDate;
 	private DatePeriod datePeriod;
 }

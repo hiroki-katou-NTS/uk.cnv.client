@@ -28,6 +28,12 @@ import nts.uk.shr.com.context.AppContexts;
 public class JpaSingleAttendanceRecordRepository extends JpaAttendanceRecordRepository
 		implements SingleAttendanceRecordRepository {
 
+	/** The dont use attribute. */
+	private static final int NOT_USE_ATTRIBUTE = 0;
+
+	/** The use attribute. */
+	private static final int USE_ATTRIBUTE = 1;
+
 	/** The single formula type. */
 	private static final int SINGLE_FORMULA_TYPE = 3;
 	
@@ -89,7 +95,8 @@ public class JpaSingleAttendanceRecordRepository extends JpaAttendanceRecordRepo
 			KfnmtRptWkAtdOutframe kfnstAttndRecUpdate = kfnstAttndRec.get();
 			kfnstAttndRecUpdate.setItemName(singleAttendanceRecord.getName().toString());
 			kfnstAttndRecUpdate.setAttribute(new BigDecimal(singleAttendanceRecord.getAttribute().value));
-			kfnstAttndRecUpdate.setUseAtr(useAtr);
+			int useAtrValue = useAtr ? USE_ATTRIBUTE : NOT_USE_ATTRIBUTE;
+			kfnstAttndRecUpdate.setUseAtr(new BigDecimal(useAtrValue));
 			this.commandProxy().update(kfnstAttndRecUpdate);
 		} else {
 			this.commandProxy().insert(this.toEntityAttndRec(layoutId, columnIndex, position, exportArt,
@@ -198,7 +205,7 @@ public class JpaSingleAttendanceRecordRepository extends JpaAttendanceRecordRepo
 				position);
 		KfnmtRptWkAtdOutframe kfnstAttndRec = this.queryProxy().find(kfnstAttndRecPk, KfnmtRptWkAtdOutframe.class)
 				.orElse(new KfnmtRptWkAtdOutframe(kfnstAttndRecPk, 1, AppContexts.user().contractCode(), companyId,
-						false, null, new BigDecimal(0)));
+						new BigDecimal(0), null, new BigDecimal(0)));
 		// find entites KfnmtRptWkAtdOutatd by attendanceRecordPK
 		List<KfnmtRptWkAtdOutatd> listAttndRecItemEntity = this.findAttendanceRecordItems(kfnstAttndRecPk);
 		KfnmtRptWkAtdOutatd attendanceRecItemEntity = listAttndRecItemEntity.isEmpty() ? new KfnmtRptWkAtdOutatd()
@@ -216,7 +223,8 @@ public class JpaSingleAttendanceRecordRepository extends JpaAttendanceRecordRepo
 		}
 		singleAttendanceRecord
 				.saveToMemento(new JpaSingleAttendanceRecordSetMemento(kfnstAttndRec, attendanceRecItemEntity));
-		kfnstAttndRec.setUseAtr(useAtr);
+		int useAtrValue = useAtr ? USE_ATTRIBUTE : NOT_USE_ATTRIBUTE;
+		kfnstAttndRec.setUseAtr(new BigDecimal(useAtrValue));
 
 		return kfnstAttndRec;
 	}

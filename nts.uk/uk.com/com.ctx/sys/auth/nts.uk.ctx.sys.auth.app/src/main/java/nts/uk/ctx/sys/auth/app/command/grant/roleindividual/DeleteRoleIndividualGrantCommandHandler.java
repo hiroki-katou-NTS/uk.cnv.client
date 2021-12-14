@@ -13,7 +13,14 @@ public class DeleteRoleIndividualGrantCommandHandler {
 	private RoleIndividualGrantRepository roleIndividualGrantRepository;
 	
 	public void deleteRoleGrant(DeleteRoleIndividualGrantCommand roleGrant){
-		this.roleIndividualGrantRepository.remove(roleGrant.userID, roleGrant.companyID, roleGrant.roleType);
+		String companyId = AppContexts.user().companyId();
+		if (companyId == null)
+			return;
+		
+		if(roleGrant.userID == null)
+			return;
+		
+		this.roleIndividualGrantRepository.remove(roleGrant.userID, companyId, roleGrant.roleType);
 	}
 	
 }

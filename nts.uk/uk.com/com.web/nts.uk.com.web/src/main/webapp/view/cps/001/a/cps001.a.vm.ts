@@ -101,15 +101,10 @@ module cps001.a.vm {
         licenseCheckDipslay: KnockoutObservable<boolean> = ko.observable(true);
         classWarning: KnockoutObservable<string> = ko.observable("");
 
-        isFromCPS018: KnockoutObservable<boolean> = ko.observable(false);
-
         constructor() {
             let self = this,
                 employee = self.employee,
-                params: IParam = getShared("CPS001A_PARAMS") || { employeeId: undefined, isFromCPS018: false };
-
-            self.isFromCPS018(params.isFromCPS018);
-            nts.uk.sessionStorage.removeItem(nts.uk.request.STORAGE_KEY_TRANSFER_DATA);
+                params: IParam = getShared("CPS001A_PARAMS") || { employeeId: undefined };
 
             employee.employeeId.subscribe(id => {
                 self.layout.listItemCls.removeAll();
@@ -265,7 +260,7 @@ module cps001.a.vm {
                         let index = _.findLastIndex(lstCardNumber, function(o) { return o == mes.parameterIds[0]; });
                         $($('[data-code = IS00779]')[index]).ntsError('set', { messageId: "Msg_346" });
                     } else {
-                        nts.uk.ui.dialog.bundledErrors(mes); 
+                        alert(mes);
                     }
 
                 });
@@ -532,7 +527,6 @@ module cps001.a.vm {
         showAll?: boolean;
         employeeId: string;
         categoryId?: string;
-        isFromCPS018: boolean;
     }
 
     export interface IEventData {

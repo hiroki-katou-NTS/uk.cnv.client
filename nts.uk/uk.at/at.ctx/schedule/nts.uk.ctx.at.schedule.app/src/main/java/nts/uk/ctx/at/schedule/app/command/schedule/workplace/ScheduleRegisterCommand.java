@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import nts.uk.ctx.at.schedule.app.find.schedule.workplace.ScheduleRegisterDto;
+import nts.uk.ctx.at.schedule.app.find.schedule.workplace.ScheduleRegister;
 
 /**
  * @author anhnm
@@ -19,8 +19,8 @@ public class ScheduleRegisterCommand {
     
     boolean overwrite;
     
-    public ScheduleRegisterDto toDomain() {
-        return new ScheduleRegisterDto(
+    public ScheduleRegister toDomain() {
+        return new ScheduleRegister(
                 targets.stream().map(x -> x.toDomain()).collect(Collectors.toList()), 
                 this.overwrite);
     }

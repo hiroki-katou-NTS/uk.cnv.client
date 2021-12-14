@@ -243,10 +243,4 @@ public class EmployeeRequestAdapterImpl implements EmployeeRequestAdapter {
 	public String getAffWkpHistItemByEmpDate(String employeeID, GeneralDate date) {
 		return workplacePub.getAffWkpHistItemByEmpDate(employeeID, date).getWorkplaceId();
 	}
-	
-	// Pub get all Sid
-	@Override
-	public List<String> getAllSidByCid(String cid) {
-		return perEmpBasicInfoPub.getAllSidByCid(cid);
-	}
 }

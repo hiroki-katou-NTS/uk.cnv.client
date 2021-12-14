@@ -1,5 +1,7 @@
 package nts.uk.ctx.sys.portal.app.find.webmenu.webmenulinking;
 
+import java.util.Optional;
+
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -12,11 +14,9 @@ public class RoleByRoleTiesFinder {
 	private RoleByRoleTiesRepository repo;
 	
 	public RoleByRoleTiesDto getRoleByRoleTiesByid(String roleId) {
-//	TODO　修正お願いいたします。		
-/*		Optional<RoleByRoleTiesDto> data = repo.getRoleByRoleTiesById(roleId).map(c->RoleByRoleTiesDto.fromDomain(c));
+		Optional<RoleByRoleTiesDto> data = repo.getRoleByRoleTiesById(roleId).map(c->RoleByRoleTiesDto.fromDomain(c));
 		if(data != null)
 			return data.get();
-*/
 		return null;
 		
 	}

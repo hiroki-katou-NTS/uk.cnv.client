@@ -59,7 +59,7 @@ export module model {
         buttonPositionNo: number;
 
         /** ボタンの表示設定 */
-        buttonDisSet: IButtonDisSetDto; 
+        buttonDisSet: IButtonDisSetDto;
 
         buttonValueType: number;
 
@@ -68,8 +68,6 @@ export module model {
         buttonType: IButtonTypeDto;
         
         icon: string;
-
-        taskChoiceArt: number;
     }
 
     export interface IButtonTypeDto {
@@ -198,7 +196,6 @@ export module model {
          */
 
         refActualResult: IRefectActualResultCommand;
-
     }
     export interface IStampButtonCommand {
         /** ページNO */
@@ -231,11 +228,6 @@ export module model {
          */
 
         overtimeDeclaration: IOvertimeDeclarationComamnd;
-
-        /**
-         * 作業グループ
-         */
-         workGroup: IWorkGroup; 
     }
 
     interface IOvertimeDeclarationComamnd {
@@ -440,14 +432,5 @@ export module model {
     export interface IGetOmissionContentDto {
         errorInfo: any;
         appDispNames: Array<any>;
-    }
-
-    // 作業グループ
-    interface IWorkGroup {
-        workCode1: string; // 作業グループ.作業CD1
-        workCode2: string; // 作業グループ.作業CD2
-        workCode3: string; // 作業グループ.作業CD3
-        workCode4: string; // 作業グループ.作業CD4
-        workCode5: string; // 作業グループ.作業CD5
     }
 }

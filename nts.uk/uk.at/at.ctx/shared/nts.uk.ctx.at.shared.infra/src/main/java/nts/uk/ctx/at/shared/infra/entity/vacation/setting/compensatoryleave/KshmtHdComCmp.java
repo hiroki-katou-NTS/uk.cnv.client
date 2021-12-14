@@ -25,11 +25,11 @@ public class KshmtHdComCmp extends UkJpaEntity implements Serializable {
 	
 	/** 管理区分 **/
 	@Column(name = "MANAGE_ATR")
-	public boolean manageAtr;
+	public int manageAtr;
 	
 	/** 紐付け管理区分 **/
 	@Column(name = "LINK_MNG_ATR")
-	public boolean linkMngAtr;
+	public int linkMngAtr;
 	
 	/** 休暇使用期限 **/
 	@Column(name = "EXPIRATION_USE_SET")
@@ -49,7 +49,7 @@ public class KshmtHdComCmp extends UkJpaEntity implements Serializable {
 	
 	// TIME_MANAGE_ATR
 	@Column(name = "TIME_MANAGE_ATR")
-	public boolean timeManageAtr;
+	public int timeManageAtr;
 	
 	/** 時間休暇消化単位 */
 	@Column(name = "DIGESTION_UNIT")
@@ -57,11 +57,11 @@ public class KshmtHdComCmp extends UkJpaEntity implements Serializable {
 	
 	/** 使用区分  - 代休管理設定.発生設定.代休発生に必要な残業時間 **/
 	@Column(name = "OCCURR_OT_USE_ATR")
-	public boolean occurrOtUseAtr;
+	public int occurrOtUseAtr;
 	
 	/** 時間区分 **/
 	@Column(name = "OCCURR_OT_TIME_ATR")
-	public boolean occurrOtTimeAtr;
+	public int occurrOtTimeAtr;
 	
 	/** 一日の時間**/
 	@Column(name = "DES_OT_ONEDAY_TIME")
@@ -77,11 +77,11 @@ public class KshmtHdComCmp extends UkJpaEntity implements Serializable {
 	
 	/** 使用区分- 代休管理設定.発生設定.代休発生に必要な休日出勤時間 **/
 	@Column(name = "OCCURR_HD_WORK_USE_ATR")
-	public boolean occurrHdWorkUseAtr;
+	public int occurrHdWorkUseAtr;
 	
 	/** 時間区分 -- 代休管理設定.発生設定.代休発生に必要な休日出勤時間.時間設定 **/ 
 	@Column(name = "OCCURR_HD_WORK_TIME_ATR")
-	public boolean occurrHdWorkTimeAtr;
+	public int occurrHdWorkTimeAtr;
 	
 	/** 一日の時間 --- 代休管理設定.発生設定.代休発生に必要な休日出勤時間.時間設定.指定時間**/
 	@Column(name = "DES_HD_WORK_ONEDAY_TIME")

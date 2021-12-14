@@ -44,8 +44,10 @@ public class JudgmentCriteriaSameStampOfSupport implements DomainAggregate {
 	 * 「Output」 ・Boolean
 	 */
 	public boolean checkStampRecognizedAsSame(TimeWithDayAttr standardStamp, TimeWithDayAttr targetStamp) {
-		
-		/** 同一の打刻化を確認する */
-		return Math.abs(standardStamp.valueAsMinutes() - targetStamp.valueAsMinutes()) <= this.sameStampRanceInMinutes.v();
+		int standardStampMinutes = standardStamp.v();
+		int targetStampMinutes   = targetStamp.v();
+		if (Math.abs(standardStampMinutes - targetStampMinutes) <= this.sameStampRanceInMinutes.v())
+			return true;
+		return false;
 	}
 }

@@ -41,27 +41,25 @@ module nts.uk.ui.at.ksu002.a {
 					{ prop: 'title', length: 10 },
 				]
 			}"></div>
-		<!-- ko if: isDisplayActual -->
-			<div class="title-label">
-				<span data-bind="i18n: 'KSU002_6'"></span>
-				<span data-bind="i18n: 'KSU002_7'"></span>
-			</div>
-			<div class="cf" data-bind="
-				attr: {
-					tabindex: $component.params.tabIndex
-				},
-				ntsSwitchButton: {
-					name: $i18n('KSU002_6'),
-					value: $component.achievement,
-					options: [
-						{ code: 1, name: $i18n('KSU002_8') },
-						{ code: 0, name: $i18n('KSU002_9') }
-					],
-					optionsText: 'name',
-					optionsValue: 'code',
-					enable: ko.computed(function() {return $component.dateRanges().length > 0})
-				}"></div>	
-		<!-- /ko -->	
+		<div class="title-label">
+			<span data-bind="i18n: 'KSU002_6'"></span>
+			<span data-bind="i18n: 'KSU002_7'"></span>
+		</div>
+		<div class="cf" data-bind="
+			attr: {
+				tabindex: $component.params.tabIndex
+			},
+			ntsSwitchButton: {
+				name: $i18n('KSU002_6'),
+				value: $component.achievement,
+				options: [
+					{ code: 1, name: $i18n('KSU002_8') },
+					{ code: 0, name: $i18n('KSU002_9') }
+				],
+				optionsText: 'name',
+				optionsValue: 'code',
+				enable: ko.computed(function() {return $component.dateRanges().length > 0})
+			}"></div>				
 		<style type="text/css" rel="stylesheet">
             .title-date {
 				margin: 5px 0;
@@ -76,7 +74,7 @@ module nts.uk.ui.at.ksu002.a {
 				display: block;
 			}
 			.title-date>div.title-label {
-				padding: 0 25px 0 54px;
+				padding: 0 25px;
 				line-height: 32px;
 			}
 			.title-date .nts-switch-button {
@@ -115,10 +113,8 @@ module nts.uk.ui.at.ksu002.a {
 			const achievement = allBindingsAccessor.get('achievement');
 			const workplaceId = allBindingsAccessor.get('workplace-id');
 			const hasChange = allBindingsAccessor.get('has-change');
-			const yearMonth = allBindingsAccessor.get('yearMonth');
 			const tabIndex = element.getAttribute('tabindex') || '1';
-			const rootVm = allBindingsAccessor.get('rootVm');
-			const params = { achievement, hasChange, dateRange, tabIndex, workplaceId, yearMonth, rootVm };
+			const params = { achievement, hasChange, dateRange, tabIndex, workplaceId };
 			const component = { name, params };
 
 			element.classList.add('cf');
@@ -141,7 +137,7 @@ module nts.uk.ui.at.ksu002.a {
 		template
 	})
 	export class TitleDateComponent extends ko.ViewModel {
-		public yearMonth: KnockoutObservable<string>;
+		public yearMonth: KnockoutObservable<string> = ko.observable(moment().format('YYYYMM'));
 
 		public selectedRangeIndex: KnockoutObservable<number> = ko.observable(1);
 
@@ -149,8 +145,6 @@ module nts.uk.ui.at.ksu002.a {
 
 		public achievement: KnockoutObservable<ACHIEVEMENT> = ko.observable(ACHIEVEMENT.NO);
 
-		isDisplayActual: KnockoutObservable<boolean> = ko.observable(false);
-		
 		constructor(private params: Params) {
 			super();
 
@@ -164,17 +158,13 @@ module nts.uk.ui.at.ksu002.a {
 					tabIndex: "1",
 					dateRange: ko.observable({ begin, finish }),
 					achievement: ko.observable(1),
-					workplaceId: ko.observable(null),
-					hasChange: ko.computed(() => false),
-					yearMonth: ko.observable(moment().format('YYYYMM')),
-					rootVm: null
+					workplaceId: ko.observable(''),
+					hasChange: ko.computed(() => false)
 				};
 			}
 
-			const { achievement, dateRange, workplaceId, hasChange, yearMonth, rootVm} = params;
+			const { achievement, dateRange, workplaceId, hasChange } = params;
 
-			vm.yearMonth = yearMonth;
-			
 			if (achievement === undefined) {
 				vm.params.achievement = ko.observable(ACHIEVEMENT.NO);
 			}
@@ -184,19 +174,12 @@ module nts.uk.ui.at.ksu002.a {
 			}
 
 			if (workplaceId === undefined) {
-				vm.params.workplaceId = ko.observable(null);
+				vm.params.workplaceId = ko.observable('');
 			}
 
 			if (hasChange === undefined) {
 				vm.params.hasChange = ko.computed(() => false)
 			}
-			rootVm.startupProcessingInformation.subscribe((v: any) => {
-				if(v && v.scheFunctionControl){
-					vm.isDisplayActual(v.scheFunctionControl.isDisplayActual);
-				}else{
-					vm.isDisplayActual(false);
-				}
-			});		
 		}
 
 		created() {
@@ -246,18 +229,17 @@ module nts.uk.ui.at.ksu002.a {
 								vm.$dialog
 									.error({ messageId: 'Msg_2021' });
 
-								vm.params.workplaceId(null);
+								vm.params.workplaceId('');
 								vm.params.dateRange({ finish: null, begin: null });
 							}
 						});
 				}
 			};
 
-			vm.params.rootVm.listOfPeriodsClose.subscribe((value: any) => {
-				if(value){
-					proccesPeriod(value);
-				}
-			});
+			// first load
+			vm.$ajax('at', API.BASE_DATE)
+				.then(proccesPeriod)
+				.fail(processExceps);
 
 			vm.yearMonth
 				.subscribe((ym: string) => {
@@ -295,7 +277,7 @@ module nts.uk.ui.at.ksu002.a {
 						}
 					}
 				});
-			let fistLoad = true;
+
 			vm.selectedRangeIndex
 				.subscribe(c => {
 					if ([null, undefined].indexOf(c) > -1) {
@@ -312,7 +294,8 @@ module nts.uk.ui.at.ksu002.a {
 								cache.dateRange = c;
 
 								const { finish, begin, wpId } = exist;
-								fistLoad ? setTimeout(() => {vm.params.workplaceId(wpId); fistLoad = false}, 100): vm.params.workplaceId(wpId);
+
+								vm.params.workplaceId(wpId);
 								vm.params.dateRange({ finish, begin });
 							} else if (cache.dateRange !== c) {
 								if (hasChange) {
@@ -325,7 +308,7 @@ module nts.uk.ui.at.ksu002.a {
 
 												const { finish, begin, wpId } = exist;
 
-												fistLoad ? setTimeout(() => {vm.params.workplaceId(wpId); fistLoad = false}, 100): vm.params.workplaceId(wpId);
+												vm.params.workplaceId(wpId);
 												vm.params.dateRange({ finish, begin });
 											} else {
 												// rollback data
@@ -337,7 +320,7 @@ module nts.uk.ui.at.ksu002.a {
 
 									const { finish, begin, wpId } = exist;
 
-									fistLoad ? setTimeout(() => {vm.params.workplaceId(wpId); fistLoad = false}, 100): vm.params.workplaceId(wpId);
+									vm.params.workplaceId(wpId);
 									vm.params.dateRange({ finish, begin });
 								}
 							}
@@ -356,7 +339,7 @@ module nts.uk.ui.at.ksu002.a {
 						if (hasChange) {
 							vm.$dialog
 								// update ver 1.21
-								.confirm({ messageId: 'Msg_1732' })
+								.confirm({ messageId: c === ACHIEVEMENT.YES ? 'Msg_2086' : 'Msg_1732' })
 								.then((v) => {
 									if (v === 'yes') {
 										cache.mode = c;
@@ -379,10 +362,8 @@ module nts.uk.ui.at.ksu002.a {
 		tabIndex: string;
 		dateRange: KnockoutObservable<c.DateRange | null>;
 		achievement: KnockoutObservable<ACHIEVEMENT>;
-		workplaceId: KnockoutObservable<string | null>;
+		workplaceId: KnockoutObservable<string>;
 		hasChange: KnockoutComputed<boolean>;
-		yearMonth: KnockoutObservable<string>;
-		rootVm: any;
 	}
 
 	interface DateOption extends c.DateRange {

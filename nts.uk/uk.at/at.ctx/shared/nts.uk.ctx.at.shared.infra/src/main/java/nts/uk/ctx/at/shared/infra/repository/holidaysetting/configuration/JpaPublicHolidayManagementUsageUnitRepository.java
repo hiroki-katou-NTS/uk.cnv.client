@@ -8,8 +8,6 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.configuration.PublicHolidayManagementUsageUnit;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.configuration.PublicHolidayManagementUsageUnitRepository;
@@ -54,9 +52,9 @@ public class JpaPublicHolidayManagementUsageUnitRepository extends JpaRepository
 	 */
 	private PublicHolidayManagementUsageUnit toDomain(KshmtHdpubUnitSet entity){
 		PublicHolidayManagementUsageUnit domain = new PublicHolidayManagementUsageUnit(
-															BooleanUtils.toInteger(entity.isManageSPubHd()),
-															BooleanUtils.toInteger(entity.isManageWkpPubHd()),
-															BooleanUtils.toInteger(entity.isManageEmpPubHd())
+															entity.getIsManageSPubHd(),
+															entity.getIsManageWkpPubHd(),
+															entity.getIsManageEmpPubHd()
 														);
 		
 		return domain;
@@ -70,9 +68,9 @@ public class JpaPublicHolidayManagementUsageUnitRepository extends JpaRepository
 	 */
 	private KshmtHdpubUnitSet toEntity(PublicHolidayManagementUsageUnit domain){
 		KshmtHdpubUnitSet e = new KshmtHdpubUnitSet();
-		e.setManageEmpPubHd(BooleanUtils.toBoolean(domain.getIsManageEmpPublicHd()));
-		e.setManageSPubHd(BooleanUtils.toBoolean(domain.getIsManageEmployeePublicHd()));
-		e.setManageWkpPubHd(BooleanUtils.toBoolean(domain.getIsManageWkpPublicHd()));
+		e.setIsManageEmpPubHd(domain.getIsManageEmpPublicHd());
+		e.setIsManageSPubHd(domain.getIsManageEmployeePublicHd());
+		e.setIsManageWkpPubHd(domain.getIsManageWkpPublicHd());
 		e.setCid(AppContexts.user().companyId());
 		return e;
 	}

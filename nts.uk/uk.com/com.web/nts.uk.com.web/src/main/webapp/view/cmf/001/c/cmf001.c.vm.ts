@@ -21,7 +21,6 @@ module nts.uk.com.cmf001.c {
                 let res = {
                     source: null,
                     settingCode: null,
-                    domainId: null,
                     itemNo: null,
                     type: null,
                     revisingValue: {
@@ -66,8 +65,6 @@ module nts.uk.com.cmf001.c {
     export class ViewModel extends ko.ViewModel {
 
         settingCode: string;
-    
-    	domainId: int;
 
         items: KnockoutObservableArray<any> = ko.observableArray([]);
 
@@ -92,17 +89,11 @@ module nts.uk.com.cmf001.c {
         isItemSelected = ko.computed(() => !util.isNullOrEmpty(this.selectedItemNo()));
 
         currentItem: any = ko.observable();
-        
-        backUrl: string;
 
         constructor() {
             super();
 
             this.settingCode = __viewContext.transferred.get().settingCode;
-            this.domainId = __viewContext.transferred.get().domainId;
-            this.backUrl = __viewContext.transferred.get().screenId === 'cmf001f'
-            	? '../f/index.xhtml'
-            	: '../b/index.xhtml';
 
             this.currentItem({
                 def: datasource.importableItem.init(),
@@ -123,7 +114,7 @@ module nts.uk.com.cmf001.c {
         loadSetting() {
             let dfd = $.Deferred();
 
-            let path = "exio/input/setting/find/" + this.settingCode + "/" + this.domainId;
+            let path = "exio/input/setting/find/" + this.settingCode;
             this.$ajax(path).done(res => {
                 this.items.removeAll();
                 res.layouts.forEach(layout => {
@@ -160,7 +151,6 @@ module nts.uk.com.cmf001.c {
 
             let path = "/screen/com/cmf/cmf001/importable-item"
                 + "/" + this.settingCode
-                + "/" + this.domainId
                 + "/" + this.selectedItemNo();
             
             this.$ajax(path).done(res => {
@@ -190,7 +180,6 @@ module nts.uk.com.cmf001.c {
 
             let path = "/exio/input/setting/assembly/revise/reviseitem/get"
                 + "/" + this.settingCode
-                + "/" + this.domainId
                 + "/" + this.selectedItemNo();
 
             this.$ajax(path).done(res => {
@@ -222,19 +211,6 @@ module nts.uk.com.cmf001.c {
                 } else {
                     mapping.revisingValue.codeConvert.convertDetailsText("");
                 }
-                if (!res.revisingValue || !res.revisingValue.timeHourlySegment){
-                    mapping.revisingValue.timeHourlySegment(1);
-                }
-                if (!res.revisingValue || !res.revisingValue.timeBaseNumber){
-                    mapping.revisingValue.timeBaseNumber(0);
-                }
-                if (!res.revisingValue || !res.revisingValue.timeDelimiter){
-                    mapping.revisingValue.timeRounding(0);
-                }
-                if (!res.revisingValue || !res.revisingValue.timeRounding){
-                    mapping.revisingValue.timeRounding(3);
-                }
-
             });
         }
 
@@ -297,7 +273,6 @@ module nts.uk.com.cmf001.c {
 
                 let command = {
                     settingCode: this.settingCode,
-                    domainId: this.domainId,
                     itemNo: this.selectedItemNo(),
                     mappingSource: item.selectedMappingType(),
                     fixedValue: fixedValue,
@@ -318,7 +293,6 @@ module nts.uk.com.cmf001.c {
             let itemNo = this.selectedItemNo();
             let command = {
                 settingCode: this.settingCode,
-                domainId: this.domainId,
                 itemNo: itemNo,
             };
 
@@ -329,14 +303,6 @@ module nts.uk.com.cmf001.c {
                     this.itemSelected(itemNo);
                 });
             });
-        }
-        
-        clickBackButton() {
-			let self = this;
-			request.jump(self.backUrl, {
-				settingCode: self.settingCode,
-				domainId: self.domainId
-			});
         }
     }
 

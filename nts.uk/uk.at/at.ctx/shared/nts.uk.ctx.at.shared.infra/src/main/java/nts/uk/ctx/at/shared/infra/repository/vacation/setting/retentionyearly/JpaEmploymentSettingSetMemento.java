@@ -4,10 +4,9 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.infra.repository.vacation.setting.retentionyearly;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.EmptYearlyRetentionSetMemento;
+import nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.UpperLimitSetting;
 import nts.uk.ctx.at.shared.infra.entity.vacation.setting.KmfmtRetentionEmpCtr;
 import nts.uk.ctx.at.shared.infra.entity.vacation.setting.KmfmtRetentionEmpCtrPK;
 
@@ -60,7 +59,7 @@ public class JpaEmploymentSettingSetMemento implements EmptYearlyRetentionSetMem
 	 */
 	@Override
 	public void setManagementCategory(ManageDistinct managementCategory) {
-		this.typeValue.setManagementCtrAtr(BooleanUtils.toBoolean(managementCategory.value));
+		this.typeValue.setManagementCtrAtr((short) managementCategory.value);
 	}
 
 }

@@ -20,6 +20,8 @@ public class CreateEmploymentRoleCmdHandler extends CommandHandler<CreateEmploym
 		CreateEmploymentRoleCmd appCommand = context.getCommand();
 		EmploymentRole employmentRole = appCommand.toDomain();
 		empRepo.addEmploymentRole(employmentRole);
+		
+
 	}
 
 }

@@ -212,6 +212,7 @@ public class AnnualLeaveInfo implements Cloneable {
 
 		this.annualPaidLeaveSet = annualPaidLeaveSet;
 
+		// ○年休情報．年月日を開始日に更新
 		this.ymd = aggregatePeriodWork.getPeriod().end();
 
 		// ○付与処理
@@ -289,6 +290,7 @@ public class AnnualLeaveInfo implements Cloneable {
 		while (itrGrantRemainingNumber.hasNext()) {
 			val grantRemainingNumber = itrGrantRemainingNumber.next();
 
+			// 期限日が年休集計期間WORK.期間.終了日でなければ、消滅処理しない
 			if (!grantRemainingNumber.getDeadline().equals(aggregatePeriodWork.getPeriod().end())) {
 				continue;
 			}
@@ -401,6 +403,7 @@ public class AnnualLeaveInfo implements Cloneable {
 
 			if (!aggregatePeriodWork.getPeriod().contains(tempAnnualLeaveMng.getYmd()))
 				continue;
+
 			// 年休を消化する
 
 			// 年休付与残数を取得

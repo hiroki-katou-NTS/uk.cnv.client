@@ -7,8 +7,6 @@ package nts.uk.ctx.at.shared.infra.repository.worktime.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import nts.uk.ctx.at.shared.dom.worktime.common.FontRearSection;
 import nts.uk.ctx.at.shared.dom.worktime.common.InstantRounding;
 import nts.uk.ctx.at.shared.dom.worktime.common.MultiStampTimePiorityAtr;
@@ -43,22 +41,22 @@ public class JpaWorkTimezoneStampSetGetMemento implements WorkTimezoneStampSetGe
 		
 		List<RoundingSet> roundingSet = new ArrayList<>();
 		roundingSet.add(new RoundingSet(new InstantRounding
-					(FontRearSection.valueOf(BooleanUtils.toInteger(this.kshmtWtComStmp.isFrontRearAtrAttendance())),
+					(FontRearSection.valueOf(this.kshmtWtComStmp.getFrontRearAtrAttendance()),
 					RoundingTimeUnit.valueOf(this.kshmtWtComStmp.getRoundingTimeUnitAttendance())),
 				Superiority.ATTENDANCE));
 		
 		roundingSet.add(new RoundingSet(new InstantRounding
-					(FontRearSection.valueOf(BooleanUtils.toInteger(this.kshmtWtComStmp.isFrontRearAtrLeave())),
+					(FontRearSection.valueOf(this.kshmtWtComStmp.getFrontRearAtrLeave()),
 					RoundingTimeUnit.valueOf(this.kshmtWtComStmp.getRoundingTimeUnitLeave())),
 				Superiority.OFFICE_WORK));
 		
 		roundingSet.add(new RoundingSet(new InstantRounding
-				(FontRearSection.valueOf(BooleanUtils.toInteger(this.kshmtWtComStmp.isFrontRearAtrGoout())),
+				(FontRearSection.valueOf(this.kshmtWtComStmp.getFrontRearAtrGoout()),
 				RoundingTimeUnit.valueOf(this.kshmtWtComStmp.getRoundingTimeUnitGoout())),
 			Superiority.GO_OUT));
 		
 		roundingSet.add(new RoundingSet(new InstantRounding
-				(FontRearSection.valueOf(BooleanUtils.toInteger(this.kshmtWtComStmp.isFrontRearAtrTurnback())),
+				(FontRearSection.valueOf(this.kshmtWtComStmp.getFrontRearAtrTurnback()),
 				RoundingTimeUnit.valueOf(this.kshmtWtComStmp.getRoundingTimeUnitTurnback())),
 			Superiority.TURN_BACK));
 		
@@ -84,27 +82,27 @@ public class JpaWorkTimezoneStampSetGetMemento implements WorkTimezoneStampSetGe
 		List<PrioritySetting> prioritySetting = new ArrayList<>();
 		
 		prioritySetting.add(new PrioritySetting(
-				MultiStampTimePiorityAtr.valueOf(BooleanUtils.toInteger(this.kshmtWtComStmp.isPiorityAtrAttendance())),
+				MultiStampTimePiorityAtr.valueOf(this.kshmtWtComStmp.getPiorityAtrAttendance()),
 				StampPiorityAtr.GOING_WORK));
 		
 		prioritySetting.add(new PrioritySetting(
-				MultiStampTimePiorityAtr.valueOf(BooleanUtils.toInteger(this.kshmtWtComStmp.isPiorityAtrLeave())),
+				MultiStampTimePiorityAtr.valueOf(this.kshmtWtComStmp.getPiorityAtrLeave()),
 				StampPiorityAtr.LEAVE_WORK));
 		
 		prioritySetting.add(new PrioritySetting(
-				MultiStampTimePiorityAtr.valueOf(BooleanUtils.toInteger(this.kshmtWtComStmp.isPiorityAtrAttendanceGate())),
+				MultiStampTimePiorityAtr.valueOf(this.kshmtWtComStmp.getPiorityAtrAttendanceGate()),
 				StampPiorityAtr.ENTERING));
 		
 		prioritySetting.add(new PrioritySetting(
-				MultiStampTimePiorityAtr.valueOf(BooleanUtils.toInteger(this.kshmtWtComStmp.isPiorityAtrLeaveGate())),
+				MultiStampTimePiorityAtr.valueOf(this.kshmtWtComStmp.getPiorityAtrLeaveGate()),
 				StampPiorityAtr.EXIT));
 		
 		prioritySetting.add(new PrioritySetting(
-				MultiStampTimePiorityAtr.valueOf(BooleanUtils.toInteger(this.kshmtWtComStmp.isPiorityAtrLogOn())),
+				MultiStampTimePiorityAtr.valueOf(this.kshmtWtComStmp.getPiorityAtrLogOn()),
 				StampPiorityAtr.PCLOGIN));
 		
 		prioritySetting.add(new PrioritySetting(
-				MultiStampTimePiorityAtr.valueOf(BooleanUtils.toInteger(this.kshmtWtComStmp.isPiorityAtrLogOff())),
+				MultiStampTimePiorityAtr.valueOf(this.kshmtWtComStmp.getPiorityAtrLogOff()),
 				StampPiorityAtr.PC_LOGOUT));
 		
 		return prioritySetting;

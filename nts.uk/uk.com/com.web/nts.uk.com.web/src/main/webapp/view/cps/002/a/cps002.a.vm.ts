@@ -106,15 +106,9 @@ module cps002.a.vm {
         licenseCheckDipslay: KnockoutObservable<boolean> = ko.observable(true);
         classWarning: KnockoutObservable<string> = ko.observable("");
 
-        isFromCPS018: KnockoutObservable<boolean> = ko.observable(false);
-
         constructor() {
             let self = this,
                 employee = self.currentEmployee();
-            
-            let params = getShared("CPS002A_PARAMS") || { isFromCPS018: false };
-            self.isFromCPS018(params.isFromCPS018);
-            nts.uk.sessionStorage.removeItem(nts.uk.request.STORAGE_KEY_TRANSFER_DATA);
 
             self.createTypeId.subscribe((newValue) => {
                 self.initValueList([]);
@@ -536,8 +530,7 @@ module cps002.a.vm {
                     EmployeeCode: employee.employeeCode(),
                     cardNo: employee.cardNo(),
                     LoginId: employee.loginId(),
-                    employeeName: employee.employeeName(),
-                    password: employee.password()
+                    employeeName: employee.employeeName()
                 };
 
             if (!self.isError()) {
@@ -560,15 +553,6 @@ module cps002.a.vm {
                             break;
                         case "Msg_346":
                             $('#cardNumber').ntsError('set', error);
-                            break;
-                        default:
-                            if (error.errors && error.errors.length > 1) {
-                                error.errors.forEach(err => {
-                                    $('#password').ntsError('set', err);
-                                });
-                            } else {
-                                $('#password').ntsError('set', error);
-                            }      
                             break;
                     }
                 });

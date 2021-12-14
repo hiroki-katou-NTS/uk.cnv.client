@@ -8,7 +8,7 @@ import lombok.Value;
 import nts.gul.text.StringUtil;
 import nts.uk.ctx.exio.dom.input.errors.ErrorMessage;
 import nts.uk.ctx.exio.dom.input.setting.assembly.revise.ReviseValue;
-import nts.gul.util.Either;
+import nts.uk.ctx.exio.dom.input.util.Either;
 
 @AllArgsConstructor
 @Value

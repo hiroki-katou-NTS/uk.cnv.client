@@ -17,9 +17,6 @@ module nts.uk.at.view.kdp002.a {
             pageComment: KnockoutObservable<string> = ko.observable('');
             commentColor: KnockoutObservable<string> = ko.observable('');
 
-            workUse:  KnockoutObservable<boolean> = ko.observable(false);
-            workGroup: KnockoutObservable<WorkGroup> = ko.observable(null);
-
             state!: KnockoutComputed<STATE>;
             constructor() {
                 const vm = this;
@@ -62,8 +59,7 @@ module nts.uk.at.view.kdp002.a {
                         self.stampGrid(new EmbossGridInfo(res, ko.unwrap(self.workManagementMultiple)));
 
                         self.stampGrid().yearMonth.subscribe((val) => {
-                            if (_.get(res, 'stampSetting.historyDisplayMethod') == 2)
-                                self.getTimeCardData();
+                            self.getTimeCardData();
                         });
 
                         let stampToSuppress = res.stampToSuppress ? res.stampToSuppress : {};
@@ -147,8 +143,7 @@ module nts.uk.at.view.kdp002.a {
             public clickBtn1(btn: any, layout: any) {
                 const vm = this;
                 const view = new ko.ViewModel();
-				let stampTime = moment(new Date()).format("HH:mm");
-				
+
                 nts.uk.ui.block.invisible();
                 nts.uk.request
                     .syncAjax("com", "server/time/now/")
@@ -162,65 +157,26 @@ module nts.uk.at.view.kdp002.a {
                             goOutArt: btn.goOutArt,
                             setPreClockArt: btn.setPreClockArt,
                             changeClockArt: btn.changeClockArt,
-                            changeCalArt: btn.changeCalArt,
-                            workGroup: ko.unwrap(vm.workGroup)
+                            changeCalArt: btn.changeCalArt
                         };
-
-                        service.getSettingStampCommon().done((result: any) => {
-                            vm.workUse(!!result.workUse);
-                            
-                            service.getEmployeeWorkByStamping({sid: __viewContext.user.employeeId, workFrameNo: 1, upperFrameWorkCode: ''}).done((res: any) => {
-                                if (vm.workUse() == true && res.task.length > 0 && btn.taskChoiceArt == 1) {
-                                    view.$window.modal('at', '/view/kdp/002/l/index.xhtml', {employeeId: __viewContext.user.employeeId}).then((works: IWorkGroup) => {
-                      
-                                    vm.workGroup(works);
-                                    data.workGroup = ko.unwrap(vm.workGroup);
-                                    
-                                    }).then (() => {
-                                        service.stampInput(data).done((res) => {
-                                            let param = {
-                                                sid: __viewContext.user.employeeId,
-                                                date: view.$date.now()
-                                            }
-        
-                                            if (vm.stampResultDisplay().notUseAttr == 1 && btn.changeClockArt == 1) {
-                                                vm.openScreenC(btn, layout);
-                                            } else {
-                                                vm.openScreenB(btn, layout, stampTime);
-                                            }
-                                            
-                                        }).fail((res) => {
-                                            nts.uk.ui.dialog.alertError({ messageId: res.messageId });
-                                        });
-                                    })
-        
-                                } else {
-                                    service.stampInput(data).done((res) => {
-                                        let param = {
-                                            sid: __viewContext.user.employeeId,
-                                            date: view.$date.now()
-                                        }
-            
-                                        if (vm.stampResultDisplay().notUseAttr == 1 && btn.changeClockArt == 1) {
-                                            vm.openScreenC(btn, layout);
-                                        } else {
-                                            vm.openScreenB(btn, layout, stampTime);
-                                        }
-                                        
-            
-                                    }).fail((res) => {
-                                        nts.uk.ui.dialog.alertError({ messageId: res.messageId });
-                                    });
-                                }
-                            });
-                        })
-                        data.workGroup = null;
+                        service.stampInput(data).done((res) => {
+                            let param = {
+                                sid: __viewContext.user.employeeId,
+                                date: view.$date.now()
+                            }
+                            if (vm.stampResultDisplay().notUseAttr == 1 && btn.changeClockArt == 1) {
+                                vm.openScreenC(btn, layout);
+                            } else {
+                                vm.openScreenB(btn, layout);
+                            }
+                        }).fail((res) => {
+                            nts.uk.ui.dialog.alertError({ messageId: res.messageId });
+                        });
                     });
             }
 
-            public openScreenB(button, layout, stampTime) {
+            public openScreenB(button, layout) {
                 let self = this;
-				const vm = new ko.ViewModel();
 
                 nts.uk.ui.windows.setShared("resultDisplayTime", self.stampSetting().resultDisplayTime);
                 nts.uk.ui.windows.setShared("infoEmpToScreenB", {
@@ -231,7 +187,7 @@ module nts.uk.at.view.kdp002.a {
                 nts.uk.ui.windows.setShared("screenB", {
                     screen: "KDP002"
                 });
-				vm.$window.modal('at', '/view/kdp/002/b/index.xhtml', {stampTime: stampTime}).then(() => {
+                nts.uk.ui.windows.sub.modal('/view/kdp/002/b/index.xhtml').onClosed(() => {
                     if (self.stampGrid().displayMethod() === 1) {
                         self.getStampData();
                     } else {
@@ -309,7 +265,6 @@ module nts.uk.at.view.kdp002.a {
                         });
                     }
             }
-
         }
     }
     export enum Mode {
@@ -319,39 +274,28 @@ module nts.uk.at.view.kdp002.a {
 
 }
 var paramSize = 0;
-let resize = () => {
-
-	var bottomMasterWrapper = $('#master-wrapper')[0].getBoundingClientRect().bottom;
-	var topStampInfo = $('#stamp-info')[0].getBoundingClientRect().top;
-	var h = bottomMasterWrapper - topStampInfo - 98;
-
-	let stampBtnHeight = (h < 48 ? 48 : h) + 'px';
-	const $hgrid = $('#stamp-history-list');
-	const $cgrid = $('#time-card-list');
-	if (paramSize !== h) {
-		paramSize = h;
-		if ($hgrid.data('igGrid')) {
-			$hgrid.igGrid("option", "height", stampBtnHeight);
-			$hgrid.data("height", stampBtnHeight);
-		}
-		if ($cgrid.data('igGrid')) {
-			$cgrid.igGrid("option", "height", stampBtnHeight);
-			$cgrid.data("height", stampBtnHeight);
-		}
-		return true;
-	} else {
-		return false;
-	}
-}
-
 let reCalGridWidthHeight = () => {
-	let dfd = $.Deferred<void>();
+    const resize = () => {
+        var bottomMasterWrapper = $('#master-wrapper')[0].getBoundingClientRect().bottom;
+        var topStampInfo = $('#stamp-info')[0].getBoundingClientRect().top;
+        var h = bottomMasterWrapper - topStampInfo - 98;
 
-	if ($('#stamp-info')[0]) {
-		setTimeout(() => {
-			dfd.resolve(resize());
-		});
-
-	}
-	return dfd.promise();
+        let stampBtnHeight = (h < 48 ? 48 : h) + 'px';
+        const $hgrid = $('#stamp-history-list');
+        const $cgrid = $('#time-card-list');
+		if (paramSize !== h) {
+			paramSize = h;
+	        if ($hgrid.data('igGrid')) {
+	            $hgrid.igGrid("option", "height", stampBtnHeight);
+	            $hgrid.data("height", stampBtnHeight);
+	        }
+	        if ($cgrid.data('igGrid')) {
+	            $cgrid.igGrid("option", "height", stampBtnHeight);
+	            $cgrid.data("height", stampBtnHeight);
+	        }
+		}
+    };
+    if ($('#stamp-info')[0]) {
+        setTimeout(resize);
+    }
 }

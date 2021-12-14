@@ -96,16 +96,4 @@ public class DataDeletionPatternSettingDto<X extends AbstractCategoryDto> implem
 		return dto;
 	}
 
-	@Override
-	public void setPatternClassification(boolean patternClassification) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setWithoutPassword(boolean withoutPassword) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

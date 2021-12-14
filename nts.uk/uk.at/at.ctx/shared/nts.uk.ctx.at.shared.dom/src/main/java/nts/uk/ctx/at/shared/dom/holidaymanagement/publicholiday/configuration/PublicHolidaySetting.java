@@ -205,68 +205,31 @@ public class PublicHolidaySetting extends AggregateRoot {
 	
 
 	/**
-	 * [5] 繰越データを作成する
+	 * 繰越データを作成する
 	 * @param employeeId 社員ID
 	 * @param yearMonth 年月
 	 * @param ymd 期限日
 	 * @param numberCarriedForward 繰越数
 	 * @param grantRemainRegisterType 登録種別
-	 * @return 公休繰越データ
+	 * @return Optional<公休繰越データ>
 	 */
-	public PublicHolidayCarryForwardData createPublicHolidayCarryForwardData(
+	public Optional<PublicHolidayCarryForwardData> createPublicHolidayCarryForwardData(
 			String employeeId,
-			GeneralDate endDay,
-			GeneralDate criteriaDate,
+			YearMonth yearMonth,
+			GeneralDate ymd,
 			LeaveRemainingDayNumber numberCarriedForward,
-			GrantRemainRegisterType grantRemainRegisterType,
-			CacheCarrier cacheCarrier,
-			RequireM2 require
+			GrantRemainRegisterType grantRemainRegisterType
 			){
 		
-		if(this.isCarryOver(employeeId, endDay, criteriaDate, numberCarriedForward, cacheCarrier, require)){
-			return new PublicHolidayCarryForwardData(
+		if((iscarryOverNumberOfPublicHoliday() && numberCarriedForward.lessThan(0.0)) || numberCarriedForward.greaterThan(0.0)){
+			return Optional.of(new PublicHolidayCarryForwardData(
 					employeeId,
+					yearMonth,
+					ymd,
 					numberCarriedForward,
-					grantRemainRegisterType);
+					grantRemainRegisterType));
 		}
-		return new PublicHolidayCarryForwardData(employeeId,
-				new LeaveRemainingDayNumber(0.0),
-				grantRemainRegisterType);
-	}
-	
-	
-	/**
-	 * [6] 未消化数を求める
-	 * @param employeeId
-	 * @param endDay
-	 * @param criteriaDate
-	 * @param carryForwardData
-	 * @param numberCarriedForward
-	 * @param grantRemainRegisterType
-	 * @param cacheCarrier
-	 * @param require
-	 * @return
-	 */
-	public LeaveRemainingDayNumber findUnused(
-			String employeeId,
-			GeneralDate endDay,
-			GeneralDate criteriaDate,
-			PublicHolidayCarryForwardData carryForwardData,
-			LeaveRemainingDayNumber numberCarriedForward,
-			CacheCarrier cacheCarrier,
-			RequireM2 require
-			){
-		
-		LeaveRemainingDayNumber offsetsNumber = carryForwardData.offsetRemainingDataOfTheMonth(numberCarriedForward);
-		if(this.isCarryOver(employeeId, endDay, criteriaDate, offsetsNumber, cacheCarrier, require)){
-			return new LeaveRemainingDayNumber(0.0);
-		}
-		
-		if(offsetsNumber.v() < 0){
-			return new LeaveRemainingDayNumber(0.0);
-		}
-		
-		return offsetsNumber;
+		return Optional.empty();
 	}
 	
 	
@@ -362,42 +325,15 @@ public class PublicHolidaySetting extends AggregateRoot {
 			aggregatePublicHolidayWork.add(new AggregatePublicHolidayWork(
 					period.getYearMonth(),
 					period.getPeriod(),
-					publicHolidayMonthSetting
+					publicHolidayMonthSetting,
+					//期限日作成
+					createDeadline(require, cacheCarrier, employeeId ,period.getPeriod().end(), criteriaDate)
 					));
 		}
 		
 		
 		return aggregatePublicHolidayWork;
 	}
-	
-	
-	/**
-	 * [pvt-3] 繰越するか判断
-	 * @param employeeId
-	 * @param endDay
-	 * @param criteriaDate
-	 * @param numberCarriedForward
-	 * @param cacheCarrier
-	 * @param require
-	 * @return
-	 */
-	private boolean isCarryOver(String employeeId,
-			GeneralDate endDay,
-			GeneralDate criteriaDate,
-			LeaveRemainingDayNumber numberCarriedForward,
-			CacheCarrier cacheCarrier,
-			RequireM2 require){
-		
-		if((iscarryOverNumberOfPublicHoliday() && numberCarriedForward.lessThan(0.0)) || numberCarriedForward.greaterThan(0.0)){
-			if(createDeadline(require, cacheCarrier, employeeId, endDay,criteriaDate).after(endDay) ){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	
-	
 	
 	//公休管理するか
 	public boolean isManagePublicHoliday(){

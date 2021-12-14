@@ -13,7 +13,7 @@ import nts.arc.layer.dom.objecttype.DomainObject;
  */
 @Getter
 @NoArgsConstructor
-public class EditStateOfDailyAttd implements DomainObject, Cloneable {
+public class EditStateOfDailyAttd implements DomainObject {
 	
 	/** 勤怠項目ID: 勤怠項目ID */
 	private int attendanceItemId;
@@ -52,16 +52,10 @@ public class EditStateOfDailyAttd implements DomainObject, Cloneable {
 				|| this.editStateSetting == EditStateSetting.HAND_CORRECTION_OTHER;
 	}
 	
-	@Override
-	public EditStateOfDailyAttd clone() {
-		return new EditStateOfDailyAttd(this.attendanceItemId, editStateSetting);
-	}
-	
 	public static interface Require {
 		
 		/** [R-1] ログイン社員IDを取得する */
 		String getLoginEmployeeId();
 		
 	}
-	
 }

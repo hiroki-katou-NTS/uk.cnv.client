@@ -42,6 +42,5 @@ public interface RoleSetGrantedPersonRepository {
 	 * @return ロールセット個人別付与．社員ID（list）・・・（２）
 	 */
 	public List<String> getSidByRoleSidDate(String companyID , List<String> lstSid , List<String> roleSetCDLst, GeneralDate date);
-
-	public List<RoleSetGrantedPerson> getByCid(String companyId);
+	
 }

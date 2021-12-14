@@ -31,6 +31,13 @@ public interface ManageAnnualSettingGetMemento {
     HalfDayManage getHalfDayManage();
 
     /**
+     * Gets the checks if is work day calculate.
+     *
+     * @return the checks if is work day calculate
+     */
+    boolean getIsWorkDayCalculate();
+
+    /**
      * Gets the remaining number setting.
      *
      * @return the remaining number setting

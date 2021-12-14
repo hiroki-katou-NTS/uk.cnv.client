@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.function.infra.entity.monthlyworkschedule;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,7 +76,7 @@ public class KfnmtRptWkMonOut extends UkJpaEntity
 
 	// column 備考欄の印字設定
 	@Column(name = "IS_REMARK_PRINTED")
-	private boolean isRemarkPrinted;
+	private BigDecimal isRemarkPrinted;
 
 	// column 備考入力No
 	@Column(name = "REMARK_INPUT_NO")
@@ -184,12 +185,12 @@ public class KfnmtRptWkMonOut extends UkJpaEntity
 
 	@Override
 	public Boolean getIsRemarkPrinted() {
-		return this.isRemarkPrinted;
+		return this.isRemarkPrinted.equals(BigDecimal.ONE);
 	}
 
 	@Override
 	public void setIsRemarkPrinted(Boolean isRemarkPrinted) {
-		this.isRemarkPrinted = isRemarkPrinted;
+		this.isRemarkPrinted = isRemarkPrinted ? BigDecimal.ONE : BigDecimal.ZERO;
 	}
 
 }

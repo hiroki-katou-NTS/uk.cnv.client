@@ -6,8 +6,6 @@ package nts.uk.ctx.at.record.infra.repository.optitem;
 
 import java.util.Optional;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import nts.uk.ctx.at.record.infra.entity.optitem.KrcmtAnyfResultRange;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.AmountRange;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcRangeCheck;
@@ -48,7 +46,7 @@ public class JpaCalcResultRangeGetMemento implements CalcResultRangeGetMemento {
 	 */
 	@Override
 	public CalcRangeCheck getUpperLimit() {
-		return CalcRangeCheck.valueOf(BooleanUtils.toInteger(this.typeValue.isUpperLimitAtr()));
+		return CalcRangeCheck.valueOf(this.typeValue.getUpperLimitAtr());
 	}
 
 	/*
@@ -60,7 +58,7 @@ public class JpaCalcResultRangeGetMemento implements CalcResultRangeGetMemento {
 	 */
 	@Override
 	public CalcRangeCheck getLowerLimit() {
-		return CalcRangeCheck.valueOf(BooleanUtils.toInteger(this.typeValue.isLowerLimitAtr()));
+		return CalcRangeCheck.valueOf(this.typeValue.getLowerLimitAtr());
 	}
 
 	/*

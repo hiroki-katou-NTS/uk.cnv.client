@@ -54,7 +54,7 @@ public class AttendanceTimeOfDailyAttendanceTest {
 		}};
 		
 		// 日別勤怠の勤怠時間 
-		AttendanceTimeOfDailyAttendance target = AttendanceTimeOfDailyAttendanceHelper.createWithActualWorkingTimeOfDaily(actualWorkingTimeDaily);
+		AttendanceTimeOfDailyAttendance target = Helper.createWithActualWorkingTimeOfDaily(actualWorkingTimeDaily);
 		
 		assertThat(target.getLateTimeOfDaily()).isEmpty();
 	}
@@ -75,7 +75,7 @@ public class AttendanceTimeOfDailyAttendanceTest {
 		}};
 		
 		// 日別勤怠の勤怠時間 
-		AttendanceTimeOfDailyAttendance target = AttendanceTimeOfDailyAttendanceHelper.createWithActualWorkingTimeOfDaily(actualWorkingTimeDaily);
+		AttendanceTimeOfDailyAttendance target = Helper.createWithActualWorkingTimeOfDaily(actualWorkingTimeDaily);
 		
 		// Action
 		List<LateTimeOfDaily> result = target.getLateTimeOfDaily();
@@ -99,7 +99,8 @@ public class AttendanceTimeOfDailyAttendanceTest {
 		}};
 		
 		// 日別勤怠の勤怠時間 
-		AttendanceTimeOfDailyAttendance target = AttendanceTimeOfDailyAttendanceHelper.createWithActualWorkingTimeOfDaily(actualWorkingTimeDaily);	
+		AttendanceTimeOfDailyAttendance target = Helper.createWithActualWorkingTimeOfDaily(actualWorkingTimeDaily);
+		
 		assertThat(target.getLeaveEarlyTimeOfDaily()).isEmpty();
 	}
 	
@@ -120,7 +121,7 @@ public class AttendanceTimeOfDailyAttendanceTest {
 		}};
 				
 		// 日別勤怠の勤怠時間 
-		AttendanceTimeOfDailyAttendance target = AttendanceTimeOfDailyAttendanceHelper.createWithActualWorkingTimeOfDaily(actualWorkingTimeDaily);
+		AttendanceTimeOfDailyAttendance target = Helper.createWithActualWorkingTimeOfDaily(actualWorkingTimeDaily);
 		
 		// Action
 		List<LeaveEarlyTimeOfDaily> result = target.getLeaveEarlyTimeOfDaily();
@@ -144,7 +145,7 @@ public class AttendanceTimeOfDailyAttendanceTest {
 		}};
 		
 		// 日別勤怠の勤怠時間 
-		AttendanceTimeOfDailyAttendance target = AttendanceTimeOfDailyAttendanceHelper.createWithActualWorkingTimeOfDaily(actualWorkingTimeDaily);
+		AttendanceTimeOfDailyAttendance target = Helper.createWithActualWorkingTimeOfDaily(actualWorkingTimeDaily);
 		
 		assertThat(target.getOutingTimeOfDaily()).isEmpty();
 	}
@@ -165,7 +166,7 @@ public class AttendanceTimeOfDailyAttendanceTest {
 		}};
 		
 		// 日別勤怠の勤怠時間 
-		AttendanceTimeOfDailyAttendance target = AttendanceTimeOfDailyAttendanceHelper.createWithActualWorkingTimeOfDaily(actualWorkingTimeDaily);
+		AttendanceTimeOfDailyAttendance target = Helper.createWithActualWorkingTimeOfDaily(actualWorkingTimeDaily);
 		
 		// Action
 		List<OutingTimeOfDaily> result = target.getOutingTimeOfDaily();
@@ -173,5 +174,26 @@ public class AttendanceTimeOfDailyAttendanceTest {
 		assertThat(result).extracting( d -> d)
 							.containsExactly( outingTime1, outingTime2 );
 	}	
+	
+	static class Helper {
+		
+		@Injectable 
+		static WorkScheduleTimeOfDaily timeOfDaily;
+		
+		@Injectable
+		static StayingTimeOfDaily stayingTimeOfDaily;
+		
+		@Injectable 
+		static AttendanceTimeOfExistMinus budget;
+		
+		@Injectable 
+		static AttendanceTimeOfExistMinus unEmploy;
+		
+		public static AttendanceTimeOfDailyAttendance createWithActualWorkingTimeOfDaily(
+				ActualWorkingTimeOfDaily actualWorkingTimeOfDaily ) {
+			
+			return new AttendanceTimeOfDailyAttendance(timeOfDaily, actualWorkingTimeOfDaily, stayingTimeOfDaily, budget, unEmploy);
+		}
+	}
 
 }

@@ -33,8 +33,11 @@ import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampDakokuRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.MakeUseJudgmentResults;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.StampFunctionAvailableService;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
 import nts.uk.ctx.at.shared.dom.adapter.holidaymanagement.CompanyAdapter;
 import nts.uk.ctx.at.shared.dom.adapter.holidaymanagement.CompanyImport622;
 import nts.uk.ctx.at.shared.dom.dailyattdcal.converter.DailyRecordShareFinder;
@@ -74,6 +77,9 @@ public class ConfirmUseOfStampInputCommandHandler
 	private EmployeeRecordAdapter sysEmpPub;
 
 	@Inject
+	private StampRecordRepository stampRecordRepo;
+
+	@Inject
 	private StampDakokuRepository stampDakokuRepo;
 	
 	@Inject
@@ -95,7 +101,7 @@ public class ConfirmUseOfStampInputCommandHandler
 	protected ConfirmUseOfStampInputResult handle(CommandHandlerContext<ConfirmUseOfStampInputCommand> context) {
 
 		StampFunctionAvailableServiceRequireImpl require = new StampFunctionAvailableServiceRequireImpl(stampUsageRepo,
-				stampCardRepo, stampCardEditRepo, companyAdapter, sysEmpPub, stampDakokuRepo,
+				stampCardRepo, stampCardEditRepo, companyAdapter, sysEmpPub, stampRecordRepo, stampDakokuRepo,
 				temporarilyReflectStampDailyAttd, getMngInfoFromEmpIDListAdapter, dailyRecordShareFinder, createDailyResults, timeReflectFromWorkinfo);
 
 		StampMeans stampMeans = EnumAdaptor.valueOf(context.getCommand().getStampMeans(), StampMeans.class);
@@ -135,6 +141,9 @@ public class ConfirmUseOfStampInputCommandHandler
 
 		@Inject
 		private EmployeeRecordAdapter sysEmpPub;
+
+		@Inject
+		private StampRecordRepository stampRecordRepo;
 
 		@Inject
 		private StampDakokuRepository stampDakokuRepo;
@@ -180,6 +189,11 @@ public class ConfirmUseOfStampInputCommandHandler
 		}
 
 		@Override
+		public void insert(StampRecord stampRecord) {
+			this.stampRecordRepo.insert(stampRecord);
+		}
+
+		@Override
 		public void insert(Stamp stamp) {
 			this.stampDakokuRepo.insert(stamp);
 		}
@@ -187,6 +201,12 @@ public class ConfirmUseOfStampInputCommandHandler
 		@Override
 		public Optional<StampCard> getByCardNoAndContractCode(String stampNumber, String contractCode) {
 			return this.stampCardRepo.getByCardNoAndContractCode(stampNumber, contractCode);
+		}
+
+		@Override
+		public boolean existsStamp(ContractCode contractCode, StampNumber stampNumber, GeneralDateTime dateTime,
+				ChangeClockArt changeClockArt) {
+			return stampDakokuRepo.existsStamp(contractCode, stampNumber, dateTime, changeClockArt);
 		}
 		
 		@Override

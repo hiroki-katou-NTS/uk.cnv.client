@@ -6,6 +6,7 @@ import javax.ejb.TransactionAttributeType;
 
 import lombok.val;
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.uk.ctx.exio.dom.input.ExecutionContext;
 import nts.uk.ctx.exio.dom.input.errors.ExternalImportError;
 import nts.uk.ctx.exio.dom.input.errors.ExternalImportErrors;
 import nts.uk.ctx.exio.dom.input.errors.ExternalImportErrorsRepository;
@@ -15,28 +16,23 @@ import nts.uk.ctx.exio.dom.input.errors.ExternalImportErrorsRepository;
 public class JpaExternalImportErrorsRepository extends JpaRepository implements ExternalImportErrorsRepository {
 
 	@Override
-	public void cleanOldTables(String companyId) {
-		table(companyId).dropTable();
+	public void setup(ExecutionContext context) {
+		table(context).createTable();
 	}
 
 	@Override
-	public void setup(String companyId) {
-		table(companyId).createTable();
+	public void add(ExecutionContext context, ExternalImportError error) {
+		table(context).insert(error);
 	}
 
 	@Override
-	public void add(String companyId, ExternalImportError error) {
-		table(companyId).insert(error);
-	}
-
-	@Override
-	public ExternalImportErrors find(String companyId, int startErrorNo, int size) {
-		val errors = table(companyId).select(startErrorNo, size);
+	public ExternalImportErrors find(ExecutionContext context, int startErrorNo, int size) {
+		val errors = table(context).select(startErrorNo, size);
 		return new ExternalImportErrors(errors);
 	}
 
 
-	private ErrorsTable table(String companyId) {
-		return new ErrorsTable(companyId, this.database().product(), this.jdbcProxy());
+	private ErrorsTable table(ExecutionContext context) {
+		return new ErrorsTable(context, this.database().product(), this.jdbcProxy());
 	}
 }

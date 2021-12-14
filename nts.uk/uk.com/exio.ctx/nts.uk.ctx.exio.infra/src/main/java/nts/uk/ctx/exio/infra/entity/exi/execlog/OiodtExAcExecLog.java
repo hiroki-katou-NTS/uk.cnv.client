@@ -65,7 +65,7 @@ public class OiodtExAcExecLog extends ContractUkJpaEntity implements Serializabl
 	 */
 	@Basic(optional = false)
 	@Column(name = "EXECUTE_FORM")
-	public boolean executeForm;
+	public int executeForm;
 
 	/**
 	 * 対象件数

@@ -47,8 +47,9 @@ import nts.uk.ctx.at.request.dom.application.common.adapter.workflow.dto.EmpPerf
 import nts.uk.ctx.at.request.dom.application.common.adapter.workflow.dto.ErrorFlagImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.workflow.dto.RepresenterInformationImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.workflow.dto.Request533Import;
-import nts.uk.ctx.at.request.dom.application.common.adapter.workflow.dto.SentMailListImport;
 import nts.uk.ctx.sys.env.pub.maildestination.IMailDestinationPub;
+import nts.uk.ctx.sys.env.pub.maildestination.MailDestination;
+import nts.uk.ctx.sys.env.pub.maildestination.OutGoingMail;
 import nts.uk.ctx.workflow.pub.agent.AgentPubExport;
 import nts.uk.ctx.workflow.pub.agent.ApproverRepresenterExport;
 import nts.uk.ctx.workflow.pub.resultrecord.ApproverApproveExport;
@@ -100,7 +101,7 @@ public class ApprovalRootStateAdapterImpl implements ApprovalRootStateAdapter {
 	public MailDestinationCache createMailDestinationCache(String companyID) {
 
 		return new MailDestinationCache(
-				sid -> this.iMailDestinationPub.getEmployeeMails(companyID, Arrays.asList(sid), 6).getSentMailLists());
+				sid -> this.iMailDestinationPub.getEmpEmailAddress(companyID, Arrays.asList(sid), 6));
 	}
 	
 	@Override
@@ -393,31 +394,31 @@ public class ApprovalRootStateAdapterImpl implements ApprovalRootStateAdapter {
 									String representerMail = "";
 									if(opMailDestCache.isPresent()) {
 										MailDestinationCache mailDestCache = opMailDestCache.get();
-										List<SentMailListImport> approverDest = mailDestCache.get(z.getApproverID());
+										List<MailDestination> approverDest = mailDestCache.get(z.getApproverID());
 										if(!CollectionUtil.isEmpty(approverDest)){
-											List<String> approverOuts = approverDest.get(0).getMailAddresses();
+											List<OutGoingMail> approverOuts = approverDest.get(0).getOutGoingMails();
 											if(!CollectionUtil.isEmpty(approverOuts)){
-												approverMail = Strings.isNotBlank(approverOuts.get(0))
-														? approverOuts.get(0) : "";
+												approverMail = Strings.isNotBlank(approverOuts.get(0).getEmailAddress())
+														? approverOuts.get(0).getEmailAddress() : "";
 											}
 										}
 										if(Strings.isNotBlank(z.getAgentID())){
-											List<SentMailListImport> agentDest = mailDestCache.get(z.getAgentID());
+											List<MailDestination> agentDest = mailDestCache.get(z.getAgentID());
 											if(!CollectionUtil.isEmpty(agentDest)){
-												List<String> agentOuts = agentDest.get(0).getMailAddresses();
+												List<OutGoingMail> agentOuts = agentDest.get(0).getOutGoingMails();
 												if(!CollectionUtil.isEmpty(agentOuts)){
-													agentMail = Strings.isNotBlank(agentOuts.get(0))
-															? agentOuts.get(0) : "";
+													agentMail = Strings.isNotBlank(agentOuts.get(0).getEmailAddress())
+															? agentOuts.get(0).getEmailAddress() : "";
 												}
 											}
 										}
 										if(Strings.isNotBlank(z.getRepresenterID())){
-											List<SentMailListImport> representerDest = mailDestCache.get(z.getRepresenterID());
+											List<MailDestination> representerDest = mailDestCache.get(z.getRepresenterID());
 											if(!CollectionUtil.isEmpty(representerDest)){
-												List<String> representerOuts = representerDest.get(0).getMailAddresses();
+												List<OutGoingMail> representerOuts = representerDest.get(0).getOutGoingMails();
 												if(!CollectionUtil.isEmpty(representerOuts)){
-													representerMail = Strings.isNotBlank(representerOuts.get(0))
-															? representerOuts.get(0) : "";
+													representerMail = Strings.isNotBlank(representerOuts.get(0).getEmailAddress())
+															? representerOuts.get(0).getEmailAddress() : "";
 												}
 											}
 										}

@@ -13,8 +13,6 @@ import javax.persistence.JoinColumns;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.NoArgsConstructor;
 import nts.arc.time.calendar.DateInMonth;
 import nts.arc.time.calendar.DayOfWeek;
@@ -51,19 +49,19 @@ public class KscmtShiftTableRuleForOrgAvai extends ContractUkJpaEntity implement
      * 勤務希望に休日を使用するか
      */
     @Column(name = "AVAILABILITY_HD_ATR")
-    public boolean holidayAtr;
+    public int holidayAtr;
 
     /**
      * 勤務希望にシフトを使用するか
      */
     @Column(name = "AVAILABILITY_SHIFT_ATR")
-    public boolean shiftAtr;
+    public int shiftAtr;
 
     /**
      * 勤務希望に時間帯を使用するか
      */
     @Column(name = "AVAILABILITY_TIMESHEET_ATR")
-    public boolean timeSheetAtr;
+    public int timeSheetAtr;
 
     /**
      * 何日前に通知するかの日数
@@ -89,7 +87,7 @@ public class KscmtShiftTableRuleForOrgAvai extends ContractUkJpaEntity implement
      * 月単位管理の場合の月の締めが末日か - シフト表のルール.シフト表の日付設定.締め日.末日とする
      */
     @Column(name = "DATE_SET_CLOSE_IS_LAST_DAY")
-    public boolean dateCloseIsLastDay;
+    public Integer dateCloseIsLastDay;
 
 
     /**
@@ -102,7 +100,7 @@ public class KscmtShiftTableRuleForOrgAvai extends ContractUkJpaEntity implement
      * 勤務希望の締切日が末日か - シフト表のルール.シフト表の日付設定.勤務希望の締切日.末日とする
      */
     @Column(name = "DATE_SET_DEADLINE_IS_LAST_DAY")
-    public boolean dateDeadlineIsLastDay;
+    public Integer dateDeadlineIsLastDay;
 
     /**
      * 希望休日の上限日数 - シフト表のルール.シフト表の日付設定.希望休日の上限
@@ -148,15 +146,15 @@ public class KscmtShiftTableRuleForOrgAvai extends ContractUkJpaEntity implement
                                          Integer dateHDUpperlimit, Integer weekSetStart, Integer weekSetDeadlineAtr, Integer weekSetDeadlineWeek) {
         super();
         this.kscmtShiftTableRuleForOrgAvaiPK = kscmtShiftTableRuleForOrgAvaiPK;
-        this.holidayAtr = BooleanUtils.toBoolean(holidayAtr);
-        this.shiftAtr = BooleanUtils.toBoolean(shiftAtr);
-        this.timeSheetAtr = BooleanUtils.toBoolean(timeSheetAtr);
+        this.holidayAtr = holidayAtr;
+        this.shiftAtr = shiftAtr;
+        this.timeSheetAtr = timeSheetAtr;
         this.fromNoticeDays = fromNoticeDays;
         this.periodUnit = periodUnit;
         this.dateCloseDay = dateCloseDay;
-        this.dateCloseIsLastDay = BooleanUtils.toBoolean(dateCloseIsLastDay);
+        this.dateCloseIsLastDay = dateCloseIsLastDay;
         this.dateDeadlineDay = dateDeadlineDay;
-        this.dateDeadlineIsLastDay = BooleanUtils.toBoolean(dateDeadlineIsLastDay);
+        this.dateDeadlineIsLastDay = dateDeadlineIsLastDay;
         this.dateHDUpperlimit = dateHDUpperlimit;
         this.weekSetStart = weekSetStart;
         this.weekSetDeadlineAtr = weekSetDeadlineAtr;
@@ -215,8 +213,8 @@ public class KscmtShiftTableRuleForOrgAvai extends ContractUkJpaEntity implement
         if (this.periodUnit != null) {
             if (this.periodUnit == WorkAvailabilityPeriodUnit.MONTHLY.value) {
                 shiftTableSetting = Optional.of(new WorkAvailabilityRuleDateSetting(
-                        new OneMonth(new DateInMonth(this.dateCloseDay, this.dateCloseIsLastDay)),
-                        new DateInMonth(this.dateDeadlineDay, this.dateDeadlineIsLastDay),
+                        new OneMonth(new DateInMonth(this.dateCloseDay, this.dateCloseIsLastDay == 1)),
+                        new DateInMonth(this.dateDeadlineDay, this.dateDeadlineIsLastDay == 1),
                         new HolidayAvailabilityMaxdays(this.dateHDUpperlimit)
                 ));
             } else {
@@ -233,14 +231,14 @@ public class KscmtShiftTableRuleForOrgAvai extends ContractUkJpaEntity implement
         }
 
         List<AssignmentMethod> availabilityAssignMethodList = new ArrayList<>();
-        if (this.holidayAtr) {
+        if (this.holidayAtr == 1) {
             availabilityAssignMethodList.add(AssignmentMethod.HOLIDAY);
         }
-        if (this.shiftAtr) {
+        if (this.shiftAtr == 1) {
             availabilityAssignMethodList.add(AssignmentMethod.SHIFT);
         }
 
-        if (this.timeSheetAtr) {
+        if (this.timeSheetAtr == 1) {
             availabilityAssignMethodList.add(AssignmentMethod.TIME_ZONE);
         }
 

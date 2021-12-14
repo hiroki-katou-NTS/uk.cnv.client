@@ -8,7 +8,7 @@ import java.util.Optional;
 import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampCard;
 import nts.uk.ctx.at.record.dom.stamp.management.StampSettingPersonHelper.Layout.ButtonSet;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.AssignmentMethod;
+import nts.uk.ctx.at.record.dom.stamp.management.StampSettingPersonHelper.Layout.Type;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.AudioType;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonDisSet;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonLayoutType;
@@ -16,13 +16,15 @@ import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.pref
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonNameSet;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonPositionNo;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonSettings;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonType;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeCalArt;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ColorSetting;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.CorrectionInterval;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.DisplaySettingsStampScreen;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.PageComment;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.PageNo;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ReservationArt;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ResultDisplayTime;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.SetPreClockArt;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.SettingDateTimeColorOfStampScreen;
@@ -98,12 +100,11 @@ public class StampSettingPersonHelper {
 		public static class Button {
 			public static ButtonSettings DUMMY = new ButtonSettings(
 					new ButtonPositionNo(1), 
-					EnumAdaptor.valueOf(0, NotUseAtr.class),
 					ButtonSet.DUMMY, 
-					Stamp.DUMMY, 
+					Type.DUMMY, 
+					EnumAdaptor.valueOf(0, NotUseAtr.class),
 					EnumAdaptor.valueOf(0, AudioType.class),
-					Optional.of(SupportWplSet.USE_THE_STAMPED_WORKPLACE),
-					Optional.of(AssignmentMethod.SELECT_AT_THE_TIME_OF_STAMPING));
+					Optional.of(SupportWplSet.USE_THE_STAMPED_WORKPLACE));
 		}
 		
 		public static class ButtonSet {
@@ -117,12 +118,18 @@ public class StampSettingPersonHelper {
 					new ColorCode("DUMMY"), new ButtonName("DUMMY"));
 		}
 		
+		public static class Type {
+			public static ButtonType DUMMY = new ButtonType(
+					EnumAdaptor.valueOf(0, ReservationArt.class), 
+					Optional.of(Stamp.DUMMY));
+		}
+		
 		public static class Stamp {
 			public static StampType DUMMY = new StampType(
 					true, 
 					EnumAdaptor.valueOf(0, GoingOutReason.class), 
 					EnumAdaptor.valueOf(0, SetPreClockArt.class),
-					EnumAdaptor.valueOf(1, ChangeClockAtr.class),
+					EnumAdaptor.valueOf(1, ChangeClockArt.class),
 					EnumAdaptor.valueOf(0, ChangeCalArt.class));
 		}
 	}
@@ -130,22 +137,14 @@ public class StampSettingPersonHelper {
 	public static StampSettingPerson settingPerson(){
 		List<StampPageLayout> lstStampPage = new ArrayList<>();
 		List<ButtonSettings> lstButtonSet = new ArrayList<>();
-		
-		StampType stampType = new StampType(
-				true, 
-				EnumAdaptor.valueOf(0, GoingOutReason.class), 
-				EnumAdaptor.valueOf(0, SetPreClockArt.class),
-				EnumAdaptor.valueOf(1, ChangeClockAtr.class),
-				EnumAdaptor.valueOf(0, ChangeCalArt.class));
 
 		lstButtonSet.add(new ButtonSettings(
 				new ButtonPositionNo(1), 
-				EnumAdaptor.valueOf(0, NotUseAtr.class), 
 				ButtonSet.DUMMY, 
-				stampType, 
+				Type.DUMMY,
+				EnumAdaptor.valueOf(0, NotUseAtr.class), 
 				EnumAdaptor.valueOf(0, AudioType.class),
-				Optional.of(SupportWplSet.USE_THE_STAMPED_WORKPLACE),
-				Optional.of(AssignmentMethod.SELECT_AT_THE_TIME_OF_STAMPING)));
+				Optional.of(SupportWplSet.USE_THE_STAMPED_WORKPLACE)));
 
 		lstStampPage.add(new StampPageLayout(
 				new PageNo(1), 
@@ -197,21 +196,13 @@ public class StampSettingPersonHelper {
 		
 		List<ButtonSettings> lstButtonSet = new ArrayList<>();
 		
-		StampType stampType = new StampType(
-				true, 
-				EnumAdaptor.valueOf(0, GoingOutReason.class), 
-				EnumAdaptor.valueOf(0, SetPreClockArt.class),
-				EnumAdaptor.valueOf(1, ChangeClockAtr.class),
-				EnumAdaptor.valueOf(0, ChangeCalArt.class));
-		
 		lstButtonSet.add(new ButtonSettings(
 				new ButtonPositionNo(1), 
-				EnumAdaptor.valueOf(0, NotUseAtr.class),
 				ButtonSet.DUMMY, 
-				stampType, 
+				Type.DUMMY,
+				EnumAdaptor.valueOf(0, NotUseAtr.class), 
 				EnumAdaptor.valueOf(0, AudioType.class),
-				Optional.of(SupportWplSet.USE_THE_STAMPED_WORKPLACE),
-				Optional.of(AssignmentMethod.SELECT_AT_THE_TIME_OF_STAMPING)));
+				Optional.of(SupportWplSet.USE_THE_STAMPED_WORKPLACE)));
 		
 		lst.add(new StampPageLayout(new PageNo(1),
 				new StampPageName("DUMMY"),
@@ -228,21 +219,13 @@ public class StampSettingPersonHelper {
 	
 	public static StampPageLayout crePageLayout(int buttonPositionNo,int pageNo){
 		List<ButtonSettings> lstButtonSetAdd = new ArrayList<>();
-		StampType stampType = new StampType(
-				true, 
-				EnumAdaptor.valueOf(0, GoingOutReason.class), 
-				EnumAdaptor.valueOf(0, SetPreClockArt.class),
-				EnumAdaptor.valueOf(1, ChangeClockAtr.class),
-				EnumAdaptor.valueOf(0, ChangeCalArt.class));
-		
 		lstButtonSetAdd.add(new ButtonSettings(
 				new ButtonPositionNo(buttonPositionNo), 
-				EnumAdaptor.valueOf(0, NotUseAtr.class), 
 				ButtonSet.DUMMY, 
-				stampType,
+				Type.DUMMY,
+				EnumAdaptor.valueOf(0, NotUseAtr.class), 
 				EnumAdaptor.valueOf(0, AudioType.class),
-				Optional.of(SupportWplSet.USE_THE_STAMPED_WORKPLACE),
-				Optional.of(AssignmentMethod.SELECT_AT_THE_TIME_OF_STAMPING)));
+				Optional.of(SupportWplSet.USE_THE_STAMPED_WORKPLACE)));
 		StampPageLayout pageLayout = new StampPageLayout(
 				new PageNo(pageNo), 
 				new StampPageName("NEW_DUMMY2"),
@@ -257,28 +240,19 @@ public class StampSettingPersonHelper {
 	public static List<ButtonSettings> getButtonSettings() {
 		List<ButtonSettings> lstBS = new ArrayList<>();
 		
-		StampType stampType = new StampType(
-				true, 
-				EnumAdaptor.valueOf(0, GoingOutReason.class), 
-				EnumAdaptor.valueOf(0, SetPreClockArt.class),
-				EnumAdaptor.valueOf(1, ChangeClockAtr.class),
-				EnumAdaptor.valueOf(0, ChangeCalArt.class));
+		lstBS.add(new ButtonSettings(new ButtonPositionNo(2),
+				new ButtonDisSet(new ButtonNameSet(new ColorCode("DUMMY"), new ButtonName("DUMMY")), new ColorCode("DUMMY")),
+				new ButtonType(ReservationArt.RESERVATION, null),
+				NotUseAtr.USE,
+				AudioType.GOOD_MORNING,
+				Optional.of(SupportWplSet.USE_THE_STAMPED_WORKPLACE)));
 		
 		lstBS.add(new ButtonSettings(new ButtonPositionNo(2),
-				EnumAdaptor.valueOf(1, NotUseAtr.class), 
 				new ButtonDisSet(new ButtonNameSet(new ColorCode("DUMMY"), new ButtonName("DUMMY")), new ColorCode("DUMMY")),
-				stampType,
+				new ButtonType(ReservationArt.RESERVATION, null),
+				NotUseAtr.USE,
 				AudioType.GOOD_MORNING,
-				Optional.of(SupportWplSet.USE_THE_STAMPED_WORKPLACE),
-				Optional.of(AssignmentMethod.SELECT_AT_THE_TIME_OF_STAMPING)));
-		
-		lstBS.add(new ButtonSettings(new ButtonPositionNo(2),
-				EnumAdaptor.valueOf(1, NotUseAtr.class), 
-				new ButtonDisSet(new ButtonNameSet(new ColorCode("DUMMY"), new ButtonName("DUMMY")), new ColorCode("DUMMY")),
-				stampType,
-				AudioType.GOOD_MORNING,
-				Optional.of(SupportWplSet.USE_THE_STAMPED_WORKPLACE),
-				Optional.of(AssignmentMethod.SELECT_AT_THE_TIME_OF_STAMPING)));
+				Optional.of(SupportWplSet.USE_THE_STAMPED_WORKPLACE)));
 		
 		return lstBS;
 	}

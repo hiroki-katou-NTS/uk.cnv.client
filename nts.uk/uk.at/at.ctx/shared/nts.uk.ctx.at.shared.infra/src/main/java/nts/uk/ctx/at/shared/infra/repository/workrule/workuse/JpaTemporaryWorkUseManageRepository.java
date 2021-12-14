@@ -4,8 +4,6 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.at.shared.dom.workrule.workuse.TemporaryWorkUseManage;
 import nts.uk.ctx.at.shared.dom.workrule.workuse.TemporaryWorkUseManageRepository;
@@ -26,7 +24,7 @@ public class JpaTemporaryWorkUseManageRepository extends JpaRepository implement
 	 * @return the flex work set
 	 */
 	public TemporaryWorkUseManage convertToDomain(KshmtTemporaryMng setting) {
-		return TemporaryWorkUseManage.createFromJavaType(setting.getId().getCid(), BooleanUtils.toInteger(setting.isUseClassification()));
+		return TemporaryWorkUseManage.createFromJavaType(setting.getId().getCid(), setting.getUseClassification());
 	}
 	
 	/**
@@ -40,7 +38,7 @@ public class JpaTemporaryWorkUseManageRepository extends JpaRepository implement
 		KshstTempWkUseManagePK primaryKey = new KshstTempWkUseManagePK();
 		primaryKey.setCid(setting.getCompanyId().v());
 		entity.setId(primaryKey);
-		entity.setUseClassification(BooleanUtils.toBoolean(setting.getUseClassification().value));
+		entity.setUseClassification(setting.getUseClassification().value);
 		return entity;
 	}
 	

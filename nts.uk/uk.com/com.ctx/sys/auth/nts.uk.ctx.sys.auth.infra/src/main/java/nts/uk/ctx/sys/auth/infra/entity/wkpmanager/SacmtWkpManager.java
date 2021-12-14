@@ -67,6 +67,7 @@ public class SacmtWkpManager extends ContractUkJpaEntity implements Serializable
 					domain.getHistoryPeriod().end()
 				);
 	}
+	
 	/**
 	 * Convert entity to domain
 	 * @return WorkplaceManager object
@@ -74,8 +75,8 @@ public class SacmtWkpManager extends ContractUkJpaEntity implements Serializable
 	public WorkplaceManager toDomain() {
 		return new WorkplaceManager(
 				this.kacmtWorkplaceManagerPK.workplaceManagerId,
-				this.workplaceId,
 				this.employeeId,
+				this.workplaceId,
 				new DatePeriod(this.startDate, this.endDate)
 				);
 	}

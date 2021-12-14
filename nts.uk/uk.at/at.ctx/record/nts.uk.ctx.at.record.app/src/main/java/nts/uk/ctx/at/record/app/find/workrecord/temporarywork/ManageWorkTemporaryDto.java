@@ -3,7 +3,6 @@
  */
 package nts.uk.ctx.at.record.app.find.workrecord.temporarywork;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,7 +20,6 @@ import lombok.Setter;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class ManageWorkTemporaryDto {
 	int maxUsage;
 	int timeTreatTemporarySame;

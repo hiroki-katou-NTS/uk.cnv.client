@@ -28,10 +28,8 @@
             class="proceed"
             data-bind="text: $i18n('KML002_9'), click: registerSchedulePersonalInfor"
           />
-
-          <button tabindex="3" class="normal" data-bind="text: $i18n('KML002_158'), click: openDialogScreenH"/>
           <div class="pull-right" >
-            <div tabindex="4" data-bind="ntsFunctionPanel: {width: 200, headerText: $i18n('KML002_10'), dataSource: functionItems}"></div> 
+            <div tabindex="3" data-bind="ntsFunctionPanel: {width: 200, headerText: $i18n('KML002_10'), dataSource: functionItems}"></div> 
           </div>
         </div>
         <div id="contents-area" class="kml-002-c">
@@ -119,8 +117,7 @@
                       options: switchOptions,
                       optionsValue: 'code',
                       optionsText: 'name',
-                      value: comparisonStandardWorkingHours,
-                      enable: false
+                      value: comparisonStandardWorkingHours
                     }"
                     ></div>
                   </td>
@@ -158,8 +155,7 @@
                       options: switchOptions,
                       optionsValue: 'code',
                       optionsText: 'name',
-                      value: nightShiftTime,
-                      enable: false
+                      value: nightShiftTime
                     }"
                     ></div>
                   </td>
@@ -178,8 +174,7 @@
                       options: switchOptions,
                       optionsValue: 'code',
                       optionsText: 'name',
-                      value: weeklyHolidayDays,
-                      enable: false
+                      value: weeklyHolidayDays
                     }"
                     ></div>
                   </td>

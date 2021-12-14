@@ -15,7 +15,7 @@ import nts.uk.ctx.exio.dom.input.errors.ItemError;
 import nts.uk.ctx.exio.dom.input.importableitem.ImportableItem;
 import nts.uk.ctx.exio.dom.input.setting.ExternalImportCode;
 import nts.uk.ctx.exio.dom.input.setting.assembly.revise.ReviseItem;
-import nts.gul.util.Either;
+import nts.uk.ctx.exio.dom.input.util.Either;
 
 /**
  * 項目マッピング
@@ -26,9 +26,6 @@ public class ImportingItemMapping {
 	/** 項目NO */
 	private final int itemNo;
 
-	/** 固定値か？ **/
-	private boolean isFixedValue;
-
 	/** CSV列番号 */
 	private Optional<Integer> csvColumnNo;
 
@@ -36,16 +33,15 @@ public class ImportingItemMapping {
 	private Optional<StringifiedValue> fixedValue;
 
 	public static ImportingItemMapping noSetting(int itemNo) {
-		return new ImportingItemMapping(itemNo, true, Optional.empty(), Optional.empty());
+		return new ImportingItemMapping(itemNo, Optional.empty(), Optional.empty());
 	}
 
-	public ImportingItemMapping(int itemNo, boolean isFixedValue, Optional<Integer> csvColumnNo, Optional<StringifiedValue> fixedValue) {
+	public ImportingItemMapping(int itemNo, Optional<Integer> csvColumnNo, Optional<StringifiedValue> fixedValue) {
 
 		if (csvColumnNo.isPresent() && fixedValue.isPresent()) {
 			throw new RuntimeException("両方同時には設定できない");
 		}
 
-		this.isFixedValue = isFixedValue;
 		this.itemNo = itemNo;
 		this.csvColumnNo = csvColumnNo;
 		this.fixedValue = fixedValue;
@@ -60,31 +56,26 @@ public class ImportingItemMapping {
 	}
 
 	public boolean isCsvMapping() {
-		return !isFixedValue;
+		return csvColumnNo.isPresent();
 	}
 
 	public boolean isFixedValue() {
-		return isFixedValue;
+		return fixedValue.isPresent();
 	}
 
 	public void setNoSetting() {
-		isFixedValue = true;
 		csvColumnNo = Optional.empty();
 		fixedValue = Optional.empty();
 	}
 
 	public void setCsvColumnNo(int columnNo) {
-		csvColumnNo = Optional.ofNullable(columnNo);
+		csvColumnNo = Optional.of(columnNo);
 		fixedValue = Optional.empty();
-		isFixedValue = !csvColumnNo.isPresent();
 	}
 
 	public void setFixedValue(StringifiedValue value) {
-		fixedValue = Optional.ofNullable(value);
-		if(fixedValue.isPresent()) {
-			csvColumnNo = Optional.empty();
-			isFixedValue = true;
-		}
+		fixedValue = Optional.of(value);
+		csvColumnNo = Optional.empty();
 	}
 
 	public Either<ItemError, DataItem> assemble(RequireAssemble require, ExecutionContext context, CsvRecord csvRecord) {
@@ -105,7 +96,7 @@ public class ImportingItemMapping {
 			val csvItem = readCsv(csvRecord);
 
 			// 編集
-			return require.getReviseItem(context.getExternalImportCode(), context.getDomainId(), itemNo)
+			return require.getReviseItem(context.getCompanyId(), context.getExternalImportCode(), itemNo)
 					.map(r -> r.revise(csvItem.getCsvValue()))
 					.orElseGet(() -> noRevise(require, context, csvItem));
 		}
@@ -131,7 +122,7 @@ public class ImportingItemMapping {
 
 	public static interface RequireAssemble {
 
-		Optional<ReviseItem> getReviseItem(ExternalImportCode settingCode, ImportingDomainId domainId, int itemNo);
+		Optional<ReviseItem> getReviseItem(String companyId, ExternalImportCode settingCode, int itemNo);
 
 		ImportableItem getImportableItem(ImportingDomainId domainId, int itemNo);
 	}

@@ -9,13 +9,9 @@
 }
 
 .tab_8_radio_cell {
-	width: 255px;
+	width: 225px;
 }
 
-.personal-setting-tab-content {
-	width: 630px !important;
-}
-
-#workTimeGoOutSetTabPanel {
-  width: 670px !important;
+.official-setting-tab-content {
+	width: 620px !important;
 }

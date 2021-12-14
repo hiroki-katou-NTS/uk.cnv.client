@@ -17,9 +17,6 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-
-import org.apache.commons.lang3.BooleanUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +84,7 @@ public class KfnmtCatMapEachType extends UkJpaEntity implements Serializable {
                     domain.getCategory().value,
                     domain.getCode().v(),
                     i,
-                    BooleanUtils.toInteger(true)
+                    true
             );
             entities.add(new KfnmtCatMapEachType(
                     key,
@@ -100,7 +97,7 @@ public class KfnmtCatMapEachType extends UkJpaEntity implements Serializable {
                     domain.getCategory().value,
                     domain.getCode().v(),
                     i,
-                    BooleanUtils.toInteger(false)
+                    false
             );
             entities.add(new KfnmtCatMapEachType(
                     key,

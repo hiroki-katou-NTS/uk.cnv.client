@@ -51,7 +51,6 @@ public class RoleSetWebservice extends WebService {
     @Inject
     private RoleSetLinkWebMenuAdapter roleSetLinkWebMenuAdapter;
 
-
     /**
      * Get all role set by login user's company id
      * @return List<RoleSetDto>
@@ -86,7 +85,7 @@ public class RoleSetWebservice extends WebService {
     /**
      * Execute register a default role set
      * @param command
-     * @return
+     * @return 
      */
     @POST
     @Path("adddefaultroleset")
@@ -116,7 +115,7 @@ public class RoleSetWebservice extends WebService {
     }
 
     /**
-     * Get company id of the login user
+     * Get company id of the login user 
      * @return companyId
      */
     @POST
@@ -124,5 +123,4 @@ public class RoleSetWebservice extends WebService {
     public JavaTypeResult<String> getCompanyIdOfLoginUser() {
         return new JavaTypeResult<String> (AppContexts.user().companyId());
     }
-
 }

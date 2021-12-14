@@ -97,14 +97,12 @@ public class EmpEmployeeAdapterImpl implements EmpEmployeeAdapter {
 	public List<EmployeeImport> findByEmpId(List<String> empIds) {
 		// Get Employee Basic Info
 		List<EmployeeBasicInfoExport> empExportList = employeePub.findBySIds(empIds);
-		List<EmployeeImport> lstEmp =  empExportList.stream().map(empExport -> EmployeeImport.builder().employeeId(empExport.getEmployeeId())
+		return empExportList.stream().map(empExport -> EmployeeImport.builder().employeeId(empExport.getEmployeeId())
 				.employeeCode(empExport.getEmployeeCode()).employeeName(empExport.getPName())
 				.employeeMailAddress(
 						empExport.getPMailAddr() == null ? null : (new MailAddress(empExport.getPMailAddr().v())))
 				.entryDate(empExport.getEntryDate()).retiredDate(empExport.getRetiredDate()).build())
 				.collect(Collectors.toList());
-        lstEmp = lstEmp.stream().sorted((a, b) -> a.getEmployeeCode().compareTo(b.getEmployeeCode())).collect(Collectors.toList());
-        return lstEmp;
 	}
 
 	@Override

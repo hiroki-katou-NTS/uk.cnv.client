@@ -318,10 +318,8 @@ public class W4D4AlarmService {
 				List<WorkPlaceHistImport> getWpl = getWplByListSidAndPeriod.stream()
 						.filter(x -> x.getEmployeeId().equals(sid)).collect(Collectors.toList());
 				if(!getWpl.isEmpty()) {
-					WorkPlaceIdAndPeriodImport wpPeriod = !getWpl.get(0).getLstWkpIdAndPeriod().isEmpty()
-							? getWpl.get(0).getLstWkpIdAndPeriod().get(0) : null;
-					if (wpPeriod != null)
-						workplaceId = wpPeriod.getWorkplaceId();
+					 WorkPlaceIdAndPeriodImport wpPeriod = getWpl.get(0).getLstWkpIdAndPeriod().get(0);
+					 workplaceId = wpPeriod.getWorkplaceId();
 				}
 				List<RecordWorkInfoFunAdapterDto> workInfoSid = workInfos.stream()
 						.filter(w -> w.getEmployeeId().equals(sid))

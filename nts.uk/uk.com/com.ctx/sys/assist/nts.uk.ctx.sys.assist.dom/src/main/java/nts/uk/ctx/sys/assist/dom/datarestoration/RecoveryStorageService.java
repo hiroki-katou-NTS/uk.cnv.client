@@ -24,7 +24,6 @@ import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import nts.uk.shr.infra.file.storage.stream.FileStoragePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,6 +112,8 @@ public class RecoveryStorageService {
 	public static final Integer INDEX_H_DATE = 2;
 
 	public static final Integer INDEX_H_START_DATE = 3;
+
+	private static final String DATA_STORE_PATH = ServerSystemProperties.fileStoragePath();
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RecoveryStorageService.class);
 
@@ -532,7 +533,7 @@ public class RecoveryStorageService {
 	}
 
 	public static String getExtractDataStoragePath(String fileId) {
-		return new FileStoragePath().getPathOfCurrentTenant().toString() + "//packs//" + fileId;
+		return DATA_STORE_PATH + "//packs//" + fileId;
 	}
 	
 }

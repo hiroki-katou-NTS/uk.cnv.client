@@ -163,8 +163,8 @@ module nts.uk.com.view.cmm049.a {
           id: "tab-5",
           title: vm.$i18n("CMM049_28"),
           content: "#A8",
-          enable: ko.observable(false),
-          visible: ko.observable(false),
+          enable: ko.observable(true),
+          visible: ko.observable(true),
         },
       ]);
       vm.selectedTab = ko.observable("tab-1");

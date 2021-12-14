@@ -1,6 +1,5 @@
 package nts.uk.ctx.at.aggregation.dom.schedulecounter.criterion;
 
-import lombok.AllArgsConstructor;
 import lombok.Value;
 import nts.arc.layer.dom.objecttype.DomainValue;
 import nts.uk.shr.com.color.ColorCode;
@@ -12,7 +11,6 @@ import nts.uk.shr.com.color.ColorCode;
  *
  */
 @Value
-@AllArgsConstructor
 public class HandlingOfCriterionAmountByNo implements DomainValue {
 
 	/** 枠NO */

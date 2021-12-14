@@ -1,7 +1,5 @@
 package nts.uk.ctx.at.record.dom.monthlyprocess.aggr;
 
-import java.util.Optional;
-
 import nts.arc.task.data.TaskDataSetter;
 import nts.arc.task.tran.AtomTask;
 import nts.arc.time.GeneralDate;
@@ -26,13 +24,13 @@ public class MonthlyAggregationErrorService {
 	 * @param outYmd 出力年月日
 	 */
 	public static AtomTask errorProcForOptimisticLock(RequireM1 require,
-			Optional<TaskDataSetter> dataSetter,
+			TaskDataSetter dataSetter,
 			String employeeId,
 			String empCalAndSumExecLogID,
 			GeneralDate outYmd){
 		
 		// 「エラーあり」に更新
-		dataSetter.ifPresent(ds -> ds.updateData("monthlyAggregateHasError", ErrorPresent.HAS_ERROR.nameId));
+		dataSetter.updateData("monthlyAggregateHasError", ErrorPresent.HAS_ERROR.nameId);
 		
 		// エラー出力
 		return AtomTask.of(() -> require.add(new ErrMessageInfo(

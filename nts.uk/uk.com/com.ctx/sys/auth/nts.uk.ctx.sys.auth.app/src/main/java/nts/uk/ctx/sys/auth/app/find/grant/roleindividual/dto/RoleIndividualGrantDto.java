@@ -22,14 +22,8 @@ public class RoleIndividualGrantDto {
 	 private GeneralDate startValidPeriod;
 	 
 	 private GeneralDate endValidPeriod;
-
-	 private String employeeId;
-
-	 private String employeeCode;
-
-	 private String businessName;
 	 
-	 public static RoleIndividualGrantDto fromDomain(RoleIndividualGrant domain ,String userName , String loginID, String employeeId, String employeeCode, String businessName) {
+	 public static RoleIndividualGrantDto fromDomain(RoleIndividualGrant domain, String userName , String loginID) {
 		 return new RoleIndividualGrantDto(
 				 domain.getCompanyId(),
 				 domain.getRoleId(),
@@ -38,9 +32,6 @@ public class RoleIndividualGrantDto {
 				 domain.getUserId(),
 				 userName,
 				 domain.getValidPeriod().start(),
-				 domain.getValidPeriod().end(),
-				 employeeId,
-				 employeeCode,
-				 businessName);
+				 domain.getValidPeriod().end());
 	 }
 }

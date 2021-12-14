@@ -20,7 +20,5 @@ public class GetInfoInitStartKsu003Dto {
 	
 	/** スケジュール修正の機能制御 */
 	private ScheFunctionControlDto functionControlDto;
-	
-	/** Optional<作業運用設定> */
-	private Integer taskOperationMethod;
+
 }

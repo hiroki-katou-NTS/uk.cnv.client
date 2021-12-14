@@ -159,6 +159,7 @@ module nts.uk.at.view.kdw008.a {
                 ]);
                 self.selectedSheetNo = ko.observable(1);
                 self.selectedSheetNo.subscribe((value) => {
+                    nts.uk.ui.errors.clearAll();
                     block.invisible();
                     if (value == 1) {
                         self.enableSheetNo(false);
@@ -166,12 +167,10 @@ module nts.uk.at.view.kdw008.a {
                         self.enableSheetNo(true);
                     }
                     if (self.isDaily()) {
-                        if (self.currentDailyFormatCode() != undefined && self.currentDailyFormatCode().length > 0) {
-	                        self.getDailyDetail(self.currentDailyFormatCode(), value).done(() => {
-                                nts.uk.ui.errors.clearAll();
-	                        });
-                        } 
-                        block.clear();
+                        nts.uk.ui.errors.clearAll();
+                        self.getDailyDetail(self.currentDailyFormatCode(), value).done(() => {
+                            block.clear();
+                        })
                     } else {
                         self.getMonthCorrectionDetail(value);
                         block.clear();

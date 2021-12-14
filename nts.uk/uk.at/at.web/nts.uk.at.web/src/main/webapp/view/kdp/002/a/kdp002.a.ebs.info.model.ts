@@ -9,27 +9,16 @@ module nts.uk.at.view.kdp002.a {
 			displayMethod: KnockoutObservable<any>;
 			displayType: any = { HIDE: 0, DISPLAY: 1, SHOW_TIME_CARD: 2 };
 			dateValue: KnockoutObservable<{ startDate: string; endDate: string; }>;
-			yearMonth: KnockoutObservable<any> = ko.observable('');
+			yearMonth: KnockoutObservable<any>;
 			workManagementMultiple: KnockoutObservable<boolean> = ko.observable(false);
-			systemDate: KnockoutObservable<any> = ko.observable('');
 
 			constructor(start: IStartPage, workManagementMultiple: boolean) {
 				let self = this;
-				let vm = new ko.ViewModel();
 				let setting = start.stampSetting;
 				
 				self.displayMethod = ko.observable(setting.historyDisplayMethod);
 				self.dateValue = ko.observable({ startDate: moment().add(-3, 'days').format('YYYY/MM/DD'), endDate: moment().format('YYYY/MM/DD') });
-				
-				vm.$ajax('at', '/server/time/now')
-				.then((c) => {
-					const sysDate = moment(c).format('YYYY/MM/DD');;
-					const yearMonth = moment(c).format('YYYY/MM');
-
-					self.yearMonth(yearMonth);
-					self.systemDate(sysDate);
-                    self.bindItemData(start.stampDataOfEmployees);
-				});
+				self.yearMonth = ko.observable(moment().format('YYYY/MM'));
 				self.workManagementMultiple(workManagementMultiple);
 
 				if (self.displayMethod() == self.displayType.DISPLAY) {
@@ -39,7 +28,7 @@ module nts.uk.at.view.kdp002.a {
 						{ headerText: nts.uk.resource.getText('KDP002_31'), key: 'stampHowAndTime', width: 90 },
 						{ headerText: nts.uk.resource.getText('KDP002_32'), key: 'timeStampType', width: 90 }
 					]);
-					//self.bindItemData(start.stampDataOfEmployees);
+					self.bindItemData(start.stampDataOfEmployees);
 				} else if (self.displayMethod() == self.displayType.SHOW_TIME_CARD) {
 					if(workManagementMultiple) {
 						self.columns([
@@ -48,7 +37,7 @@ module nts.uk.at.view.kdp002.a {
 							{ headerText: nts.uk.resource.getText('KDP002_33', ['#Com_WorkIn']), key: 'workIn1', width: 90 },
 							{ headerText: nts.uk.resource.getText('KDP002_34', ['#Com_WorkOut']), key: 'workOut1', width: 100 }
 						]);
-						//self.bindItemData(start.timeCard.listAttendances);
+						self.bindItemData(start.timeCard.listAttendances);
 					} else {
 						self.columns([
 							{ headerText: 'コード', key: 'code', width: 100, hidden: true },
@@ -58,13 +47,9 @@ module nts.uk.at.view.kdp002.a {
 							{ headerText: nts.uk.resource.getText('KDP002_35', ['#Com_WorkIn']), key: 'workIn2', width: 90 },
 							{ headerText: nts.uk.resource.getText('KDP002_36', ['#Com_WorkOut']), key: 'workOut2', width: 110 }
 						]);
-						//self.bindItemData(start.timeCard.listAttendances);
+						self.bindItemData(start.timeCard.listAttendances);
 					}
 				}
-
-				self.yearMonth.subscribe(() => {
-					self.currentCode(null);
-				})
 			}
 
 			setTimeStampType(stampData) {
@@ -117,20 +102,11 @@ module nts.uk.at.view.kdp002.a {
 						} else {
 							formatedCardTime = "<span class=''>" + formatedCardTime + "</span>";
 						}
-						
-						let systemDate = model.systemDate();
-						
-						if (timeCard.date === systemDate && systemDate.substr(0, 7) === model.yearMonth()) {
-							model.currentCode(timeCard.code);
-							self.setScroll(timeCard.code);
-						}
-						
 						timeCard.date = formatedCardTime;
 						timeCard.workIn1 = timeCard.workIn1 ? nts.uk.time.format.byId("ClockDay_Short_HM", timeCard.workIn1) : null;
 						timeCard.workOut1 = timeCard.workOut1 ? nts.uk.time.format.byId("ClockDay_Short_HM", timeCard.workOut1) : null;
 						timeCard.workIn2 = timeCard.workIn2 ? nts.uk.time.format.byId("ClockDay_Short_HM", timeCard.workIn2) : null;
 						timeCard.workOut2 = timeCard.workOut2 ? nts.uk.time.format.byId("ClockDay_Short_HM", timeCard.workOut2) : null;
-						
 					});
 					model.items(items);
 				}
@@ -214,8 +190,4 @@ module nts.uk.at.view.kdp002.a {
 			backGroundColor: string;
 		}
 	}
-}
-
-var setScroll = function(currentCode: number){
-	$( "#time-card-list_scrollContainer" ).scrollTop(24*(currentCode-3));
 }

@@ -15,20 +15,21 @@ import nts.arc.diagnose.stopwatch.concurrent.ConcurrentStopwatches;
 import nts.arc.diagnose.stopwatch.embed.EmbedStopwatch;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
-import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.function.dom.adapter.RegulationInfoEmployeeAdapter;
 import nts.uk.ctx.at.schedulealarm.app.query.alarmcheck.AlarmCheckConditionsQuery;
 import nts.uk.ctx.at.schedulealarm.app.query.alarmcheck.AlarmCheckConditionsQueryDto;
+import nts.uk.ctx.at.shared.dom.common.EmployeeId;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.EmployeeSearchCallSystemType;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.GetEmpCanReferService;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.GetTargetIdentifiInforService;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.RegulationInfoEmpQuery;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.TargetOrgIdenInfor;
-import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.EmpAffiliationInforAdapter;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.EmpOrganizationImport;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.WorkplaceGroupAdapter;
 import nts.uk.ctx.bs.employee.dom.employee.mgndata.EmployeeDataMngInfo;
 import nts.uk.ctx.bs.employee.dom.employee.mgndata.EmployeeDataMngInfoRepository;
+import nts.uk.ctx.bs.employee.pub.workplace.export.EmpOrganizationPub;
+import nts.uk.ctx.bs.employee.pub.workplace.workplacegroup.EmpOrganizationExport;
 import nts.uk.ctx.bs.person.dom.person.info.Person;
 import nts.uk.ctx.bs.person.dom.person.info.PersonRepository;
 import nts.uk.query.pub.employee.EmployeeSearchQueryDto;
@@ -50,6 +51,9 @@ import nts.uk.shr.com.context.AppContexts;
 public class GetInformationStartupScreenQuery {
 
     @Inject
+    private EmpOrganizationPub empOrganizationPub;
+
+    @Inject
     private WorkplaceGroupAdapter workplaceGroupAdapter;
     @Inject
     private RegulationInfoEmployeeAdapter regulInfoEmployeeAdap;
@@ -63,9 +67,6 @@ public class GetInformationStartupScreenQuery {
 
     @Inject
     private AlarmCheckConditionsQuery alarmCheckConditionsQuery;
-    
-    @Inject
-	private EmpAffiliationInforAdapter empAffiliationInforAdapter;
 
     final static String SPACE = " ";
     final static String ZEZO_TIME = "00:00";
@@ -77,7 +78,7 @@ public class GetInformationStartupScreenQuery {
         String sid = AppContexts.user().employeeId();
         GeneralDate baseDate = GeneralDate.today();
 
-        GetTargetIdentifiInforService.Require require = EmbedStopwatch.embed(new RequireImpl());
+        GetTargetIdentifiInforService.Require require = EmbedStopwatch.embed(new RequireImpl(empOrganizationPub));
 
         // 1. 取得する(Require, 年月日, 社員ID)
         TargetOrgIdenInfor targeOrg = GetTargetIdentifiInforService.get(require, baseDate, sid);
@@ -88,7 +89,7 @@ public class GetInformationStartupScreenQuery {
                 regulInfoEmpPub));
 
         // 2. 取得する(Require, 年月日, 社員ID, 対象組織識別情報)
-        List<String> sids = GetEmpCanReferService.getByOrg(requireGetEmpBySpecrOrg, sid, baseDate, DatePeriod.oneDay(baseDate), targeOrg);
+        List<String> sids = GetEmpCanReferService.getByOrg(requireGetEmpBySpecrOrg, baseDate, sid, targeOrg);
 
         ConcurrentStopwatches.printAll();
 
@@ -118,15 +119,23 @@ public class GetInformationStartupScreenQuery {
     }
 
 
-	private class RequireImpl implements GetTargetIdentifiInforService.Require {
+    @AllArgsConstructor
+    private class RequireImpl implements GetTargetIdentifiInforService.Require {
 
-		@Override
-		public List<EmpOrganizationImport> getEmpOrganization(GeneralDate referenceDate, List<String> listEmpId) {
+        @Inject
+        private EmpOrganizationPub empOrganizationPub;
 
-			return empAffiliationInforAdapter.getEmpOrganization(referenceDate, listEmpId);
-		}
+        @Override
+        public List<EmpOrganizationImport> getEmpOrganization(GeneralDate referenceDate, List<String> listEmpId) {
 
-	}
+            List<EmpOrganizationExport> exports = empOrganizationPub.getEmpOrganiztion(referenceDate, listEmpId);
+            List<EmpOrganizationImport> data = exports.stream().map(i -> {
+                return new EmpOrganizationImport(new EmployeeId(i.getEmpId()), i.getBusinessName(), i.getEmpCd(), i.getWorkplaceId(), i.getWorkplaceGroupId());
+            }).collect(Collectors.toList());
+            return data;
+        }
+
+    }
 
     @AllArgsConstructor
     private class RequireGetEmpBySpecrOrgImpl implements GetEmpCanReferService.Require {
@@ -139,20 +148,20 @@ public class GetInformationStartupScreenQuery {
         private RegulationInfoEmployeePub regulInfoEmpPub;
 
         @Override
-        public List<String> getEmpCanReferByWorkplaceGroup(String empId, GeneralDate date, DatePeriod period, String workplaceGroupID) {
-            List<String> data = workplaceGroupAdapter.getReferableEmp(empId, date, period, workplaceGroupID);
+        public List<String> getEmpCanReferByWorkplaceGroup(GeneralDate date, String empId, String workplaceGroupID) {
+            List<String> data = workplaceGroupAdapter.getReferableEmp( date, empId, workplaceGroupID);
             return data;
         }
-
+        
         @Override
         public List<String> sortEmployee(List<String> lstmployeeId, EmployeeSearchCallSystemType sysAtr, Integer sortOrderNo,
                                          GeneralDate referenceDate, Integer nameType) {
-
+        	
             List<String> data = regulInfoEmpAdap.sortEmployee(
-            		AppContexts.user().companyId(),
-            		lstmployeeId,
-            		sysAtr.value,
-            		sortOrderNo,
+            		AppContexts.user().companyId(), 
+            		lstmployeeId, 
+            		sysAtr.value, 
+            		sortOrderNo, 
             		nameType,
                     GeneralDateTime.fromString(referenceDate.toString() + SPACE + ZEZO_TIME, DATE_TIME_FORMAT));
             return data;
@@ -160,7 +169,7 @@ public class GetInformationStartupScreenQuery {
 
         @Override
         public String getRoleID() {
-
+        	
             return AppContexts.user().roles().forAttendance();
         }
 
@@ -184,8 +193,8 @@ public class GetInformationStartupScreenQuery {
                     .worktypeCodes(new ArrayList<String>())
                     .filterByClosure(false)
                     .closureIds(new ArrayList<Integer>())
-                    .periodStart( GeneralDateTime.fromString(q.getPeriodStart() + SPACE + ZEZO_TIME, DATE_TIME_FORMAT) )
-                    .periodEnd( GeneralDateTime.fromString(q.getPeriodEnd() + SPACE + ZEZO_TIME, DATE_TIME_FORMAT) )
+                    .periodStart(GeneralDateTime.now())
+                    .periodEnd(GeneralDateTime.now())
                     .includeIncumbents(true)
                     .includeWorkersOnLeave(true)
                     .includeOccupancy(true)
@@ -205,7 +214,7 @@ public class GetInformationStartupScreenQuery {
         }
 
         @Override
-		public List<String> getAllEmpCanReferByWorkplaceGroup(String empId, GeneralDate date, DatePeriod period) {
+		public List<String> getAllEmpCanReferByWorkplaceGroup(GeneralDate date, String empId) {
 			// don't have to implement it
 			return null;
 		}

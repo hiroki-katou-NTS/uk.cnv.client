@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.at.shared.dom.common.color.ColorCode;
-import nts.uk.ctx.at.shared.dom.workrule.goingout.GoingOutReason;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 
 /**
@@ -21,36 +19,27 @@ public class TimeStampSetShareTStampHelper {
 		
 		List<StampPageLayout> lstStampPageLayout = new ArrayList<>();
 		List<ButtonSettings> lstButtonSet = new ArrayList<>();
-		StampType stampType = new StampType(
-				true, 
-				EnumAdaptor.valueOf(0, GoingOutReason.class), 
-				EnumAdaptor.valueOf(0, SetPreClockArt.class), 
-				EnumAdaptor.valueOf(1, ChangeClockAtr.class),
-				EnumAdaptor.valueOf(0, ChangeCalArt.class));
 		
 		lstButtonSet.add(new ButtonSettings(new ButtonPositionNo(1),
-				NotUseAtr.USE,
 				new ButtonDisSet(new ButtonNameSet(new ColorCode("DUMMY"), new ButtonName("DUMMY")), new ColorCode("DUMMY")),
-				stampType,
+				new ButtonType(ReservationArt.RESERVATION, Optional.empty()),
+				NotUseAtr.USE,
 				AudioType.NONE,
-				Optional.of(SupportWplSet.SELECT_AT_THE_TIME_OF_STAMPING),
-				Optional.of(AssignmentMethod.SELECT_AT_THE_TIME_OF_STAMPING)));
+				Optional.of(SupportWplSet.SELECT_AT_THE_TIME_OF_STAMPING)));
 		
 		lstButtonSet.add(new ButtonSettings(new ButtonPositionNo(3),
-				NotUseAtr.USE,
 				new ButtonDisSet(new ButtonNameSet(new ColorCode("DUMMY"), new ButtonName("DUMMY")), new ColorCode("DUMMY")),
-				stampType,
+				new ButtonType(ReservationArt.RESERVATION, Optional.empty()),
+				NotUseAtr.USE,
 				AudioType.NONE,
-				Optional.of(SupportWplSet.SELECT_AT_THE_TIME_OF_STAMPING),
-				Optional.of(AssignmentMethod.SELECT_AT_THE_TIME_OF_STAMPING)));
+				Optional.of(SupportWplSet.SELECT_AT_THE_TIME_OF_STAMPING)));
 		
 		lstButtonSet.add(new ButtonSettings(new ButtonPositionNo(4),
-				NotUseAtr.USE,
 				new ButtonDisSet(new ButtonNameSet(new ColorCode("DUMMY"), new ButtonName("DUMMY")), new ColorCode("DUMMY")),
-				stampType,
+				new ButtonType(ReservationArt.RESERVATION, Optional.empty()),
+				NotUseAtr.USE,
 				AudioType.NONE,
-				Optional.of(SupportWplSet.SELECT_AT_THE_TIME_OF_STAMPING),
-				Optional.of(AssignmentMethod.SELECT_AT_THE_TIME_OF_STAMPING)));
+				Optional.of(SupportWplSet.SELECT_AT_THE_TIME_OF_STAMPING)));
 		
 		
 		lstStampPageLayout.add(new StampPageLayout(new PageNo(1),

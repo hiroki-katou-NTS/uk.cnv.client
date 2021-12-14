@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 
 import nts.arc.testing.assertion.NtsAssert;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
 /**
  * 
  * @author tutk
@@ -14,14 +14,14 @@ import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.pref
 public class ChangeClockArtTest {
 	@Test
 	public void getters() {
-		ChangeClockAtr changeClockArt = ChangeClockAtr.valueOf(1);//dummy
+		ChangeClockArt changeClockArt = ChangeClockArt.valueOf(1);//dummy
 		NtsAssert.invokeGetters(changeClockArt);
 	}
 	@Test
 	public void test() {
-		ChangeClockAtr changeClockArt = ChangeClockAtr.valueOf(1);//dummy
-		assertThat(changeClockArt).isEqualTo(ChangeClockAtr.WORKING_OUT);
-		changeClockArt = ChangeClockAtr.valueOf(20);
+		ChangeClockArt changeClockArt = ChangeClockArt.valueOf(1);//dummy
+		assertThat(changeClockArt).isEqualTo(ChangeClockArt.WORKING_OUT);
+		changeClockArt = ChangeClockArt.valueOf(20);
 		assertThat(changeClockArt).isEqualTo(null);
 	}
 	
@@ -31,29 +31,29 @@ public class ChangeClockArtTest {
 	 */
 	@Test
 	public void testCheckWorkingOut_1() {
-		ChangeClockAtr changeClockArt = ChangeClockAtr.valueOf(1);
+		ChangeClockArt changeClockArt = ChangeClockArt.valueOf(1);
 		assertThat(changeClockArt.checkWorkingOut()).isTrue();
-		changeClockArt = ChangeClockAtr.valueOf(0);
+		changeClockArt = ChangeClockArt.valueOf(0);
 		assertThat(changeClockArt.checkWorkingOut()).isFalse();
-		changeClockArt = ChangeClockAtr.valueOf(2);
+		changeClockArt = ChangeClockArt.valueOf(2);
 		assertThat(changeClockArt.checkWorkingOut()).isFalse();
-		changeClockArt = ChangeClockAtr.valueOf(3);
+		changeClockArt = ChangeClockArt.valueOf(3);
 		assertThat(changeClockArt.checkWorkingOut()).isFalse();
-		changeClockArt = ChangeClockAtr.valueOf(4);
+		changeClockArt = ChangeClockArt.valueOf(4);
 		assertThat(changeClockArt.checkWorkingOut()).isFalse();
-		changeClockArt = ChangeClockAtr.valueOf(5);
+		changeClockArt = ChangeClockArt.valueOf(5);
 		assertThat(changeClockArt.checkWorkingOut()).isFalse();
-		changeClockArt = ChangeClockAtr.valueOf(6);
+		changeClockArt = ChangeClockArt.valueOf(6);
 		assertThat(changeClockArt.checkWorkingOut()).isFalse();
-		changeClockArt = ChangeClockAtr.valueOf(7);
+		changeClockArt = ChangeClockArt.valueOf(7);
 		assertThat(changeClockArt.checkWorkingOut()).isFalse();
-		changeClockArt = ChangeClockAtr.valueOf(8);
+		changeClockArt = ChangeClockArt.valueOf(8);
 		assertThat(changeClockArt.checkWorkingOut()).isFalse();
-		changeClockArt = ChangeClockAtr.valueOf(9);
+		changeClockArt = ChangeClockArt.valueOf(9);
 		assertThat(changeClockArt.checkWorkingOut()).isFalse();
-		changeClockArt = ChangeClockAtr.valueOf(10);
+		changeClockArt = ChangeClockArt.valueOf(10);
 		assertThat(changeClockArt.checkWorkingOut()).isFalse();
-		changeClockArt = ChangeClockAtr.valueOf(11);
+		changeClockArt = ChangeClockArt.valueOf(11);
 		assertThat(changeClockArt.checkWorkingOut()).isFalse();
 	}
 	

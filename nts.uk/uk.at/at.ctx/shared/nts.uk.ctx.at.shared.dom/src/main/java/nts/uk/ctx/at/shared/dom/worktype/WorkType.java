@@ -110,7 +110,6 @@ public class  WorkType extends AggregateRoot implements Cloneable, Serializable{
 				|| wt == WorkTypeClassification.HolidayWork;
 	}
 	
-	/** [6] 計算時に就業時間帯が不要かどうか判断する */
 	public boolean isNoneWorkTimeType(){
 		if (dailyWork != null && dailyWork.getWorkTypeUnit() == WorkTypeUnit.OneDay) {
 			return isNoneWorkTimeType(dailyWork.getOneDay());
@@ -635,32 +634,6 @@ public class  WorkType extends AggregateRoot implements Cloneable, Serializable{
 			
 			/** 1日午前午後区分.午後 */
 			return Optional.of(WorkAtr.Afternoon);
-		}
-		
-		return Optional.empty();
-	}
-	
-	/** [5] 指定の分類の1日午前午後区分を取得 */
-	public Optional<WorkAtr> getWorkAtrForWorkTypeClassification(WorkTypeClassification clas) {
-		
-		/** if @1日の勤務.勤務区分 = １日 and @1日の勤務.1日 = 勤務種類の分類 */
-		if (isOneDay() && dailyWork.getOneDay() == clas)
-			return Optional.of(WorkAtr.OneDay);
-		
-		/** if @1日の勤務.勤務区分 = 午前と午後 */
-		if (!isOneDay()) {
-			
-			/** if @1日の勤務.午前 = 勤務種類の分類 and @1日の勤務.午後 = 勤務種類の分類 */
-			if (dailyWork.getAfternoon() == clas && dailyWork.getMorning() == clas)
-				return Optional.of(WorkAtr.OneDay);
-				
-			/** if @1日の勤務.午前 = 勤務種類の分類 */
-			if (dailyWork.getMorning() == clas)
-				return Optional.of(WorkAtr.Monring);
-			
-			/** if @1日の勤務.午後 = 勤務種類の分類 */
-			if (dailyWork.getAfternoon() == clas)
-				return Optional.of(WorkAtr.Afternoon);
 		}
 		
 		return Optional.empty();

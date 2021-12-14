@@ -131,9 +131,9 @@ public class MonthlyAggregationService {
 			ConcurrentStopwatches.start("10000:社員ごと：" + employeeId);
 			
 			// 社員1人分の処理　（社員の月別実績を集計する）
-			val aggrStatus = MonthlyAggregationEmployeeService.aggregate(
-					require, cacheCarrier, Optional.of(asyncContext), companyId, employeeId, date.get(),
-					empCalAndSumExecLogID, reAggrAtr, companySets, Optional.empty());
+			MonthlyAggregationEmployeeService.AggregationResult aggrStatus = MonthlyAggregationEmployeeService.aggregate(
+					require, cacheCarrier, asyncContext,
+					companyId, employeeId, date.get(), empCalAndSumExecLogID, reAggrAtr, companySets);
 			ProcessState coStatus = aggrStatus.getStatus().getState();
 //			atomTasks.addAll(aggrStatus.getAtomTasks());
 			stateHolder.add(coStatus);

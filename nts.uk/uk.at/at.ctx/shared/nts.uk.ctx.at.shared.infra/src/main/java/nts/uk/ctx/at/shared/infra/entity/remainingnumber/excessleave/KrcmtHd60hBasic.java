@@ -19,7 +19,7 @@ public class KrcmtHd60hBasic extends ContractUkJpaEntity{
     public String employeeId;
 	
 	@Column(name="USE_ATR")
-	public boolean useAtr;
+	public int useAtr;
 	
 	@Column(name="OCCURRENCE_UNIT")
 	public int occurrenceUnit;

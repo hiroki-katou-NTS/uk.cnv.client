@@ -12,10 +12,8 @@ import nts.arc.layer.ws.WebService;
 import nts.uk.ctx.sys.gateway.app.command.sendmail.SendMailForgetPassMobileCommandHandler;
 import nts.uk.ctx.sys.gateway.app.command.sendmail.SendMailInfoCommand;
 import nts.uk.ctx.sys.gateway.app.command.sendmail.SendMailInfoCommandHandler;
-import nts.uk.ctx.sys.gateway.app.command.sendmail.SendMailInfoFormCCG007DCommandHandler;
 import nts.uk.ctx.sys.gateway.app.command.sendmail.SendMailInfoFormGCommand;
 import nts.uk.ctx.sys.gateway.app.command.sendmail.SendMailInfoFormGCommandHandler;
-import nts.uk.ctx.sys.gateway.app.command.sendmail.dto.SendMailCCG007DReturnDto;
 import nts.uk.ctx.sys.gateway.app.command.sendmail.dto.SendMailReturnDto;
 
 /**
@@ -33,10 +31,6 @@ public class SendMailWebService extends WebService {
 	/** The send mail info form G command handler. */
 	@Inject 
 	private SendMailInfoFormGCommandHandler sendMailInfoFormGCommandHandler;
-	
-	/** The send mail info form CCG007D command handler. */
-	@Inject 
-	private SendMailInfoFormCCG007DCommandHandler sendMailInfoFormCCG007DCommandHandler;
 	
 	/** The send mail info mobile command handler. */
 	@Inject 
@@ -68,22 +62,9 @@ public class SendMailWebService extends WebService {
 		return this.sendMailInfoFormGCommandHandler.handle(command);
 	}
 	
-	/**
-	 * Submit send mail CCG007D.
-	 *
-	 * @param command the command
-	 * @return the list
-	 */
-	@POST
-	@Path("submitCCG007D")
-	public SendMailCCG007DReturnDto submitSendMailCCG007D(SendMailInfoFormGCommand command) {
-		//sendMailformCCG007D
-		return this.sendMailInfoFormCCG007DCommandHandler.handle(command);
-	}
-	
 	@POST
 	@Path("mobile")
-	public SendMailCCG007DReturnDto sendMailMobile(SendMailInfoFormGCommand command) {
+	public List<SendMailReturnDto> sendMailMobile(SendMailInfoFormGCommand command) {
 		return this.mobileSendMail.handle(command);
 	}
 }

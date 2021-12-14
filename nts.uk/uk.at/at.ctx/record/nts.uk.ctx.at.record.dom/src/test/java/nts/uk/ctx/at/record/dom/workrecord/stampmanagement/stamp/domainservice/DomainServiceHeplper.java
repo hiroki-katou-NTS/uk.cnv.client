@@ -19,6 +19,9 @@ import nts.uk.ctx.at.record.dom.stamp.application.StampPromptApplication;
 import nts.uk.ctx.at.record.dom.stamp.application.StampRecordDis;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.ErAlApplication;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampHelper;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonType;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ReservationArt;
 import nts.uk.ctx.at.record.dom.worktime.TimeLeavingOfDailyPerformance;
 import nts.uk.ctx.at.shared.dom.common.color.ColorCode;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingWork;
@@ -66,7 +69,7 @@ public class DomainServiceHeplper {
 	}
 
 	public static StampDataOfEmployees getStampDataOfEmployeesDefault() {
-		return new StampDataOfEmployees("employeeId", GeneralDate.today(), new ArrayList<>());
+		return new StampDataOfEmployees("employeeId", GeneralDate.today(), new ArrayList<>(), new ArrayList<>());
 	}
 
 	public static StampDataReflectResult getStampDataReflectResultDefault() {
@@ -116,6 +119,14 @@ public class DomainServiceHeplper {
 		return new ErAlApplication("companyID", "S005",Arrays.asList(0,1,2));
 	}
 	
+	public static ButtonType getButtonTypeDefault() {
+		return new ButtonType(ReservationArt.valueOf(0), Optional.of(StampHelper.getStampTypeDefault()));
+		
+	}
+	public static ButtonType getButtonTypeHaveStampTypeNull() {
+		return new ButtonType(ReservationArt.valueOf(0),null);
+		
+	}
 	
 	public static WorkingConditionItem getWorkingCondWorktimeIsNull() {
 		SingleDaySchedule weekdayTime = new  SingleDaySchedule(new ArrayList<>(), Optional.empty());

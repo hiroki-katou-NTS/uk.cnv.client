@@ -105,14 +105,6 @@ module nts.uk.at.view.kal003.b.viewmodel {
                     // change select item check
                     self.workRecordExtractingCondition().checkItem.subscribe((itemCheck) => {
                         errors.clearAll();
-                        self.workRecordExtractingCondition().errorAlarmCondition().workTypeCondition().comparePlanAndActual(0);
-                        self.workRecordExtractingCondition().errorAlarmCondition().workTimeCondition().comparePlanAndActual(0);
-                        if (itemCheck == 5) {
-                            self.workRecordExtractingCondition().errorAlarmCondition().workTypeCondition().comparePlanAndActual(1);
-                        }
-                        if (itemCheck == 6) {
-                            self.workRecordExtractingCondition().errorAlarmCondition().workTimeCondition().comparePlanAndActual(1); 
-                        }
                         //fix bug 100145
                         self.workRecordExtractingCondition().errorAlarmCondition().workTypeCondition().planLstWorkType([]);
                         self.comparisonRange().minAmountOfMoneyValue(null);
@@ -2268,7 +2260,7 @@ module nts.uk.at.view.kal003.b.viewmodel {
                 || ( _.indexOf([RangeCompareType.BETWEEN_RANGE_OPEN, RangeCompareType.OUTSIDE_RANGE_OPEN], operator) == -1
                     && minValue > maxValue ))
             {
-                $(el).ntsError('set', { messageId: "Msg_836" });
+                $(el).ntsError('set', { messageId: "Msg_927" });
             }
             return;
         }

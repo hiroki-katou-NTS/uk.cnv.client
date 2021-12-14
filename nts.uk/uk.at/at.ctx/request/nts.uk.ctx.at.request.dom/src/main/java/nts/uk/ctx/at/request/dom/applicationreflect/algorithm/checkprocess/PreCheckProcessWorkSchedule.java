@@ -21,7 +21,6 @@ import nts.uk.ctx.at.request.dom.application.common.adapter.schedule.schedule.ba
 import nts.uk.ctx.at.request.dom.application.common.adapter.workplace.EmploymentHistoryImported;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.checkprocess.CheckAchievementConfirmation.ConfirmClsStatus;
 import nts.uk.ctx.at.request.dom.applicationreflect.object.ReflectStatusResult;
-import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 
 /**
@@ -52,7 +51,7 @@ public class PreCheckProcessWorkSchedule {
 
 		// 事前の残業申請かどうかチェック
 		if (application.getAppType() == ApplicationType.OVER_TIME_APPLICATION
-				&& application.getPrePostAtr() == PrePostAtr.PREDICT && AppContexts.optionLicense().customize().ootsuka()) {
+				&& application.getPrePostAtr() == PrePostAtr.PREDICT) {
 			return new PreCheckProcessResult(NotUseAtr.USE, reflectStatus);
 		}
 

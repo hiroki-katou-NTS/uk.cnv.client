@@ -13,16 +13,18 @@ public class WorkplaceHistoryItemImport {
 
 	private String  workplaceId;
 
-//	private String  normalWorkplaceId;
+	private String  normalWorkplaceId;
 	
 	/** 勤務場所コード */
 //	private Optional<String> workLocationCode;
 
-	public WorkplaceHistoryItemImport(String historyId, String employeeId, String workplaceId) {
+	public WorkplaceHistoryItemImport(String historyId, String employeeId, String workplaceId, String normalWorkplaceId) {
 		this.historyId = historyId;
 		this.employeeId = employeeId;
 		this.workplaceId = workplaceId;
-//		this.normalWorkplaceId = normalWorkplaceId;
+		this.normalWorkplaceId = normalWorkplaceId;
 //		this.workLocationCode = workLocationCode;
 	}
+	
+	
 }

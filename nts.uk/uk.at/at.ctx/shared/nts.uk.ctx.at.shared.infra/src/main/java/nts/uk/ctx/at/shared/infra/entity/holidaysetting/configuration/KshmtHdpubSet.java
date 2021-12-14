@@ -43,7 +43,7 @@ public class KshmtHdpubSet extends ContractUkJpaEntity implements Serializable {
    
     /** The is manage com public hd. */
     @Column(name = "IS_MANAGE_COM_PUBLIC_HD")
-    private boolean isManageComPublicHd;
+    private Integer isManageComPublicHd;
     
     /** The public hd manage atr. */
     @Column(name = "PUBLIC_HD_MANAGE_ATR")
@@ -68,7 +68,7 @@ public class KshmtHdpubSet extends ContractUkJpaEntity implements Serializable {
 
     /** The is weekly hd check. */
     @Column(name = "IS_WEEKLY_HD_CHECK")
-    private boolean isWeeklyHdCheck;
+    private Integer isWeeklyHdCheck;
 
     /**
      * Instantiates a new kshmt public hd set.

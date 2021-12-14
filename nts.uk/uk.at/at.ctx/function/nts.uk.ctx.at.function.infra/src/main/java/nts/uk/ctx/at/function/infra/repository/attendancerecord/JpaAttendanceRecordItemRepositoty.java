@@ -54,7 +54,7 @@ public class JpaAttendanceRecordItemRepositoty extends JpaAttendanceRecordReposi
 		        			x.getExclusVer(),
 		        			x.getContractCd(),
 		        			x.getCid(),
-		        			x.isUseAtr(),
+		        			x.getUseAtr(),
 		        			x.getItemName(),
 		        			x.getAttribute());
 		        	return entity;

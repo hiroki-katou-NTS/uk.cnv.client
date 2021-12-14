@@ -5,8 +5,6 @@ import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.arc.time.calendar.period.YearMonthPeriod;
 
-import java.util.List;
-
 public interface HolidayRemainMergeAdapter {
 
 	/**
@@ -26,12 +24,4 @@ public interface HolidayRemainMergeAdapter {
 	 */
 	public HdRemainDetailMerEx getRemainDetailMer(String employeeId, YearMonth currentMonth, 
 			GeneralDate baseDate, DatePeriod period, CheckCallRequest checkCall);
-
-
-
-	// 363 KDR
-	public List<AggrResultOfAnnualLeaveEachMonthKdr> getRs363(String employeeId, YearMonth currentMonth,
-			 GeneralDate baseDate, DatePeriod period, boolean checkCall363);
-
-
 }

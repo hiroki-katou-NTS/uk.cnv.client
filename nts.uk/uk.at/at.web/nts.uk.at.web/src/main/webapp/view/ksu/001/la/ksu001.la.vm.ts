@@ -22,7 +22,6 @@ module nts.uk.at.view.ksu001.la {
             exitStatus: KnockoutObservable<string> = ko.observable("Cancel");  
             placeHolders: string = "";
             scheduleTeamModel: KnockoutObservable<ScheduleTeamModel> = ko.observable(new ScheduleTeamModel("", "", "", "",[]));
-            listEmpData = null;
 
             constructor() {
                 var self = this;
@@ -85,12 +84,9 @@ module nts.uk.at.view.ksu001.la {
 
             public startPage(): JQueryPromise<any> {
                 let self = this;
-                var dfd = $.Deferred();  
-                let dataShare = nts.uk.ui.windows.getShared("KSU001La");             
-                let baseDate = dataShare.date;
-                self.listEmpData = dataShare.listEmpData;
+                var dfd = $.Deferred();               
+                let baseDate = nts.uk.ui.windows.getShared("baseDate");
                 self.baseDate(baseDate);
-                
                 blockUI.invisible();
                 let dateRequest: any = {baseDate: self.baseDate()};   
                 service.findWorkplaceGroup(dateRequest).done((data: WorkplaceGroup) => {
@@ -128,9 +124,11 @@ module nts.uk.at.view.ksu001.la {
 
             private getEmpOrgInfo(): void {
                 const self = this;
+                let request:any = {};
                 let itemLeft: any = {};  
-                 
-                service.findEmpOrgInfo({empInfoRequest : self.listEmpData}).done((dataAll: Array<ItemModel>)=>{
+                request.baseDate = self.baseDate();
+                request.workplaceGroupId = self.workplaceGroupId(); 
+                service.findEmpOrgInfo(request).done((dataAll: Array<ItemModel>)=>{
                     _.each(dataAll, x =>{
                         if(x.teamName === ""){
                             x.teamName = nts.uk.resource.getText('KSU001_3223');

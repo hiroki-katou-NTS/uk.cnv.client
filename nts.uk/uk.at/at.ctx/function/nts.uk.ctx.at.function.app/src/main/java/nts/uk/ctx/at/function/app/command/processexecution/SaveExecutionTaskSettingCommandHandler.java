@@ -247,7 +247,11 @@ public class SaveExecutionTaskSettingCommandHandler
 
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	public String scheduleOnCurrentCompany(UkJobScheduleOptions options) {
-		return this.scheduler.scheduleOnCurrentCompany(options).getScheduleId();
+		try {
+			return this.scheduler.scheduleOnCurrentCompany(options).getScheduleId();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public boolean isLastDayOfMonth(int year, int month, int day) {

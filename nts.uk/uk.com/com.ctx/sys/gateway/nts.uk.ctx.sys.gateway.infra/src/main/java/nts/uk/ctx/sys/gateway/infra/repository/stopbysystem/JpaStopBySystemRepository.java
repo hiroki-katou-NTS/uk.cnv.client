@@ -46,9 +46,12 @@ public class JpaStopBySystemRepository extends JpaRepository implements StopBySy
 
 	@Override
 	public Optional<StopBySystem> findByCdStatus(String contractCd, int systemStatus) {
-		return this.queryProxy().query(FIND_BY_CD_STATUS, SgwdtStopBySystem.class)
-				.setParameter("contractCd", contractCd)
-				.setParameter("systemStatus", systemStatus)
-				.getSingle(c -> toDomain(c));
+		
+		return this.forTenantDatasource(contractCd, em ->{
+			return this.queryProxy(em).query(FIND_BY_CD_STATUS, SgwdtStopBySystem.class)
+					.setParameter("contractCd", contractCd)
+					.setParameter("systemStatus", systemStatus)
+					.getSingle(c -> toDomain(c));	
+		});
 	}
 }

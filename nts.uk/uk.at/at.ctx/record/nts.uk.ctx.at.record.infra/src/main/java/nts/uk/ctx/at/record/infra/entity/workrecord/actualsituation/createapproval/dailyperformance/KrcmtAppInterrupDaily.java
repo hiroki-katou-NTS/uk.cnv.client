@@ -7,8 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.record.dom.workrecord.actualsituation.createapproval.dailyperformance.AppInterrupDaily;
 import nts.uk.shr.infra.data.entity.ContractCompanyUkJpaEntity;
@@ -23,8 +21,7 @@ public class KrcmtAppInterrupDaily extends ContractCompanyUkJpaEntity implements
 	public String executionId;
 
 	@Column(name = "SUSPENDED_STATE")
-	public boolean suspendedState;
-	
+	public int suspendedState;
 	@Override
 	protected Object getKey() {
 		return executionId;
@@ -33,7 +30,7 @@ public class KrcmtAppInterrupDaily extends ContractCompanyUkJpaEntity implements
 	public KrcmtAppInterrupDaily(String executionId, int suspendedState) {
 		super();
 		this.executionId = executionId;
-		this.suspendedState = BooleanUtils.toBoolean(suspendedState);
+		this.suspendedState = suspendedState;
 	}
 	
 	public static KrcmtAppInterrupDaily toEntity(AppInterrupDaily domain) {
@@ -45,7 +42,7 @@ public class KrcmtAppInterrupDaily extends ContractCompanyUkJpaEntity implements
 	public AppInterrupDaily toDomain() {
 		return new AppInterrupDaily(
 				this.executionId,
-				this.suspendedState
+				this.suspendedState == 1?true:false
 				);
 	}
 	

@@ -6,7 +6,7 @@ import nts.uk.ctx.at.record.app.find.stamp.management.StampTypeDto;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonDisSet;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonNameSet;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonSettings;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampType;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonType;
 
 /**
  * @author anhdt
@@ -33,8 +33,6 @@ public class ButtonSettingDto {
 	private Integer btnDisplayType;
 	
 	private Integer supportWplset;
-	
-	private Integer taskChoiceArt;
 
 	public ButtonSettingDto(ButtonSettings btnSet) {
 		this.btnPositionNo = btnSet.getButtonPositionNo().v();
@@ -45,25 +43,23 @@ public class ButtonSettingDto {
 		this.btnTextColor = btnNameSet.getTextColor().v();
 		this.btnBackGroundColor = btnDisSet.getBackGroundColor().v();
 
-//		ButtonType btnType = btnSet.getButtonType();
-		// Ở dakoku7 buttonType đã đc sửa thành StampType  => không còn trường btnReservationArt nữa
-		this.btnReservationArt = null;
-		
-		StampType btnType = btnSet.getType();
+		ButtonType btnType = btnSet.getButtonType();
+		this.btnReservationArt = btnType.getReservationArt().value;
 
-		this.changeHalfDay = btnType.isChangeHalfDay();
-		this.goOutArt = btnType.getGoOutArt().map(m -> m.value).orElse(null);
-		this.setPreClockArt = btnType.getSetPreClockArt().value;
-		this.changeClockArt = btnType.getChangeClockArt().value;
-		this.changeCalArt = btnType.getChangeCalArt().value;
+		btnType.getStampType().ifPresent(x -> {
+			this.changeHalfDay = x.isChangeHalfDay();
+			this.goOutArt = x.getGoOutArt().isPresent() ? x.getGoOutArt().get().value : null;
+			this.setPreClockArt = x.getSetPreClockArt() == null ? null : x.getSetPreClockArt().value;
+			this.changeClockArt = x.getChangeClockArt() == null ? null : x.getChangeClockArt().value;
+			this.changeCalArt = x.getChangeCalArt() == null ? null : x.getChangeCalArt().value;
+		});
 
 		this.supportWplset = btnSet.getSupportWplSet().map(m -> m.value).orElse(null);
-		this.taskChoiceArt = btnSet.getTaskChoiceArt().map(m -> m.value).orElse(null);
 		this.usrArt = btnSet.getUsrArt().value;
 		this.audioType = btnSet.getAudioType().value;
 		this.btnDisplayType = changeHalfDay != null
 				? ButtonSettingsDto
-						.toButtonValueType(StampTypeDto.fromDomain(btnSet.getType()))
+						.toButtonValueType(StampTypeDto.fromDomain(btnType.getStampType().map(x -> x).orElse(null)))
 				: -1;
 	}
 }

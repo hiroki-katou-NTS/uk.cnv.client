@@ -25,7 +25,6 @@ module nts.uk.at.view.kdw001.d {
             isDisplayCheckbox  :KnockoutObservable<boolean>;
             isCheckbox : KnockoutObservable<boolean>;
             ifCallScreenBToD : KnockoutObservable<boolean>;                        
-            isCreatingFutureDay: KnockoutObservable<boolean>;
             constructor() {
                 let self = this;
                 
@@ -46,14 +45,14 @@ module nts.uk.at.view.kdw001.d {
               self.isDisplayCheckbox = ko.observable(false); 
               self.isCheckbox = ko.observable(false);                  
               self.ifCallScreenBToD = ko.observable(false); 
-              self.isCreatingFutureDay = ko.observable(true);
+                
                 
                 //Get screenName value from a screen
                 __viewContext.transferred.ifPresent(data => {
                     self.screenName = data.screenName;
                 });
             }
-
+            
             opendScreenBorJ() {
                 if (!$(".nts-input").ntsError("hasError")) {
                     $("#wizard").ntsWizard("prev");        

@@ -23,15 +23,11 @@ public class XimmtCodeConvertPK implements Serializable{
 	
 	@Column(name = "SETTING_CODE")
 	private String settingCode;
-
-	/* 受入グループID */
-	@Column(name = "DOMAIN_ID")
-	private int domainId;
 	
 	@Column(name = "ITEM_NO")
 	private int itemNo;
 	
 	public static XimmtCodeConvertPK of(XimmtReviseItemPK parentPk) {
-		return new XimmtCodeConvertPK(parentPk.getCompanyId(), parentPk.getSettingCode(), parentPk.getDomainId(), parentPk.getItemNo());
+		return new XimmtCodeConvertPK(parentPk.getCompanyId(), parentPk.getSettingCode(), parentPk.getItemNo());
 	}
 }

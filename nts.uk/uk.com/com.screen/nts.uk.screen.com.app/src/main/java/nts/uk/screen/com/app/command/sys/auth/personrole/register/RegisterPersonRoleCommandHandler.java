@@ -38,24 +38,17 @@ public class RegisterPersonRoleCommandHandler extends CommandHandler<RegisterPer
 		String contractCode = AppContexts.user().contractCode();
 
 		Role role = command.toDomain(companyId, contractCode);
-		// 未来日参照許可：「しない」固定で登録
-		PersonRole personRole = new PersonRole(role.getRoleId(), companyId, false);
+		PersonRole personRole = new PersonRole(role.getRoleId(), command.getReferFutureDate());
 
 		if (command.getCreateMode()) {
-			// 画面で指定されたロールの内容でドメインモデル「ロール」を新規作成する
 			roleService.insertRole(role);
-
-			// 画面で指定された個人情報ロールの内容でドメインモデル「個人情報ロール」を新規作成する
 			personRoleRepo.insert(personRole);
 		} else {
-			// 画面内で指定されたロールの内容でドメインモデル「ロール」を更新する
 			roleService.updateRole(role);
-
-			// 画面で指定された個人情報ロールの内容でドメインモデル「個人情報ロール」を更新する
 			personRoleRepo.update(personRole);
 		}
 
-		// アルゴリズム「個人情報の権限を新規作成する」を実行する
+		// 個人情報の権限
 		saveFunctionAuth(command, role.getRoleId(), companyId);
 
 	}

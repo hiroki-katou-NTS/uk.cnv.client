@@ -4,116 +4,147 @@
  *****************************************************************/
 package nts.uk.ctx.sys.auth.dom.roleset;
 
-import java.util.Optional;
-
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import nts.arc.layer.dom.AggregateRoot;
 import nts.uk.ctx.sys.auth.dom.role.RoleType;
 
 /**
- * ロールセット
- * UKDesign.ドメインモデル.NittsuSystem.UniversalK.システム.権限管理.ロールセット.ロールセット
+ * ロールセット - Class RoleSet.
  * @author HieuNV
  */
 @Getter
-@AllArgsConstructor
 public class RoleSet extends AggregateRoot {
+
+    /** ロールセットコード. */
+    private RoleSetCode roleSetCd;
 
     /** 会社ID */
     private String companyId;
 
-    /** コード */
-    private RoleSetCode roleSetCd;
-
-    /** 名称*/
+    /** ロールセット名称*/
     private RoleSetName roleSetName;
-    
-    /** 就業ロール */
-    private Optional<String> employmentRoleId;
 
-    /** 個人情報ロール */
-    private Optional<String> personInfRoleId;
+    /** 承認権限*/
+    private ApprovalAuthority approvalAuthority;
 
-    /** 給与ロール */
-    private Optional<String> salaryRoleId;
-    
-    /** 人事ロール */
-    private Optional<String> hRRoleId;
-    
-    /** マイナンバーロール */
-    private Optional<String> myNumberRoleId;
+    /** ロールID: オフィスヘルパーロール */
+    private String officeHelperRoleId;
 
-    /**  オフィスヘルパーロール */
-    private Optional<String> officeHelperRoleId;
-    
+    /** ロールID: マイナンバーロール */
+    private String myNumberRoleId;
+
+    /** ロールID: 人事ロール */
+    private String hRRoleId;
+
+    /** ロールID: 個人情報ロール */
+    private String personInfRoleId;
+
+    /** ロールID: 就業ロール */
+    private String employmentRoleId;
+
+    /** ロールID: 給与ロール */
+    private String salaryRoleId;
+
     /**
-     * 作る
-     * @param cid 会社ID
-     * @param roleSetCd コード
-     * @param roleSetName 名称
-     * @param attendanceRoleId 就業ロール
-     * @param personInfoRoleId 個人情報ロール	
-     * @return
+     * Instantiates a new role set.
+     *
+     * @param roleSetCd
+     * @param companyId
+     * @param roleSetName
+     * @param approvalAuthority
+     * @param officeHelperRoleId
+     * @param myNumberRoleId
+     * @param hRRoleId
+     * @param personInfRoleId
+     * @param employmentRoleId
+     * @param salaryRoleId
      */
-    public static RoleSet create(String cid
-    		,	String roleSetCd
-    		,	String roleSetName
-    		,	Optional<String> attendanceRoleId
-    		,	Optional<String> personInfoRoleId) {
-    	return new RoleSet(cid
-    			,	new RoleSetCode(roleSetCd)
-    			,	new RoleSetName(roleSetName)
-    			,	attendanceRoleId, personInfoRoleId
-    			,	Optional.empty(),	Optional.empty()
-    			,	Optional.empty(),	Optional.empty() );
+    public RoleSet(String roleSetCd
+            , String companyId
+            , String roleSetName
+            , ApprovalAuthority approvalAuthority
+            , String officeHelperRoleId
+            , String myNumberRoleId
+            , String hRRoleId
+            , String personInfRoleId
+            , String employmentRoleId
+            , String salaryRoleId) {
+        super();
+        this.roleSetCd             = new RoleSetCode(roleSetCd);
+        this.companyId             = companyId;
+        this.roleSetName         = new RoleSetName(roleSetName);
+        this.approvalAuthority     = approvalAuthority;
+        this.officeHelperRoleId = officeHelperRoleId;
+        this.myNumberRoleId     = myNumberRoleId;
+        this.hRRoleId             = hRRoleId;
+        this.personInfRoleId     = personInfRoleId;
+        this.employmentRoleId     = employmentRoleId;
+        this.salaryRoleId         = salaryRoleId;
+    }
+
+    /**
+     * If has approval Authority right.
+     *
+     * @return true
+     */
+    public boolean hasApprovalAuthority() {
+        return this.approvalAuthority == ApprovalAuthority.HasRight;
+    }
+
+    /**
+     * If hasn't approval Authority right.
+     *
+     * @return true
+     */
+    public boolean hasntApprovalAuthority() {
+        return this.approvalAuthority == ApprovalAuthority.HasntRight;
+    }
+
+    /**
+     * set approval authority
+     */
+    public void setApprovalAuthority() {
+        this.approvalAuthority = ApprovalAuthority.HasRight;
+    }
+
+    /**
+     * Remove approval authority
+     */
+    public void removeApprovalAuthority() {
+        this.approvalAuthority = ApprovalAuthority.HasntRight;
     }
 
     /**
      * remove value of PersonInfRole field
      */
     public void removePersonInfRole() {
-        this.personInfRoleId = Optional.empty();
+        this.personInfRoleId = null;
     }
     
     /**
      * remove value of PersonInfRole field
      */
     public void setEmploymentRoleId() {
-        this.employmentRoleId = Optional.empty();
+        this.employmentRoleId = null;
     }
     
-    /**
-     * get roleID by roleType
-     * @param roleType ロール種類
-     * @return
-     */
+    /** Get RoleID by RoleType */
     public String getRoleIDByRoleType(RoleType roleType) {
     	switch(roleType) {
 	    	case EMPLOYMENT:
-	    		return convertToString(this.employmentRoleId);
+	    		return this.employmentRoleId;
 	    	case SALARY:
-	    		return convertToString(this.salaryRoleId);
+	    		return this.salaryRoleId;
 	    	case HUMAN_RESOURCE:
-	    		return convertToString(this.hRRoleId);
+	    		return this.hRRoleId;
 	    	case OFFICE_HELPER:
-	    		return convertToString(this.officeHelperRoleId);
+	    		return this.officeHelperRoleId;
 	    	case MY_NUMBER:
-	    		return this.convertToString(this.myNumberRoleId);
+	    		return this.myNumberRoleId;
 	    	case PERSONAL_INFO:
-	    		return convertToString(this.personInfRoleId);
+	    		return this.personInfRoleId;
     		default:
     			return "";
     	}
-    }
-    
-    /**
-     * convert roleID to string
-     * roleId == empty, return ""
-     * @param roleID
-     * @return
-     */
-    private String convertToString(Optional<String> roleID) {
-    	return roleID.isPresent()? roleID.get(): "";
     }
 }

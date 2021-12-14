@@ -13,8 +13,6 @@ import nts.uk.ctx.sys.auth.dom.role.RoleName;
 import nts.uk.ctx.sys.auth.dom.role.RoleType;
 import nts.uk.ctx.sys.auth.infra.entity.role.SacmtRole;
 
-import java.util.Optional;
-
 /**
  * The Class JpaRoleGetMemento.
  */
@@ -96,13 +94,6 @@ public class JpaRoleGetMemento implements RoleGetMemento {
 	@Override
 	public String getCompanyId() {
 		return this.entity.getCid();
-	}
-
-	@Override
-	public Optional<Boolean> getApprovalAuthority() {
-		return this.entity.getApprovalAuthority() == null
-				? Optional.empty()
-				: Optional.of(this.entity.getApprovalAuthority() == 1);
 	}
 
 }

@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.shared.dom.holidaymanagement.treatmentholiday;
 
 import lombok.Value;
+import lombok.val;
 import nts.arc.layer.dom.objecttype.DomainValue;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
@@ -38,20 +39,32 @@ public class WeeklyHolidayAcqMana implements HolidayAcquisitionManagement, Domai
 	 * [2] 管理期間を取得する
 	 * 
 	 * @param require
-	 * @param baseDate 基準日
+	 * @param ymd
 	 * @return
 	 */
 	@Override
 	public HolidayAcqManaPeriod getManagementPeriod(HolidayAcquisitionManagement.Require require,
-			GeneralDate baseDate) {
+			GeneralDate ymd) {
 		// $仮設定 = require.開始曜日を取得する
 		WeekRuleManagement weekRuleManagement = require.find(); 
 		// $開始日 = 基準日.日を足す(1).直前の日(年月日の検索#($週の管理.週開始)
-		baseDate = baseDate.addDays(1).previous(DateSeek.dayOfWeek(weekRuleManagement.getDayOfWeek()));
+		ymd = ymd.addDays(1).previous(DateSeek.dayOfWeek(weekRuleManagement.getDayOfWeek()));
 		// $期間 = 期間#期間($開始日,$開始日#日を足す(6))
-		DatePeriod period = new DatePeriod(baseDate, baseDate.addDays(6));
+		DatePeriod period = new DatePeriod(ymd, ymd.addDays(6));
 		// return 休日取得の管理期間#($期間,@1週間の休日日数)
 		return new HolidayAcqManaPeriod(period, new FourWeekDays(this.weeklyDays.v()));
+	}
+	
+	/**
+	 * [3] 28日間を取得する
+	 */
+	@Override
+	public DatePeriod get28Days(HolidayAcquisitionManagement.Require require,
+			GeneralDate ymd) {
+		
+		val manaPeriod = this.getManagementPeriod(require, ymd);
+		
+		return new DatePeriod(manaPeriod.getPeriod().start(), manaPeriod.getPeriod().start().addDays(27));
 	}
 
 	public static interface Require {
@@ -63,4 +76,7 @@ public class WeeklyHolidayAcqMana implements HolidayAcquisitionManagement, Domai
 		 */
 		public WeekRuleManagement find();
 	}
+
+
+
 }

@@ -117,9 +117,6 @@ module nts.uk.at.view.kdp010.j {
 				if(value == 12 || value == 13){
 					return !self.settingsStampUse.temporaryUse;
 				}
-                if(value == 10 || value == 11) {
-					return !self.settingsStampUse.entranceExitUse;
-				}
 				return false;
 			}
             
@@ -304,7 +301,7 @@ module nts.uk.at.view.kdp010.j {
         
         class StampPageComment{
             pageComment = ko.observable("");
-            commentColor = ko.observable("#7F7F7F");
+            commentColor = ko.observable("#000000");
             constructor(){}
             update(data?:any){
                 let self = this;
@@ -316,7 +313,7 @@ module nts.uk.at.view.kdp010.j {
 			clear(){
 				let self = this;
 				self.pageComment("");
-            	self.commentColor("#7F7F7F");
+            	self.commentColor("#000000");
 			}
         }
         
@@ -328,7 +325,6 @@ module nts.uk.at.view.kdp010.j {
             audioType = 0;
 			icon: KnockoutObservable<string> = ko.observable();
 			supportWplSet: number;
-            taskChoiceArt: number
             constructor(){}
             update(param: any){
                 let self = this;
@@ -339,7 +335,6 @@ module nts.uk.at.view.kdp010.j {
 					self.icon(self.getUrlImg(self.buttonType));
                     self.usrArt(param.usrArt);
                     self.supportWplSet = param.supportWplSet;
-                    self.taskChoiceArt = param.taskChoiceArt;
                 }
             }
 

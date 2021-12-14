@@ -4,12 +4,11 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.infra.repository.vacation.setting.subst;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.subst.ComSubstVacationSetMemento;
 import nts.uk.ctx.at.shared.dom.vacation.setting.subst.SubstVacationSetting;
 import nts.uk.ctx.at.shared.infra.entity.vacation.setting.subst.KsvstComSubstVacation;
+import nts.uk.ctx.at.shared.infra.entity.vacation.setting.subst.KsvstSubstVacationSetting;
 
 /**
  * The Class JpaComSubstVacationSetMemento.
@@ -55,13 +54,13 @@ public class JpaComSubstVacationSetMemento implements ComSubstVacationSetMemento
 
 	@Override
 	public void setManageDistinct(ManageDistinct manageDistinct) {
-		this.typeValue.setManageAtr(BooleanUtils.toBoolean(manageDistinct.value));
+		this.typeValue.setManageAtr(manageDistinct.value);
 		
 	}
 
 	@Override
 	public void setLinkingManagementATR(ManageDistinct linkingManagementATR) {
-		this.typeValue.setLinkMngAtr(BooleanUtils.toBoolean(linkingManagementATR.value));
+		this.typeValue.setLinkMngAtr(linkingManagementATR.value);
 		
 	}
 

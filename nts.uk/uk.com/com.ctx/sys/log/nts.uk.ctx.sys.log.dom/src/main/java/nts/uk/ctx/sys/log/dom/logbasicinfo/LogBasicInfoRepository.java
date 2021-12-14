@@ -20,7 +20,4 @@ public interface LogBasicInfoRepository {
 	
 	List<LogBasicInformation> getLogBasicInfo(String companyId, List<String> operationIds);
 	
-	//取得する																							
-	List<LogBasicInformation> getLogBasicInfo(List<String> operationId);
-	
 }

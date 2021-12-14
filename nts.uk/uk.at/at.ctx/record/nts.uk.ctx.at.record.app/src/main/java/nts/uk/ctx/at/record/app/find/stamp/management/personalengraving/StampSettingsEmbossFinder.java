@@ -21,6 +21,8 @@ import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampDakokuRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.EmployeeStampInfo;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.GetListStampEmployeeService;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.GetStampTypeToSuppressService;
@@ -64,6 +66,9 @@ public class StampSettingsEmbossFinder {
 
 	@Inject
 	private StampCardRepository stampCardRepo;
+
+	@Inject
+	private StampRecordRepository stampRecordRepo;
 
 	@Inject
 	private StampDakokuRepository stampDakokuRepo;
@@ -133,7 +138,7 @@ public class StampSettingsEmbossFinder {
 
 	public List<EmployeeStampInfo> getEmployeeStampDatas(DatePeriod period, String employeeId) {
 		List<EmployeeStampInfo> employeeStampDatas = new ArrayList<>();
-		EmpStampDataRequiredImpl empStampDataR = new EmpStampDataRequiredImpl(stampCardRepo,
+		EmpStampDataRequiredImpl empStampDataR = new EmpStampDataRequiredImpl(stampCardRepo, stampRecordRepo,
 				stampDakokuRepo);
 
 		List<GeneralDate> betweens = period.datesBetween();
@@ -152,7 +157,7 @@ public class StampSettingsEmbossFinder {
 
 	public StampToSuppress getStampToSuppress(String employeeId) {
 		StampTypeToSuppressRequiredImpl stampTypeToSuppressR = new StampTypeToSuppressRequiredImpl(stampCardRepo,
-				stampDakokuRepo, stampSetPerRepo, predetemineTimeSettingRepo,
+				stampRecordRepo, stampDakokuRepo, stampSetPerRepo, predetemineTimeSettingRepo,
 				settingsSmartphoneStampRepo, portalStampSettingsrepo, workingConditionItemRepo, workingConditionRepo);
 
 		return GetStampTypeToSuppressService.get(stampTypeToSuppressR, employeeId, StampMeans.INDIVITION);
@@ -180,11 +185,19 @@ public class StampSettingsEmbossFinder {
 		protected StampCardRepository stampCardRepo;
 
 		@Inject
+		protected StampRecordRepository stampRecordRepo;
+
+		@Inject
 		protected StampDakokuRepository stampDakokuRepo;
 
 		@Override
 		public List<StampCard> getListStampCard(String sid) {
 			return stampCardRepo.getListStampCard(sid);
+		}
+
+		@Override
+		public List<StampRecord> getStampRecord(List<StampNumber> stampNumbers, GeneralDate date) {
+			return stampRecordRepo.get(AppContexts.user().contractCode(), stampNumbers, date);
 		}
 
 		@Override
@@ -215,14 +228,14 @@ public class StampSettingsEmbossFinder {
 		@Inject
 		private PortalStampSettingsRepository portalStampSettingsrepo;
 		
-		public StampTypeToSuppressRequiredImpl(StampCardRepository stampCardRepo,
+		public StampTypeToSuppressRequiredImpl(StampCardRepository stampCardRepo, StampRecordRepository stampRecordRepo,
 				StampDakokuRepository stampDakokuRepo, StampSetPerRepository stampSetPerRepo,
 				PredetemineTimeSettingRepository predetemineTimeSettingRepo,
 				SettingsSmartphoneStampRepository settingsSmartphoneStampRepo,
 				PortalStampSettingsRepository portalStampSettingsrepo,
 				WorkingConditionItemRepository workingConditionItemRepo,
 				WorkingConditionRepository workingConditionRepo) {
-			super(stampCardRepo, stampDakokuRepo);
+			super(stampCardRepo, stampRecordRepo, stampDakokuRepo);
 			this.stampSetPerRepo = stampSetPerRepo;
 			this.predetemineTimeSettingRepo = predetemineTimeSettingRepo;
 			this.settingsSmartphoneStampRepo = settingsSmartphoneStampRepo;

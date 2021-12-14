@@ -1,0 +1,9 @@
+.container-custom {	
+	display: flex;
+	margin: 10px;
+	width: 1000px;
+}
+
+#A3_1 {
+  width: 100px;
+}

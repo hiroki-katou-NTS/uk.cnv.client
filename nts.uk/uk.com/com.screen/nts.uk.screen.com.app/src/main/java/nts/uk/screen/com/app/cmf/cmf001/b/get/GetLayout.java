@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import lombok.val;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomainId;
 import nts.uk.ctx.exio.dom.input.importableitem.ImportableItem;
-import nts.uk.ctx.exio.dom.input.setting.DomainImportSetting;
 import nts.uk.ctx.exio.dom.input.setting.ExternalImportCode;
 import nts.uk.ctx.exio.dom.input.setting.ExternalImportSetting;
 import nts.uk.ctx.exio.dom.input.setting.assembly.mapping.ImportingItemMapping;
@@ -31,10 +30,9 @@ public class GetLayout {
 		val settingOpt = require.getSetting(AppContexts.user().companyId(), query.getSettingCode());
 		if (settingOpt.isPresent()) {
 			val setting = settingOpt.get();
-			Optional<DomainImportSetting> domainSetting = setting.getDomainSetting(query.getImportingDomainId());
-			if (domainSetting.isPresent()) {
+			if (query.getImportingDomainId() == setting.getExternalImportDomainId()) {
 				// 設定されている項目
-				return domainSetting.get().getAssembly().getMapping().getMappings().stream()
+				return setting.getAssembly().getMapping().getMappings().stream()
 						.map(m -> m.getItemNo())
 						.collect(Collectors.toList());
 			}
@@ -61,9 +59,7 @@ public class GetLayout {
 		
 		val settingOpt = require.getSetting(AppContexts.user().companyId(), query.getSettingCode());
 		if (settingOpt.isPresent()) {
- 			val setting = settingOpt.get();
-			Optional<DomainImportSetting> domainSetting = setting.getDomainSetting(query.getImportingDomainId());
-			return getSaved(require, query, domainSetting);
+			return getSaved(require, query, settingOpt.get());
 		}
 		else {
 			return getAllImportables(require, query);
@@ -77,9 +73,7 @@ public class GetLayout {
 		
 		val settingOpt = require.getSetting(AppContexts.user().companyId(), query.getSettingCode());
 		if (settingOpt.isPresent()) {
- 			val setting = settingOpt.get();
-			Optional<DomainImportSetting> domainSetting = setting.getDomainSetting(query.getImportingDomainId());
-			results.addAll(getSaved(require, query, domainSetting).stream()
+			results.addAll(getSaved(require, query, settingOpt.get()).stream()
 					.filter(s -> query.getItemNoList().contains(s.getItemNo()))
 					.collect(toList()));
 		}
@@ -103,42 +97,32 @@ public class GetLayout {
 	private static List<ExternalImportLayoutDto> getAllImportables(GetLayout.Require require, GetLayoutParam query) {
 		
 		val importableItems = require.getImportableItems(query.getImportingDomainId());
-
+		
 		return importableItems.stream()
-				.map(t -> ExternalImportLayoutDto.fromDomain(
-						t,
-						ImportingItemMapping.noSetting(t.getItemNo())))
+				.map(i -> ExternalImportLayoutDto.fromDomain(
+						require,
+						query.getSettingCode(),
+						query.getImportingDomainId(),
+						ImportingItemMapping.noSetting(i.getItemNo())))
 				.collect(Collectors.toList());
 	}
 	
 	private List<ExternalImportLayoutDto> getSaved(
 			GetLayout.Require require,
 			GetLayoutParam query,
-			Optional<DomainImportSetting> setting) {
-		List<ImportingItemMapping> mappings = setting.isPresent()
-			? setting.get().getAssembly().getMapping().getMappings()
-			: new ArrayList<>();
-		return toLayouts(require, query, mappings);
+			ExternalImportSetting setting) {
+		return toLayouts(require, query, setting.getAssembly().getMapping().getMappings());
 	}
 	
 	private List<ExternalImportLayoutDto> toLayouts(GetLayout.Require require, GetLayoutParam query,
 			List<ImportingItemMapping> mappings) {
-		// 対象受入項目NO一覧
-		val targetItemNoList = mappings.stream()
-				.map(i -> i.getItemNo())
-				.collect(Collectors.toList());
-		// 対象受入項目の受入可能項目を取得
-		val importableItems = require.getImportableItems(query.getImportingDomainId());
-		val targetItems = importableItems.stream()
-				.filter(i -> targetItemNoList.contains(i.getItemNo()))
-				.collect(Collectors.toList());
-
-		return targetItems.stream()
-				.map(t -> ExternalImportLayoutDto.fromDomain(
-						t,
-						mappings.stream()
-								.filter(m -> m.getItemNo() == t.getItemNo())
-								.collect(Collectors.toList()).get(0)))
+		
+		return mappings.stream()
+				.map(i -> ExternalImportLayoutDto.fromDomain(
+						require,
+						query.getSettingCode(),
+						query.getImportingDomainId(),
+						new ImportingItemMapping(i.getItemNo(), i.getCsvColumnNo(), i.getFixedValue())))
 				.collect(Collectors.toList());
 	}
 	

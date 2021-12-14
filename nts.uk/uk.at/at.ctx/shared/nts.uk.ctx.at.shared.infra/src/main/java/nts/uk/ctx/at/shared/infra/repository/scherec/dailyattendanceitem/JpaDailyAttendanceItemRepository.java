@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -107,9 +106,7 @@ public class JpaDailyAttendanceItemRepository extends JpaRepository implements D
 		if(dailyAttendanceItemIds.isEmpty())
 			return Collections.emptyList();
 		List<DailyAttendanceItem> resultList = new ArrayList<>();
-		List<Integer> ids = dailyAttendanceItemIds.stream().filter(d -> d != null).collect(Collectors.toList());
-		if (ids.isEmpty()) return resultList;
-		CollectionUtil.split(ids, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subList -> {
+		CollectionUtil.split(dailyAttendanceItemIds, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subList -> {
 			resultList.addAll(this.queryProxy().query(FIND_BY_ID, KrcmtDailyAttendanceItem.class)
 								.setParameter("companyId", companyId)
 								.setParameter("dailyAttendanceItemIds", subList)

@@ -36,6 +36,8 @@ import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.RefectActualRes
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampDakokuRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampLocationInfor;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.EmployeeStampInfo;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.GetListStampEmployeeService;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.RetrieveNoStampCardRegisteredService;
@@ -65,6 +67,9 @@ public class OutputScreenListOfStampFinder {
 
 	@Inject
 	private StampCardRepository stampCardRepository;
+
+	@Inject
+	private StampRecordRepository stampRecordRepository;
 
 	@Inject
 	private StampDakokuRepository stampDakokuRepository;
@@ -132,7 +137,8 @@ public class OutputScreenListOfStampFinder {
 		List<EmployeeStampInfo> listEmployeeStampInfo = new ArrayList<>();
 		List<String> listWorkLocationCode = new ArrayList<>();
 
-		GetListStampEmployeeService.Require require = new RequireImpl(stampCardRepository, stampDakokuRepository);
+		GetListStampEmployeeService.Require require = new RequireImpl(stampCardRepository, stampRecordRepository,
+				stampDakokuRepository);
 		for (GeneralDate date : datePerriod.datesBetween()) {
 			for (String employeeId : listEmp) {
 				Optional<EmployeeStampInfo> optEmployeeStampInfo = GetListStampEmployeeService.get(require, employeeId,
@@ -336,8 +342,9 @@ public class OutputScreenListOfStampFinder {
 		// RetrieveNoStampCardRegisteredService
 		// 1取得する(@Require, 期間): 打刻情報リスト
 		// 打刻カード未登録の打刻データを取得する
-		RetrieveNoStampCardRegisteredService.Require requireCardNo = new RequireCardNoIml(stampDakokuRepository);
-		List<StampInfoDisp> listStampInfoDisp = RetrieveNoStampCardRegisteredService.get(requireCardNo, datePerriod);
+		RetrieveNoStampCardRegisteredService.Require requireCardNo = new RequireCardNoIml(stampRecordRepository,
+				stampDakokuRepository);
+		List<StampInfoDisp> listStampInfoDisp = RetrieveNoStampCardRegisteredService.get(requireCardNo, datePerriod, contractCode);
 		List<RefectActualResult> listRefectActual = listStampInfoDisp.stream().map(c -> c.getStamp())
 				.filter(t -> t.isPresent()).distinct().map(g -> g.get().getRefActualResults())
 				.collect(Collectors.toList());
@@ -465,11 +472,18 @@ public class OutputScreenListOfStampFinder {
 		@Inject
 		private StampCardRepository stampCardRepository;
 		@Inject
+		private StampRecordRepository stampRecordRepository;
+		@Inject
 		private StampDakokuRepository stampDakokuRepository;
 
 		@Override
 		public List<StampCard> getListStampCard(String sid) {
 			return stampCardRepository.getListStampCard(sid);
+		}
+
+		@Override
+		public List<StampRecord> getStampRecord(List<StampNumber> stampNumbers, GeneralDate stampDate) {
+			return stampRecordRepository.get(AppContexts.user().contractCode(), stampNumbers, stampDate);
 		}
 
 		@Override
@@ -483,12 +497,21 @@ public class OutputScreenListOfStampFinder {
 	private static class RequireCardNoIml implements RetrieveNoStampCardRegisteredService.Require {
 
 		@Inject
+		private StampRecordRepository stampRecordRepo;
+		@Inject
 		private StampDakokuRepository stampDakokuRepo;
 
+		@Override
+		public List<StampRecord> getStempRcNotResgistNumber(DatePeriod period) {
+
+			return stampRecordRepo.getStempRcNotResgistNumber(AppContexts.user().contractCode(), period);
+
+		}
 
 		@Override
-		public List<Stamp> getStempRcNotResgistNumberStamp(DatePeriod period) {
-			return stampDakokuRepo.getStempRcNotResgistNumberStamp(AppContexts.user().contractCode(), period);
+		public List<Stamp> getStempRcNotResgistNumberStamp(String contractCode, DatePeriod period) {
+			// TODO Auto-generated method stub
+			return stampDakokuRepo.getStempRcNotResgistNumberStamp(contractCode, period);
 		}	
 	}
 

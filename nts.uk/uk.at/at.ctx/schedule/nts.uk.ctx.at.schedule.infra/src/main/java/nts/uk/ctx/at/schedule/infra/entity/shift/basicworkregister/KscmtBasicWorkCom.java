@@ -21,7 +21,7 @@ import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 @Entity
 @Setter
 @Getter
-@Table(name = "KSCMT_STANDARD_WORK_CMP")
+@Table(name = "KSCMT_BASIC_WORK_COM")
 public class KscmtBasicWorkCom extends ContractUkJpaEntity implements Serializable {
 
 	/** The Constant serialVersionUID. */
@@ -32,11 +32,11 @@ public class KscmtBasicWorkCom extends ContractUkJpaEntity implements Serializab
 	protected KscmtCompanyWorkSetPK kscmtCompanyWorkSetPK;
 
 	/** The worktype code. */
-	@Column(name = "WKTP_CD")
+	@Column(name = "WORK_TYPE_CD")
 	private String worktypeCode;
 	
 	/** The working code. */
-	@Column(name = "WKTM_CD")
+	@Column(name = "WORKING_CD")
 	private String workingCode;
 
 

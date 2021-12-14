@@ -15,6 +15,7 @@ import mockit.integration.junit4.JMockit;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampHelper;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordHelper;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.GetListStampEmployeeService.Require;
 
 /**
@@ -67,6 +68,8 @@ public class GetListStampEmployeeServiceTest {
 				require.getListStampCard(anyString);
 				result = Arrays
 						.asList(StampHelper.getStampCardByInput("stampCardId1", "stampNumber1", GeneralDate.today()));
+				require.getStampRecord((List<StampNumber>) any, (GeneralDate) any);
+				result = Arrays.asList(StampRecordHelper.getStampRecord());
 				
 				require.getStamp((List<StampNumber>) any, (GeneralDate) any);
 				result = Arrays.asList(StampHelper.getStampDefault());

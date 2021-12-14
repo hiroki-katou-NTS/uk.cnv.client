@@ -16,6 +16,8 @@ public class RoleSetDto {
 
     private String roleSetName;
 
+    private int approvalAuthority;
+
     private String officeHelperRoleId;
 
     private String myNumberRoleId;
@@ -27,5 +29,4 @@ public class RoleSetDto {
     private String employmentRoleId;
 
     private String salaryRoleId;
-
 }

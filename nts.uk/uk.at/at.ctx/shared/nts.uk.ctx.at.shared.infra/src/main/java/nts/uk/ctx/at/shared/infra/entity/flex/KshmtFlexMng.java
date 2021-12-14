@@ -27,7 +27,7 @@ public class KshmtFlexMng extends ContractUkJpaEntity implements Serializable {
 	
 	/** フレックス勤務を管理する */
 	@Column(name="MANAGE_FLEX_WORK")
-	private boolean manageFlexWork;
+	private int manageFlexWork;
 
 	@Override
 	protected Object getKey() {

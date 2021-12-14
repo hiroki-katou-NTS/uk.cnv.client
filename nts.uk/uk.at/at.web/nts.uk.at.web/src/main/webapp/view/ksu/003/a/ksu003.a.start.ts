@@ -1,23 +1,19 @@
 module nts.uk.at.view.ksu003.a {
-	let __viewContext: any = window["__viewContext"] || {};
+	let __viewContexts: any = window["__viewContext"] || {};
 	
 	__viewContext.ready(function() {
 		nts.uk.characteristics.restore("USER_KSU003_INFOR").done(function(data : any) {
-			__viewContext.viewModel = {
+			let screenModel = {
 			viewmodelA: new viewmodel.ScreenModel(data),
-            viewmodelAb: new nts.uk.at.view.ksu003.ab.viewmodel.ScreenModel()
+			// ver 4 - comment
+            //viewmodelAb: new nts.uk.at.view.ksu003.ab.viewmodel.ScreenModel()
 			}
 			nts.uk.ui.block.grayout();
-			__viewContext.viewModel.viewmodelA.startPage().done(function() {
-				__viewContext.bind(__viewContext.viewModel);
+			screenModel.viewmodelA.startPage().done(function() {
+				__viewContext.bind(screenModel);
 				$('#ui-area').css('display','');
 				$(window).resize(function() {
-					__viewContext.viewModel.viewmodelA.setPositionButonDownAndHeightGrid();
-				});
-				
-				__viewContext.viewModel.viewmodelAb.startPage().done(function() {
-					$('#screen-Ab1').css('display','');
-					$('#screen-Ab2').css('display','');
+					screenModel.viewmodelA.setPositionButonDownAndHeightGrid();
 				});
 			});
 			initEvent();

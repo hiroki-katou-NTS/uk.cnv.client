@@ -26,7 +26,6 @@ import nts.uk.ctx.at.request.dom.application.AppReason;
 import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.ApplicationType;
 import nts.uk.ctx.at.request.dom.application.PrePostAtr;
-import nts.uk.ctx.at.request.dom.application.ReflectedState;
 import nts.uk.ctx.at.request.dom.application.overtime.OvertimeAppAtr;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.common.ReflectApplicationHelper;
 import nts.uk.ctx.at.request.dom.reasonappdaily.ApplicationReasonInfo;
@@ -55,7 +54,7 @@ public class ReflectApplicationReasonTest {
 
 		Application application = ReflectApplicationHelper.createApp(PrePostAtr.POSTERIOR);
 
-		val actualResult = ReflectApplicationReason.reflectReason(require, application, GeneralDate.today(), GeneralDateTime.FAKED_NOW, "1", ReflectedState.WAITREFLECTION);
+		val actualResult = ReflectApplicationReason.reflectReason(require, application, GeneralDate.today(), GeneralDateTime.FAKED_NOW);
 
 		assertThat(actualResult).isEmpty();
 	}
@@ -93,9 +92,9 @@ public class ReflectApplicationReasonTest {
 			}
 		};
 
-		val actualResult = ReflectApplicationReason.reflectReason(require, application, GeneralDate.today(), GeneralDateTime.FAKED_NOW, "1", ReflectedState.WAITREFLECTION);
+		val actualResult = ReflectApplicationReason.reflectReason(require, application, GeneralDate.today(), GeneralDateTime.FAKED_NOW);
 		NtsAssert.atomTask(() -> actualResult.get(), any -> require.addUpdateReason(any.get()),
-				any -> require.processCreateHist(any.get(), any.get(), any.get(), any.get(), any.get(), any.get(), any.get(), any.get()));
+				any -> require.processCreateHist(any.get(), any.get(), any.get(), any.get(), any.get(), any.get()));
 
 	}
 
@@ -135,9 +134,9 @@ public class ReflectApplicationReasonTest {
 			}
 		};
 
-		val actualResult = ReflectApplicationReason.reflectReason(require, application, GeneralDate.today(), GeneralDateTime.FAKED_NOW, "1", ReflectedState.WAITREFLECTION);
+		val actualResult = ReflectApplicationReason.reflectReason(require, application, GeneralDate.today(), GeneralDateTime.FAKED_NOW);
 		NtsAssert.atomTask(() -> actualResult.get(), any -> require.addUpdateReason(any.get()),
-				any -> require.processCreateHist(any.get(), any.get(), any.get(), any.get(), any.get(), any.get(), any.get(), any.get()));
+				any -> require.processCreateHist(any.get(), any.get(), any.get(), any.get(), any.get(), any.get()));
 
 	}
 

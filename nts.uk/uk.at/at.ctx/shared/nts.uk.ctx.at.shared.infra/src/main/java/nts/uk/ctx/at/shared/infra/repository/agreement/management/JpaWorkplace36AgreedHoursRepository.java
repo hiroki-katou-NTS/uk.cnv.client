@@ -11,9 +11,6 @@ import nts.uk.ctx.at.shared.infra.entity.agreement.management.Ksrmt36AgrMgtWkpPk
 import nts.uk.shr.com.context.AppContexts;
 
 import javax.ejb.Stateless;
-
-import org.apache.commons.lang3.BooleanUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -73,10 +70,10 @@ public class JpaWorkplace36AgreedHoursRepository extends JpaRepository implement
     @Override
     public void delete(AgreementTimeOfWorkPlace domain) {
         val entity = this.queryProxy().find(new Ksrmt36AgrMgtWkpPk(domain.getWorkplaceId()
-                , BooleanUtils.toBoolean(domain.getLaborSystemAtr().value)), Ksrmt36AgrMgtWkp.class);
+                , domain.getLaborSystemAtr().value), Ksrmt36AgrMgtWkp.class);
         if (entity.isPresent()) {
             this.commandProxy().remove(Ksrmt36AgrMgtWkp.class, new Ksrmt36AgrMgtWkpPk(domain.getWorkplaceId()
-                    , BooleanUtils.toBoolean(domain.getLaborSystemAtr().value)));
+                    , domain.getLaborSystemAtr().value));
 			this.getEntityManager().flush();
         }
     }
@@ -99,7 +96,7 @@ public class JpaWorkplace36AgreedHoursRepository extends JpaRepository implement
     @Override
     public List<String> findWorkPlaceSetting(LaborSystemtAtr laborSystemAtr) {
         return this.queryProxy().query(FIND_WORKPLACE_SETTING, Ksrmt36AgrMgtWkp.class)
-                .setParameter("laborSystemAtr", laborSystemAtr.value == 1)
+                .setParameter("laborSystemAtr", laborSystemAtr.value)
 				.setParameter("companyID", AppContexts.user().companyId())
                 .getList(f -> f.ksrmt36AgrMgtWkpPk.workplaceId);
     }
@@ -109,7 +106,7 @@ public class JpaWorkplace36AgreedHoursRepository extends JpaRepository implement
 
         return this.queryProxy().query(FIND_BY_WKP_AND_LABOR, Ksrmt36AgrMgtWkp.class)
                 .setParameter("workplaceId", workplaceId)
-                .setParameter("laborSystemAtr", laborSystemAtr.value == 1)
+                .setParameter("laborSystemAtr", laborSystemAtr.value)
                 .getSingle(Ksrmt36AgrMgtWkp::toDomain);
     }
 }

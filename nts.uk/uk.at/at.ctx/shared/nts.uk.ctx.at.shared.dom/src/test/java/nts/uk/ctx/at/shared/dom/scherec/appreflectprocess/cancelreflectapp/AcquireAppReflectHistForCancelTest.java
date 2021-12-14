@@ -18,7 +18,6 @@ import nts.uk.ctx.at.shared.dom.scherec.application.common.ApplicationShare;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.PrePostAtrShare;
 import nts.uk.ctx.at.shared.dom.scherec.application.reflectprocess.common.ReflectApplicationHelper;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.AppReflectExecInfo;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.ApplicationReflectHistory;
 
 @RunWith(JMockit.class)
@@ -78,7 +77,7 @@ public class AcquireAppReflectHistForCancelTest {
 		val actualResult = AcquireAppReflectHistForCancel.process(require, app, GeneralDate.ymd(2021, 4, 22),
 				ScheduleRecordClassifi.RECORD);
 
-		assertHist(createAppReflectHistAll("1", GeneralDateTime.ymdhms(2021, 4, 16, 0, 0, 0)), actualResult.get().getAppHistPrev());
+		assertHist(createAppReflectHistAll("1", GeneralDateTime.ymdhms(2021, 4, 16, 0, 0, 0)), actualResult.get());
 	}
 
 	/*
@@ -113,16 +112,16 @@ public class AcquireAppReflectHistForCancelTest {
 		val actualResult = AcquireAppReflectHistForCancel.process(require, app, GeneralDate.ymd(2021, 4, 22),
 				ScheduleRecordClassifi.RECORD);
 
-		assertHist(createAppReflectHistAll("1", GeneralDateTime.ymdhms(2021, 4, 15, 0, 0, 0)), actualResult.get().getAppHistPrev());
+		assertHist(createAppReflectHistAll("1", GeneralDateTime.ymdhms(2021, 4, 15, 0, 0, 0)), actualResult.get());
 	}
 	
 	private ApplicationReflectHistory createAppReflectHistAll(String id, GeneralDateTime date) {
-		return new ApplicationReflectHistory("1", GeneralDate.ymd(2021, 4, 01), id, ScheduleRecordClassifi.RECORD,
-				true, new ArrayList<>(), new AppReflectExecInfo(false, "1", date));
+		return new ApplicationReflectHistory("1", GeneralDate.ymd(2021, 4, 01), id, date, ScheduleRecordClassifi.RECORD,
+				true, new ArrayList<>());
 	}
 
 	private void assertHist(ApplicationReflectHistory before, ApplicationReflectHistory after) {
 		assertThat(before.getApplicationId()).isEqualTo(after.getApplicationId());
-		assertThat(before.getAppExecInfo().getReflectionTime()).isEqualTo(after.getAppExecInfo().getReflectionTime());
+		assertThat(before.getReflectionTime()).isEqualTo(after.getReflectionTime());
 	}
 }

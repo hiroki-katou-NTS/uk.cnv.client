@@ -1,13 +1,6 @@
 package nts.uk.file.at.app.export.worktype;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -30,13 +23,7 @@ import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.Unre
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationlatearrival.CancelAtr;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationlatearrival.LateEarlyCancelAppSet;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationlatearrival.LateEarlyCancelAppSetRepository;
-import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.AppSetForProxyApp;
-import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.ApplicationSetting;
-import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.ApplicationSettingRepository;
-import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.BeforeAddCheckMethod;
-import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.DisplayReason;
-import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.DisplayReasonRepository;
-import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.RecordDate;
+import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.*;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.appdeadlineset.AppDeadlineSetting;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.appdeadlineset.DeadlineCriteria;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.applicationrestrictionsetting.AppLimitSetting;
@@ -49,8 +36,6 @@ import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.appo
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.appovertime.OvertimeQuotaSetUse;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.approvallistsetting.ApprovalListDispSetRepository;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.approvallistsetting.ApprovalListDisplaySetting;
-import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.businesstrip.AppTripRequestSet;
-import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.businesstrip.AppTripRequestSetRepository;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.hdworkapplicationsetting.CalcStampMiss;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.hdworkapplicationsetting.HolidayWorkAppSet;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.hdworkapplicationsetting.HolidayWorkAppSetRepository;
@@ -81,6 +66,8 @@ import nts.uk.ctx.at.request.dom.setting.employment.appemploymentsetting.AppEmpl
 import nts.uk.ctx.at.request.dom.setting.employment.appemploymentsetting.AppEmploymentSetRepository;
 import nts.uk.ctx.at.request.dom.setting.employment.appemploymentsetting.BreakOrRestTime;
 import nts.uk.ctx.at.request.dom.setting.employment.appemploymentsetting.BusinessTripAppWorkType;
+import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.businesstrip.AppTripRequestSet;
+import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.businesstrip.AppTripRequestSetRepository;
 import nts.uk.ctx.at.request.dom.setting.workplace.appuseset.ApplicationUseSetting;
 import nts.uk.ctx.at.request.dom.setting.workplace.requestbycompany.RequestByCompany;
 import nts.uk.ctx.at.request.dom.setting.workplace.requestbycompany.RequestByCompanyRepository;
@@ -90,6 +77,8 @@ import nts.uk.ctx.at.shared.app.find.workrule.closure.ClosureHistoryFinder;
 import nts.uk.ctx.at.shared.app.find.workrule.closure.dto.ClosureHistoryFindDto;
 import nts.uk.ctx.at.shared.dom.ot.frame.OvertimeWorkFrame;
 import nts.uk.ctx.at.shared.dom.ot.frame.OvertimeWorkFrameRepository;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItem;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemRepository;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.directgoback.ApplicationStatus;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.directgoback.GoBackReflect;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.directgoback.GoBackReflectRepository;
@@ -112,8 +101,6 @@ import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.va
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.vacationapplication.subleaveapp.SubLeaveAppReflectRepository;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.vacationapplication.subleaveapp.SubstituteLeaveAppReflect;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.workchangeapp.ReflectWorkChangeApp;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItem;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemRepository;
 import nts.uk.ctx.at.shared.dom.workrule.outsideworktime.overtime.overtimeframe.OverTimeFrameNo;
 import nts.uk.ctx.bs.employee.dom.employment.Employment;
 import nts.uk.ctx.bs.employee.dom.employment.EmploymentRepository;
@@ -124,6 +111,8 @@ import nts.uk.ctx.sys.portal.pub.standardmenu.StandardMenuNameQuery;
 import nts.uk.ctx.sys.portal.pub.standardmenu.StandardMenuPub;
 import nts.uk.ctx.workflow.app.find.approvermanagement.setting.ApprovalSettingDto;
 import nts.uk.ctx.workflow.app.find.approvermanagement.setting.ApprovalSettingFinder;
+import nts.uk.ctx.workflow.app.find.approvermanagement.setting.JobAssignSettingDto;
+import nts.uk.ctx.workflow.app.find.approvermanagement.setting.JobAssignSettingFinder;
 import nts.uk.screen.at.app.worktype.WorkTypeDto;
 import nts.uk.screen.at.app.worktype.WorkTypeQueryRepository;
 import nts.uk.shr.com.context.AppContexts;
@@ -162,6 +151,9 @@ public class PreparationBeforeApplyExportImpl implements MasterListData {
 
     @Inject
     private AppWorkChangeSetRepository appWorkChangeSetRepo;
+
+    @Inject
+    private JobAssignSettingFinder jobFinder;
 
     @Inject
     private ApprovalSettingFinder approvalSettingFinder;
@@ -477,14 +469,15 @@ public class PreparationBeforeApplyExportImpl implements MasterListData {
         return "";
     }
 
-    private List<MasterData> getDataA17(RecordDate recordDateAtr, int approvalByPersonAtr) {
+    private List<MasterData> getDataA17(RecordDate recordDateAtr, int approvalByPersonAtr, Boolean includeConcurrentPersonel) {
         List<MasterData> data = new ArrayList<>();
         for (int row = 0; row < ROW_SIZE_A5; row++) {
             Map<String, MasterCellData> rowData = new HashMap<>();
             for (int col = 0; col < MAIN_COL_SIZE; col++) {
                 boolean value;
                 if (row == 0) value = recordDateAtr == RecordDate.APP_DATE;
-                else value = approvalByPersonAtr == 1;
+                else if (row == 1) value = approvalByPersonAtr == 1;
+                else value = includeConcurrentPersonel;
                 rowData.put(
                         COLUMN_NO_HEADER + col,
                         MasterCellData.builder()
@@ -744,6 +737,7 @@ public class PreparationBeforeApplyExportImpl implements MasterListData {
 
         Optional<ApplicationSetting> applicationSetting = appSettingRepo.findByCompanyId(companyId);
         ApprovalSettingDto approvalSetting = approvalSettingFinder.findApproSet();
+        JobAssignSettingDto jobAssignSetting = jobFinder.findApp();
         List<DisplayReason> displayReasons = displayReasonRepo.findByCompanyId(companyId);
         Optional<AppReflectExecutionCondition> appReflectExecutionCondition = appReflectConditionRepo.findByCompanyId(companyId);
         if (!applicationSetting.isPresent()
@@ -753,7 +747,7 @@ public class PreparationBeforeApplyExportImpl implements MasterListData {
         data.addAll(getDataA4(applicationSetting.get().getAppDeadlineSetLst()));
         data.addAll(getDataA7(applicationSetting.get().getReceptionRestrictionSettings()));
         data.addAll(getDataA11(applicationSetting.get().getAppLimitSetting()));
-        data.addAll(getDataA17(applicationSetting.get().getRecordDate(), approvalSetting.getPrinFlg()));
+        data.addAll(getDataA17(applicationSetting.get().getRecordDate(), approvalSetting.getPrinFlg(), jobAssignSetting.getIsConcurrently()));
 
         Integer nightOTReflectAtr = appSetRepo.getNightOvertimeReflectAtr(companyId);
         if (nightOTReflectAtr != null) {

@@ -116,7 +116,6 @@ public class JpaTempChildCareManagementRepository extends JpaRepository implemen
 		this.getEntityManager().createQuery(REMOVE_BY_SID_PERIOD)
 		.setParameter("sid", sid)
 		.setParameter("startYmd", period.start())
-		.setParameter("endYmd", period.end())
-		.executeUpdate();
+		.setParameter("endYmd", period.end());
 	}
 }

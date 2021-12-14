@@ -19,7 +19,6 @@ import nts.uk.ctx.at.request.dom.adapter.workrecod.actuallock.dto.AchievementAtr
 import nts.uk.ctx.at.request.dom.adapter.workrecod.actuallock.dto.IgnoreFlagDuringLockImport;
 import nts.uk.ctx.at.request.dom.application.ApplicationType;
 import nts.uk.ctx.at.request.dom.application.PrePostAtr;
-import nts.uk.ctx.at.request.dom.application.ReflectedState;
 import nts.uk.ctx.at.request.dom.application.common.adapter.bs.EmployeeRequestAdapter;
 import nts.uk.ctx.at.request.dom.application.common.adapter.bs.dto.SWkpHistImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.actuallock.DetermineActualResultLockAdapter;
@@ -128,9 +127,9 @@ public class CreateRequireReflectionProcess {
 
 		@Override
 		public Pair<ReflectStatusResult, AtomTask> process(ApplicationShare application,
-				GeneralDate date, ReflectStatusResult reflectStatus, int preAppWorkScheReflectAttr, String execId) {
+				GeneralDate date, ReflectStatusResult reflectStatus, int preAppWorkScheReflectAttr) {
 			return eflectApplicationWorkScheduleAdapter.process(application, date, reflectStatus,
-					preAppWorkScheReflectAttr, execId);
+					preAppWorkScheReflectAttr);
 		}
 
 		@Override
@@ -165,8 +164,8 @@ public class CreateRequireReflectionProcess {
 
 		@Override
 		public Pair<ReflectStatusResult, Optional<AtomTask>> processWork(ApplicationShare application,
-				GeneralDate date, ReflectStatusResult reflectStatus, GeneralDateTime reflectTime, String execId) {
-			return reflectApplicationWorkRecordAdapter.process(application, date, reflectStatus, reflectTime, execId);
+				GeneralDate date, ReflectStatusResult reflectStatus, GeneralDateTime reflectTime) {
+			return reflectApplicationWorkRecordAdapter.process(application, date, reflectStatus, reflectTime);
 		}
 
 		@Override
@@ -183,8 +182,8 @@ public class CreateRequireReflectionProcess {
 
 		@Override
 		public void processCreateHist(String employeeId, GeneralDate date, String appId,
-				ScheduleRecordClassifi classification, Map<Integer, String> mapValue, GeneralDateTime reflectTime, String execId, ReflectedState reflectStatus) {
-			createEditStatusHistAppReasonAdapter.process(employeeId, date, appId, classification, mapValue, reflectTime, execId, reflectStatus);
+				ScheduleRecordClassifi classification, Map<Integer, String> mapValue, GeneralDateTime reflectTime) {
+			createEditStatusHistAppReasonAdapter.process(employeeId, date, appId, classification, mapValue, reflectTime);
 		}
 
 		@Override

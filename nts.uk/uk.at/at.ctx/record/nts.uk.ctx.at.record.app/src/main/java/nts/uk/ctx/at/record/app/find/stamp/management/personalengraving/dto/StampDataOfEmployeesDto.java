@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import lombok.Data;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.EmployeeStampInfo;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.StampDataOfEmployees;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.StampInfoDisp;
@@ -45,12 +46,12 @@ public class StampDataOfEmployeesDto {
                  .filter(distinctByKey(s -> s.retriveKey()))
                  .collect(Collectors.toMap(Stamp::retriveKey, s -> s));
         
-//        List<StampRecord> stampRecords = domain.getListStampRecord();
-//        stampRecords.sort((d1, d2) -> d2.getStampDateTime().compareTo(d1.getStampDateTime()));
-//        for(StampRecord stampRecord : stampRecords) {
-//            Stamp stamp = cardNumberStamp.get(stampRecord.retriveKey());
-//            this.stampRecords.add(new StampRecordDto(stampRecord, stamp));
-//        }
+        List<StampRecord> stampRecords = domain.getListStampRecord();
+        stampRecords.sort((d1, d2) -> d2.getStampDateTime().compareTo(d1.getStampDateTime()));
+        for(StampRecord stampRecord : stampRecords) {
+            Stamp stamp = cardNumberStamp.get(stampRecord.retriveKey());
+            this.stampRecords.add(new StampRecordDto(stampRecord, stamp));
+        }
 	}
 
 	public static <T> Predicate<T> distinctByKey(

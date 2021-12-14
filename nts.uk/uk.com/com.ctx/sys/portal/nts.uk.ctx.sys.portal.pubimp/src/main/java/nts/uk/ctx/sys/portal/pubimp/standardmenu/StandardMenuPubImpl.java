@@ -51,9 +51,7 @@ public class StandardMenuPubImpl implements StandardMenuPub {
 
 	@Override
 	public List<StandardMenuNameExport> getMenus(String companyId, int system) {
-		return standardMenuRepo.findAll1(companyId).stream()
-				.filter(x -> x.getSystem().value == system)
-				.map(this::toExport).collect(Collectors.toList());
+		return standardMenuRepo.findBySystem(companyId, system).stream().map(this::toExport).collect(Collectors.toList());
 	}
 
 	private StandardMenuNameExport toExport(StandardMenu domain) {

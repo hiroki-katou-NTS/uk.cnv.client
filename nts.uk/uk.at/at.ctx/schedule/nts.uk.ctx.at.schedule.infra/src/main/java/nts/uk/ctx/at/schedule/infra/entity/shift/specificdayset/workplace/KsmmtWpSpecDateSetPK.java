@@ -18,10 +18,10 @@ public class KsmmtWpSpecDateSetPK implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 	
-	@Column(name = "WKP_ID")
+	@Column(name = "WKPID")
 	public String workplaceId;
 
-	@Column(name = "YMD")
+	@Column(name = "SPECIFIC_DATE")
 	public GeneralDate specificDate;
 
 	@Column(name = "SPECIFIC_DATE_ITEM_NO")

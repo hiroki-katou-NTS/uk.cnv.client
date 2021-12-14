@@ -28,9 +28,9 @@ public class ReflectApplicationWorkScheduleAdapterImpl implements ReflectApplica
 
 	@Override
 	public Pair<ReflectStatusResult, AtomTask> process(Object application, GeneralDate date,
-			ReflectStatusResult reflectStatus, int preAppWorkScheReflectAttr, String execId) {
+			ReflectStatusResult reflectStatus, int preAppWorkScheReflectAttr) {
 		val result = reflectApplicationWorkSchedulePub.process(application, date, convertTo(reflectStatus),
-				preAppWorkScheReflectAttr, execId);
+				preAppWorkScheReflectAttr);
 		return Pair.of(convertToDom(result.getLeft()), result.getRight());
 	}
 

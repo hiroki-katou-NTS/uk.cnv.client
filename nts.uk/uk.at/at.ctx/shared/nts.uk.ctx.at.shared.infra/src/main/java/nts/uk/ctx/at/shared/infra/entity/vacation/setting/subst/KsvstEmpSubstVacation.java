@@ -33,7 +33,7 @@ public class KsvstEmpSubstVacation extends ContractUkJpaEntity  implements Seria
 	protected KsvstEmpSubstVacationPK kclstEmpSubstVacationPK;
 	//管理区分
 	@Column(name = "MANAGE_ATR")
-	private boolean manageAtr;
+	private Integer manageAtr;
 
 	public static final JpaEntityMapper<KsvstEmpSubstVacation> MAPPER =
 			new JpaEntityMapper<>(KsvstEmpSubstVacation.class);

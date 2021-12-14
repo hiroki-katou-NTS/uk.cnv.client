@@ -12,14 +12,12 @@ import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampCard;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.support.SupportCardNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeCalArt;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.SetPreClockArt;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampType;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.OvertimeDeclaration;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkLocationCD;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.work.WorkCode;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.work.WorkGroup;
 import nts.uk.ctx.at.shared.dom.workrule.goingout.GoingOutReason;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
 /**
@@ -28,8 +26,6 @@ import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
  *
  */
 public class StampHelper {
-	
-	public static WorkGroup group = new WorkGroup(new WorkCode("DUMMY"), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()); //dummy
 
 	public static Stamp getStampDefault() {
 		return new Stamp(new ContractCode("DUMMY"),
@@ -42,19 +38,19 @@ public class StampHelper {
 						false,
 						GoingOutReason.valueOf(0), 
 						SetPreClockArt.valueOf(0), 
-						ChangeClockAtr.valueOf(0),
+						ChangeClockArt.valueOf(0),
 						ChangeCalArt.valueOf(0)),
-				new RefectActualResult(new WorkInformationStamp(Optional.empty(), 
-																Optional.empty(),
-																Optional.of(new WorkLocationCD("workLocationCD")), 
-																Optional.of(new SupportCardNumber(9999))),
-										new WorkTimeCode("workTimeCode"), 
-										new OvertimeDeclaration(new AttendanceTime(0),
-																new AttendanceTime(0)),
-																group),
+				new RefectActualResult(new WorkInformationStamp(Optional.empty(), Optional.empty(),
+						Optional.of(new WorkLocationCD("workLocationCD")), 
+						Optional.of(new SupportCardNumber(9999))),
+						new WorkTimeCode("workTimeCode"), 
+						new OvertimeDeclaration(
+								new AttendanceTime(0),
+								new AttendanceTime(0))),
 				new ImprintReflectionState(false, Optional.empty()),
 				Optional.ofNullable(getGeoCoordinateDefault()),
-				Optional.empty()
+				Optional.empty(),
+				"DUMMY"
 				);
 	}
 	
@@ -69,7 +65,7 @@ public class StampHelper {
 						false,
 						GoingOutReason.valueOf(0), 
 						SetPreClockArt.valueOf(0), 
-						ChangeClockAtr.valueOf(0),
+						ChangeClockArt.valueOf(0),
 						ChangeCalArt.valueOf(0)),
 				new RefectActualResult(
 						new WorkInformationStamp(Optional.empty(), Optional.empty(),
@@ -78,15 +74,14 @@ public class StampHelper {
 						new WorkTimeCode("workTimeCode"), 
 						new OvertimeDeclaration(
 								new AttendanceTime(1),
-								new AttendanceTime(2)),
-								group),
+								new AttendanceTime(2))),
 				new ImprintReflectionState(true, Optional.empty()),
 				Optional.ofNullable(getGeoCoordinateDefault()),
-				Optional.empty());
-
+				Optional.empty(),
+				"DUMMY");
 	}
 	
-	public static Stamp getStampByChangeClockArt(String stampNumber,ChangeClockAtr changeClockArt,GeneralDateTime dateTime) {
+	public static Stamp getStampByChangeClockArt(String stampNumber,ChangeClockArt changeClockArt,GeneralDateTime dateTime) {
 		return new Stamp(new ContractCode("DUMMY"),
 				new StampNumber(stampNumber),
 				dateTime, 
@@ -106,42 +101,43 @@ public class StampHelper {
 						new WorkTimeCode("workTimeCode"), 
 						new OvertimeDeclaration(
 								new AttendanceTime(1),
-								new AttendanceTime(2)),
-								group),
+								new AttendanceTime(2))),
 				new ImprintReflectionState(false, Optional.empty()),
 				Optional.ofNullable(getGeoCoordinateDefault()),
-				Optional.empty());
+				Optional.empty(),
+				"DUMMY"
+				);
 	}
 	public static List<Stamp> getListStampDefault() {
 		List<Stamp> data = new ArrayList<>();
 		data.add(getStampDefault());
 		data.add(new Stamp(new ContractCode("DUMMY"),new StampNumber("stampNumber"), GeneralDateTime.now(),
 				new Relieve(AuthcMethod.valueOf(0), StampMeans.valueOf(0)),
-				new StampType(false, GoingOutReason.valueOf(0), SetPreClockArt.valueOf(0), ChangeClockAtr.valueOf(0),
+				new StampType(false, GoingOutReason.valueOf(0), SetPreClockArt.valueOf(0), ChangeClockArt.valueOf(0),
 						ChangeCalArt.valueOf(0)),
 				new RefectActualResult(new WorkInformationStamp(Optional.empty(), Optional.empty(),
 						Optional.of(new WorkLocationCD("workLocationCD")), 
 								Optional.of(new SupportCardNumber(9999))),
 						new WorkTimeCode("workTimeCode"),
-						new OvertimeDeclaration(new AttendanceTime(0), new AttendanceTime(0)),
-						group),
+						new OvertimeDeclaration(new AttendanceTime(0), new AttendanceTime(0))),
 				new ImprintReflectionState(false, Optional.empty()),
 				Optional.ofNullable(getGeoCoordinateDefault()),
-				Optional.empty())
+				Optional.empty(),
+				"DUMMY")
 				);
 		data.add(new Stamp(new ContractCode("DUMMY"),new StampNumber("stampNumber"), GeneralDateTime.now(),
 				new Relieve(AuthcMethod.valueOf(0), StampMeans.valueOf(0)),
-				new StampType(false, GoingOutReason.valueOf(0), SetPreClockArt.valueOf(0), ChangeClockAtr.valueOf(0),
+				new StampType(false, GoingOutReason.valueOf(0), SetPreClockArt.valueOf(0), ChangeClockArt.valueOf(0),
 						ChangeCalArt.valueOf(0)),
 				new RefectActualResult(new WorkInformationStamp(Optional.empty(), Optional.empty(),
 						Optional.of(new WorkLocationCD("workLocationCD")), 
 								Optional.of(new SupportCardNumber(9999))),
 						new WorkTimeCode("workTimeCode"),
-						new OvertimeDeclaration(new AttendanceTime(0), new AttendanceTime(0)),
-						group),
+						new OvertimeDeclaration(new AttendanceTime(0), new AttendanceTime(0))),
 				new ImprintReflectionState(false, Optional.empty()),
 				Optional.ofNullable(getGeoCoordinateDefault()),
-				Optional.empty())
+				Optional.empty(),
+				"DUMMY")
 				);
 		return data;
 	}
@@ -151,11 +147,11 @@ public class StampHelper {
 				false,
 				GoingOutReason.valueOf(0), 
 				SetPreClockArt.valueOf(0), 
-				ChangeClockAtr.valueOf(0),
+				ChangeClockArt.valueOf(0),
 				ChangeCalArt.valueOf(0));
 	}
 	public static StampType getStampTypeHaveInput(boolean changeHalfDay, GoingOutReason goOutArt, SetPreClockArt setPreClockArt,
-			ChangeClockAtr changeClockArt, ChangeCalArt changeCalArt) {
+			ChangeClockArt changeClockArt, ChangeCalArt changeCalArt) {
 		return new StampType(
 				changeHalfDay, goOutArt, setPreClockArt, changeClockArt, changeCalArt);
 	}
@@ -170,8 +166,7 @@ public class StampHelper {
 				Optional.of(new WorkLocationCD("workLocationCD")), 
 						Optional.of(new SupportCardNumber(9999))),
 				new WorkTimeCode("workTimeCode"),
-				getOvertimeDeclarationDefault(),
-				group);
+				getOvertimeDeclarationDefault());
 	}
 	
 	public static Relieve getRelieveDefault() {

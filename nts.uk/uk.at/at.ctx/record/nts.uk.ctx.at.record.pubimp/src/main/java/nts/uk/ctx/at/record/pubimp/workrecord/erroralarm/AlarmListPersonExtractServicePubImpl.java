@@ -114,8 +114,7 @@ public class AlarmListPersonExtractServicePubImpl implements AlarmListPersonExtr
 			List<String> lstAnyConID, List<WorkPlaceHistImportAl> getWplByListSidAndPeriod,
 			List<ResultOfEachCondition> lstResultCondition, List<AlarmListCheckInfor> lstCheckType,
 			List<AlarmEmployeeList> alarmEmployeeList, List<AlarmExtractionCondition> alarmExtractConditions,
-			String alarmCheckConditionCode, Consumer<Integer> counter,
-			Supplier<Boolean> shouldStop) {
+			String alarmCheckConditionCode) {
 		multiMonthCheck.extractMultiMonthlyAlarm(cid,
 				lstSid,
 				mPeriod,
@@ -125,9 +124,7 @@ public class AlarmListPersonExtractServicePubImpl implements AlarmListPersonExtr
 				lstCheckType,
 				alarmEmployeeList,
 				alarmExtractConditions,
-				alarmCheckConditionCode,
-				counter,
-				shouldStop);
+				alarmCheckConditionCode);
 		
 	}
 

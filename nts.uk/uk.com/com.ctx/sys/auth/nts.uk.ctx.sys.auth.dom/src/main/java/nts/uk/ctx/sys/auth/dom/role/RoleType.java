@@ -92,19 +92,4 @@ public enum RoleType {
 		// Not found.
 		return null;
 	}
-	
-	/**
-	 * 管理者ロールか
-	 * @return
-	 */
-	public boolean isManagerRole() {
-		switch (this) {
-			case SYSTEM_MANAGER:
-			case COMPANY_MANAGER:
-			case GROUP_COMAPNY_MANAGER:
-				return true;
-			default:
-				return false;
-		}
-	}
 }

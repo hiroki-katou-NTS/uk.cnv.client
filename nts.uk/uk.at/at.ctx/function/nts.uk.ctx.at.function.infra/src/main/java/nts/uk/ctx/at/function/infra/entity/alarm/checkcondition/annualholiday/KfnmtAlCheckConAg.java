@@ -11,8 +11,6 @@ import javax.persistence.JoinColumns;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.function.dom.alarm.checkcondition.annualholiday.AlarmCheckConAgr;
 import nts.uk.ctx.at.function.infra.entity.alarm.checkcondition.KfnmtAlarmCheckConditionCategory;
@@ -32,7 +30,7 @@ public class KfnmtAlCheckConAg extends ContractUkJpaEntity implements Serializab
 	 * 期間按分使用区分
 	 */
 	@Column(name = "DIVIDE_ATR")
-	public boolean distByPeriod;
+	public int distByPeriod;
 	
 	/**
 	 * 表示するメッセージ
@@ -62,7 +60,7 @@ public class KfnmtAlCheckConAg extends ContractUkJpaEntity implements Serializab
 	public KfnmtAlCheckConAg(KfnmtAlCheckConAgPK pk, int distByPeriod, String displayMessage, int usageObliDay) {
 		super();
 		this.pk = pk;
-		this.distByPeriod = BooleanUtils.toBoolean(distByPeriod);
+		this.distByPeriod = distByPeriod;
 		this.displayMessage = displayMessage;
 		this.usageObliDay = usageObliDay;
 	}
@@ -75,7 +73,7 @@ public class KfnmtAlCheckConAg extends ContractUkJpaEntity implements Serializab
 	}
 
 	public AlarmCheckConAgr toDomain() {
-		return new AlarmCheckConAgr(distByPeriod, displayMessage, usageObliDay);
+		return new AlarmCheckConAgr(distByPeriod == 1, displayMessage, usageObliDay);
 	}
 
 }

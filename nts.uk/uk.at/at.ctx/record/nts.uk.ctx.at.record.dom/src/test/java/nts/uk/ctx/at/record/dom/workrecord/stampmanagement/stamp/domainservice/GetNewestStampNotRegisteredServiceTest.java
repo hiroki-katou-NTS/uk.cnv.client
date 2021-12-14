@@ -13,6 +13,7 @@ import mockit.integration.junit4.JMockit;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampHelper;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordHelper;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.GetNewestStampNotRegisteredService.Require;
 
 /**
@@ -32,7 +33,9 @@ public class GetNewestStampNotRegisteredServiceTest {
 		
 		new Expectations() {
 			{	
-				require.getStempRcNotResgistNumberStamp( new DatePeriod(GeneralDate.today(), GeneralDate.today()));
+				require.getStempRcNotResgistNumber(new DatePeriod(GeneralDate.today(), GeneralDate.today()));
+				
+				require.getStempRcNotResgistNumberStamp(anyString, new DatePeriod(GeneralDate.today(), GeneralDate.today()));
 			}
 		};
 		
@@ -48,7 +51,10 @@ public class GetNewestStampNotRegisteredServiceTest {
 		
 		new Expectations() {
 			{	
-				require.getStempRcNotResgistNumberStamp(new DatePeriod(GeneralDate.today(), GeneralDate.today()));
+				require.getStempRcNotResgistNumber(new DatePeriod(GeneralDate.today(), GeneralDate.today()));
+				result = StampRecordHelper.getListStampRecord();
+				
+				require.getStempRcNotResgistNumberStamp(anyString, new DatePeriod(GeneralDate.today(), GeneralDate.today()));
 				result = StampHelper.getListStampDefault();
 			}
 		};

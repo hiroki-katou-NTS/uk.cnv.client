@@ -40,18 +40,16 @@ public class DeletePersonRoleCommandHandler extends CommandHandler<DeletePersonR
 		String roleId = command.getRoleId();
 		String companyId = AppContexts.user().companyId();
 		
-		// アルゴリズム「ロール削除」を実行する
+		//ロール
 		roleService.removeRole(roleId);
 
-		// アルゴリズム「個人情報ロール削除」を実行する
+		//個人情報のロール
 		personRoleRepo.remove(roleId);
 
-		// ドメインモデル「ロール」.「担当区分」をチェックする
 		if (command.getAssignAtr() == RoleAtr.GENERAL.value) {
-			// ドメインモデルロールセットを取得する
+			
 			List<RoleSet> roleSets = roleSetRepo.findByCompanyIdAndPersonRole(companyId, roleId);
 			if (!roleSets.isEmpty()) {
-				// アルゴリズム「ロールセット更新登録」を実行する
 				roleSets.forEach(rs -> {
 					rs.removePersonInfRole();
 					roleSetService.updateRoleSet(rs);
@@ -60,7 +58,7 @@ public class DeletePersonRoleCommandHandler extends CommandHandler<DeletePersonR
 			}
 		}
 		
-		// アルゴリズム「指定ロールの個人情報の権限を削除する」を実行する
+		//個人情報の権限
 		personInfoAuthRepo.delete(companyId, roleId);
 	}
 	

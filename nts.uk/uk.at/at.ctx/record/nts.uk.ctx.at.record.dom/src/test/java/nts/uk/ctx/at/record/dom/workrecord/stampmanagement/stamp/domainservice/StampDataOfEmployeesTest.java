@@ -9,6 +9,8 @@ import nts.arc.testing.assertion.NtsAssert;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampHelper;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordHelper;
 /**
  * 
  * @author tutk
@@ -26,9 +28,9 @@ public class StampDataOfEmployeesTest {
 	public void testStampDataOfEmployees() {
 		String employeeId = "employee";//dummy
 		GeneralDate date = GeneralDate.today();//dummy
-//		List<StampRecord> listStampRecord = Arrays.asList(StampRecordHelper.getStampRecord());//dummy
+		List<StampRecord> listStampRecord = Arrays.asList(StampRecordHelper.getStampRecord());//dummy
 		List<Stamp> listStamp =Arrays.asList(StampHelper.getStampDefault());//dummy
-		StampDataOfEmployees stampDataOfEmployees = new StampDataOfEmployees(employeeId, date, listStamp);
+		StampDataOfEmployees stampDataOfEmployees = new StampDataOfEmployees(employeeId, date, listStampRecord, listStamp);
 		NtsAssert.invokeGetters(stampDataOfEmployees);
 	}
 

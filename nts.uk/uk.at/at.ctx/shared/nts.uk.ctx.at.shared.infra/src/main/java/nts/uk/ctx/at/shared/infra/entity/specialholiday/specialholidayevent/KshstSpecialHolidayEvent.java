@@ -7,8 +7,6 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 //import nts.arc.time.GeneralDate;
@@ -37,31 +35,31 @@ public class KshstSpecialHolidayEvent extends ContractUkJpaEntity implements Ser
 
 	/* 忌引とする */
 	@Column(name = "MAKE_INVITATION_ATR")
-	public boolean makeInvitation;
+	public int makeInvitation;
 
 	/* 休日を取得日に含める */
 	@Column(name = "INCLUDE_HOLIDAYS_ATR")
-	public boolean includeHolidays;
+	public int includeHolidays;
 
 	/* 年齢条件 */
 	@Column(name = "AGE_LIMIT_ATR")
-	public boolean ageLimit;
+	public int ageLimit;
 
 	/* 性別条件 */
 	@Column(name = "GENDER_RESTRICT_ATR")
-	public boolean genderRestrict;
+	public int genderRestrict;
 
 	/* 雇用条件 */
 	@Column(name = "RESTRICT_EMP_ATR")
-	public boolean restrictEmployment;
+	public int restrictEmployment;
 
 	/* 分類条件 */
 	@Column(name = "RESTRICT_CLS_ATR")
-	public boolean restrictClassification;
+	public int restrictClassification;
 
 	/* 性別 */
 	@Column(name = "GENDER_ATR")
-	public boolean gender;
+	public Integer gender;
 
 	/* 年齢範囲 */
 	@Column(name = "AGE_RANGE_LOWER_LIMIT")
@@ -91,13 +89,13 @@ public class KshstSpecialHolidayEvent extends ContractUkJpaEntity implements Ser
 	public void updateEntity(SpecialHolidayEvent domain) {
 		this.maxNumberDayType = domain.getMaxNumberDay().value;
 		this.fixedDayGrant = domain.getFixedDayGrant().v();
-		this.makeInvitation = BooleanUtils.toBoolean(domain.getMakeInvitation().value);
-		this.includeHolidays = BooleanUtils.toBoolean(domain.getIncludeHolidays().value);
-		this.ageLimit = BooleanUtils.toBoolean(domain.getAgeLimit().value);
-		this.genderRestrict = BooleanUtils.toBoolean(domain.getGenderRestrict().value);
-		this.restrictEmployment = BooleanUtils.toBoolean(domain.getRestrictEmployment().value);
-		this.restrictClassification = BooleanUtils.toBoolean(domain.getRestrictClassification().value);
-		this.gender = BooleanUtils.toBoolean(domain.getGender().value);
+		this.makeInvitation = domain.getMakeInvitation().value;
+		this.includeHolidays = domain.getIncludeHolidays().value;
+		this.ageLimit = domain.getAgeLimit().value;
+		this.genderRestrict = domain.getGenderRestrict().value;
+		this.restrictEmployment = domain.getRestrictEmployment().value;
+		this.restrictClassification = domain.getRestrictClassification().value;
+		this.gender = domain.getGender().value;
 		this.ageRangeLowerLimit = domain.getAgeLowerLimit();
 		this.ageRangeHigherLimit = domain.getAgeRangeHigherLimit();
 		this.ageStandard = domain.getAgeStandard().value;

@@ -13,7 +13,6 @@ import lombok.AllArgsConstructor;
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
-import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.function.dom.adapter.RegulationInfoEmployeeAdapter;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.EmployeeSearchCallSystemType;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.GetEmpCanReferService;
@@ -80,7 +79,7 @@ public class GetEmployeeOrganizationInfoScreenQuery {
                 regulInfoEmpPub );
 
         // 1. 取得する(Require, 年月日, 社員ID, 対象組織識別情報)
-        List<String> sids = GetEmpCanReferService.getByOrg(require, sid, baseDate, DatePeriod.oneDay(baseDate), targetOrgIdenInfor);
+        List<String> sids = GetEmpCanReferService.getByOrg(require, baseDate, sid, targetOrgIdenInfor);
 
         // 2. 社員コードとビジネスネームを取得する
         // ドメインモデル「社員データ管理情報」を全て取得する
@@ -109,20 +108,20 @@ public class GetEmployeeOrganizationInfoScreenQuery {
         private RegulationInfoEmployeePub regulInfoEmpPub;
 
         @Override
-        public List<String> getEmpCanReferByWorkplaceGroup(String empId, GeneralDate date, DatePeriod period, String workplaceGroupID) {
-            List<String> data = workplaceGroupAdapter.getReferableEmp(empId, date, period, workplaceGroupID);
+        public List<String> getEmpCanReferByWorkplaceGroup(GeneralDate date, String empId, String workplaceGroupID) {
+            List<String> data = workplaceGroupAdapter.getReferableEmp(date, empId, workplaceGroupID);
             return data;
         }
 
         @Override
         public List<String> sortEmployee(List<String> lstmployeeId, EmployeeSearchCallSystemType sysAtr, Integer sortOrderNo,
                                          GeneralDate referenceDate, Integer nameType) {
-
+        	
             List<String> data = regulInfoEmpAdap.sortEmployee(
-            		AppContexts.user().companyId(),
-            		lstmployeeId,
-            		sysAtr.value,
-            		sortOrderNo,
+            		AppContexts.user().companyId(), 
+            		lstmployeeId, 
+            		sysAtr.value, 
+            		sortOrderNo, 
             		nameType,
                     GeneralDateTime.fromString(referenceDate.toString() + SPACE + ZEZO_TIME, DATE_TIME_FORMAT));
             return data;
@@ -130,7 +129,7 @@ public class GetEmployeeOrganizationInfoScreenQuery {
 
         @Override
         public String getRoleID() {
-
+        	
         	return AppContexts.user().roles().forAttendance();
         }
 
@@ -154,8 +153,8 @@ public class GetEmployeeOrganizationInfoScreenQuery {
                     .worktypeCodes(new ArrayList<String>())
                     .filterByClosure(false)
                     .closureIds(new ArrayList<Integer>())
-                    .periodStart( GeneralDateTime.fromString(q.getPeriodStart() + " 00:00", "yyyy/MM/dd HH:mm") )
-                    .periodEnd( GeneralDateTime.fromString(q.getPeriodEnd() + " 00:00", "yyyy/MM/dd HH:mm") )
+                    .periodStart(GeneralDateTime.now())
+                    .periodEnd(GeneralDateTime.now())
                     .includeIncumbents(true)
                     .includeWorkersOnLeave(true)
                     .includeOccupancy(true)
@@ -175,7 +174,7 @@ public class GetEmployeeOrganizationInfoScreenQuery {
         }
 
 		@Override
-		public List<String> getAllEmpCanReferByWorkplaceGroup(String empId, GeneralDate date, DatePeriod period) {
+		public List<String> getAllEmpCanReferByWorkplaceGroup(GeneralDate date, String empId) {
 			// don't have to implement it
 			return null;
 		}

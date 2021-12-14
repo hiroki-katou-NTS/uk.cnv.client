@@ -22,6 +22,6 @@ public class KsmmtCalendarCompanyPK implements Serializable {
 	@Column(name = "CID")
 	public String companyId;
 	
-	@Column(name = "YMD")
+	@Column(name = "YMD_K")
 	public GeneralDate date;
 }

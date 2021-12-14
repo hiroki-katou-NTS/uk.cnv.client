@@ -120,7 +120,7 @@ public class GetListWorkplacesByEmpsServiceTest {
 				result = Optional.of(date);
 				
 				require.getAffiliatedEmployees(workplaceId, date.end());
-				result = Arrays.asList(new AffWorkplaceHistoryItemImport("historyId", employeeId, workplaceId));
+				result = Arrays.asList(new AffWorkplaceHistoryItemImport("historyId", employeeId, workplaceId, "normalWorkplaceId"));
 				
 				require.getWorkplaceManager(employeeId, GeneralDate.ymd(9000, 12, 31));
 				result = new WorkplaceManagerDto("workplaceManagerId", employeeId, workplaceId, date);

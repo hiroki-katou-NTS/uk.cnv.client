@@ -4,8 +4,6 @@
  *****************************************************************/
 package nts.uk.ctx.at.schedule.infra.repository.plannedyearholiday.frame;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import nts.uk.ctx.at.schedule.dom.plannedyearholiday.frame.NotUseAtr;
 import nts.uk.ctx.at.schedule.dom.plannedyearholiday.frame.PlanYearHolidayFrameName;
 import nts.uk.ctx.at.schedule.dom.plannedyearholiday.frame.PlanYearHolidayFrameNo;
@@ -56,7 +54,7 @@ public class JpaPlanYearHolidayFrameSetMemento implements PlanYearHolidayFrameSe
 	 */
 	@Override
 	public void setUseClassification(NotUseAtr useAtr) {
-		this.kscstPlanYearHdFrame.setUseAtr(BooleanUtils.toBoolean(useAtr.value));
+		this.kscstPlanYearHdFrame.setUseAtr((short)useAtr.value);
 	}
 
 	/* (non-Javadoc)

@@ -85,13 +85,13 @@ public class CheckTimeIsIncorrect {
 		ContainsResult containsResult1 = wi.containsOnChangeableWorkingTime(require, ClockAreaAtr.START, new WorkNo(1),
 				new TimeWithDayAttr(workTime1.getStartTime().getTime()));
 		listContainsResult.add(convertToContainsResult(containsResult1, TextResource.localize("KSU001_54"),
-				convertToTime(workTime1.getStartTime().getTime()), true, InnerIndex.STARTTIME.value));
+				convertToTime(workTime1.getStartTime().getTime()), true));
 
 		// 3:変更可能な勤務時間帯のチェック(Require, 対象時刻区分, 勤務NO, 時刻(日区分付き))
 		ContainsResult containsResult2 = wi.containsOnChangeableWorkingTime(require, ClockAreaAtr.END, new WorkNo(1),
 				new TimeWithDayAttr(workTime1.getEndTime().getTime()));
 		listContainsResult.add(convertToContainsResult(containsResult2, TextResource.localize("KSU001_55"),
-				convertToTime(workTime1.getEndTime().getTime()), true, InnerIndex.ENDTIME.value));
+				convertToTime(workTime1.getEndTime().getTime()), true));
 
 		// 4:
 		if (workTime2 != null) {
@@ -99,22 +99,22 @@ public class CheckTimeIsIncorrect {
 			ContainsResult containsResult3 = wi.containsOnChangeableWorkingTime(require, ClockAreaAtr.START,
 					new WorkNo(2), new TimeWithDayAttr(workTime2.getStartTime().getTime()));
 			listContainsResult.add(convertToContainsResult(containsResult3, TextResource.localize("KSU001_56"),
-					convertToTime(workTime2.getStartTime().getTime()), false, InnerIndex.STARTTIME.value));
+					convertToTime(workTime2.getStartTime().getTime()), false));
 
 			// 4.2
 			ContainsResult containsResult4 = wi.containsOnChangeableWorkingTime(require, ClockAreaAtr.END,
 					new WorkNo(2), new TimeWithDayAttr(workTime2.getEndTime().getTime()));
 			listContainsResult.add(convertToContainsResult(containsResult4, TextResource.localize("KSU001_57"),
-					convertToTime(workTime2.getEndTime().getTime()), false, InnerIndex.ENDTIME.value));
+					convertToTime(workTime2.getEndTime().getTime()), false));
 		}
 		return listContainsResult;
 	}
 	
-	private ContainsResultDto convertToContainsResult(ContainsResult containsResult,String nameError,String timeInput,boolean isWorkNo1, int innerIndex) {
+	private ContainsResultDto convertToContainsResult(ContainsResult containsResult,String nameError,String timeInput,boolean isWorkNo1) {
 		return new ContainsResultDto(containsResult.isContains(), 
 				containsResult.getTimeSpan().isPresent()? 
 						new TimeSpanForCalcSharedDto(containsResult.getTimeSpan().get().start(), containsResult.getTimeSpan().get().end()):null,
-						nameError,timeInput,isWorkNo1,innerIndex
+						nameError,timeInput,isWorkNo1
 				);
 	}
 	

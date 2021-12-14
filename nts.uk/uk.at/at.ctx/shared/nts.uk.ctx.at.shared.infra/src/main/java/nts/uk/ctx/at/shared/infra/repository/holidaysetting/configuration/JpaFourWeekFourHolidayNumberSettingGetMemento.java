@@ -15,6 +15,9 @@ import nts.uk.shr.com.context.AppContexts;
  */
 public class JpaFourWeekFourHolidayNumberSettingGetMemento implements FourWeekFourHolidayNumberSettingGetMemento{
 	
+	/** The Constant TRUE_VALUE. */
+	private final static int TRUE_VALUE = 1;
+	
 	/** The kshmt fourweekfour hd numb set. */
 	private Kshmt4w4dNumSet kshmtFourweekfourHdNumbSet;
 	
@@ -32,7 +35,10 @@ public class JpaFourWeekFourHolidayNumberSettingGetMemento implements FourWeekFo
 	 */
 	@Override
 	public boolean getIsOneWeekHoliday() {
-		return this.kshmtFourweekfourHdNumbSet.isOneWeekHd();
+		if(this.kshmtFourweekfourHdNumbSet.getIsOneWeekHd() == TRUE_VALUE){
+			return true;
+		}
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -52,7 +58,10 @@ public class JpaFourWeekFourHolidayNumberSettingGetMemento implements FourWeekFo
 	 */
 	@Override
 	public boolean getIsFourWeekHoliday() {
-		return this.kshmtFourweekfourHdNumbSet.isFourWeekHd();
+		if(this.kshmtFourweekfourHdNumbSet.getIsFourWeekHd() == TRUE_VALUE){
+			return true;
+		}
+		return false;
 	}
 
 	/* (non-Javadoc)

@@ -20,8 +20,6 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattend
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.TargetOrgIdenInfor;
 import nts.uk.ctx.at.shared.dom.workrule.shiftmaster.ShiftMasterCode;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
-import nts.uk.ctx.at.shared.dom.worktype.WorkType;
-import nts.uk.ctx.at.shared.dom.worktype.WorkTypeCode;
 
 /**
  * 職場計の勤務方法別人数カテゴリを集計する
@@ -46,15 +44,12 @@ public class CountNumberOfPeopleByEachWorkMethodService {
 			List<IntegrationOfDaily> scheduleList,
 			List<IntegrationOfDaily> actualList ) {
 		
-		val workingDayScheduleList = getOnlyWorkingDay( require, scheduleList );
-		val workingDayActualList = getOnlyWorkingDay( require, actualList );
-		
 		return countByWorkMethod(
 				require, 
 				targetOrg, 
 				period, 
-				workingDayScheduleList, 
-				workingDayActualList, 
+				scheduleList, 
+				actualList, 
 				AggregationUnitOfWorkMethod.WORK_TIME, 
 				workMethod -> new WorkTimeCode(workMethod) );
 	} 
@@ -189,38 +184,8 @@ public class CountNumberOfPeopleByEachWorkMethodService {
 		
 	}
 	
-	/**
-	 * 出勤系の日別勤怠のみ取得する
-	 * @param require
-	 * @param dailyWorks 日別勤怠リスト
-	 * @return
-	 */
-	private static List<IntegrationOfDaily> getOnlyWorkingDay( Require require, List<IntegrationOfDaily> dailyWorks ){
-		
-		val workTypeCodes = dailyWorks.stream()
-				.filter( dw -> dw.getWorkInformation().getRecordInfo().getWorkTimeCodeNotNull().isPresent() )
-				.map( dw -> dw.getWorkInformation().getRecordInfo().getWorkTypeCode() )
-				.distinct()
-				.collect(Collectors.toList());
-		
-		val workingDayWorkTypeCodes = require.getWorkTypes(workTypeCodes).stream()
-				.filter( wt -> wt.isWorkingDay() )
-				.map( wt -> wt.getWorkTypeCode() )
-				.collect( Collectors.toList() );
-		
-		return dailyWorks.stream()
-				.filter( dw -> workingDayWorkTypeCodes.contains( dw.getWorkInformation().getRecordInfo().getWorkTypeCode() ) )
-				.collect( Collectors.toList() );
-	}
-	
 	public static interface Require extends NumberOfEmployeesByWorkMethodCountingService.Require {
 		
-		/**
-		 * 勤務種類を取得する
-		 * @param workTypeCodes 勤務種類コードリスト
-		 * @return
-		 */
-		List< WorkType> getWorkTypes( List<WorkTypeCode> workTypeCodes );
 	}
 	
 

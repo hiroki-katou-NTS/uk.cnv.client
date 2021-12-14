@@ -39,7 +39,7 @@ public class KmfmtRetentionEmpCtr extends ContractUkJpaEntity implements Seriali
 	@Basic(optional = false)
 	@NotNull
 	@Column(name = "MANAGE_ATR")
-	private boolean managementCtrAtr;
+	private short managementCtrAtr;
 
 	/*
 	 * (non-Javadoc)

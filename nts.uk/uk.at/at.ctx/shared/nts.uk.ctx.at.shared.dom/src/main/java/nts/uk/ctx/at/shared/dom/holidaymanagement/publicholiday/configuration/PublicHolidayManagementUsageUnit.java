@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.Setter;
 import nts.arc.layer.dom.AggregateRoot;
 import nts.arc.time.GeneralDate;
-import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.shared.dom.adapter.employment.SharedSidPeriodDateEmploymentImport;
 import nts.uk.ctx.at.shared.dom.adapter.workplace.SharedAffWorkPlaceHisImport;
@@ -148,7 +147,7 @@ public class PublicHolidayManagementUsageUnit extends AggregateRoot{
 				require.getEmpHistBySidAndPeriod(employeeIds,  new DatePeriod(criteriaDate, criteriaDate))
 				.stream().findFirst().map(c ->c);
 		
-		if(!employmentHist.isPresent()){
+		if(employmentHist.isPresent()){
 			return new ArrayList<>();
 		}
 		if(employmentHist.get().getAffPeriodEmpCodeExports().isEmpty()){
@@ -164,17 +163,9 @@ public class PublicHolidayManagementUsageUnit extends AggregateRoot{
 				require);
 	}
 	
-	/**
-	 * 職場月間日数設定を取得する
-	 * @param require
-	 * @param companyID
-	 * @param employeeId
-	 * @param periodList
-	 * @param criteriaDate
-	 * @return
-	 */
+	//職場月間日数設定を取得する
 	private List<PublicHolidayMonthSetting> getWkpPublicHolidayMonthSetting(
-			RequireM1 require, String companyID, String employeeId, List<AggregationPeriod> periodList, GeneralDate criteriaDate){
+			RequireM1 require, String companyID, String employeeId,	List<AggregationPeriod> periodList, GeneralDate criteriaDate){
 		
 		//社員と基準日から所属職場履歴項目を取得する
 		Optional<SharedAffWorkPlaceHisImport> affWorkplaceHistoryItem = require.getAffWorkPlaceHis(employeeId, criteriaDate);
@@ -183,31 +174,12 @@ public class PublicHolidayManagementUsageUnit extends AggregateRoot{
 			return new ArrayList<>();
 		}
 		
-		//職場の上位職場を基準職場を含めて取得する
-		List<String> workIDList = require.getWorkplaceIdAndUpper(companyID, criteriaDate,
-				affWorkplaceHistoryItem.get().getWorkplaceId());
-
-		List<PublicHolidayMonthSetting> wkpMonthSetting = new ArrayList<>();
-		List<YearMonth> yearMonth = periodList.stream().map(x ->x.getYearMonth()).collect(Collectors.toList());
-		
-		for(String workID : workIDList){
-			// 年月リストから職場月間日数設定を取得する
-			List<PublicHolidayMonthSetting> monthSetting = GetWorkplaceMonthDaySettingFromTheYearMonthList
-					.get(companyID, workID, yearMonth, require);
-
-			if(!monthSetting.isEmpty()){
-				wkpMonthSetting.addAll(monthSetting);
-				List<YearMonth> msym = monthSetting.stream().map(c->c.createYearMonth()).collect(Collectors.toList());
-				yearMonth.removeAll(msym);
-			}
-			
-			if(yearMonth.isEmpty()){
-				break;
-			}
-			
-		}
-		
-		return  wkpMonthSetting;
+		//年月リストから職場月間日数設定を取得する
+		return  GetWorkplaceMonthDaySettingFromTheYearMonthList.get(
+				companyID,
+				affWorkplaceHistoryItem.get().getWorkplaceId(), 
+				periodList.stream().map(x ->x.getYearMonth()).collect(Collectors.toList()),
+				require);
 	}
 	
 	//設定の上書き
@@ -233,9 +205,6 @@ public class PublicHolidayManagementUsageUnit extends AggregateRoot{
 		
 		//社員と基準日から所属職場履歴項目を取得する
 		Optional<SharedAffWorkPlaceHisImport> getAffWorkPlaceHis(String employeeId, GeneralDate processingDate);
-		
-		//職場の上位職場を基準職場を含めて取得する
-		List<String> getWorkplaceIdAndUpper(String companyId, GeneralDate baseDate, String workplaceId);
 		
 		//社員（List）と期間から雇用履歴を取得する
 		List<SharedSidPeriodDateEmploymentImport> getEmpHistBySidAndPeriod(List<String> employeeID, DatePeriod Period);

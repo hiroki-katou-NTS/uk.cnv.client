@@ -11,9 +11,7 @@
 }
 
 .licenseCheck{
-	margin-top: 0;
-	margin-bottom: 0;
-	margin-right: 140px;
+	margin: 0 140px;
     min-width: 160px;
     display: inline-block;
 }

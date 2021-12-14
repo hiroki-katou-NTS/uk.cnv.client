@@ -10,6 +10,5 @@ public enum EmployeeSystem {
     SHUTDOWM_COMPANY,
     PAID_WORK,
     NURSING_CARE,
-    SIXTY_HOURS,
-    SPECIAL_LEAVE_SETTING
+    SIXTY_HOURS
 }

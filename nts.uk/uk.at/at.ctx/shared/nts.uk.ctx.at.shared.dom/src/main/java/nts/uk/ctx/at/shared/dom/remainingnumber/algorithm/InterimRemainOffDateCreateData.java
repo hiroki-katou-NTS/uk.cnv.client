@@ -1396,21 +1396,7 @@ public class InterimRemainOffDateCreateData {
 		occurrenceDetailData.add(detailData);
 		return occurrenceDetailData;
 	}
-  
-	private static List<WorkTypeClassification> lstZansu(){
-		List<WorkTypeClassification> lstOutput = new ArrayList<>();
-		lstOutput.add(WorkTypeClassification.AnnualHoliday);
-		lstOutput.add(WorkTypeClassification.YearlyReserved);
-		lstOutput.add(WorkTypeClassification.SubstituteHoliday);
-		lstOutput.add(WorkTypeClassification.Absence);
-		lstOutput.add(WorkTypeClassification.Pause);
-		lstOutput.add(WorkTypeClassification.TimeDigestVacation);
-		lstOutput.add(WorkTypeClassification.HolidayWork);
-		lstOutput.add(WorkTypeClassification.Shooting);
-		lstOutput.add(WorkTypeClassification.SpecialHoliday);
-		lstOutput.add(WorkTypeClassification.Holiday);
-		return lstOutput;
-	}
+
 	/**
 	 * 勤務種類の分類に対応する残数発生使用明細を設定する
 	 * @param dataOutput

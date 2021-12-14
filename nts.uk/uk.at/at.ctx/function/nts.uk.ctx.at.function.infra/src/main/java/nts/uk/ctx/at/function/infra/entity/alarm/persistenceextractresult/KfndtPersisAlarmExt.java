@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import nts.arc.layer.infra.data.jdbc.map.JpaEntityMapper;
 import nts.arc.time.GeneralDate;
 import nts.gul.collection.CollectionUtil;
+import nts.gul.text.IdentifierUtil;
 import nts.uk.ctx.at.shared.dom.alarmList.AlarmPatternCode;
 import nts.uk.ctx.at.shared.dom.alarmList.AlarmPatternName;
 import nts.uk.ctx.at.shared.dom.alarmList.persistenceextractresult.AlarmEmployeeList;
@@ -15,6 +16,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -77,7 +79,7 @@ public class KfndtPersisAlarmExt extends ContractUkJpaEntity implements Serializ
                                             y.getAlarmCheckConditionCode().v(),
                                             y.getAlarmListCheckType().value,
                                             y.getAlarmCheckConditionNo(),
-                                            z.getPeriodDate().getStartDate().isPresent() ? String.valueOf(z.getPeriodDate().getStartDate().get()) : String.valueOf(GeneralDate.today())
+                                            z.getPeriodDate().getStartDate().isPresent() ? String.valueOf(z.getPeriodDate().getStartDate().get()) : String.valueOf(GeneralDate.min())
                                     ),
                                     z.getPeriodDate().getEndDate().isPresent() ? String.valueOf(z.getPeriodDate().getEndDate().get()) : null,
                                     domain.getAlarmPatternName().v(),

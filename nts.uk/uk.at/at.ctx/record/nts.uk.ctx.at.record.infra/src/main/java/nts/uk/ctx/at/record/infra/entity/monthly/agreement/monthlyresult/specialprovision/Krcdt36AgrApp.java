@@ -16,9 +16,6 @@ import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 
 import javax.persistence.*;
-
-import org.apache.commons.lang3.BooleanUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +52,7 @@ public class Krcdt36AgrApp extends ContractUkJpaEntity implements Serializable {
     public String applicantsSID;
 
     @Column(name = "APP_ATR")
-    public boolean typeAgreement;
+    public int typeAgreement;
 
     @Column(name = "YM")
     public Integer yearMonth;
@@ -220,7 +217,7 @@ public class Krcdt36AgrApp extends ContractUkJpaEntity implements Serializable {
                 domain.getEnteredPersonSID(),
                 domain.getInputDate(),
                 domain.getApplicantsSID(),
-                BooleanUtils.toBoolean(domain.getApplicationTime().getTypeAgreement().value),
+                domain.getApplicationTime().getTypeAgreement().value,
                 domain.getApplicationTime().getOneMonthTime().isPresent() ? domain.getApplicationTime().getOneMonthTime().get().getYearMonth().v() : null,
                 domain.getApplicationTime().getOneMonthTime().isPresent() ? domain.getApplicationTime().getOneMonthTime().get().getErrorTimeInMonth().getError().v() : null,
                 domain.getApplicationTime().getOneMonthTime().isPresent() ? domain.getApplicationTime().getOneMonthTime().get().getErrorTimeInMonth().getAlarm().v() : null,
@@ -332,7 +329,7 @@ public class Krcdt36AgrApp extends ContractUkJpaEntity implements Serializable {
             oneYearTime = new OneYearTime(OneYearErrorAlarmTime.of(new AgreementOneYearTime(entity.yearErrorTime == null ? 0 : entity.yearErrorTime), new AgreementOneYearTime(entity.yearAlarmTime == null ? 0 : entity.yearAlarmTime)), new Year(entity.year));
         }
 
-        ApplicationTime applicationTime = new ApplicationTime(EnumAdaptor.valueOf(BooleanUtils.toInteger(entity.typeAgreement), TypeAgreementApplication.class), oneMonthTime == null ? Optional.empty() : Optional.of(oneMonthTime), oneYearTime == null ? Optional.empty() : Optional.of(oneYearTime));
+        ApplicationTime applicationTime = new ApplicationTime(EnumAdaptor.valueOf(entity.typeAgreement, TypeAgreementApplication.class), oneMonthTime == null ? Optional.empty() : Optional.of(oneMonthTime), oneYearTime == null ? Optional.empty() : Optional.of(oneYearTime));
 
         Overtime overtime = new Overtime(new AgreementOneMonthTime(entity.monthOverTime), new AgreementOneYearTime(entity.yearOverTime));
         OvertimeIncludingHoliday overtimeIncludingHoliday = new OvertimeIncludingHoliday(

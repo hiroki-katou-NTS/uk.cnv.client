@@ -30,18 +30,15 @@ public class ExternalImportExecuteCommandHandler extends AsyncCommandHandler<Ext
 		String companyId = AppContexts.user().companyId();
 		
 		val require = this.require.create(companyId);
-		val externalImportSetting = require.getExternalImportSetting(command.getExternalImportCode());
-		val currentState = require.getExternalImportCurrentState();
+		val setting = require.getExternalImportSetting(companyId, command.getExternalImportCode());
+		val currentState = require.getExternalImportCurrentState(companyId);
 		
 		val taskData = context.asAsync().getDataSetter();
 		try {
 			
-			currentState.execute(require, externalImportSetting, () -> {
-				externalImportSetting.getDomainSettings().forEach(setting -> {
-					val atomTasks = ExecuteImporting.execute(
-							require,externalImportSetting.getCompanyId(), externalImportSetting.getCode(), setting);
-					transaction.separateForEachTask(atomTasks);
-				});
+			currentState.execute(require, setting, () -> {
+				val atomTasks = ExecuteImporting.execute(require, setting);
+				transaction.separateForEachTask(atomTasks);
 			});
 			
 			taskData.setData("process", "done");

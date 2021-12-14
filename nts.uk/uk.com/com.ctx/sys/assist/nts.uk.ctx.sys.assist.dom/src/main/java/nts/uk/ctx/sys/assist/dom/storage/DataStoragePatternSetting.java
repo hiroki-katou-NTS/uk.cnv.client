@@ -3,8 +3,6 @@ package nts.uk.ctx.sys.assist.dom.storage;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.Getter;
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.layer.dom.AggregateRoot;
@@ -129,21 +127,21 @@ public class DataStoragePatternSetting extends AggregateRoot {
 		memento.setIdenSurveyArch(idenSurveyArch.value);
 		memento.setMonthlyReferMonth(monthlyReferMonth.map(v -> v.value).orElse(null));
 		memento.setMonthlyReferYear(monthlyReferYear.map(v -> v.value).orElse(null));
-		memento.setPatternClassification(BooleanUtils.toBoolean(patternClassification.value));
+		memento.setPatternClassification(patternClassification.value);
 		memento.setPatternCode(patternCode.v());
 		memento.setPatternCompressionPwd(patternCompressionPwd.map(FileCompressionPassword::v).orElse(null));
 		memento.setPatternName(patternName.v());
 		memento.setPatternSuppleExplanation(patternSuppleExplanation.orElse(null));
-		memento.setWithoutPassword(BooleanUtils.toBoolean(withoutPassword.value));
+		memento.setWithoutPassword(withoutPassword.value);
 		memento.setCategories(this.categories);
 	}
 
 	public static interface MementoSetter {
-		void setWithoutPassword(boolean withoutPassword);
+		void setWithoutPassword(int withoutPassword);
 
 		void setPatternCode(String patternCode);
 
-		void setPatternClassification(boolean patternClassification);
+		void setPatternClassification(int patternClassification);
 
 		void setPatternName(String patternName);
 

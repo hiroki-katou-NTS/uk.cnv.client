@@ -1,7 +1,6 @@
 package nts.uk.screen.com.app.command.sys.auth.personrole.register;
 
 import java.util.List;
-import java.util.Optional;
 
 import lombok.Data;
 import nts.uk.ctx.sys.auth.dom.role.ContractCode;
@@ -96,11 +95,6 @@ public class RegisterPersonRoleCommand  {
 		public String getCompanyId() {
 			return this.companyId;		
 		}
-
-		@Override
-		public Optional<Boolean> getApprovalAuthority() {
-			return Optional.empty();
-		}
-
+		
 	}
 }

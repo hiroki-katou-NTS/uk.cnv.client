@@ -21,7 +21,6 @@ import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumb
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualleave.AnnualLeaveManageInforImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualleave.AnnualLeaveRemainingNumberImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualleave.ReNumAnnLeaReferenceDateImport;
-import nts.uk.ctx.at.request.dom.application.common.adapter.record.remainingnumber.annualleave.ReNumAnnLeaveImport;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeRepository;
 import nts.uk.shr.com.context.AppContexts;
 
@@ -33,22 +32,13 @@ public class AnnLeaveRemainNumberImpl implements AnnLeaveRemainNumberAdapter {
 	
 	@Inject
 	private WorkTypeRepository workTypeRepository;
-	
-	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-    @Override
-    public ReNumAnnLeaveImport getReferDateAnnualLeaveRemain(String employeeID, GeneralDate date) {
-        ReNumAnnLeaReferenceDateExport reNum = this.annLeavePub.getReferDateAnnualLeaveRemainNumber(employeeID, date);
-        return new ReNumAnnLeaveImport(
-                reNum.getRemainingDays(), 
-                reNum.getRemainingTime());
-    }
 
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@Override
 	public ReNumAnnLeaReferenceDateImport getReferDateAnnualLeaveRemainNumber(String employeeID, GeneralDate date) {
 		ReNumAnnLeaReferenceDateExport reNum = this.annLeavePub.getReferDateAnnualLeaveRemainNumber(employeeID, date);
 		return new ReNumAnnLeaReferenceDateImport(
-											mapNumber(reNum.getAnnualLeaveRemainNumberExport().getRemainNumberWithMinusExport()),
+											mapNumber(reNum.getAnnualLeaveRemainNumberExport()),
 											mapLeaveGrants(reNum.getAnnualLeaveGrantExports()),
 											mapManageInfors(reNum.getAnnualLeaveManageInforExports()));
 	}
@@ -94,15 +84,19 @@ public class AnnLeaveRemainNumberImpl implements AnnLeaveRemainNumberAdapter {
 		if (number == null) {
 			return null;
 		}
-		
-		return new AnnualLeaveRemainingNumberImport(number.getAnnualLeaveGrantPreDay(), 
-				number.getAnnualLeaveGrantPreTime(), 
-				number.getNumberOfRemainGrantPre(),
-				number.getTimeAnnualLeaveGrantPre(), 
-				number.getAnnualLeaveGrantPostDay(), 
-				number.getAnnualLeaveGrantPostTime(),
-				number.getNumberOfRemainGrantPost(), 
-				number.getAnnualLeaveGrantPostTime());
+		return new AnnualLeaveRemainingNumberImport(
+											number.getAnnualLeaveGrantPreDay(), 
+											number.getAnnualLeaveGrantPreTime(),
+											number.getNumberOfRemainGrantPre(), 
+											number.getTimeAnnualLeaveWithMinusGrantPre(), 
+											number.getAnnualLeaveGrantPostDay(),
+											number.getAnnualLeaveGrantPostTime(), 
+											number.getNumberOfRemainGrantPost(), 
+											number.getTimeAnnualLeaveWithMinusGrantPost(),
+											number.getAnnualLeaveGrantDay(),
+											number.getAnnualLeaveGrantTime(),
+											number.getAttendanceRate(),
+											number.getWorkingDays());
 	}
 
 }

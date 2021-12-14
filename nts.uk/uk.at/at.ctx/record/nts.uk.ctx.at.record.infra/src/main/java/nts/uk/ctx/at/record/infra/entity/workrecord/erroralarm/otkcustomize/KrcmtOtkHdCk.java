@@ -12,8 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.otkcustomize.ContinuousHolCheckSet;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.primitivevalue.ContinuousVacationDays;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.primitivevalue.DisplayMessage;
@@ -36,7 +34,7 @@ public class KrcmtOtkHdCk extends ContractUkJpaEntity implements Serializable {
 	private String cid;
 
 	@Column(name="USE_ATR")
-	public boolean useAtr;
+	public int useAtr;
 
 	@Column(name="CONTINUOUS_DAYS")
 	public int continuousDays;
@@ -56,7 +54,7 @@ public class KrcmtOtkHdCk extends ContractUkJpaEntity implements Serializable {
 	public KrcmtOtkHdCk(String cid, int useAtr, int continuousDays, String messageDisplay) {
 		super();
 		this.cid = cid;
-		this.useAtr = BooleanUtils.toBoolean(useAtr);
+		this.useAtr = useAtr;
 		this.continuousDays = continuousDays;
 		this.messageDisplay = messageDisplay;
 	}
@@ -72,7 +70,7 @@ public class KrcmtOtkHdCk extends ContractUkJpaEntity implements Serializable {
 								.map(c -> new WorkTypeCode(c.id.worktypeCd)).collect(Collectors.toList()), 
 						krcctOtkWtNonTarget == null ? new ArrayList<>() : krcctOtkWtNonTarget.stream()
 								.map(c -> new WorkTypeCode(c.id.worktypeCd)).collect(Collectors.toList()), 
-						useAtr, new DisplayMessage(messageDisplay), new ContinuousVacationDays(continuousDays));
+						useAtr == 1 ? true : false, new DisplayMessage(messageDisplay), new ContinuousVacationDays(continuousDays));
 	}
 	
 	public static KrcmtOtkHdCk fromDomain(ContinuousHolCheckSet setting){

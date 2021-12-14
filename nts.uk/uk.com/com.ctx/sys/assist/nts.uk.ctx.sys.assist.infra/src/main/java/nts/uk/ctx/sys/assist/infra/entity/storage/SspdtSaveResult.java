@@ -13,8 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import nts.arc.time.GeneralDateTime;
@@ -102,7 +100,7 @@ public class SspdtSaveResult extends ContractUkJpaEntity implements Serializable
 	 */
 	@Basic(optional = false)
 	@Column(name = "DELETED_FILES")
-	public boolean deletedFiles;
+	public int deletedFiles;
 
 	/**
 	 * 圧縮パスワード
@@ -137,7 +135,7 @@ public class SspdtSaveResult extends ContractUkJpaEntity implements Serializable
 	 */
 	@Basic(optional = false)
 	@Column(name = "SAVE_FOR_INVEST")
-	public boolean saveForInvest;
+	public int saveForInvest;
 
 	/**
 	 * ファイルID
@@ -187,13 +185,13 @@ public class SspdtSaveResult extends ContractUkJpaEntity implements Serializable
 				this.saveForm, 
 				this.saveEndDatetime, 
 				this.saveStartDatetime,
-				BooleanUtils.toInteger(this.deletedFiles), 
+				this.deletedFiles, 
 				this.compressedPassword, 
 				this.practitioner,
 				this.listResultOfLogs.stream().map(item -> item.toDomain()).collect(Collectors.toList()),
 				this.targetNumberPeople,
 				this.saveStatus,
-				BooleanUtils.toInteger(this.saveForInvest),
+				this.saveForInvest,
 				this.fileId, 
 				new LoginInfo(pcId,pcName,pcAccount)
 			);
@@ -212,12 +210,12 @@ public class SspdtSaveResult extends ContractUkJpaEntity implements Serializable
 				domain.getSaveForm().value, 
 				domain.getSaveEndDatetime().orElse(null), 
 				domain.getSaveStartDatetime().orElse(null),
-				BooleanUtils.toBoolean(domain.getDeletedFiles().value), 
+				domain.getDeletedFiles().value, 
 				domain.getCompressedPassword().map(i -> i.v()).orElse(null),
 				domain.getPractitioner(), 
 				domain.getTargetNumberPeople().orElse(null),
 				domain.getSaveStatus().map(i->i.value).orElse(null),
-				BooleanUtils.toBoolean(domain.getSaveForInvest().value),
+				domain.getSaveForInvest().value,
 				domain.getFileId().orElse(null),
 				domain.getLoginInfo().getIpAddress(),
 				domain.getLoginInfo().getPcName(),

@@ -13,9 +13,7 @@ module nts.uk.pr.view.kmf001.c {
             roundProcessClassific: 'ctx/at/share/vacation/setting/annualpaidleave/find/roundProcessClassific',
             
             save: 'ctx/at/share/vacation/setting/annualpaidleave/save',
-            findSetting: 'ctx/at/share/vacation/setting/annualpaidleave/find/setting',
-            findLeaveCount: "at/shared/scherec/leaveCount/get",
-            registerLeaveCount: "at/shared/scherec/leaveCount/register"
+            findSetting: 'ctx/at/share/vacation/setting/annualpaidleave/find/setting'
         };
         
         export function findManageDistinct(): JQueryPromise<any> {
@@ -53,15 +51,6 @@ module nts.uk.pr.view.kmf001.c {
         export function findSetting(): JQueryPromise<any> {
             return nts.uk.request.ajax(servicePath.findSetting);
         }
-
-        export function findLeaveCount(): JQueryPromise<any> {
-          return nts.uk.request.ajax(servicePath.findLeaveCount);
-        }
-
-        export function registerLeaveCount(param: any): JQueryPromise<any> {
-          return nts.uk.request.ajax(servicePath.registerLeaveCount, param);
-        }
-
         /**
         * Model namespace.
         */

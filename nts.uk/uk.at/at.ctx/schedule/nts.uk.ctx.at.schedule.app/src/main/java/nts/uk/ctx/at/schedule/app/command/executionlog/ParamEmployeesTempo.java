@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.schedule.dom.adapter.executionlog.dto.ShortWorkTimeDto;
 import nts.uk.ctx.at.schedule.dom.executionlog.CreationMethod;
 import nts.uk.ctx.at.schedule.dom.executionlog.ImplementAtr;
 import nts.uk.ctx.at.schedule.dom.schedule.algorithm.WorkRestTimeZoneDto;
-import nts.uk.ctx.at.shared.dom.employeeworkway.EmployeeWorkingStatus;
+import nts.uk.ctx.at.schedule.dom.schedule.workschedule.ScheManaStatuTempo;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.affiliationinfor.AffiliationInforOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
 
@@ -61,7 +62,7 @@ public class ParamEmployeesTempo {
 	private String empId; // creator.getEmployeeId()
 	
 	/** 社員の在職状態 */
-	private Optional<EmployeeWorkingStatus> optManaStatuTempo; // masterCache.getListManaStatuTempo()
+	private Optional<ScheManaStatuTempo> optManaStatuTempo; // masterCache.getListManaStatuTempo()
 	
 	/** 社員の短時間勤務一覧 */
 	private Optional<ShortWorkTimeDto> optShortWorkTimeDto; // masterCache.getListShortWorkTimeDto()
@@ -70,7 +71,7 @@ public class ParamEmployeesTempo {
 			Map<String, WorkRestTimeZoneDto> mapFixedWorkSetting, ImplementAtr implementAtr, GeneralDate startDate,
 			GeneralDate endDate, AffiliationInforOfDailyAttd affiliationInforOfDailyAttd,
 			Map<String, WorkRestTimeZoneDto> mapDiffTimeWorkSetting,
-			Map<String, WorkRestTimeZoneDto> mapFlowWorkSetting, String empId, Optional<EmployeeWorkingStatus> optManaStatuTempo,
+			Map<String, WorkRestTimeZoneDto> mapFlowWorkSetting, String empId, Optional<ScheManaStatuTempo> optManaStatuTempo,
 			Optional<ShortWorkTimeDto> optShortWorkTimeDto) {
 		super();
 		this.createMethodAtr = createMethodAtr;
@@ -94,7 +95,7 @@ public class ParamEmployeesTempo {
 			AffiliationInforOfDailyAttd affiliationInforOfDailyAttd,
 			Map<String, WorkRestTimeZoneDto> mapDiffTimeWorkSetting,
 			Map<String, WorkRestTimeZoneDto> mapFlowWorkSetting, String empId,
-			Optional<EmployeeWorkingStatus> optManaStatuTempo, Optional<ShortWorkTimeDto> optShortWorkTimeDto) {
+			Optional<ScheManaStatuTempo> optManaStatuTempo, Optional<ShortWorkTimeDto> optShortWorkTimeDto) {
 		super();
 		this.createMethodAtr = createMethodAtr;
 		this.optWorkingConItem = optWorkingConItem;

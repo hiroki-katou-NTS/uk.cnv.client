@@ -7,7 +7,7 @@ module nts.uk.pr.view.kmf001.d {
     import EmploymentSettingDto = nts.uk.pr.view.kmf001.d.service.model.EmploymentSettingDto;
     import EmploymentSettingFindDto = nts.uk.pr.view.kmf001.d.service.model.EmploymentSettingFindDto;
     
-    const LEAVE_TYPE = 2;
+    
     export module viewmodel {
         export class ScreenModel {
             selectedItem: KnockoutObservable<string>;
@@ -106,7 +106,6 @@ module nts.uk.pr.view.kmf001.d {
                 .fail(function(res) {
                     nts.uk.ui.dialog.alert(res.message);
                 });
-                self.findLeaveCount();
                 return dfd.promise();
             }
             
@@ -134,6 +133,7 @@ module nts.uk.pr.view.kmf001.d {
                     if (data == null) {
                         self.retentionYearsAmount(99);
                         self.maxDaysCumulation(0);
+                        self.leaveAsWorkDays(true);
                         self.selectedComManagement(1);
                     }
                     else {
@@ -142,13 +142,6 @@ module nts.uk.pr.view.kmf001.d {
                     $('#switch-btn-anagement').focus();
                     self.employmentVisible(self.selectedComManagement() == 1);
                 });
-            }
-
-            private findLeaveCount(): JQueryPromise<any> {
-              const vm = this;
-              return service.findLeaveCount().then(result => {
-                vm.leaveAsWorkDays(_.includes(result.countedLeaveList, LEAVE_TYPE));
-              });
             }
             
             // Bind EmploymentSetting Data
@@ -172,7 +165,8 @@ module nts.uk.pr.view.kmf001.d {
                 var self = this;
                 self.selectedComManagement(data.managementCategory);
                 self.retentionYearsAmount(data.upperLimitSetting.retentionYearsAmount);
-                self.maxDaysCumulation(data.upperLimitSetting.maxDaysCumulation);;
+                self.maxDaysCumulation(data.upperLimitSetting.maxDaysCumulation);
+                self.leaveAsWorkDays(data.leaveAsWorkDays);
             }
             
             // Collect wholeCompany Data
@@ -289,10 +283,7 @@ module nts.uk.pr.view.kmf001.d {
                 service.saveRetentionYearly(self.collectWholeCompanyData()).done(function() {
                     self.employmentVisible(self.selectedComManagement() == 1);
                     nts.uk.ui.dialog.info({ messageId: "Msg_15" });
-                }).then(() => service.registerLeaveCount({
-                  isCounting: self.leaveAsWorkDays(),
-                  leaveType: LEAVE_TYPE
-                })).fail((res) => {
+                }).fail((res) => {
                     nts.uk.ui.dialog.alertError(res.message);
                 }).always(() => {
                     nts.uk.ui.block.clear();

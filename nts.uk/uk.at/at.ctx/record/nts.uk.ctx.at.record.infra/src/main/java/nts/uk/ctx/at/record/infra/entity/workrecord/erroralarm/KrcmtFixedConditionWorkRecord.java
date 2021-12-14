@@ -7,8 +7,6 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.NoArgsConstructor;
 import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.FixedConditionWorkRecord;
@@ -31,7 +29,7 @@ public class KrcmtFixedConditionWorkRecord extends ContractUkJpaEntity implement
 	public String message;
 
 	@Column(name = "USE_ATR")
-	public boolean useAtr;
+	public int useAtr;
 	
 	@Override
 	protected Object getKey() {
@@ -42,7 +40,7 @@ public class KrcmtFixedConditionWorkRecord extends ContractUkJpaEntity implement
 		super();
 		this.krcmtFixedConditionWorkRecordPK = krcmtFixedConditionWorkRecordPK;
 		this.message = message;
-		this.useAtr = BooleanUtils.toBoolean(useAtr);
+		this.useAtr = useAtr;
 	}
 	
 	public static KrcmtFixedConditionWorkRecord toEntity(FixedConditionWorkRecord domain) {
@@ -61,7 +59,7 @@ public class KrcmtFixedConditionWorkRecord extends ContractUkJpaEntity implement
 				this.krcmtFixedConditionWorkRecordPK.dailyAlarmConID,
 				EnumAdaptor.valueOf(this.krcmtFixedConditionWorkRecordPK.fixConWorkRecordNo, WorkRecordFixedCheckItem.class),
 				new FixedConditionWorkRecordName(this.message),
-				this.useAtr
+				this.useAtr == 1?true:false
 				);
 	}
 

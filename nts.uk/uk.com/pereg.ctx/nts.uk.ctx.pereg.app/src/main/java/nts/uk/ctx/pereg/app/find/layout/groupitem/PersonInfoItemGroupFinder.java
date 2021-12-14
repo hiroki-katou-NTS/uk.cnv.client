@@ -199,17 +199,8 @@ public class PersonInfoItemGroupFinder {
 
 		groupIds.stream().forEach(f -> {
 			List<PerInfoItemDefDto> lstItemDfDto = getAllItemDfTest(f);
-			if (lstItemDfDto != null) {
-				Optional<PersonInfoItemGroup> groupOp = repo.getById(f);
-			
-				if (groupOp.isPresent()) {
-					lstItemDfDto.forEach(item -> {
-						item.setPersonInfoItemGroupId(f);
-						item.setFieldGroupName(groupOp.get().getFieldGroupName().v());
-					});
-				}
+			if (lstItemDfDto != null)
 				result.addAll(lstItemDfDto);
-			}
 		});
 
 		return result;

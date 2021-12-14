@@ -1,8 +1,6 @@
 package nts.uk.screen.at.ws.schedule.scheduleteam;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.ws.rs.POST;
@@ -29,18 +27,6 @@ public class Ksu001LaWS extends WebService{
 	@POST
 	@Path("empOrgInfo")
 	public List<EmployeeOrganizationInfoDto> getEmpOrgInfo(Ksu001LaRequest request){
-		List<EmployeeInfoRequest> empInfoRequest = request.getEmpInfoRequest();
-		List<EmployeeOrganizationInfoDto> data = ksu001LaScreenQuery.getEmployeesOrganizationInfo(empInfoRequest.stream().map(i -> i.getId()).collect(Collectors.toList()));
-		if(data.isEmpty()) return new ArrayList<>();
-		return data.stream().map(e -> {
-			EmployeeOrganizationInfoDto dto = new EmployeeOrganizationInfoDto();
-			dto.setEmployeeId(e.getEmployeeId());
-			dto.setTeamCd(e.getTeamCd());
-			dto.setTeamName( e.getTeamName());
-			EmployeeInfoRequest emp = empInfoRequest.stream().filter(i -> i.getId().equals(e.getEmployeeId())).findFirst().get();
-			dto.setBusinessName(emp.getName());
-			dto.setEmployeeCd(emp.getCode());
-			return dto;
-		}).collect(Collectors.toList());
+		return ksu001LaScreenQuery.getEmployeesOrganizationInfo(request.toDate(), request.getWorkplaceGroupId());
 	}
 }

@@ -1016,7 +1016,6 @@ module nts.uk.at.view.kaf022.l.viewmodel {
                 }
                 dataSetting.optionName(getText(optionNames1[i]));
                 dataSetting.optionName2(getText(optionNames2[i]));
-                dataSetting.enableRadio(i === 6 ? false : true);
                 absenceSet.push(dataSetting);
             }
             return absenceSet;
@@ -1061,7 +1060,6 @@ module nts.uk.at.view.kaf022.l.viewmodel {
         displayWorkTypes: KnockoutObservable<string> = ko.observable('');
         optionName: KnockoutObservable<string> = ko.observable('');
         optionName2: KnockoutObservable<string> = ko.observable('');
-        enableRadio: KnockoutObservable<boolean> = ko.observable(true);
         // enableButton: KnockoutObservable<boolean>;
         inputId: string;
 

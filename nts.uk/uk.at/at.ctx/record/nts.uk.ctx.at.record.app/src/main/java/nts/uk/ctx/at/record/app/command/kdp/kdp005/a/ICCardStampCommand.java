@@ -23,7 +23,7 @@ public class ICCardStampCommand {
 	private String stampedCardNumber;
 
 	// 打刻日時
-	private GeneralDateTime datetime;
+	private String datetime;
 
 	// 打刻ボタン
 	private StampButtonCommand stampButton;
@@ -32,7 +32,7 @@ public class ICCardStampCommand {
 	private RefectActualResultCommand refActualResult;
 
 	public GeneralDateTime getStampDatetime() {
-		return GeneralDateTime.fromString(datetime.toString(), "yyyy/MM/dd HH:mm:ss");
+		return GeneralDateTime.now();
 	}
 
 	public StampButton getStampButton() {

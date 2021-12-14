@@ -104,7 +104,7 @@ public class GetReserveLeaveNumbersImpl implements GetReserveLeaveNumbers {
 				grantDays,
 				asOfPeriodEnd.getRemainingNumber().getReserveLeaveWithMinus().getUsedNumber().getUsedDays(),
 				asOfPeriodEnd.getRemainingNumber().getReserveLeaveWithMinus().getRemainingNumberInfo().getRemainingNumber().getTotalRemainingDays(),
-				asOfPeriodEnd.getRemainingNumber().getReserveLeaveUndigestedNumber().getUndigestedDays());
+				asOfPeriodEnd.getRemainingNumber().getＲeserveLeaveUndigestedNumber().getUndigestedDays());
 
 		// 当月積立年休を返す
 		return result;
@@ -163,14 +163,13 @@ public class GetReserveLeaveNumbersImpl implements GetReserveLeaveNumbers {
 		val aggrResultOfReserve = aggrResultOfReserveOpt.get();
 
 		// 積立年休の集計結果を出力用クラスにコピー
+		val asOfPeriodEnd = aggrResultOfReserve.getAsOfPeriodEnd();
 		ReserveLeaveGrantDayNumber grantDays = new ReserveLeaveGrantDayNumber(0.0);
-		if (aggrResultOfReserve.getAsOfStartNextDayOfPeriodEnd().getGrantInfo().isPresent()) {
-			grantDays = aggrResultOfReserve.getAsOfStartNextDayOfPeriodEnd().getGrantInfo().get().getGrantDays();
-		}
+		if (asOfPeriodEnd.getGrantInfo().isPresent()) grantDays = asOfPeriodEnd.getGrantInfo().get().getGrantDays();
 		// 当月積立年休を返す
 		return new ReserveLeaveNowExport(startMonthRemain, grantDays,
-				aggrResultOfReserve.getAsOfPeriodEnd().getRemainingNumber().getReserveLeaveWithMinus().getUsedNumber().getUsedDays(),
-				aggrResultOfReserve.getAsOfPeriodEnd().getRemainingNumber().getReserveLeaveWithMinus().getRemainingNumberInfo().getRemainingNumber().getTotalRemainingDays(),
-				aggrResultOfReserve.getAsOfStartNextDayOfPeriodEnd().getRemainingNumber().getReserveLeaveUndigestedNumber().getUndigestedDays());
+				asOfPeriodEnd.getRemainingNumber().getReserveLeaveWithMinus().getUsedNumber().getUsedDays(),
+				asOfPeriodEnd.getRemainingNumber().getReserveLeaveWithMinus().getRemainingNumberInfo().getRemainingNumber().getTotalRemainingDays(),
+				asOfPeriodEnd.getRemainingNumber().getＲeserveLeaveUndigestedNumber().getUndigestedDays());
 	}
 }

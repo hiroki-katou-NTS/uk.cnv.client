@@ -1,0 +1,3 @@
+INS_DATE,INS_CCD,INS_SCD,INS_PG,UPD_DATE,UPD_CCD,UPD_SCD,UPD_PG,EXCLUS_VER,FUNCTION_NO,NAME,DESCRIPTION,DEISPLAY_ORDER,INITIAL_VALUE
+,,,,,,,,0,1,"登録","スケジュール修正(個人別)の画面で、自分のスケジュールを登録できます。",1,0
+,,,,,,,,0,2,"出力","社員ごとのスケジュール表を出力できます。",2,0

@@ -11,17 +11,17 @@ import nts.arc.enums.EnumAdaptor;
 @RequiredArgsConstructor
 public enum SingleValueCompareType {
     /* 等しくない（≠） */
-    NOT_EQUAL(0, "等しくない（≠）"),
+    NOT_EQUAL(0, "≠"),
     /* 等しい（＝） */
-    EQUAL(1, "等しい（＝）"),
+    EQUAL(1, "＝"),
     /* 以下（≦） */
-    LESS_OR_EQUAL(2, "以下（≦）"),
+    LESS_OR_EQUAL(2, "≦"),
     /* 以上（≧） */
-    GREATER_OR_EQUAL(3, "以上（≧）"),
+    GREATER_OR_EQUAL(3, "≧"),
     /* より小さい（＜） */
-    LESS_THAN(4, "より小さい（＜）"),
+    LESS_THAN(4, "＜"),
     /* より大きい（＞） */
-    GREATER_THAN(5, "より大きい（＞）");
+    GREATER_THAN(5, "＞");
 
     public final int value;
     public final String nameId;

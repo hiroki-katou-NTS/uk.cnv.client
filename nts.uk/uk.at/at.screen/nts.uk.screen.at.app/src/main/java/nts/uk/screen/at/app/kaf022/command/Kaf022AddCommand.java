@@ -35,6 +35,7 @@ public class Kaf022AddCommand {
 	private int nightOvertimeReflectAtr;
 
 	private int approvalByPersonAtr;
+	private int includeConcurrentPersonel;
 
 	private AppReflectExeConditionCommand appReflectCondition;
 

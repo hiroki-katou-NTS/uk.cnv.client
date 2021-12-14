@@ -130,7 +130,7 @@ module nts.uk.at.view.kaf022.a.viewmodel {
                 new ItemModel(1, getText('KAF022_75')),
                 new ItemModel(0, getText('KAF022_82'))
             ]);
-            self.approvalSetting = ko.observable(new ItemA17(0, 0));
+            self.approvalSetting = ko.observable(new ItemA17(0, 0, false));
 
             // A19
             self.nightOvertimeReflect = ko.observable(0);
@@ -252,7 +252,8 @@ module nts.uk.at.view.kaf022.a.viewmodel {
             let self = this;
             self.approvalSetting(new ItemA17(
                 allData.applicationSetting ? allData.applicationSetting.recordDate : 0,
-                allData.approvalSettingDto ? allData.approvalSettingDto.prinFlg : 0
+                allData.approvalSettingDto ? allData.approvalSettingDto.prinFlg : 0,
+                false //allData.jobAssign ? allData.jobAssign.isConcurrently : false
             ));
         }
 
@@ -326,6 +327,7 @@ module nts.uk.at.view.kaf022.a.viewmodel {
                 prePostDisplayAtr: self.prePostDisplayAtr(),
                 recordDate: self.approvalSetting().baseDateAtr(),
                 approvalByPersonAtr: self.approvalSetting().approvalByPersonAtr(),
+                includeConcurrentPersonel: self.approvalSetting().includeConcurrentPersonel(),
 
                 nightOvertimeReflectAtr: self.nightOvertimeReflect(),
 
@@ -455,9 +457,12 @@ module nts.uk.at.view.kaf022.a.viewmodel {
         baseDateAtr: KnockoutObservable<number>;
         // 本人による承認
         approvalByPersonAtr: KnockoutObservable<number>;
-        constructor(baseDateAtr: number, approvalByPersonAtr: number) {
+        // 兼務者を含める
+        includeConcurrentPersonel: KnockoutObservable<number>;
+        constructor(baseDateAtr: number, approvalByPersonAtr: number, includeConcurrentPersonel: boolean) {
             this.baseDateAtr = ko.observable(baseDateAtr);
             this.approvalByPersonAtr = ko.observable(approvalByPersonAtr);
+            this.includeConcurrentPersonel = ko.observable(includeConcurrentPersonel ? 1 : 0);
         }
     }
 

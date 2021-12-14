@@ -147,7 +147,7 @@ module nts.uk.at.view.kdp010.h {
 							self.dataShare = totalTimeArr;
 							self.isDel(true);
 						} else {
-							self.setColor("#D9D9D9", ".btn-name");
+							self.setColor("#999", ".btn-name");
 							self.getInfoButton(null);
 							self.dataShare = null;
 							self.isDel(false);
@@ -279,8 +279,7 @@ module nts.uk.at.view.kdp010.h {
 							}),
 							usrArt: item.usrArt,
 							audioType: item.audioType,
-							supportWplSet: item.supportWplSet,
-							taskChoiceArt: item.taskChoiceArt
+							supportWplSet: item.supportWplSet
 						});
 						lstButton.push(lstButtonSet);
 					});
@@ -301,7 +300,6 @@ module nts.uk.at.view.kdp010.h {
 					self.isDel(true);
 					self.currentSelectLayout(self.selectedLayout());
 					info({ messageId: "Msg_15" }).then(() => {
-						self.dataKdpH = undefined;
 						$(document).ready(function() {
 							$('#combobox').focus();
 						});
@@ -351,9 +349,6 @@ module nts.uk.at.view.kdp010.h {
 				}
 				if(value == 12 || value == 13){
 					return !self.settingsStampUse.temporaryUse;
-				}
-				if(value == 10 || value == 11) {
-					return !self.settingsStampUse.entranceExitUse;
 				}
 				return false;
 			}
@@ -518,11 +513,7 @@ module nts.uk.at.view.kdp010.h {
 			/** 音声使用方法 */
 			audioType: number;
 			
-			/** 応援職場設定方法 */
 			supportWplSet: number;
-
-			/** 作業指定方法 */
-			taskChoiceArt: number;
 
 			constructor(param: IButtonSettingsCommand) {
 				this.buttonPositionNo = param.buttonPositionNo;
@@ -531,7 +522,6 @@ module nts.uk.at.view.kdp010.h {
 				this.usrArt = param.usrArt;
 				this.audioType = param.audioType;
 				this.supportWplSet = param.supportWplSet;
-				this.taskChoiceArt = param.taskChoiceArt;
 			}
 		}
 
@@ -546,10 +536,7 @@ module nts.uk.at.view.kdp010.h {
 			usrArt: number;
 			/** 音声使用方法 */
 			audioType: number;
-			/** 応援職場設定方法 */
 			supportWplSet : number;
-			/** 作業指定方法 */
-			taskChoiceArt: number;
 		}
 
 		// ButtonDisSetCommand
@@ -647,16 +634,16 @@ module nts.uk.at.view.kdp010.h {
 		}
 		export class ButtonDisplay {
 			buttonName: KnockoutObservable<string> = ko.observable('');
-			buttonColor: KnockoutObservable<string> = ko.observable('#D9D9D9');
-			textColor: KnockoutObservable<string> = ko.observable('#D9D9D9');
+			buttonColor: KnockoutObservable<string> = ko.observable('#999');
+			textColor: KnockoutObservable<string> = ko.observable('#999');
 			icon: KnockoutObservable<string> = ko.observable(null);
 			usrArt: KnockoutObservable<number> = ko.observable(0);
 			constructor() {
 				let self = this;
 				self.usrArt.subscribe((v: number) => {
 					if(v == 0){
-						self.buttonColor('#D9D9D9');
-						self.textColor('#D9D9D9');
+						self.buttonColor('#999');
+						self.textColor('#999');
 					}
 				});
 			}

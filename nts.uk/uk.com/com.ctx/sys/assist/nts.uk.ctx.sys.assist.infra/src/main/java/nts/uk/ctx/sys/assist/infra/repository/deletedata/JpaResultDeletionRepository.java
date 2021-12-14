@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import nts.arc.layer.infra.data.JpaRepository;
@@ -78,7 +77,7 @@ private static final String SELECT_WITH_NOT_NULL_LIST_EMPLOYEE =
 			data.endDateTimeDel = resultDel.getEndDateTimeDel().orElse(null);
 			data.fileSize = resultDel.getFileSize();
 			data.fileId = resultDel.getFileId();
-			data.isDeletedFilesFlg = resultDel.isDeletedFilesFlg();
+			data.isDeletedFilesFlg = resultDel.isDeletedFilesFlg() == true ? 1: 0;
 			data.numberEmployees = resultDel.getNumberEmployees();
 			
 			// redmine #108204
@@ -147,7 +146,7 @@ private static final String SELECT_WITH_NOT_NULL_LIST_EMPLOYEE =
 				.setParameter("fileId", fileId)
 				.getSingle();
 		op.ifPresent(data -> {
-			data.isDeletedFilesFlg = BooleanUtils.toBoolean(NotUseAtr.USE.value);
+			data.isDeletedFilesFlg = NotUseAtr.USE.value;
 			this.commandProxy().update(data);
 		});
 	}

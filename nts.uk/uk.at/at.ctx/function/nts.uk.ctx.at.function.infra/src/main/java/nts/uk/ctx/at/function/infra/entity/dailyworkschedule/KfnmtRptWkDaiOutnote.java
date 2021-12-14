@@ -5,6 +5,7 @@
 package nts.uk.ctx.at.function.infra.entity.dailyworkschedule;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -44,7 +45,7 @@ public class KfnmtRptWkDaiOutnote extends ContractUkJpaEntity implements Seriali
 
 	/** The use cls. */
 	@Column(name="USE_CLS")
-	private boolean useCls;
+	private BigDecimal useCls;
 
 	/** The contract cd. */
 	@Column(name="CONTRACT_CD")

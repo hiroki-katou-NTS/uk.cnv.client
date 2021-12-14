@@ -48,36 +48,40 @@ module nts.uk.at.view.kaf006.shr.viewmodel {
         }
 
         public static openKDL005(param: any) {
-            setShared("KDL005_DATA", param.employeeIds);
-
-			if (param.employeeIds.length > 1) {
-                nts.uk.ui.windows.sub.modal("/view/kdl/005/a/index.xhtml", {  width: 1160, height: 640 });
+            setShared("KDL005_DATA", param);
+            if(param.employeeIds.length > 1) {
+                modal("/view/kdl/005/a/multi.xhtml");
             } else {
-                nts.uk.ui.windows.sub.modal("/view/kdl/005/a/index.xhtml",{  width: 860, height: 640 });
+                modal("/view/kdl/005/a/single.xhtml");
             }
         }
 
         public static openKDL020(param: any) {
-			setShared('KDL020_DATA', param.employeeIds);
-			if (param.employeeIds.length > 1)
-				nts.uk.ui.windows.sub.modal("/view/kdl/020/a/index.xhtml",{  width: 1040, height: 660 });
-			else
-				nts.uk.ui.windows.sub.modal("/view/kdl/020/a/index.xhtml",{  width: 730, height: 660 });
+            setShared('KDL020A_PARAM', param);
+            if(param.employeeIds.length > 1 ) {
+                modal("/view/kdl/020/a/multi.xhtml");
+            } else {
+                modal("/view/kdl/020/a/single.xhtml");
+            }
         }
 
         public static openKDL051(param: any) {
-            setShared('KDL051A_PARAM', param.employeeIds);
+            setShared('KDL051A_PARAM', param);
             if(param.employeeIds.length > 1 ) {
-                nts.uk.ui.windows.sub.modal("/view/kdl/051/a/index.xhtml",{width: 980, height: 570});
+                modal("/view/kdl/051/multi.xhtml");
             } else {
-                nts.uk.ui.windows.sub.modal("/view/kdl/051/a/index.xhtml",{width: 650, height: 530});
+                modal("/view/kdl/051/single.xhtml");
             }
         }
 
         public static openKDL052(param: any) {
             const vm = new ko.ViewModel();
-            setShared('KDL052A_PARAM', param);            
-            vm.$window.modal('/view/kdl/052/a/index.xhtml');
+
+            if (param.employeeIds.length > 1) {
+                vm.$window.modal('/view/kdl/052/multi.xhtml', param);
+            } else {
+                vm.$window.modal('/view/kdl/052/single.xhtml', param);
+            }
         }
 
         public static openKDL017(param: any) {
@@ -90,20 +94,17 @@ module nts.uk.at.view.kaf006.shr.viewmodel {
         }
 
         public static openKDL009(param: any) {
-            setShared('KDL009_DATA', param.employeeIds);
+            setShared('KDL009_DATA', param);
             if(param.employeeIds.length > 1) {
-                nts.uk.ui.windows.sub.modal("/view/kdl/009/a/index.xhtml",{width: 1100, height: 650});
+                nts.uk.ui.windows.sub.modal("/view/kdl/009/a/multi.xhtml");
             } else {
-                nts.uk.ui.windows.sub.modal("/view/kdl/009/a/index.xhtml",{width: 770, height: 650});
+                nts.uk.ui.windows.sub.modal("/view/kdl/009/a/single.xhtml");
             }  
         }
 
         public static openKDL029(param: any) {
-			setShared('KDL029_DATA', param.employeeIds);
-			if (param.employeeIds.length > 1)
-				modal("/view/kdl/029/a/index.xhtml",{  width: 1060, height: 600 });
-			else
-				modal("/view/kdl/029/a/index.xhtml",{  width: 710, height: 600 });
+            setShared('KDL029_PARAM', param);
+            modal('/view/kdl/029/a/index.xhtml');
         }
     }
 

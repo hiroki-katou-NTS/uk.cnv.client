@@ -11,8 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.schedule.dom.shift.management.shifttable.ShiftTableRule;
 import nts.uk.ctx.at.schedule.dom.shift.management.shifttable.ShiftTableRuleForOrganization;
@@ -40,13 +38,13 @@ public class KscmtShiftTableRuleForOrg extends ContractUkJpaEntity implements Se
      * 公開運用区分
      */
     @Column(name = "USE_PUBLICATION_ATR")
-    public boolean usePublicAtr;
+    public int usePublicAtr;
 
     /**
      * 勤務希望運用区分
      */
     @Column(name = "USE_AVAILABILITY_ATR")
-    public boolean useWorkAvailabilityAtr;
+    public int useWorkAvailabilityAtr;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "kscmtShiftTableRuleForOrg", orphanRemoval = true)
     public KscmtShiftTableRuleForOrgAvai kscmtShiftTableRuleForOrgAvai;
@@ -60,8 +58,8 @@ public class KscmtShiftTableRuleForOrg extends ContractUkJpaEntity implements Se
                                      KscmtShiftTableRuleForOrgAvai kscmtShiftTableRuleForOrgAvai) {
         super();
         this.pk = pk;
-        this.usePublicAtr = BooleanUtils.toBoolean(usePublicAtr);
-        this.useWorkAvailabilityAtr = BooleanUtils.toBoolean(useWorkAvailabilityAtr);
+        this.usePublicAtr = usePublicAtr;
+        this.useWorkAvailabilityAtr = useWorkAvailabilityAtr;
         this.kscmtShiftTableRuleForOrgAvai = kscmtShiftTableRuleForOrgAvai;
     }
 
@@ -102,7 +100,7 @@ public class KscmtShiftTableRuleForOrg extends ContractUkJpaEntity implements Se
         }
         return new ShiftTableRuleForOrganization(
                 target,
-                kscmtShiftTableRuleForOrgAvai.toDomain(BooleanUtils.toInteger(this.usePublicAtr), BooleanUtils.toInteger(this.useWorkAvailabilityAtr))
+                kscmtShiftTableRuleForOrgAvai.toDomain(this.usePublicAtr, this.useWorkAvailabilityAtr)
         );
     }
 }

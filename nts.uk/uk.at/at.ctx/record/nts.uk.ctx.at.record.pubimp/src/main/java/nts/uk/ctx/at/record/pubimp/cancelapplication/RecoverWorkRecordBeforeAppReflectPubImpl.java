@@ -25,8 +25,6 @@ import nts.uk.ctx.at.record.pub.appreflect.export.RCReflectedStateExport;
 import nts.uk.ctx.at.record.pub.cancelapplication.RCRecoverAppReflectOutputExport;
 import nts.uk.ctx.at.record.pub.cancelapplication.RecoverWorkRecordBeforeAppReflectPub;
 import nts.uk.ctx.at.shared.dom.dailyattdcal.converter.DailyRecordShareFinder;
-import nts.uk.ctx.at.shared.dom.scherec.adapter.log.schedulework.CorrectRecordDailyResultImport;
-import nts.uk.ctx.at.shared.dom.scherec.adapter.log.schedulework.work.GetRecordDailyPerformanceLogAdapter;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.ApplicationShare;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.ApplicationReflectHistory;
@@ -60,16 +58,13 @@ public class RecoverWorkRecordBeforeAppReflectPubImpl implements RecoverWorkReco
 
 	@Inject
 	private ApplicationReflectHistoryRepo applicationReflectHistoryRepo;
-	
-	@Inject
-	private GetRecordDailyPerformanceLogAdapter getRecordDailyPerformanceLogAdapter;
 
 	@Override
 	public RCRecoverAppReflectOutputExport process(ApplicationShare application, GeneralDate date,
 			RCReflectStatusResultExport reflectStatus, NotUseAtr dbRegisterClassfi) {
 		RequireImpl requireImpl = new RequireImpl(dailyRecordConverter,
 				dailyRecordShareFinder, correctionAfterTimeChange, calculateDailyRecordServiceCenter,
-				dailyRecordAdUpService, applicationReflectHistoryRepo, getRecordDailyPerformanceLogAdapter);
+				dailyRecordAdUpService, applicationReflectHistoryRepo);
 		RCRecoverAppReflectOutput output = RecoverWorkRecordBeforeAppReflect.process(requireImpl, application, date,
 				convertToShare(reflectStatus), dbRegisterClassfi);
 		return new RCRecoverAppReflectOutputExport(convertToExport(output.getReflectStatus()), output.getWorkRecord(),
@@ -114,8 +109,6 @@ public class RecoverWorkRecordBeforeAppReflectPubImpl implements RecoverWorkReco
 		private final DailyRecordAdUpService dailyRecordAdUpService;
 		
 		private final ApplicationReflectHistoryRepo applicationReflectHistoryRepo;
-		
-		private final GetRecordDailyPerformanceLogAdapter getRecordDailyPerformanceLogAdapter;
 
 		@Override
 		public List<ApplicationReflectHistory> findAppReflectHistAfterMaxTime(String sid, GeneralDate baseDate,
@@ -168,22 +161,6 @@ public class RecoverWorkRecordBeforeAppReflectPubImpl implements RecoverWorkReco
 			applicationReflectHistoryRepo.updateAppReflectHist(sid, appId, baseDate, classification, flagRemove);
 		}
 
-		@Override
-		public List<ApplicationReflectHistory> getCancelHistOtherId(String sid, GeneralDate date, String appId,
-				GeneralDateTime createTime, ScheduleRecordClassifi classification) {
-			return applicationReflectHistoryRepo.getCancelHistOtherId(sid, date, appId, createTime, classification);
-		}
 
-		@Override
-		public List<CorrectRecordDailyResultImport> getBySpecifyItemId(String sid, GeneralDate targetDate,
-				Integer itemId) {
-			return getRecordDailyPerformanceLogAdapter.getBySpecifyItemId(sid, targetDate, itemId);
-		}
-
-		@Override
-		public List<ApplicationReflectHistory> getHistWithSidDate(String sid, GeneralDate date,
-				ScheduleRecordClassifi classification) {
-			return applicationReflectHistoryRepo.getHistWithSidDate(sid, date, classification);
-		}
 	}
 }

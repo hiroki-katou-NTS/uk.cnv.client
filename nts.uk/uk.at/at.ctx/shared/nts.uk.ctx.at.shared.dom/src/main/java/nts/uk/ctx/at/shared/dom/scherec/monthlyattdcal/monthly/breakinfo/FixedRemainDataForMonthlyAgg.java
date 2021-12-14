@@ -1,6 +1,5 @@
 package nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.breakinfo;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -17,9 +16,4 @@ public class FixedRemainDataForMonthlyAgg {
 	
 	/** 月別確定管理データ */
 	private FixedManagementDataMonth monthly;
-	
-	public FixedRemainDataForMonthlyAgg(){
-		this.daily = new ArrayList<>();
-		this.monthly = new FixedManagementDataMonth();
-	}
 }

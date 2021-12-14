@@ -4,6 +4,8 @@
  *****************************************************************/
 package nts.uk.ctx.at.function.infra.repository.statement;
 
+import java.math.BigDecimal;
+
 import nts.uk.ctx.at.function.dom.statement.StampOutputSettingCode;
 import nts.uk.ctx.at.function.dom.statement.StampOutputSettingName;
 import nts.uk.ctx.at.function.dom.statement.StampingOutputItemSetSetMemento;
@@ -18,6 +20,12 @@ public class JpaStampOutpItemSetSetMemento implements StampingOutputItemSetSetMe
 
 	/** The entity. */
 	private KfnmtStampOutpItem entity;
+	
+	/** The Constant VALUE_TRUE. */
+	private static final Integer VALUE_TRUE = 1;
+	
+	/** The Constant VALUE_FALSE. */
+	private static final Integer VALUE_FALSE = 0;
 	
 	/**
 	 * Instantiates a new jpa kfnmt stamp outp item set set memento.
@@ -61,7 +69,7 @@ public class JpaStampOutpItemSetSetMemento implements StampingOutputItemSetSetMe
 	 */
 	@Override
 	public void setOutputEmbossMethod(boolean outputEmbossMethod) {
-		this.entity.setOutputEmbossMethod(outputEmbossMethod);
+		this.entity.setOutputEmbossMethod(BigDecimal.valueOf(outputEmbossMethod == true ? VALUE_TRUE : VALUE_FALSE));
 	}
 
 	/* (non-Javadoc)
@@ -69,7 +77,7 @@ public class JpaStampOutpItemSetSetMemento implements StampingOutputItemSetSetMe
 	 */
 	@Override
 	public void setOutputWorkHours(boolean outputWorkHours) {
-		this.entity.setOutputWorkHours(outputWorkHours);
+		this.entity.setOutputWorkHours(BigDecimal.valueOf(outputWorkHours == true ? VALUE_TRUE : VALUE_FALSE));
 	}
 
 	/* (non-Javadoc)
@@ -77,7 +85,7 @@ public class JpaStampOutpItemSetSetMemento implements StampingOutputItemSetSetMe
 	 */
 	@Override
 	public void setOutputSetLocation(boolean outputSetLocation) {
-		this.entity.setOutputSetLocation(outputSetLocation);
+		this.entity.setOutputSetLocation(BigDecimal.valueOf(outputSetLocation == true ? VALUE_TRUE : VALUE_FALSE));
 	}
 
 	/* (non-Javadoc)
@@ -85,7 +93,7 @@ public class JpaStampOutpItemSetSetMemento implements StampingOutputItemSetSetMe
 	 */
 	@Override
 	public void setOutputPosInfor(boolean outputPosInfor) {
-		this.entity.setOutputPosInfor(outputPosInfor);
+		this.entity.setOutputPosInfor(BigDecimal.valueOf(outputPosInfor == true ? VALUE_TRUE : VALUE_FALSE));
 	}
 
 	/* (non-Javadoc)
@@ -93,7 +101,7 @@ public class JpaStampOutpItemSetSetMemento implements StampingOutputItemSetSetMe
 	 */
 	@Override
 	public void setOutputOT(boolean outputOT) {
-		this.entity.setOutputOt(outputOT);
+		this.entity.setOutputOt(BigDecimal.valueOf(outputOT == true ? VALUE_TRUE : VALUE_FALSE));
 	}
 
 	/* (non-Javadoc)
@@ -101,7 +109,7 @@ public class JpaStampOutpItemSetSetMemento implements StampingOutputItemSetSetMe
 	 */
 	@Override
 	public void setOutputNightTime(boolean outputNightTime) {
-		this.entity.setOutputNightTime(outputNightTime);
+		this.entity.setOutputNightTime(BigDecimal.valueOf(outputNightTime == true ? VALUE_TRUE : VALUE_FALSE));
 	}
 
 	/* (non-Javadoc)
@@ -109,6 +117,6 @@ public class JpaStampOutpItemSetSetMemento implements StampingOutputItemSetSetMe
 	 */
 	@Override
 	public void setOutputSupportCard(boolean outputSupportCard) {
-		this.entity.setOutputSupportCard(outputSupportCard);
+		this.entity.setOutputSupportCard(BigDecimal.valueOf(outputSupportCard == true ? VALUE_TRUE : VALUE_FALSE));
 	}
 }

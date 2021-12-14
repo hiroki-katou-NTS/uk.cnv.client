@@ -18,7 +18,5 @@ public class EmpInfoDto {
 	String LoginId;
 	
 	String employeeName;
-	
-	String password;
 
 }

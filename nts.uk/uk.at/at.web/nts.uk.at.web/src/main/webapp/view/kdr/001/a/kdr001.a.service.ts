@@ -8,17 +8,12 @@ module nts.uk.at.view.kdr001.a {
                 saveAsExcel: "at/function/holidaysremaining/report",
                 getDate: "at/function/holidaysremaining/getDate",
                 getCurrentLoginerRole: "at/function/holidaysremaining/getCurrentLoginerRole",
-                getBreakSelection: "at/function/holidaysremaining/getBreakSelection",
-                getCheckAuthor: "at/function/holidaysremaining/getCheckAuthor"
+                getBreakSelection: "at/function/holidaysremaining/getBreakSelection"
             };
         
         
         export function findAll() : JQueryPromise<any> {
             return nts.uk.request.ajax("at", path.findAll);
-        }
-
-        export function getCheckAuthor() : JQueryPromise<any> {
-            return nts.uk.request.ajax("at", path.getCheckAuthor);
         }
         
         export function saveAsExcel(data){

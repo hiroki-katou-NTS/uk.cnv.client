@@ -176,10 +176,7 @@ module nts.uk.at.view.kaf006_ref.a.viewmodel {
                     }
 
                     vm.checkCondition(vm.data);
-                    const hdAppSetTemp = _.filter(vm.hdAppSetTmp(), (x) => {
-                        return x.holidayAppType !== 6
-                    });
-                    vm.hdAppSet(ko.toJS(hdAppSetTemp));
+                    vm.hdAppSet(ko.toJS(vm.hdAppSetTmp));
                 }
             }).fail((error: any) => {
                 if (error) {
@@ -1627,20 +1624,26 @@ module nts.uk.at.view.kaf006_ref.a.viewmodel {
 
         openKDL020() {
             let vm = this;
-            nts.uk.ui.windows.setShared('KDL020_DATA', vm.application().employeeIDLst());
-            if (vm.application().employeeIDLst().length > 1) {
-                nts.uk.ui.windows.sub.modal("/view/kdl/020/a/index.xhtml",{  width: 1040, height: 660 });
-			else
-				nts.uk.ui.windows.sub.modal("/view/kdl/020/a/index.xhtml",{  width: 730, height: 660 });
+            var employeeIds = [];
+            employeeIds.push(__viewContext.user.employeeId);
+            nts.uk.ui.windows.setShared('KDL020A_PARAM', {
+                baseDate: new Date(vm.data.appDispInfoStartupOutput.appDispInfoWithDateOutput.baseDate), 
+                employeeIds: vm.application().employeeIDLst()});
+            if (employeeIds.length > 1) {
+                nts.uk.ui.windows.sub.modal("/view/kdl/020/a/multi.xhtml");
+            } else {
+                nts.uk.ui.windows.sub.modal("/view/kdl/020/a/single.xhtml");
+            }
         }
 
         openKDL029() {
             let vm = this;
-            nts.uk.ui.windows.setShared('KDL029_DATA', vm.application().employeeIDLst());
-			if (vm.application().employeeIDLst().length > 1)
-				nts.uk.ui.windows.sub.modal("/view/kdl/029/a/index.xhtml",{  width: 1060, height: 600 });
-			else
-				nts.uk.ui.windows.sub.modal("/view/kdl/029/a/index.xhtml",{  width: 710, height: 600 });
+            let param = {
+                employeeIds: vm.application().employeeIDLst(),
+                baseDate: moment(new Date(vm.data.appDispInfoStartupOutput.appDispInfoWithDateOutput.baseDate)).format("YYYY/MM/DD")
+            }
+            nts.uk.ui.windows.setShared('KDL029_PARAM', param);
+            nts.uk.ui.windows.sub.modal('/view/kdl/029/a/index.xhtml');
         }
 
         openKDL005() {
@@ -1649,11 +1652,11 @@ module nts.uk.at.view.kaf006_ref.a.viewmodel {
                 employeeIds: vm.application().employeeIDLst(),
                 baseDate: moment(new Date(vm.data.appDispInfoStartupOutput.appDispInfoWithDateOutput.baseDate)).format("YYYYMMDD")
             }
-            nts.uk.ui.windows.setShared('KDL005_DATA', data.employeeIds);
+            nts.uk.ui.windows.setShared('KDL005_DATA', data);
             if (data.employeeIds.length > 1) {
-                nts.uk.ui.windows.sub.modal("/view/kdl/005/a/index.xhtml", {  width: 1160, height: 640 });
+                nts.uk.ui.windows.sub.modal("/view/kdl/005/a/multi.xhtml");
             } else {
-                nts.uk.ui.windows.sub.modal("/view/kdl/005/a/index.xhtml",{  width: 860, height: 640 });
+                nts.uk.ui.windows.sub.modal("/view/kdl/005/a/single.xhtml");
             }
         }
 

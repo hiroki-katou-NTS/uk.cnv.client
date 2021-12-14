@@ -5,43 +5,42 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
-import lombok.val;
-import nts.arc.enums.EnumAdaptor;
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.at.auth.dom.employmentrole.EmploymentRole;
 import nts.uk.ctx.at.auth.dom.employmentrole.EmploymentRoleRepository;
-import nts.uk.shr.com.enumcommon.NotUseAtr;
 import nts.uk.ctx.at.auth.infra.entity.employmentrole.KacmtRoleAttendance;
+import nts.uk.ctx.at.auth.infra.entity.employmentrole.KacmtEmploymentRolePK;
 
 @Stateless
 public class JpaEmploymentRoleRepository extends JpaRepository implements EmploymentRoleRepository {
 
 	private static final String GET_ALL_BY_COMPANY_ID = "SELECT e"
 			+ " FROM KacmtRoleAttendance e"
-			+ " WHERE e.companyID = :companyID";
+			+ " WHERE e.kacmtEmploymentRolePK.companyID = :companyID";
+	
+	private static final String GET_EMPLOYMENT_BY_ID = GET_ALL_BY_COMPANY_ID
+			+ " AND e.kacmtEmploymentRolePK.roleID = :roleID";
+
 	@Override
 	public List<EmploymentRole> getAllByCompanyId(String companyId) {
 		return this.queryProxy().query(GET_ALL_BY_COMPANY_ID, KacmtRoleAttendance.class)
 		.setParameter("companyID", companyId)
-		.getList(KacmtRoleAttendance::toDomain);
+		.getList(c -> c.toDomain());
+	}
+
+	@Override
+	public List<EmploymentRole> getListEmploymentRole(String companyId) {
+		return this.queryProxy().query(GET_ALL_BY_COMPANY_ID, KacmtRoleAttendance.class)
+				.setParameter("companyID", companyId)
+				.getList(c -> c.toDomain());
 	}
 	
 	@Override
-	public Optional<EmploymentRole> getEmploymentRoleById( String roleId) {
-		val entityOpt = this.queryProxy().find(roleId,KacmtRoleAttendance.class);
-		if(!entityOpt.isPresent()){
-			return Optional.empty();
-		}else {
-			val entity = entityOpt.get();
-			val domain = new EmploymentRole(
-					entity.roleID,
-					entity.companyID,
-					EnumAdaptor.valueOf(entity.futureDateRefPermit, NotUseAtr.class)
-			);
-			return Optional.of(domain);
-
-		}
-
+	public Optional<EmploymentRole> getEmploymentRoleById(String companyId, String roleId) {
+		return this.queryProxy().query(GET_EMPLOYMENT_BY_ID, KacmtRoleAttendance.class)
+				.setParameter("companyID", companyId)
+				.setParameter("roleID", roleId)
+				.getSingle(c -> c.toDomain());
 	}
 
 	@Override
@@ -53,18 +52,19 @@ public class JpaEmploymentRoleRepository extends JpaRepository implements Employ
 	@Override
 	public void updateEmploymentRole(EmploymentRole employmentRole) {
 		KacmtRoleAttendance dataUpdate = KacmtRoleAttendance.toEntity(employmentRole);
-		val oldDataOpt = this.queryProxy().find(dataUpdate.roleID, KacmtRoleAttendance.class);
-		if(oldDataOpt.isPresent()){
-			val oldData = oldDataOpt.get();
-			oldData.setCompanyID(dataUpdate.companyID);
-			oldData.setFutureDateRefPermit(dataUpdate.futureDateRefPermit);
-			this.commandProxy().update(oldData);
-		}
+		KacmtRoleAttendance newData = this.queryProxy().find(dataUpdate.kacmtEmploymentRolePK, KacmtRoleAttendance.class).get();
+		newData.setScheduleEmployeeRef(dataUpdate.scheduleEmployeeRef);
+		newData.setBookEmployeeRef(dataUpdate.bookEmployeeRef);
+		newData.setEmployeeRefSpecAgent(dataUpdate.employeeRefSpecAgent);
+		newData.setPresentInqEmployeeRef(dataUpdate.presentInqEmployeeRef);
+		newData.setFutureDateRefPermit(dataUpdate.futureDateRefPermit);
+		this.commandProxy().update(newData);
 	}
 
 	@Override
-	public void deleteEmploymentRole(String roleId) {
-		this.commandProxy().remove(KacmtRoleAttendance.class,roleId);
+	public void deleteEmploymentRole(String companyId, String roleId) {
+		KacmtEmploymentRolePK kacmtEmploymentRolePK = new  KacmtEmploymentRolePK(companyId,roleId);
+		this.commandProxy().remove(KacmtRoleAttendance.class,kacmtEmploymentRolePK);
 	}
 
 }

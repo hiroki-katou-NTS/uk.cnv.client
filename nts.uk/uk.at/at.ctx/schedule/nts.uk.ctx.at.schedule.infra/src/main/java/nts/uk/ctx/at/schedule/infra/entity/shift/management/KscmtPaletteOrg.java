@@ -13,14 +13,13 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPalette;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPaletteDisplayInfor;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPaletteName;
+import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPaletteCom;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPaletteOrg;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftRemarks;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.TargetOrgIdenInfor;
@@ -50,7 +49,7 @@ public class KscmtPaletteOrg extends ContractUkJpaEntity{
 	
 	/** 使用区分 */
 	@Column(name = "USE_ATR")
-	public boolean useAtr;
+	public int useAtr;
 	
 	/** 備考 */
 	@Column(name = "NOTE")
@@ -72,7 +71,7 @@ public class KscmtPaletteOrg extends ContractUkJpaEntity{
 		
 		return new KscmtPaletteOrg(pk,
 				shiftPalletsOrg.getShiftPallet().getDisplayInfor().getShiftPalletName().v(),
-				BooleanUtils.toBoolean(shiftPalletsOrg.getShiftPallet().getDisplayInfor().getShiftPalletAtr().value),
+				shiftPalletsOrg.getShiftPallet().getDisplayInfor().getShiftPalletAtr().value,
 				shiftPalletsOrg.getShiftPallet().getDisplayInfor().getRemarks().v(),
 				shiftPalletsOrg.getShiftPallet().getCombinations().stream()
 				.map(x -> KscmtPaletteOrgCombi.fromDomain(x, pk)).collect(Collectors.toList()));
@@ -80,7 +79,7 @@ public class KscmtPaletteOrg extends ContractUkJpaEntity{
 
 	public void toEntity(ShiftPaletteOrg shiftPalletsCom) {
 		this.pageName = shiftPalletsCom.getShiftPallet().getDisplayInfor().getShiftPalletName().v();
-		this.useAtr = BooleanUtils.toBoolean(shiftPalletsCom.getShiftPallet().getDisplayInfor().getShiftPalletAtr().value);
+		this.useAtr = shiftPalletsCom.getShiftPallet().getDisplayInfor().getShiftPalletAtr().value;
 		this.note = shiftPalletsCom.getShiftPallet().getDisplayInfor().getRemarks().v();
 
 		orgCombis.stream().forEach(x -> {
@@ -104,7 +103,7 @@ public class KscmtPaletteOrg extends ContractUkJpaEntity{
 		return new ShiftPaletteOrg( new TargetOrgIdenInfor(EnumAdaptor.valueOf(pk.targetUnit, TargetOrganizationUnit.class), Optional.ofNullable(workplaceId), Optional.ofNullable(groupWorkplaceId)) ,
 				pk.page,
 				new ShiftPalette(
-						new ShiftPaletteDisplayInfor(new ShiftPaletteName(pageName), EnumAdaptor.valueOf(BooleanUtils.toInteger(useAtr), NotUseAtr.class),
+						new ShiftPaletteDisplayInfor(new ShiftPaletteName(pageName), EnumAdaptor.valueOf(useAtr, NotUseAtr.class),
 								new ShiftRemarks(note)),
 						orgCombis.stream().map(x -> x.toDomain()).collect(Collectors.toList())));
 	}

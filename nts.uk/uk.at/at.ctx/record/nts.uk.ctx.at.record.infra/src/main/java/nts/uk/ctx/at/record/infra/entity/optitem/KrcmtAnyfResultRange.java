@@ -36,11 +36,11 @@ public class KrcmtAnyfResultRange extends ContractUkJpaEntity implements Seriali
 
 	/** The upper limit atr. */
 	@Column(name = "UPPER_LIMIT_ATR")
-	private boolean upperLimitAtr;
+	private int upperLimitAtr;
 
 	/** The lower limit atr. */
 	@Column(name = "LOWER_LIMIT_ATR")
-	private boolean lowerLimitAtr;
+	private int lowerLimitAtr;
 
 //	/** The upper time range. */
 //	@Column(name = "UPPER_TIME_RANGE")

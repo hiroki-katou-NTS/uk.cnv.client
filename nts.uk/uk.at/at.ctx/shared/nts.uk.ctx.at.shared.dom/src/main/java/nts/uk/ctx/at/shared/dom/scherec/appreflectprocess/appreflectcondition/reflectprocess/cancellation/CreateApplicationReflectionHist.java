@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import nts.arc.time.GeneralDateTime;
-import nts.uk.ctx.at.shared.dom.scherec.application.common.ReflectedStateShare;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.DailyRecordOfApplication;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.DailyRecordToAttendanceItemConverter;
@@ -22,16 +21,14 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.editstate.E
 public class CreateApplicationReflectionHist {
 
 	public static void create(Require require, String appId, ScheduleRecordClassifi classifi,
-			DailyRecordOfApplication dailyRecordApp, IntegrationOfDaily domainBefore, GeneralDateTime reflectTime,
-			String execId, ReflectedStateShare reflectState) {
+			DailyRecordOfApplication dailyRecordApp, IntegrationOfDaily domainBefore, GeneralDateTime reflectTime) {
 
 		// 申請反映前のデータを取得
 		addDataBeforeAppReflect(require, dailyRecordApp.getAttendanceBeforeReflect(), domainBefore);
 
 		// 申請反映履歴を追加する
-		require.insertAppReflectHist(new ApplicationReflectHistory(domainBefore.getEmployeeId(), domainBefore.getYmd(),
-				appId, classifi, false, dailyRecordApp.getAttendanceBeforeReflect(),
-				new AppReflectExecInfo(reflectState == ReflectedStateShare.REFLECTED, execId, reflectTime)));
+		require.insertAppReflectHist(new ApplicationReflectHistory(domainBefore.getEmployeeId(), domainBefore.getYmd(), appId,
+				reflectTime, classifi, false, dailyRecordApp.getAttendanceBeforeReflect()));
 	}
 
 	public static interface Require {

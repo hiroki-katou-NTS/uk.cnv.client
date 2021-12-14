@@ -26,15 +26,4 @@ public class WorkplaceManagerAdapterImpl implements WorkplaceManagerAdapter {
                 x.getHistoryPeriod()))
             .collect(Collectors.toList());
     }
-
-    @Override
-    public List<WorkplaceManagerImport> getWkpManagerListByWkpId(String workplaceId) {
-        return workplaceManagerPub.getWkpManagerListByWkpId(workplaceId).stream().map(x ->
-                new WorkplaceManagerImport(
-                        x.getWorkplaceManagerId(),
-                        x.getEmployeeId(),
-                        x.getWorkplaceId(),
-                        x.getHistoryPeriod()))
-                .collect(Collectors.toList());
-    }
 }

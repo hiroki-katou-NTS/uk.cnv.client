@@ -5,8 +5,6 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worklabor.flex.FlexSet;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worklabor.flex.FlexSetRepository;
@@ -35,8 +33,7 @@ public class JpaFlexSetRepository extends JpaRepository implements FlexSetReposi
 	 */
 	private FlexSet convertToDomain(KshmtCalcCFlex kshstFlexSet) {
 		FlexSet flexSet = FlexSet.createFromJavaType(kshstFlexSet.kshstFlexSetPK.companyId, kshstFlexSet.missCalcHd,
-				kshstFlexSet.premiumCalcHd, kshstFlexSet.missCalcSubhd, kshstFlexSet.premiumCalcSubhd, 
-				BooleanUtils.toInteger(kshstFlexSet.flexDeductCalc), kshstFlexSet.flexNonwkingCalc);
+				kshstFlexSet.premiumCalcHd, kshstFlexSet.missCalcSubhd, kshstFlexSet.premiumCalcSubhd, kshstFlexSet.flexDeductCalc, kshstFlexSet.flexNonwkingCalc);
 		
 		return flexSet;
 	}
@@ -85,7 +82,7 @@ public class JpaFlexSetRepository extends JpaRepository implements FlexSetReposi
 				entity.premiumCalcHd = flexSet.getPremiumCalcHd().value;
 				entity.missCalcSubhd = flexSet.getMissCalcSubhd().value;
 				entity.premiumCalcSubhd = flexSet.getPremiumCalcSubhd().value;
-				entity.flexDeductCalc = BooleanUtils.toBoolean(flexSet.getFlexDeductTimeCalc().value);
+				entity.flexDeductCalc = flexSet.getFlexDeductTimeCalc().value;
 				entity.flexNonwkingCalc = flexSet.getFlexNonworkingDayCalc().value;
 				
 				entity.kshstFlexSetPK = primaryKey;

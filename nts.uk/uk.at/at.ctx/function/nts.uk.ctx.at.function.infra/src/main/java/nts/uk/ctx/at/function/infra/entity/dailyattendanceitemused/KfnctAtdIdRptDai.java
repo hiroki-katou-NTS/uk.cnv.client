@@ -10,8 +10,6 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import nts.uk.ctx.at.function.dom.dailyattendanceitem.DailyAttendanceItemUsed;
@@ -32,16 +30,16 @@ public class KfnctAtdIdRptDai extends UkJpaEntity
 	private KfnctAtdIdRptDaiPK kfnctAtdIdRptDaiPK;
 	
 	@Column(name = "WORK_DAILY")
-	private boolean workDaily;
+	private BigDecimal workDaily;
 	
 	@Column(name = "WORK_ATTENDANCE")
-	private boolean workAttendance;
+	private BigDecimal workAttendance;
 	
 	@Column(name = "ATD_WORK_DAILY")
-	private boolean atdWorkDaily;
+	private BigDecimal atdWorkDaily;
 	
 	@Column(name = "ATD_WORK_ATTENDANCE")
-	private boolean atdWorkAttendance;
+	private BigDecimal atdWorkAttendance;
 
 	@Override
 	protected Object getKey() {
@@ -70,16 +68,16 @@ public class KfnctAtdIdRptDai extends UkJpaEntity
 		for (FormCanUsedForTime formCanUsedForTime : form) {
 			switch (formCanUsedForTime) {
 				case DAILY_WORK_SCHEDULE:
-					this.setWorkDaily(true);
+					this.setWorkDaily(BigDecimal.valueOf(1));
 					break;
 				case ATTENDANCE_BOOK:
-					this.setWorkAttendance(true);
+					this.setWorkAttendance(BigDecimal.valueOf(1));
 					break;
 				case WORK_SITUATION_TABLE:
-					this.setAtdWorkDaily(true);
+					this.setAtdWorkDaily(BigDecimal.valueOf(1));
 					break;
 				case ANNUAL_WORK_LEDGER:
-					this.setAtdWorkAttendance(true);
+					this.setAtdWorkAttendance(BigDecimal.valueOf(1));
 					break;
 				default:
 					break;
@@ -100,10 +98,10 @@ public class KfnctAtdIdRptDai extends UkJpaEntity
 	@Override
 	public List<FormCanUsedForTime> getFormCanUsedForTimes() {
 		return Arrays.asList(
-				FormCanUsedForTime.valueOf(BooleanUtils.toInteger(this.workDaily)),
-				FormCanUsedForTime.valueOf(BooleanUtils.toInteger(this.workAttendance)),
-				FormCanUsedForTime.valueOf(BooleanUtils.toInteger(this.atdWorkAttendance)),
-				FormCanUsedForTime.valueOf(BooleanUtils.toInteger(this.atdWorkDaily)));
+				FormCanUsedForTime.valueOf(this.workDaily.intValue()),
+				FormCanUsedForTime.valueOf(this.workAttendance.intValue()),
+				FormCanUsedForTime.valueOf(this.atdWorkAttendance.intValue()),
+				FormCanUsedForTime.valueOf(this.atdWorkDaily.intValue()));
 	}
 
 }

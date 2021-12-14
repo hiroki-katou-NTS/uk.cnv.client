@@ -57,7 +57,6 @@ module nts.uk.ui.at.ksu002.a {
 				"></button>
 			<button class="small btn-help" data-bind="
 					i18n: 'KSU002_27',
-					enable: false,
 					attr: {
 						tabindex: $$tabindex
 					}
@@ -77,7 +76,7 @@ module nts.uk.ui.at.ksu002.a {
 					value: $component.workTypeData.selected,
 					options: $component.workTypeData.dataSources,
 					optionsValue: 'workTypeCode',
-					enable: workTypeEnable,
+					enable: ko.unwrap($component.data.mode) === 'copy' && !!$component.data.workplaceId(),
 					editable: false,
 					selectFirstIfNull: true,
 					visibleItemsCount: 10,
@@ -220,13 +219,12 @@ module nts.uk.ui.at.ksu002.a {
 			dataSources: KnockoutObservableArray<k.WorkTimeModel>;
 			disabled: KnockoutComputed<boolean>;
 		};
-		workTypeEnable: KnockoutObservable<boolean> = ko.observable(false);
 
 		constructor(private data: Parameter) {
 			super();
 
 			const vm = this;
-			
+
 			if (!data) {
 				vm.data = {
 					tabIndex: "1",
@@ -236,17 +234,10 @@ module nts.uk.ui.at.ksu002.a {
 						undo: ko.computed(() => true)
 					},
 					mode: ko.observable('copy'),
-					workplaceId: ko.observable(null),
+					workplaceId: ko.observable(''),
 					selected: ko.observable(null)
 				};
 			}
-			vm.data.workplaceId.subscribe((v) => {
-				vm.workTypeEnable(data.mode() === 'copy' &&  v != null);
-			});
-			
-			vm.data.mode.subscribe((v) => {
-				vm.workTypeEnable(data.workplaceId() != null &&  v === 'copy');
-			});
 
 			const { selected, clickable, clickBtn, mode, workplaceId } = vm.data;
 
@@ -270,7 +261,7 @@ module nts.uk.ui.at.ksu002.a {
 			}
 
 			if (workplaceId === undefined) {
-				vm.data.workplaceId = ko.observable(null);
+				vm.data.workplaceId = ko.observable('');
 			}
 
 			const { redo, undo } = vm.data.clickable;
@@ -364,7 +355,7 @@ module nts.uk.ui.at.ksu002.a {
 										const command = { workTimeCode, workTypeCode };
 
 										return vm.$blockui('invisible')
-											.then(() => vm.$ajax('at', AB_API.CR_WT_HD, command).done(() => vm.$blockui('clear')));
+											.then(() => vm.$ajax('at', AB_API.CR_WT_HD, command));
 									}
 
 									return null;
@@ -398,7 +389,8 @@ module nts.uk.ui.at.ksu002.a {
 											}
 										}
 									});
-								});
+								})
+								.always(() => vm.$blockui('clear'));
 						}
 					}
 				},

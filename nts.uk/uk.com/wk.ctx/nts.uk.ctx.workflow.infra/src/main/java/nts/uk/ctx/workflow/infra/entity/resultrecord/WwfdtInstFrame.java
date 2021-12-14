@@ -32,7 +32,7 @@ public class WwfdtInstFrame extends ContractUkJpaEntity {
 	private WwfdpAppFrameInstancePK pk;
 	
 	@Column(name="CONFIRM_ATR")
-	private boolean confirmAtr;
+	private Integer confirmAtr;
 	
 	@ManyToOne
 	@PrimaryKeyJoinColumns({

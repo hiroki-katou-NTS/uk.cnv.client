@@ -39,7 +39,7 @@ public class KscstPlanYearHdFrame extends ContractUkJpaEntity implements Seriali
     
     /** The use atr. */
     @Column(name = "USE_ATR")
-    private boolean useAtr;
+    private short useAtr;
     
     /** The plan year hd name. */
     @Column(name = "PLAN_YEAR_HD_NAME")

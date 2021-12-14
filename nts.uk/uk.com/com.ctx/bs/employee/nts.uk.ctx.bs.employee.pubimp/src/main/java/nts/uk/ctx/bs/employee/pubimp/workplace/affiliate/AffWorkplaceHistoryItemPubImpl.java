@@ -25,7 +25,8 @@ public class AffWorkplaceHistoryItemPubImpl implements AffWorkplaceHistoryItemPu
             return new AffWorkplaceHistoryItemExport(
                 x.getHistoryId(),
                 x.getEmployeeId(),
-                x.getWorkplaceId());
+                x.getWorkplaceId(),
+                x.getNormalWorkplaceId());
         }).collect(Collectors.toList());
     }
 }

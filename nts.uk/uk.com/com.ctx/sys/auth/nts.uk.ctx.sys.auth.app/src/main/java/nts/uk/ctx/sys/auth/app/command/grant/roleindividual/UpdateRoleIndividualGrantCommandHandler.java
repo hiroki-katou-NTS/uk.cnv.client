@@ -11,12 +11,17 @@ public class UpdateRoleIndividualGrantCommandHandler {
 	private RoleIndividualGrantRepository roleIndividualGrantRepository;
 	
 	public String UpDateRoleGrant(UpdateRoleIndividualGrantCommand roleGrant){
+		String companyId = AppContexts.user().companyId();
+		if (companyId == null)
+			return null;
+		roleGrant.setCompanyID(companyId);
+		
 		if(roleGrant.userID == null)
 			return null;
 		
 		if(this.roleIndividualGrantRepository.findByUserCompanyRoleType(roleGrant.userID, roleGrant.companyID, roleGrant.roleType).isPresent()){
 			this.roleIndividualGrantRepository.update(roleGrant.toDomain());
-			return roleGrant.getCompanyID()+"_"+roleGrant.getUserID()+"_"+roleGrant.getRoleType();
+			return roleGrant.getUserID();
 		}else{
 			return null;
 		}

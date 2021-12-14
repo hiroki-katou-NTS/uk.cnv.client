@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nts.uk.ctx.at.shared.app.find.worktime.common.dto.WorkTimezoneCommonSetDto;
-import nts.uk.ctx.at.shared.app.find.worktime.flexset.dto.CoreTimeSettingDto;
-import nts.uk.ctx.at.shared.app.find.worktime.flexset.dto.FlexWorkSettingDto;
 
 @Getter
 @Setter
@@ -39,16 +37,11 @@ public class GetMoreInformationOutput {
 	/**
 	 * Optional<就業時間帯の設定>
 	 */
-	private WorkTimeSettingNameDto workTimeSettingName;
-	
-	/**
-	 * Optional<フレックス勤務設定.コアタイム時間帯>
-	 */
-	private CoreTimeSettingDto coreTimeFlexSetting;
+	private WorkTimeSettingNameDto workTimeSettingName; 
 
 	public GetMoreInformationOutput(WorkTimezoneCommonSetDto workTimezoneCommonSet, BreakTimeKdl045Dto breakTime,
 			Integer workTimeForm, Integer workStyle, WorkTypeSettingNameDto workTypeSettingName,
-			WorkTimeSettingNameDto workTimeSettingName,CoreTimeSettingDto coreTimeFlexSetting) {
+			WorkTimeSettingNameDto workTimeSettingName) {
 		super();
 		this.workTimezoneCommonSet = workTimezoneCommonSet;
 		this.breakTime = breakTime;
@@ -56,7 +49,6 @@ public class GetMoreInformationOutput {
 		this.workStyle = workStyle;
 		this.workTypeSettingName = workTypeSettingName;
 		this.workTimeSettingName = workTimeSettingName;
-		this.coreTimeFlexSetting = coreTimeFlexSetting;
 	}
 	
 	

@@ -79,14 +79,11 @@ public class JpaEditStateOfDailyPerformanceRepository extends JpaRepository
 
 	@Override
 	public void add(List<EditStateOfDailyPerformance> editStates) {
-		
-		
-		List<KrcdtDayEditState> entities = editStates.stream()
-		.map(c -> new KrcdtDayEditState(new KrcdtDailyRecEditSetPK(c.getEmployeeId(),
-				c.getYmd(), c.getEditState().getAttendanceItemId()), c.getEditState().getEditStateSetting().value))
-		.collect(Collectors.toList());
-		
-		this.commandProxy().insertAll(entities);
+		this.commandProxy().insertAll(
+						editStates.stream()
+								.map(c -> new KrcdtDayEditState(new KrcdtDailyRecEditSetPK(c.getEmployeeId(),
+										c.getYmd(), c.getEditState().getAttendanceItemId()), c.getEditState().getEditStateSetting().value))
+								.collect(Collectors.toList()));
 		
 	}
 

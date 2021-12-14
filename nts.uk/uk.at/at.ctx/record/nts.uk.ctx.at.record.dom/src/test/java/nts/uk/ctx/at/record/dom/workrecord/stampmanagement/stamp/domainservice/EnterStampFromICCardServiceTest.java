@@ -31,8 +31,6 @@ import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.pref
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.OvertimeDeclaration;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkLocationCD;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.work.WorkCode;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.work.WorkGroup;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
 
 /**
@@ -48,8 +46,6 @@ public class EnterStampFromICCardServiceTest {
 
 	@Injectable
 	private nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.EnterStampForSharedStampService.Require require1;
-	
-	public static WorkGroup group = new WorkGroup(new WorkCode("DUMMY"), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()); //dummy
 
 	@Test
 	public void getters() {
@@ -70,7 +66,7 @@ public class EnterStampFromICCardServiceTest {
 		RefectActualResult result = new RefectActualResult(new WorkInformationStamp(Optional.empty(), Optional.empty(),
 				Optional.of(new WorkLocationCD("workLocationCD")), 
 				Optional.of(new SupportCardNumber(9999))),
-				new WorkTimeCode("DUMMY"), declaration, group);
+				new WorkTimeCode("DUMMY"), declaration);
 		
 		new Expectations() {
 			{
@@ -92,7 +88,7 @@ public class EnterStampFromICCardServiceTest {
 		RefectActualResult result = new RefectActualResult(new WorkInformationStamp(Optional.empty(), Optional.empty(),
 				Optional.of(new WorkLocationCD("workLocationCD")), 
 				Optional.of(new SupportCardNumber(9999))),
-				new WorkTimeCode("DUMMY"), declaration, group);
+				new WorkTimeCode("DUMMY"), declaration);
 		AtomTask atomTask = AtomTask.of(() -> {});// dummy
 
 		TimeStampInputResult inputResult = new TimeStampInputResult(

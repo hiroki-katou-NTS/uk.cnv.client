@@ -38,8 +38,8 @@ public class DefaultRoleService implements RoleService{
 
 	@Override
 	public void insertRole(Role role) {
-		boolean duplicateRole = roleRepo.exists(AppContexts.user().companyId(), role.getRoleType(), role.getAssignAtr(), role.getRoleCode());
-		if(duplicateRole) throw new BusinessException("Msg_3");
+		Optional<Role> duplicateRole = roleRepo.findRoleByRoleCode(AppContexts.user().companyId(), role.getRoleCode().v(), role.getRoleType().value);
+		if(duplicateRole.isPresent()) throw new BusinessException("Msg_3");
 		if(role.canInsert()) {
 			roleRepo.insert(role);
 		}		

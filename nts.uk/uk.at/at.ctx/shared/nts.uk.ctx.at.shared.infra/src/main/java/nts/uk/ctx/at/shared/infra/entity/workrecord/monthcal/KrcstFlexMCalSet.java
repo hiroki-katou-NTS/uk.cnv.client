@@ -39,11 +39,11 @@ public abstract class KrcstFlexMCalSet extends ContractUkJpaEntity {
 
 	/** フレックス時間の扱い.残業時間をフレックス時間に含める */
 	@Column(name = "INCLUDE_OT")
-	private boolean includeOt;
+	private int includeOt;
 
 	/** フレックス時間の扱い.法定外休出時間をフレックス時間に含める */
 	@Column(name = "INCLUDE_HDWK")
-	private boolean includeHdwk;
+	private int includeHdwk;
 
 	/** 集計方法 */
 	@Column(name = "AGGR_METHOD")
@@ -70,8 +70,8 @@ public abstract class KrcstFlexMCalSet extends ContractUkJpaEntity {
 		aggrMethod =  domain.getAggrMethod().value;
 		insufficSet = domain.getInsufficSet().getCarryforwardSet().value;
 		legalAggrSet = domain.getLegalAggrSet().getAggregateSet().value;
-		includeOt = domain.getFlexTimeHandle().isIncludeOverTime();
-		includeHdwk = domain.getFlexTimeHandle().isIncludeIllegalHdwk();
+		includeOt = domain.getFlexTimeHandle().isIncludeOverTime() ? 1 : 0;
+		includeHdwk = domain.getFlexTimeHandle().isIncludeIllegalHdwk() ? 1 : 0;
 		
 		settlePeriod = domain.getInsufficSet().getSettlePeriod().value;
 		startMonth = domain.getInsufficSet().getStartMonth().v();
@@ -80,7 +80,7 @@ public abstract class KrcstFlexMCalSet extends ContractUkJpaEntity {
 	
 	public FlexTimeHandle flexTimeHandle() {
 		
-		return FlexTimeHandle.of(includeOt, includeHdwk);
+		return FlexTimeHandle.of(includeOt == 1, includeHdwk == 1);
 	}
 	
 	public FlexAggregateMethod flexAggregateMethod() {
