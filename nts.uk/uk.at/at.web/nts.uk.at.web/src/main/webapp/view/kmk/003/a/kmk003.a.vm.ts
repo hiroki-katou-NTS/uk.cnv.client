@@ -1232,12 +1232,12 @@ module nts.uk.at.view.kmk003.a {
                                 dto.timezone.end = morningEnd;
                                 morningTimes.push(dto);
                             }
-                            if (w.timezone.end() > afterStart) {
-                                let dto = w.toDto();
-                                dto.workTimezoneNo = afternoonNo++;
-                                dto.timezone.start = afterStart;
-                                afternoonTimes.push(dto);
-                            }
+                            // if (w.timezone.end() > afterStart) {
+                            //     let dto = w.toDto();
+                            //     dto.workTimezoneNo = afternoonNo++;
+                            //     dto.timezone.start = afterStart;
+                            //     afternoonTimes.push(dto);
+                            // }
                         }
                     })
 

@@ -18,7 +18,7 @@ public class OneMonthTimeCommand {
 	
 	public OneMonthTime toDomain() {
 		
-		return OneMonthTime.of(
+		return OneMonthTime.createWithCheck(
 				erAlTime.toDomain(),
 				new AgreementOneMonthTime(upperLimit));
 	}

@@ -101,17 +101,16 @@ public class AnnLeaEmpBasicInfoDomService{
 		// No268特別休暇の利用制御
 		AnnualPaidLeaveSetting annualPaidLeaveSet = annualPaidLeaveSettingRepository.findByCompanyId(AppContexts.user().companyId());
 
-		if (annualPaidLeaveSet.getTimeSetting().getTimeManageType() == ManageDistinct.NO
-				|| annualPaidLeaveSet.getTimeSetting().getMaxYearDayLeave().manageType == ManageDistinct.NO) {
+		if (annualPaidLeaveSet.getTimeSetting().getTimeManageType() == ManageDistinct.NO) {
 			return annLeaveRemainNumber.getDays() + "日";
-		}
+		}	
 
 		int remainingMinutes = annLeaveRemainNumber.getMinutes();
 
 		int remainingHours = remainingMinutes / 60;
 		remainingMinutes -= remainingHours * 60;
 
-		return annLeaveRemainNumber.getDays() + "日と　" + remainingHours + ":" + convertWithMinutes(remainingMinutes);
+		return annLeaveRemainNumber.getDays() + "日と" + remainingHours + ":" + convertWithMinutes(remainingMinutes);
 	}
 
 	public Map<String, String> calculateAnnLeaNumWithFormat(String cid, Map<String, List<AnnualLeaveGrantRemainingData>> annualLeaveGrantDataLst) {

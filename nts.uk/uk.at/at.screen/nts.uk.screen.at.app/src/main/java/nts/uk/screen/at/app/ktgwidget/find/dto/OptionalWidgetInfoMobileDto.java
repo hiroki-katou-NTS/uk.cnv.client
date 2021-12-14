@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nts.arc.time.GeneralDate;
+import nts.uk.screen.at.app.ktgwidget.ktg004.VacationSetting;
 
 @Getter
 @Setter
@@ -62,8 +63,11 @@ public class OptionalWidgetInfoMobileDto {
 	/** 16 Reserved Years Remain Number 積立年休残数 */
 	private RemainingNumber reservedYearsRemainNo;
 	
-	/** 18 Remain Alternation Number 代休残数 */
-	private Double remainAlternationNoDay;
+	/** 18 Remain Alternation Number 代休の残時間 */
+	private int remainAlternationNoDay;
+	
+	/** 18 Remain Alternation Number 代休の残日残数 */
+	private Double remainAlternationDay;
 	
 	/** 19 RemainsLeft 振休残数 */
 	private Double remainsLeft;
@@ -82,5 +86,8 @@ public class OptionalWidgetInfoMobileDto {
 	
 	/** ６０Ｈ超休残数 */
 	private TimeOT extraRest = new TimeOT(0, 0);
+	
+	/** 休暇設定 */
+	private VacationSetting vacationSetting;
 
 }

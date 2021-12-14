@@ -80,6 +80,7 @@ import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSettingRepository;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeCode;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeRepository;
+import nts.uk.shr.com.time.TimeWithDayAttr;
 
 @Stateless
 public class HolidayServiceImpl implements HolidayService {
@@ -161,7 +162,7 @@ public class HolidayServiceImpl implements HolidayService {
 		appHdWorkDispInfoOutput.setHdWorkDispInfoWithDateOutput(hdWorkDispInfoWithDateOutput);
 		
 		//01-03_休出時間枠を取得
-		List<WorkdayoffFrame> workdayoffFrameList = workdayoffFrameRepository.getAllWorkdayoffFrame(companyId);
+		List<WorkdayoffFrame> workdayoffFrameList = workdayoffFrameRepository.findByUseAtr(companyId, 1);
 		appHdWorkDispInfoOutput.setWorkdayoffFrameList(workdayoffFrameList);
 		
 		//	指定社員の申請残業枠を取得する 
@@ -244,6 +245,21 @@ public class HolidayServiceImpl implements HolidayService {
 				appHdWorkDispInfoOutput.getHolidayWorkAppSet(), appHdWorkDispInfoOutput.getHdWorkOvertimeReflect(), 
 				appDispInfoWithDateOutput.getOpActualContentDisplayLst().orElse(Collections.emptyList()));
 		appHdWorkDispInfoOutput.setHdWorkDispInfoWithDateOutput(hdWorkDispInfoWithDateOutput);
+		
+		// 休憩時間帯を取得する
+		List<ActualContentDisplay> opActualContentDisplayLst = appHdWorkDispInfoOutput.getAppDispInfoStartupOutput()
+				.getAppDispInfoWithDateOutput().getOpActualContentDisplayLst().orElse(Collections.emptyList());
+		Optional<AchievementDetail> achievementDetail = !opActualContentDisplayLst.isEmpty() ? 
+				opActualContentDisplayLst.get(0).getOpAchievementDetail() : Optional.empty();
+		BreakTimeZoneSetting breakTimeZoneSettingList = commonOverTimeAlgorithm.selectWorkTypeAndTime(
+				companyId, 
+				hdWorkDispInfoWithDateOutput.getInitWorkType().orElse(null), 
+				hdWorkDispInfoWithDateOutput.getInitWorkTime().orElse(null), 
+				hdWorkDispInfoWithDateOutput.getWorkHours()==null ? Optional.empty() : hdWorkDispInfoWithDateOutput.getWorkHours().getStartTimeOp1(), 
+				hdWorkDispInfoWithDateOutput.getWorkHours()==null ? Optional.empty() : hdWorkDispInfoWithDateOutput.getWorkHours().getEndTimeOp1(), 
+				achievementDetail);
+		// 勤務内容.休憩時間帯を再セットする
+		appHdWorkDispInfoOutput.getHdWorkDispInfoWithDateOutput().setBreakTimeZoneSettingList(Optional.ofNullable(breakTimeZoneSettingList));
 		
 		// 	計算（従業員）
 		WorkContent workContent = commonHolidayWorkAlgorithm.getWorkContent(hdWorkDispInfoWithDateOutput);
@@ -424,7 +440,7 @@ public class HolidayServiceImpl implements HolidayService {
 		hdWorkDispInfoWithDateOutput.setInitWorkTimeName(workTime.isPresent() ? Optional.of(workTime.get().getWorkTimeDisplayName().getWorkTimeName()) : Optional.empty());
 		
 		//	01-03_休出時間枠を取得
-		List<WorkdayoffFrame> workdayoffFrameList = workdayoffFrameRepository.getAllWorkdayoffFrame(companyId);
+		List<WorkdayoffFrame> workdayoffFrameList = workdayoffFrameRepository.findByUseAtr(companyId, 1);
 		appHdWorkDispInfoOutput.setWorkdayoffFrameList(workdayoffFrameList);
 		
 //		指定社員の申請残業枠を取得する 
@@ -556,7 +572,9 @@ public class HolidayServiceImpl implements HolidayService {
 				appHdWorkDispInfoOutput.getAppDispInfoStartupOutput(), 
 				new ArrayList<String>(), 
 				Optional.of(timeDigestionParam), 
-				false);
+				false, 
+				Optional.of(appHolidayWork.getWorkInformation().getWorkTypeCode().v()), 
+				appHolidayWork.getWorkInformation().getWorkTimeCodeNotNull().map(WorkTimeCode::v));
 		
 		//3.個別エラーチェック
 		checkBeforeOutput = commonHolidayWorkAlgorithm.individualErrorCheck(require, companyId, appHdWorkDispInfoOutput, appHolidayWork, 1);	//mode update = 1

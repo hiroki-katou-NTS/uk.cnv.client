@@ -2,8 +2,6 @@ import { _, Vue } from '@app/provider';
 import { component, Prop, Watch } from '@app/core/component';
 
 @component({
-    name: 'kdls35',
-    route: '/kdl/s35',
     style: require('./style.scss'),
     template: require('./index.vue'),
     resource: require('./resources.json'),

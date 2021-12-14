@@ -141,9 +141,7 @@ public class ActualLock extends AggregateRoot {
 		DatePeriod periodClosure = require.getClosurePeriod(this.closureId.value, closure.getClosureMonth().getProcessingYm());
 		GeneralDate startPeriodClosure = periodClosure.start().addDays(-1);
 		GeneralDate endPeriodClosure = periodClosure.end().addDays(1);
-		period.subtract(new DatePeriod(startPeriodClosure, endPeriodClosure));
-		listPeriod.add(period);
-		return listPeriod;
+		return period.subtract(new DatePeriod(startPeriodClosure, endPeriodClosure));
 	}
 
 	public static interface Require {

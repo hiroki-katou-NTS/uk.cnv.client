@@ -4,6 +4,10 @@ import java.util.Optional;
 
 import lombok.Getter;
 import lombok.Setter;
+import nts.arc.time.GeneralDate;
+import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.TimeAnnualLeaveTimeDay;
+import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.processten.AbsenceTenProcess;
+import nts.uk.ctx.at.shared.dom.workingcondition.WorkingConditionItem;
 
 /**
  * 休暇付与数
@@ -74,5 +78,13 @@ public class LeaveGrantNumber {
 	public boolean isZero() {
 		return this.days.v().equals(0.0) && this.getMinutesOrZero().equals(0);
 	}
+	
+	public LeaveRemainingNumber calcDiff(String companyId, String employeeId, GeneralDate baseDate,
+			LeaveRemainingNumber remain, LeaveRemainingNumber.RequireM3 require) {
+		LeaveRemainingNumber differencer = new LeaveRemainingNumber(this.getDays().v(), this.getMinutesOrZero().v());
+		differencer.digestLeaveUsedNumber(require, remain, companyId, employeeId, baseDate).clone();
+		return differencer;
+	}
+
 
 }

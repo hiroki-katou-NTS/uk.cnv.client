@@ -20,4 +20,12 @@ public enum WTCalSettingAtr {
 	public final int value;
 
 	public final String nameId;
+	
+	/**
+	 * 自動計算するか
+	 * return 自動計算する
+	 */
+	public boolean isCalculation() {
+		return this.equals(CALCULATION);
+	}
 }

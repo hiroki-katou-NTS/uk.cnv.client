@@ -5,6 +5,7 @@
 package nts.uk.ctx.at.shared.dom.adapter.employee;
 
 import java.util.List;
+import java.util.Map;
 
 import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
@@ -24,15 +25,15 @@ public interface EmpEmployeeAdapter {
 	// for RequestList #1-2
 	EmployeeImport findByEmpId(String empId);
 	EmployeeImport findByEmpIdRequire(CacheCarrier cacheCarrier, String empId);
-	
+
 	List<EmployeeImport> findByEmpId(List<String> empIds);
-	
+
 	// RequestList335
 	List<String> getListEmpByWkpAndEmpt(List<String> wkps , List<String> lstempts , DatePeriod dateperiod);
-	
+
 	// RequestList61
 	List<PersonEmpBasicInfoImport> getPerEmpBasicInfo(List<String> employeeIds);
-	
+
 	/**
 	 * 社員ID（List）と指定期間から所属会社履歴項目を取得
 	 * @param sids
@@ -40,7 +41,7 @@ public interface EmpEmployeeAdapter {
 	 * @return
 	 */
 	List<AffCompanyHistSharedImport> getAffCompanyHistByEmployee(CacheCarrier cacheCarrier, List<String> sids, DatePeriod datePeriod);
-	
+
 	EmployeeRecordImport findByAllInforEmpId(CacheCarrier cacheCarrier, String empId);
 	/**
 	 * 社員ID(List)と期間から分類の全ての情報を取得する
@@ -51,11 +52,11 @@ public interface EmpEmployeeAdapter {
 	 */
 	List<SClsHistImport> lstClassByEmployeeId(CacheCarrier cacheCarrier,String companyId, List<String> employeeIds,
 			DatePeriod datePeriod);
-	
+
 	AffCompanyHistSharedImport GetAffComHisBySidAndBaseDate(String sid, GeneralDate baseDate);
-	
+
 	AffCompanyHistSharedImport GetAffComHisBySid(String cid, String sid);
-	
+
 	/**
 	 * đối ứng cho cps003
 	 * @param cid
@@ -75,5 +76,13 @@ public interface EmpEmployeeAdapter {
 	 * @return
 	 */
 	List<EmployeeBasicInfoImport> getEmpInfoLstBySids(List<String> sids, DatePeriod period, boolean isDelete, boolean isGetAffCompany);
+
+	/**
+	 * 社員コードから社員IDを取得する
+	 * @param companyId 会社ID
+	 * @param employeeCodes 社員コード(List)
+	 * @return Map<社員コード, 社員ID>
+	 */
+	Map<String, String> getEmployeeIDListByCode(String companyId, List<String> employeeCodes);
 
 }

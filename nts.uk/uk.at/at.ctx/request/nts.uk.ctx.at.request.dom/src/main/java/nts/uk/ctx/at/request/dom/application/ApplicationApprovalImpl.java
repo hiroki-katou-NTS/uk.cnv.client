@@ -17,7 +17,6 @@ import nts.uk.ctx.at.request.dom.application.common.adapter.workflow.ApprovalRoo
 import nts.uk.ctx.at.request.dom.application.common.adapter.workflow.dto.ApprovalPhaseStateImport_New;
 import nts.uk.ctx.at.request.dom.application.gobackdirectly.GoBackDirectlyRepository;
 import nts.uk.ctx.at.request.dom.application.holidayshipment.absenceleaveapp.AbsenceLeaveAppRepository;
-import nts.uk.ctx.at.request.dom.application.holidayshipment.compltleavesimmng.AppHdsubRec;
 import nts.uk.ctx.at.request.dom.application.holidayshipment.compltleavesimmng.AppHdsubRecRepository;
 import nts.uk.ctx.at.request.dom.application.holidayshipment.recruitmentapp.RecruitmentAppRepository;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.AppHolidayWorkRepository;
@@ -90,14 +89,13 @@ public class ApplicationApprovalImpl implements ApplicationApprovalService {
 	private TimeLeaveApplicationRepository timeLeaveAppRepo;
 
 	@Override
-	public void delete(String appID) {
+	public void delete(String appID, ApplicationType appType, Optional<StampRequestMode> stampRequestMode, Optional<HdsubRecLinkData> hdSubRecLink) {
 		String companyID = AppContexts.user().companyId();
 		String linkAppID = "";
-		Application application = applicationRepository.findByID(appID).get();
-		switch (application.getAppType()) {
+		switch (appType) {
 		case STAMP_APPLICATION:
-			if (application.getOpStampRequestMode().isPresent()) {
-				if (application.getOpStampRequestMode().get() == StampRequestMode.STAMP_ADDITIONAL) {
+			if (stampRequestMode.isPresent()) {
+				if (stampRequestMode.get() == StampRequestMode.STAMP_ADDITIONAL) {
 					appStampRepository.delete(companyID, appID);
 				} else {
 					appRecordImageRepository.delete(companyID, appID);
@@ -120,17 +118,27 @@ public class ApplicationApprovalImpl implements ApplicationApprovalService {
 			appHolidayWorkRepository.delete(companyID, appID);
 			break;
 		case COMPLEMENT_LEAVE_APPLICATION:
-			Optional<AppHdsubRec> appHdsubRec = appHdsubRecRepository.findByAppId(appID);
-			if(appHdsubRec.isPresent()) {
-				linkAppID = Arrays.asList(appHdsubRec.get().getRecAppID(), appHdsubRec.get().getAbsenceLeaveAppID())
-						.stream().filter(x -> !x.equals(appID)).findAny().orElse(null);
-				absRepo.remove(appHdsubRec.get().getAbsenceLeaveAppID());
-				recRepo.remove(appHdsubRec.get().getRecAppID());
-				appHdsubRecRepository.remove(appHdsubRec.get().getAbsenceLeaveAppID(), appHdsubRec.get().getRecAppID());
-			}else {
-				absRepo.remove(appID);
-				recRepo.remove(appID);
-			}
+//			Optional<AppHdsubRec> appHdsubRec = appHdsubRecRepository.findByAppId(appID);
+//			if(appHdsubRec.isPresent()) {
+//				linkAppID = Arrays.asList(appHdsubRec.get().getRecAppID(), appHdsubRec.get().getAbsenceLeaveAppID())
+//						.stream().filter(x -> !x.equals(appID)).findAny().orElse(null);
+//				absRepo.remove(appHdsubRec.get().getAbsenceLeaveAppID());
+//				recRepo.remove(appHdsubRec.get().getRecAppID());
+//				appHdsubRecRepository.remove(appHdsubRec.get().getAbsenceLeaveAppID(), appHdsubRec.get().getRecAppID());
+//			}else {
+//				absRepo.remove(appID);
+//				recRepo.remove(appID);
+//			}
+		    if (hdSubRecLink.isPresent()) {
+		        linkAppID = Arrays.asList(hdSubRecLink.get().absId, hdSubRecLink.get().recId)
+                      .stream().filter(x -> !x.equals(appID)).findAny().orElse(null);
+		        absRepo.remove(hdSubRecLink.get().absId);
+		        recRepo.remove(hdSubRecLink.get().recId);
+		        appHdsubRecRepository.remove(hdSubRecLink.get().absId, hdSubRecLink.get().recId);
+		    } else {
+		        absRepo.remove(appID);
+		        recRepo.remove(appID);
+		    }
 			break;
 		case ABSENCE_APPLICATION:
 			appAbsenceRepository.delete(companyID, appID);

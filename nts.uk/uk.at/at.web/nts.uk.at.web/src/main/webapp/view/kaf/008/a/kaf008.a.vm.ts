@@ -267,7 +267,7 @@ module nts.uk.at.view.kaf008_ref.a.viewmodel {
 
             if (err && err.messageId) {
                 // 年月日＋#Msg_ID
-                if ( _.includes(["Msg_23","Msg_24","Msg_1912","Msg_1913","Msg_457","Msg_1685"], err.messageId)) {
+                if ( _.includes(["Msg_23","Msg_24","Msg_1913","Msg_457","Msg_1685"], err.messageId)) {
                     err.message = err.parameterIds[0] + err.message;
                 }
 
@@ -289,7 +289,6 @@ module nts.uk.at.view.kaf008_ref.a.viewmodel {
                         break;
                     }
                     case "Msg_1685":
-                    case "Msg_1912":
                     case "Msg_1913": {
                         let id = '#' + err.parameterIds[0].replace(/\//g, "") + '-tmCode';
                         vm.$errors({

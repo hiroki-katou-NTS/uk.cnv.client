@@ -238,7 +238,7 @@ module nts.uk.at.view.ksu003.a.model {
 	export function calcAllTime(schedule: any, lstTime: any, timeRangeLimit: any, dispStart: any, dispStartHours: any) {
 		// Tính tổng thời gian làm việc
 		timeRangeLimit = timeRangeLimit;
-		let targetInfor = nts.uk.ui.windows.getShared("targetInforKsu003"); // thay tạm cho __viewContext.viewModel.viewmodelA.dataScreen003A().targetInfor
+		let targetInfor = nts.uk.ui.windows.getShared("targetInforKsu003"); // thay tạm cho __viewContext.viewModel.viewmodelA.dataScreen003A().targetInfor sau khi merge 5_3 thì xóa đi
 		let totalTimeAll = 0, totalTimeWork = 0,
 			start1 = (schedule.workScheduleDto != null && schedule.workScheduleDto.startTime1 != null && schedule.workScheduleDto.startTime1 != 0) ? (model.checkTimeChart(schedule.workScheduleDto.startTime1, timeRangeLimit * 5 + dispStart * 5, dispStartHours)) : 0,
 			end1 = (schedule.workScheduleDto != null && schedule.workScheduleDto.endTime1 != null && schedule.workScheduleDto.endTime1 != 0) ? (model.checkTimeChart(schedule.workScheduleDto.endTime1, timeRangeLimit * 5 + dispStart * 5, dispStartHours)) : 0,
@@ -400,8 +400,8 @@ module nts.uk.at.view.ksu003.a.model {
 						workTimeCd: employeeInfo[cells[0].rowIndex].workScheduleDto.workTimeCode,
 						startTime: employeeInfo[cells[0].rowIndex].workScheduleDto.startTime1,
 						endTime: employeeInfo[cells[0].rowIndex].workScheduleDto.endTime1,
-						startTime2: employeeInfo[cells[0].rowIndex].workScheduleDto.startTime2,
-						endTime2: employeeInfo[cells[0].rowIndex].workScheduleDto.endTime2,
+						startTime2: employeeInfo[cells[0].rowIndex].workScheduleDto.startTime2 == 0 ? null : employeeInfo[cells[0].rowIndex].workScheduleDto.startTime2 ,
+						endTime2: employeeInfo[cells[0].rowIndex].workScheduleDto.endTime2 == 0 ? null : employeeInfo[cells[0].rowIndex].workScheduleDto.endTime2,
 						listBreakTime: employeeInfo[cells[0].rowIndex].workScheduleDto.listBreakTimeZoneDto,
 						directAtr: employeeInfo[cells[0].rowIndex].workInfoDto.directAtr,
 						bounceAtr: employeeInfo[cells[0].rowIndex].workInfoDto.bounceAtr,
@@ -432,8 +432,8 @@ module nts.uk.at.view.ksu003.a.model {
 					workTimeCd: employeeInfo[index045].workScheduleDto.workTimeCode,
 					startTime: employeeInfo[index045].workScheduleDto.startTime1,
 					endTime: employeeInfo[index045].workScheduleDto.endTime1,
-					startTime2: employeeInfo[index045].workScheduleDto.startTime2,
-					endTime2: employeeInfo[index045].workScheduleDto.endTime2,
+					startTime2: employeeInfo[index045].workScheduleDto.startTime2 == 0 ? null : employeeInfo[index045].workScheduleDto.startTime2 ,
+					endTime2: employeeInfo[index045].workScheduleDto.endTime2 == 0 ? null : employeeInfo[index045].workScheduleDto.endTime2,
 					listBreakTime: employeeInfo[index045].workScheduleDto.listBreakTimeZoneDto,
 					directAtr: employeeInfo[index045].workInfoDto.directAtr,
 					bounceAtr: employeeInfo[index045].workInfoDto.bounceAtr,

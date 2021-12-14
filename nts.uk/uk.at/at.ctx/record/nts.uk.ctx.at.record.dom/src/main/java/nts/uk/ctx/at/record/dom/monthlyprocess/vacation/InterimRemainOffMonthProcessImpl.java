@@ -12,9 +12,9 @@ import lombok.val;
 import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.record.dom.require.RecordDomRequireService;
 import nts.uk.ctx.at.shared.dom.dailyattdcal.dailyattendance.IntegrationOfDailyGetter;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.DailyInterimRemainMngData;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.require.RemainNumberTempRequireService;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.require.RemainNumberTempRequireService.Require;
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.interim.TempAnnualLeaveMngs;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.IntegrationOfMonthly;
@@ -35,11 +35,11 @@ public class InterimRemainOffMonthProcessImpl implements InterimRemainOffMonthPr
 	@Inject
 	private CompensLeaveComSetRepository compensLeaveComSetRepo;
 	@Inject
-	private RemainNumberTempRequireService requireService;
-	@Inject
 	private IntegrationOfDailyGetter integrationOfDailyGetter;
 	@Inject
 	private IntegrationOfMonthlyGetter integrationOfMonthlyGetter;
+	@Inject
+	private RecordDomRequireService requireService;
 
 	@Override
 	public FixedRemainDataForMonthlyAgg monthInterimRemainData(CacheCarrier cacheCarrier, String cid, String sid,

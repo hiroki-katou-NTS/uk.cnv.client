@@ -28,7 +28,7 @@ public class ReflectionProcess {
 	// 反映処理
 	public static Pair<Optional<OneDayReflectStatusOutput>, Optional<AtomTask>> process(Require require,
 			String companyId, Application application, boolean isCalWhenLock,
-			GeneralDate targetDate, SEmpHistImport empHist) {
+			GeneralDate targetDate, List<SEmpHistImport> empHist) {
 
 		// 対象日の反映状態を<output>1日の反映状態にセット
 		ReflectionStatusOfDay reflectionStatusOfDay = application.getReflectionStatus().getListReflectionStatusOfDay()
@@ -40,7 +40,8 @@ public class ReflectionProcess {
 		result.setReflectStatusAll(reflectionStatusOfDay.getScheReflectStatus(), reflectionStatusOfDay.getActualReflectStatus());
 
 		// 締めIDを取得する
-		Optional<ClosureEmployment> closureEmpOpt = require.findByEmploymentCD(companyId, empHist.getEmploymentCode());
+		Optional<String> empCode = empHist.stream().filter(x -> x.getPeriod().contains(targetDate)).map(x -> x.getEmploymentCode()).findFirst();
+		Optional<ClosureEmployment> closureEmpOpt = !empCode.isPresent() ? Optional.empty() : require.findByEmploymentCD(companyId, empCode.get());
 
 		if (!closureEmpOpt.isPresent())
 			return Pair.of(Optional.empty(), Optional.empty());
@@ -48,14 +49,14 @@ public class ReflectionProcess {
 		// 勤務予定への反映処理-- in processing
 		Pair<ReflectStatusResult, Optional<AtomTask>> reflectSchedule = ProcessReflectWorkSchedule.processReflect(
 				require, companyId, closureEmpOpt.get().getClosureId(), application, isCalWhenLock,
-				targetDate, result.getStatusWorkSchedule());
+				targetDate, result.getStatusWorkSchedule(), empHist);
 		result.setStatusWorkSchedule(reflectSchedule.getLeft());
 		reflectSchedule.getRight().ifPresent(x -> tasks.add(x));
 
 		// 勤務実績への反映処理-- in processing
 		Pair<ReflectStatusResult, Optional<AtomTask>> resultRecord = ProcessReflectWorkRecord.processReflect(require,
 				companyId, closureEmpOpt.get().getClosureId(), application, isCalWhenLock, targetDate,
-				result.getStatusWorkRecord());
+				result.getStatusWorkRecord(), empHist);
 		result.setStatusWorkRecord(resultRecord.getLeft());
 		resultRecord.getRight().ifPresent(x -> tasks.add(x));
 

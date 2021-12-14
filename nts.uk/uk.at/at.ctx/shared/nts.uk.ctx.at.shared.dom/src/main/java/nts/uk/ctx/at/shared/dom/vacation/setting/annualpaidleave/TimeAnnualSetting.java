@@ -14,6 +14,7 @@ import nts.uk.ctx.at.shared.dom.common.timerounding.Rounding;
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.TimeAnnualRoundProcesCla;
 import nts.uk.ctx.at.shared.dom.vacation.setting.TimeDigestiveUnit;
+import nts.uk.ctx.at.shared.dom.yearholidaygrant.LimitedTimeHdDays;
 
 /**
  * 　時間年休管理設定
@@ -80,5 +81,13 @@ public class TimeAnnualSetting extends DomainObject implements Serializable {
         	  memento.setRoundProcessClassific(this.roundProcessClassific);	
         }
         memento.setTimeAnnualLeaveTimeDay(this.timeAnnualLeaveTimeDay);
+    }
+    /**
+     * [6] 時間年休上限日数を取得
+     * @param fromGrantTableDays
+     * @return
+     */
+    public Optional<LimitedTimeHdDays> getLimitedTimeHdDays(Optional<LimitedTimeHdDays> fromGrantTableDays){
+    	return this.maxYearDayLeave.getLimitedTimeHdDays(fromGrantTableDays);
     }
 }

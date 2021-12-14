@@ -10,7 +10,10 @@ import lombok.Value;
 
 @Value
 public class ReserveLeaveDto {
-
+	
+	/**
+	 * 積休管理する
+	 */
 	private boolean manageRemainNumber;
 	
 	private Double remainNumber; 

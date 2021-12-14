@@ -167,4 +167,8 @@ public interface InterimBreakDayOffMngRepository {
 	List<InterimBreakMng> getBreakBySidDateList(String sid, List<GeneralDate> lstDate);
 	
 	List<InterimDayOffMng> getDayOffDateList(String sid, List<GeneralDate> lstDate);
+	
+	Optional<InterimDayOffMng> getDayOffByDate(String sid, GeneralDate date);
+	
+	List<InterimDayOffMng> getDayOffByIds(List<String> remainManaIds);
 }

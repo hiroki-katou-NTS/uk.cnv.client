@@ -4,10 +4,16 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.dom.worktime.common;
 
+import java.util.Optional;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.DayoffChangeAtr;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.InterimRemainOffDateCreateData.RequireM4;
+import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CheckDateForManageCmpLeaveService;
 import nts.uk.ctx.at.shared.dom.worktime.service.WorkTimeDomainObject;
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.ScreenMode;
 
@@ -185,10 +191,12 @@ public class SubHolTransferSet extends WorkTimeDomainObject implements Cloneable
 	
 	//代休振替可能時間を取得
 	public AttendanceTime getTransferTime(AttendanceTime transferTime) {
+		if (transferTime.v().intValue() == 0)
+			return new AttendanceTime(0);
 		if (this.subHolTransferSetAtr == SubHolTransferSetAtr.SPECIFIED_TIME_SUB_HOL) {
-			if(this.designatedTime.getOneDayTime().v() != 0 && transferTime.v() >= this.designatedTime.getOneDayTime().v()) {
+			if(this.designatedTime.getOneDayTime().v().intValue() != 0 && transferTime.v().intValue() >= this.designatedTime.getOneDayTime().v().intValue()) {
 				return new AttendanceTime(this.designatedTime.getOneDayTime().v());
-			}else if(this.designatedTime.getHalfDayTime().v() != 0 && transferTime.v() >= this.designatedTime.getHalfDayTime().v()) {
+			}else if(this.designatedTime.getHalfDayTime().v().intValue() != 0 && transferTime.v().intValue() >= this.designatedTime.getHalfDayTime().v().intValue()) {
 				return new AttendanceTime(this.designatedTime.getHalfDayTime().v());
 			}else {
 				return new AttendanceTime(0);
@@ -196,5 +204,42 @@ public class SubHolTransferSet extends WorkTimeDomainObject implements Cloneable
 		} else {
 			return new AttendanceTime(transferTime.v() - certainTime.v());
 		}
+	}
+	
+	// 代休振替可能日数を取得
+	public Optional<Double> getTransferDays(AttendanceTime transferTime){
+		if (transferTime.v().intValue() == 0)
+			return Optional.empty();
+		
+		if (this.subHolTransferSetAtr == SubHolTransferSetAtr.CERTAIN_TIME_EXC_SUB_HOL) {
+			return Optional.empty();
+		}
+		AttendanceTime time = this.getTransferTime(transferTime);
+		if(this.getDesignatedTime().getOneDayTime().v().intValue() == time.v().intValue())
+			return Optional.of(1.0);
+		if(this.getDesignatedTime().getHalfDayTime().v().intValue() == time.v().intValue())
+			return Optional.of(0.5);
+		return Optional.empty();
+	}
+	
+	public Optional<TranferDayTime> calDayoffTranferTime(
+			RequireM4 require, String cid, String sid, GeneralDate date, String workTimeCode, Integer workTime, DayoffChangeAtr dayoffChange) {
+		
+		if(!CheckDateForManageCmpLeaveService.check(require, cid, sid, date)){
+			return Optional.empty();
+		}
+		return Optional.of(processDesignationTime(workTime));
+	}
+	
+	/**
+	 * 指定時間の振替処理を行う
+	 * @param transferSetting
+	 * @param timeSetting 振替可能時間
+	 * @param createAtr
+	 * @return
+	 */
+	private TranferDayTime processDesignationTime(Integer workTime) {
+		return new TranferDayTime(getTransferTime(new AttendanceTime(workTime)).v(),
+				getTransferDays(new AttendanceTime(workTime)));
 	}
 }

@@ -1,26 +1,30 @@
 package nts.uk.ctx.at.request.infra.repository.application.businesstrip;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
+
 import com.aspose.cells.Cell;
 import com.aspose.cells.Cells;
 import com.aspose.cells.Worksheet;
+
 import nts.arc.i18n.I18NText;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.DayOfWeek;
 import nts.uk.ctx.at.request.dom.application.businesstrip.BusinessTripInfo;
 import nts.uk.ctx.at.request.dom.application.businesstrip.BusinessTripPrintContent;
+import nts.uk.ctx.at.request.dom.application.businesstrip.BusinessTripWorkHour;
 import nts.uk.ctx.at.request.dom.application.common.service.print.PrintContentOfApp;
-import nts.uk.ctx.at.shared.dom.common.TimeZoneWithWorkNo;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeRepository;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.time.TimeWithDayAttr;
-import org.apache.logging.log4j.util.Strings;
-
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Stateless
 public class AposeBusinessTrip {
@@ -115,13 +119,21 @@ public class AposeBusinessTrip {
                     currentWkTypeNameRow.setValue(wkTypeName);
                 }
             }
-            if (eachinfo.getWorkingHours().isPresent()) {
-                Optional<TimeZoneWithWorkNo> workNo1 = eachinfo.getWorkingHours().get().stream().filter(i -> i.getWorkNo().v().equals(1)).findFirst();
-                if (workNo1.isPresent()
-                        && workNo1.get().getTimeZone() != null
-                        && workNo1.get().getTimeZone().getStartTime() != null
-                        && workNo1.get().getTimeZone().getEndTime() != null) {
-                    currentTimeRow.setValue(workNo1.get().getTimeZone().getStartTime().getFullText() + I18NText.getText("KAF008_69") + workNo1.get().getTimeZone().getEndTime().getFullText());
+            if (!eachinfo.getWorkingHours().isEmpty()) {
+                String start = "";
+                String end = "";
+                Optional<BusinessTripWorkHour> workNo1 = eachinfo.getWorkingHours().stream().filter(i -> i.getWorkNo().v().equals(1)).findFirst();
+                if (workNo1.isPresent()) {
+                    start = workNo1.get().getStartDate().isPresent() ? workNo1.get().getStartDate().get().getFullText() : "";
+                    end = workNo1.get().getEndDate().isPresent() ? workNo1.get().getEndDate().get().getFullText() : "";
+                    if (!StringUtils.isEmpty(start) || !StringUtils.isEmpty(end)) {
+                        if (StringUtils.isEmpty(start)) start = "　　　　";
+                        if (StringUtils.isEmpty(end)) end = "　　　　";
+                        currentTimeRow.setValue(
+                                start + 
+                                I18NText.getText("KAF008_69") + 
+                                end);
+                    }
                 }
             }
             startRow++;

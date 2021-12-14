@@ -5,9 +5,11 @@
 package nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import lombok.Getter;
 import nts.arc.layer.dom.DomainObject;
+import nts.uk.ctx.at.shared.dom.yearholidaygrant.LimitedHalfHdCnt;
 
 /**
  * The Class YearVacationManageSetting.
@@ -78,4 +80,13 @@ public class ManageAnnualSetting extends DomainObject implements Serializable{
         memento.setYearLyOfDays(this.yearlyOfNumberDays);}
         
     }
+    /**
+     * [3] 半日年休上限回数を取得
+     * @param fromGrantTableCount
+     * @return
+     */
+	 public Optional<LimitedHalfHdCnt> getLimitedHalfCount(Optional<LimitedHalfHdCnt> fromGrantTableCount){
+		 return this.getHalfDayManage().getLimitedHalfCount(fromGrantTableCount);
+	 }
+	 
 }

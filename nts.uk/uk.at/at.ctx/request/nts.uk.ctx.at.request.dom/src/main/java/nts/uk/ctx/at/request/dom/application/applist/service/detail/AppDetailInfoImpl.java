@@ -6,6 +6,8 @@ import java.util.Optional;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import org.apache.logging.log4j.util.Strings;
+
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSetting;
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSettingRepository;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
@@ -51,6 +53,9 @@ public class AppDetailInfoImpl implements AppDetailInfoRepository {
 	 */
 	@Override
 	public String findWorkTypeName(List<WorkType> lstWkType, String wkTypeCd) {
+		if(wkTypeCd==null) {
+			return Strings.EMPTY;
+		}
 		if (lstWkType.isEmpty()) {
 			Optional<WorkType> wt = repoWorkType.findByPK(AppContexts.user().companyId(), wkTypeCd);
 			return wt.isPresent() ? wt.get().getName().v() : "マスタ未登録";
@@ -72,6 +77,9 @@ public class AppDetailInfoImpl implements AppDetailInfoRepository {
 	 */
 	@Override
 	public String findWorkTimeName(List<WorkTimeSetting> lstWkTime, String wkTimeCd) {
+		if(wkTimeCd==null) {
+			return Strings.EMPTY;
+		}
 		if (lstWkTime.isEmpty()) {
 			Optional<WorkTimeSetting> workTime = repoworkTime.findByCode(AppContexts.user().companyId(), wkTimeCd);
 			return workTime.isPresent() ? workTime.get().getWorkTimeDisplayName().getWorkTimeName().v() : "マスタ未登録";

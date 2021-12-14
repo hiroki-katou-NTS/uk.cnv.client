@@ -25,9 +25,6 @@ public class RegisterCommandHandler extends CommandHandlerWithResult<RegisterCom
 		RegisterCommand param = context.getCommand();
 		Application application = param.appOverTime.application.toDomain();
 		AppOverTime appOverTime = param.appOverTime.toDomain();
-		if (appOverTime.getDetailOverTimeOp().isPresent()) {
-			appOverTime.getDetailOverTimeOp().get().setAppId(application.getAppID());
-		}
 		appOverTime.setApplication(application);
 		
 		return overTimeRegisterService.register(

@@ -177,11 +177,9 @@ public class JpaEmploymentMonthDaySettingRepository extends JpaRepository implem
 		for(Year year:years){
 			List<KshmtHdpubMonthdaysEmp> result = this.findBy(companyId, empCd, year, null);
 			
-			// Check continue
-			if (result.isEmpty()) {
-				continue;
+			if (!result.isEmpty()) {
+				domain.add(new EmploymentMonthDaySetting(new JpaEmploymentMonthDaySettingGetMemento(result)));
 			}
-			domain.add(new EmploymentMonthDaySetting(new JpaEmploymentMonthDaySettingGetMemento(result)));
 		}
 		return domain;
 	}

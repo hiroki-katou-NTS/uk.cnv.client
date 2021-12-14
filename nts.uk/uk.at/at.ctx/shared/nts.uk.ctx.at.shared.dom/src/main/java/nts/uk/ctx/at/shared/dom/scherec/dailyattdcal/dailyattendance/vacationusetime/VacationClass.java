@@ -228,7 +228,7 @@ public class VacationClass {
 				);
 			}
         } else {
-            if (!siftCode.isPresent()) {
+            if (siftCode.isPresent()) {
                 return predetermineTimeSet.isPresent() ? predetermineTimeSet.get().getAdditionSet().getAddTime()
 						: new BreakDownTimeDay(new AttendanceTime(0), new AttendanceTime(0), new AttendanceTime(0));
             } else {

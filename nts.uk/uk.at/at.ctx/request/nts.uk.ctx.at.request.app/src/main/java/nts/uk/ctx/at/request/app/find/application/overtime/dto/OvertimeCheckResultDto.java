@@ -10,5 +10,4 @@ public class OvertimeCheckResultDto {
 	private int AttendanceId;
 	private int FrameNo;
 	private boolean isConfirm;
-	private AppOvertimeDetailDto appOvertimeDetail;
 }

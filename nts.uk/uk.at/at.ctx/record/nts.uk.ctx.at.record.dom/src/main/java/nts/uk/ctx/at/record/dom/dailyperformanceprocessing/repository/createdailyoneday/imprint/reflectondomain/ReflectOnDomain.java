@@ -45,7 +45,7 @@ public class ReflectOnDomain {
 		}
 		workStamp.setLocationCode(workLocationCD);
 		//「打刻．反映済み区分」をtrueにする
-		stamp.setReflectedCategory(true);
+		stamp.getImprintReflectionStatus().markAsReflected(ymd);
 		return workStamp;
 		
 	}

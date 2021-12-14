@@ -22,7 +22,6 @@ import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.request.dom.adapter.monthly.vacation.childcarenurse.ChildCareNursePeriodImport;
-import nts.uk.ctx.at.request.dom.adapter.monthly.vacation.childcarenurse.TempChildCareNurseManagementImport;
 import nts.uk.ctx.at.request.dom.adapter.monthly.vacation.childcarenurse.care.GetRemainingNumberCareAdapter;
 import nts.uk.ctx.at.request.dom.adapter.monthly.vacation.childcarenurse.care.GetRemainingNumberChildCareAdapter;
 import nts.uk.ctx.at.request.dom.adapter.monthly.vacation.childcarenurse.care.GetRemainingNumberNursingAdapter;
@@ -31,7 +30,6 @@ import nts.uk.ctx.at.request.dom.adapter.record.remainingnumber.holidayover60h.A
 import nts.uk.ctx.at.request.dom.adapter.record.remainingnumber.holidayover60h.GetHolidayOver60hRemNumWithinPeriodAdapter;
 import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.ApplicationApprovalService;
-import nts.uk.ctx.at.request.dom.application.ApplicationDate;
 import nts.uk.ctx.at.request.dom.application.ApplicationRepository;
 import nts.uk.ctx.at.request.dom.application.EmploymentRootAtr;
 import nts.uk.ctx.at.request.dom.application.ReflectedState;
@@ -101,12 +99,8 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.interim.InterimAbsMng;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.interim.InterimRecAbasMngRepository;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.interim.InterimRecMng;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.AppRemainCreateInfor;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.ApplicationType;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.InterimRemainDataMngRegisterDateChange;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.PrePostAtr;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.TimeDigestionParam;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.TimeDigestionUsageInfor;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.require.RemainNumberTempRequireService;
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.export.InterimRemainMngMode;
 import nts.uk.ctx.at.shared.dom.remainingnumber.base.TargetSelectionAtr;
@@ -128,7 +122,6 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveComDayOffManaRepo
 import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveComDayOffManagement;
 import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveManaDataRepository;
 import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveManagementData;
-import nts.uk.ctx.at.shared.dom.remainingnumber.work.VacationTimeInforNew;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.BasicScheduleService;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.SetupType;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.WorkStyle;
@@ -384,6 +377,12 @@ public class AbsenceServiceProcessImpl implements AbsenceServiceProcess {
     
     @Inject
     private AnnualHolidayManagementAdapter annualHolidayManagementAdapter;
+    
+    @Inject
+	private LeaveComDayOffManaRepository leaveComDayOffManaRepository;
+	
+	@Inject
+	private PayoutSubofHDManaRepository payoutSubofHDManaRepository;
 
 	private final String FORMAT_DATE = "yyyy/MM/dd";
 
@@ -1066,7 +1065,7 @@ public class AbsenceServiceProcessImpl implements AbsenceServiceProcess {
 		            appAbsenceStartInfoOutput.getAppDispInfoStartupOutput().getAppDispInfoNoDateOutput().getEmployeeInfoLst().get(0).getSid(),
 		            appDates.isEmpty() ? Optional.empty() : Optional.of(GeneralDate.fromString(appDates.get(0), FORMAT_DATE)),
 		            workTypeCD,
-		            appAbsenceStartInfoOutput.getSelectedWorkTimeCD(),
+		            appAbsenceStartInfoOutput.isWorkTimeChange() ? appAbsenceStartInfoOutput.getSelectedWorkTimeCD() : Optional.empty(),
 		            Optional.empty(),
 		            Optional.empty(),
 		            Optional.empty());
@@ -2018,6 +2017,7 @@ public class AbsenceServiceProcessImpl implements AbsenceServiceProcess {
         appAbsenceStartInfoOutput.setHdAppSet(holidayRequestSetOutput.getHdAppSet());
         appAbsenceStartInfoOutput.setVacationAppReflect(holidayRequestSetOutput.getVacationAppReflect());
         appAbsenceStartInfoOutput.setRemainVacationInfo(remainVacationInfo);
+        appAbsenceStartInfoOutput.setWorkTimeChange(applyForLeave.isPresent() ? applyForLeave.get().getReflectFreeTimeApp().getWorkChangeUse().isUse() : false);
 
         // 勤務種類・就業時間帯情報を取得する
         appAbsenceStartInfoOutput = this.getWorkTypeWorkTimeInfo(companyID, applyForLeave.isPresent() ? applyForLeave.get() : null, appAbsenceStartInfoOutput);
@@ -2176,7 +2176,9 @@ public class AbsenceServiceProcessImpl implements AbsenceServiceProcess {
                 appAbsenceStartInfoOutput.getAppDispInfoStartupOutput(), 
                 Arrays.asList(appAbsence.getReflectFreeTimeApp().getWorkInfo().getWorkTypeCode().v()), 
                 Optional.of(timeDigestionParam), 
-                false);
+                false, 
+                Optional.of(appAbsence.getReflectFreeTimeApp().getWorkInfo().getWorkTypeCode().v()), 
+                appAbsence.getReflectFreeTimeApp().getWorkInfo().getWorkTimeCodeNotNull().map(WorkTimeCode::v));
 
         // 休暇申請登録時チェック処理
         List<ConfirmMsgOutput> listConfirmMsg = this.checkAbsenceWhenRegister(true, companyID, appAbsence, appAbsenceStartInfoOutput, holidayDates);
@@ -2196,6 +2198,17 @@ public class AbsenceServiceProcessImpl implements AbsenceServiceProcess {
 
         // ドメインモデル「休暇申請」を更新する
         this.applyForLeaveRepository.update(applyForLeave, companyID, application.getAppID());
+        
+        // ドメインモデル「休出代休紐付け管理」を取得する
+		List<LeaveComDayOffManagement> leaveComDayOffManagementLst = leaveComDayOffManaRepository.getBycomDayOffID(application.getEmployeeID(), application.getAppDate().getApplicationDate())
+				.stream().filter(x -> x.getAssocialInfo().getTargetSelectionAtr()==TargetSelectionAtr.REQUEST).collect(Collectors.toList());
+		// ドメインモデル「振出振休紐付け管理」を取得する
+		List<PayoutSubofHDManagement> payoutSubofHDManagementLst = payoutSubofHDManaRepository.getBySubId(application.getEmployeeID(), application.getAppDate().getApplicationDate())
+				.stream().filter(x -> x.getAssocialInfo().getTargetSelectionAtr()==TargetSelectionAtr.REQUEST).collect(Collectors.toList());
+		// 休暇発生日リストに追加する
+		List<GeneralDate> holidayLst = new ArrayList<>();
+		holidayLst.addAll(leaveComDayOffManagementLst.stream().map(x -> x.getAssocialInfo().getOutbreakDay()).collect(Collectors.toList()));
+		holidayLst.addAll(payoutSubofHDManagementLst.stream().map(x -> x.getAssocialInfo().getOutbreakDay()).collect(Collectors.toList()));
 
         // 休暇紐付け管理を更新する
         this.registerVacationLinkManage(leaveComDayOffMana, payoutSubofHDManagements);
@@ -2214,6 +2227,8 @@ public class AbsenceServiceProcessImpl implements AbsenceServiceProcess {
         List<GeneralDate> listHolidayDates = holidayAppDates.stream().map(date -> GeneralDate.fromString(date, FORMAT_DATE)).collect(Collectors.toList());
 
         listDates = listDates.stream().filter(date -> !listHolidayDates.contains(date)).collect(Collectors.toList());
+        
+        listDates.addAll(holidayLst);
 
         // 暫定データの登録
         this.interimRemainDataMngRegisterDateChange.registerDateChange(companyID, applyForLeave.getApplication().getEmployeeID(), listDates);
@@ -2502,52 +2517,6 @@ public class AbsenceServiceProcessImpl implements AbsenceServiceProcess {
 //        }
 //    }
     
-    public List<AppRemainCreateInfor> createAppRemain(ApplyForLeave application) {
-        List<AppRemainCreateInfor> result = new ArrayList<AppRemainCreateInfor>();
-        String workTypeCode = null;
-        String workTimeCode = null;
-        
-        if (application.getReflectFreeTimeApp().getWorkInfo() != null 
-                && application.getReflectFreeTimeApp().getWorkInfo().getWorkTypeCode() != null) {
-            workTypeCode = application.getReflectFreeTimeApp().getWorkInfo().getWorkTypeCode().v();
-        }
-        
-        if (application.getReflectFreeTimeApp().getWorkInfo() != null 
-                && application.getReflectFreeTimeApp().getWorkInfo().getWorkTimeCodeNotNull().isPresent()) {
-            workTimeCode = application.getReflectFreeTimeApp().getWorkInfo().getWorkTypeCode().v();
-        }
-        
-        TimeDigestionUsageInfor timeDigest = null;
-        Optional<TimeDigestApplication> timeDigestApplicationOpt = application.getReflectFreeTimeApp().getTimeDegestion();
-        if (timeDigestApplicationOpt.isPresent()) {
-            TimeDigestApplication timeDigestApplication = timeDigestApplicationOpt.get();
-            timeDigest = new TimeDigestionUsageInfor(
-                    timeDigestApplication.getTimeAnnualLeave() == null ? null : timeDigestApplication.getTimeAnnualLeave().v(), 
-                    timeDigestApplication.getTimeOff() == null ? null : timeDigestApplication.getTimeOff().v(), 
-                    timeDigestApplication.getOvertime60H() == null ? null : timeDigestApplication.getOvertime60H().v(), 
-                    timeDigestApplication.getChildTime() == null ? null : timeDigestApplication.getChildTime().v(), 
-                    timeDigestApplication.getNursingTime() == null ? null : timeDigestApplication.getNursingTime().v());
-        }
-        
-        AppRemainCreateInfor appRemainCreateInfor = new AppRemainCreateInfor(
-                application.getEmployeeID(), 
-                application.getAppID(), 
-                application.getInputDate(), 
-                application.getAppDate().getApplicationDate(), 
-                EnumAdaptor.valueOf(application.getPrePostAtr().value, PrePostAtr.class), 
-                EnumAdaptor.valueOf(application.getAppType().value, ApplicationType.class), 
-                Optional.ofNullable(workTypeCode), 
-                Optional.ofNullable(workTimeCode), 
-                new ArrayList<VacationTimeInforNew>(), 
-                Optional.empty(), 
-                Optional.empty(), 
-                application.getOpAppStartDate().map(ApplicationDate::getApplicationDate),
-                application.getOpAppEndDate().map(ApplicationDate::getApplicationDate), 
-                new ArrayList<GeneralDate>(), 
-                Optional.of(timeDigest));
-        result.add(appRemainCreateInfor);
-        return result;
-    }
     
     @AllArgsConstructor
     private class RequireM11Imp implements BreakDayOffMngInPeriodQuery.RequireM11, AbsenceReruitmentMngInPeriodQuery.RequireM11 {

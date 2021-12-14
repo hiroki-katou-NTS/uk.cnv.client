@@ -17,6 +17,8 @@ public interface ShiftMasterRepository {
 	public boolean checkExists(String companyId, String workTypeCd, String workTimeCd);
 	
 	public boolean checkExistsByCd(String companyId, String shiftMaterCode);
+	
+	public boolean checkExistByImportCd(String companyId, ShiftMasterImportCode importCd);
 
 	public void insert(ShiftMaster shiftMater);
 
@@ -33,5 +35,22 @@ public interface ShiftMasterRepository {
 
 	/** [7] *get(会社ID, List<シフトマスタコード>) **/
 	List<ShiftMaster> getByListShiftMaterCd2(String companyId, List<String> shiftMaterCodes);
+	
+	List<ShiftMaster> getByListImportCodes(String companyId, List<String> importCodes);
+	
+	/**
+	 * exists (会社ID, シフトマスタ取り込みコード)
+	 * @param companyId 会社ID
+	 * @param importCode シフトマスタ取り込みコード
+	 * @return
+	 */
+	boolean exists (String companyId, ShiftMasterImportCode importCode);
 
+	/**
+	 * get (会社ID, シフトマスタ取り込みコード)
+	 * @param companyId 会社ID
+	 * @param importCode シフトマスタ取り込みコード
+	 * @return
+	 */
+	Optional<ShiftMaster> getShiftMaster(String companyId, ShiftMasterImportCode importCode);
 }

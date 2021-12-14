@@ -87,6 +87,11 @@ public class AppAbsenceStartInfoOutput {
 	private boolean workTypeNotRegister;
 	
 	/**
+	 * 就業時間帯を変更フラグ
+	 */
+	private boolean workTimeChange;
+	
+	/**
 	 * 特別休暇表示情報
 	 */
 	private Optional<SpecAbsenceDispInfo> specAbsenceDispInfo = Optional.empty();

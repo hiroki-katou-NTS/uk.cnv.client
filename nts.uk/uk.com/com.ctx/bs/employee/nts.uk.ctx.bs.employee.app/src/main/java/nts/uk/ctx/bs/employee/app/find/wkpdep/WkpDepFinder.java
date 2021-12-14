@@ -1,8 +1,8 @@
 package nts.uk.ctx.bs.employee.app.find.wkpdep;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -188,6 +188,10 @@ public class WkpDepFinder {
 		int highestHierarchy = lstHWkpInfo.stream()
 				.min((a, b) -> a.getHierarchyCode().length() - b.getHierarchyCode().length()).get().getHierarchyCode()
 				.length();
+		
+		// list parent
+		List<InformationDto> lstParent = this.getListParent(lstHWkpInfo, highestHierarchy);
+				
 		Iterator<InformationDto> iteratorWkpHierarchy = lstHWkpInfo.iterator();
 		// while have workplace
 		while (iteratorWkpHierarchy.hasNext()) {
@@ -201,14 +205,17 @@ public class WkpDepFinder {
 													wkpHierarchy.getDispName(),
 													new ArrayList<WkpDepTreeDto>());
 			// build List
-			this.pushToList(lstReturn, dto, wkpHierarchy.getHierarchyCode(), Strings.EMPTY, highestHierarchy);
+			this.pushToList(lstReturn,lstParent, dto, wkpHierarchy.getHierarchyCode(), Strings.EMPTY, highestHierarchy);
 		}
 		return lstReturn;
 	}
 
-	private void pushToList(List<WkpDepTreeDto> lstReturn, WkpDepTreeDto dto, String hierarchyCode, String preCode,
+	private void pushToList(List<WkpDepTreeDto> lstReturn,List<InformationDto> lstParent, WkpDepTreeDto dto, String hierarchyCode, String preCode,
 			int highestHierarchy) {
-		if (hierarchyCode.length() == highestHierarchy) {
+		
+		Optional<InformationDto> isParent = lstParent.stream().filter(i ->i.getHierarchyCode().equals(hierarchyCode)).findFirst();
+		
+		if (isParent.isPresent()) {
 			// check duplicate code
 			if (lstReturn.isEmpty()) {
 				lstReturn.add(dto);
@@ -221,15 +228,46 @@ public class WkpDepFinder {
 				}
 			}
 		} else {
+			
 			String searchCode = hierarchyCode.substring(0, hierarchyCode.length() - HIERARCHY_LENGTH);
-			
-			WkpDepTreeDto optWorkplaceFindDto = find(lstReturn , searchCode);
-			
+
+			WkpDepTreeDto optWorkplaceFindDto = find(lstReturn, searchCode);
+
 			if (optWorkplaceFindDto == null) {
 				return;
 			}
 			optWorkplaceFindDto.getChildren().add(dto);
+
 		}
+	}
+	
+	private List<InformationDto> getListParent(List<InformationDto> lstHWkpInfo, int highestHierarchy) {
+
+		List<InformationDto> lstParent = new ArrayList<>();
+
+		List<InformationDto> lstOrder = lstHWkpInfo.stream()
+				.sorted(Comparator.comparingInt(InformationDto::getHierarchyCodeLength)).collect(Collectors.toList());
+
+		for (InformationDto item : lstOrder) {
+			boolean isParent = false;
+
+			if (item.getHierarchyCodeLength() == highestHierarchy) {
+				isParent = true;
+			} else {
+				List<InformationDto> parent = lstParent.stream().filter(p -> {
+					return item.getHierarchyCode().startsWith(p.getHierarchyCode());
+				}).collect(Collectors.toList());
+				if(parent.isEmpty()){
+					isParent = true;
+				}
+			}
+
+			if (isParent) {
+				lstParent.add(item);
+			}
+
+		}
+		return lstParent;
 	}
 	
 	private WkpDepTreeDto find(List<WkpDepTreeDto> lstReturn, String searchCode){

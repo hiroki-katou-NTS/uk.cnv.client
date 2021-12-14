@@ -101,10 +101,6 @@ public class UpdateOvertimeCommand {
 	 * 計算フラグ
 	 */
 	private int calculateFlag;
-	/**
-	 * 時間外時間の詳細
-	 */
-	private AppOvertimeDetailCommand appOvertimeDetail;
 	
 	private String appReasonID;
 	

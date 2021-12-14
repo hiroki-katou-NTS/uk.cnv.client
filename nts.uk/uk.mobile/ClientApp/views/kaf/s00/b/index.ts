@@ -183,28 +183,30 @@ export class KafS00BComponent extends Vue {
                 resolve(true);
             }, 300);
         }).then(() => {
-            if (value) {
-                self.$updateValidator('dateRange', { validate: true });
-                self.$updateValidator('date', { validate: false });
-                self.$validate('dateRange');
-                if (self.$valid) {
-                    self.$emit('kaf000BChangeDate',
-                        {
-                            startDate: self.dateRange.start,
-                            endDate: self.dateRange.end
-                        }); 
-                }
-                 
-            } else {
-                self.$updateValidator('dateRange', { validate: false });
-                self.$updateValidator('date', { validate: true });
-                self.$validate('date');
-                if (self.$valid) {
-                    self.$emit('kaf000BChangeDate',
-                        {
-                            startDate: self.date,
-                            endDate: self.date
-                        }); 
+            if (self.params.mode == ScreenMode.NEW) {
+                if (value) {
+                    self.$updateValidator('dateRange', { validate: true });
+                    self.$updateValidator('date', { validate: false });
+                    self.$validate('dateRange');
+                    if (self.$valid) {
+                        self.$emit('kaf000BChangeDate',
+                            {
+                                startDate: self.dateRange.start,
+                                endDate: self.dateRange.end
+                            });
+                    }
+
+                } else {
+                    self.$updateValidator('dateRange', { validate: false });
+                    self.$updateValidator('date', { validate: true });
+                    self.$validate('date');
+                    if (self.$valid) {
+                        self.$emit('kaf000BChangeDate',
+                            {
+                                startDate: self.date,
+                                endDate: self.date
+                            });
+                    }
                 }
             }
         });

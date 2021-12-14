@@ -60,6 +60,8 @@ public class TopPageAlarmAdapterImpl implements TopPageAlarmAdapter {
 		alarmInformation.setPatternName(alarmInfo.getPatternName());
 		alarmInformation.setLinkUrl(alarmInfo.getLinkUrl());
 		alarmInformation.setDisplayMessage(alarmInfo.getDisplayMessage());
+		alarmInformation.setNoErrEmployeeIds(alarmInfo.getNoErrEmployeeIds());
+		
 		return alarmInformation;
 	}
 

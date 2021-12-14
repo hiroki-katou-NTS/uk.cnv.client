@@ -37,9 +37,6 @@ public class HolidayWorkRegisterMobileCommandHandler extends CommandHandlerWithR
 			appHolidayWork = param.getAppHolidayWorkUpdate().toDomain();
 		}
 		
-		if (appHolidayWork.getAppOvertimeDetail().isPresent()) {
-			appHolidayWork.getAppOvertimeDetail().get().setAppId(application.getAppID());
-		}
 		appHolidayWork.setApplication(application);
 		
 		return holidayWorkRegisterService.registerMobile(param.getMode(), 

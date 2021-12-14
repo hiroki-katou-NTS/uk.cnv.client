@@ -22,7 +22,8 @@ public class GetDigestListOverwriteChangeDaikyu {
 			RequestChangeDigestOccr changeDigest) {
 
 		// $確定データ一覧
-		List<CompensatoryDayOffManaData> lstFix = require.getFixByDayOffDatePeriod(sid);
+		List<CompensatoryDayOffManaData> lstFix = require.getFixByDayOffDatePeriod(sid).stream()
+				.filter(x -> x.isRemaing()).collect(Collectors.toList());
 
 		// $暫定データ一覧
 		List<InterimDayOffMng> lstTemporary = require.getTempDayOffBySidPeriod(sid, dateData);

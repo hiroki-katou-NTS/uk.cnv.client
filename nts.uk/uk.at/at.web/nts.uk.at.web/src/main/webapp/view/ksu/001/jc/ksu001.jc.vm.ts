@@ -147,8 +147,9 @@ module nts.uk.at.view.ksu001.jc.viewmodel {
                 taisho.workplaceId = self.workplaceId;
                 taisho.targetUnit = 0
             }
-            if (self.selectedTab == 'groupworkplace') {
-                taisho.workplaceId = '';
+            if (self.selectedTab == 'workplaceGroup') {
+                taisho.workplaceGroupId = self.workplaceId;
+                taisho.targetUnit = 1
             }
 
             service.getShiftMasterWorkInfo(taisho).done((data) => {

@@ -42,4 +42,12 @@ public interface WorkplaceGroupPublish {
 	 * @return
 	 */
 	List<String> getReferableEmployees(GeneralDate date , String empID ,String workplaceGroupId );
+	
+	/**
+	 * [5] 参照可能な社員をすべて取得する
+	 * @param date 基準日
+	 * @param employeeId 社員ID
+	 * @return List<社員ID>
+	 */
+	List<String> getAllReferableEmployees(GeneralDate date, String employeeId);
 }

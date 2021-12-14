@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.record.infra.entity.log;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -108,7 +109,7 @@ public class KrcdtExecLog extends ContractUkJpaEntity implements Serializable {
 				this.processStatus, 
 				this.periodCoverdStartDate, 
 				this.periodCoverdEndDate,
-                this.isCalWhenLock == null?null:new Boolean(this.isCalWhenLock==1?true:false));
+                Optional.ofNullable(this.isCalWhenLock == null ? null : this.isCalWhenLock== 1));
 		if (this.krcdtExecutionLogPK.executionContent == ExecutionContent.DAILY_CREATION.value) {
 			domain.setDailyCreationSetInfo(calExeSetInfor.toDomain());
 		} else if(this.krcdtExecutionLogPK.executionContent == ExecutionContent.DAILY_CALCULATION.value ) {
@@ -139,7 +140,7 @@ public class KrcdtExecLog extends ContractUkJpaEntity implements Serializable {
 				(domain.getObjectPeriod()!=null&&domain.getObjectPeriod().isPresent())?domain.getObjectPeriod().get().getStartDate():null,
 				(domain.getObjectPeriod()!=null&&domain.getObjectPeriod().isPresent())?domain.getObjectPeriod().get().getEndDate():null,
 				 domain.getCalExecutionSetInfoID(),
-                 domain.getIsCalWhenLock()==null?null:(domain.getIsCalWhenLock().booleanValue()?1:0));
+                 domain.getIsCalWhenLock().map(c -> c ? 1 : 0).orElse(0));
 		if (domain.getExecutionContent() == ExecutionContent.DAILY_CREATION) {
 			entity.calExeSetInfor = KrcdtCalExeSetInfor.toEntity(domain.getDailyCreationSetInfo().get());
 		}else if(domain.getExecutionContent() == ExecutionContent.DAILY_CALCULATION) {

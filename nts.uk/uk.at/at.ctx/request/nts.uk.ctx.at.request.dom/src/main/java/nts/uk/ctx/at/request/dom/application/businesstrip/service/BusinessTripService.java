@@ -7,6 +7,7 @@ import nts.uk.ctx.at.request.dom.application.common.service.other.output.ActualC
 import nts.uk.ctx.at.request.dom.application.common.service.setting.output.AppDispInfoStartupOutput;
 import nts.uk.ctx.at.request.dom.setting.employment.appemploymentsetting.AppEmploymentSet;
 import nts.uk.ctx.at.request.dom.setting.employment.appemploymentsetting.BusinessTripAppWorkType;
+import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeClassification;
 
@@ -94,5 +95,14 @@ public interface BusinessTripService {
 
      */
     WorkTimeGetOuput getWorkTimeBusinessTrip(WorkType workType, String workTypeCd, List<BusinessTripWorkingHours> workingHours);
+    
+    /**
+     * 勤務種類により出退勤時刻をチェックする
+     * @param date
+     * @param workTypeCode
+     * @param startTime
+     * @param endTime
+     */
+    void checkTimeByWorkType(GeneralDate date, String workTypeCode, Integer startTime, Integer endTime);
 
 }

@@ -3,6 +3,7 @@ package nts.uk.ctx.at.shared.dom.remainingnumber.reserveleave.empinfo.grantremai
 import java.math.BigDecimal;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.error.BusinessException;
 import nts.arc.time.GeneralDate;
@@ -15,6 +16,7 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdat
 import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveUsedNumber;
 
 @Getter
+@NoArgsConstructor
 // domain name CS00038: 積立年休付与残数データ
 public class ReserveLeaveGrantRemainingData extends LeaveGrantRemainingData {
 
@@ -68,34 +70,27 @@ public class ReserveLeaveGrantRemainingData extends LeaveGrantRemainingData {
 	public double digest(double usedDays, boolean isForcibly){
 
 		// 「積立年休使用日数」を所得
-		if (usedDays <= 0.0) return 0.0;
-		double remainingDays = usedDays;
+		if (usedDays <= 0.0) 
+			return 0.0;
 
-		// 積立年休残数が足りているかチェック
-		boolean isSubtractRemain = false;
-//		double remainingNumber = this.details.getRemainingNumber().v();
+
 		double remainingNumber = this.details.getRemainingNumber().getDays().v();
-		if (remainingNumber >= remainingDays) isSubtractRemain = true;
-		// 「強制的に消化する」をチェック
-		else if (isForcibly) isSubtractRemain = true;
-
-		if (isSubtractRemain){
+		if (isDigestionable(usedDays,isForcibly)){
 
 			// 積立年休残数から減算
-			double newRemain = remainingNumber - remainingDays;
+			double newRemain = remainingNumber - usedDays;
 			this.details.setRemainingNumber(new LeaveRemainingNumber(newRemain, 0));
 
 			// 積立年休使用数に加算
 //			this.details.addDaysToUsedNumber(remainingDays);
-			this.details.getUsedNumber().add(new LeaveUsedNumber(remainingDays, 0) );
+			this.details.getUsedNumber().add(new LeaveUsedNumber(usedDays, 0) );
 
 			// 積立年休使用残を0にする
-			remainingDays = 0.0;
+			return 0.0;
 		}
 		else {
-
-			// 積立年休使用残から減算
-			remainingDays -= remainingNumber;
+			//積立年休使用残から減算
+			double remainingDays = usedDays - remainingNumber; 
 
 			// 積立年休使用数に加算
 			// this.details.addDaysToUsedNumber(remainingNumber);
@@ -103,10 +98,16 @@ public class ReserveLeaveGrantRemainingData extends LeaveGrantRemainingData {
 
 			// 積立年休残数を0にする
 			this.details.setRemainingNumber(new LeaveRemainingNumber());
+			
+			return remainingDays;
 		}
+	}
 
-		// 積立年休使用残を返す
-		return remainingDays;
+	private boolean isDigestionable(double usedDays, boolean isForcibly) {
+		if (isForcibly)
+			return true;
+
+		return this.details.getRemainingNumber().getDays().greaterThanOrEqualTo(usedDays);
 	}
 
 	public static void validate(ReserveLeaveGrantRemainingData domain) {

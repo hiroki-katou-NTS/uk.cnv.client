@@ -4,6 +4,8 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.dom.workrule;
 
+import java.util.Optional;
+
 /**
  * 勤務情報のエラー状態
  * 
@@ -86,5 +88,26 @@ public enum ErrorStatusWorkInfo {
 		}
 		// Not found.
 		return null;
+	}
+	
+	public Optional<String> getErrorMessageId() {
+		switch(this) {
+		case WORKTIME_ARE_REQUIRE_NOT_SET:
+			return Optional.of("Msg_435");
+		case WORKTIME_ARE_SET_WHEN_UNNECESSARY:
+			return Optional.of("Msg_434");
+		case WORKTYPE_WAS_DELETE:
+			return Optional.of("Msg_590");
+		case WORKTIME_WAS_DELETE:
+			return Optional.of("Msg_591");
+		case WORKTYPE_WAS_ABOLISHED:
+			return Optional.of("Msg_468");
+		case WORKTIME_HAS_BEEN_ABOLISHED:
+			return Optional.of("Msg_469");
+		case NORMAL:
+			return Optional.empty();
+		default:
+			return Optional.empty();
+		}
 	}
 }

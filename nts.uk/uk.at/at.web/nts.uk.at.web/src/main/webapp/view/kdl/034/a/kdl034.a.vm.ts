@@ -6,6 +6,7 @@ module nts.uk.at.view.kdl034.a.viewmodel {
     import getMessage = nts.uk.resource.getMessage;
     import ApplicationDto = nts.uk.at.view.kaf000.b.viewmodel.model.ApplicationDto;
     import block = nts.uk.ui.block;
+	import CommonProcess = nts.uk.at.view.kaf000.shr.viewmodel.CommonProcess;
     export class ScreenModel {
         listApprover: KnockoutObservableArray<Approver> = ko.observableArray([]);
         errorFlag: number = -1;
@@ -90,25 +91,27 @@ module nts.uk.at.view.kdl034.a.viewmodel {
                 }
                 service.remand(command).done(function(result) {
                     block.clear();
-                    let successList: Array<string> = [];
-                    let failedList: Array<string> = [];
+                    let autoSuccessMail: Array<string> = [];
+                    let autoFailMail: Array<string> = [];
+					let autoFailServer: Array<string> = [];
                     if (result) {
                         // メール送信時のエラーチェック
-                        if (result.successList) {
-                            _.forEach(result.successList, x => {
-                                successList.push(x);
+                        if (result.autoSuccessMail) {
+                            _.forEach(result.autoSuccessMail, x => {
+                                autoSuccessMail.push(x);
                             });
                         }
-                        if (result.errorList) {
-                            _.forEach(result.errorList, x => {
-                                failedList.push(x);
+                        if (result.autoFailMail) {
+                            _.forEach(result.autoFailMail, x => {
+                                autoFailMail.push(x);
                             });
                         }
+						autoFailServer = result.autoFailServer;
                     }
                     setShared("KDL034_PARAM_RES", command);
                     //情報メッセージ（Msg_223）
                     dialog.info({ messageId: "Msg_223" }).then(() => {
-                        self.handleSendMailResult(successList, failedList);
+                        self.handleSendMailResult(autoSuccessMail, autoFailMail, autoFailServer);
                     });
                 }).fail(function(res) {
                     block.clear();
@@ -120,25 +123,31 @@ module nts.uk.at.view.kdl034.a.viewmodel {
             }).ifNo(() => {});
         }
         
-        handleSendMailResult(successList, failedList) {
-            let numOfSuccess = successList.length;
-            let numOfFailed = failedList.length
+        handleSendMailResult(autoSuccessMail: Array<string>, autoFailMail: Array<string>, autoFailServer: Array<string>) {
+            let numOfSuccess = autoSuccessMail.length;
+            let numOfFailed = autoFailMail.length;
+			if(!_.isEmpty(autoFailServer)) {
+				dialog.alertError({ messageId: "Msg_1057" }).then(() => {
+                    nts.uk.ui.windows.close();
+                });
+				return;
+			}
             let sucessListAsStr = "";
             if (numOfSuccess == 0 && numOfFailed == 0) {
                 nts.uk.ui.windows.close();
             } else if (numOfSuccess != 0 && numOfFailed == 0) {
                 let msg = getMessage('Msg_392');
-                dialog.info({ message: msg.replace("{0}", successList.join('\n')), messageId: "Msg_392" }).then(() => {
+                dialog.info({ message: msg.replace("{0}", autoSuccessMail.join('\n')), messageId: "Msg_392" }).then(() => {
                     nts.uk.ui.windows.close();
                 });
             } else if (numOfSuccess == 0 && numOfFailed != 0) {
-                dialog.alertError({ message: getMessage('Msg_769') + "\n" + failedList.join('\n'), messageId: "Msg_769" }).then(() => {
+                dialog.alertError({ message: getMessage('Msg_769') + "\n" + autoFailMail.join('\n'), messageId: "Msg_769" }).then(() => {
                     nts.uk.ui.windows.close();
                 });
             } else {
                 let msg = getMessage('Msg_392');
-                dialog.info({ message: msg.replace("{0}", successList.join('\n')), messageId: "Msg_392" }).then(() => {
-                    dialog.alertError({ message: getMessage('Msg_769') + "\n" + failedList.join('\n'), messageId: "Msg_769" }).then(() => {
+                dialog.info({ message: msg.replace("{0}", autoSuccessMail.join('\n')), messageId: "Msg_392" }).then(() => {
+                    dialog.alertError({ message: getMessage('Msg_769') + "\n" + autoFailMail.join('\n'), messageId: "Msg_769" }).then(() => {
                         nts.uk.ui.windows.close();
                     });
                 });

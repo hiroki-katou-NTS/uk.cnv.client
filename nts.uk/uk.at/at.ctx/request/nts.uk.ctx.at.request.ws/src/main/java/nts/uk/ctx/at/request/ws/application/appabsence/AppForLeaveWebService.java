@@ -21,6 +21,7 @@ import nts.uk.ctx.at.request.app.find.application.appabsence.dto.AppAbsenceStart
 import nts.uk.ctx.at.request.app.find.application.appabsence.dto.AppForLeaveStartBCommand;
 import nts.uk.ctx.at.request.app.find.application.appabsence.dto.ChangeHolidayDatesParam;
 import nts.uk.ctx.at.request.app.find.application.appabsence.dto.ChangeRelationShipDto;
+import nts.uk.ctx.at.request.app.find.application.appabsence.dto.ChangeWorkTimeParam;
 import nts.uk.ctx.at.request.app.find.application.appabsence.dto.ChangeWorkTypeParam;
 import nts.uk.ctx.at.request.app.find.application.appabsence.dto.CheckBeforeRegisterHolidayParam;
 import nts.uk.ctx.at.request.app.find.application.appabsence.dto.CheckTyingManagementParam;
@@ -96,6 +97,14 @@ public class AppForLeaveWebService extends WebService{
 	public AppAbsenceStartInfoDto getChangeWorkType(ChangeWorkTypeParam param) {
 		return this.appForLeaveFinder.getChangeWorkType(param);
 	}
+	
+	@POST
+	@Path("findChangeUsingWorkTime")
+	public AppAbsenceStartInfoDto getChangeWorkTime(ChangeWorkTimeParam param) {
+	    return this.appForLeaveFinder.getChangeWorkTime(param);
+	}
+	
+	
 	@POST
 	@Path("getListWorkTime")
 	public List<String> getListWorkTime(ParamGetAllAppAbsence param) {

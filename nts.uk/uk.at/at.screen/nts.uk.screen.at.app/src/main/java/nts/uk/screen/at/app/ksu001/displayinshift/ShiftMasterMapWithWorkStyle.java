@@ -19,6 +19,7 @@ public class ShiftMasterMapWithWorkStyle {
 	public String shiftMasterCode;
 	public String color;
 	public String remark;
+	public String importCode;
 	public String workTypeCode;
 	public String workTimeCode;
 	public String workStyle;  // 出勤休日区分 (co truong hơp workStyle = null nên ko để kiểu int được) class WorkStyle
@@ -30,6 +31,7 @@ public class ShiftMasterMapWithWorkStyle {
 		this.shiftMasterName = info.getName().v();
 		this.color = info.getColor().v();
 		this.remark = info.getRemarks().isPresent() ? info.getRemarks().get().v() : null;
+		this.importCode = domain.getImportCode().map(importCode -> importCode.v()).orElse(null);
 		this.workTypeCode = domain.getWorkTypeCode() == null ? null : domain.getWorkTypeCode().toString().toString();
 		this.workTimeCode = domain.getWorkTimeCode() == null ? null : domain.getWorkTimeCode().toString().toString();
 		this.workStyle = workStyle;

@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.request.app.find.application.gobackdirectly.WorkInformationDto;
 import nts.uk.ctx.at.request.app.find.application.overtime.ApplicationTimeDto;
-import nts.uk.ctx.at.request.app.find.application.overtime.dto.AppOvertimeDetailDto;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.AppHolidayWork;
 import nts.uk.ctx.at.shared.app.find.common.TimeZoneWithWorkNoDto;
 import nts.uk.ctx.at.shared.dom.workdayoff.frame.NotUseAtr;
@@ -54,18 +53,12 @@ public class AppHolidayWorkDto {
 	 */
 	private List<TimeZoneWithWorkNoDto> workingTimeList;
 	
-	/**
-	 * 時間外時間の詳細
-	 */
-	private AppOvertimeDetailDto appOvertimeDetail;
-	
 	public static AppHolidayWorkDto fromDomain(AppHolidayWork domain) {
 		if(domain == null) return null;
 		return new AppHolidayWorkDto(WorkInformationDto.fromDomain(domain.getWorkInformation()), 
 				ApplicationTimeDto.fromDomain(domain.getApplicationTime()), 
 				domain.getBackHomeAtr().equals(NotUseAtr.USE), domain.getGoWorkAtr().equals(NotUseAtr.USE), 
 				domain.getBreakTimeList().orElse(Collections.emptyList()).stream().map(breakTime -> TimeZoneWithWorkNoDto.fromDomain(breakTime)).collect(Collectors.toList()), 
-				domain.getWorkingTimeList().orElse(Collections.emptyList()).stream().map(workingTime -> TimeZoneWithWorkNoDto.fromDomain(workingTime)).collect(Collectors.toList()), 
-				AppOvertimeDetailDto.fromDomain(domain.getAppOvertimeDetail()));
+				domain.getWorkingTimeList().orElse(Collections.emptyList()).stream().map(workingTime -> TimeZoneWithWorkNoDto.fromDomain(workingTime)).collect(Collectors.toList()));
 	}
 }

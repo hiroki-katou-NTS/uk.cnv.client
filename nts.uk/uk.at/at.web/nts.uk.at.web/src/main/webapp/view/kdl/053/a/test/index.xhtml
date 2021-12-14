@@ -17,8 +17,17 @@
 			<div id="functions-area">
 				<button data-bind="click: openDialog">Open KDL053</button>
 			</div>
-			<div id="content-area">		
-				<div style="margin: 20px 0px 0px 20px ; font-weight: bold;">Has Error ?:
+			<div id="content-area">
+				<div style="margin: 20px 0 0 20px ; font-weight: bold;">項目列を表示するか ?:
+					<div data-bind="ntsRadioBoxGroup: {
+						options: itemList,
+						optionsValue: 'id',
+						optionsText: 'name',
+						value: dispItemCol,
+						enable: enable}">
+					</div>
+				</div>
+				<div style="margin: 20px 0 0 20px ; font-weight: bold;">Has Error ?:
 					<div data-bind="ntsRadioBoxGroup: {
 						options: itemList,
 						optionsValue: 'id',

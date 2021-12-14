@@ -231,7 +231,8 @@ public abstract class CalculationTimeSheet {
 	public AttendanceTime calcDeductionTime(
 			ConditionAtr conditionAtr,
 			DeductionAtr dedAtr,
-			TimeSheetRoundingAtr roundAtr){
+			TimeSheetRoundingAtr roundAtr,
+			NotUseAtr canOffset){
 		
 		// 保持している控除時間帯を取得
 		List<TimeSheetOfDeductionItem> itemList = this.getDedTimeSheetByAtr(dedAtr, conditionAtr);
@@ -240,7 +241,7 @@ public abstract class CalculationTimeSheet {
 		NotUseAtr unitRound = roundAtr == TimeSheetRoundingAtr.PerTimeSheet ? NotUseAtr.USE : NotUseAtr.NOT_USE;
 		int totalMinutes = 0;
 		for (TimeSheetOfDeductionItem item : itemList){
-			totalMinutes += item.calcTotalTime(NotUseAtr.USE, unitRound).valueAsMinutes();
+			totalMinutes += item.calcTotalTime(canOffset, unitRound).valueAsMinutes();
 		}
 		// 丸め区分を取得
 		if (roundAtr == TimeSheetRoundingAtr.PerTimeFrame){

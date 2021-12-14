@@ -422,7 +422,7 @@ public class ExcessOfStatutoryTimeOfDaily {
 	 */
 	public AttendanceTime calcOverTime() {
 		if(this.overTimeWork.isPresent()) {
-			return new AttendanceTime(this.getOverTimeWork().get().calcTotalFrameTime() + this.getOverTimeWork().get().calcTransTotalFrameTime());
+			return new AttendanceTime(this.getOverTimeWork().get().calcTotalFrameTime() .v()+ this.getOverTimeWork().get().calcTransTotalFrameTime().v());
 		}
 		return new AttendanceTime(0);
 	}
@@ -433,7 +433,7 @@ public class ExcessOfStatutoryTimeOfDaily {
 	 */
 	public AttendanceTime calcWorkHolidayTime() {
 		if(this.workHolidayTime.isPresent()) {
-			return new AttendanceTime(this.getWorkHolidayTime().get().calcTotalFrameTime() + this.getWorkHolidayTime().get().calcTransTotalFrameTime());
+			return new AttendanceTime(this.getWorkHolidayTime().get().calcTotalFrameTime().v() + this.getWorkHolidayTime().get().calcTransTotalFrameTime().v());
 		}
 		return new AttendanceTime(0);
 	}

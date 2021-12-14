@@ -71,12 +71,12 @@ public class ApplicationCancellationProcessTest {
 				result = Optional.of(new ClosureEmployment("", "1", 1));
 
 				SCApplicationCancellationProcess.processSchedule(require, anyString, (Application) any,
-						(GeneralDate) any, anyInt, (ReflectStatusResult) any, (NotUseAtr) any);
+						(GeneralDate) any, anyInt, (ReflectStatusResult) any, (NotUseAtr) any, (EmploymentHistShareImport) any);
 				result = new SCCancelProcessOneDayOutput(
 						ReflectApplicationHelper.createReflectStatusResult(ReflectedState.CANCELED), null, null);
 
 				RCApplicationCancellationProcess.processRecord(require, anyString, (Application) any, (GeneralDate) any,
-						anyInt, (ReflectStatusResult) any, (NotUseAtr) any);
+						anyInt, (ReflectStatusResult) any, (NotUseAtr) any , (EmploymentHistShareImport)any);
 				result = new RCCancelProcessOneDayOutput(
 						ReflectApplicationHelper.createReflectStatusResult(ReflectedState.CANCELED), null, null);
 			}
@@ -135,12 +135,12 @@ public class ApplicationCancellationProcessTest {
 				result = Optional.of(new ClosureEmployment("", "1", 1));
 
 				SCApplicationCancellationProcess.processSchedule(require, anyString, (Application) any,
-						(GeneralDate) any, anyInt, (ReflectStatusResult) any, (NotUseAtr) any);
+						(GeneralDate) any, anyInt, (ReflectStatusResult) any, (NotUseAtr) any, (EmploymentHistShareImport) any);
 				result = new SCCancelProcessOneDayOutput(
 						ReflectApplicationHelper.createReflectStatusResult(ReflectedState.CANCELED), null, null);
 
 				RCApplicationCancellationProcess.processRecord(require, anyString, (Application) any, (GeneralDate) any,
-						anyInt, (ReflectStatusResult) any, (NotUseAtr) any);
+						anyInt, (ReflectStatusResult) any, (NotUseAtr) any, (EmploymentHistShareImport)any);
 				result = new RCCancelProcessOneDayOutput(
 						ReflectApplicationHelper.createReflectStatusResult(ReflectedState.CANCELED), null, null);
 			}
@@ -195,13 +195,13 @@ public class ApplicationCancellationProcessTest {
 				result = Optional.of(new ClosureEmployment("", "1", 1));
 
 				SCApplicationCancellationProcess.processSchedule(require, anyString, (Application) any,
-						(GeneralDate) any, anyInt, (ReflectStatusResult) any, (NotUseAtr) any);
+						(GeneralDate) any, anyInt, (ReflectStatusResult) any, (NotUseAtr) any, (EmploymentHistShareImport) any);
 				result = new SCCancelProcessOneDayOutput(
 						ReflectApplicationHelper.createReflectStatusResult(ReflectedState.CANCELED), null,
 						AtomTask.none());
 
 				RCApplicationCancellationProcess.processRecord(require, anyString, (Application) any, (GeneralDate) any,
-						anyInt, (ReflectStatusResult) any, (NotUseAtr) any);
+						anyInt, (ReflectStatusResult) any, (NotUseAtr) any, (EmploymentHistShareImport)any);
 				result = new RCCancelProcessOneDayOutput(
 						ReflectApplicationHelper.createReflectStatusResult(ReflectedState.CANCELED), null,
 						AtomTask.none());

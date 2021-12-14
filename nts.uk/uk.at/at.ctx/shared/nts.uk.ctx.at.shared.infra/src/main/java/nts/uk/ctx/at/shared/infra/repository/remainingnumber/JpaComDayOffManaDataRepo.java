@@ -19,12 +19,13 @@ import nts.arc.layer.infra.data.jdbc.NtsResultSet;
 import nts.arc.layer.infra.data.jdbc.NtsStatement;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
+import nts.arc.time.calendar.period.DatePeriod;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.ComDayOffManaDataRepository;
 import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.CompensatoryDayOffManaData;
 import nts.uk.ctx.at.shared.infra.entity.remainingnumber.subhdmana.KrcdtHdComMng;
+import nts.uk.ctx.at.shared.infra.entity.remainingnumber.subhdmana.KrcdtHdWorkMng;
 import nts.uk.shr.com.context.AppContexts;
-import nts.arc.time.calendar.period.DatePeriod;
 
 @Stateless
 public class JpaComDayOffManaDataRepo extends JpaRepository implements ComDayOffManaDataRepository {
@@ -58,6 +59,10 @@ public class JpaComDayOffManaDataRepo extends JpaRepository implements ComDayOff
 	private static final String GET_BY_LST_DAYOFF_DATE = "SELECT a FROM KrcdtHdComMng a"
 			+ " WHERE a.cID = :cId"
 			+ " AND a.dayOff IN :lstDate";
+	
+	private static final String SELECT_BY_SID_AND_DAY_OFF = "SELECT t FROM KrcdtHdComMng t "
+			+ "WHERE t.sID = :sid "
+			+ "AND t.dayOff = :date";
 	
 	@Override
 	public List<CompensatoryDayOffManaData> getBySidDate(String cid, String sid, GeneralDate ymd) {
@@ -425,5 +430,22 @@ public class JpaComDayOffManaDataRepo extends JpaRepository implements ComDayOff
 	}
 	
 
+
+	@Override
+	public Optional<CompensatoryDayOffManaData> findBySidAndDate(String sid, GeneralDate date) {
+		return this.queryProxy().query(SELECT_BY_SID_AND_DAY_OFF, KrcdtHdComMng.class)
+				.setParameter("sid", sid).setParameter("date", date)
+				.getSingle(this::toDomain);
+	}
+
+	@Override
+	public void deleteAfter(String sid, boolean unknownDateFlag, GeneralDate target) {
+		this.getEntityManager().createQuery("DELETE FROM KrcdtHdComMng d WHERE d.sID = :sid "
+				+ " AND d.unknownDate = :unknownDate AND d.dayOff >= :targetDate", KrcdtHdWorkMng.class)
+		.setParameter("sid", sid)
+		.setParameter("unknownDate", unknownDateFlag)
+		.setParameter("targetDate", target)
+		.executeUpdate();
+	}
 
 }

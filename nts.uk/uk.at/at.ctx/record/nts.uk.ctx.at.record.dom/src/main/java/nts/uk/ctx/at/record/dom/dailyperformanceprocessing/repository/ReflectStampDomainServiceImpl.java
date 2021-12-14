@@ -124,8 +124,6 @@ public class ReflectStampDomainServiceImpl implements ReflectStampDomainService 
 					// cần bỏ những lỗi giống nhau trong 1 ngày.
 					listE = listE.stream().distinct().collect(Collectors.toList());
 					listErrorMessageInfo.addAll(listE);
-					// 反映された年月日を更新する
-					stamp.getImprintReflectionStatus().setReflectedDate(Optional.of(GeneralDate.today()));
 				}
 			}
 			// 手修正がある勤怠項目ID一覧を取得する

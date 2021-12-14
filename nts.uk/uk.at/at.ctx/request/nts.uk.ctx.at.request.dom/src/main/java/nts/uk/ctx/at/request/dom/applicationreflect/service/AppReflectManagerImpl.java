@@ -62,7 +62,7 @@ public class AppReflectManagerImpl implements AppReflectManager {
 	
 	@Override	
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void reflectEmployeeOfApp(Application appInfor, SEmpHistImport sEmpHistImport, 
+	public void reflectEmployeeOfApp(Application appInfor, List<SEmpHistImport> sEmpHistImport, 
 			ExecutionTypeExImport execuTionType, String excLogId, int currentRecord) {
 		try {
 			self.reflectEmployeeOfAppWithTransaction(appInfor, sEmpHistImport, execuTionType, excLogId);
@@ -94,7 +94,7 @@ public class AppReflectManagerImpl implements AppReflectManager {
 	
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@Transactional
-	public void reflectEmployeeOfAppWithTransaction(Application appInfor, SEmpHistImport sEmpHistImport, ExecutionTypeExImport execuTionType,
+	public void reflectEmployeeOfAppWithTransaction(Application appInfor, List<SEmpHistImport> sEmpHistImport, ExecutionTypeExImport execuTionType,
 			String excLogId) {
 		String companyID = AppContexts.user().companyId();
 		

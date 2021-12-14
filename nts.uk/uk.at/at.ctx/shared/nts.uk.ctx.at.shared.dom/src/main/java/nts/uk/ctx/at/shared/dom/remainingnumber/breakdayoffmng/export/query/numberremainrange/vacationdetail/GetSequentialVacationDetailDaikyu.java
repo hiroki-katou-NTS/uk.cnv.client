@@ -6,7 +6,6 @@ import java.util.Optional;
 import lombok.val;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.SubstituteHolidayAggrResult;
-import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.VacationDetails;
 import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.InterimRemain;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.breakinfo.FixedManagementDataMonth;
 
@@ -17,7 +16,7 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.breakinfo.FixedMa
  */
 public class GetSequentialVacationDetailDaikyu {
 
-	public static VacationDetails process(Require require, String cid, String sid, DatePeriod dateData,
+	public static AfterChangeHolidayDaikyuInfoResult process(Require require, String cid, String sid, DatePeriod dateData,
 			FixedManagementDataMonth fixManaDataMonth, List<InterimRemain> interimMng, Optional<DatePeriod> processDate,
 			Optional<SubstituteHolidayAggrResult> optBeforeResult) {
 
@@ -27,8 +26,7 @@ public class GetSequentialVacationDetailDaikyu {
 
 		// 変更後の代休休出情報を返す
 		return GetCompenChangeOccDigest
-				.get(require, sid, dateData, createDigestOccurr.getChangeDigest(), createDigestOccurr.getChangeOccr())
-				.getVacationDetail();
+				.get(require, sid, dateData, createDigestOccurr.getChangeDigest(), createDigestOccurr.getChangeOccr());
 	}
 
 	public static interface Require extends GetCompenChangeOccDigest.Require {

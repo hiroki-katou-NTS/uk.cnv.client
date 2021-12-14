@@ -135,4 +135,8 @@ public class PayoutManagementData extends AggregateRoot {
 				EnumAdaptor.valueOf(this.getLawAtr().value, HolidayAtr.class));
 	}
 
+	// 2] 残数が残っている
+	public boolean isRemaing() {
+		return this.stateAtr == DigestionAtr.UNUSED;
+	}
 }

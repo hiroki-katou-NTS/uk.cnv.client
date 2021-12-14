@@ -39,7 +39,7 @@ public interface AppCommonDomainService {
 	 * @param stampRecordOutput
 	 * @return 打刻エラー情報
 	 */
-	public List<ErrorStampInfo> getErrorStampList(StampRecordOutput stampRecordOutput);
+	public List<ErrorStampInfo> getErrorStampList(StampRecordOutput stampRecordOutput, Optional<String> workTypeCd);
 	
 	/**
 	 * Refactor4

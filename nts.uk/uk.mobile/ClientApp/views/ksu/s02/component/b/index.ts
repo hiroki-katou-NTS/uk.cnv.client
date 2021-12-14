@@ -25,7 +25,7 @@ import {
         }
     },
     constraints: [
-        'nts.uk.ctx.at.schedule.dom.shift.management.workavailability.WorkAvailabilityMemo'  
+        'nts.uk.ctx.at.schedule.dom.shift.management.workavailability.WorkAvailabilityMemo'
     ]
 })
 export class CalendarBComponent extends Vue {
@@ -61,6 +61,10 @@ export class CalendarBComponent extends Vue {
 
     public isCaretLeft = true;
 
+    public endRight = true;
+
+    public endLeft = true;
+
     private startWork = '';
 
     public created() {
@@ -84,18 +88,18 @@ export class CalendarBComponent extends Vue {
         let self = this;
         let year = parseInt((yearMonth / 100).toString());
         let month = yearMonth % 100;
-        if (year > parseInt(self.startWork.substring(0, 4)) || year == parseInt(self.startWork.substring(0, 4)) && month >= parseInt(self.startWork.substring(5, 7)) ) {
+        if (year > parseInt(self.startWork.substring(0, 4)) || year == parseInt(self.startWork.substring(0, 4)) && month >= parseInt(self.startWork.substring(5, 7))) {
             self.isCurrentMonth = true;
         } else {
             self.isCurrentMonth = false;
         }
         let yearChange = year - parseInt(self.startDate.substring(0, 4));
         let monthChange = month - parseInt(self.startDate.substring(5, 7)) + yearChange * 12;
-        let data = self.getDatePeriodDto(self.startDate,self.endDate, monthChange,self.dataStartPage.shiftWorkUnit);
+        let data = self.getDatePeriodDto(self.startDate, self.endDate, monthChange, self.dataStartPage.shiftWorkUnit);
         self.startDate = data.startDate;
         self.endDate = data.endDate;
         this.$emit('changeMonth', { startDate: self.startDate, endDate: self.endDate });
-        
+
     }
 
     @Watch('params.dataFromParent')
@@ -218,7 +222,7 @@ export class CalendarBComponent extends Vue {
                     dateDisplayD = '<span ' + classDisplayToDay + '>' + dateDisplayD + '</span>';
                 }
             }
-            
+
             let checkMemo = false;
             if (dataDate.memo != null && dataDate.memo != '') {
                 checkMemo = true;
@@ -275,7 +279,7 @@ export class CalendarBComponent extends Vue {
                     dateDisplay: dateDisplayD,
                     workAvailabilityOfOneDayDto: null,
                     showMemo: false,
-                    nameListInfor: [], 
+                    nameListInfor: [],
                     canUpdateCell: false
                 };
                 listData.push(dataDisplay);
@@ -319,6 +323,11 @@ export class CalendarBComponent extends Vue {
 
     public cellFocus(el) {
         let self = this;
+        if (self.showPopup) {
+            self.showPopup = false;
+
+            return;
+        }
         self.showPopup = false;
         let dataClick = _.find(self.listDataDisplay, function (o) { return o.id == el.currentTarget.id; });
         self.memoCurent = '';
@@ -341,11 +350,24 @@ export class CalendarBComponent extends Vue {
             self.showPopup = true;
             let offset = $('#' + el.currentTarget.id).offset();
             let offsetLeft = offset.left - 10;
-            if (self.idCurent == 'd6' || self.idCurent == 'd13' || self.idCurent == 'd20' || self.idCurent == 'd27') {
-                offsetLeft = offset.left - 60;
+            if (self.idCurent == 'd5' || self.idCurent == 'd12' || self.idCurent == 'd19' || self.idCurent == 'd26' || self.idCurent == 'd33' || self.idCurent == 'd40') {
+                offsetLeft = offset.left - 20;
+            }
+
+            if (self.idCurent == 'd6' || self.idCurent == 'd13' || self.idCurent == 'd20' || self.idCurent == 'd27' || self.idCurent == 'd34' || self.idCurent == 'd41') {
+                offsetLeft = offset.left - 75;
                 self.isCaretLeft = false;
+                self.endLeft = false;
+                self.endRight = true;
+            } else if (self.idCurent == 'd0' || self.idCurent == 'd7' || self.idCurent == 'd14' || self.idCurent == 'd21' || self.idCurent == 'd28' || self.idCurent == 'd35') {
+                offsetLeft = offset.left + 10;
+                self.isCaretLeft = false;
+                self.endLeft = true;
+                self.endRight = false;
             } else {
                 self.isCaretLeft = true;
+                self.endLeft = false;
+                self.endRight = false;
             }
             $(popup)
                 .fadeIn()
@@ -475,7 +497,7 @@ export class CalendarBComponent extends Vue {
      * @param monthChange number month change
      * @param shiftWorkUnit mode month(1) or mode week(0)
      */
-    public getDatePeriodDto(startDate: string, endDate: string, monthChange: number,shiftWorkUnit: number) {
+    public getDatePeriodDto(startDate: string, endDate: string, monthChange: number, shiftWorkUnit: number) {
         let startD = '';
         let startE = '';
         let yearMonth = startD.substring(0, 4) + startD.substring(5, 7);
@@ -498,9 +520,9 @@ export class CalendarBComponent extends Vue {
         } else { //mode week
             startD = moment(startDate).add(monthChange, 'M').format('YYYY/MM/DD').toString();
             startE = moment(startD).add(6, 'days').format('YYYY/MM/DD').toString();
-            
+
         }
-        
+
         let dataResult = {
             startDate: startD,
             endDate: startE

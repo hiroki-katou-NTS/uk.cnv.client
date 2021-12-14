@@ -87,7 +87,19 @@ export class KafS00ShrComponent extends Vue {
 
             return;
         }	
-        vm.$modal.error({ messageId: failData.messageId, messageParams: failData.parameterIds });
+
+        if (failData.errors) {
+            if (failData.errors.length > 0) {
+                let error = failData.errors[0];
+                vm.$modal.error({ messageId: error.messageId, messageParams: Array.from(error.parameterIds, (item: string) => item) }).then(() => {
+                    failData.errors = _.drop(failData.errors);
+
+                    return vm.handleErrorCommon(failData);
+                });
+            }
+        } else {
+            vm.$modal.error({ messageId: failData.messageId, messageParams: failData.parameterIds });
+        }
     }
 
     public createApplicationInsert(appTypeParam): Application {

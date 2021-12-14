@@ -2,6 +2,7 @@ package nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nts.arc.time.GeneralDate;
@@ -13,13 +14,14 @@ import nts.arc.time.GeneralDate;
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class RegulationInfoEmpQuery {
 
 	/** The base date. */
 	private GeneralDate baseDate; // 基準日
 
 	/** The reference range. */
-	private Integer referenceRange; // 検索参照範囲
+	private SearchReferenceRange referenceRange; // 検索参照範囲
 
 	/** The filter by employment. */
 	private Boolean filterByEmployment; // 雇用で絞り込む
@@ -94,7 +96,7 @@ public class RegulationInfoEmpQuery {
 	private String nameType; // 氏名の種類
 
 	/** The system type. */
-	private Integer systemType;
+	private CCG001SystemType systemType;
 	
 	private String roleId;
 	
@@ -104,46 +106,4 @@ public class RegulationInfoEmpQuery {
 	/** The closure ids. */
 	private List<Integer> closureIds;
 
-	public RegulationInfoEmpQuery(GeneralDate baseDate, Integer referenceRange, Boolean filterByEmployment,
-			List<String> employmentCodes, Boolean filterByDepartment, List<String> departmentCodes,
-			Boolean filterByWorkplace, List<String> workplaceIds, Boolean filterByClassification,
-			List<String> classificationCodes, Boolean filterByJobTitle, List<String> jobTitleCodes,
-			Boolean filterByWorktype, List<String> worktypeCodes, GeneralDate periodStart, GeneralDate periodEnd,
-			Boolean includeIncumbents, Boolean includeWorkersOnLeave, Boolean includeOccupancy, Boolean includeRetirees,
-			Boolean includeAreOnLoan, Boolean includeGoingOnLoan, GeneralDate retireStart, GeneralDate retireEnd,
-			Integer sortOrderNo, String nameType, Integer systemType, String roleId, Boolean filterByClosure,
-			List<Integer> closureIds) {
-		super();
-		this.baseDate = baseDate;
-		this.referenceRange = referenceRange;
-		this.filterByEmployment = filterByEmployment;
-		this.employmentCodes = employmentCodes;
-		this.filterByDepartment = filterByDepartment;
-		this.departmentCodes = departmentCodes;
-		this.filterByWorkplace = filterByWorkplace;
-		this.workplaceIds = workplaceIds;
-		this.filterByClassification = filterByClassification;
-		this.classificationCodes = classificationCodes;
-		this.filterByJobTitle = filterByJobTitle;
-		this.jobTitleCodes = jobTitleCodes;
-		this.filterByWorktype = filterByWorktype;
-		this.worktypeCodes = worktypeCodes;
-		this.periodStart = periodStart;
-		this.periodEnd = periodEnd;
-		this.includeIncumbents = includeIncumbents;
-		this.includeWorkersOnLeave = includeWorkersOnLeave;
-		this.includeOccupancy = includeOccupancy;
-		this.includeRetirees = includeRetirees;
-		this.includeAreOnLoan = includeAreOnLoan;
-		this.includeGoingOnLoan = includeGoingOnLoan;
-		this.retireStart = retireStart;
-		this.retireEnd = retireEnd;
-		this.sortOrderNo = sortOrderNo;
-		this.nameType = nameType;
-		this.systemType = systemType;
-		this.roleId = roleId;
-		this.filterByClosure = filterByClosure;
-		this.closureIds = closureIds;
-	}
-	
 }

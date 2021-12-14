@@ -17,8 +17,29 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.paymana.PayoutSubofHDManagement;
  */
 public class GetModifiOutbreakDigest {
 
+	//  取得して相殺する
+	public static AfterChangeHolidayInfoResult getAndOffset(Require require, String sid, DatePeriod dateData,
+			RequestChangeDigestOccr changeDigest, RequestChangeDigestOccr changeOccr) {
+
+		val afterChangeResult = changeAccordChangeRequest(require, sid, dateData, changeDigest, changeOccr);
+
+		// ＄変更後．紐付けされている振出の未相殺数を更新する（）
+		afterChangeResult.getOffsetNotAssoci();
+
+		// ＄変更後．紐付けされている振休の未相殺数を更新する（
+		afterChangeResult.getVactionNotAssoci();
+
+		return afterChangeResult;
+	}
+
 	// 取得する
 	public static AfterChangeHolidayInfoResult get(Require require, String sid, DatePeriod dateData,
+			RequestChangeDigestOccr changeDigest, RequestChangeDigestOccr changeOccr) {
+		return changeAccordChangeRequest(require, sid, dateData, changeDigest, changeOccr);
+	}
+
+	// 変更要求に従って変更する
+	private static AfterChangeHolidayInfoResult changeAccordChangeRequest(Require require, String sid, DatePeriod dateData,
 			RequestChangeDigestOccr changeDigest, RequestChangeDigestOccr changeOccr) {
 		// $消化一覧 = 上書き変更を加えた消化一覧を取得する.取得する(require, 社員ID, 期間, 消化の変更要求)
 		VacationDetails digest = GetDigestListOverwriteChange.get(require, sid, dateData, changeDigest);

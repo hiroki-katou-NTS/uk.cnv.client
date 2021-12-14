@@ -70,25 +70,33 @@
 							<div data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KAF018_317')}</div>	
 						</div>
 						<div class="table" style="margin-top: 20px;">
-							<div class="kaf018-a-checkBox">
-								<div data-bind="ntsCheckBox: { checked: applicationApprovalFlg.value,
-															enable: applicationApprovalFlg.enable }"></div>
-								<div style="display: inline-block;" data-bind="text: applicationApprovalFlg.text"></div>
+							<div data-bind="if: applicationApprovalFlg.display">
+								<div class="kaf018-a-checkBox">
+									<div data-bind="ntsCheckBox: { checked: applicationApprovalFlg.value,
+																enable: applicationApprovalFlg.enable }"></div>
+									<div style="display: inline-block; vertical-align: top;" data-bind="text: applicationApprovalFlg.text"></div>
+								</div>
 							</div>
-							<div class="kaf018-a-checkBox">
-								<div data-bind="ntsCheckBox: { checked: confirmAndApprovalDailyFlg.value, 
-															enable: confirmAndApprovalDailyFlg.enable }"></div>
-								<div style="display: inline-block;" data-bind="text: confirmAndApprovalDailyFlg.text"></div>
+							<div data-bind="if: confirmAndApprovalDailyFlg.display">
+								<div class="kaf018-a-checkBox">
+									<div data-bind="ntsCheckBox: { checked: confirmAndApprovalDailyFlg.value, 
+																enable: confirmAndApprovalDailyFlg.enable }"></div>
+									<div style="display: inline-block; vertical-align: top;" data-bind="text: confirmAndApprovalDailyFlg.text"></div>
+								</div>
 							</div>
-							<div class="kaf018-a-checkBox">
-								<div data-bind="ntsCheckBox: { checked: confirmAndApprovalMonthFlg.value, 
-															enable: confirmAndApprovalMonthFlg.enable }"></div>
-								<div style="display: inline-block;" data-bind="text: confirmAndApprovalMonthFlg.text"></div>
+							<div data-bind="if: confirmAndApprovalMonthFlg.display">
+								<div class="kaf018-a-checkBox">
+									<div data-bind="ntsCheckBox: { checked: confirmAndApprovalMonthFlg.value, 
+																enable: confirmAndApprovalMonthFlg.enable }"></div>
+									<div style="display: inline-block; vertical-align: top;" data-bind="text: confirmAndApprovalMonthFlg.text"></div>
+								</div>
 							</div>
-							<div class="kaf018-a-checkBox">
-								<div data-bind="ntsCheckBox: { checked: confirmEmploymentFlg.value, 
-															enable: confirmEmploymentFlg.enable }"></div>
-								<div style="display: inline-block;" data-bind="text: confirmEmploymentFlg.text"></div>
+							<div data-bind="if: confirmEmploymentFlg.display">
+								<div class="kaf018-a-checkBox">
+									<div data-bind="ntsCheckBox: { checked: confirmEmploymentFlg.value, 
+																enable: confirmEmploymentFlg.enable }"></div>
+									<div style="display: inline-block; vertical-align: top;" data-bind="text: confirmEmploymentFlg.text"></div>
+								</div>
 							</div>
 						</div>
 					</div>

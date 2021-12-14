@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.inject.Inject;
 
 import lombok.val;
 import nts.arc.enums.EnumAdaptor;
@@ -20,7 +19,6 @@ import nts.arc.layer.infra.data.JpaRepository;
 import nts.arc.layer.infra.data.jdbc.NtsResultSet;
 import nts.arc.time.YearMonth;
 import nts.gul.collection.CollectionUtil;
-import nts.uk.ctx.at.record.dom.monthly.TimeOfMonthlyRepository;
 import nts.uk.ctx.at.record.infra.entity.monthly.mergetable.KrcdtMonAnyItemValueMerge;
 import nts.uk.ctx.at.record.infra.entity.monthly.mergetable.KrcdtMonMergePk;
 import nts.uk.ctx.at.shared.dom.common.anyitem.AnyAmountMonth;
@@ -39,9 +37,6 @@ import nts.uk.shr.com.time.calendar.date.ClosureDate;
 @Stateless
 public class JpaAnyItemOfMonthly extends JpaRepository implements AnyItemOfMonthlyRepository {
 	
-	@Inject
-	private TimeOfMonthlyRepository timeRepo;
-
 	private static final String FIND_BY_MONTHLY_AND_CLOSURE = "SELECT a FROM KrcdtMonAnyItemValueMerge a "
 			+ "WHERE a.krcdtMonAnyItemValuePk.employeeId = :employeeId "
 			+ "AND a.krcdtMonAnyItemValuePk.yearMonth = :yearMonth "
@@ -898,7 +893,6 @@ public class JpaAnyItemOfMonthly extends JpaRepository implements AnyItemOfMonth
 			entity.toEntityAnyItemOfMonthly(domain);
 		}
 		this.getEntityManager().persist(entity);
-		markMonTimeDirty(key);
 	}
 	
 	/** 登録および更新 */
@@ -921,7 +915,6 @@ public class JpaAnyItemOfMonthly extends JpaRepository implements AnyItemOfMonth
 			entity.toEntityAnyItemOfMonthly(d);
 		}
 		this.getEntityManager().persist(entity);
-		this.markMonTimeDirty(key);
 	}
 	
 	/** 削除 */
@@ -951,7 +944,6 @@ public class JpaAnyItemOfMonthly extends JpaRepository implements AnyItemOfMonth
 							.setParameter("employeeId", employeeId)
 							.setParameter("yearMonth", yearMonth.v()).getList().forEach(entity -> {
 								this.commandProxy().remove(entity);
-								this.markMonTimeDirty(entity.krcdtMonAnyItemValuePk);
 							});
 //		this.getEntityManager().createQuery(DELETE_BY_MONTHLY).setParameter("employeeId", employeeId)
 //				.setParameter("yearMonth", yearMonth.v()).executeUpdate();
@@ -965,11 +957,6 @@ public class JpaAnyItemOfMonthly extends JpaRepository implements AnyItemOfMonth
 				.setParameter("closureId", closureId.value).setParameter("closureDay", closureDate.getClosureDay().v())
 				.setParameter("isLastDay", (closureDate.getLastDayOfMonth() ? 1 : 0)).getSingle().ifPresent(entity -> {
 					remover.accept(entity);
-					this.markMonTimeDirty(entity.krcdtMonAnyItemValuePk);
 				});
-	}
-
-	private void markMonTimeDirty(KrcdtMonMergePk entityKey){
-		this.timeRepo.dirtying(() -> entityKey);
 	}
 }

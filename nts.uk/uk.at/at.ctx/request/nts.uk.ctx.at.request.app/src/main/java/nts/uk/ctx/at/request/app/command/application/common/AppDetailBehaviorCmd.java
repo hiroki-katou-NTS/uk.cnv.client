@@ -19,4 +19,6 @@ public class AppDetailBehaviorCmd {
 	
 	private AppDispInfoStartupDto appDispInfoStartupOutput;
 	
+	private HdsubRecLinkDataDto hdsubRecLinkData;
+	
 }

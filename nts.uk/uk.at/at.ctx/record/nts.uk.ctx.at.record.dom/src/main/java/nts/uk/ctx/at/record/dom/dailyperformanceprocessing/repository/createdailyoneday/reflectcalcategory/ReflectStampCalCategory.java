@@ -20,9 +20,9 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.editstate.E
 @Stateless
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class ReflectStampCalCategory {
-	public void reflectStamp(AutoCalSetting normalOtTime, List<EditStateOfDailyAttd> editState, int attendanceItem) {
+	public void reflectStamp(AutoCalSetting normalOtTime, List<EditStateOfDailyAttd> editState, int attendanceItem,AutoCalAtrOvertime overTimeAutoCalAtr) {
 		// 「パラメータ。自動計算設定。計算区分」を確認する
-		if (normalOtTime.getCalAtr() != AutoCalAtrOvertime.TIMERECORDER) {
+		if (overTimeAutoCalAtr != AutoCalAtrOvertime.TIMERECORDER) {
 			return;
 		}
 		// パラメータ。自動計算設定。計算区分＝打刻から計算する

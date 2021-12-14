@@ -6,7 +6,9 @@ import java.util.Optional;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.record.dom.stamp.card.stampcard.ContractCode;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
 
 /**
  * 打刻Repository
@@ -62,5 +64,9 @@ public interface StampDakokuRepository {
 	public List<Stamp> getByDateTimeperiod(List<String> listCard, GeneralDateTime startDate, GeneralDateTime endDate);
 
 	public Optional<Stamp> get(String contractCode, StampNumber stampNumber);
+	
+	//[6] exists(契約コード,打刻カード番号, 打刻日時,時刻変更区分)
+	public boolean existsStamp(ContractCode contractCode, StampNumber stampNumber, GeneralDateTime dateTime,
+			ChangeClockArt changeClockArt) ;
 
 }

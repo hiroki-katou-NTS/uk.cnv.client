@@ -335,7 +335,8 @@
         </li>
       </ul>
       <span v-show="isCaretLeft" class="caret-helpbutton caret-bottom"></span>
-      <span v-show="!isCaretLeft" class="caret-helpbutton caret-bottom1"></span>
+      <span v-show="endRight" class="caret-helpbutton caret-bottom1"></span>
+      <span v-show="endLeft" class="caret-helpbutton caret-bottom2"></span>
     </div>
     <div class="modal-confirm" v-show="showConfirmDialog">
       <div class="modal show">

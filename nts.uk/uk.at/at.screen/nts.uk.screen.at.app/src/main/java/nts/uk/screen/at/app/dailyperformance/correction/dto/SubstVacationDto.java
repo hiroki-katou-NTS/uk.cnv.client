@@ -15,7 +15,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SubstVacationDto {
-
+	
+	/**
+	 * 振休管理する
+	 */
 	private boolean manageAtr;
 
 	private Double holidayRemain;

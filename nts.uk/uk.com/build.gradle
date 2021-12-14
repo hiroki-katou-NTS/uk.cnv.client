@@ -252,6 +252,7 @@ project (':com.file:nts.uk.file.com.app') {
 		compile project(':wk.ctx:nts.uk.ctx.workflow.dom')
 		compile project(':query:nts.uk.query.pub')
 		compile project(':pereg.ctx:nts.uk.ctx.pereg.dom')
+		compile project(':office.ctx:nts.uk.ctx.office.dom')
 	}
 }
 

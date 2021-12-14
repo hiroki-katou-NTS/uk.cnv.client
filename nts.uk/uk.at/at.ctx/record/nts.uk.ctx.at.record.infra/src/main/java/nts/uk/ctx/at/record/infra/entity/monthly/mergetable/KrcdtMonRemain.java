@@ -28,10 +28,19 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.Rema
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.RemainingTimes;
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.UsedMinutes;
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.UsedTimes;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffDayAndTimes;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffDayTimeUnUse;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffDayTimeUse;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffRemainCarryForward;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffRemainDayAndTimes;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.MonthlyDayoffRemainData;
 import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveGrantDayNumber;
 import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveRemainingDayNumber;
 import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveRemainingTime;
 import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveUsedDayNumber;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveUsedTime;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.MonthVacationGrantDay;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.MonthVacationGrantTime;
 import nts.uk.ctx.at.shared.dom.remainingnumber.nursingcareleavemanagement.childcare.ChildCareNurseUsedNumber;
 import nts.uk.ctx.at.shared.dom.remainingnumber.reserveleave.empinfo.grantremainingdata.daynumber.ReserveLeaveGrantDayNumber;
 import nts.uk.ctx.at.shared.dom.remainingnumber.reserveleave.empinfo.grantremainingdata.daynumber.ReserveLeaveRemainingDayNumber;
@@ -69,10 +78,6 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.childcar
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.childcarenurse.ChildCareNurseRemainingNumber;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.childcarenurse.ChildCareNurseUsedInfo;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.childcarenurse.ChildcareNurseRemNumEachMonth;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.DayOffDayAndTimes;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.DayOffRemainDayAndTimes;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.MonthlyDayoffRemainData;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.RemainDataTimesMonth;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.publicholiday.PublicHolidayRemNumEachMonth;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.reserveleave.ReserveLeave;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.reserveleave.ReserveLeaveGrant;
@@ -169,6 +174,7 @@ public class KrcdtMonRemain extends ContractUkJpaEntity implements Serializable 
 	/** 実使用回数 */
 	@Column(name = "AL_FACT_USED_TIMES")
 	public Integer annleaFactUsedTimes;
+	
 	/** 合計残日数付与前 */
 	@Column(name = "AL_REM_DAYS_BEFORE")
 	public double annleaRemainingDaysBefore;
@@ -1626,15 +1632,14 @@ public class KrcdtMonRemain extends ContractUkJpaEntity implements Serializable 
 		if (normalUsed.getUsedTime().isPresent()) {
 			this.annleaUsedMinutes = normalUsed.getUsedTime().get().v();
 		}
+		
 		this.annleaUsedDaysBefore = normalUsedBefore.getUsedDays().map(c -> c.v()).orElse(0d);
 		if (normalUsedBefore.getUsedTime().isPresent()){
 			this.annleaUsedMinutesBefore = normalUsedBefore.getUsedTime().get().v();
-//			if (normalUsedTime.getUsedTimeAfterGrant().isPresent()) {
-//				this.annleaUsedMinutesAfter = normalUsedTime.getUsedTimeAfterGrant().get().v();
-//			}
 		}
 
 		this.annleaUsedTimes = normal.getUsedNumberInfo().getAnnualLeaveUsedTimes().v();
+		
 		if (normalUsedAfterOpt.isPresent()) {
 			this.annleaUsedDaysAfter = normalUsedAfterOpt.get().getUsedDays().map(c -> c.v()).orElse(0d);
 			if (normalUsedAfterOpt.get().getUsedTime().isPresent()){
@@ -1656,6 +1661,9 @@ public class KrcdtMonRemain extends ContractUkJpaEntity implements Serializable 
 		if (realUsedBefore.getUsedTime().isPresent()) {
 			this.annleaFactUsedMinutesBefore = realUsedBefore.getUsedTime().get().v();
 		}
+		
+		this.annleaFactUsedTimes = real.getUsedNumberInfo().getAnnualLeaveUsedTimes().v();
+		
 		if (realUsedAfterOpt.isPresent()) {
 			this.annleaFactUsedDaysAfter = realUsedAfterOpt.get().getUsedDays().map(c -> c.v()).orElse(0d);
 			if (realUsedAfterOpt.get().getUsedTime().isPresent()) {
@@ -2749,13 +2757,13 @@ public class KrcdtMonRemain extends ContractUkJpaEntity implements Serializable 
 		if (domain.getUseDayTimes().getTime().isPresent()){
 			this.dayOffUsedMinutes = domain.getUseDayTimes().getTime().get().v();
 		}
-		this.dayOffRemainingDays = domain.getRemainingDayTimes().getDays().v();
-		if (domain.getRemainingDayTimes().getTimes().isPresent()){
-			this.dayOffRemainingMinutes = domain.getRemainingDayTimes().getTimes().get().v();
+		this.dayOffRemainingDays = domain.getRemainingDayTimes().getDay().v();
+		if (domain.getRemainingDayTimes().getTime().isPresent()){
+			this.dayOffRemainingMinutes = domain.getRemainingDayTimes().getTime().get().v();
 		}
-		this.dayOffCarryforwardDays = domain.getCarryForWardDayTimes().getDays().v();
-		if (domain.getCarryForWardDayTimes().getTimes().isPresent()){
-			this.dayOffCarryforwardMinutes = domain.getCarryForWardDayTimes().getTimes().get().v();
+		this.dayOffCarryforwardDays = domain.getCarryForWardDayTimes().getDay().v();
+		if (domain.getCarryForWardDayTimes().getTime().isPresent()){
+			this.dayOffCarryforwardMinutes = domain.getCarryForWardDayTimes().getTime().get().v();
 		}
 		this.dayOffUnUsedDays = domain.getUnUsedDayTimes().getDay().v();
 		if (domain.getUnUsedDayTimes().getTime().isPresent()){
@@ -3969,23 +3977,41 @@ public class KrcdtMonRemain extends ContractUkJpaEntity implements Serializable 
 				EnumAdaptor.valueOf(closureStatus, ClosureStatus.class),
 				this.startDate,
 				this.endDate,
-				createDayOff(this.dayOffOccurredDays, this.dayOffOccurredTimes),
-				createDayOff(this.dayOffUsedDays, this.dayOffUsedMinutes),
+				createOccurrenceDayTime(this.dayOffOccurredDays, this.dayOffOccurredTimes),
+				createUseDayTime(this.dayOffUsedDays, this.dayOffUsedMinutes),
 				createDayOffRemain(this.dayOffRemainingDays, this.dayOffRemainingMinutes),
-				createDayOffRemain(this.dayOffCarryforwardDays, this.dayOffCarryforwardMinutes),
-				createDayOff(this.dayOffUnUsedDays, this.dayOffUnUsedTimes));
+				createCarryForWardDayTimes(this.dayOffCarryforwardDays, this.dayOffCarryforwardMinutes),
+				createUnUsedDayTimes(this.dayOffUnUsedDays, this.dayOffUnUsedTimes));
 	}
 
 	private DayOffRemainDayAndTimes createDayOffRemain(double days, Integer times) {
 		return new DayOffRemainDayAndTimes(
-				new AttendanceDaysMonthToTal(days),
-				Optional.ofNullable(times == null ? null : new RemainingMinutes(times)));
+				new LeaveRemainingDayNumber(days),
+				Optional.ofNullable(times == null ? null : new LeaveRemainingTime(times)));
 	}
 
-	private DayOffDayAndTimes createDayOff(double days, Integer times) {
+	private DayOffDayTimeUse createUseDayTime(double days, Integer times) {
+		return new DayOffDayTimeUse(
+				new LeaveUsedDayNumber(days),
+				Optional.ofNullable(times == null ? null : new LeaveUsedTime(times)));
+	}
+	
+	private DayOffDayAndTimes createOccurrenceDayTime(double days, Integer times) {
 		return new DayOffDayAndTimes(
-				new RemainDataDaysMonth(days),
-				Optional.ofNullable(times == null ? null : new RemainDataTimesMonth(times)));
+				new MonthVacationGrantDay(days),
+				Optional.ofNullable(times == null ? null : new MonthVacationGrantTime(times)));
+	}
+	
+	private DayOffRemainCarryForward createCarryForWardDayTimes(double days, Integer times) {
+		return new DayOffRemainCarryForward(
+				new LeaveRemainingDayNumber(days),
+				Optional.ofNullable(times == null ? null : new LeaveRemainingTime(times)));
+	}
+	
+	private DayOffDayTimeUnUse createUnUsedDayTimes(double days, Integer times) {
+		return new DayOffDayTimeUnUse(
+				new LeaveRemainingDayNumber(days),
+				Optional.ofNullable(times == null ? null : new LeaveRemainingTime(times)));
 	}
 
 	/**
@@ -4051,8 +4077,8 @@ public class KrcdtMonRemain extends ContractUkJpaEntity implements Serializable 
 							),
 					/** 本年残数 */
 					ChildCareNurseRemainingNumber.of(
-							new DayNumberOfRemain(this.careRemainDaysBefore),
-							this.careRemainMinutesBefore==null? Optional.empty(): Optional.of(new TimeOfRemain(this.careRemainMinutesBefore))
+							new DayNumberOfRemain(this.childRemainDaysBefore),
+							this.childRemainMinutesBefore==null? Optional.empty(): Optional.of(new TimeOfRemain(this.childRemainMinutesBefore))
 							),
 					/** 翌年使用数 */
 					Optional.of(ChildCareNurseUsedInfo.of(
@@ -4069,8 +4095,8 @@ public class KrcdtMonRemain extends ContractUkJpaEntity implements Serializable 
 							)),
 					/** 翌年残数 */
 					Optional.of(ChildCareNurseRemainingNumber.of(
-							new DayNumberOfRemain(this.careRemainDaysAfter),
-							this.careRemainMinutesAfter == null? Optional.empty(): Optional.of(new TimeOfRemain(this.careRemainMinutesAfter))
+							new DayNumberOfRemain(this.childRemainDaysAfter),
+							this.childRemainMinutesAfter == null? Optional.empty(): Optional.of(new TimeOfRemain(this.childRemainMinutesAfter))
 							))
 				);
 		return new ChildcareRemNumEachMonth(
@@ -4125,8 +4151,8 @@ public class KrcdtMonRemain extends ContractUkJpaEntity implements Serializable 
 							),
 					/** 本年残数 */
 					ChildCareNurseRemainingNumber.of(
-							new DayNumberOfRemain(this.childRemainDaysBefore),
-							this.childRemainMinutesBefore == null?Optional.empty() : Optional.of(new TimeOfRemain(this.childRemainMinutesBefore))
+							new DayNumberOfRemain(this.careRemainDaysBefore),
+							this.careRemainMinutesBefore == null?Optional.empty() : Optional.of(new TimeOfRemain(this.careRemainMinutesBefore))
 							),
 					/** 翌年使用数 */
 					Optional.of(ChildCareNurseUsedInfo.of(
@@ -4143,8 +4169,8 @@ public class KrcdtMonRemain extends ContractUkJpaEntity implements Serializable 
 							)),
 					/** 翌年残数 */
 					Optional.of(ChildCareNurseRemainingNumber.of(
-							new DayNumberOfRemain(this.childRemainDaysAfter),
-							this.childRemainMinutesAfter == null? Optional.empty(): Optional.of(new TimeOfRemain(this.childRemainMinutesAfter))
+							new DayNumberOfRemain(this.careRemainDaysAfter),
+							this.careRemainMinutesAfter == null? Optional.empty(): Optional.of(new TimeOfRemain(this.careRemainMinutesAfter))
 							))
 				);
 		return new CareRemNumEachMonth(

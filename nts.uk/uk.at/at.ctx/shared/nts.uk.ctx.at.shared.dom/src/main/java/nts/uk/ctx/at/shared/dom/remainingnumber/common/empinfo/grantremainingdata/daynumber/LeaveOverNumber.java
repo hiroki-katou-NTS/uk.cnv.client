@@ -12,6 +12,7 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.empinfo.grantremain
  * @author masaaki_jinno
  *
  */
+@Getter
 @AllArgsConstructor
 public class LeaveOverNumber {
 
@@ -90,5 +91,13 @@ public class LeaveOverNumber {
 				timeOver.map(c -> new TimeOver(c.v())));
 
 		return cloned;
+	}
+	
+	public TimeOver getTimeOverOrZero() {
+		return this.getTimeOver().map(c -> c).orElse(new TimeOver(0));
+	}
+
+	public LeaveRemainingNumber toLeaveRemainingNumber() {
+		return new LeaveRemainingNumber(this.getNumberOverDays().v(), this.getTimeOverOrZero().v());
 	}
 }

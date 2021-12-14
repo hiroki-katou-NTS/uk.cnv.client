@@ -51,7 +51,7 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.RecordRemainCreateInfo
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.ScheRemainCreateInfor;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.TimeDigestionParam;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.TimeDigestionUsageInfor;
-import nts.uk.ctx.at.shared.dom.remainingnumber.work.VacationTimeInforNew;
+import nts.uk.ctx.at.shared.dom.remainingnumber.work.VacationTimeUseInfor;
 import nts.uk.ctx.at.shared.dom.worktype.specialholidayframe.SpecialHdFrameNo;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 
@@ -285,9 +285,9 @@ public class NewBeforeRegisterImpl implements NewBeforeRegister {
 		
 		if (!flag) {
 		    // 登録時の残数チェック
-		    List<VacationTimeInforNew> vacationTimeInforNews = timeDigestionUsageInfor.isPresent() ? 
+		    List<VacationTimeUseInfor> vacationTimeInforNews = timeDigestionUsageInfor.isPresent() ? 
 		            timeDigestionUsageInfor.get().getTimeLeaveApplicationDetails().stream().map(x -> 
-		            new VacationTimeInforNew(
+		            new VacationTimeUseInfor(
 		                    x.getAppTimeType(), 
 		                    x.getTimeDigestApplication().getTimeAnnualLeave(), 
 		                    x.getTimeDigestApplication().getTimeOff(), 
@@ -296,7 +296,7 @@ public class NewBeforeRegisterImpl implements NewBeforeRegister {
 		                    x.getTimeDigestApplication().getChildTime(), 
 		                    x.getTimeDigestApplication().getNursingTime(), 
 		                    x.getTimeDigestApplication().getSpecialVacationFrameNO().map(y -> new SpecialHdFrameNo(y))))
-		            .collect(Collectors.toList()) : new ArrayList<VacationTimeInforNew>();
+		            .collect(Collectors.toList()) : new ArrayList<VacationTimeUseInfor>();
 		            AppRemainCreateInfor appRemainCreateInfor = new AppRemainCreateInfor(
 		                    application.getEmployeeID(), 
 		                    application.getAppID(), 
@@ -314,7 +314,7 @@ public class NewBeforeRegisterImpl implements NewBeforeRegister {
 		                            application.getOpAppStartDate().map(ApplicationDate::getApplicationDate), 
 		                            application.getOpAppEndDate().map(ApplicationDate::getApplicationDate), 
 		                            lstDateHd, 
-		                            timeDigestionUsageInfor.map(TimeDigestionParam::toTimeDigestionUsageInfor));
+		                            timeDigestionUsageInfor.map(TimeDigestionParam::toTimeDigestionUsageInfor), Optional.empty());
 		            InterimRemainCheckInputParam param = new InterimRemainCheckInputParam(
 		                    companyID, 
 		                    application.getEmployeeID(), 

@@ -14,8 +14,7 @@ public class AppPhaseInsTmp {
 	private Integer approvalForm;
 	
 	public boolean equalOther(AppPhaseInsTmp appPhaseInsTmp) {
-		if(rootID.equals(appPhaseInsTmp.getRootID()) &&
-			phaseOrder==appPhaseInsTmp.getPhaseOrder() &&
+		if(phaseOrder==appPhaseInsTmp.getPhaseOrder() &&
 			approvalForm==appPhaseInsTmp.getApprovalForm()) {
 			return true;
 		}

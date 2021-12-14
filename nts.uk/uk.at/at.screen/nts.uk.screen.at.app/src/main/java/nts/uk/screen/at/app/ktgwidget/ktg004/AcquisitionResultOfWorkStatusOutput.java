@@ -43,4 +43,7 @@ public class AcquisitionResultOfWorkStatusOutput {
     
     //翌月の締め情報
   	private CurrentClosingPeriod nextMonthClosingInformation;
+  	
+  	// 休暇設定
+  	private VacationSetting vacationSetting;
 }

@@ -21,4 +21,7 @@ public class WorkStyleDto {
 	
 	@Getter
 	private String remarks;
+
+	@Getter
+	private String importCode;
 }

@@ -372,7 +372,7 @@ module nts.uk.at.view.kwr007.a {
       let isHasOutput: Boolean = true;
       isHasOutput = _.some(vm.detailsOutputSettings(), (x) => x.checked() === true);
       if( !isHasOutput ) {
-        vm.$dialog.error({ messageId: 'Msg_1894' }).then(() => { });
+        vm.$dialog.error({ messageId: 'Msg_2309' }).then(() => { });
         hasError.error = true;
         hasError.focusId = 'A82_85';
         return hasError;

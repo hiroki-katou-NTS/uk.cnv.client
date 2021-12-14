@@ -41,6 +41,6 @@ public class StampInfoDispDto {
 		return new StampInfoDispDto(domain.getStampNumber() != null ? domain.getStampNumber().v() : null,
 				domain.getStampDatetime(), domain.getStampDatetime().toString("yyyy/MM/dd HH:mm:ss"),
 				domain.getStampAtr(),
-				!domain.getStamp().isPresent() ? StampInfoDto.fromDomain(domain.getStamp().get()) : null);
+				domain.getStamp().isPresent() ? StampInfoDto.fromDomain(domain.getStamp().get()) : null);
 	}
 }

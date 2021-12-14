@@ -40,9 +40,13 @@ module nts.uk.com.view.ccg034.i {
       const vm = this;
       vm.imageType.subscribe(value => {
         if (value === 1 && !nts.uk.text.isNullOrEmpty(vm.fileId())) {
-          vm.$ajax("/shr/infra/file/storage/infor/" + vm.fileId()).then((res: any) => {
-            vm.fileSize(Math.round(Number(res.originalSize) / 1024));
-            vm.updatePreview();
+          vm.$ajax("/shr/infra/file/storage/isexist/" + vm.fileId()).then((isExist: boolean) => {
+            if (isExist) {
+              vm.$ajax("/shr/infra/file/storage/infor/" + vm.fileId()).then((res: any) => {
+                vm.fileSize(Math.round(Number(res.originalSize) / 1024));
+                vm.updatePreview();
+              });
+            }
           });
         }
       });

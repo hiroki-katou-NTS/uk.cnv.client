@@ -39,54 +39,55 @@
           />
         </div>
         <!-- A1_2-->
-        <div id="content-area" class="kwr-004">
+        <div id="contents-area" class="kwr-004">
           <!-- A3_1-->
           <div id="CCG001" tabindex="-1"></div>
-          <div class="pull-left fixed-flex-layout-left">
-            <div class="employees-list">
-              <!-- A2_1, A2_2, A2_3 -->
-              <div class="panel panel-frame date-time-picker">
-                <div
-                  class="date-time-picker-label"
-                  data-bind="ntsFormLabel: {}, text:  $i18n('KWR004_12')"
-                ></div>
-                <!-- YearMonth Picker -->
-                <div
-                  id="daterangepicker"
-                  tabindex="1"
-                  data-bind="ntsDateRangePicker: { 
-                  required: true, 
-                  enable: true, 
+          <div class="container">
+            <div class="pull-left fixed-flex-layout-left">
+              <div class="employees-list">
+                <!-- A2_1, A2_2, A2_3 -->
+                <div class="panel panel-frame date-time-picker">
+                  <div
+                          class="date-time-picker-label"
+                          data-bind="ntsFormLabel: {}, text:  $i18n('KWR004_12')"
+                  ></div>
+                  <!-- YearMonth Picker -->
+                  <div
+                          id="daterangepicker"
+                          tabindex="1"
+                          data-bind="ntsDateRangePicker: {
+                  required: true,
+                  enable: true,
                   value: periodDate,
-                  maxRange: 'oneYear', 
-                  type: 'yearmonth', 
+                  maxRange: 'oneYear',
+                  type: 'yearmonth',
                   jumpUnit: 'year',
                   showNextPrevious: true,
                   name: $i18n('KWR004_12')
                 }"
-                />
-              </div>
-              <!-- A3_2-->
-              <div tabindex="4" id="kcp005" class="panel panel-frame">22</div>
-            </div>
-          </div>
-          <div class="pull-left fixed-flex-layout-right">
-            <!-- A4_1-->
-            <div class="panel panel-frame">
-              <div class="panel-row">
-                <div class="row-left">
-                  <!-- A5_1-->
-                  <div
-                    class="label"
-                    data-bind="ntsFormLabel: {}, text: $i18n('KWR004_13')"
-                  ></div>
+                  />
                 </div>
-                <div class="row-right">
-                  <div class="radios-group">
-                    <!-- A5_2 -->
+                <!-- A3_2-->
+                <div tabindex="4" id="kcp005" class="panel panel-frame">22</div>
+              </div>
+            </div>
+            <div class="pull-left fixed-flex-layout-right">
+              <!-- A4_1-->
+              <div class="panel panel-frame" style="height: 578px;">
+                <div class="panel-row">
+                  <div class="row-left">
+                    <!-- A5_1-->
                     <div
-                      tabindex="5"
-                      data-bind="ntsRadioBoxGroup: {
+                            class="label"
+                            data-bind="ntsFormLabel: {}, text: $i18n('KWR004_13')"
+                    ></div>
+                  </div>
+                  <div class="row-right">
+                    <div class="radios-group">
+                      <!-- A5_2 -->
+                      <div
+                              tabindex="5"
+                              data-bind="ntsRadioBoxGroup: {
                         options: itemListSetting,
                         optionsValue: 'id',
                         optionsText: 'name',
@@ -94,15 +95,15 @@
                         enable: true,
                         name: $i18n('KWR004_13')
                       }"
-                    ></div>
-                  </div>
-                  <div class="text-box-button">
-                    <div class="item item-1">
-                      <!-- A5_3_2 - KWR004_105-->
-                      <div
-                        tabindex="6"
-                        id="KWR004_105"
-                        data-bind="ntsComboBox: {
+                      ></div>
+                    </div>
+                    <div class="text-box-button">
+                      <div class="item item-1">
+                        <!-- A5_3_2 - KWR004_105-->
+                        <div
+                                tabindex="6"
+                                id="KWR004_105"
+                                data-bind="ntsComboBox: {
                           name: $i18n('KWR004_16'),
                           options:  settingListItems1,
                           optionsValue: 'code',
@@ -117,21 +118,21 @@
                             { prop: 'code', length: 2 },
                             { prop: 'name', length: 10 },
                           ]}"
-                      ></div>
-                      <!-- A5_3_3-->
-                      <button
-                        tabindex="7" class="w-50"
-                        data-bind="enable: isEnableSelectedCode() &amp;&amp; isWorker, 
+                        ></div>
+                        <!-- A5_3_3-->
+                        <button
+                                tabindex="7" class="w-50"
+                                data-bind="enable: isEnableSelectedCode() &amp;&amp; isWorker,
                                   click: showDialogScreenB, text: $i18n('KWR004_17')"
-                      />
-                    </div>
+                        />
+                      </div>
 
-                    <div class="item item-2">
-                      <!-- A5_4_2 - KWR004_106-->
-                      <div
-                        tabindex="8"
-                        id="KWR004_106"
-                        data-bind="ntsComboBox: {
+                      <div class="item item-2">
+                        <!-- A5_4_2 - KWR004_106-->
+                        <div
+                                tabindex="8"
+                                id="KWR004_106"
+                                data-bind="ntsComboBox: {
                           name: $i18n('KWR004_18'),
                           options:  settingListItems2,
                           optionsValue: 'code',
@@ -146,30 +147,30 @@
                             { prop: 'code', length: 2 },
                             { prop: 'name', length: 10 },
                           ]}"
-                      ></div>
-                      <!-- A5_3_3-->
-                      <button
-                        tabindex="9" class="w-50"
-                        data-bind="enable: !isEnableSelectedCode() &amp;&amp; allowFreeSetting , click: showDialogScreenB, text: $i18n('KWR004_19')"
-                      />
+                        ></div>
+                        <!-- A5_3_3-->
+                        <button
+                                tabindex="9" class="w-50"
+                                data-bind="enable: !isEnableSelectedCode() &amp;&amp; allowFreeSetting , click: showDialogScreenB, text: $i18n('KWR004_19')"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="panel-row">
-                <div class="row-left">
-                  <!-- A6_1-->
-                  <div
-                    class="label"
-                    data-bind="ntsFormLabel: {}, text: $i18n('KWR004_20')"
-                  ></div>
-                </div>
-                <div class="row-right row-switch-button">
-                  <!-- A6_2 -->
-                  <div
-                    tabindex="10"
-                    class="cf"
-                    data-bind="ntsSwitchButton: {
+                <div class="panel-row">
+                  <div class="row-left">
+                    <!-- A6_1-->
+                    <div
+                            class="label"
+                            data-bind="ntsFormLabel: {}, text: $i18n('KWR004_20')"
+                    ></div>
+                  </div>
+                  <div class="row-right row-switch-button">
+                    <!-- A6_2 -->
+                    <div
+                            tabindex="10"
+                            class="cf"
+                            data-bind="ntsSwitchButton: {
                     name: $i18n('KWR004_20'),
                     options: [
                       { code: 1, name: $i18n('KWR004_21')},
@@ -180,7 +181,8 @@
                     value: zeroDisplayClassification,
                     required: false,
                     enable: true }"
-                  ></div>
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>

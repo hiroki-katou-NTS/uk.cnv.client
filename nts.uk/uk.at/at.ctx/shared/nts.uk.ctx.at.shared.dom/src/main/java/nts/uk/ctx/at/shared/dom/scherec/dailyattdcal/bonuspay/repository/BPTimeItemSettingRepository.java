@@ -19,6 +19,8 @@ public interface BPTimeItemSettingRepository {
 
 	List<BPTimeItemSetting> getListSpecialSetting(String companyId);
 
+	List<BPTimeItemSetting> getListAllSetting(String companyId);
+
 	void addListSetting(List<BPTimeItemSetting> lstSetting);
 
 	void updateListSetting(List<BPTimeItemSetting> lstSetting);

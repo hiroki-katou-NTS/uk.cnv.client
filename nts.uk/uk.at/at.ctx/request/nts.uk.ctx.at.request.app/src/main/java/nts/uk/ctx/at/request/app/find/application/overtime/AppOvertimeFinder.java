@@ -167,9 +167,6 @@ public class AppOvertimeFinder {
 		DisplayInfoOverTime displayInfoOverTime = param.displayInfoOverTime.toDomain();
 		Application application = param.appOverTime.application.toDomain();
 		AppOverTime appOverTime = param.appOverTime.toDomain();
-		if (appOverTime.getDetailOverTimeOp().isPresent()) {
-			appOverTime.getDetailOverTimeOp().get().setAppId(application.getAppID());
-		}
 		appOverTime.setApplication(application);
 		output = overtimeService.checkErrorRegister(
 				param.require,
@@ -184,9 +181,6 @@ public class AppOvertimeFinder {
 		DisplayInfoOverTime displayInfoOverTime = param.displayInfoOverTime.toDomain();
 		Application application = param.appOverTime.application.toDomain();
 		AppOverTime appOverTime = param.appOverTime.toDomain();
-		if (appOverTime.getDetailOverTimeOp().isPresent()) {
-			appOverTime.getDetailOverTimeOp().get().setAppId(application.getAppID());
-		}
 		appOverTime.setApplication(application);
 		output = CheckBeforeOutputMultiDto.fromDomain(overtimeService.checkErrorRegisterMultiple(
 				param.require,
@@ -296,9 +290,6 @@ public class AppOvertimeFinder {
 	public List<ConfirmMsgOutput> checkBeforeInsert(ParamCheckBeforeRegister param) {
 		Application application = param.appOverTime.application.toDomain();
 		AppOverTime appOverTime = param.appOverTime.toDomain();
-		if (appOverTime.getDetailOverTimeOp().isPresent()) {
-			appOverTime.getDetailOverTimeOp().get().setAppId(application.getAppID());
-		}
 		appOverTime.setApplication(application);
 		return overtimeService.checkBeforeInsert(
 				param.require,
@@ -323,9 +314,6 @@ public class AppOvertimeFinder {
 			appOverTime = param.appOverTimeUpdate.toDomain();
 		}
 		
-		if (appOverTime.getDetailOverTimeOp().isPresent()) {
-			appOverTime.getDetailOverTimeOp().get().setAppId(application.getAppID());
-		}
 		appOverTime.setApplication(application);
 		
 		DisplayInfoOverTime output = overtimeService.calculateMobile(

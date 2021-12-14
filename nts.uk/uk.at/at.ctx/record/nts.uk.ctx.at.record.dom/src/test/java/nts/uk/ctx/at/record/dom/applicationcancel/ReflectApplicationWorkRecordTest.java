@@ -97,7 +97,7 @@ public class ReflectApplicationWorkRecordTest {
 
 		};
 
-		val actualResult = ReflectApplicationWorkRecord.process(require, appImg,
+		val actualResult = ReflectApplicationWorkRecord.process(require,  "", appImg,
 				GeneralDate.ymd(2020, 01, 01), reflectStatus, GeneralDateTime.FAKED_NOW);
 
 		assertThat(actualResult.getLeft().getReflectStatus()).isEqualTo(RCReflectedState.REFLECTED);
@@ -135,7 +135,7 @@ public class ReflectApplicationWorkRecordTest {
 				result = Optional.of(ReflectApplicationHelper.createDailyRecord(ScheduleRecordClassifi.RECORD).getDomain());
 				
 				// 「[RQ667]申請反映後の日別勤怠(work）を作成する（勤務実績）」のテスト呼び出す
-				RCCreateDailyAfterApplicationeReflect.process(require, (ApplicationShare) any,
+				RCCreateDailyAfterApplicationeReflect.process(require, "", (ApplicationShare) any,
 						(DailyRecordOfApplication) any, (GeneralDate) any);
 				times = 1;
 
@@ -143,7 +143,7 @@ public class ReflectApplicationWorkRecordTest {
 
 		};
 
-		val actualResult = ReflectApplicationWorkRecord.process(require, appImg,
+		val actualResult = ReflectApplicationWorkRecord.process(require,  "", appImg,
 				GeneralDate.ymd(2020, 01, 01), reflectStatus, GeneralDateTime.FAKED_NOW);
 
 		assertThat(actualResult.getLeft().getReflectStatus()).isEqualTo(RCReflectedState.REFLECTED);

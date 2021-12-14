@@ -35,7 +35,7 @@ public class GetApplicationReflectionResult {
 		if (!dailyData.isPresent())
 			return dailyData;
 		// 申請反映後の日別勤怠(work）を作成する（勤務実績）
-		DailyAfterAppReflectResult dailyAppReflect = RCCreateDailyAfterApplicationeReflect.process(require, application,
+		DailyAfterAppReflectResult dailyAppReflect = RCCreateDailyAfterApplicationeReflect.process(require, companyId, application,
 				new DailyRecordOfApplication(new ArrayList<>(), ScheduleRecordClassifi.RECORD, dailyData.get()),
 				baseDate);
 

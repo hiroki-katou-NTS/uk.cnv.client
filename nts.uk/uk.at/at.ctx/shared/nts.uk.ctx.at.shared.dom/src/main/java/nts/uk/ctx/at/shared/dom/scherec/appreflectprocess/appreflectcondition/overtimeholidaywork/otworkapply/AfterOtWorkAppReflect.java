@@ -14,7 +14,7 @@ import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.ov
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.OthersReflect;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.ReflectFlexTime;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.reflectbreak.ReflectApplicationTime;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.TranferOvertimeCompensatory;
+import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.TranferOvertimeCompensatoryApp;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.DailyRecordOfApplication;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.condition.ReflectAttendance;
@@ -86,11 +86,11 @@ public class AfterOtWorkAppReflect {
 		this.getBreakLeaveApplication().process(overTimeApp.getBreakTimeOp(), dailyApp);
 
 		// 残業時間の代休振替
-		TranferOvertimeCompensatory.process(require, cid, dailyApp.getDomain());
+		TranferOvertimeCompensatoryApp.process(require, cid, dailyApp.getDomain());
 		return lstId;
 	}
 
-	public static interface RequireAfter extends TranferOvertimeCompensatory.Require, ReflectAttendance.Require {
+	public static interface RequireAfter extends TranferOvertimeCompensatoryApp.Require, ReflectAttendance.Require {
 
 	}
 }

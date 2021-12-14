@@ -351,4 +351,13 @@ public class JpaStampDakokuRepository extends JpaRepository implements StampDako
 				.setParameter("cardNumbers", stampNumber).getList().stream().findFirst().map(x -> toDomain(x));
 	}
 
+	@Override
+	public boolean existsStamp(ContractCode contractCode, StampNumber stampNumber, GeneralDateTime dateTime,
+			ChangeClockArt changeClockArt) {
+		return this.queryProxy()
+				.find(new KrcdtStampPk(contractCode.v(), stampNumber.v(), dateTime, changeClockArt.value),
+						KrcdtStamp.class)
+				.isPresent();
+	}
+
 }

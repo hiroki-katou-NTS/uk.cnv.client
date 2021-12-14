@@ -4118,6 +4118,7 @@ module nts.uk.at.view.ksu003.a.viewmodel {
 				model.removeError(css.cssWorkType, css.cssWorkTime, css.cssWorkTypeName, css.cssWorkTName, css.cssStartTime1, css.cssEndTime1, css.cssStartTime2, css.cssEndTime2, 0);
 				_.remove($("#extable-ksu003").data("errors"), {rowIndex:lineNo})
 				block.clear()
+				setShared("targetInforKsu003", self.dataScreen003A().targetInfor); // fix tạm sau khi merge 5_3 thì xóa đi
 				self.dataScreen045A(getShared('dataFromKdl045'));
 				self.check045003 = false;
 				if (!_.isNil(self.dataScreen045A())) {
@@ -4426,7 +4427,6 @@ module nts.uk.at.view.ksu003.a.viewmodel {
 											lineNo: lineNo
 										}
 									}]);
-
 									self.check045003 = false;
 									$("#extable-ksu003").exTable("cellValue", "middle", empId, "worktimeCode", "");
 									model.setCellValue(empId);
@@ -4471,7 +4471,7 @@ module nts.uk.at.view.ksu003.a.viewmodel {
 									self.checkClearTime = false;
 									self.checkUpdateMidChart = false;
 								}
-
+								setShared("targetInforKsu003", self.dataScreen003A().targetInfor); // fix tạm sau khi merge 5_3 thì xóa đi
 								self.setDataToMidExtable(lineNo, empId, self.dataScreen003A().employeeInfo[lineNo].workScheduleDto, self.dataScreen003A().employeeInfo[lineNo].fixedWorkInforDto);
 								self.convertDataIntoExtable(lineNo);
 

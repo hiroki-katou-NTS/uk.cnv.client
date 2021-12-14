@@ -3,8 +3,6 @@ import { component, Prop, Watch } from '@app/core/component';
 import { vmOf } from 'vue/types/umd';
 
 @component({
-    name: 'kdls36',
-    route: '/kdl/s36',
     style: require('./style.scss'),
     template: require('./index.vue'),
     resource: require('./resources.json'),

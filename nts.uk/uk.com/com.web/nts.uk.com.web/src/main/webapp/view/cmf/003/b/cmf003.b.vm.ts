@@ -396,7 +396,6 @@ module nts.uk.com.view.cmf003.b {
         };
 
         self.selectedTitleAtr.subscribe(function (value) {
-          self.buton_E_enable(true);
           self.lstPersonComponentOption.disableSelection = value == 0 ? true : false;
           $('#employeeSearch').ntsListComponent(self.lstPersonComponentOption);
           self.nextButtonText(value === 0 ? getText('CMF003_171') : getText('CMF003_53'));
@@ -405,7 +404,6 @@ module nts.uk.com.view.cmf003.b {
         self.selectedTitleAtr.valueHasMutated();
 
         self.selectedPatternId.subscribe(value => {
-          self.buton_E_enable(true);
           self.selectPattern(value);
         });
 
@@ -787,7 +785,7 @@ module nts.uk.com.view.cmf003.b {
 
             setShared("CMF001_E_PARAMS", params);
             nts.uk.ui.windows.sub.modal("/view/cmf/003/f/index.xhtml").onClosed(() => {
-              self.buton_E_enable(false);
+              self.buton_E_enable(self.selectedTitleAtr() === 0);
               self.buton_E_enable.valueHasMutated();
               $(".goback").focus();
             });

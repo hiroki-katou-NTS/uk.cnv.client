@@ -18,10 +18,7 @@ import nts.arc.time.GeneralDate;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.gul.text.IdentifierUtil;
-import nts.uk.ctx.at.record.dom.remainingnumber.childcarenurse.care.GetRemainingNumberCareService;
-import nts.uk.ctx.at.record.dom.remainingnumber.childcarenurse.childcare.AggrResultOfChildCareNurse;
 import nts.uk.ctx.at.record.dom.remainingnumber.childcarenurse.childcare.ChildCareNurseRequireImplFactory;
-import nts.uk.ctx.at.record.dom.remainingnumber.childcarenurse.childcare.GetRemainingNumberChildCareService;
 import nts.uk.ctx.at.record.dom.remainingnumber.specialleave.empinfo.grantremainingdata.ComplileInPeriodOfSpecialLeaveParam;
 import nts.uk.ctx.at.record.dom.remainingnumber.specialleave.export.SpecialLeaveManagementService;
 import nts.uk.ctx.at.record.dom.require.RecordDomRequireService;
@@ -39,7 +36,6 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.InterimRemainOffPeriod
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.RemainErrors;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.RemainInputParam;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.require.RemainNumberTempRequireService;
-import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.export.InterimRemainMngMode;
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.interim.TempAnnualLeaveMngs;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.NumberRemainVacationLeaveRangeProcess;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.BreakDayOffRemainMngRefactParam;
@@ -72,10 +68,6 @@ import nts.uk.shr.com.time.calendar.date.ClosureDate;
 public class InterimRemainDataMngCheckRegisterImpl implements InterimRemainDataMngCheckRegister {
 
 	@Inject
-	private ComSubstVacationRepository subRepos;
-	@Inject
-	private CompensLeaveComSetRepository leaveSetRepos;
-	@Inject
 	private GetAnnLeaRemNumWithinPeriodSharedImport annualService;
 //	@Inject
 //	private ComplileInPeriodOfSpecialLeaveSharedImport specialLeaveService;
@@ -83,6 +75,9 @@ public class InterimRemainDataMngCheckRegisterImpl implements InterimRemainDataM
 	/** REQUIRE対応 */
 	@Inject
 	private RemainNumberTempRequireService requireService;
+	
+	@Inject
+	private RecordDomRequireService recordDomrequireService;
 
 	@Inject
 	private NumberRemainVacationLeaveRangeProcess numberRemainVacationLeaveRangeProcess;
@@ -110,10 +105,6 @@ public class InterimRemainDataMngCheckRegisterImpl implements InterimRemainDataM
 		// 代休不足区分、振休不足区分、年休不足区分、積休不足区分、特休不足区分、公休不足区分、超休不足区分、子の看護不足区分、介護不足区分をfalseにする(初期化) 
 		EarchInterimRemainCheck outputData = new EarchInterimRemainCheck(false, false, false, false, false, false,
 				false, false, false);
-		Optional<ComSubstVacation> comSetting = subRepos.findById(inputParam.getCid());
-		CompensatoryLeaveComSetting leaveComSetting = leaveSetRepos.find(inputParam.getCid());
-		CompanyHolidayMngSetting comHolidaySetting = new CompanyHolidayMngSetting(inputParam.getCid(), comSetting,
-				leaveComSetting);
 		
 		// 各残数をチェックするか判断する    #118506
 		RemainNumberClassification remainNumberClassification = remainingNumberCheck.determineCheckRemain(inputParam.getCid(), inputParam.getWorkTypeCds(), inputParam.getTimeDigestionUsageInfor());
@@ -121,7 +112,7 @@ public class InterimRemainDataMngCheckRegisterImpl implements InterimRemainDataM
 		// 暫定管理データをメモリ上で作成する
 		Map<GeneralDate, DailyInterimRemainMngData> mapDataOutput = new HashMap<>();
 
-		val require = requireService.createRequire();
+		val require = recordDomrequireService.createRequire();
 		CacheCarrier cacheCarrier = new CacheCarrier();
 
 		inputParam.getAppData().stream().forEach(x -> {
@@ -131,9 +122,12 @@ public class InterimRemainDataMngCheckRegisterImpl implements InterimRemainDataM
 			}
 			InterimRemainCreateDataInputPara dataCreate = new InterimRemainCreateDataInputPara(inputParam.getCid(),
 					inputParam.getSid(), dateData, inputParam.getRecordData(), inputParam.getScheData(),
-					inputParam.getAppData(), false);
+					inputParam.getAppData());
+
+			//inputの情報から、暫定データを差分作成する。
 			Map<GeneralDate, DailyInterimRemainMngData> mapDataOutputTmp = InterimRemainOffPeriodCreateData
-					.createInterimRemainDataMng(require, cacheCarrier, dataCreate, comHolidaySetting);
+					.createInterimRemainByScheRecordApp(require, cacheCarrier, dataCreate);
+			
 			// 振休申請は取り消しになる時を対応します。
 			if (x.getAppType() == ApplicationType.COMPLEMENT_LEAVE_APPLICATION
 					&& mapDataOutputTmp.containsKey(x.getAppDate())) {
@@ -333,8 +327,10 @@ public class InterimRemainDataMngCheckRegisterImpl implements InterimRemainDataM
 			outputData.setAnnualErrors(lstError.stream().filter(errorcheck -> {
 				if (errorcheck == AnnualLeaveErrorSharedImport.SHORTAGE_AL_OF_UNIT_DAY_AFT_GRANT
 						|| errorcheck == AnnualLeaveErrorSharedImport.SHORTAGE_AL_OF_UNIT_DAY_BFR_GRANT
-						|| errorcheck == AnnualLeaveErrorSharedImport.SHORTAGE_TIMEAL_AFTER_GRANT
-						|| errorcheck == AnnualLeaveErrorSharedImport.SHORTAGE_TIMEAL_BEFORE_GRANT) {
+						|| errorcheck == AnnualLeaveErrorSharedImport.EXCESS_MAX_HALFDAY_AFTER_GRANT
+						|| errorcheck == AnnualLeaveErrorSharedImport.EXCESS_MAX_HALFDAY_BEFORE_GRANT
+						|| errorcheck == AnnualLeaveErrorSharedImport.EXCESS_MAX_TIMEAL_AFTER_GRANT
+						|| errorcheck == AnnualLeaveErrorSharedImport.EXCESS_MAX_TIMEAL_BEFORE_GRANT) {
 					return true;
 				}else {
 					return false;

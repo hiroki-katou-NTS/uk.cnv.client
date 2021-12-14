@@ -66,7 +66,7 @@ public class ReflectStampSupport {
 		// 反映状態を確認する
 		if (reflectionAtr == ReflectionAtr.REFLECTED) {
 			// 打刻は反映済みをする
-			stamp.setReflectedCategory(true);
+			stamp.getImprintReflectionStatus().markAsReflected(integrationOfDaily.getYmd());
 		}
 	}
 	

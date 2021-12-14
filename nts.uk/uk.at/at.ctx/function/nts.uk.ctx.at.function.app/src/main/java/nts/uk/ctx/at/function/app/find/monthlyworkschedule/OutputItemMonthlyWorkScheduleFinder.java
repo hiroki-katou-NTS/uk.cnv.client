@@ -335,6 +335,7 @@ public class OutputItemMonthlyWorkScheduleFinder {
 						.getListSheetCorrectedMonthly().stream()
 						.sorted(Comparator.comparing(SheetCorrectedMonthly::getSheetNo))
 						.flatMap(t -> t.getListDisplayTimeItem().stream())
+						.sorted(Comparator.comparing(DisplayTimeItem::getDisplayOrder))
 						.map(item -> new DisplayTimeItemDto(item.getItemDaily()
 			    				  , null
 			    				  , item.getColumnWidthTable()))
@@ -352,6 +353,7 @@ public class OutputItemMonthlyWorkScheduleFinder {
 						.getListSheetCorrectedMonthly().stream()
 						.sorted(Comparator.comparing(SheetCorrectedMonthly::getSheetNo))
 						.flatMap(t -> t.getListDisplayTimeItem().stream())
+						.sorted(Comparator.comparing(DisplayTimeItem::getDisplayOrder))
 						.map(item -> new DisplayTimeItemDto(item.getItemDaily()
 			    				  , null
 			    				  , item.getColumnWidthTable()))

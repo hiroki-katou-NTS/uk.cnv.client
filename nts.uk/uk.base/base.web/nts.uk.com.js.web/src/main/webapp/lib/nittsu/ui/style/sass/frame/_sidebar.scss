@@ -97,6 +97,16 @@ $sidebar_arrow_width: 50px;
 		min-width: 70px;
 		line-height: $sidebar_content_header_height;
 	}
+	
+	& > button.btn-error {
+		// margin-left: 25px;
+		vertical-align: middle;
+		position: absolute;
+		left: 10px;
+		// top: 40px;
+		bottom: -12px;
+		z-index: 10005;
+	}
 }
 .sidebar-content{
     overflow: auto;

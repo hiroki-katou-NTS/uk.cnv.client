@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.function.algorithm.aftercorrectatt;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -12,7 +13,8 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.editstate.E
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.holidayworktime.ClearHolidayWorkTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.overtimehours.clearovertime.ClearOvertimeHour;
 import nts.uk.ctx.at.shared.dom.worktype.AttendanceHolidayAttr;
-import nts.uk.ctx.at.shared.dom.worktype.algorithm.JudgeHdSystemOneDayService;
+import nts.uk.ctx.at.shared.dom.worktype.WorkType;
+import nts.uk.ctx.at.shared.dom.worktype.algorithm.GetWorkTypeServiceShare;
 
 /**
  * @author ThanhNX
@@ -26,7 +28,7 @@ public class ClearConflictTime {
 //	private WorkTypeRepository workTypeRepo;
 
 	@Inject
-	private JudgeHdSystemOneDayService judgeHdSystemOneDayService;
+	private GetWorkTypeServiceShare getWorkTypeService;
 
 	// 矛盾した時間をクリアする
 	public IntegrationOfDaily process(IntegrationOfDaily domainDaily) {
@@ -39,11 +41,11 @@ public class ClearConflictTime {
 
 		String workTypeCode = domainDaily.getWorkInformation().getRecordInfo().getWorkTypeCode().v();
 		// 勤務種類を取得
-		// Optional<WorkType> workTypeOpt =
-		// workTypeRepo.findByPK(AppContexts.user().companyId(), workTypeCode);
-
 		// 1日半日出勤・1日休日系の判定
-		AttendanceHolidayAttr attHolidayAttr = judgeHdSystemOneDayService.judgeHdOnDayWorkPer(workTypeCode);
+		Optional<WorkType>worktype = getWorkTypeService.getWorkType(workTypeCode);
+		if(!worktype.isPresent())
+			return domainDaily;
+		AttendanceHolidayAttr attHolidayAttr = worktype.get().chechAttendanceDay().toAttendanceHolidayAttr();
 
 		if (attHolidayAttr == AttendanceHolidayAttr.HOLIDAY) {
 			// 残業時間のクリア

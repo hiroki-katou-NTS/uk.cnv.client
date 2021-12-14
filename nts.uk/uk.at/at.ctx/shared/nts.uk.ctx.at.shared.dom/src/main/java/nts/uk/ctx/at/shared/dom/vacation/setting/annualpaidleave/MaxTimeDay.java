@@ -8,6 +8,7 @@ import java.io.Serializable;
 
 import nts.arc.primitive.IntegerPrimitiveValue;
 import nts.arc.primitive.constraint.IntegerRange;
+import nts.uk.ctx.at.shared.dom.yearholidaygrant.LimitedTimeHdDays;
 
 /**
  * 時間年休上限日数
@@ -26,6 +27,10 @@ public class MaxTimeDay extends IntegerPrimitiveValue<MaxTimeDay> implements Ser
      */
     public MaxTimeDay(Integer rawValue) {
         super(rawValue);
+    }
+    
+    public LimitedTimeHdDays toLimitedTimeHdDays(){
+    	return new LimitedTimeHdDays(this.v());
     }
 
 }

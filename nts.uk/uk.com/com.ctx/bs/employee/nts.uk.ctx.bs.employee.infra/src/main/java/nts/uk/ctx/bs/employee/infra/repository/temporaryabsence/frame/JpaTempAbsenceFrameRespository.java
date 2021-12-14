@@ -5,6 +5,7 @@
 package nts.uk.ctx.bs.employee.infra.repository.temporaryabsence.frame;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,6 +37,10 @@ public class JpaTempAbsenceFrameRespository extends JpaRepository
 			+ " AND e.useAtr = 1 "
 			+ " AND e.bsystTempAbsenceFramePK.tempAbsenceFrNo >= 2"
 			+ " AND e.bsystTempAbsenceFramePK.tempAbsenceFrNo <= 9";
+	
+	private static final String FIND_BY_CID_AND_FRAME_NOS = "SELECT t FROM BsystTempAbsenceFrame t "
+			+ "WHERE t.bsystTempAbsenceFramePK.cid = :cid "
+			+ "AND t.bsystTempAbsenceFramePK.tempAbsenceFrNo IN :frameNos";
 
 	/*
 	 * (non-Javadoc)
@@ -185,6 +190,16 @@ public class JpaTempAbsenceFrameRespository extends JpaRepository
 		}
 		return toListTempAbsenceFrame(listEntity);
 	}
+	
+	@Override
+	public List<TempAbsenceFrame> findByCidAndFrameNos(String cid, List<Integer> tempAbsenceFrameNos) {
+		if (tempAbsenceFrameNos.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return this.queryProxy().query(FIND_BY_CID_AND_FRAME_NOS, BsystTempAbsenceFrame.class)
+				.setParameter("cid", cid).setParameter("frameNos", tempAbsenceFrameNos)
+				.getList(this::toDomain);
+	}
 
 	private List<TempAbsenceFrame> toListTempAbsenceFrame(List<BsystTempAbsenceFrame> listEntity) {
 		List<TempAbsenceFrame> lstTempAbsenceFrame = new ArrayList<>();
@@ -196,7 +211,7 @@ public class JpaTempAbsenceFrameRespository extends JpaRepository
 		}
 		return lstTempAbsenceFrame;
 	}
-
+	
 	private TempAbsenceFrame toDomain(BsystTempAbsenceFrame entity) {
 		return new TempAbsenceFrame(entity.getBsystTempAbsenceFramePK().getCid(),
 				entity.getBsystTempAbsenceFramePK().getTempAbsenceFrNo(), Integer.valueOf(entity.getUseAtr()),

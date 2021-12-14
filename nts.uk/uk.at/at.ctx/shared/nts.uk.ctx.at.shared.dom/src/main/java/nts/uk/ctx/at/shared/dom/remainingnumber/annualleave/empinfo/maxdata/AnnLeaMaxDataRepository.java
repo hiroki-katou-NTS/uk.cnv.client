@@ -23,6 +23,6 @@ public interface AnnLeaMaxDataRepository {
 	 * @param sids
 	 * @return
 	 */
-	List<AnnualLeaveMaxData> getAll(String cid, List<String> sids);
+	List<AnnualLeaveMaxData> getAll(List<String> sids);
 
 }

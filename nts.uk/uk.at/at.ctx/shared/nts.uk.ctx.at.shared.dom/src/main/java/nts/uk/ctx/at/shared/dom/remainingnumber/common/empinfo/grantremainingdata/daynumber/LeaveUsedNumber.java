@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import lombok.Getter;
 import lombok.Setter;
+import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.interim.TempAnnualLeaveMngs;
 
 /**
  * 休暇使用数
@@ -130,7 +131,7 @@ public class LeaveUsedNumber{
 		if(numberOverDays == null && timeOver == null) {
 			this.leaveOverLimitNumber = Optional.empty();
 		}else {
-			this.leaveOverLimitNumber = Optional.of(new LeaveOverNumber(numberOverDays, minutes));
+			this.leaveOverLimitNumber = Optional.of(new LeaveOverNumber(numberOverDays, timeOver));
 		}
 	}
 
@@ -200,6 +201,21 @@ public class LeaveUsedNumber{
 	 */
 	public boolean isUseDay() {
 		return this.getDays().greaterThan(0.0);
+	}
+	
+	
+	public LeaveUsedNumber(TempAnnualLeaveMngs tempAnnualLeaveMng) {
+
+		this.days = (new LeaveUsedDayNumber(
+				tempAnnualLeaveMng.getUsedNumber().getUsedDayNumber().map(mapper -> mapper.v()).orElse(0.0)));
+		this.minutes = Optional.of(new LeaveUsedTime(
+				tempAnnualLeaveMng.getUsedNumber().getUsedTime().map(mapper -> mapper.v()).orElse(0)));
+		this.stowageDays=Optional.empty();
+		this.leaveOverLimitNumber=Optional.empty();
+	}
+	
+	public boolean isLimitOver(){
+		return this.getLeaveOverLimitNumber().isPresent();
 	}
 
 }

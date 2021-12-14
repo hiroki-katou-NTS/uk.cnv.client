@@ -435,9 +435,6 @@ public class ReserveLeaveInfo implements Cloneable {
 			targetList.add(tmpReserveLeaveMng);
 		}
 
-		// ダミーデータリスト
-		List<LeaveGrantRemainingData> dummyDataList = new ArrayList<LeaveGrantRemainingData>();
-
 		targetList.sort((a, b) -> a.getYmd().compareTo(b.getYmd()));
 
 		// 付与前付与後を判断する
@@ -447,7 +444,7 @@ public class ReserveLeaveInfo implements Cloneable {
 
 			// 積立年休を消化する
 			{
-				// 年休使用数WORK
+				// 積立年休使用数WORK
 				ReserveLeaveUsedNumber usedNumber = new ReserveLeaveUsedNumber();
 
 				// 積立年休付与残数を取得
@@ -486,8 +483,20 @@ public class ReserveLeaveInfo implements Cloneable {
 				RemNumShiftListWork remNumShiftListWork = new RemNumShiftListWork();
 
 				// 休暇残数を指定使用数消化する
-				LeaveGrantRemainingData.digest(require, targetRemainingDatas, remNumShiftListWork, leaveUsedNumber,
-						companyId, employeeId, aggrPeriodWork.getPeriod().start());
+				Optional<LeaveGrantRemainingData> dummyData = LeaveGrantRemainingData.digest(
+						require,
+						targetRemainingDatas,
+						remNumShiftListWork,
+						leaveUsedNumber,
+						companyId,
+						employeeId,
+						aggrPeriodWork.getPeriod().start());
+				
+				if(dummyData.isPresent()){
+					ReserveLeaveGrantRemainingData addData = new ReserveLeaveGrantRemainingData();
+					addData.setAllValue(dummyData.get());
+					this.grantRemainingList.add(addData);
+				}
 
 				// 残数（現在）を消化後の状態にする
 				{

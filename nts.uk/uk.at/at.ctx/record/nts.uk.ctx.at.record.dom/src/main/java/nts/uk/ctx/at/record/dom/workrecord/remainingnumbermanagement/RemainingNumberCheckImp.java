@@ -8,6 +8,8 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.TimeDigestionParam;
+import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHolidayRepository;
+import nts.uk.ctx.at.shared.dom.worktype.DailyWork;
 import nts.uk.ctx.at.shared.dom.worktype.Holiday;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeRepository;
@@ -24,6 +26,9 @@ public class RemainingNumberCheckImp implements RemainingNumberCheck {
     
     @Inject
     private DetermineCareNursingCheck determineCareNursingCheck;
+    
+    @Inject
+    private SpecialHolidayRepository specialHolidayRepo;
 
     @Override
     public RemainNumberClassification determineCheckRemain(String cId, List<String> workTypeCodes,
@@ -71,6 +76,7 @@ public class RemainingNumberCheckImp implements RemainingNumberCheck {
             workTypeLst.forEach(workType -> {
                 // ＠勤務種類からどんな休暇種類を含むか判断する
                 Holiday holiday = workType.getDailyWork().determineHolidayByWorkType();
+                
                 
                 // 介護看護がチェックするか判断する
                 ChildCareNurseCheck childCareNurseCheck = determineCareNursingCheck.determineCareNursingCheck(
@@ -123,13 +129,64 @@ public class RemainingNumberCheckImp implements RemainingNumberCheck {
                 if (holiday.isPause()) {
                     remainNumberClassification.setChkPause(true);
                 }
-                if (holiday.isSpecialHoliday()) {
+                if (checkSpecialHoliday(cId, 
+                        workType.getWorkTypeSetList().stream().map(wts -> wts.getSumAbsenseNo()).collect(Collectors.toList()), 
+                        workType.getWorkTypeSetList().stream().map(wts -> wts.getSumSpHodidayNo()).collect(Collectors.toList()),
+                        workType.getDailyWork())) {
                     remainNumberClassification.setChkSpecial(true);
+                }
+                if (holiday.isYearlyReserved()) {
+                    remainNumberClassification.setChkFundingAnnual(true);
+                }
+                if (holiday.isHoliday()) {
+                    remainNumberClassification.setChkPublicHoliday(true);
                 }
             });
         }
 
         return remainNumberClassification;
+    }
+    
+    /**
+     * 特別休暇をチェックするか
+     * @param cId
+     * @param absenceFrameNo
+     * @param specialHolidayFrame
+     * @param dailyWork
+     * @return
+     */
+    private boolean checkSpecialHoliday(String cId, List<Integer> absenceFrameNo, List<Integer> specialHolidayFrame, DailyWork dailyWork){
+    	
+    	if(dailyWork.isAbsence()){
+    		boolean checkAbsence = absenceFrameNo.stream().anyMatch(x ->{
+        		List<Integer> absenceSpecialCd = specialHolidayRepo.findByAbsframeNo(cId, x);
+        		if(!absenceSpecialCd.isEmpty()){
+        			return true;
+        		}
+        		return false;
+        	});
+    		
+    		if(checkAbsence){
+    			return checkAbsence;
+    		}
+    		
+    	}
+    	
+    	if(dailyWork.isSpecHoliday()){
+    		boolean checkSpecialHoliday =  specialHolidayFrame.stream().anyMatch(x ->{
+	    		List<Integer> holidaySpecialCd = specialHolidayRepo.findBySphdSpecLeave(cId, x);
+		    	if(!holidaySpecialCd.isEmpty()){
+		    		return true;
+		    	}
+		    	return false;
+	    	});
+	    	 
+	    	 if(checkSpecialHoliday){
+	    		 return checkSpecialHoliday;
+	    	 }
+
+    	}
+    	return false;
     }
 
 }

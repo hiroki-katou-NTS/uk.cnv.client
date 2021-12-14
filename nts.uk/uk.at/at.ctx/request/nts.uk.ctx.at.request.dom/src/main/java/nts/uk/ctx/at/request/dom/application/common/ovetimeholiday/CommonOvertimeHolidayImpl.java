@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import org.apache.logging.log4j.util.Strings;
 
 import nts.arc.enums.EnumAdaptor;
-import nts.arc.error.BundledBusinessException;
 import nts.arc.error.BusinessException;
 import nts.arc.time.GeneralDate;
 import nts.gul.collection.CollectionUtil;
@@ -25,7 +24,6 @@ import nts.uk.ctx.at.request.dom.application.PrePostAtr;
 import nts.uk.ctx.at.request.dom.application.UseAtr;
 import nts.uk.ctx.at.request.dom.application.common.adapter.bs.EmployeeRequestAdapter;
 import nts.uk.ctx.at.request.dom.application.common.adapter.bs.dto.SWkpHistImport;
-import nts.uk.ctx.at.request.dom.application.common.adapter.frame.OvertimeInputCaculation;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.dailyattendancetime.DailyAttendanceTimeCaculation;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.dailyattendancetime.DailyAttendanceTimeCaculationImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.schedule.shift.businesscalendar.specificdate.WpSpecificDateSettingAdapter;
@@ -34,23 +32,18 @@ import nts.uk.ctx.at.request.dom.application.common.service.newscreen.output.Con
 import nts.uk.ctx.at.request.dom.application.common.service.other.AgreementTimeService;
 import nts.uk.ctx.at.request.dom.application.common.service.other.OtherCommonAlgorithm;
 import nts.uk.ctx.at.request.dom.application.common.service.other.Time36UpperLimitCheck;
-import nts.uk.ctx.at.request.dom.application.common.service.other.output.AppTimeItem;
 import nts.uk.ctx.at.request.dom.application.common.service.other.output.OverTimeWorkHoursOutput;
-import nts.uk.ctx.at.request.dom.application.common.service.other.output.Time36ErrorOutput;
-import nts.uk.ctx.at.request.dom.application.common.service.other.output.Time36UpperLimitCheckResult;
-import nts.uk.ctx.at.request.dom.application.holidayworktime.HolidayWorkInput;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.service.dto.CalculatedFlag;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOvertimeDetail;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOvertimeDetailRepository;
 import nts.uk.ctx.at.request.dom.application.overtime.ApplicationTime;
 import nts.uk.ctx.at.request.dom.application.overtime.AttendanceType_Update;
 import nts.uk.ctx.at.request.dom.application.overtime.HolidayMidNightTime;
-import nts.uk.ctx.at.request.dom.application.overtime.OverTimeInput;
 import nts.uk.ctx.at.request.dom.application.overtime.OverTimeShiftNight;
 import nts.uk.ctx.at.request.dom.application.overtime.OvertimeApplicationSetting;
 import nts.uk.ctx.at.request.dom.application.overtime.service.WeekdayHolidayClassification;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.AppDateContradictionAtr;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.overtimerestappcommon.Time36AgreeCheckRegister;
+import nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeOfExistMinus;
+import nts.uk.ctx.at.shared.dom.common.time.TimeSpanForCalc;
 import nts.uk.ctx.at.shared.dom.employmentrules.employmenttimezone.BreakTimeZoneService;
 import nts.uk.ctx.at.shared.dom.employmentrules.employmenttimezone.BreakTimeZoneSharedOutPut;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.BasicScheduleService;
@@ -58,14 +51,12 @@ import nts.uk.ctx.at.shared.dom.schedule.basicschedule.WorkStyle;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.repository.BPTimeItemRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.timeitem.BonusPayTimeItem;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.breaking.BreakTimeSheet;
-import nts.uk.ctx.at.shared.dom.workdayoff.frame.WorkdayoffFrame;
 import nts.uk.ctx.at.shared.dom.workrule.outsideworktime.holidaywork.StaturoryAtrOfHolidayWork;
 import nts.uk.ctx.at.shared.dom.worktime.algorithm.rangeofdaytimezone.DuplicateStateAtr;
 import nts.uk.ctx.at.shared.dom.worktime.algorithm.rangeofdaytimezone.DuplicationStatusOfTimeZone;
 import nts.uk.ctx.at.shared.dom.worktime.algorithm.rangeofdaytimezone.RangeOfDayTimeZoneService;
-import nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeOfExistMinus;
-import nts.uk.ctx.at.shared.dom.common.time.TimeSpanForCalc;
 import nts.uk.ctx.at.shared.dom.worktime.common.DeductionTime;
+import nts.uk.ctx.at.shared.dom.worktime.common.TimeZone;
 import nts.uk.ctx.at.shared.dom.worktype.DailyWork;
 import nts.uk.ctx.at.shared.dom.worktype.HolidayAtr;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
@@ -75,7 +66,6 @@ import nts.uk.ctx.at.shared.dom.worktype.WorkTypeUnit;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 import nts.uk.shr.com.time.TimeWithDayAttr;
-import nts.uk.ctx.at.shared.dom.worktime.common.TimeZone;
 
 
 
@@ -110,9 +100,6 @@ public class CommonOvertimeHolidayImpl implements CommonOvertimeHoliday {
 
 	@Inject
 	private Time36UpperLimitCheck time36UpperLimitCheck;
-
-	@Inject
-	private AppOvertimeDetailRepository appOvertimeDetailRepository;
 	
 	@Inject
 	private DailyAttendanceTimeCaculation dailyAttendanceTimeCaculation;
@@ -357,203 +344,6 @@ public class CommonOvertimeHolidayImpl implements CommonOvertimeHoliday {
 			throw new BusinessException("Msg_750");
 		}
 	}
-
-	@Override
-	public Optional<AppOvertimeDetail> registerOvertimeCheck36TimeLimit(String companyId, String employeeId,
-			GeneralDate appDate, List<OverTimeInput> overTimeInput) {
-		// 代行申請かをチェックする
-		// TODO
-		// ３６時間の上限チェック(新規登録)
-		List<AppTimeItem> appTimeItems = overTimeInput.stream()
-				.filter(x -> x != null && x.getApplicationTimeValue() != null).collect(Collectors.toList()).stream()
-				.map(x -> {
-					return new AppTimeItem(x.getApplicationTimeValue(), x.getFrameNo());
-				}).collect(Collectors.toList());
-		Time36UpperLimitCheckResult result = time36UpperLimitCheck.checkRegister(companyId, employeeId, appDate,
-				ApplicationType.OVER_TIME_APPLICATION, appTimeItems);
-		// 上限エラーフラグがtrue AND ドメインモデル「残業休出申請共通設定」.時間外超過区分がチェックする（登録不可）
-		if (result.getErrorFlg().size() > 0) {
-			BundledBusinessException bundledBusinessExceptions = BundledBusinessException.newInstance();
-			for (Time36ErrorOutput time36ErrorOutput : result.getErrorFlg()) {
-				switch (time36ErrorOutput.errorFlg) {
-				case MONTH:
-					bundledBusinessExceptions.addMessage("Msg_1535", "00:00", "00:00", "", "",
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime, time36ErrorOutput.yearMonthStart,
-							time36ErrorOutput.yearMonthEnd);
-					break;
-				case YEAR:
-					bundledBusinessExceptions.addMessage("Msg_1536", "00:00", "00:00", "", "",
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime, time36ErrorOutput.yearMonthStart,
-							time36ErrorOutput.yearMonthEnd);
-					break;
-				case MAX_MONTH:
-					bundledBusinessExceptions.addMessage("Msg_1537", "00:00", "00:00", "", "",
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime, time36ErrorOutput.yearMonthStart,
-							time36ErrorOutput.yearMonthEnd);
-					break;
-				case AVERAGE_MONTH:
-					bundledBusinessExceptions.addMessage("Msg_1538", "1900/01", "1900/01", "00:00", "00:00",
-							time36ErrorOutput.yearMonthStart, time36ErrorOutput.yearMonthEnd,
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime);
-					break;
-				default:
-					break;
-				}
-			}
-			throw bundledBusinessExceptions;
-		}
-		return result.getAppOvertimeDetail();
-	}
-
-	@Override
-	public Optional<AppOvertimeDetail> updateOvertimeCheck36TimeLimit(String companyId, String appId,
-			String enteredPersonId, String employeeId, GeneralDate appDate, List<OverTimeInput> overTimeInput) {
-		Optional<AppOvertimeDetail> appOvertimeDetailOpt = appOvertimeDetailRepository
-				.getAppOvertimeDetailById(companyId, appId);
-		// ３６時間の上限チェック(照会)
-		List<AppTimeItem> appTimeItems = CollectionUtil.isEmpty(overTimeInput) ? Collections.emptyList()
-				: overTimeInput.stream().map(x -> {
-					return new AppTimeItem(x.getApplicationTimeValue(), x.getFrameNo());
-				}).collect(Collectors.toList());
-		Time36UpperLimitCheckResult result = time36UpperLimitCheck.checkUpdate(companyId, appOvertimeDetailOpt,
-				employeeId, appDate, ApplicationType.OVER_TIME_APPLICATION, appTimeItems);
-		// 上限エラーフラグがtrue AND ドメインモデル「残業休出申請共通設定」.時間外超過区分がチェックする（登録不可）
-		if (result.getErrorFlg().size() > 0) {
-			BundledBusinessException bundledBusinessExceptions = BundledBusinessException.newInstance();
-			for (Time36ErrorOutput time36ErrorOutput : result.getErrorFlg()) {
-				switch (time36ErrorOutput.errorFlg) {
-				case MONTH:
-					bundledBusinessExceptions.addMessage("Msg_1535", "00:00", "00:00", "", "",
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime, time36ErrorOutput.yearMonthStart,
-							time36ErrorOutput.yearMonthEnd);
-					break;
-				case YEAR:
-					bundledBusinessExceptions.addMessage("Msg_1536", "00:00", "00:00", "", "",
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime, time36ErrorOutput.yearMonthStart,
-							time36ErrorOutput.yearMonthEnd);
-					break;
-				case MAX_MONTH:
-					bundledBusinessExceptions.addMessage("Msg_1537", "00:00", "00:00", "", "",
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime, time36ErrorOutput.yearMonthStart,
-							time36ErrorOutput.yearMonthEnd);
-					break;
-				case AVERAGE_MONTH:
-					bundledBusinessExceptions.addMessage("Msg_1538", "1900/01", "1900/01", "00:00", "00:00",
-							time36ErrorOutput.yearMonthStart, time36ErrorOutput.yearMonthEnd,
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime);
-					break;
-				default:
-					break;
-				}
-			}
-			throw bundledBusinessExceptions;
-		}
-		return result.getAppOvertimeDetail();
-	}
-
-	@Override
-	public Optional<AppOvertimeDetail> registerHdWorkCheck36TimeLimit(String companyId, String employeeId,
-			GeneralDate appDate, List<HolidayWorkInput> holidayWorkInputs) {
-		// 代行申請かをチェックする
-		// TODO
-		// ３６時間の上限チェック(新規登録)
-		List<AppTimeItem> appTimeItems = holidayWorkInputs.stream().filter(x -> x != null && x.getApptime() != null)
-				.collect(Collectors.toList()).stream().map(x -> {
-					return new AppTimeItem(x.getApptime(), x.getFrameNo());
-				}).collect(Collectors.toList());
-		Time36UpperLimitCheckResult result = time36UpperLimitCheck.checkRegister(companyId, employeeId, appDate,
-				ApplicationType.HOLIDAY_WORK_APPLICATION, appTimeItems);
-		// 上限エラーフラグがtrue AND ドメインモデル「残業休出申請共通設定」.時間外超過区分がチェックする（登録不可）
-		if (result.getErrorFlg().size() > 0) {
-			BundledBusinessException bundledBusinessExceptions = BundledBusinessException.newInstance();
-			for (Time36ErrorOutput time36ErrorOutput : result.getErrorFlg()) {
-				switch (time36ErrorOutput.errorFlg) {
-				case MONTH:
-					bundledBusinessExceptions.addMessage("Msg_1535", "00:00", "00:00", "", "",
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime, time36ErrorOutput.yearMonthStart,
-							time36ErrorOutput.yearMonthEnd);
-					break;
-				case YEAR:
-					bundledBusinessExceptions.addMessage("Msg_1536", "00:00", "00:00", "", "",
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime, time36ErrorOutput.yearMonthStart,
-							time36ErrorOutput.yearMonthEnd);
-					break;
-				case MAX_MONTH:
-					bundledBusinessExceptions.addMessage("Msg_1537", "00:00", "00:00", "", "",
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime, time36ErrorOutput.yearMonthStart,
-							time36ErrorOutput.yearMonthEnd);
-					break;
-				case AVERAGE_MONTH:
-					bundledBusinessExceptions.addMessage("Msg_1538", "1900/01", "1900/01", "00:00", "00:00",
-							time36ErrorOutput.yearMonthStart, time36ErrorOutput.yearMonthEnd,
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime);
-					break;
-				default:
-					break;
-				}
-			}
-			throw bundledBusinessExceptions;
-		}
-		return result.getAppOvertimeDetail();
-	}
-
-	@Override
-	public Optional<AppOvertimeDetail> updateHdWorkCheck36TimeLimit(String companyId, String appId,
-			String enteredPersonId, String employeeId, GeneralDate appDate, List<HolidayWorkInput> holidayWorkInputs) {
-		Optional<AppOvertimeDetail> appOvertimeDetailOpt = appOvertimeDetailRepository
-				.getAppOvertimeDetailById(companyId, appId);
-		// ３６時間の上限チェック(照会)
-		List<AppTimeItem> appTimeItems = CollectionUtil.isEmpty(holidayWorkInputs) ? Collections.emptyList()
-				: holidayWorkInputs.stream().map(x -> {
-					return new AppTimeItem(x.getApptime(), x.getFrameNo());
-				}).collect(Collectors.toList());
-		Time36UpperLimitCheckResult result = time36UpperLimitCheck.checkUpdate(companyId, appOvertimeDetailOpt,
-				employeeId, appDate, ApplicationType.HOLIDAY_WORK_APPLICATION, appTimeItems);
-		// 上限エラーフラグがtrue AND ドメインモデル「残業休出申請共通設定」.時間外超過区分がチェックする（登録不可）
-		if (result.getErrorFlg().size() > 0) {
-			BundledBusinessException bundledBusinessExceptions = BundledBusinessException.newInstance();
-			for (Time36ErrorOutput time36ErrorOutput : result.getErrorFlg()) {
-				switch (time36ErrorOutput.errorFlg) {
-				case MONTH:
-					bundledBusinessExceptions.addMessage("Msg_1535", "00:00", "00:00", "", "",
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime, time36ErrorOutput.yearMonthStart,
-							time36ErrorOutput.yearMonthEnd);
-					break;
-				case YEAR:
-					bundledBusinessExceptions.addMessage("Msg_1536", "00:00", "00:00", "", "",
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime, time36ErrorOutput.yearMonthStart,
-							time36ErrorOutput.yearMonthEnd);
-					break;
-				case MAX_MONTH:
-					bundledBusinessExceptions.addMessage("Msg_1537", "00:00", "00:00", "", "",
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime, time36ErrorOutput.yearMonthStart,
-							time36ErrorOutput.yearMonthEnd);
-					break;
-				case AVERAGE_MONTH:
-					bundledBusinessExceptions.addMessage("Msg_1538", "1900/01", "1900/01", "00:00", "00:00",
-							time36ErrorOutput.yearMonthStart, time36ErrorOutput.yearMonthEnd,
-							time36ErrorOutput.realTime, time36ErrorOutput.limitTime);
-					break;
-				default:
-					break;
-				}
-			}
-			throw bundledBusinessExceptions;
-		}
-		return result.getAppOvertimeDetail();
-	}
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
 
 	@Override
 	public UseAtr preAppSetCheck(PrePostAtr prePostAtr, UseAtr preExcessDisplaySetting) {

@@ -32,6 +32,8 @@ module nts.uk.at.view.kmk007.a.viewmodel {
         langId: KnockoutObservable<string> = ko.observable('ja');
         medicalOption: KnockoutObservable<boolean> = ko.observable(true);
 
+        optionalItemCalculationMethod: any = { code: 3, name: nts.uk.resource.getText('Enum_CalculateMethod_TIME_DIGEST_VACATION') };
+
         constructor() {
             var self = this,
                 lwt: any = self.listWorkType,
@@ -138,7 +140,6 @@ module nts.uk.at.view.kmk007.a.viewmodel {
                 { code: 0, name: nts.uk.resource.getText('Enum_CalculateMethod_DO_NOT_GO_TO_WORK') },
                 { code: 1, name: nts.uk.resource.getText('Enum_CalculateMethod_MAKE_ATTENDANCE_DAY') },
                 { code: 2, name: nts.uk.resource.getText('Enum_CalculateMethod_EXCLUDE_FROM_WORK_DAY') },
-                { code: 3, name: nts.uk.resource.getText('Enum_CalculateMethod_TIME_DIGEST_VACATION') }
             ]);
 
             self.roundingRules = ko.observableArray([
@@ -189,6 +190,15 @@ module nts.uk.at.view.kmk007.a.viewmodel {
                 } else {
                     self.setWorkTypeSet(self.currentWorkType().morning(), ko.toJS(self.oneDay));
                 }
+
+                // 『時間消化休暇』が選択されている場合のみ
+                if (newOneDayCls === 9) {
+                  if (!_.find(self.itemCalculatorMethod(), self.optionalItemCalculationMethod)) {
+                    self.itemCalculatorMethod.push(self.optionalItemCalculationMethod);
+                  }
+                } else if (self.currentWorkType().afternoonCls() !== 9) {
+                  self.itemCalculatorMethod.remove(self.optionalItemCalculationMethod);
+                }
             });
 
             self.currentWorkType().afternoonCls.subscribe(function(newOneDayCls) {
@@ -203,6 +213,15 @@ module nts.uk.at.view.kmk007.a.viewmodel {
                     self.setWorkTypeSet(self.currentWorkType().afternoon(), ko.toJS(self.currentAfternoon));
                 } else {
                     self.setWorkTypeSet(self.currentWorkType().afternoon(), ko.toJS(self.oneDay));
+                }
+
+                // 『時間消化休暇』が選択されている場合のみ
+                if (newOneDayCls === 9) {
+                  if (!_.find(self.itemCalculatorMethod(), self.optionalItemCalculationMethod)) {
+                    self.itemCalculatorMethod.push(self.optionalItemCalculationMethod);
+                  }
+                } else if (self.currentWorkType().morningCls() !== 9) {
+                  self.itemCalculatorMethod.remove(self.optionalItemCalculationMethod);
                 }
             });
 

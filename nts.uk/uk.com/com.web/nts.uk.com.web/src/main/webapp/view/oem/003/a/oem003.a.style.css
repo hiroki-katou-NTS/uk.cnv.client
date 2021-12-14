@@ -1,0 +1,84 @@
+.fixed-flex-layout-left {
+  width: 1130px;
+  padding: 5px;
+}
+.fixed-flex-layout-right {
+  padding: 10px;
+  margin: auto;
+}
+.button-img {
+  cursor: pointer;
+}
+table.data-table th,
+table.data-table td {
+  text-align: center;
+  padding: 1px !important;
+}
+table.data-table tr td.text-area span {
+  display: flex !important;
+}
+table.data-table {
+  width: 1130px;
+}
+table.data-table tr:not(.data-table-header) {
+  height: 47px;
+}
+table.data-table .ntsControl {
+  height: 45px !important;
+}
+table.data-table .ntsControl .nts-editor:not(textarea) {
+  height: calc(100% - 14px) !important;
+  border-radius: 0px !important;
+}
+table.data-table .ntsControl:not(.error) .nts-editor {
+  border: none !important;
+}
+table.data-table .ui-igcombo-wrapper .ui-igcombo .ui-igcombo-button,
+table.data-table tr td:not(.error-item-type) div:not(.error) .ui-igcombo {
+  border: none !important;
+}
+table.data-table .ui-igcombo-wrapper .ui-igcombo-buttonicon,
+table.data-table .ui-igcombo-wrapper .nts-toggle-dropdown .nts-combo-item .text {
+  line-height: 45px !important;
+  border: none !important;
+  margin: 0 !important;
+}
+
+div.ui-iggrid-scrolldiv table.data-table tr:hover td,
+div.ui-iggrid-scrolldiv table.data-table tr:hover td .nts-editor,
+div.ui-iggrid-scrolldiv table.data-table tr:hover td .ui-igcombo-button,
+div.ui-iggrid-scrolldiv table.data-table tr:hover td .ui-igcombo-buttonicon {
+  background: linear-gradient(0deg, rgba(68,224,140,0.1), rgba(68,224,140,0.1)),#fff;
+  color: #30CC40;
+  font-weight: 400;
+}
+div.ui-iggrid-scrolldiv table.data-table tr:hover td .nts-toggle-dropdown .text {
+  color: #30CC40;
+  font-weight: 400;
+}
+
+div.ui-iggrid-scrolldiv table.data-table tr.active td,
+div.ui-iggrid-scrolldiv table.data-table tr.active td .nts-editor,
+div.ui-iggrid-scrolldiv table.data-table tr.active td .ui-igcombo-button,
+div.ui-iggrid-scrolldiv table.data-table tr.active td .ui-igcombo-buttonicon {
+  background: linear-gradient(0deg, rgba(68,224,140,0.1), rgba(68,224,140,0.1)),#fff;
+  color: #30CC40;
+  font-weight: 600 !important;
+}
+div.ui-iggrid-scrolldiv table.data-table tr.active td .nts-toggle-dropdown .text {
+  color: #30CC40;
+  font-weight: 600 !important;
+}
+.updown button {
+  border: none !important;
+  box-shadow: none !important;
+  height: 50px;
+}
+.updown button i {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.error-item-type .ui-igcombo-wrapper>.ui-igcombo {
+  border-color: #ff6666;
+}

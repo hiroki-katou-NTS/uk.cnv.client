@@ -1,8 +1,6 @@
 package nts.uk.ctx.bs.employee.pubimp.workplace.workplacegroup;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -21,7 +19,7 @@ import nts.uk.ctx.bs.employee.dom.workplace.group.WorkplaceGroup;
 import nts.uk.ctx.bs.employee.dom.workplace.group.WorkplaceGroupRespository;
 import nts.uk.ctx.bs.employee.dom.workplace.group.domainservice.EmployeeInfoData;
 import nts.uk.ctx.bs.employee.dom.workplace.group.domainservice.GetAllEmpWhoBelongWorkplaceGroupService;
-import nts.uk.ctx.bs.employee.dom.workplace.group.domainservice.GetEmpCanReferBySpecifyWorkgroupService;
+import nts.uk.ctx.bs.employee.dom.workplace.group.domainservice.GetEmpCanReferByWorkplaceGroupService;
 import nts.uk.ctx.bs.employee.pub.employee.workplace.export.WorkplaceGroupExport;
 import nts.uk.ctx.bs.employee.pub.workplace.AffWorkplaceHistoryItemExport;
 import nts.uk.ctx.bs.employee.pub.workplace.ResultRequest597Export;
@@ -108,9 +106,18 @@ public class WorkplaceGroupPubIpml implements WorkplaceGroupPublish {
 		// return 職場グループを指定して参照可能な社員を取得する#取得する( require, 基準日, 社員ID, 職場グループID )
 		RequireWorkgroupService require = new RequireWorkgroupService(repoWorkplaceGroup, repoAffWorkplaceGroup,
 				pub, adapter, pub, syRoleAdapter);
-		List<String> data = GetEmpCanReferBySpecifyWorkgroupService.getEmpCanRefer(require, date, empID,
+		List<String> data = GetEmpCanReferByWorkplaceGroupService.getByWorkplaceGroup(require, date, empID,
 				workplaceGroupId);
 		return data;
+	}
+	
+	@Override
+	public List<String> getAllReferableEmployees(GeneralDate date, String employeeId) {
+		//	return DS_職場グループ単位で参照可能な社員を取得する#すべて取得する( require, 基準日, 社員ID ): flatMap $.value
+		RequireWorkgroupService require = new RequireWorkgroupService(repoWorkplaceGroup, repoAffWorkplaceGroup,
+				pub, adapter, pub, syRoleAdapter);
+		return GetEmpCanReferByWorkplaceGroupService.getAll(require, date, employeeId)
+				.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
 	}
 
 	@AllArgsConstructor
@@ -160,7 +167,7 @@ public class WorkplaceGroupPubIpml implements WorkplaceGroupPublish {
 	}
 
 	@AllArgsConstructor
-	private static class RequireWorkgroupService implements GetEmpCanReferBySpecifyWorkgroupService.Require {
+	private static class RequireWorkgroupService implements GetEmpCanReferByWorkplaceGroupService.Require {
 
 		@Inject
 		private WorkplaceGroupRespository repoWorkplaceGroup;

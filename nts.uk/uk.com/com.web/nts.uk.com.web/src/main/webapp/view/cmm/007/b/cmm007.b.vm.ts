@@ -16,6 +16,8 @@ module nts.uk.com.view.cmm007.b {
             com_jobtitle:  KnockoutObservable<string>;
             com_department:  KnockoutObservable<string>;
             com_workplace:  KnockoutObservable<string>;
+            com_equipmentClass: KnockoutObservable<string>;
+            com_equipmentItem: KnockoutObservable<string>;
             com_office:  KnockoutObservable<string>;
             com_company:  KnockoutObservable<string>;
             com_contract:  KnockoutObservable<string>;
@@ -50,6 +52,8 @@ module nts.uk.com.view.cmm007.b {
                 _self.com_jobtitle = ko.observable("");
                 _self.com_department = ko.observable("");
                 _self.com_workplace = ko.observable("");
+                _self.com_equipmentClass = ko.observable("");
+                _self.com_equipmentItem = ko.observable("");
                 _self.com_office = ko.observable("");
                 _self.com_company = ko.observable("");
                 _self.com_contract = ko.observable("");
@@ -96,6 +100,12 @@ module nts.uk.com.view.cmm007.b {
                                break;
                             case SystemResourceId.Com_Workplace:
                                _self.com_workplace(e.resourceContent);
+                               break;
+                            case SystemResourceId.Com_EquipmentClass:
+                               _self.com_equipmentClass(e.resourceContent);
+                               break;
+                            case SystemResourceId.Com_EquipmentItem:
+                               _self.com_equipmentItem(e.resourceContent);
                                break;
                             case SystemResourceId.Com_Office:
                                _self.com_office(e.resourceContent);
@@ -198,6 +208,8 @@ module nts.uk.com.view.cmm007.b {
                                          new SystemResourceDto(SystemResourceId.Com_Jobtitle, _self.com_jobtitle()),
                                          new SystemResourceDto(SystemResourceId.Com_Department, _self.com_department()),
                                          new SystemResourceDto(SystemResourceId.Com_Workplace, _self.com_workplace()),
+                                         new SystemResourceDto(SystemResourceId.Com_EquipmentClass, _self.com_equipmentClass()),
+                                         new SystemResourceDto(SystemResourceId.Com_EquipmentItem, _self.com_equipmentItem()),
                                          new SystemResourceDto(SystemResourceId.Com_Office, _self.com_office()),
                                          new SystemResourceDto(SystemResourceId.Com_Company, _self.com_company()),
                                          new SystemResourceDto(SystemResourceId.Com_Contract,_self.com_contract()),
@@ -230,6 +242,8 @@ module nts.uk.com.view.cmm007.b {
                 $('#com_jobtitle').ntsEditor("validate");
                 $('#com_department').ntsEditor("validate");
                 $('#com_workplace').ntsEditor("validate");
+                $('#com_equipmentClass').ntsEditor("validate");
+                $('#com_equipmentItem').ntsEditor("validate");
                 $('#com_office').ntsEditor("validate");
                 $('#com_company').ntsEditor("validate");
                 $('#com_contract').ntsEditor("validate");
@@ -266,6 +280,8 @@ module nts.uk.com.view.cmm007.b {
                 $('#com_jobtitle').ntsEditor("clear");
                 $('#com_department').ntsEditor("clear");
                 $('#com_workplace').ntsEditor("clear");
+                $('#com_equipmentClass').ntsEditor("clear");
+                $('#com_equipmentItem').ntsEditor("clear");
                 $('#com_office').ntsEditor("clear");
                 $('#com_company').ntsEditor("clear");
                 $('#com_contract').ntsEditor("clear");
@@ -297,6 +313,8 @@ module nts.uk.com.view.cmm007.b {
         export const Com_Jobtitle = "Com_Jobtitle";
         export const Com_Department = "Com_Department";
         export const Com_Workplace = "Com_Workplace";
+        export const Com_EquipmentClass = "Com_EquipmentClass";
+        export const Com_EquipmentItem = "Com_EquipmentItem";
         export const Com_Office = "Com_Office";
         export const Com_Company = "Com_Company";
         export const Com_Contract = "Com_Contract";

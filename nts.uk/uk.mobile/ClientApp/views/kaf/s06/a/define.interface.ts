@@ -746,6 +746,9 @@ export interface AppAbsenceStartInfoDto {
     // 勤務種類マスタ未登録
     workTypeNotRegister: boolean;
 
+    // 就業時間帯を変更フラグ
+    workTimeChange: boolean;
+
     // 特別休暇表示情報
     specAbsenceDispInfo: SpecAbsenceDispInfoDto;
 

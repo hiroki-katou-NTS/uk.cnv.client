@@ -210,9 +210,13 @@ public class GoingOutStampOrderChecking {
 				if (timeLeavingWork.getAttendanceStamp() != null && timeLeavingWork.getAttendanceStamp().isPresent()
 						&& timeLeavingWork.getAttendanceStamp().get().getStamp() != null
 						&& timeLeavingWork.getAttendanceStamp().get().getStamp().isPresent()
+						&&timeLeavingWork.getAttendanceStamp().get().getStamp()
+						.get().getTimeDay().getTimeWithDay().isPresent()
 						&& timeLeavingWork.getLeaveStamp() != null && timeLeavingWork.getLeaveStamp().isPresent()
 						&& timeLeavingWork.getLeaveStamp().get().getStamp() != null
-						&& timeLeavingWork.getLeaveStamp().get().getStamp().isPresent()) {
+						&& timeLeavingWork.getLeaveStamp().get().getStamp().isPresent()
+						&& timeLeavingWork.getLeaveStamp().get().getStamp().get()
+						.getTimeDay().getTimeWithDay().isPresent()) {
 					TimeWithDayAttr stampStartTimeSecondTime = timeLeavingWork.getAttendanceStamp().get().getStamp()
 							.get().getTimeDay().getTimeWithDay().get();
 					TimeWithDayAttr endStartTimesecondTime = timeLeavingWork.getLeaveStamp().get().getStamp().get()

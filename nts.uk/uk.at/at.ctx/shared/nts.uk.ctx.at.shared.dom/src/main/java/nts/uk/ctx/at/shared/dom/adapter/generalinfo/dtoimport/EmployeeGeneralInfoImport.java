@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nts.uk.ctx.at.shared.dom.employeeworkway.businesstype.employee.BusinessTypeOfEmployeeHis;
 
+/**
+ * 特定期間の社員情報
+ */
 @NoArgsConstructor
 @Getter
 @Setter

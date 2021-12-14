@@ -8,13 +8,17 @@ import javax.inject.Inject;
 import lombok.val;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffDayAndTimes;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffDayTimeUnUse;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffDayTimeUse;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffRemainCarryForward;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffRemainDayAndTimes;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.MonthlyDayoffRemainData;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.BreakDayOffManagementQuery;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveRemainingDayNumber;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveUsedDayNumber;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.MonthVacationGrantDay;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.ClosureStatus;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.absenceleave.AttendanceDaysMonthToTal;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.absenceleave.RemainDataDaysMonth;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.DayOffDayAndTimes;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.DayOffRemainDayAndTimes;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.MonthlyDayoffRemainData;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureId;
 import nts.uk.shr.com.time.calendar.date.ClosureDate;
 
@@ -73,19 +77,19 @@ public class TempDayoffServiceImpl implements TempDayoffService {
 				period.start(),
 				period.end(),
 				new DayOffDayAndTimes(
-						new RemainDataDaysMonth(occurDays),
+						new MonthVacationGrantDay(occurDays),
 						Optional.empty()),
-				new DayOffDayAndTimes(
-						new RemainDataDaysMonth(usedDays),
-						Optional.empty()),
-				new DayOffRemainDayAndTimes(
-						new AttendanceDaysMonthToTal(remainDays),
+				new DayOffDayTimeUse(
+						new LeaveUsedDayNumber(usedDays),
 						Optional.empty()),
 				new DayOffRemainDayAndTimes(
-						new AttendanceDaysMonthToTal(carryforwardDays),
+						new LeaveRemainingDayNumber(remainDays),
 						Optional.empty()),
-				new DayOffDayAndTimes(
-						new RemainDataDaysMonth(0.0),
+				new DayOffRemainCarryForward(
+						new LeaveRemainingDayNumber(carryforwardDays),
+						Optional.empty()),
+				new DayOffDayTimeUnUse(
+						new LeaveRemainingDayNumber(0.0),
 						Optional.empty()));
 	}
 }

@@ -423,6 +423,7 @@ module cps002.a.vm {
 
         start() {
             let self = this;
+            const vm = new ko.ViewModel();
 
             self.currentEmployee().clearData();
 
@@ -436,11 +437,13 @@ module cps002.a.vm {
 
                 self.subContraint.valueHasMutated();
 
-                nts.uk.characteristics.restore("NewEmployeeBasicInfo").done((data: IEmployeeBasicInfo) => {
-                    self.employeeBasicInfo(data);
-                    $('#contents-area').removeClass('hidden');
-                    self.getLayout();
-                });
+                vm.$window.storage('NewEmployeeBasicInfo')
+                    .then((data: any) => {{
+                        // self.employeeBasicInfo(data);
+                        $('#contents-area').removeClass('hidden');
+                        self.getLayout();
+                        self.employeeBasicInfo(data);
+                    }})
             });
         }
 
@@ -1006,7 +1009,7 @@ module cps002.a.vm {
             if (item.dataType === "TIME" && item.saveData.value) {
                 return nts.uk.time.parseTime(item.saveData.value, true).format();
             }
-            
+
             if (item.dataType === "TIMEPOINT" && item.saveData.value) {
                 return window['nts']['uk']['time']['minutesBased']['clock']['dayattr']['create'](item.saveData.value).fullText;
             }
@@ -1040,7 +1043,7 @@ module cps002.a.vm {
         itemsClassification?: Array<any>;
         classificationItems?: Array<any>;
         standardDate?: string;
-        wrkPlaceStartDate? :string;
+        wrkPlaceStartDate?: string;
     }
 
     class EmpRegHistory {

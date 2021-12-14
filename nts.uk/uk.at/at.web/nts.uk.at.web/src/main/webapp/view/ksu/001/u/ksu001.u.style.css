@@ -3,6 +3,7 @@
     justify-content: center;  
     /* margin-left: 550px; */
     margin-left: 440px;
+    margin-top: 1px;
 } 
 .container-custom {
     display: flex; 
@@ -15,6 +16,11 @@
     /* height: 36px; */
 }
 
+.img-icon {
+    width: 22px !important;
+    height: 22px !important;
+}
+
 .fc-title {
 	text-align: center;
 	font-size: 14px;    
@@ -22,6 +28,12 @@
 }
 .panel.ntsPanel {
     padding: 15px 15px !important;
+}
+
+#content-area {
+    width: 600px;
+    height: 680px;
+    overflow-y: auto;
 }
 
 #calendar{
@@ -44,8 +56,8 @@
 }
 
 .btn-extra{
-    width: 58px !important;
-    height: 38px !important;
+    width: 66px !important;
+    height: 30px !important;
 }
 
 #line {

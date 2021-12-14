@@ -29,6 +29,7 @@ import nts.uk.ctx.at.request.dom.application.businesstrip.BusinessTrip;
 import nts.uk.ctx.at.request.dom.application.businesstrip.BusinessTripInfo;
 import nts.uk.ctx.at.request.dom.application.businesstrip.BusinessTripInfoOutput;
 import nts.uk.ctx.at.request.dom.application.businesstrip.BusinessTripRepository;
+import nts.uk.ctx.at.request.dom.application.businesstrip.BusinessTripWorkHour;
 import nts.uk.ctx.at.request.dom.application.businesstrip.BusinessTripWorkTypes;
 import nts.uk.ctx.at.request.dom.application.common.adapter.bs.AtEmployeeAdapter;
 import nts.uk.ctx.at.request.dom.application.common.adapter.bs.dto.EmployeeInfoImport;
@@ -65,6 +66,7 @@ import nts.uk.ctx.at.shared.dom.worktype.WorkTypeClassification;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeRepository;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeUnit;
 import nts.uk.shr.com.context.AppContexts;
+import nts.uk.shr.com.time.TimeWithDayAttr;
 
 @Stateless
 public class BusinessTripServiceImlp implements BusinessTripService {
@@ -193,6 +195,7 @@ public class BusinessTripServiceImlp implements BusinessTripService {
         tripRequestSet.ifPresent(output::setSetting);
         // ドメインモデル「出張申請」を取得する
         Optional<BusinessTrip> businessTrip = businessTripRepository.findByAppId(companyId, appId);
+        val applicationOpt = appRepo.findByID(appId);
 
         Optional<AppEmploymentSet> opEmploymentSet = appDispInfoStartupOutput.getAppDispInfoWithDateOutput().getOpEmploymentSet();
         // アルゴリズム「出張申請勤務種類を取得する」を実行する
@@ -212,6 +215,10 @@ public class BusinessTripServiceImlp implements BusinessTripService {
         // ドメインモデル「勤務種類」を取得する
         List<BusinessTripWorkTypes> businessTripWorkTypes = new ArrayList<>();
         if (businessTrip.isPresent()) {
+            if (applicationOpt.isPresent()) {
+                businessTrip.get().setApplication(applicationOpt.get());
+            }
+            
             List<String> cds = businessTrip.get().getInfos().stream()
                     .map(i -> i.getWorkInformation().getWorkTypeCode().v())
                     .distinct()
@@ -358,13 +365,13 @@ public class BusinessTripServiceImlp implements BusinessTripService {
 
     private ResultCheckInputCode checkInputTimeCode(Integer startWorkTime, Integer endWorkTime) {
         // 出勤時刻、退勤時刻のいずれかが空白の場合
-        if (startWorkTime == null || endWorkTime == null) {
-            return new ResultCheckInputCode(false, "Msg_1912");
-        } else {
-            // 出勤時刻＞退勤時刻となっている場合
-            if (startWorkTime > endWorkTime) {
-                return new ResultCheckInputCode(false, "Msg_1913");
-            }
+//        if (startWorkTime == null || endWorkTime == null) {
+//            return new ResultCheckInputCode(false, "Msg_1912");
+//        } else {
+//        }
+        // 出勤時刻＞退勤時刻となっている場合
+        if (startWorkTime != null && endWorkTime != null && startWorkTime > endWorkTime) {
+            return new ResultCheckInputCode(false, "Msg_1913");
         }
         return new ResultCheckInputCode(true, null);
     }
@@ -436,10 +443,10 @@ public class BusinessTripServiceImlp implements BusinessTripService {
             Integer workTimeStart = null;
             Integer workTimeEnd = null;
 
-            if (i.getWorkingHours().isPresent() && !i.getWorkingHours().get().isEmpty()) {
-                workTimeStart = i.getWorkingHours().get().get(0).getTimeZone().getStartTime().v();
-                workTimeEnd = i.getWorkingHours().get().get(0).getTimeZone().getEndTime().v();
-            }
+            workTimeStart = i.getWorkingHours().get(0).getStartDate().isPresent() ? 
+                    i.getWorkingHours().get(0).getStartDate().map(TimeWithDayAttr::v).get() : null;
+            workTimeEnd =  i.getWorkingHours().get(0).getEndDate().isPresent() ? 
+                    i.getWorkingHours().get(0).getEndDate().map(TimeWithDayAttr::v).get() : null;
 
             // アルゴリズム「出張申請就業時間帯チェック」を実行する
             ResultCheckInputCode checkRequiredCode = this.checkRequireWorkTimeCode(wkTypeCd, wkTimeCd, workTimeStart, workTimeEnd, false);
@@ -475,6 +482,9 @@ public class BusinessTripServiceImlp implements BusinessTripService {
                                     .getAppDispInfoWithDateOutput()
                                     .getOpActualContentDisplayLst().get() : Collections.emptyList()
             );
+            
+            // 勤務種類により出退勤時刻をチェックする
+            this.checkTimeByWorkType(i.getDate(), wkTypeCd, workTimeStart, workTimeEnd);
 
         });
     }
@@ -649,8 +659,10 @@ public class BusinessTripServiceImlp implements BusinessTripService {
                     if (info.isPresent()) {
                         wkTimeCd = info.get().getWorkInformation().getWorkTimeCode() == null ? null : info.get().getWorkInformation().getWorkTimeCode().v();
                         wkTypeCd = info.get().getWorkInformation().getWorkTypeCode().v();
-                        opWorkTime = info.get().getWorkingHours().isPresent() ? Optional.ofNullable(info.get().getWorkingHours().get().get(0).getTimeZone().getStartTime() != null ? info.get().getWorkingHours().get().get(0).getTimeZone().getStartTime().v() : null) : Optional.empty();
-                        opLeaveTime = info.get().getWorkingHours().isPresent() ? Optional.ofNullable(info.get().getWorkingHours().get().get(0).getTimeZone().getEndTime() != null ? info.get().getWorkingHours().get().get(0).getTimeZone().getEndTime().v() : null) : Optional.empty();
+                        
+                        Optional<BusinessTripWorkHour> workTimeFilter = info.get().getWorkingHours().stream().filter(x -> x.getWorkNo().v() == 1).findFirst();
+                        opWorkTime = workTimeFilter.isPresent() ? workTimeFilter.get().getStartDate().map(TimeWithDayAttr::v) : Optional.empty();
+                        opLeaveTime = workTimeFilter.isPresent() ? workTimeFilter.get().getEndDate().map(TimeWithDayAttr::v) : Optional.empty();
                     }
                 }
                 break;
@@ -867,6 +879,64 @@ public class BusinessTripServiceImlp implements BusinessTripService {
         default:
             return false;
         }
+    }
+
+    @Override
+    public void checkTimeByWorkType(GeneralDate date, String workTypeCode, Integer startTime,
+            Integer endTime) {
+        // 「勤務種類」を取得する
+        Optional<WorkType> wkTypeOpt = wkTypeRepo.findByPK(AppContexts.user().companyId(), workTypeCode);
+        
+        if (!wkTypeOpt.isPresent()) {
+            return;
+        }
+        
+        // 分類を判断する
+        boolean isWorkingType = this.isWorkingType(wkTypeOpt.get());
+        
+        // 分類と出勤時刻・退勤時刻をチェックする
+        if (isWorkingType) {
+            if (startTime == null && endTime == null) {
+                throw new BusinessException("Msg_2301", date.toString());
+            }
+        } else {
+            if (startTime != null || endTime != null) {
+                throw new BusinessException("Msg_2302", date.toString());
+            }
+        }
+    }
+    
+    private boolean isWorkingType(WorkType workType) {
+        WorkTypeUnit workTypeUnit = workType.getDailyWork().getWorkTypeUnit();
+        WorkTypeClassification oneDay = workType.getDailyWork().getOneDay();
+        WorkTypeClassification morning = workType.getDailyWork().getMorning();
+        WorkTypeClassification afternoon = workType.getDailyWork().getAfternoon();
+        
+        if (workTypeUnit.equals(WorkTypeUnit.OneDay)) {
+            if (oneDay.equals(WorkTypeClassification.Attendance)
+                    || oneDay.equals(WorkTypeClassification.Shooting) 
+                    || oneDay.equals(WorkTypeClassification.ContinuousWork) 
+                    || oneDay.equals(WorkTypeClassification.HolidayWork)) {
+                return true;
+            }
+        }
+        if (workTypeUnit.equals(WorkTypeUnit.MonringAndAfternoon)) {
+            if (morning.equals(WorkTypeClassification.Attendance)
+                    || morning.equals(WorkTypeClassification.Shooting) 
+                    || morning.equals(WorkTypeClassification.ContinuousWork) 
+                    || morning.equals(WorkTypeClassification.HolidayWork)) {
+                return true;
+            }
+            if (afternoon.equals(WorkTypeClassification.Attendance)
+                    || afternoon.equals(WorkTypeClassification.Shooting) 
+                    || afternoon.equals(WorkTypeClassification.ContinuousWork) 
+                    || afternoon.equals(WorkTypeClassification.HolidayWork)) {
+                return true;
+            }
+        }
+        
+        
+        return false;
     }
 
 }

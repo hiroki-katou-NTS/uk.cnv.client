@@ -75,8 +75,14 @@ public class CompensatoryLeaveComSetting extends AggregateRoot {
 	 *
 	 * @return true, if is managed
 	 */
+	//代休を管理するかどうか判断する
 	public boolean isManaged() {
 		return this.isManaged.equals(ManageDistinct.YES);
+	}
+	
+	//時間代休を管理するか判断する
+	public boolean isManagedTime() {
+		return isManaged() && this.compensatoryDigestiveTimeUnit.getIsManageByTime().equals(ManageDistinct.YES);
 	}
 
 	/**

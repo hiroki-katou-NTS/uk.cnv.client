@@ -86,7 +86,7 @@
 										</td>
 									</tr>
 								</com:ko-if>
-								<com:ko-if bind="_.find(itemsSetting(), { 'item': 27 }).displayType">
+								<com:ko-if bind="_.find(itemsSetting(), { 'item': 27 }).displayType && vacationSetting.annualManage">
 									<tr>
 										<td>
 											<span class="row-name">#{i18n.getText('KTG004_9')}</span>
@@ -94,7 +94,7 @@
 										</td>
 									</tr>
 								</com:ko-if>
-								<com:ko-if bind="_.find(itemsSetting(), { 'item': 28 }).displayType">
+								<com:ko-if bind="_.find(itemsSetting(), { 'item': 28 }).displayType && vacationSetting.accumAnnualManage">
 									<tr>
 										<td>
 											<span class="row-name">#{i18n.getText('KTG004_10')}</span>
@@ -102,7 +102,7 @@
 										</td>
 									</tr>
 								</com:ko-if>
-								<com:ko-if bind="_.find(itemsSetting(), { 'item': 29 }).displayType">
+								<com:ko-if bind="_.find(itemsSetting(), { 'item': 29 }).displayType && vacationSetting.substituteManage">
 									<tr>
 										<td>
 											<span class="row-name">#{i18n.getText('KTG004_11')}</span>
@@ -110,7 +110,7 @@
 										</td>
 									</tr>
 								</com:ko-if>
-								<com:ko-if bind="_.find(itemsSetting(), { 'item': 30 }).displayType">
+								<com:ko-if bind="_.find(itemsSetting(), { 'item': 30 }).displayType && vacationSetting.accomoManage">
 									<tr>
 										<td>
 											<span class="row-name">#{i18n.getText('KTG004_12')}</span>
@@ -118,7 +118,7 @@
 										</td>
 									</tr>
 								</com:ko-if>
-								<com:ko-if bind="_.find(itemsSetting(), { 'item': 31 }).displayType">
+								<com:ko-if bind="_.find(itemsSetting(), { 'item': 31 }).displayType && vacationSetting.childCaremanage">
 									<tr>
 										<td>
 											<span class="row-name">#{i18n.getText('KTG004_13')}</span>
@@ -126,7 +126,7 @@
 										</td>
 									</tr>
 								</com:ko-if>
-								<com:ko-if bind="_.find(itemsSetting(), { 'item': 32 }).displayType">
+								<com:ko-if bind="_.find(itemsSetting(), { 'item': 32 }).displayType && vacationSetting.nursingManage">
 									<tr>
 										<td>
 											<span class="row-name">#{i18n.getText('KTG004_14')}</span>

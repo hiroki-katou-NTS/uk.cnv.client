@@ -1,10 +1,14 @@
 package nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata;
 
+import java.util.Optional;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.interim.TempAnnualLeaveMngs;
 import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveRemainingTime;
 import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveUsedTime;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.erroralarm.AnnualLeaveError;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.GrantBeforeAfterAtr;
 
 /**
  * 時間年休上限
@@ -117,6 +121,24 @@ public class TimeAnnualLeaveMax {
 	 */
 	private LeaveRemainingTime calcRemainMinutess(MaxMinutes maxMinutesIn, LeaveUsedTime usedMinutesIn) {
 		return new LeaveRemainingTime(maxMinutesIn.v() - usedMinutesIn.v());
+	}
+	
+	
+	/**
+	 * 時間年休上限超過チェック
+	 * @param grantAtr 付与前、付与後の区分
+	 * @return Optional<AnnualLeaveError> 年休エラー
+	 */
+	public Optional<AnnualLeaveError>  ExcessMaxErroeCheck(GrantBeforeAfterAtr grantAtr){
+		if(!this.IsExceed()){
+			return Optional.empty();
+		}
+		
+		if(grantAtr == GrantBeforeAfterAtr.BEFORE_GRANT){
+			return Optional.of(AnnualLeaveError.EXCESS_MAX_TIMEAL_BEFORE_GRANT);
+		}else{
+			return Optional.of(AnnualLeaveError.EXCESS_MAX_TIMEAL_AFTER_GRANT);
+		}
 	}
 
 }

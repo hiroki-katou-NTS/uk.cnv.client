@@ -2,43 +2,25 @@ package nts.uk.ctx.at.shared.dom.workrule.shiftmaster;
 
 import java.util.Optional;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import nts.arc.layer.dom.DomainObject;
 
 /**
  * シフトマスタの表示情報
  * @author tutk
- *
  */
-public class ShiftMasterDisInfor {
-	/**
-	 * 名称
-	 */
-	@Getter
+@Getter
+@AllArgsConstructor
+public class ShiftMasterDisInfor extends DomainObject {
+
+	/** 名称 **/
 	private ShiftMasterName name;
-	
-	/**
-	 * 色
-	 */
-	@Getter
+	/** 色 **/
 	private ColorCodeChar6 color;
-	
-	/**
-	 * スマホ表示用の色
-	 */
-	@Getter
+	/** スマホ表示用の色 **/
 	private ColorCodeChar6 colorSmartPhone;
-	
-	/**
-	 * 備考
-	 */
-	@Getter
+	/** 備考 **/
 	private Optional<Remarks> remarks;
 
-	public ShiftMasterDisInfor(ShiftMasterName name, ColorCodeChar6 color,ColorCodeChar6 colorSmartPhone, Remarks remarks) {
-		this.name = name;
-		this.color = color;
-		this.colorSmartPhone = colorSmartPhone;
-		this.remarks = Optional.ofNullable(remarks);
-	}
-	
 }

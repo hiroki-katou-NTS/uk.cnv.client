@@ -3,6 +3,7 @@ package nts.uk.ctx.at.request.dom.cancelapplication.algorithm;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -15,18 +16,21 @@ import mockit.Mocked;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
 import nts.arc.time.GeneralDate;
+import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.ApplicationType;
 import nts.uk.ctx.at.request.dom.application.PrePostAtr;
 import nts.uk.ctx.at.request.dom.application.ReasonNotReflectDaily;
 import nts.uk.ctx.at.request.dom.application.ReflectedState;
 import nts.uk.ctx.at.request.dom.application.businesstrip.BusinessTrip;
+import nts.uk.ctx.at.request.dom.application.common.adapter.bs.dto.SEmpHistImport;
 import nts.uk.ctx.at.request.dom.applicationreflect.AppReflectExecutionCondition;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.checkprocess.PreCheckProcessWorkRecord;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.checkprocess.PreCheckProcessWorkSchedule.PreCheckProcessResult;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.common.ReflectApplicationHelper;
 import nts.uk.ctx.at.request.dom.applicationreflect.object.PreApplicationWorkScheReflectAttr;
 import nts.uk.ctx.at.request.dom.applicationreflect.object.ReflectStatusResult;
+import nts.uk.ctx.at.shared.dom.adapter.employment.EmploymentHistShareImport;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.ApplicationShare;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 
@@ -58,7 +62,7 @@ public class RCApplicationCancellationProcessTest {
 		RCCancelProcessOneDayOutput actualResult = RCApplicationCancellationProcess.processRecord(require, "",
 				application, GeneralDate.ymd(2021, 4, 20), 1,
 				ReflectApplicationHelper.createReflectStatusResult(ReflectedState.NOTREFLECTED), // 反映状態=未反映
-				NotUseAtr.NOT_USE);
+				NotUseAtr.NOT_USE, new EmploymentHistShareImport("", "", new DatePeriod(GeneralDate.min(), GeneralDate.max())));
 
 		assertThat(actualResult.getStatusWorkRecord().getReflectStatus()).isEqualTo(ReflectedState.CANCELED);
 		new Verifications() {
@@ -92,7 +96,7 @@ public class RCApplicationCancellationProcessTest {
 
 		RCApplicationCancellationProcess.processRecord(require, "", application, GeneralDate.ymd(2021, 4, 20), 1,
 				ReflectApplicationHelper.createReflectStatusResult(ReflectedState.REFLECTED), // 反映状態=反映済み
-				NotUseAtr.NOT_USE);
+				NotUseAtr.NOT_USE, new EmploymentHistShareImport("", "", new DatePeriod(GeneralDate.min(), GeneralDate.max())));
 
 		new Verifications() {
 			{
@@ -134,7 +138,7 @@ public class RCApplicationCancellationProcessTest {
 		};
 		RCApplicationCancellationProcess.processRecord(require, "", application, GeneralDate.ymd(2021, 4, 20), 1,
 				ReflectApplicationHelper.createReflectStatusResult(ReflectedState.REFLECTED), // 反映状態=未反映
-				NotUseAtr.USE);
+				NotUseAtr.USE, new EmploymentHistShareImport("", "", new DatePeriod(GeneralDate.min(), GeneralDate.max())));
 
 		new Verifications() {
 			{
@@ -162,6 +166,7 @@ public class RCApplicationCancellationProcessTest {
 	 * →事前申請の処理ができる
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void test4(@Mocked PreCheckProcessWorkRecord pre) {
 
@@ -177,14 +182,14 @@ public class RCApplicationCancellationProcessTest {
 						NotUseAtr.NOT_USE, // 
 						NotUseAtr.NOT_USE));//勤務実績が確定状態でも反映する
 				PreCheckProcessWorkRecord.preCheck(require, "", (Application) any, anyInt, anyBoolean,
-						(ReflectStatusResult) any, (GeneralDate) any);
+						(ReflectStatusResult) any, (GeneralDate) any, (List<SEmpHistImport>)any);
 				result = new PreCheckProcessResult(NotUseAtr.USE, null);// 前申請の処理ができる
 
 			}
 		};
 		RCApplicationCancellationProcess.processRecord(require, "", application, GeneralDate.ymd(2021, 4, 20), 1,
 				ReflectApplicationHelper.createReflectStatusResult(ReflectedState.REFLECTED), // 反映状態=未反映
-				NotUseAtr.USE);
+				NotUseAtr.USE, new EmploymentHistShareImport("", "", new DatePeriod(GeneralDate.min(), GeneralDate.max())));
 
 		new Verifications() {
 			{
@@ -214,6 +219,7 @@ public class RCApplicationCancellationProcessTest {
 	 * →事前申請の処理ができない
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void test5(@Mocked PreCheckProcessWorkRecord pre) {
 
@@ -229,7 +235,7 @@ public class RCApplicationCancellationProcessTest {
 						NotUseAtr.NOT_USE, // 
 						NotUseAtr.NOT_USE));//勤務実績が確定状態でも反映する
 				PreCheckProcessWorkRecord.preCheck(require, "", (Application) any, anyInt, anyBoolean,
-						(ReflectStatusResult) any, (GeneralDate) any);
+						(ReflectStatusResult) any, (GeneralDate) any, (List<SEmpHistImport>)any);
 				result = new PreCheckProcessResult(NotUseAtr.NOT_USE,
 						ReflectApplicationHelper.createRCReflectStatusResult(ReflectedState.REFLECTED,
 								ReasonNotReflectDaily.ACHIEVEMENTS_LOCKED));// 事前申請の処理ができない
@@ -239,7 +245,7 @@ public class RCApplicationCancellationProcessTest {
 		RCCancelProcessOneDayOutput actualResult = RCApplicationCancellationProcess.processRecord(require, "",
 				application, GeneralDate.ymd(2021, 4, 20), 1,
 				ReflectApplicationHelper.createReflectStatusResult(ReflectedState.REFLECTED), // 反映状態=未反映
-				NotUseAtr.USE);
+				NotUseAtr.USE, new EmploymentHistShareImport("", "", new DatePeriod(GeneralDate.min(), GeneralDate.max())));
 
 		assertThat(actualResult.getStatusWorkRecord().getReasonNotReflectWorkRecord())
 				.isEqualTo(ReasonNotReflectDaily.ACHIEVEMENTS_LOCKED);

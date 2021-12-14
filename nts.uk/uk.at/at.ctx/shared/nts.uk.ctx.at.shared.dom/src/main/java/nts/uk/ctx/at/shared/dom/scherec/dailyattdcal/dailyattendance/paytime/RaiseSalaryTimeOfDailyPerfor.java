@@ -9,12 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.BonusPayAutoCalcSet;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.BonusPayAtr;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.timeitem.BPTimeItemSetting;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.calcategory.CalAttrOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.TimeWithCalculation;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.timezone.CalculationRangeOfOneDay;
-import nts.uk.ctx.at.shared.dom.workrule.outsideworktime.AutoCalRaisingSalarySetting;
 
 /**
  * 
@@ -35,19 +34,17 @@ public class RaiseSalaryTimeOfDailyPerfor {
 	/**
 	 * 日別実績の加給時間
 	 * @param oneDayRange 1日の計算範囲
-	 * @param raisingAutoCalcSet 加給の自動計算設定
-	 * @param bonusPayAutoCalcSet 加給自動計算設定
+	 * @param bpTimeItemSets 加給自動計算設定
 	 * @param calcAtrOfDaily 日別実績の計算区分
 	 * @return 日別実績の加給時間
 	 */
 	public static RaiseSalaryTimeOfDailyPerfor calcBonusPayTime(
 			CalculationRangeOfOneDay oneDayRange,
-			AutoCalRaisingSalarySetting raisingAutoCalcSet,
-			BonusPayAutoCalcSet bonusPayAutoCalcSet,
+			List<BPTimeItemSetting> bpTimeItemSets,
 			CalAttrOfDailyAttd calcAtrOfDaily) {
 		if(oneDayRange == null) return new RaiseSalaryTimeOfDailyPerfor(Collections.emptyList(), Collections.emptyList());
-		val bonusPay = oneDayRange.calcBonusPayTime(raisingAutoCalcSet, bonusPayAutoCalcSet, calcAtrOfDaily,BonusPayAtr.BonusPay);
-		val specBonusPay = oneDayRange.calcSpecBonusPayTime(raisingAutoCalcSet, bonusPayAutoCalcSet, calcAtrOfDaily, BonusPayAtr.SpecifiedBonusPay);
+		val bonusPay = oneDayRange.calcBonusPayTime(bpTimeItemSets, calcAtrOfDaily);
+		val specBonusPay = oneDayRange.calcSpecBonusPayTime(bpTimeItemSets, calcAtrOfDaily);
 		
 		return new RaiseSalaryTimeOfDailyPerfor(bonusPay, specBonusPay);
 	}

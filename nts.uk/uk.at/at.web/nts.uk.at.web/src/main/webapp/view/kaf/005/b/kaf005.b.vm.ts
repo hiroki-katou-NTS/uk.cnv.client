@@ -1528,14 +1528,16 @@ module nts.uk.at.view.kafsample.b.viewmodel {
 				let breakTime = infoWithDateApplication.breakTime;
 				if (!_.isNil(breakTime)) {
 					if (!_.isEmpty(breakTime.timeZones)) {
-						_.forEach(breakTime.timeZones, (item: TimeZone, index) => {
-							if (Number(index) < 10) {
-								let restItem = restTimeArray[index] as RestTime;
-								restItem.start(item.start);
-								restItem.end(item.end);
+						_.forEach(restTimeArray, (item, index) => {
+							let findItem = breakTime.timeZones[index];
+							if(findItem) {
+								item.start(findItem.start);
+								item.end(findItem.end);
+							} else {
+								item.start(null);
+								item.end(null);
 							}
-						})
-
+						});
 					} else {
 						_.forEach(self.restTime(), (item: RestTime) => {
 							item.start(null);

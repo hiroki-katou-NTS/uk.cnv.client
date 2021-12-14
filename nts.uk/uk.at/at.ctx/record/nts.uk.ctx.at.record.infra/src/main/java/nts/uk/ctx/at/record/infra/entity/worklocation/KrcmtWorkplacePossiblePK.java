@@ -36,10 +36,5 @@ public class KrcmtWorkplacePossiblePK implements Serializable {
 	@NotNull
 	@Column(name = "CID")
 	public String cid;
-	
-	/** 職場ID */
-	@NotNull
-	@Column(name = "WK_PLACEID")
-	public String workplaceId;
 
 }

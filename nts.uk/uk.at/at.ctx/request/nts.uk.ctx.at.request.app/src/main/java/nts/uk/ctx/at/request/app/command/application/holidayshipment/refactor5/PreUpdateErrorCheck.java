@@ -18,6 +18,7 @@ import nts.uk.ctx.at.request.dom.application.common.service.setting.CommonAlgori
 import nts.uk.ctx.at.request.dom.application.holidayshipment.absenceleaveapp.AbsenceLeaveApp;
 import nts.uk.ctx.at.request.dom.application.holidayshipment.recruitmentapp.RecruitmentApp;
 import nts.uk.ctx.at.shared.dom.remainingnumber.paymana.PayoutSubofHDManagement;
+import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
 
 /**
  * @author thanhpv
@@ -99,7 +100,9 @@ public class PreUpdateErrorCheck {
 					 displayInforWhenStarting.appDispInfoStartup.toDomain(), 
 					 Arrays.asList(rec.get().getWorkInformation().getWorkTypeCode().v()), 
 					 Optional.empty(), 
-					 existFlag);
+					 existFlag, 
+					 Optional.of(rec.get().getWorkInformation().getWorkTypeCode().v()), 
+					 rec.get().getWorkInformation().getWorkTimeCodeNotNull().map(WorkTimeCode::v));
 		 }
 		 if(abs.isPresent()) {
 			 //アルゴリズム「登録前共通処理（更新）」を実行する
@@ -115,7 +118,9 @@ public class PreUpdateErrorCheck {
 					 displayInforWhenStarting.appDispInfoStartup.toDomain(), 
 					 Arrays.asList(abs.get().getWorkInformation().getWorkTypeCode().v()), 
 					 Optional.empty(), 
-					 existFlag);
+					 existFlag, 
+					 Optional.of(abs.get().getWorkInformation().getWorkTypeCode().v()), 
+					 abs.get().getWorkInformation().getWorkTimeCodeNotNull().map(WorkTimeCode::v));
 		 }
 		
 	}

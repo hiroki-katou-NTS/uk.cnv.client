@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+  <ui:composition template="../../../../master/dialog.xhtml">
+    <ui:define name="htmlHead">
+      <script>
+        var dialogSize = {
+          width: 400,
+          height: 400
+        };
+      </script>
+      <com:stylefile path="oew001.c.style.css" />
+      <com:scriptfile set="IGNITE" />
+      <com:scriptfile path="../share/model.js" />
+      <com:scriptfile path="oew001.c.vm.js" />
+    </ui:define>
+
+    <ui:define name="content">
+      <div id="contents-area">
+        <div class="div-line flex valign-center">
+          <div id="C1_1" class="setting-label" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('OEW001_40')}</div>
+          <button id="C1_2" data-bind="click: openDialogD" tabindex="1">#{i18n.getText('OEW001_41')}</button>
+          <label id="C1_3" class="ml-10" data-bind="text: equipmentClsName"></label>
+        </div>
+        <div class="div-line flex valign-center">
+          <div id="C2_1" class="setting-label" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('OEW001_42')}</div> 
+          <div id="C2_2" data-bind="ntsComboBox: {
+            name: '#[OEW001_43]',
+            options: equipmentInformationList,
+            optionsValue: 'code',
+            optionsText: 'name',
+            value: selectedEquipmentInfoCode,
+            visibleItemsCount: 8,
+            enable: ko.computed(function() { return !isSelectAll(); }),
+            columns: [
+              { prop: 'code', length: 5 },
+              { prop: 'name', length: 30 }
+            ]
+          }" tabindex="2"></div>
+        </div>
+        <div class="div-line flex valign-center">
+          <div id="C3_1" class="setting-label" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('OEW001_44')}</div>
+          <div id="C3_2" data-bind="ntsDatePicker: {
+            name: '#[OEW001_45]',
+            value: yearMonth,
+            required: true,
+            dateFormat: 'yearmonth',
+            valueFormat: 'YYYYMM',
+            showJumpButtons: true
+          }" tabindex="3"></div>
+        </div>
+      </div>
+      <div id="functions-area-bottom">
+        <button id="C4_1" class="large proceed" data-bind="click: processExportExcel">#{i18n.getText('OEW001_46')}</button>
+        <button id="C4_2" class="large proceed" data-bind="click: processExportCsv">#{i18n.getText('OEW001_47')}</button>
+        <button id="C4_3" class="large" data-bind="click: processCloseDialog">#{i18n.getText('OEW001_48')}</button>
+      </div>
+    </ui:define>
+  </ui:composition>
+</body>
+</html>

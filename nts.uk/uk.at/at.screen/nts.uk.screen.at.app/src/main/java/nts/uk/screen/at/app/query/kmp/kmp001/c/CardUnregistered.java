@@ -72,7 +72,7 @@ public class CardUnregistered {
 		
 		if (stamps.isPresent()) {
 			Optional<WorkLocation> work = workLocationRepo.findByCode(companyID,
-					stamps.get().getRefActualResults().getWorkInforStamp().get().getWorkLocationCD().get().v());
+					stamps.get().getRefActualResults().getWorkInforStamp().get().getWorkLocationCD().map(m -> m.v()).orElse(""));
 			if(work.isPresent()) {
 				nameWorks.add(work.get().getWorkLocationName().v());
 			}

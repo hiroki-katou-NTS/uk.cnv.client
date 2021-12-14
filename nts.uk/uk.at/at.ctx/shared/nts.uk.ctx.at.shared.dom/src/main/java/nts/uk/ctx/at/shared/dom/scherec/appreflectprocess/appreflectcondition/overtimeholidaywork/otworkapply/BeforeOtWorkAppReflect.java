@@ -11,6 +11,7 @@ import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.Re
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.BreakApplication;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.ReflectFlexTime;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.reflectbreak.ReflectApplicationTime;
+import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.TranferOvertimeCompensatoryApp;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.DailyRecordOfApplication;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.condition.ReflectAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.condition.ReflectWorkInformation;
@@ -63,6 +64,8 @@ public class BeforeOtWorkAppReflect {
 			// 残業時間の反映
 			ReflectApplicationTime.process(overTimeApp.getApplicationTime().getApplicationTime(), dailyApp,
 					Optional.of(ReflectAppDestination.RECORD));
+			// 残業時間の代休振替(申請用)
+			TranferOvertimeCompensatoryApp.process(require, cid, dailyApp.getDomain());
 		}
 		
 		// 事前フレックス時間を反映する
@@ -75,7 +78,7 @@ public class BeforeOtWorkAppReflect {
 
 	}
 
-	public static interface Require extends ReflectWorkInformation.Require, ReflectAttendance.Require {
+	public static interface Require extends ReflectWorkInformation.Require, ReflectAttendance.Require, TranferOvertimeCompensatoryApp.Require {
 
 	}
 }

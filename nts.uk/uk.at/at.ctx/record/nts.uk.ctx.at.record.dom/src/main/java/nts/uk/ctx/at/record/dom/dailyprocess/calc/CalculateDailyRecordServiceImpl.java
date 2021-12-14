@@ -31,7 +31,6 @@ import nts.uk.ctx.at.shared.dom.adapter.employment.BsEmploymentHistoryImport;
 import nts.uk.ctx.at.shared.dom.adapter.employment.ShareEmploymentAdapter;
 import nts.uk.ctx.at.shared.dom.attendance.MasterShareBus.MasterShareContainer;
 import nts.uk.ctx.at.shared.dom.calculationattribute.enums.DivergenceTimeAttr;
-import nts.uk.ctx.at.shared.dom.common.CompanyId;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.common.time.BreakDownTimeDay;
 import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.HolidayAddtionSet;
@@ -43,11 +42,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalOvert
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalRestTimeSetting;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalSetting;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalcOfLeaveEarlySetting;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.BonusPayAutoCalcSet;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.HolidayTimesheetCalculationSetting;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.OvertimeTimesheetCalculationSetting;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.TimeLimitUpperLimitSetting;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.WorkingTimesheetCalculationSetting;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.deviationtime.AutoCalcSetOfDivergenceTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingWork;
@@ -594,12 +589,6 @@ public class CalculateDailyRecordServiceImpl implements CalculateDailyRecordServ
 
 		GeneralDate targetDate = recordReGetClass.getIntegrationOfDaily().getYmd();
 
-		// 加給時間計算設定
-		BonusPayAutoCalcSet bonusPayAutoCalcSet = new BonusPayAutoCalcSet(new CompanyId(companyId), 1,
-				WorkingTimesheetCalculationSetting.CalculateAutomatic,
-				OvertimeTimesheetCalculationSetting.CalculateAutomatic,
-				HolidayTimesheetCalculationSetting.CalculateAutomatical);
-
 		// 休暇クラス
 		VacationClass vacation = CalcDefaultValue.DEFAULT_VACATION;
 
@@ -639,7 +628,7 @@ public class CalculateDailyRecordServiceImpl implements CalculateDailyRecordServ
 
 		/* 時間の計算 */
 		recordReGetClass.setIntegrationOfDaily(AttendanceTimeOfDailyPerformance.calcTimeResult(vacation, workType.get(),
-				flexCalcMethod, bonusPayAutoCalcSet, eachCompanyTimeSet, divergenceTimeList,
+				flexCalcMethod, eachCompanyTimeSet, divergenceTimeList,
 				calculateOfTotalConstraintTime, scheduleReGetClass, recordReGetClass,
 				recordReGetClass.getPersonDailySetting().getPersonInfo(),
 				getPredByPersonInfo(recordReGetClass.getPersonDailySetting().getPersonInfo().getWorkCategory().getWorkTime().getWeekdayTime().getWorkTimeCode(),
@@ -1120,7 +1109,7 @@ public class CalculateDailyRecordServiceImpl implements CalculateDailyRecordServ
 			String companyId, String WorkTypeCode) {
 		// val x = shareContainer.getShared("WorkType" + WorkTypeCode);
 		val workType = shareContainer.getShared("WorkType" + WorkTypeCode,
-				() -> workTypeRepository.findNoAbolishByPK(companyId, WorkTypeCode));
+				() -> workTypeRepository.findByPK(companyId, WorkTypeCode));
 		if (workType.isPresent()) {
 			return Optional.of(workType.get().clone());
 		}

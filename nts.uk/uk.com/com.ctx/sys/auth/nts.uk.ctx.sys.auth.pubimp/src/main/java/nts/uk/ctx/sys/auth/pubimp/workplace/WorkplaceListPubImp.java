@@ -127,6 +127,7 @@ public class WorkplaceListPubImp implements WorkplaceListPub{
 		List<WorkplaceManager> listWorkplaceManager = workplaceManagerRepository.findListWkpManagerByEmpIdAndBaseDate(employeeId, GeneralDate.today());
 		for (WorkplaceManager workplaceManager : listWorkplaceManager) {
 			if(!subListWorkPlace.contains(workplaceManager.getWorkplaceId())){
+				subListWorkPlace.add(workplaceManager.getWorkplaceId());
 				// [No.567]職場の下位職場を取得する
 				subListWorkPlace.addAll(workplacePub.getAllChildrenOfWorkplaceId(companyID, GeneralDate.today(), workplaceManager.getWorkplaceId()));
 			}

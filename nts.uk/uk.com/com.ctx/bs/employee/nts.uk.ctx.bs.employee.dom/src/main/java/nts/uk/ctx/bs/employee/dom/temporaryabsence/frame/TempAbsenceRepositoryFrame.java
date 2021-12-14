@@ -49,4 +49,6 @@ public interface TempAbsenceRepositoryFrame {
 	 * @return
 	 */
 	List<TempAbsenceFrame> findByCidForReq546(String cId);
+	
+	List<TempAbsenceFrame> findByCidAndFrameNos(String cid, List<Integer> tempAbsenceFrameNos);
 }

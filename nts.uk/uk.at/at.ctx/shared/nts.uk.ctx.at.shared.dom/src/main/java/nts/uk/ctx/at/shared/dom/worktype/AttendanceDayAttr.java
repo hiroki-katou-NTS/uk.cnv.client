@@ -3,6 +3,7 @@ package nts.uk.ctx.at.shared.dom.worktype;
 import java.util.Optional;
 
 import lombok.AllArgsConstructor;
+import nts.arc.error.BusinessException;
 import nts.uk.ctx.at.shared.dom.worktime.common.AmPmAtr;
 
 /**
@@ -83,5 +84,21 @@ public enum AttendanceDayAttr {
 				return Optional.empty();
 		}
 
+	}
+	
+	public AttendanceHolidayAttr toAttendanceHolidayAttr() {
+		switch (this) {
+		case FULL_TIME:
+		case HOLIDAY_WORK:
+			return AttendanceHolidayAttr.FULL_TIME;
+		case HOLIDAY:
+			return AttendanceHolidayAttr.HOLIDAY;
+		case HALF_TIME_AM:
+			return AttendanceHolidayAttr.MORNING;
+		case HALF_TIME_PM:
+			return AttendanceHolidayAttr.AFTERNOON;
+		default:
+			throw new BusinessException("toAttendanceHolidayAttr error");
+		}
 	}
 }

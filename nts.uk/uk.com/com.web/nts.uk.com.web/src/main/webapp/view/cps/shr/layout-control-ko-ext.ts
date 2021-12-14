@@ -27,6 +27,8 @@ module nts.custombinding {
         writeConstraints = window['nts']['uk']['ui']['validation']['writeConstraints'],
         parseTimeWidthDay = window['nts']['uk']['time']['minutesBased']['clock']['dayattr']['create'];
 
+    let space_character_JP = '　';
+
     export class PropControl implements KnockoutBindingHandler {
         init = (element: HTMLElement, valueAccessor: any, allBindingsAccessor: any, viewModel: any, bindingContext: KnockoutBindingContext) => {
             let $element = $(element),
@@ -1270,7 +1272,10 @@ module nts.custombinding {
             }, 0);
         };
 
+
+
         private _constructor = (element: HTMLElement, valueAccessor: any) => {
+            const vm = new ko.ViewModel();
             let self = this,
                 services = self.services,
                 $element = $(element),
@@ -1285,10 +1290,10 @@ module nts.custombinding {
                             name: text('CPS007_6'),
                             enable: ko.observable(true)
                         }, {
-                                id: CAT_OR_GROUP.GROUP,
-                                name: text('CPS007_7'),
-                                enable: ko.observable(true)
-                            }]),
+                            id: CAT_OR_GROUP.GROUP,
+                            name: text('CPS007_7'),
+                            enable: ko.observable(true)
+                        }]),
                         optionsValue: 'id',
                         optionsText: 'name'
                     },
@@ -1961,18 +1966,50 @@ module nts.custombinding {
                                     if (selected) {
                                         def.textValue(selected.optionText);
                                     } else {
-                                        def.value(undefined);
+
                                         switch (def.item.referenceType) {
                                             case ITEM_SELECT_TYPE.DESIGNATED_MASTER:
                                                 if (cbv.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)) {
                                                     def.textValue(text('CPS001_107'));
+                                                    def.value(undefined);
                                                 } else {
-                                                    def.textValue(`${cbv}　${text('CPS001_107')}`);
+                                                    let childData: any = getShared('childData');
+                                                    let childDataKDL001: any = getShared('kml001selectedTimes')
+
+                                                    if (childData) {
+                                                        // Set name workTime after select workTime in dialog KDL003
+                                                        if (childData.selectedWorkTimeCode === cbv) {
+                                                            def.textValue(cbv + space_character_JP + childData.selectedWorkTimeName);
+                                                        }
+                                                        // Set name workTime after select workTime in dialog KDL001
+                                                    } else if (childDataKDL001 && childDataKDL001.length > 0) {
+                                                        if (childDataKDL001[0].selectedWorkTimeCode === cbv) {
+                                                            def.textValue(cbv + space_character_JP + childDataKDL001[0].selectedWorkTimeName);
+                                                        }
+                                                    } else {
+                                                        // Lấy name workTime trong trường hợp workTime được chọn không được setting ở màn hình KMK017.
+                                                        if (def.defValue) {
+                                                            if (def.itemCode === 'IS00131' || def.itemCode === 'IS00140' || def.itemCode === 'IS00194' || def.itemCode === 'IS00203' ||
+                                                                def.itemCode === 'IS00212' || def.itemCode === 'IS00221' || def.itemCode === 'IS00230' || def.itemCode === 'IS00239' ||
+                                                                def.itemCode === 'IS00185') {
+
+                                                                nts.uk.request.ajax('com', 'ctx/pereg/layout/find/nameWorkTime/' + def.defValue).done((data: any) => {
+                                                                    if (data) {
+                                                                        def.textValue(cbv + space_character_JP + data.name);
+                                                                    } else {
+                                                                        def.textValue(def.defValue + space_character_JP + text('CPS001_107'));
+                                                                    }
+                                                                })
+                                                            }
+                                                        }
+                                                    }
+
                                                 }
                                                 break;
                                             case ITEM_SELECT_TYPE.CODE_NAME:
                                             case ITEM_SELECT_TYPE.ENUM:
                                                 def.textValue(text('CPS001_107'));
+                                                def.value(undefined);
                                                 break;
                                         }
                                     }
@@ -1984,7 +2021,7 @@ module nts.custombinding {
                         });
                     }
                 },
-                proc = function(data: any): any {
+                proc = function (data: any): any {
                     if (!data.item) {
                         return {
                             text: undefined,
@@ -2272,7 +2309,7 @@ module nts.custombinding {
                         } else if (x.type == ITEM_TYPE.SET_TABLE) {
                             x.dispType = DISP_TYPE.SET_TABLE;
                         }
-                        if(x.itemCode == 'IS00129' || x.itemCode == 'IS00138') {
+                        if (x.itemCode == 'IS00129' || x.itemCode == 'IS00138') {
                             x.dispType = DISP_TYPE.SET_MULTILINE;
                         }
                     });
@@ -2865,7 +2902,7 @@ module nts.custombinding {
                 });
 
                 // events handler
-                $(ctrls.line).on('click', function() {
+                $(ctrls.line).on('click', function () {
                     let item: IItemClassification = {
                         layoutID: random(),
                         dispOrder: -1,
@@ -2970,7 +3007,7 @@ module nts.custombinding {
                                                         dfds.push(dfd);
                                                     });
 
-                                                    $.when.apply($, dfds).then(function() {
+                                                    $.when.apply($, dfds).then(function () {
                                                         let args = _.flatten(arguments),
                                                             items = _(args)
                                                                 .filter(x => !!x && x.itemTypeState.itemType == ITEM_TYPE.SINGLE)

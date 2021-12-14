@@ -37,9 +37,9 @@ public class AgreementDomainServiceTest {
 			WorkingSystem.REGULAR_WORK, null, null, null, null, null);
 	
 	BasicAgreementSetting setting = new BasicAgreementSetting(new AgreementOneMonth(
-			OneMonthTime.of(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(50 * 60), 
+			OneMonthTime.createWithCheck(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(50 * 60), 
 					new AgreementOneMonthTime(40* 60)), new AgreementOneMonthTime(60* 60)), 
-			OneMonthTime.of(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(80* 60), 
+			OneMonthTime.createWithCheck(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(80* 60), 
 					new AgreementOneMonthTime(75* 60)), new AgreementOneMonthTime(100* 60))), 
 		null, null, null);
 	

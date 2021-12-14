@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:com="http://xmlns.jcp.org/jsf/component"
+  xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+  <ui:composition template="../../../../master/base.xhtml">
+    <ui:define name="htmlHead">
+      <com:stylefile path="oem002.a.style.css" />
+      <com:scriptfile path="oem002.a.vm.js" />
+      <com:scriptfile set="IGNITE" />
+      <com:ValidatorScript>
+        nts.uk.ctx.office.dom.equipment.information.EquipmentCode
+        nts.uk.ctx.office.dom.equipment.information.EquipmentName
+        nts.uk.ctx.office.dom.equipment.information.EquipmentRemark
+      </com:ValidatorScript>
+    </ui:define>
+
+    <ui:define name="content">
+      <div id="functions-area">
+        <a id="A1_6" class="goback" data-bind="ntsLinkButton: { jump: '/view/oem/001/a/index.xhtml' }" tabindex="1">#{i18n.getText('OEM002_3')}</a>
+        <div class="button-group">
+          <button id="A1_1" data-bind="click: resetNewMode" tabindex="2">#{i18n.getText('OEM002_4')}</button>
+          <button id="A1_2" class="proceed" data-bind="click: processSave" tabindex="3">#{i18n.getText('OEM002_5')}</button>
+        </div>
+        <div class="button-group">
+          <button id="A1_3" class="danger" data-bind="click: processDelete, enable: !isNewMode()" tabindex="4">#{i18n.getText('OEM002_6')}</button>
+        </div>
+        <div class="button-group">
+          <button id="A1_4" data-bind="click: processExport" tabindex="5">#{i18n.getText('OEM002_7')}</button>
+        </div>
+      </div>
+      <div id="contents-area" class="fixed-flex-layout">
+        <div class="fixed-flex-layout-left">
+          <div id="A2_11" data-bind="ntsSearchBox: {
+            mode: 'igGrid',
+            comId: 'A2_1',
+            targetKey: 'code',
+            items: equipmentInfoList,
+            selected: selectedEquipmentInfoCode,
+            selectedKey: 'code',
+            fields: ['equipmentClsName', 'code', 'name']
+          }" tabindex="6"></div>
+          <table id="A2_1" data-bind="ntsGridList: {
+            name: '#[OEM002_8]',
+            options: equipmentInfoList,
+            optionsValue: 'code',
+            columns: columns,
+            multiple: false,
+            value: selectedEquipmentInfoCode,
+            rows: 10
+          }" tabindex="7"></table>
+        </div>
+        <div class="fixed-flex-layout-right" data-bind="with: selectedEquipmentInfo">
+          <div class="flex valign-center">
+            <div id="A2_8" class="form-label" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('OEM002_12')}</div>
+            <input id="A2_9" class="mr-10" data-bind="ntsTextEditor: {
+              name: '#[OEM002_13]',
+              value: equipmentClsName,
+              required: true,
+              option: { width: '200px' }
+            }" readonly="readonly" tabindex="8" />
+            <button id="A2_10" data-bind="click: $parent.openDialogB.bind($parent)" tabindex="9">#{i18n.getText('OEM002_14')}</button>
+          </div>
+          <div class="flex valign-center">
+            <div id="A3_1" class="form-label" data-bind="ntsFormLabel: { required: true, constraint: ['EquipmentCode', 'EquipmentName'] }">#{i18n.getText('OEM002_15')}</div>
+            <input id="A3_2" class="mr-10" data-bind="ntsTextEditor: {
+              name: '#[OEM002_16]',
+              constraint: 'EquipmentCode',
+              value: code,
+              enable: $parent.isNewMode,
+              required: true,
+              option: { width: '40px' }
+            }" tabindex="10" />
+            <input id="A3_3" data-bind="ntsTextEditor: {
+              name: '#[OEM002_17]',
+              constraint: 'EquipmentName',
+              value: name,
+              required: true,
+              option: { width: '200px' }
+            }" tabindex="11" /> 
+          </div>
+          <div class="flex valign-center">
+            <div id="A3_4" class="form-label" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('OEM002_18')}</div>
+            <div id="A3_5" data-bind="ntsDateRangePicker: {
+              name: '#[OEM002_19]',
+              required: true,
+              showNextPrevious: false,
+              value: validPeriod
+            }" tabindex="12"></div>
+          </div>
+          <div class="flex valign-top">
+            <div id="A3_6" class="form-label" data-bind="ntsFormLabel: { constraint: 'EquipmentRemark' }">#{i18n.getText('OEM002_20')}</div>
+            <textarea id="A3_7" data-bind="ntsMultilineEditor: { 
+              name: '#[OEM002_21]',
+              value: remark,
+              constraint: 'EquipmentRemark',
+              option: { width: '270px' }
+            }" tabindex="13"></textarea>
+          </div>
+        </div>
+      </div>
+    </ui:define>
+  </ui:composition>
+</body>
+</html>

@@ -22,6 +22,7 @@ import nts.uk.ctx.at.request.app.find.application.appabsence.dto.AccumulatedRest
 import nts.uk.ctx.at.request.app.find.application.appabsence.dto.AnualLeaveManagementDto;
 import nts.uk.ctx.at.request.app.find.application.appabsence.dto.AppAbsenceStartInfoDto;
 import nts.uk.ctx.at.request.app.find.application.appabsence.dto.ChangeRelationShipDto;
+import nts.uk.ctx.at.request.app.find.application.appabsence.dto.ChangeWorkTimeParam;
 import nts.uk.ctx.at.request.app.find.application.appabsence.dto.ChangeWorkTypeParam;
 import nts.uk.ctx.at.request.app.find.application.appabsence.dto.DisplayAllScreenParam;
 import nts.uk.ctx.at.request.app.find.application.appabsence.dto.NursingCareLeaveManagementDto;
@@ -153,15 +154,12 @@ public class AppAbsenceFinder {
 	public AppAbsenceStartInfoDto getChangeAppDate(String companyID, AppAbsenceStartInfoDto appAbsenceStartInfoOutput, List<String> appDates, int holidayType, AppDispInfoWithDateDto appWithDate) {
 		// INPUT．「休暇申請起動時の表示情報」を更新する
 	    appAbsenceStartInfoOutput.getAppDispInfoStartupOutput().setAppDispInfoWithDateOutput(appWithDate);
-		// 承認ルートの基準日を確認する
-		int requestSetting = appAbsenceStartInfoOutput.getAppDispInfoStartupOutput().getAppDispInfoNoDateOutput().getApplicationSetting().getRecordDate();
-		if(requestSetting == RecordDate.APP_DATE.value) {
-		    // 休暇種類変更時処理
-		    AppAbsenceStartInfoOutput appAbsence = this.absenseProcess.holidayTypeChangeProcess(companyID, appAbsenceStartInfoOutput.toDomain(companyID), appDates, EnumAdaptor.valueOf(holidayType, HolidayAppType.class));
-		    
-			// INPUT．「休暇申請起動時の表示情報」を更新する
-			appAbsenceStartInfoOutput = AppAbsenceStartInfoDto.fromDomain(appAbsence);
-		}
+	    // 休暇種類変更時処理
+	    AppAbsenceStartInfoOutput appAbsence = this.absenseProcess.holidayTypeChangeProcess(companyID, appAbsenceStartInfoOutput.toDomain(companyID), appDates, EnumAdaptor.valueOf(holidayType, HolidayAppType.class));
+	    
+	    // INPUT．「休暇申請起動時の表示情報」を更新する
+	    appAbsenceStartInfoOutput = AppAbsenceStartInfoDto.fromDomain(appAbsence);
+	    
 		// 各休暇の管理区分を取得する
 		CheckDispHolidayType checkDispHolidayType = absenseProcess.checkDisplayAppHdType(
 				companyID, 
@@ -259,6 +257,36 @@ public class AppAbsenceFinder {
 				EnumAdaptor.valueOf(param.getHolidayAppType(), HolidayAppType.class), 
 				Optional.ofNullable(param.getWorkTypeCd()));
 		return AppAbsenceStartInfoDto.fromDomain(appAbsenceStartInfoOutput);
+	}
+	
+	/**
+	 * 「就業時間帯を変更する」を切り替える
+	 * @param 社員ID sId
+	 * @param 年月日 date
+	 * @param 勤務種類コード workTypeCd
+	 * @param 就業時間帯コード workTimeCd
+	 * @param 休暇申請起動時の表示情報 appInfo
+	 * @return
+	 */
+	public AppAbsenceStartInfoDto getChangeWorkTime(ChangeWorkTimeParam param) {
+	    // 「就業時間帯を変更フラグ」を変更する
+	        // process on UI
+	    
+	    // 指定する勤務種類に必要な休暇時間を算出する
+	    AttendanceTime requiredTime = absenseProcess.calculateTimeRequired(
+	            param.getSId(), 
+	            param.getDate() == null ? Optional.empty() : Optional.ofNullable(GeneralDate.fromString(param.getDate(), "yyyy/MM/dd")), 
+	            Optional.ofNullable(param.getWorkTypeCd()), 
+	            Optional.ofNullable(param.getWorkTimeCd()), 
+	            Optional.empty(), 
+	            Optional.empty(), 
+	            Optional.empty());
+	    
+	    // 返ってきた「必要時間」を「休暇申請起動時の表示情報」にセットする
+	    AppAbsenceStartInfoDto appInfo = param.getAppAbsenceStartInfo();
+	    appInfo.setRequiredVacationTime(requiredTime.v());
+	    
+	    return appInfo;
 	}
 
 	/**

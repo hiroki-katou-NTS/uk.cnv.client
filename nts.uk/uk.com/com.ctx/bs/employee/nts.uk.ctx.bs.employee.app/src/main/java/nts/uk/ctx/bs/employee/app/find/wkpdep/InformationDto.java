@@ -1,5 +1,8 @@
 package nts.uk.ctx.bs.employee.app.find.wkpdep;
 
+import com.google.common.base.Strings;
+
+import eu.medsea.util.StringUtil;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import nts.uk.ctx.bs.employee.dom.department.master.DepartmentInformation;
@@ -66,6 +69,12 @@ public class InformationDto {
         this.genericName = wkpInfo.getGenericName();
         this.hierarchyCode = wkpInfo.getHierarchyCode();
         this.externalCode = wkpInfo.getExternalCode();
+    }
+    
+    public Integer getHierarchyCodeLength(){
+    	if(Strings.isNullOrEmpty(this.hierarchyCode))
+    		return null;
+    	return this.hierarchyCode.length();
     }
 
 }

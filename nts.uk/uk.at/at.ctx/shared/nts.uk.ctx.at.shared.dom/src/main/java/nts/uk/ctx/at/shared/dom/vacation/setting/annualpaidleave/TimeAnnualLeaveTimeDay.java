@@ -29,7 +29,7 @@ public class TimeAnnualLeaveTimeDay {
 	
 	public Optional<LaborContractTime> getContractTime(Require require, String employeeId, GeneralDate baseDate){
 		// 会社一律で設定されているとき
-		if ( this.getTimeOfDayReference().equals(AnnualTimePerDayRefer.CompanyUniform)){
+		if ( this.getTimeOfDayReference().equals(DayTimeAnnualLeave.Company_wide_Uniform)){
 
 			// １日の時間をセット
 			return this.getUniformTime();

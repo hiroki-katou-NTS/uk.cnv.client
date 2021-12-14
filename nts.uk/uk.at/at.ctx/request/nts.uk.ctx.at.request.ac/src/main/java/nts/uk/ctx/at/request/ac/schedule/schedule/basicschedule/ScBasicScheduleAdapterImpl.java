@@ -12,6 +12,7 @@ import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.request.dom.application.common.adapter.schedule.schedule.basicschedule.BasicScheduleConfirmImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.schedule.schedule.basicschedule.BasicScheduleConfirmImport.ConfirmedAtrImport;
+import nts.uk.ctx.at.request.dom.application.common.adapter.schedule.schedule.basicschedule.BreakTimeSheetImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.schedule.schedule.basicschedule.ScBasicScheduleAdapter;
 import nts.uk.ctx.at.request.dom.application.common.adapter.schedule.schedule.basicschedule.ScBasicScheduleImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.schedule.schedule.basicschedule.ShortWorkingTimeSheetImport;
@@ -65,7 +66,12 @@ public class ScBasicScheduleAdapterImpl implements ScBasicScheduleAdapter {
 						x.getShortWorkTimeFrameNo(), 
 						x.getChildCareAttr(), 
 						x.getStartTime(), 
-						x.getEndTime())).collect(Collectors.toList()));
+						x.getEndTime())).collect(Collectors.toList()), 
+				scWorkScheduleExport.getListBreakTimeSheetExports().stream().map(x -> new BreakTimeSheetImport(
+				        x.getBreakFrameNo(), 
+				        x.getStartTime(), 
+				        x.getEndTime(), 
+				        x.getBreakTime())).collect(Collectors.toList()));
 	}
 
 	@Override

@@ -462,10 +462,10 @@
                       <div
                         id="only-shift"
                         style="
-                          height: 31vh;
                           top: 60px;
                           overflow: scroll;
                         "
+                        :class="screenSmall ? 'mode-shift-small' : 'mode-shift-big'"
                        >
                        <div v-if="isCurrentMonth">
                           <nts-checkbox v-for="(option, k) in listShiftMasterInfo" 
@@ -473,31 +473,10 @@
                             v-bind:value="option.shiftMaster.shiftMasterCode" v-bind:key="k" 
                             v-click="setDataDisplay"
                             >
-                              <div  v-click="setDataDisplay" style="float: right;display: flex;" > <span
-                              v-bind:style="{  backgroundColor: option.shiftMaster.colorSmartphone, color: option.shiftMaster.colorText }"
-                                class="form-control select-el"
-                                style="
-                                  margin-top: 0.9vh;
-                                  font-size: 3vh;
-                                  width: 42px;
-                                  height: 4.5vh;
-                                  padding: 0.4vw;
-                                  float: left;
-                                  margin-left: 10px;
-                                  font-weight: bold;
-                                  border: 0px solid #ced4da;
-                                  text-align: center;
-                                "
-                                >{{option.shiftMaster.shiftMasterName}}</span> &nbsp;&nbsp;  <span style="font-weight: bold;font-size: 3vw;">{{option.shiftMaster.workTime1}} &nbsp;&nbsp; {{option.shiftMaster.workTime2}}</span></div>
-                          </nts-checkbox>
-                        </div>
-                        <div v-else>
-                            <div v-for="(option, k) in nameListInforCurrent" 
-                              v-bind:key="k" 
-                              style="float: left;font-size: 12px;display: flex;" class="form-check-2"
-                              >
-                                <span
-                                v-bind:style="{  backgroundColor: option.shiftMaster.colorSmartphone, color: option.shiftMaster.colorText }"
+                              <div  v-click="setDataDisplay" style="float: right;display: flex;" > 
+                                
+                                <div v-if="screenSmall">
+                                  <span v-bind:style="{  backgroundColor: option.shiftMaster.colorSmartphone, color: option.shiftMaster.colorText }"
                                   class="form-control select-el"
                                   style="
                                     margin-top: 0.9vh;
@@ -511,8 +490,76 @@
                                     border: 0px solid #ced4da;
                                     text-align: center;
                                   "
+                                  >{{option.shiftMaster.shiftMasterName}}</span> 
+                                   &nbsp;&nbsp;  
+                                  <span style="font-weight: bold;font-size: 3.5vw;">{{option.shiftMaster.workTime1}} &nbsp;&nbsp; {{option.shiftMaster.workTime2}}</span>
+                                </div>
+                                <div v-else>
+                                  <span v-bind:style="{  backgroundColor: option.shiftMaster.colorSmartphone, color: option.shiftMaster.colorText }"
+                                  class="form-control select-el"
+                                  style="
+                                    margin-top: 1.1vh;
+                                    font-size: 2.5vh;
+                                    width: 42px;
+                                    height: 4.5vh;
+                                    padding: 0.3vw;
+                                    float: left;
+                                    margin-left: 10px;
+                                    font-weight: bold;
+                                    border: 0px solid #ced4da;
+                                    text-align: center;
+                                  "
+                                  >{{option.shiftMaster.shiftMasterName}}</span> 
+                                   &nbsp;&nbsp;  
+                                  <span style="font-weight: bold;font-size: 3.5vw;">{{option.shiftMaster.workTime1}} &nbsp;&nbsp; {{option.shiftMaster.workTime2}}</span>
+                                </div>
+                               </div>
+                               
+                          </nts-checkbox>
+                        </div>
+                        <div v-else>
+                            <div v-for="(option, k) in nameListInforCurrent" 
+                              v-bind:key="k" 
+                              style="float: left;font-size: 12px;display: flex;" class="form-check-2"
+                              >
+                                <div v-if="screenSmall">
+                                <span
+                                v-bind:style="{  backgroundColor: option.shiftMaster.colorSmartphone, color: option.shiftMaster.colorText }"
+                                  class="form-control select-el"
+                                  style="
+                                    margin-top: 1.2vh;
+                                    font-size: 3vh;
+                                    width: 42px;
+                                    height: 4.5vh;
+                                    padding: 0.4vw;
+                                    float: left;
+                                    margin-left: 10px;
+                                    font-weight: bold;
+                                    border: 0px solid #ced4da;
+                                    text-align: center;
+                                  "
                                   >{{option.shiftMaster.shiftMasterName}}</span>
-                                  <span style="float: left;margin-top: 2.1vh;font-weight: bold;font-size: 3vw;"> &nbsp;&nbsp;  {{option.shiftMaster.workTime1}} &nbsp;&nbsp; {{option.shiftMaster.workTime2}}</span>
+                                </div>
+                                <div v-else>
+                                  <span
+                                v-bind:style="{  backgroundColor: option.shiftMaster.colorSmartphone, color: option.shiftMaster.colorText }"
+                                  class="form-control select-el"
+                                  style="
+                                    margin-top: 1.7vh;
+                                    font-size: 2.5vh;
+                                    width: 42px;
+                                    height: 4.5vh;
+                                    padding: 0.3vw;
+                                    float: left;
+                                    margin-left: 10px;
+                                    font-weight: bold;
+                                    border: 0px solid #ced4da;
+                                    text-align: center;
+                                  "
+                                  >{{option.shiftMaster.shiftMasterName}}</span>
+
+                                </div>
+                                  <span style="float: left;margin-top: 2.1vh;font-weight: bold;font-size: 3.5vw;"> &nbsp;&nbsp;  {{option.shiftMaster.workTime1}} &nbsp;&nbsp; {{option.shiftMaster.workTime2}}</span>
                                   
                             </div>
                           </div>
@@ -545,19 +592,7 @@
                           <div
                             class="input-group input-group-transparent"
                           >
-                            <!-- <textarea
-                              v-model="memoCurent"
-                              disabled
-                              type=""
-                              rows="2"
-                              v-bind:placeholder="$i18n('KSUS02_12')"
-                              class="form-control"
-                              style="
-                                margin-top: 0px;
-                                margin-bottom: 0px;
-                                height: 80px; 
-                              "
-                            ></textarea> -->
+                            
                             <nts-text-area
                               id="text-area-1"
                               v-model="memoCurent"

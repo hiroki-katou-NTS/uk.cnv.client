@@ -159,10 +159,6 @@ public class Stamp implements DomainAggregate, Cloneable {
 		return this.getCardNumber().v() + this.getStampDateTime().toString();
 	}
 
-	public void setReflectedCategory(boolean reflectedCategory) {
-		this.imprintReflectionStatus.setReflectedCategory(reflectedCategory);
-	}
-
 	@Override
 	public Stamp clone() {
 		return new Stamp(new ContractCode(contractCode.v()),

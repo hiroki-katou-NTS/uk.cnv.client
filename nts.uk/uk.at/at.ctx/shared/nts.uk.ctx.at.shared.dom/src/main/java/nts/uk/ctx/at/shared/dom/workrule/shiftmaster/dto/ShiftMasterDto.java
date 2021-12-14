@@ -20,6 +20,7 @@ public class ShiftMasterDto {
 	private String shiftMasterCode;
 	private String color;
 	private String remark;
+	private String importCode;
 	private String workTypeCd;
 	private String workTypeName;
 	private String workTimeCd;
@@ -36,9 +37,10 @@ public class ShiftMasterDto {
 		this.shiftMasterName = info.getName().v();
 		this.color = info.getColor().v();
 		this.remark = info.getRemarks().isPresent() ? info.getRemarks().get().v() : null;
+		this.importCode = domain.getImportCode().isPresent() ? domain.getImportCode().get().v() : null;
 	}
 
-	public ShiftMasterDto(String companyId, String shiftMasterName, String shiftMaterCode, String color, String remark,
+	public ShiftMasterDto(String companyId, String shiftMasterName, String shiftMaterCode, String color, String remark, String importCode,
 			String workTypeCd, String workTypeName, String wtypecid, String workTimeCd, String workTimeName,
 			String wtimecid) {
 		this.companyId = companyId;
@@ -48,6 +50,7 @@ public class ShiftMasterDto {
 		this.remark = !StringUtils.isEmpty(remark) ? remark : "";
 		this.workTypeCd = workTypeCd;
 		this.workTypeName = !StringUtils.isEmpty(workTypeName) ? workTypeName : "";
+		this.importCode = importCode;
 		if (StringUtils.isEmpty(wtypecid)) {
 			this.workTypeName = I18NText.getText("KSM015_28", workTypeCd, I18NText.getText("KSM015_29"));
 		}
@@ -62,7 +65,7 @@ public class ShiftMasterDto {
 		this.workTime2 = "";
 	}
 	
-	public ShiftMasterDto(String companyId, String shiftMasterName, String shiftMaterCode, String color, String remark,
+	public ShiftMasterDto(String companyId, String shiftMasterName, String shiftMaterCode, String color, String remark, String importCode,
 			String workTypeCd, String workTypeName, String wtypecid, String workTimeCd, String workTimeName,
 			String wtimecid,String colorSmartphone) {
 		this.companyId = companyId;
@@ -70,6 +73,7 @@ public class ShiftMasterDto {
 		this.shiftMasterCode = shiftMaterCode;
 		this.color = color;
 		this.remark = !StringUtils.isEmpty(remark) ? remark : "";
+		this.importCode = importCode;
 		this.workTypeCd = workTypeCd;
 		this.workTypeName = !StringUtils.isEmpty(workTypeName) ? workTypeName : "";
 		if (StringUtils.isEmpty(wtypecid)) {

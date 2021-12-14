@@ -44,7 +44,7 @@ public class ObtainAppReflectResultProcess {
 		for (Application app : lstApp) {
 			/// 申請反映結果を取得
 			Optional<IntegrationOfDaily> dailyResult = require
-					.getAppReflectResult(cid, ConvertApplicationToShare.toAppliction(app), baseDate, optDaily);
+					.getAppReflectResult(cid, ConvertApplicationToShare.toAppliction(app, baseDate), baseDate, optDaily);
 			if (dailyResult.isPresent()) {
 				optDaily = dailyResult;
 			}

@@ -62,7 +62,7 @@ module nts.uk.com.view.cps001.g.vm {
             // Subsribe table
             _self.currentValue.subscribe(value => {
                 if (value) {
-                     clearError();
+                    clearError();
                     _self.createMode(false);
                     service.getDetail(value).done((result: IAnnualLeaveGrantRemainingData) => {
                         if (result) {
@@ -76,7 +76,7 @@ module nts.uk.com.view.cps001.g.vm {
                         clearError();
                         $('#idGrantDate').focus();
                     });
-                   
+
                 }
             });
 
@@ -118,7 +118,7 @@ module nts.uk.com.view.cps001.g.vm {
                         _self.alllist(data);
                         _self.changeFollowExpSta(_self.checked());
 
-                        let currentIndex = _.findIndex(_self.listAnnualLeaveGrantRemainData(), function(item: IAnnualLeaveGrantRemainingData) {
+                        let currentIndex = _.findIndex(_self.listAnnualLeaveGrantRemainData(), function (item: IAnnualLeaveGrantRemainingData) {
                             return item.annLeavID == annID;
                         });
                         // Set focus
@@ -148,7 +148,7 @@ module nts.uk.com.view.cps001.g.vm {
             if (value) {
                 _self.listAnnualLeaveGrantRemainData(_self.alllist());
             } else {
-                _self.listAnnualLeaveGrantRemainData(_.filter(_self.alllist(), function(item) {
+                _self.listAnnualLeaveGrantRemainData(_.filter(_self.alllist(), function (item) {
                     return item.expirationStatus === EXPIRED_STATUS.AVAILABLE;
                 }));
             }
@@ -169,7 +169,7 @@ module nts.uk.com.view.cps001.g.vm {
                 service.getItemDef().done((data) => {
                     if (!data[6].display && !data[9].display && !data[12].display) {
                         var currentDialog = nts.uk.ui.windows.getSelf();
-                        currentDialog.$dialog.dialog('option','width',595);
+                        currentDialog.$dialog.dialog('option', 'width', 595);
                     }
 
                     self.itemDefs = data;
@@ -183,7 +183,7 @@ module nts.uk.com.view.cps001.g.vm {
         }
         setItemDefValue(data: any): JQueryPromise<any> {
             let self = this, dfd = $.Deferred();
-            $("td[data-itemCode]").each(function() {
+            $("td[data-itemCode]").each(function () {
                 let itemCodes = $(this).attr('data-itemCode');
                 if (itemCodes) {
                     let itemCodeArray = itemCodes.split(" ");
@@ -192,11 +192,13 @@ module nts.uk.com.view.cps001.g.vm {
                             return item.itemCode == itemCode;
                         });
                         if (itemDef) {
-                            // if (itemDef.display) {
-                            //     $(this).children().first().html("<label>" + itemDef.itemName + "</label>");
-                            // } else {
-                            //     $(this).parent().css("display", "none");
-                            // }
+                            if (!['IS00385', 'IS00386', 'IS00387', 'IS00388'].includes(itemDef.itemCode)) {
+                                if (itemDef.display) {
+                                    $(this).children().first().html("<label>" + itemDef.itemName + "</label>");
+                                } else {
+                                    $(this).parent().css("display", "none");
+                                }
+                            }
                             let timeType = itemCodeArray[itemCodeArray.length - 1];
                             switch (timeType) {
                                 case "IS00385":
@@ -292,28 +294,28 @@ module nts.uk.com.view.cps001.g.vm {
             if (_self.createMode()) {
 
                 service.add(command).done((data: Array<string>) => {
-                    info({ messageId: "Msg_15" }).then(function() {
+                    info({ messageId: "Msg_15" }).then(function () {
                         _self.startPage(data[0]);
                     });
                     unblock();
                 }).fail((res) => {
                     if (res.messageId == 'Msg_1023') {
                         $('#idGrantDate').ntsError('set', { messageId: res.messageId });
-                    }else if (res.messageId == 'Msg_1456') {
-                         nts.uk.ui.dialog.alertError({ messageId: res.messageId });
+                    } else if (res.messageId == 'Msg_1456') {
+                        nts.uk.ui.dialog.alertError({ messageId: res.messageId });
                     }
                     unblock();
                 });
             } else {
                 service.update(command).done((data) => {
-                    info({ messageId: "Msg_15" }).then(function() {
+                    info({ messageId: "Msg_15" }).then(function () {
                         _self.startPage(ko.toJS(_self.currentItem()).annLeavID);
                     });
                     unblock();
                 }).fail((res) => {
                     if (res.messageId == 'Msg_1456') {
-                       nts.uk.ui.dialog.alertError({ messageId: res.messageId });
-                    }else if (res.messageId != 'Msg_1023') {
+                        nts.uk.ui.dialog.alertError({ messageId: res.messageId });
+                    } else if (res.messageId != 'Msg_1023') {
                         $('#idGrantDate').ntsError('set', { messageId: res.messageId });
                     }
                     unblock();
@@ -333,7 +335,7 @@ module nts.uk.com.view.cps001.g.vm {
          */
         public remove(): void {
             let _self = this,
-                currentIndex = _.findIndex(_self.listAnnualLeaveGrantRemainData(), function(item: IAnnualLeaveGrantRemainingData) {
+                currentIndex = _.findIndex(_self.listAnnualLeaveGrantRemainData(), function (item: IAnnualLeaveGrantRemainingData) {
                     return item.annLeavID == ko.toJS(_self.currentItem()).annLeavID;
                 }),
                 finalIndex = _self.listAnnualLeaveGrantRemainData().length - 1;
@@ -349,7 +351,7 @@ module nts.uk.com.view.cps001.g.vm {
                         grantDate: ko.toJS(_self.currentItem()).grantDate
                     };
                     service.deleteLeav(command).done((message: string) => {
-                        info({ messageId: "Msg_16" }).then(function() {
+                        info({ messageId: "Msg_16" }).then(function () {
 
                             // set focus
                             if (currentIndex === 0 && currentIndex === finalIndex) {

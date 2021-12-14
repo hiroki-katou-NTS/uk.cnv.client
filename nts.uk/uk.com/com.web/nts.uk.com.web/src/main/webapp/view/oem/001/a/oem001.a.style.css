@@ -1,0 +1,37 @@
+.panel.panel-frame {
+  width: 255px;
+  height: 330px;
+  float: left;
+  display: block;
+  margin-left: 30px;
+}
+
+.panel.panel-frame > * {
+  margin-top: 10px;
+}
+
+.panel.panel-gray-bg {
+  text-align: center;
+}
+
+.panel.panel-gray-bg > label {
+  font-size: 1.5em;
+}
+
+.btn-with-caret > .caret {
+  text-align: center;
+}
+
+.btn-with-caret > button {
+  width: 235px;
+}
+
+.btn-with-caret > button:not(.caret-right) {
+  width: 245px !important;
+}
+
+.caret-bottom:after {
+	color: #92D050;
+	border-width: 18px 55px;
+	margin-top: 15px;
+}

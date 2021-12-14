@@ -3,7 +3,7 @@ package nts.uk.screen.at.app.ktgwidget.ktg004;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
+import nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeOfExistMinus;
 
 /**
  * @author thanhpv
@@ -20,10 +20,10 @@ public class RemainingDaysAndTimeDto {
 	//時間
 	private String time = "00:00";
 
-	public RemainingDaysAndTimeDto(double day, AttendanceTime time) {
+	public RemainingDaysAndTimeDto(double day, AttendanceTimeOfExistMinus time) {
 		super();
 		this.day = day;
-		this.time = time.hour() + ":" + (time.minute() < 10 ? ("0" + time.minute()) : time.minute());
+		this.time = (time.v() < 0 ? "-" : "") + time.hour() + ":" + (time.minute() < 10 ? ("0" + time.minute()) : time.minute());
 	}
 	
 }

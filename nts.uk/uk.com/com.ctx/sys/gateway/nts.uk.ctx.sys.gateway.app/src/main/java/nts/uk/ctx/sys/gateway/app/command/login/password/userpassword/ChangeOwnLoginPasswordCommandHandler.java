@@ -31,8 +31,8 @@ public class ChangeOwnLoginPasswordCommandHandler extends CommandHandler<ChangeO
 		val require = requireProvider.create();
 		val command = context.getCommand();
 		
-		val atomTask = ChangeLoginPasswordOfUser.change(require, AppContexts.user().userId(), command.getNewPassword(),
-				command.getConfirmPassword());
+		val atomTask = ChangeLoginPasswordOfUser.change(require, AppContexts.user().userId(),
+				command.getCurrentPassword(), command.getNewPassword(), command.getConfirmPassword());
 		
 		transaction.execute(atomTask);
 	}

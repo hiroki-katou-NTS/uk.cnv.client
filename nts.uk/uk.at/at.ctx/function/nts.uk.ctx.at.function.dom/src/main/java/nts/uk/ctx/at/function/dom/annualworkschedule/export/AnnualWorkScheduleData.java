@@ -208,6 +208,12 @@ public class AnnualWorkScheduleData {
 			final long MAX_VALUE = 999999999;
 			return String.format("%,d", Math.min(value.longValue(), MAX_VALUE)) + "円";
 		}
+		if (valOutFormat.equals(ValueOuputFormat.DAYS)) {
+			return String.valueOf(value) + "日";
+		}
+		if (valOutFormat.equals(ValueOuputFormat.TIMES)) {
+			return String.valueOf(value) + "回";
+		}
 		return String.valueOf(value.floatValue());
 	}
 

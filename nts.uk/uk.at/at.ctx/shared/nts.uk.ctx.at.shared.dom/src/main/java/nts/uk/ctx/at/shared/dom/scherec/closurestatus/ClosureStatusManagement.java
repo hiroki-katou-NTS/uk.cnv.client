@@ -6,6 +6,7 @@ import lombok.Getter;
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.error.BusinessException;
 import nts.arc.layer.dom.AggregateRoot;
+import nts.arc.time.GeneralDate;
 import nts.arc.time.YearMonth;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureId;
 import nts.uk.shr.com.time.calendar.date.ClosureDate;
@@ -51,13 +52,14 @@ public class ClosureStatusManagement extends AggregateRoot {
 	 * @return 	締めされていない期間
 	 */
 	public Optional<DatePeriod> closureStateManagenent(DatePeriod period) {
-		if(period.end().before(this.period.end())) {
+		GeneralDate endDateForCheck = this.period.end() .addDays(1);
+		if(period.end().before(endDateForCheck)) { 
 			return Optional.empty();
 		}
-		if(period.start().after(this.period.end())) {
+		if(period.start().after(endDateForCheck)) {
 			return Optional.of(period);
 		}
-		return Optional.of(new DatePeriod(this.period.start(), period.end())); 
+		return Optional.of(new DatePeriod(endDateForCheck, period.end())); 
 	}
 
 }

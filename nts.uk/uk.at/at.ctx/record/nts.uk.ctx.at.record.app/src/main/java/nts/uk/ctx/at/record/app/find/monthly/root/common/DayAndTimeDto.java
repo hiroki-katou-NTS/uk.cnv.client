@@ -5,17 +5,22 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.shared.dom.attendance.util.item.AttendanceItemDataGate;
-import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.RemainingMinutes;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffDayAndTimes;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffDayTimeUnUse;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffDayTimeUse;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffRemainCarryForward;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffRemainDayAndTimes;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveRemainingDayNumber;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveRemainingTime;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveUsedDayNumber;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveUsedTime;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.MonthVacationGrantDay;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.MonthVacationGrantTime;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.ItemConst;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.anno.AttendanceItemLayout;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.anno.AttendanceItemValue;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ValueType;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.absenceleave.AttendanceDaysMonthToTal;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.absenceleave.RemainDataDaysMonth;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.DayOffDayAndTimes;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.DayOffRemainDayAndTimes;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.RemainDataTimesMonth;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.specialholiday.ActualSpecialLeaveRemain;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.specialholiday.ActualSpecialLeaveRemainDay;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.specialholiday.SpecialLeavaRemainTime;
@@ -64,19 +69,47 @@ public class DayAndTimeDto implements ItemConst, AttendanceItemDataGate {
 		return domain == null ? null : new DayAndTimeDto(domain.getDay().v(), domain.getTime().isPresent() ? domain.getTime().get().valueAsMinutes() : null);
 	}
 	
-	public DayOffDayAndTimes toOff(){
-		return new DayOffDayAndTimes(new RemainDataDaysMonth(days == null ? 0 : days),
-				Optional.ofNullable(time == null ? null : new RemainDataTimesMonth(time)));
+	public DayOffRemainCarryForward toCarry(){
+		return new DayOffRemainCarryForward(new LeaveRemainingDayNumber(days == null ? 0 : days),
+				Optional.ofNullable(time == null ? null : new LeaveRemainingTime(time)));
+	}
+	
+	public static DayAndTimeDto from(DayOffRemainCarryForward domain){
+		return domain == null ? null : new DayAndTimeDto(domain.getDay().v(), domain.getTime().isPresent() ? domain.getTime().get().valueAsMinutes() : null);
+	}
+	
+	public DayOffDayAndTimes toOccr() {
+		return new DayOffDayAndTimes(new MonthVacationGrantDay(days == null ? 0 : days),
+				Optional.ofNullable(time == null ? null : new MonthVacationGrantTime(time)));
+	}
+	
+	public DayOffDayTimeUse toUse() {
+		return new DayOffDayTimeUse(new LeaveUsedDayNumber(days == null ? 0 : days),
+				Optional.ofNullable(time == null ? null : new LeaveUsedTime(time)));
+	}
+	
+	public static DayAndTimeDto from(DayOffDayTimeUse domain){
+		return domain == null ? null : new DayAndTimeDto(domain.getDay().v(), domain.getTime().isPresent() ? domain.getTime().get().valueAsMinutes() : null);
+	}
+	
+	public DayOffRemainDayAndTimes toRemain() {
+		return new DayOffRemainDayAndTimes(new LeaveRemainingDayNumber(days == null ? 0 : days),
+				Optional.ofNullable(time == null ? null : new LeaveRemainingTime(time)));
+	}
+	
+	public DayOffDayTimeUnUse toUnUse() {
+		return new DayOffDayTimeUnUse(new LeaveRemainingDayNumber(days == null ? 0 : days),
+				Optional.ofNullable(time == null ? null : new LeaveRemainingTime(time)));
+	}
+	
+	public static DayAndTimeDto from(DayOffDayTimeUnUse domain){
+		return domain == null ? null : new DayAndTimeDto(domain.getDay().v(), domain.getTime().isPresent() ? domain.getTime().get().valueAsMinutes() : null);
 	}
 	
 	public static DayAndTimeDto from(DayOffRemainDayAndTimes domain){
-		return domain == null ? null : new DayAndTimeDto(domain.getDays().v(), domain.getTimes().isPresent() ? domain.getTimes().get().valueAsMinutes() : null);
+		return domain == null ? null : new DayAndTimeDto(domain.getDay().v(), domain.getTime().isPresent() ? domain.getTime().get().valueAsMinutes() : null);
 	}
 	
-	public DayOffRemainDayAndTimes toOffRemain(){
-		return new DayOffRemainDayAndTimes(new AttendanceDaysMonthToTal(days == null ? 0 : days),
-				Optional.ofNullable(time == null ? null : new RemainingMinutes(time)));
-	}
 	@Override
 	public Optional<ItemValue> valueOf(String path) {
 		switch (path) {

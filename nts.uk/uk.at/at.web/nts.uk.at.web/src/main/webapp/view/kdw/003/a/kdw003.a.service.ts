@@ -80,8 +80,8 @@ module nts.uk.at.view.kdw003.a.service {
         return nts.uk.request.ajax(paths.getNameMonthlyAttItem, data);
     }
 
-    export function searchEmployee(employeeId: string) {
-        return nts.uk.request.ajax(paths.searchEmployee + "/" + employeeId);
+    export function searchEmployee(employeeCode: string) {
+        return nts.uk.request.ajax(paths.searchEmployee + "/" + employeeCode);
     }
 
     export function calcTime(param: any) {

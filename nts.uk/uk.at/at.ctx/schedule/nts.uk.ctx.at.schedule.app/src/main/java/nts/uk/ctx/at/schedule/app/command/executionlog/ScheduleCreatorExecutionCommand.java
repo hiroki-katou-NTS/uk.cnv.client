@@ -47,9 +47,9 @@ public class ScheduleCreatorExecutionCommand {
 
 	private List<String> employeeIds;
 	
-	@Getter
-	@Setter
-	private CountDownLatch countDownLatch;
+//	@Getter
+//	@Setter
+//	private CountDownLatch countDownLatch;
 	
 	@Getter
 	@Setter

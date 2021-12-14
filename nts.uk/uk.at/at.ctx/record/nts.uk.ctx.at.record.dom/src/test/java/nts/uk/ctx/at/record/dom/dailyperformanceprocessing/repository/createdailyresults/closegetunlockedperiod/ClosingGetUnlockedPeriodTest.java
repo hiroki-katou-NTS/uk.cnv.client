@@ -37,9 +37,17 @@ public class ClosingGetUnlockedPeriodTest {
 		String employmentCode = "employmentCode";// dummy
 		IgnoreFlagDuringLock ignoreFlagDuringLock = IgnoreFlagDuringLock.CAN_CAL_LOCK;
 		AchievementAtr achievementAtr = AchievementAtr.DAILY;// dummy
+		ClosureEmployment closureEmployment = new ClosureEmployment("companyId", employmentCode, 1);
+		
+		new Expectations() {
+			{
+				require.findByEmploymentCD(anyString);
+				result = Optional.of(closureEmployment);
+
+			}
+		};
 		List<DatePeriod> result = ClosingGetUnlockedPeriod.get(require, period, employmentCode, ignoreFlagDuringLock,
 				achievementAtr);
-
 		assertThat(result.get(0).start()).isEqualTo(period.start());
 		assertThat(result.get(0).end()).isEqualTo(period.end());
 
@@ -128,8 +136,8 @@ public class ClosingGetUnlockedPeriodTest {
 		List<DatePeriod> result = ClosingGetUnlockedPeriod.get(require, period, employmentCode, ignoreFlagDuringLock,
 				achievementAtr);
 	
-		assertThat(result.get(0).start()).isEqualTo(periodClosure.start());
-		assertThat(result.get(0).end()).isEqualTo(period.end());
+		assertThat(result.get(0).start()).isEqualTo(GeneralDate.ymd(2021, 02, 1));
+		assertThat(result.get(0).end()).isEqualTo(GeneralDate.ymd(2021, 02, 15));
 
 	}
 

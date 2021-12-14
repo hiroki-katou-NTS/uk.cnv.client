@@ -21,7 +21,7 @@ import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.configuration.Da
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.CalculationState;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.NotUseAttribute;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.WorkInfoOfDailyAttendance;
-import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.GetEmpCanReferBySpecOrganizationService;
+import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.GetEmpCanReferService;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.GetTargetIdentifiInforService;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.TargetOrgIdenInfor;
 
@@ -48,7 +48,7 @@ public class GetWorkTogetherEmpOnDayBySpecEmpServiceTest {
 	@SuppressWarnings("static-access")
 	@Test
 	public void getWorkTogetherEmployeeOnDay(@Mocked GetTargetIdentifiInforService targetOrgService
-			, @Mocked GetEmpCanReferBySpecOrganizationService empSameOrgService) {
+			, @Mocked GetEmpCanReferService empSameOrgService) {
 		val sid = "sid_0";
 		val baseDate = GeneralDate.today();
 		val empSameOrgs = Arrays.asList("sid_1", "sid_2", "sid_3");
@@ -65,7 +65,7 @@ public class GetWorkTogetherEmpOnDayBySpecEmpServiceTest {
 				targetOrgService.get(require, baseDate, sid);
 				result = targetOrg;
 				
-				empSameOrgService.getListEmpID(require, baseDate, sid, targetOrg);
+				empSameOrgService.getByOrg(require, baseDate, sid, targetOrg);
 				result = empSameOrgs;
 				
 				require.getWorkSchedule(empSameOrgs, baseDate);

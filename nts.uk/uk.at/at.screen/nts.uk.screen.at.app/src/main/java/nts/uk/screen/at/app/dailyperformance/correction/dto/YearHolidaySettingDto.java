@@ -16,6 +16,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class YearHolidaySettingDto {
 
+	/**
+	 * 年休管理する
+	 */
 	private boolean manageYearOff;
 
 	private boolean manageTimeOff;

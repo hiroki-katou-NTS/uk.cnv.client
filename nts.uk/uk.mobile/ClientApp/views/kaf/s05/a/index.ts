@@ -481,13 +481,17 @@ export class KafS05Component extends KafS00ShrComponent {
                 // 勤務種類リストと就業時間帯リストがない場合エラーを返す
                 if (vm.model.displayInfoOverTime) {
                     
-                    if (_.isEmpty(vm.model.displayInfoOverTime.infoBaseDateOutput.worktypes)) {
+                    if (_.isEmpty(vm.model.displayInfoOverTime.infoBaseDateOutput.worktypes)
+                        && vm.model.displayInfoOverTime.infoNoBaseDate.overTimeAppSet.applicationDetailSetting.timeCalUse == NotUseAtr.USE
+                    ) {
                         // msg_1567
                         vm.$modal.error({ messageId: 'Msg_1567'});	
                     }
                     if (vm.model.displayInfoOverTime.appDispInfoStartup.appDispInfoWithDateOutput.opWorkTimeLst) {
                         
-                        if (_.isEmpty(vm.model.displayInfoOverTime.appDispInfoStartup.appDispInfoWithDateOutput.opWorkTimeLst)) {
+                        if (_.isEmpty(vm.model.displayInfoOverTime.appDispInfoStartup.appDispInfoWithDateOutput.opWorkTimeLst)
+                        && vm.model.displayInfoOverTime.infoNoBaseDate.overTimeAppSet.applicationDetailSetting.timeCalUse == NotUseAtr.USE        
+                        ) {
                             vm.$modal.error({ messageId: 'Msg_1568'});	
                         }
                     } else {

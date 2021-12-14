@@ -7,6 +7,7 @@ package nts.uk.ctx.at.shared.ac.employee;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -18,12 +19,22 @@ import lombok.val;
 import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
-import nts.uk.ctx.at.shared.dom.adapter.employee.*;
+import nts.uk.ctx.at.shared.dom.adapter.employee.AffComHistItemShareImport;
+import nts.uk.ctx.at.shared.dom.adapter.employee.AffCompanyHistSharedImport;
+import nts.uk.ctx.at.shared.dom.adapter.employee.ClassificationImport;
+import nts.uk.ctx.at.shared.dom.adapter.employee.EmpEmployeeAdapter;
+import nts.uk.ctx.at.shared.dom.adapter.employee.EmployeeBasicInfoImport;
+import nts.uk.ctx.at.shared.dom.adapter.employee.EmployeeImport;
+import nts.uk.ctx.at.shared.dom.adapter.employee.EmployeeRecordImport;
+import nts.uk.ctx.at.shared.dom.adapter.employee.MailAddress;
+import nts.uk.ctx.at.shared.dom.adapter.employee.PersonEmpBasicInfoImport;
+import nts.uk.ctx.at.shared.dom.adapter.employee.SClsHistImport;
 import nts.uk.ctx.bs.employee.pub.classification.SClsHistExport;
 import nts.uk.ctx.bs.employee.pub.classification.SyClassificationPub;
 import nts.uk.ctx.bs.employee.pub.company.AffCompanyHistExport;
 import nts.uk.ctx.bs.employee.pub.company.SyCompanyPub;
 import nts.uk.ctx.bs.employee.pub.employee.EmployeeBasicInfoExport;
+import nts.uk.ctx.bs.employee.pub.employee.EmployeeDataMngInfoExport;
 import nts.uk.ctx.bs.employee.pub.employee.ResultRequest600Export;
 import nts.uk.ctx.bs.employee.pub.employee.SyEmployeePub;
 import nts.uk.ctx.bs.employee.pub.employee.export.PersonEmpBasicInfoPub;
@@ -38,10 +49,10 @@ public class EmpEmployeeAdapterImpl implements EmpEmployeeAdapter {
 	/** The employee pub. */
 	@Inject
 	private SyEmployeePub employeePub;
-	
+
 	@Inject
 	private PersonEmpBasicInfoPub personEmpBasicInfoPub;
-	
+
 	@Inject
 	private SyCompanyPub syCompanyPub;
 	@Inject
@@ -59,7 +70,7 @@ public class EmpEmployeeAdapterImpl implements EmpEmployeeAdapter {
 		val cacheCarrier = new CacheCarrier();
 		return findByEmpIdRequire(cacheCarrier, empId);
 	}
-	
+
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public EmployeeImport findByEmpIdRequire(CacheCarrier cacheCarrier, String empId) {
@@ -81,7 +92,7 @@ public class EmpEmployeeAdapterImpl implements EmpEmployeeAdapter {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public List<EmployeeImport> findByEmpId(List<String> empIds) {
 		// Get Employee Basic Info
@@ -173,7 +184,7 @@ public class EmpEmployeeAdapterImpl implements EmpEmployeeAdapter {
 		AffCompanyHistSharedImport importList = convert(this.syCompanyPub.GetAffComHisBySidAndBaseDate(sid, baseDate));
 		return importList;
 	}
-	
+
 	@Override
 	public AffCompanyHistSharedImport GetAffComHisBySid(String cid, String sid){
 		AffCompanyHistSharedImport importList = convert(this.syCompanyPub.GetAffComHisBySid(cid,sid));
@@ -200,5 +211,12 @@ public class EmpEmployeeAdapterImpl implements EmpEmployeeAdapter {
 			return Collections.emptyList();
 		return data.stream().map(c -> new EmployeeBasicInfoImport(c.getSid(), c.getEmployeeCode(), c.getEmployeeName()))
 				.collect(Collectors.toList());
+	}
+
+	//社員コードから社員IDを取得する
+	@Override
+	public Map<String, String> getEmployeeIDListByCode(String companyId, List<String> employeeCodes) {
+		return employeePub.findSdataMngInfoByEmployeeCodes(companyId, employeeCodes)
+				.stream().collect(Collectors.toMap(EmployeeDataMngInfoExport::getEmployeeCode, EmployeeDataMngInfoExport::getEmployeeId));
 	}
 }

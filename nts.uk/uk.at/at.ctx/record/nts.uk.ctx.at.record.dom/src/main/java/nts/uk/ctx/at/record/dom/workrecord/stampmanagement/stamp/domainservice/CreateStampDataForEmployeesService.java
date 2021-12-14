@@ -1,5 +1,6 @@
 package nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,6 +8,7 @@ import nts.arc.error.BusinessException;
 import nts.arc.task.tran.AtomTask;
 import nts.arc.time.GeneralDateTime;
 import nts.gul.location.GeoCoordinate;
+import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.reflectstamp.ReflectStampInDailyRecord;
 import nts.uk.ctx.at.record.dom.employmentinfoterminal.infoterminal.service.ConvertTimeRecordStampService;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.AutoCreateStampCardNumberService;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.ContractCode;
@@ -69,7 +71,7 @@ public class CreateStampDataForEmployeesService {
 		//	if not $打刻作成するか
 		if(!stampAtr) {
 			// $永続化処理 = 打刻データ反映処理#打刻を登録する(require, $打刻記録, $打刻データ)
-			AtomTask reflectResult = StampDataReflectProcessService.registerStamp(require, stampRecord, Optional.empty());
+			AtomTask reflectResult = RegisterStampData.registerStamp(require, stampRecord, Optional.empty()).orElse(AtomTask.none());
 			// $処理結果 = 打刻データ反映処理結果#打刻データ反映処理結果(Optional.Empty,$永続化処理)
 			StampDataReflectResult stampDataReflectResult = new StampDataReflectResult(Optional.empty(), reflectResult);
 			//	return 打刻入力結果#打刻入力結果($処理結果, $打刻カード作成結果.永続化処理)	
@@ -80,15 +82,25 @@ public class CreateStampDataForEmployeesService {
 		Stamp stamp = new Stamp(stampRecord, relieve, buttonType.getStampType().get(), refActualResults, stampLocationInfor);
 		
 		// $永続化処理 = 打刻データ反映処理#打刻を登録する(require, $打刻記録, $打刻データ)
-		AtomTask atom = StampDataReflectProcessService.registerStamp(require, stampRecord, Optional.of(stamp));
+		AtomTask atom = RegisterStampData.registerStamp(require, stampRecord, Optional.of(stamp)).orElse(AtomTask.none());
 		
 		// $打刻反映結果 = データタイムレコードを打刻に変換する#日別実績を処理する(require, 会社ID, 社員ID, $永続化処理)
-		Optional<StampDataReflectResult> reflectResult = ConvertTimeRecordStampService.createDailyData(require,
-				Optional.of(cid), Optional.of(employeeId), Optional.of(stamp), atom);
+//		Optional<StampDataReflectResult> reflectResult = ConvertTimeRecordStampService.createDailyData(require,
+//				Optional.of(cid), Optional.of(employeeId), Optional.of(stamp), atom);
+		Optional<StampDataReflectResult> stampDataResultOpt = ReflectStampInDailyRecord.reflect(require, stamp);
 		
+		if(!stampDataResultOpt.isPresent()) {
+			return new TimeStampInputResult(new StampDataReflectResult(Optional.empty(), atom), stampResult.getAtomTask());
+		}
+		
+		List<AtomTask> taskLst = new ArrayList<>();
+		taskLst.add(atom);
+		taskLst.add(stampDataResultOpt.get().getAtomTask());
 		//return 打刻入力結果#打刻入力結果($打刻反映結果, $打刻カード作成結果.永続化処理)
-		
-		return new TimeStampInputResult(reflectResult.map(m -> m).orElse(null), stampResult.getAtomTask());
+
+		return new TimeStampInputResult(stampDataResultOpt
+				.map(m -> new StampDataReflectResult(m.getReflectDate(), AtomTask.bundle(taskLst))).get(),
+				stampResult.getAtomTask());
 	}
 
 	/**

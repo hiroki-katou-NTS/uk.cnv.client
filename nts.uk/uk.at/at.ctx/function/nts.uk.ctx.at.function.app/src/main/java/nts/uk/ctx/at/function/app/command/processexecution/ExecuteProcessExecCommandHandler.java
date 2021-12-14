@@ -3,6 +3,8 @@ package nts.uk.ctx.at.function.app.command.processexecution;
 import java.util.Optional;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
 import lombok.val;
@@ -17,6 +19,7 @@ import nts.uk.ctx.at.function.dom.processexecution.executionlog.ProcessExecution
 import nts.uk.ctx.at.function.dom.processexecution.repository.ProcessExecutionLogManageRepository;
 //import nts.uk.ctx.at.schedule.app.command.executionlog.ScheduleCreatorExecutionCommand;
 @Stateless
+@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class ExecuteProcessExecCommandHandler extends AsyncCommandHandler<ExecuteProcessExecutionCommand> {
 	@Inject
 	private ExecuteProcessExecutionCommandHandler execHandler;

@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 
 import mockit.Expectations;
 import mockit.Injectable;
+import mockit.Mocked;
 import mockit.integration.junit4.JMockit;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
@@ -25,6 +26,8 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numb
 import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.CompensatoryDayOffManaData;
 import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveManagementData;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.breakinfo.FixedManagementDataMonth;
+import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.processten.SettingSubstituteHolidayProcess;
+import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.processten.SubstitutionHolidayOutput;
 
 @RunWith(JMockit.class)
 public class AcquisitionRemainNumAtStartCountTest {
@@ -65,8 +68,10 @@ public class AcquisitionRemainNumAtStartCountTest {
 	 * 繰越数がない（代休日数 ＝ 休出日数）
 	 */
 	@Test
-	public void test() {
+	public void test(@Mocked SettingSubstituteHolidayProcess settingProcess) {
 
+		SubstitutionHolidayOutput setting = new SubstitutionHolidayOutput();
+		setting.setTimeOfPeriodFlg(false);
 		new Expectations() {
 			{
 				// 代休管理データ
@@ -88,6 +93,11 @@ public class AcquisitionRemainNumAtStartCountTest {
 								0), // 未使用数
 						createLeav("a6", GeneralDate.ymd(2019, 11, 14), 1.0, 0, 0.0, // 発生数
 								0));// 未使用数
+				
+				SettingSubstituteHolidayProcess.getSettingForSubstituteHoliday(require, anyString, anyString,
+						(GeneralDate) any);
+				result = setting;
+				
 			}
 		};
 

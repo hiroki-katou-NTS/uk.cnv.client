@@ -48,6 +48,7 @@ class RegistrationForm {
        color: KnockoutObservable<String>;
        colorSmartphone: KnockoutObservable<String>;
        note: KnockoutObservable<String>;
+       importCode: KnockoutObservable<String>;
        newMode: KnockoutObservable<Boolean>;
        workTypeCd: KnockoutObservable<String>;
        workTypeName: KnockoutObservable<String>;
@@ -65,10 +66,18 @@ class RegistrationForm {
               self.shiftMasterName = ko.observable("");
               self.shiftMasterName.subscribe(function(codeChanged: string) {
                      self.shiftMasterName($.trim(self.shiftMasterName()));
+                     if (_.isEmpty(self.importCode())){
+                            //copy B7_2 to B11_3
+                            self.importCode(self.shiftMasterName());
+                     }
               });
               self.color = ko.observable("#FFFFFF");
               self.colorSmartphone = ko.observable("#FFFFFF");
               self.note = ko.observable("");
+              self.importCode = ko.observable("");
+              self.importCode.subscribe(function (){
+                     self.importCode($.trim(self.importCode()));
+              })
               self.newMode = ko.observable(false);
               self.workTypeCd = ko.observable('');
               self.workTypeName = ko.observable('');
@@ -100,6 +109,7 @@ class RegistrationForm {
                      self.shiftMasterName(shiftMaster.shiftMasterName);
                      self.color("#" + shiftMaster.color);
                      self.note(shiftMaster.remark);
+                     self.importCode(shiftMaster.importCode);
                      self.newMode(false);
                      self.workTypeName(shiftMaster.workTypeName);
                      self.workTypeCd(shiftMaster.workTypeCd);
@@ -116,6 +126,7 @@ class RegistrationForm {
               self.shiftMasterName('');
               self.color("#FFFFFF");
               self.note('');
+              self.importCode("");
               self.workTypeName('');
               self.workTypeCd('');
               self.workTimeSetName('');
@@ -126,6 +137,7 @@ class RegistrationForm {
               let self = this;
               self.selectedCode(self.selectedCode().trim());
               self.shiftMasterName(self.shiftMasterName().trim());
+              self.importCode(self.importCode().trim());
        }
        
 }
@@ -136,6 +148,7 @@ interface ShiftMaster {
        shiftMasterCode: String;
        color: String;
        remark: String;
+       importCode: String;
        workTypeCd: String;
        workTypeName: String;
        workTimeCd: String;
@@ -148,15 +161,17 @@ class RegisterShiftMasterDto {
        color: String;
        colorSmartphone: String;
        remark: String;
+       importCode: String;
        workTypeCd: String;
        workTimeSetCd: String;
-       newMode: boolean;
+       newMode: Boolean;
        constructor(form: RegistrationForm) {
               this.shiftMasterName = form.shiftMasterName();
               this.shiftMasterCode = form.selectedCode();
               this.color = form.color().replace('#', '');
               this.colorSmartphone = form.color().replace('#', ''); // Hien tai bang vs color
               this.remark = form.note();
+              this.importCode = form.importCode();
               this.workTypeCd = form.workTypeCd();
               this.workTimeSetCd = form.workTimeSetCd();
               this.newMode = form.newMode();

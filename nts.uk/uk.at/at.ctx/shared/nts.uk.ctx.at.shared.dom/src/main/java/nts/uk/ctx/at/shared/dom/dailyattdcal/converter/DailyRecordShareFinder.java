@@ -13,4 +13,6 @@ public interface DailyRecordShareFinder {
 
 	public List<IntegrationOfDaily> findByListEmployeeId(List<String> employeeId,
 			DatePeriod baseDate);
+	
+	public List<IntegrationOfDaily> find(String employeeId, List<GeneralDate> lstDate);
 }

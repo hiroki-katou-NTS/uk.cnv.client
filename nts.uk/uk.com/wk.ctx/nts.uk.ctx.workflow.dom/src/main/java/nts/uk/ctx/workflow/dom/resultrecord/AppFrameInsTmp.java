@@ -16,8 +16,7 @@ public class AppFrameInsTmp {
 	private Integer confirmAtr;
 	
 	public boolean equalOther(AppFrameInsTmp appFrameInsTmp) {
-		if(rootID.equals(appFrameInsTmp.getRootID()) &&
-			phaseOrder==appFrameInsTmp.getPhaseOrder() &&
+		if(phaseOrder==appFrameInsTmp.getPhaseOrder() &&
 			frameOrder==appFrameInsTmp.getFrameOrder() &&
 			confirmAtr==appFrameInsTmp.getConfirmAtr()) {
 			return true;

@@ -109,21 +109,44 @@ export class WidgetDisplayItemType {
   public earlyRetreat?: Number;
   public yearlyHoliday?: YearlyHolidayDto;
   public reservedYearsRemainNo?: RemainingNumber;
-  public remainAlternationNoDay?: Number;
+  public remainAlternationNoDay?: number;
+  public remainAlternationDay?: number;
   public remainsLeft?: Number;
   public publicHDNo?: Number;
   public childRemainNo?: RemainingNumber;
   public careLeaveNo?: RemainingNumber;
   public sphdramainNo?: Array<RemainingNumber>;
   public extraRest?: TimeDto;
+  public vacationSetting: VacationSetting;
  
+}
+
+class VacationSetting {
+  // 60H超休残数管理する
+  public holiday60HManage: boolean;
+  // 介護残数管理する
+  public nursingManage: boolean;
+  // 公休残数管理する
+  public publicHolidayManage: boolean;
+  // 子の看護残数管理する
+  public childCaremanage: boolean;
+  // 振休残数管理する
+  public accomoManage: boolean;
+  // 積立年休残数管理する
+  public accumAnnualManage: boolean;
+  // 代休残数管理する
+  public substituteManage: boolean;
+  // 代休時間残数管理する
+  public substituteTimeManage: boolean;
+  // 年休残数管理する
+  public annualManage: boolean;
 }
 
 class YearlyHolidayDto {
   public afterGrantDateInfo: DateInfoDto;
-  public grantedDaysNo: Number;
+  public grantedDaysNo: number;
   public nextGrantDateInfo: DateInfoDto;
-  public nextGrantDate: String;
+  public nextGrantDate: string;
   public attendanceRate: Number;
   public calculationMethod: Number;
   public nextTime: String;
@@ -134,15 +157,15 @@ class YearlyHolidayDto {
 }
 
 export class DateInfoDto {
-  public day: Number;
+  public day: number;
   public hours: TimeDto;
   public remaining: Number;
   public timeYearLimit: TimeDto;
 }
 
 export class TimeDto {
-  public hours: Number;
-  public min: Number;
+  public hours: number;
+  public min: number;
 }
 
 export class DisplayItemType {

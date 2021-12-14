@@ -37,9 +37,6 @@ public class AppOverTime extends Application {
 	// 勤務情報
 	private Optional<WorkInformation> workInfoOp = Optional.empty(); 
 	
-	// 時間外時間の詳細
-	private Optional<AppOvertimeDetail> detailOverTimeOp = Optional.empty();
-	
 	public AppOverTime(Application application) {
 		super(application);
 	}

@@ -196,9 +196,9 @@ public class AppDataCreationImpl implements AppDataCreation {
 		default:
 			appListInfo.getAppLst().sort(Comparator.comparing(x -> {
 				return x.getApplicantCD() + 
-						x.getAppDate().toString() + 
 						x.getAppType().value + 
 						x.getOpAppTypeDisplay() + 
+						x.getAppDate().toString() + 
 						x.getPrePostAtr() + 
 						x.getInputDate().toString();
 			}));

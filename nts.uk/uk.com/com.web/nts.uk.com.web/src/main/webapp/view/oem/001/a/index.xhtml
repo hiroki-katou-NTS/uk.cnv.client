@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:com="http://xmlns.jcp.org/jsf/component"
+  xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+  <ui:composition template="../../../../master/base.xhtml">
+    <ui:define name="htmlHead">
+      <com:stylefile path="oem001.a.style.css" />
+      <com:scriptfile path="oem001.a.vm.js" />
+    </ui:define>
+
+    <ui:define name="content">
+      <div id="contents-area">
+        <div id="A1_1" class="panel panel-frame">
+          <div id="A1_2" class="panel panel-gray-bg">
+            <label id="A1_3">#{i18n.getText("OEM001_2")}</label>
+          </div>
+          <div>
+            <label id="A1_4">#{i18n.getText("OEM001_3")}</label>
+          </div>
+          <div class="btn-with-caret">
+            <button id="A1_5" class="caret-right" data-bind="click: openScreenOEM004" tabindex="1">#{i18n.getText("OEM001_4")}</button>
+            <div class="caret">
+              <span id="A1_6" class="caret-bottom caret-inline"></span>
+            </div>
+          </div>
+          <div>
+            <label id="A1_7">#{i18n.getText("OEM001_5")}</label>
+          </div>
+          <div class="btn-with-caret">
+            <button id="A1_8" class="caret-right" data-bind="click: openScreenOEM002" tabindex="2">#{i18n.getText("OEM001_6")}</button>
+          </div>
+        </div>
+        <div id="A1_9" class="panel panel-frame">
+          <div id="A1_10" class="panel panel-gray-bg">
+            <label id="A1_11">#{i18n.getText("OEM001_7")}</label>
+          </div>
+          <div>
+            <label id="A1_12">#{i18n.getText("OEM001_8")}</label>
+          </div>
+          <div class="btn-with-caret">
+            <button id="A1_13" class="caret-right" data-bind="click: openScreenOEM003" tabindex="3">#{i18n.getText("OEM001_9")}</button>
+          </div>
+        </div>
+      </div>
+    </ui:define>
+  </ui:composition>
+</body>
+</html>

@@ -377,11 +377,12 @@ module nts.uk.at.view.kaf018.b.viewmodel {
 		getWkpInfo(key: string) {
 			const vm = this;
 			let currentWkpInfo = _.find(vm.dataSource, o => o.wkpID==key);
-			let displayWkpInfo = '<div style="width: 150px; display: inline-block;">' + currentWkpInfo.wkpCD + '</div>';
+			let displayWkpInfo = '';
 			for(let i = 1; i < currentWkpInfo.level; i++) {
-				displayWkpInfo += '<div style="width: 10px; display: inline-block;"></div>';
+				displayWkpInfo += '<div style="width: 20px; display: inline-block;"></div>';
 			}
-			displayWkpInfo += '<span>' + currentWkpInfo.wkpName + '</span>';
+			displayWkpInfo += '<div style="display: inline-block;">' + currentWkpInfo.wkpCD + '</div>';
+			displayWkpInfo += '<div style="display: inline-block;"><span style="margin-left: 20px;">' + currentWkpInfo.wkpName + '</span></div>';
 			return displayWkpInfo;
 		}
 		

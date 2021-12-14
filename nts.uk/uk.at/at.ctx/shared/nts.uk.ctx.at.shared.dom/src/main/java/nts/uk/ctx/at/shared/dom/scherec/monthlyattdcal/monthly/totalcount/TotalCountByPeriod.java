@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.val;
@@ -87,7 +88,9 @@ public class TotalCountByPeriod implements Cloneable, Serializable {
 	public void totalize(RequireM1 require, String companyId, String employeeId,
 			DatePeriod period, MonAggrCompanySettings companySets, MonthlyCalculatingDailys monthlyCalcDailys){
 
-		val dailyWorks = monthlyCalcDailys.getDailyWorks(employeeId);
+		val dailyWorks = monthlyCalcDailys.getDailyWorks(employeeId)
+				.stream().filter(d -> period.contains(d.getYmd())).collect(Collectors.toList());
+		
 		val attendanceStates = new AttendanceStatusList(monthlyCalcDailys.getAttendanceTimeOfDailyMap(), 
 														monthlyCalcDailys.getTimeLeaveOfDailyMap());
 		

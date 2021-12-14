@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.record.dom.stampmanagement.workplace;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import nts.gul.location.GeoCoordinate;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.ContractCode;
@@ -12,7 +13,7 @@ public class WorkLocationHelper {
 		
 		return new WorkLocation(new ContractCode("ContractCode"), new WorkLocationCD("WorkLocationCD"),
 				new WorkLocationName("WorkLocationName"), new StampMobilePossibleRange(RadiusAtr.M_100, new GeoCoordinate(100, 200)),
-				new ArrayList<>(), new ArrayList<>());
+				new ArrayList<>(), Optional.empty());
 		
 	}
 

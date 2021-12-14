@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.verticaltotal.workdays;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import lombok.Getter;
 import lombok.val;
@@ -209,7 +210,8 @@ public class WorkDaysOfMonthly implements Serializable{
 		
 		// 特別休暇日数の集計
 		this.specialVacationDays.aggregate(require, cid, sid, ymd, workingSystem, workType, 
-				workInfo.getRecordInfo(), attendanceTimeOfDaily, workTypeDaysCountTable, isAttendanceDay);
+				workInfo.getRecordInfo(), Optional.ofNullable(attendanceTimeOfDaily), 
+				workTypeDaysCountTable, isAttendanceDay);
 		
 		// 時間消化休暇の集計
 		this.timeConsumpDays.aggregate(workType, attendanceTimeOfDaily);

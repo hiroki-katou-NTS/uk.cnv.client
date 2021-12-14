@@ -1535,6 +1535,7 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
 				if (valueTypeEnum.isIntegerCountable() || valueTypeEnum.isDoubleCountable()) {
 					totalVal.addValue(val.value(), totalValueTypeEnum);
 					totalVal.setValueType(val.getValueType());
+					totalVal.setUnit(val.getUnit());
 				}
 			});
 		});
@@ -1547,7 +1548,7 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
 				lstAttendanceId.stream().forEach(attendanceId -> {
 					int attendanceDisplay = attendanceId.getAttendanceDisplay();
 					if (!employeeData.mapPersonalTotal.containsKey(attendanceDisplay)) {
-						employeeData.mapPersonalTotal.put(attendanceDisplay, new TotalValue(attendanceDisplay, "", TotalValue.STRING));
+						employeeData.mapPersonalTotal.put(attendanceDisplay, new TotalValue(attendanceDisplay, "", TotalValue.STRING, ""));
 						TotalValue totalVal = new TotalValue();
 						totalVal.setAttendanceId(attendanceDisplay);
 						totalVal.setValue("");
@@ -1573,8 +1574,11 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
 	                    
 	                    // Change value type
 	                    personalTotal.setValueType(valueType);
+	                    personalTotal.setUnit(aVal.getUnit());
 	                    totalVal.setValueType(valueType);
+	                    totalVal.setUnit(aVal.getUnit());
 	                    totalGrossVal.setValueType(valueType);
+	                    totalGrossVal.setUnit(aVal.getUnit());
 	                    
 	                    if (aVal.value() == null) return;
 
@@ -1612,11 +1616,13 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
 						} else {
 							totalVal.setValue("");
 						}
+						totalVal.setUnit(item.getUnit());
 					} else {
 						TotalValue totalVal = new TotalValue();
 						totalVal.setAttendanceId(item.getAttendanceId());
 						totalVal.setValue(item.getValue());
 						totalVal.setValueType(item.getValueType());
+						totalVal.setUnit(item.getUnit());
 						lstTotalVal.add(totalVal);
 					}
 				});
@@ -1663,6 +1669,7 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
 						if (valueTypeEnum.isIntegerCountable() || valueTypeEnum.isDoubleCountable()) {
 							totalValue.addValue(actualValue.value(), valueTypeEnum);
 						}
+						totalValue.setUnit(actualValue.getUnit());
 					}
 					else {
 						totalValue = new TotalValue();
@@ -1675,6 +1682,7 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
 								totalValue.setValue("0");
 							}
 						}
+						totalValue.setUnit(actualValue.getUnit());
 						totalValue.setValueType(valueType);
 						lstTotalValue.add(totalValue);
 					}
@@ -1703,6 +1711,7 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
 						totalWorkplaceValue.setValueType(valueType);
 						lstTotalHierarchyValue.add(totalWorkplaceValue);
 					}
+					totalWorkplaceValue.setUnit(actualValue.getUnit());
 				});
 			}
 		}
@@ -1738,6 +1747,7 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
 					totalValue.setValueType(valueType);
 					lstTotalValue.add(totalValue);
 				}
+				totalValue.setUnit(actualValue.getUnit());
 			});
 		});
 	}
@@ -1775,6 +1785,7 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
 					totalValue.setValueType(totalVal.getValueType());
 					lstGrossTotal.add(totalValue);
 				}
+				totalValue.setUnit(totalVal.getUnit());
 			});
 		});
 	}
@@ -2567,8 +2578,10 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
 					
 					for (int i = 0; i < 9; i++) {
 						Cell dayTypeTag = cells.get(currentRow, i*2 + 3);
-						dayTypeTag.setValue((totalCountDay.getAllDayCount().get(i) == 0
-								&& condition.getZeroDisplayType() == ZeroDisplayType.NON_DISPLAY) ? "" : totalCountDay.getAllDayCount().get(i));
+						String value = totalCountDay.getAllDayCount().get(i);
+						boolean isZeroValue = Integer.valueOf(value.substring(0, value.length() - 1)) == 0;
+						dayTypeTag.setValue((isZeroValue && condition.getZeroDisplayType() == ZeroDisplayType.NON_DISPLAY) 
+								? "" : totalCountDay.getAllDayCount().get(i));
 					}
 					
 					currentRow++;
@@ -2848,15 +2861,15 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
 		} else if (this.isNumber(actualValue.getValue())) {
 			if (valueTypeEnum.isDouble()) {
 				double actualDoubleValue = actualValue.getValue() != null ? Double.parseDouble(actualValue.getValue()) : 0d;
-				cell.setValue((zeroDisplayType == ZeroDisplayType.NON_DISPLAY && actualDoubleValue == 0d) ? "" : actualValue.getValue());
+				cell.setValue((zeroDisplayType == ZeroDisplayType.NON_DISPLAY && actualDoubleValue == 0d) ? "" : actualValue.formatValue());
 			} else if (valueTypeEnum.isInteger()) {
 				int actualIntValue = actualValue.getValue() != null ? Integer.parseInt(actualValue.getValue()) : 0;
-				cell.setValue((zeroDisplayType == ZeroDisplayType.NON_DISPLAY && actualIntValue == 0) ? "" : actualValue.getValue());
+				cell.setValue((zeroDisplayType == ZeroDisplayType.NON_DISPLAY && actualIntValue == 0) ? "" : actualValue.formatValue());
 			} else
-				cell.setValue(actualValue.getValue());
+				cell.setValue(actualValue.formatValue());
 			style.setHorizontalAlignment(TextAlignmentType.RIGHT);
 		} else {
-			cell.setValue(actualValue.getValue());
+			cell.setValue(actualValue.formatValue());
 			style.setHorizontalAlignment(TextAlignmentType.LEFT);
 		}
 		setFontStyle(style, fontSize);
@@ -3038,7 +3051,10 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
                         cells = sheetInfo.getSheet().getCells();
                         currentRow = sheetInfo.getStartDataIndex();
                     }
-                    currentRow = this.printDateBracket(currentRow, templateSheetCollection, sheetInfo, titleDate, contentPosition1);
+				}
+				
+				if (rowPageTracker.isNewPage()) {
+					currentRow = this.printDateBracket(currentRow, templateSheetCollection, sheetInfo, titleDate, contentPosition1);
                     currentRow = this.printWorkplace(currentRow, templateSheetCollection, sheetInfo, workplaceTitle, contentPosition);
                     rowPageTracker.useRemainingRow(2);
 				}
@@ -3360,7 +3376,7 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
     	ValueType valueTypeEnum = EnumAdaptor.valueOf(totalValue.getValueType(), ValueType.class);
     	if (valueTypeEnum.isIntegerCountable()) {
     		if ((valueTypeEnum == ValueType.COUNT) && value != null) {
-    			cell.putValue((zeroDisplayType == ZeroDisplayType.NON_DISPLAY && value.equals("0")) ? "" : value, true);
+    			cell.putValue((zeroDisplayType == ZeroDisplayType.NON_DISPLAY && value.equals("0")) ? "" : totalValue.formatValue(), true);
     		} else {
     			if (!StringUtil.isNullOrEmpty(value, false))
 					cell.setValue(getTimeAttr(value, false, zeroDisplayType));
@@ -3371,17 +3387,16 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
 		} else if (this.isNumber(value) && (valueTypeEnum.isDouble() || valueTypeEnum.isInteger())) {
 			if (valueTypeEnum.isDouble()) {
 				double actualDoubleValue = value != null ? Double.parseDouble(value) : 0d;
-				cell.setValue((zeroDisplayType == ZeroDisplayType.NON_DISPLAY && actualDoubleValue == 0d) ? "" : value);
+				cell.setValue((zeroDisplayType == ZeroDisplayType.NON_DISPLAY && actualDoubleValue == 0d) ? "" : totalValue.formatValue());
 			} else if (valueTypeEnum.isInteger()) {
 				int actualIntValue = value != null ? Integer.parseInt(value) : 0;
-				cell.setValue((zeroDisplayType == ZeroDisplayType.NON_DISPLAY && actualIntValue == 0) ? "" : value);
+				cell.setValue((zeroDisplayType == ZeroDisplayType.NON_DISPLAY && actualIntValue == 0) ? "" : totalValue.formatValue());
 			} else
-				cell.setValue((zeroDisplayType == ZeroDisplayType.NON_DISPLAY && value.equals("0")) ? "" : value);
+				cell.setValue((zeroDisplayType == ZeroDisplayType.NON_DISPLAY && value.equals("0")) ? "" : totalValue.formatValue());
 			style.setHorizontalAlignment(TextAlignmentType.RIGHT);
 		} else {
-			cell.setValue((value != null && zeroDisplayType == ZeroDisplayType.NON_DISPLAY && value.equals("0")) ? "" : value);
+			cell.setValue((value != null && zeroDisplayType == ZeroDisplayType.NON_DISPLAY && value.equals("0")) ? "" : totalValue.formatValue());
     	}
-    	
     	setFontStyle(style, fontSize);
     	cell.setStyle(style);
 	}

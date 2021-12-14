@@ -41,10 +41,10 @@ module nts.uk.at.view.kaf018.a.viewmodel {
 		created(params: KAF018BParam) {
 			const vm = this;
 			vm.displayUpdMailTmpBtn = __viewContext.user.role.isInCharge.attendance;
-			vm.applicationApprovalFlg = new CheckBoxValue(false, true, vm.$i18n('KAF018_318'));
-			vm.confirmAndApprovalDailyFlg = new CheckBoxValue(false, true, '');
-			vm.confirmAndApprovalMonthFlg = new CheckBoxValue(false, true, '');
-			vm.confirmEmploymentFlg = new CheckBoxValue(false, true, vm.$i18n('KAF018_321'));
+			vm.applicationApprovalFlg = new CheckBoxValue(false, true, true, vm.$i18n('KAF018_318'));
+			vm.confirmAndApprovalDailyFlg = new CheckBoxValue(false, true, true, '');
+			vm.confirmAndApprovalMonthFlg = new CheckBoxValue(false, true, true, '');
+			vm.confirmEmploymentFlg = new CheckBoxValue(false, true, true, vm.$i18n('KAF018_321'));
 			vm.treeGrid = {
 				isShowAlreadySet: false,
 				isMultipleUse: false,
@@ -86,18 +86,24 @@ module nts.uk.at.view.kaf018.a.viewmodel {
 						vm.confirmAndApprovalMonthFlg.text(vm.$i18n('KAF018_557'));
 					}
 					if((useSetResult.usePersonConfirm) || (useSetResult.useBossConfirm)) {
+						vm.confirmAndApprovalDailyFlg.display(true);
 						vm.confirmAndApprovalDailyFlg.enable(true);
 					} else {
+						vm.confirmAndApprovalDailyFlg.display(false);
 						vm.confirmAndApprovalDailyFlg.enable(false);
 					}
 					if((useSetResult.monthlyIdentityConfirm) || (useSetResult.monthlyConfirm)) {
+						vm.confirmAndApprovalMonthFlg.display(true);
 						vm.confirmAndApprovalMonthFlg.enable(true);
 					} else {
+						vm.confirmAndApprovalMonthFlg.display(false);
 						vm.confirmAndApprovalMonthFlg.enable(false);
 					}
 					if(useSetResult.employmentConfirm) {
+						vm.confirmEmploymentFlg.display(true);
 						vm.confirmEmploymentFlg.enable(true);
 					} else {
+						vm.confirmEmploymentFlg.display(false);
 						vm.confirmEmploymentFlg.enable(false);
 					}
 				}
@@ -338,10 +344,12 @@ module nts.uk.at.view.kaf018.a.viewmodel {
 	
 	export class CheckBoxValue {
 		value: KnockoutObservable<boolean>;
+		display: KnockoutObservable<boolean>;
 		enable: KnockoutObservable<boolean>;
 		text: KnockoutObservable<string>;
-		constructor(value: boolean, enable: boolean, text: string) {
+		constructor(value: boolean, display: boolean, enable: boolean, text: string) {
 			this.value = ko.observable(value);
+			this.display = ko.observable(display);
 			this.enable = ko.observable(enable);
 			this.text = ko.observable(text);
 		}

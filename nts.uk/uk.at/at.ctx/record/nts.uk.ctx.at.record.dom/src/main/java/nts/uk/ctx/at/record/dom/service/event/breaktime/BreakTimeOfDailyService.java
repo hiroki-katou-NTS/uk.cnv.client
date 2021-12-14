@@ -84,7 +84,7 @@ public class BreakTimeOfDailyService {
 
 		List<ItemValue> beforeCorrectItemValues = converter.convert(CorrectEventConts.BREAK_TIME_ITEMS);
 		
-		if (!wt.isWokingDay()) {
+		if (!wt.isWorkingDay()) {
 			return deleteBreakTime(working, directToDB, CorrectEventConts.BREAK_TIME_ITEMS, breakTimeRecord, converter, beforeCorrectItemValues);
 		}
 

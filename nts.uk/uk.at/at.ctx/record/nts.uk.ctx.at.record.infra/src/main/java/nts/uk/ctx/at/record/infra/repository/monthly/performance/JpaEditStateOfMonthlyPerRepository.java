@@ -3,14 +3,10 @@ package nts.uk.ctx.at.record.infra.repository.monthly.performance;
 import java.util.List;
 
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.arc.time.YearMonth;
-import nts.arc.time.calendar.period.DatePeriod;
 import nts.arc.time.calendar.period.YearMonthPeriod;
-import nts.uk.ctx.at.record.dom.monthly.TimeOfMonthlyRepository;
-import nts.uk.ctx.at.record.infra.entity.monthly.mergetable.KrcdtMonMergePk;
 import nts.uk.ctx.at.record.infra.entity.monthly.performance.KrcdtEditStateOfMothlyPer;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.editstate.EditStateOfMonthlyPerRepository;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.editstate.EditStateOfMonthlyPerformance;
@@ -42,9 +38,6 @@ public class JpaEditStateOfMonthlyPerRepository extends JpaRepository implements
 			+ "AND a.krcdtEditStateOfMothlyPerPK.processDate >= :startDate "
 			+ "AND a.krcdtEditStateOfMothlyPerPK.processDate <= :endDate";
 	
-	@Inject
-	private TimeOfMonthlyRepository timeMonthRepo;
-	
 	/** 検索　（締め） */
 	@Override
 	public List<EditStateOfMonthlyPerformance> findByClosure(
@@ -70,8 +63,6 @@ public class JpaEditStateOfMonthlyPerRepository extends JpaRepository implements
 				.setParameter("closureDay", closureDate.getClosureDay().v())
 				.setParameter("isLastDay", (closureDate.getLastDayOfMonth() ? 1 : 0))
 				.executeUpdate();
-		this.timeMonthRepo.dirtying(() -> new KrcdtMonMergePk(employeeId, yearMonth.v(), closureId.value, 
-															closureDate.getClosureDay().v(), closureDate.getLastDayOfMonth() ? 1 : 0));
 	}
 
 	@Override

@@ -173,6 +173,7 @@ module nts.uk.at.view.kaf020.b {
                     vm.$ajax(PATH_API.register, command).done(result => {
                         if (result != undefined) {
                             vm.$dialog.info({messageId: "Msg_15"}).then(() => {
+                                nts.uk.request.ajax("at", PATH_API.reflectApp, result.reflectAppIdLst);
 								CommonProcess.handleAfterRegister(result, vm.isSendMail(), vm, false, vm.appDispInfoStartupOutput().appDispInfoNoDateOutput.employeeInfoLst);
 							});
                             // let contents: Array<OptionalItemApplicationContent> = [];

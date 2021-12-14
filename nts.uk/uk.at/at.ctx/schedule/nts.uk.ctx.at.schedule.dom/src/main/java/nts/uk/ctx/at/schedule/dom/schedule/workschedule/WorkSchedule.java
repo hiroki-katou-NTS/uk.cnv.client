@@ -118,6 +118,9 @@ public class WorkSchedule implements DomainAggregate {
 			optTimeLeaving = Optional.of(
 					TimeLeavingOfDailyAttd.createByPredetermineZone(require, workInformation) );
 		}
+		
+		val isBackStraight = workInformation.isBackStraight(require) ? NotUseAttribute.Use : NotUseAttribute.Not_use;
+		val isGoStraight = workInformation.isGoStraight(require) ? NotUseAttribute.Use : NotUseAttribute.Not_use;
 			
 		return new WorkSchedule(
 				employeeId, 
@@ -127,8 +130,8 @@ public class WorkSchedule implements DomainAggregate {
 						require, 
 						workInformation, 
 						CalculationState.No_Calculated, 
-						NotUseAttribute.Not_use, 
-						NotUseAttribute.Not_use, 
+						isBackStraight, 
+						isGoStraight, 
 						DayOfWeek.convertFromCommonClass(date.dayOfWeekEnum())), 
 				AffiliationInforOfDailyAttd.create(require, employeeId, date), 
 				new BreakTimeOfDailyAttd(),
@@ -489,11 +492,9 @@ public class WorkSchedule implements DomainAggregate {
 		if ( newBreakTimeList.isEmpty() ) {
 			updatedAttendanceItemList = new ArrayList<>(Arrays.asList( 
 					WS_AttendanceItem.StartBreakTime1, 
-					WS_AttendanceItem.EndBreakTime1,
-					WS_AttendanceItem.BreakTime) );
+					WS_AttendanceItem.EndBreakTime1) );
 		} else {
 			updatedAttendanceItemList = WS_AttendanceItem.getBreakTimeItemWithSize( newBreakTimeList.size() );
-			updatedAttendanceItemList.add(WS_AttendanceItem.BreakTime);
 		}
 		updatedAttendanceItemList.forEach( item -> this.lstEditState.add(
 				EditStateOfDailyAttd.createByHandCorrection(require, item.ID, this.employeeID)));

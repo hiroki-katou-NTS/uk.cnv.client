@@ -20,12 +20,12 @@ module nts.uk.at.view.kaf006.shr.component1.viewmodel {
                     </div>
                     <!-- /ko -->
                     <!-- ko if: $parent.condition21 -->
-                    <div class="row-underline" style="display: flex; justify-content: space-between">
+                    <div class="row-underline" style="justify-content: space-between">
                         <div>
                             <div data-bind="ntsFormLabel: {}, text: $i18n('KAF006_69')"></div>
-                            <div data-bind="text: $parent.grantDaysOfYear" style="font-size: 0.7rem; margin-left: 12px"></div>
+                            <a class="hyperlink" style="float: right;" href="" data-bind="text: $parent.yearRemain, click: openKDL020"></a>
                         </div>
-                        <a class="hyperlink" href="" data-bind="text: $parent.yearRemain, click: openKDL020"></a>
+                        <div data-bind="text: $parent.grantDaysOfYear" style="font-size: 0.7rem; margin-left: 12px"></div>
                     </div>
                     <!-- /ko -->
                     <!-- ko if: $parent.condition24 -->

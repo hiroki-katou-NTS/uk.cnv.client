@@ -7,7 +7,7 @@ import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.dailyperformanceprocessing.ErrMessageResource;
 import nts.uk.ctx.at.shared.dom.workrecord.workperfor.dailymonthlyprocessing.enums.ExecutionContent;
 /**
- * エラー
+ * エラーメッセージ
  * @author tutk
  *
  */

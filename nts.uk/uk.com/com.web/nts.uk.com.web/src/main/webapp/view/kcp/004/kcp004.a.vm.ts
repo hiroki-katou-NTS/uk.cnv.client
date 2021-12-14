@@ -59,7 +59,7 @@ module kcp004.a.viewmodel {
             });
             self.isDialog = ko.observable(false);
             self.isShowAlreadySet = ko.observable(true);
-            self.restrictionOfReferenceRange = ko.observable(false);
+            self.restrictionOfReferenceRange = ko.observable(true);
             self.isShowSelectButton = ko.observable(true);
             self.enableShowSelectButton = ko.computed(function() {
                 return self.isMultipleTreeGrid();

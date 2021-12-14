@@ -28,9 +28,6 @@ public class HolidayWorkRegisterCommandHandler extends CommandHandlerWithResult<
 		RegisterCommand param = context.getCommand();
 		Application application = param.getAppHolidayWork().getApplication().toDomain();
 		AppHolidayWork appHolidayWork = param.getAppHolidayWork().toDomain();
-		if (appHolidayWork.getAppOvertimeDetail().isPresent()) {
-			appHolidayWork.getAppOvertimeDetail().get().setAppId(application.getAppID());
-		}
 		appHolidayWork.setApplication(application);
 		
 		return holidayWorkRegisterService.register(param.getCompanyId(), 

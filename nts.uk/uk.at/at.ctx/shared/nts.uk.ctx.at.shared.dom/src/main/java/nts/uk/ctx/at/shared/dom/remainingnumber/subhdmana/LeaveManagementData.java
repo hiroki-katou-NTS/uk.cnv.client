@@ -164,4 +164,9 @@ public class LeaveManagementData extends AggregateRoot {
 		return new UnbalanceVacation(this.expiredDate, this.subHDAtr, this.disapearDate, common, this.fullDayTime,
 				this.halfDayTime);
 	}
+	
+	// 2] 残数が残っている
+	public boolean isRemaing() {
+		return this.subHDAtr == DigestionAtr.UNUSED;
+	}
 }

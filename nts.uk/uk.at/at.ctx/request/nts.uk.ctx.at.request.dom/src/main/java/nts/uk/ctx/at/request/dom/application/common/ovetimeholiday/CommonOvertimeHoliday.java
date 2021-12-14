@@ -7,22 +7,18 @@ import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.request.dom.application.ApplicationType;
 import nts.uk.ctx.at.request.dom.application.PrePostAtr;
 import nts.uk.ctx.at.request.dom.application.UseAtr;
-import nts.uk.ctx.at.request.dom.application.common.adapter.frame.OvertimeInputCaculation;
 import nts.uk.ctx.at.request.dom.application.common.service.newscreen.output.ConfirmMsgOutput;
 import nts.uk.ctx.at.request.dom.application.common.service.other.output.OverTimeWorkHoursOutput;
-import nts.uk.ctx.at.request.dom.application.holidayworktime.HolidayWorkInput;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.service.dto.CalculatedFlag;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOvertimeDetail;
 import nts.uk.ctx.at.request.dom.application.overtime.ApplicationTime;
-import nts.uk.ctx.at.request.dom.application.overtime.OverTimeInput;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.AppDateContradictionAtr;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.overtimerestappcommon.Time36AgreeCheckRegister;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.timeitem.BonusPayTimeItem;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.breaking.BreakTimeSheet;
 import nts.uk.ctx.at.shared.dom.worktime.common.DeductionTime;
+import nts.uk.ctx.at.shared.dom.worktime.common.TimeZone;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 import nts.uk.shr.com.time.TimeWithDayAttr;
-import nts.uk.ctx.at.shared.dom.worktime.common.TimeZone;
 
 public interface CommonOvertimeHoliday {
 	
@@ -108,34 +104,6 @@ public interface CommonOvertimeHoliday {
 	 * @param timeCalUse 時刻計算利用区分
 	 */
 	void calculateButtonCheck(CalculatedFlag calculateFlg, UseAtr timeCalUse);
-	
-	/**
-	 * 03-03_３６上限チェック（月間） KAF005
-	 */
-	Optional<AppOvertimeDetail> registerOvertimeCheck36TimeLimit(String companyId, String employeeId,
-			GeneralDate appDate, List<OverTimeInput> overTimeInput);
-
-	/**
-	 * 05_３６上限チェック(詳細) KAF005
-	 */
-	Optional<AppOvertimeDetail> updateOvertimeCheck36TimeLimit(String companyId, String appId, String enteredPersonId,
-			String employeeId, GeneralDate appDate, List<OverTimeInput> overTimeInput);
-
-	/**
-	 * 03-03_３６上限チェック（月間） KAF010
-	 */
-	Optional<AppOvertimeDetail> registerHdWorkCheck36TimeLimit(String companyId, String employeeId, GeneralDate appDate,
-			List<HolidayWorkInput> holidayWorkInputs);
-
-	/**
-	 * ３６上限チェック(詳細) KAF010
-	 */
-	Optional<AppOvertimeDetail> updateHdWorkCheck36TimeLimit(String companyId, String appId, String enteredPersonId,
-			String employeeId, GeneralDate appDate, List<HolidayWorkInput> holidayWorkInputs);
-
-	
-	
-
 	
 	/**
 	 * Refactor5 06_計算処理

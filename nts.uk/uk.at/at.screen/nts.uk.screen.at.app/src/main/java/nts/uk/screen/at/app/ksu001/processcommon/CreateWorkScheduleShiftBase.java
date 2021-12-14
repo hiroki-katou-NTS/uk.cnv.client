@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package nts.uk.screen.at.app.ksu001.processcommon;
 
@@ -59,7 +59,7 @@ import nts.uk.shr.com.context.AppContexts;
  */
 @Stateless
 public class CreateWorkScheduleShiftBase {
-	
+
 	@Inject
 	private WorkTypeRepository workTypeRepo;
 	@Inject
@@ -71,7 +71,7 @@ public class CreateWorkScheduleShiftBase {
 	@Inject
 	private ShiftMasterRepository shiftMasterRepo;
 	@Inject
-	private FixedWorkSettingRepository fixedWorkSet; 
+	private FixedWorkSettingRepository fixedWorkSet;
 	@Inject
 	private FlowWorkSettingRepository flowWorkSet;
 	@Inject
@@ -162,18 +162,19 @@ public class CreateWorkScheduleShiftBase {
 				}
 			}
 		});
-		
+
 		// convert list to Map
 		Map<ShiftMaster, Optional<WorkStyle>> mapShiftMasterWithWorkStyle2 = new HashMap<>();
 		String companyId = AppContexts.user().companyId();
 		for (ShiftMasterMapWithWorkStyle obj : listShiftMaster) {
-			ShiftMasterDisInfor displayInfor = new ShiftMasterDisInfor(new ShiftMasterName(obj.shiftMasterName),new ColorCodeChar6(obj.color),new ColorCodeChar6(obj.color), new Remarks(obj.remark));
-			ShiftMaster ShiftMaster = new ShiftMaster(companyId, new ShiftMasterCode(obj.shiftMasterCode), displayInfor,obj.workTypeCode, obj.workTimeCode);
+			ShiftMasterDisInfor displayInfor = new ShiftMasterDisInfor(new ShiftMasterName(obj.shiftMasterName),new ColorCodeChar6(obj.color),new ColorCodeChar6(obj.color), Optional.of(new Remarks(obj.remark)));
+			//TODO 取り込みコード追加
+			ShiftMaster ShiftMaster = new ShiftMaster(companyId, new ShiftMasterCode(obj.shiftMasterCode), displayInfor,obj.workTypeCode, obj.workTimeCode, Optional.empty());
 			mapShiftMasterWithWorkStyle2.put(ShiftMaster, obj.workStyle == null ? Optional.empty(): Optional.of(EnumAdaptor.valueOf(Integer.valueOf(obj.workStyle), WorkStyle.class)));
 		}
 		return new WorkScheduleShiftBaseResult(listWorkScheduleShift, mapShiftMasterWithWorkStyle2);
 	}
-	
+
 	@AllArgsConstructor
 	private static class RequireCombiAndWorkHolidayImpl implements GetCombinationrAndWorkHolidayAtrService.Require {
 

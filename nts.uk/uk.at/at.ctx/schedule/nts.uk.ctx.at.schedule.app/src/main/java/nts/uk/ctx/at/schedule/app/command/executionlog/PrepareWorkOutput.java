@@ -47,6 +47,7 @@ public class PrepareWorkOutput {
 		this.scheduleTimeZone = scheduleTimeZone;
 		this.lstWorkTimeDto = lstWorkTimeDto;
 		this.executionLog = executionLog;
+		this.workType = Optional.empty();
 	}
 
 	public PrepareWorkOutput(WorkInformation information, List<TimezoneUse> scheduleTimeZone,

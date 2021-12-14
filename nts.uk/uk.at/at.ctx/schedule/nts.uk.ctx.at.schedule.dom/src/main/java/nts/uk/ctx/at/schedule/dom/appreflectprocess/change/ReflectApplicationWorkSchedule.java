@@ -70,7 +70,7 @@ public class ReflectApplicationWorkSchedule {
 		// input.日別勤怠(work）を[反映前の日別勤怠(work)]へコピーして保持する
 		IntegrationOfDaily domainDaily = new IntegrationOfDaily(workSchedule.getEmployeeID(), workSchedule.getYmd(),
 				workSchedule.getWorkInfo(), CalAttrOfDailyAttd.createAllCalculate(), workSchedule.getAffInfo(), Optional.empty(), new ArrayList<>(),
-				Optional.empty(), workSchedule.getLstBreakTime(), workSchedule.getOptAttendanceTime(),
+				workSchedule.getOutingTime(), workSchedule.getLstBreakTime(), workSchedule.getOptAttendanceTime(),
 				workSchedule.getOptTimeLeaving(), workSchedule.getOptSortTimeWork(), Optional.empty(), Optional.empty(),
 				Optional.empty(), workSchedule.getLstEditState(), Optional.empty(), new ArrayList<>(), snapshot);
 

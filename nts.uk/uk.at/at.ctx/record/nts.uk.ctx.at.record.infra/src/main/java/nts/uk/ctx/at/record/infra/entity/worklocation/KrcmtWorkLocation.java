@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
@@ -13,6 +14,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -60,9 +62,9 @@ public class KrcmtWorkLocation extends UkJpaEntity implements Serializable {
 	@Column(name = "LONGITUDE")
 	public double longitude;
 	
-	@OneToMany(targetEntity = KrcmtWorkplacePossible.class, mappedBy = "krcmtWorkLocation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@OneToOne(targetEntity = KrcmtWorkplacePossible.class, mappedBy = "krcmtWorkLocation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	@JoinTable(name = "KRCMT_POSSIBLE_WKP")
-	public List<KrcmtWorkplacePossible> krcmtWorkplacePossible;
+	public KrcmtWorkplacePossible krcmtWorkplacePossible;
 	
 	@OneToMany(targetEntity = KrcmtIP4Address.class, mappedBy = "krcmtWorkLocation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	@JoinTable(name = "KRCMT_IP4ADDRESS")
@@ -80,10 +82,10 @@ public class KrcmtWorkLocation extends UkJpaEntity implements Serializable {
 				workLocation.getStampRange().getRadius().value,
 				workLocation.getStampRange().getGeoCoordinate().getLatitude(),
 				workLocation.getStampRange().getGeoCoordinate().getLongitude(),
-				workLocation
-						.getListWorkplace().stream().map(c -> KrcmtWorkplacePossible
-								.toEntiy(workLocation.getContractCode().v(), workLocation.getWorkLocationCD().v(), c))
-						.collect(Collectors.toList()),
+				workLocation.getWorkplace().isPresent() ? KrcmtWorkplacePossible.toEntiy(
+						workLocation.getContractCode().v(),
+						workLocation.getWorkLocationCD().v(),
+						workLocation.getWorkplace().get()) : null,
 				workLocation
 						.getListIPAddress().stream().map(c -> KrcmtIP4Address
 								.toEntity(workLocation.getContractCode().v(), workLocation.getWorkLocationCD().v(), c))
@@ -100,8 +102,6 @@ public class KrcmtWorkLocation extends UkJpaEntity implements Serializable {
 						RadiusAtr.toEnum(this.radius), 
 						new GeoCoordinate(this.latitude, this.longitude)),
 				this.krcmtIP4Address.stream().map(c->c.toDomain()).collect(Collectors.toList()),
-				this.krcmtWorkplacePossible.stream().map(c->c.toDomain()).collect(Collectors.toList()));
+				Optional.ofNullable(this.krcmtWorkplacePossible == null ? null : this.krcmtWorkplacePossible.toDomain()));
 	}
-	
-
 }

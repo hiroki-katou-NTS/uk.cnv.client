@@ -31,7 +31,7 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.InterimRemainCheckInpu
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.RecordRemainCreateInfor;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.ScheRemainCreateInfor;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.TimeDigestionParam;
-import nts.uk.ctx.at.shared.dom.remainingnumber.work.VacationTimeInforNew;
+import nts.uk.ctx.at.shared.dom.remainingnumber.work.VacationTimeUseInfor;
 import nts.uk.ctx.at.shared.dom.worktype.specialholidayframe.SpecialHdFrameNo;
 @Stateless
 public class DetailBeforeUpdateImpl implements DetailBeforeUpdate {
@@ -54,7 +54,7 @@ public class DetailBeforeUpdateImpl implements DetailBeforeUpdate {
 	public void processBeforeDetailScreenRegistration(String companyID, String employeeID, GeneralDate appDate,
 			int employeeRouteAtr, String appID, PrePostAtr postAtr, int version, String wkTypeCode,
 			String wkTimeCode, AppDispInfoStartupOutput appDispInfoStartupOutput, List<String> workTypeCds, 
-            Optional<TimeDigestionParam> timeDigestionUsageInfor, boolean flag) {
+            Optional<TimeDigestionParam> timeDigestionUsageInfor, boolean flag, Optional<String> workTypeRemainChk, Optional<String> workTimeRemainChk) {
 		//勤務種類、就業時間帯チェックのメッセージを表示
 		displayWorkingHourCheck(companyID, wkTypeCode, wkTimeCode);
 		// 選択した勤務種類の矛盾チェック(check sự mâu thuẫn của worktype đã chọn)
@@ -87,9 +87,9 @@ public class DetailBeforeUpdateImpl implements DetailBeforeUpdate {
         
         if (!flag) {
             // 登録時の残数チェック
-            List<VacationTimeInforNew> vacationTimeInforNews = timeDigestionUsageInfor.isPresent() ? 
+            List<VacationTimeUseInfor> vacationTimeInforNews = timeDigestionUsageInfor.isPresent() ? 
                     timeDigestionUsageInfor.get().getTimeLeaveApplicationDetails().stream().map(x -> 
-                    new VacationTimeInforNew(
+                    new VacationTimeUseInfor(
                             x.getAppTimeType(), 
                             x.getTimeDigestApplication().getTimeAnnualLeave(), 
                             x.getTimeDigestApplication().getTimeOff(), 
@@ -98,7 +98,7 @@ public class DetailBeforeUpdateImpl implements DetailBeforeUpdate {
                             x.getTimeDigestApplication().getChildTime(), 
                             x.getTimeDigestApplication().getNursingTime(), 
                             x.getTimeDigestApplication().getSpecialVacationFrameNO().map(y -> new SpecialHdFrameNo(y))))
-                    .collect(Collectors.toList()) : new ArrayList<VacationTimeInforNew>();
+                    .collect(Collectors.toList()) : new ArrayList<VacationTimeUseInfor>();
             AppRemainCreateInfor appRemainCreateInfor = new AppRemainCreateInfor(
                     application.getEmployeeID(), 
                     application.getAppID(), 
@@ -106,8 +106,8 @@ public class DetailBeforeUpdateImpl implements DetailBeforeUpdate {
                     application.getAppDate().getApplicationDate(), 
                     EnumAdaptor.valueOf(application.getPrePostAtr().value, nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.PrePostAtr.class), 
                     EnumAdaptor.valueOf(application.getAppType().value, nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.ApplicationType.class), 
-                    Optional.ofNullable(wkTypeCode),
-                    Optional.ofNullable(wkTimeCode), 
+                    workTypeRemainChk,
+                    workTimeRemainChk, 
                     vacationTimeInforNews, 
                     Optional.of(application.getAppType().equals(ApplicationType.HOLIDAY_WORK_APPLICATION) && timeDigestionUsageInfor.isPresent() 
                             ? timeDigestionUsageInfor.get().getOverHolidayTime() : 0), 
@@ -116,7 +116,7 @@ public class DetailBeforeUpdateImpl implements DetailBeforeUpdate {
                     application.getOpAppStartDate().map(ApplicationDate::getApplicationDate), 
                     application.getOpAppEndDate().map(ApplicationDate::getApplicationDate), 
                     holidays, 
-                    timeDigestionUsageInfor.map(TimeDigestionParam::toTimeDigestionUsageInfor));
+                    timeDigestionUsageInfor.map(TimeDigestionParam::toTimeDigestionUsageInfor), Optional.empty());
             InterimRemainCheckInputParam param = new InterimRemainCheckInputParam(
                     companyID, 
                     application.getEmployeeID(), 

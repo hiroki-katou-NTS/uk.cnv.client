@@ -100,14 +100,14 @@ public class KrcdtAgreementTime extends ContractUkJpaEntity implements Serializa
 		
 		/** 36協定時間 */
 		val agreementTime = AgreementTimeOfMonthly.of(new AttendanceTimeMonth(this.agreementTime), 
-														OneMonthTime.of(
+														OneMonthTime.createWithCheck(
 																OneMonthErrorAlarmTime.of(
 																	new AgreementOneMonthTime(this.agreementErrorTime), 
 																	new AgreementOneMonthTime(this.agreementAlarmTime)), 
 																new AgreementOneMonthTime(this.agreementLimitTime)));
 		/** 36協定上限時間 */
 		val exceptTime = AgreementTimeOfMonthly.of(new AttendanceTimeMonth(this.exceptAgreementTime), 
-													OneMonthTime.of(
+													OneMonthTime.createWithCheck(
 															OneMonthErrorAlarmTime.of(
 																new AgreementOneMonthTime(this.exceptAgreementErrorTime), 
 																new AgreementOneMonthTime(this.exceptAgreementAlarmTime)), 

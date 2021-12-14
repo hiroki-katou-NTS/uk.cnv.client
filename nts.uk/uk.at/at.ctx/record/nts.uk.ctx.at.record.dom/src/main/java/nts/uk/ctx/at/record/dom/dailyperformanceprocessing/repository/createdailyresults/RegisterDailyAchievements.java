@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
+import lombok.val;
+import nts.arc.task.tran.TransactionService;
 import nts.uk.ctx.at.record.dom.daily.DailyRecordAdUpService;
 import nts.uk.ctx.at.record.dom.functionalgorithm.errorforcreatedaily.ErrorHandlingCreateDailyResults;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
@@ -24,6 +29,7 @@ import nts.uk.shr.com.context.AppContexts;
  *
  */
 @Stateless
+@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class RegisterDailyAchievements {
 
 	@Inject
@@ -40,36 +46,49 @@ public class RegisterDailyAchievements {
 
 	@Inject
 	private InterimRemainDataMngRegisterDateChange interimRemainDataMngRegisterDateChange;
+	
+	@Inject
+	private TransactionService transactionService;
 
 	public void register(List<IntegrationOfDaily> listIntegrationOfDaily, List<ErrorMessageInfo> listError,
 			List<Stamp> listStamp, Optional<String> empCalAndSumExecLogId) {
 		String companyId = AppContexts.user().companyId();
+		
+		val erByDate = listError.stream().collect(Collectors.groupingBy(ErrorMessageInfo::getProcessDate, Collectors.toList()));
+		
+		val stampByDate = listStamp.stream().filter(c -> c.getImprintReflectionStatus().getReflectedDate().isPresent())
+				.collect(Collectors.groupingBy(c -> c.getImprintReflectionStatus().getReflectedDate().get(), Collectors.toList()));
 
-		for (ErrorMessageInfo errorMessageInfo : listError) {
-			String empCalAndSumExeLogId = empCalAndSumExecLogId.isPresent() ? empCalAndSumExecLogId.get() : null;
-			// 日別実績の作成エラー処理
-			errorHandlingCreateDailyResults.executeCreateError(companyId, errorMessageInfo.getEmployeeID(),
-					errorMessageInfo.getProcessDate(), empCalAndSumExeLogId, errorMessageInfo.getExecutionContent(),
-					errorMessageInfo.getResourceID(), errorMessageInfo.getMessageError());
+		for (IntegrationOfDaily iod : listIntegrationOfDaily) {
+			
+			transactionService.execute(() -> {
+				if (erByDate.containsKey(iod.getYmd())) {
+					erByDate.get(iod.getYmd()).forEach(errorMessageInfo -> {
+						
+						// 日別実績の作成エラー処理
+						errorHandlingCreateDailyResults.executeCreateError(companyId, errorMessageInfo.getEmployeeID(),
+								errorMessageInfo.getProcessDate(), empCalAndSumExecLogId.orElse(null), 
+								errorMessageInfo.getExecutionContent(), errorMessageInfo.getResourceID(), 
+								errorMessageInfo.getMessageError());
+					});
+				}
+				// ドメインモデル「打刻」を更新する (Update 「打刻」)
+				if (stampByDate.containsKey(iod.getYmd())) {
+					stampByDate.get(iod.getYmd()).forEach(stampItem -> {
+						this.stampDakokuRepository.update(stampItem);
+					});
+				}
+				
+				// エラーで本人確認と上司承認を解除する
+				dailyRecordAdUpService.removeConfirmApproval(Arrays.asList(iod));
+
+				// 登録する (Đăng ký)
+				registerDailyWork.register(iod, new ArrayList<>());
+				
+				// 暫定データの登録
+				this.interimRemainDataMngRegisterDateChange.registerDateChange(companyId,
+						iod.getEmployeeId(), Arrays.asList(iod.getYmd()));
+			}); 
 		}
-
-		// Do list Stamp là stamp của tất cả các ngày trong period, nên tách riêng xử lý
-		// update của stamp
-		// ドメインモデル「打刻」を更新する (Update 「打刻」)
-		listStamp.forEach(stampItem -> {
-			this.stampDakokuRepository.update(stampItem);
-		});
-		// エラーで本人確認と上司承認を解除する
-		dailyRecordAdUpService.removeConfirmApproval(listIntegrationOfDaily);
-
-		for (IntegrationOfDaily integrationOfDaily : listIntegrationOfDaily) {
-			// 登録する (Đăng ký)
-			registerDailyWork.register(integrationOfDaily, new ArrayList<>());
-			// 暫定データの登録
-			this.interimRemainDataMngRegisterDateChange.registerDateChange(companyId,
-					integrationOfDaily.getEmployeeId(), Arrays.asList(integrationOfDaily.getYmd()));
-		}
-
 	}
-
 }

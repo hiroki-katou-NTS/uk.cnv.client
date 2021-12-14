@@ -107,19 +107,24 @@ public class WorkCycleReflectionDialog {
 		dto.setSatHoliday(convertToDomain(map.get(Optional.of(HolidayAtr.STATUTORY_HOLIDAYS))));
 		dto.setNonSatHoliday(convertToDomain(map.get(Optional.of(HolidayAtr.NON_STATUTORY_HOLIDAYS))));
 
-		WorkTypeCode satHoliday = CollectionUtil.isEmpty(dto.getSatHoliday()) ? null : new WorkTypeCode(dto.getSatHoliday().get(0).getWorkTypeCode());
-		WorkTypeCode nonSatHoliday = CollectionUtil.isEmpty(dto.getNonSatHoliday()) ? null : new WorkTypeCode(dto.getNonSatHoliday().get(0).getWorkTypeCode());
-		WorkTypeCode pubHoliday = CollectionUtil.isEmpty(dto.getPubHoliday()) ? null : new WorkTypeCode(dto.getPubHoliday().get(0).getWorkTypeCode());
-
-		WorkCycleRefSetting config = WorkCycleRefSetting.create(
-				new WorkCycleCode(workCycleCode),
-				refOrder,
-				numOfSlideDays,
-				Optional.ofNullable(satHoliday),
-				Optional.ofNullable(nonSatHoliday),
-				Optional.ofNullable(pubHoliday)
-		);
-		List<WorkCycleReflectionDto.RefImageEachDayDto> refImageEachDayDtos = getWorkCycleAppImage(creationPeriod, config);
+		List<WorkCycleReflectionDto.RefImageEachDayDto> refImageEachDayDtos;
+		// #119456
+		if (!dto.getPubHoliday().isEmpty() && !dto.getSatHoliday().isEmpty() && !dto.getNonSatHoliday().isEmpty()) {
+			WorkTypeCode satHoliday = new WorkTypeCode(dto.getSatHoliday().get(0).getWorkTypeCode());
+			WorkTypeCode nonSatHoliday = new WorkTypeCode(dto.getNonSatHoliday().get(0).getWorkTypeCode());
+			WorkTypeCode pubHoliday = new WorkTypeCode(dto.getPubHoliday().get(0).getWorkTypeCode());
+			WorkCycleRefSetting config = WorkCycleRefSetting.create(
+					new WorkCycleCode(workCycleCode),
+					refOrder,
+					numOfSlideDays,
+					Optional.of(satHoliday),
+					Optional.of(nonSatHoliday),
+					Optional.of(pubHoliday)
+			);
+			refImageEachDayDtos = getWorkCycleAppImage(creationPeriod, config);
+		} else {
+			refImageEachDayDtos = new ArrayList<>();
+		}
 		dto.setReflectionImage(refImageEachDayDtos); // 反映イメージ
 		return dto;
 	}

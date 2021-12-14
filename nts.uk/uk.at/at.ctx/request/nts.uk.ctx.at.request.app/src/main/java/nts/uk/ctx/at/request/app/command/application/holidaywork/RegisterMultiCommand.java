@@ -6,7 +6,6 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nts.uk.ctx.at.request.app.command.application.overtime.AppOvertimeDetailCommand;
 import nts.uk.ctx.at.request.app.command.setting.company.applicationapprovalsetting.applicationsetting.apptypeset.AppTypeSettingCommand;
 import nts.uk.ctx.at.request.app.find.application.common.dto.ApprovalRootStateImportDto;
 
@@ -44,11 +43,6 @@ public class RegisterMultiCommand {
 	 * List＜社員ID, 承認ルートの内容＞
 	 */
 	private Map<String, ApprovalRootStateImportDto> approvalRootContentMap;
-	
-	/**
-	 * List＜社員ID, 時間外時間の詳細＞
-	 */
-	private Map<String, AppOvertimeDetailCommand> appOvertimeDetailMap;
 	
 	/**
 	 * 申請種類別設定

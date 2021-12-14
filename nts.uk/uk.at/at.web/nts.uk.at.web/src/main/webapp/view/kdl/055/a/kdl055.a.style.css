@@ -1,0 +1,11 @@
+.col-1 {
+    width: 160px;
+}
+
+.mv-17 {
+    margin: 17px 20px;
+}
+
+#overwrite > .nts-switch-button {
+    width: 60px;
+}

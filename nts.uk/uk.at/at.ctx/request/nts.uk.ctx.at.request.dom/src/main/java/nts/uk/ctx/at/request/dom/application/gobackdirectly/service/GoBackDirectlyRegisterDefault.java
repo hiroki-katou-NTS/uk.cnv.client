@@ -202,7 +202,9 @@ public class GoBackDirectlyRegisterDefault implements GoBackDirectlyRegisterServ
 				inforGoBackCommonDirectOutput.getAppDispInfoStartup(), 
 				goBackDirectly.getDataWork().isPresent() ? Arrays.asList(goBackDirectly.getDataWork().get().getWorkTypeCode().v()) : new ArrayList<String>(), 
 				Optional.empty(), 
-				false);
+				false, 
+				goBackDirectly.getDataWork().map(x -> x.getWorkTypeCode().v()), 
+				goBackDirectly.getDataWork().isPresent() ? goBackDirectly.getDataWork().get().getWorkTimeCodeNotNull().map(WorkTimeCode::v) : Optional.empty());
 	}
 	/**
 	 * 共通登録前のエラーチェック処理

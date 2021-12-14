@@ -1,0 +1,334 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+  <ui:composition template="../../../../master/base.xhtml">
+    <ui:define name="htmlHead">
+      <com:scriptfile set="IGNITE" />
+      <com:ValidatorScript>
+        nts.uk.ctx.office.dom.equipment.achievement.EquipmentFormTitle
+        nts.uk.ctx.office.dom.equipment.achievement.UsageItemName
+        nts.uk.ctx.office.dom.equipment.achievement.DisplayWidth
+        nts.uk.ctx.office.dom.equipment.achievement.UsageRecordUnit
+        nts.uk.ctx.office.dom.equipment.achievement.ItemDescription
+        nts.uk.ctx.office.dom.equipment.achievement.MinimumUsageRecord
+        nts.uk.ctx.office.dom.equipment.achievement.MaximumUsageRecord
+        nts.uk.ctx.office.dom.equipment.achievement.UsageItemtime
+        nts.uk.ctx.office.dom.equipment.achievement.DigitsNumber
+        nts.uk.ctx.office.dom.equipment.achievement.UsageRecordUnit
+        nts.uk.ctx.office.dom.equipment.achievement.ItemDescription
+			</com:ValidatorScript>
+      <com:stylefile path="oem003.a.style.css" />
+      <com:scriptfile path="oem003.a.vm.js" />
+    </ui:define>
+
+    <ui:define name="content">
+      <div id="functions-area">
+        <!-- A1 -->
+        <a class="goback" data-bind="ntsLinkButton: { jump: '/view/oem/001/a/index.xhtml' }">#{i18n.getText('OEM003_20')}</a>
+        <!-- A1_1 -->
+        <button id="btn-register" tabindex="1" class="proceed" data-bind="enable: $root.errors.isEmpty, click: clickRegister">#{i18n.getText('OEM003_2')}</button>
+        <!-- A1_2 -->
+        <button tabindex="2" style="margin-left: 50px;" data-bind="click: clickExport">#{i18n.getText('OEM003_3')}</button>
+      </div>
+      <div id="contents-area" style="padding: 5px 20px;">
+        <div class="fixed-flex-layout">
+          <!-- A2_1 -->
+          <div style="min-width: 175px;" data-bind="ntsFormLabel: {
+            required: true,
+            text: $vm.$i18n('OEM003_24'),
+            constraint: 'EquipmentFormTitle' }">
+          </div>
+          <!-- A2_2 -->
+          <input tabindex="3" id="form-title" data-bind="ntsTextEditor: {
+            name: '#[OEM003_24]',
+            value: formTitle,
+            required: true,
+            constraint: 'EquipmentFormTitle'}"/>
+        </div>
+        <div class="fixed-flex-layout">
+          <div class="fixed-flex-layout-left" style="padding: 0; width: 1095px; display: inline-flex;">
+            <!-- A3_1 -->
+            <div class="label" style="min-width: 175px;" data-bind="ntsFormLabel: { text: $vm.$i18n('OEM003_4') }"></div>
+            <!-- A3_2 -->
+            <button style="min-width: 90px; height: 35px;" data-bind="click: clickAdd, enable: enableButtonAdd()">#{i18n.getText('OEM003_5')}</button>
+          </div>
+        </div>
+        <div class="fixed-flex-layout">
+          <div class="fixed-flex-layout-left nts-gridlist ui-iggrid" style="border: none !important;">
+            <!-- A4 -->
+            <table tabindex="4" id="data-table" class="ui-iggrid-layout-helper">
+              <tr>
+                <td>
+                  <table class="data-table ui-iggrid-headertable ui-widget-header ui-helper-reset">
+                    <colgroup>
+                      <col style="width: 40px;"/>
+                      <col style="width: 155px;"/>
+                      <col style="width: 80px;"/>
+                      <col style="width: 145px;"/>
+                      <col style="width: 112px;"/>
+                      <col style="width: 112px;"/>
+                      <col style="width: 92px;"/>
+                      <col style="width: 50px;"/>
+                      <col style="width: 300px;"/>
+                      <col style="width: 40px;"/>
+                    </colgroup>
+                    <thead>
+                      <tr class="data-table-header">
+                        <th class="ui-iggrid-header ui-widget-header">
+                          <!-- A4_H1 -->
+                          <div data-bind="ntsCheckBox: { checked: checkAll }"></div>
+                        </th>
+                        <th class="ui-iggrid-header ui-widget-header">
+                          <!-- A4_H2 -->
+                          <div data-bind="ntsFormLabel: {required: true, text: $vm.$i18n('OEM003_8'), constraint: 'UsageItemName' }"></div>
+                        </th>
+                        <th class="ui-iggrid-header ui-widget-header">
+                          <!-- A4_H3 -->
+                          <div style="width: 70px;" data-bind="ntsFormLabel: {required: true, text: $vm.$i18n('OEM003_9'), constraint: 'DisplayWidth' }"></div>
+                        </th>
+                        <th class="ui-iggrid-header ui-widget-header">
+                          <!-- A4_H4 -->
+                          <div data-bind="ntsFormLabel: {required: true, text: $vm.$i18n('OEM003_10') }"></div>
+                        </th>
+                        <th class="ui-iggrid-header ui-widget-header">
+                          <!-- A4_H5 -->
+                          <div data-bind="ntsFormLabel: {required: true, text: $vm.$i18n('OEM003_11') }"></div>
+                        </th>
+                        <th class="ui-iggrid-header ui-widget-header">
+                          <!-- A4_H6 -->
+                          <div data-bind="ntsFormLabel: {required: true, text: $vm.$i18n('OEM003_12') }"></div>
+                        </th>
+                        <th class="ui-iggrid-header ui-widget-header">
+                          <!-- A4_H7 -->
+                          <div data-bind="ntsFormLabel: {required: false, text: $vm.$i18n('OEM003_13'), constraint: 'UsageRecordUnit' }"></div>
+                        </th>
+                        <th class="ui-iggrid-header ui-widget-header">
+                          <!-- A4_H8 -->
+                          <div style="width: 30px; padding: 0;" data-bind="ntsFormLabel: {required: false, text: $vm.$i18n('OEM003_14') }"></div>
+                        </th>
+                        <th class="ui-iggrid-header ui-widget-header">
+                          <!-- A4_H9 -->
+                          <div data-bind="ntsFormLabel: {required: false, text: $vm.$i18n('OEM003_15'), constraint: 'ItemDescription' }"></div>
+                        </th>
+                        <th class="ui-iggrid-header ui-widget-header">
+                          <!-- A4_H10 -->
+                          <div style="padding: 0;" data-bind="ntsFormLabel: {required: false, text: $vm.$i18n('OEM003_16') }"></div>
+                        </th>
+                      </tr>
+                    </thead>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="ui-iggrid-scrolldiv" style="overflow-y: scroll; height: 290px;">
+                    <table class="data-table">
+                      <colgroup>
+                        <col style="width: 40px;"/>
+                        <col style="width: 155px;"/>
+                        <col style="width: 80px;"/>
+                        <col style="width: 150px;"/>
+                        <col style="width: 114px;"/>
+                        <col style="width: 114px;"/>
+                        <col style="width: 62px;"/>
+                        <col style="width: 50px;"/>
+                        <col style="width: 300px;"/>
+                        <col style="width: 40px;"/>
+                      </colgroup>
+                      <tbody data-bind="foreach: dataTables">
+                        <tr style="position: relative;" data-bind="css: css()">
+                          <td>
+                            <!-- A4_D1 -->
+                            <div data-bind="ntsCheckBox: {checked: checked}"></div>
+                          </td>
+                          <td>
+                            <!-- A4_D2 -->
+                            <input class="A4_D2" data-bind="ntsTextEditor: {
+                              name: '#[OEM003_8]',
+                              constraint: 'UsageItemName',
+                              value: itemName,
+                              required: true,
+                              option: {
+                                textalign: 'left',
+                                width: '131px'
+                              }
+                            }"/>
+                          </td>
+                          <td>
+                            <!-- A4_D3 -->
+                            <input data-bind="ntsNumberEditor: {
+                              name: '#[OEM003_9]',
+                              constraint: 'DisplayWidth',
+                              value: displayWidth,
+                              required: true,
+                              option: { width: '56px' }
+                            }"/>
+                          </td>
+                          <td style="position: relative;" data-bind="css: {
+                            'error-item-type': itemTypeError
+                          }">
+                            <!-- A4_D4 -->
+                            <div class="item-type"
+                              style="text-align: left; position: absolute; top: 1px; left: 1px;"
+                              data-bind="ntsComboBox: {
+                                name: $vm.$i18n('OEM003_10'),
+                                options: itemTypes,
+                                optionsValue: 'itemNo',
+                                visibleItemsCount: 5,
+                                value: itemNo,
+                                optionsText: 'text',
+                                editable: false,
+                                enable: true,
+                                required: true,
+                                width: '146px',
+                                selectFirstIfNull: false,
+                                columns: [
+                                  { prop: 'text', length: 5 },
+                                ]
+                              }">
+                            </div>
+                          </td>
+                          <td>
+                            <!-- A4_D5 -->
+                            <com:ko-if bind="isCharOrNumber()	|| isItemTypeNull()">
+                              <input data-bind="ntsNumberEditor: {
+                                name: '#[OEM003_11]',
+                                constraint: 'MinimumUsageRecord',
+                                value: min,
+                                required: ko.computed(() => isNumeric() &amp;&amp; !isItemTypeNull()),
+                                enable: ko.computed(() => isNumeric() &amp;&amp; !isItemTypeNull()),
+                                option: { textalign: 'center', width: '90px', numberGroup: true, grouplength: 3 }
+                              }"/>
+                            </com:ko-if>
+                            <!-- A4_D5_1 -->
+                            <com:ko-if bind="isTime()">
+                              <input data-bind="ntsTimeEditor: {
+                                name: '#[OEM003_11]',
+                                value: min,
+                                constraint: 'UsageItemtime',
+                                inputFormat: 'time',
+                                mode: 'time',
+                                required: isTime(),
+                                option: { textalign: 'center', width: '90px' }
+                              }"/>
+                            </com:ko-if>
+                          </td>
+                          <td>
+                            <com:ko-if bind="ko.computed(() => isNumeric() || isItemTypeNull())">
+                              <!-- A4_D6 -->
+                              <input data-bind="ntsNumberEditor: {
+                                name: '#[OEM003_12]',
+                                constraint: 'MaximumUsageRecord',
+                                value: max,
+                                required: ko.computed(() => isNumeric() || isItemTypeNull()),
+                                enable: !isItemTypeNull(),
+                                option: { textalign: 'center', width: '90px', numberGroup: true, grouplength: 3 }
+                              }"/>
+                            </com:ko-if>
+                            <com:ko-if bind="isTime()">
+                              <!-- A4_D6_1 -->
+                              <input data-bind="ntsTimeEditor: {
+                                name: '#[OEM003_12]',
+                                value: max,
+                                constraint: 'UsageItemtime',
+                                inputFormat: 'time',
+                                mode: 'time',
+                                required: isTime(),
+                                option: { textalign: 'center', width: '90px' }
+                              }"/>
+                            </com:ko-if>
+                            <com:ko-if bind="isCharacter()">
+                              <!-- A4_D6_2 -->
+                              <input data-bind="ntsNumberEditor: {
+                                name: '#[OEM003_12]',
+                                constraint: 'DigitsNumber',
+                                value: digitsNo,
+                                required: isCharacter(),
+                                option: { textalign: 'center', width: '70px' }
+                              }"/>
+                            </com:ko-if>
+                          </td>
+                          <td>
+                            <!-- A4_D7 -->
+                            <input data-bind="ntsTextEditor: {
+                              name: '#[OEM003_13]',
+                              constraint: 'UsageRecordUnit',
+                              value: unit,
+                              enable: isCharOrNumber(),
+                              option: { textalign: 'center', width: '70px' }
+                            }"/>
+                          </td>
+                          <td>
+                            <!-- A4_D8 -->
+                            <div data-bind="ntsCheckBox: { name: '#[OEM003_14]', checked: require } "></div>
+                          </td>
+                          <td class="text-area">
+                            <!-- A4_D9 -->
+                            <textarea
+                              style="overflow-y: scroll; padding-top: 0px; padding-bottom: 0px; height: 100% !important;"
+                              data-bind="ntsMultilineEditor: {
+                                name: '#[OEM003_15]',
+                                value: memo,
+                                option: {
+                                  resizeable: false,
+                                  width: '277px',
+                                  textalign: 'left'
+                                },
+                                enable: true,
+                                constraint: 'ItemDescription'
+                              }"
+                            />
+                          </td>
+                          <td>
+                            <!-- A4_D10 -->
+                            <i class="button-img" data-bind="
+                              ntsIcon: { no: 198, width: 30, height: 30 },
+                              click: $parent.removeData.bind($parent, order)">
+                            </i>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="fixed-flex-layout-right" style="padding-top: 35px;">
+            <div class="updown">
+              <button style="margin-bottom: 10px;">
+                <!-- A6_1 -->
+                <i class="button-img" data-bind="
+                  ntsIcon: { no: 130, width: 30, height: 50 },
+                  click: toOrderBy.bind($vm, 'before')">
+                </i>
+              </button>
+              
+              <br/>
+              <button>
+                <!-- A6_2 -->
+                <i class="button-img" data-bind="
+                  ntsIcon: { no: 131, width: 30, height: 50 },
+                  click: toOrderBy.bind($vm, 'after')">
+                </i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="fixed-flex-layout" style="flex-direction: column; margin-top: 5px;">
+          <!-- A5_1 -->
+          <label>#{i18n.getText('OEM003_17')}</label>
+          <!-- A5_2 -->
+          <label>#{i18n.getText('OEM003_18')}</label>
+          <!-- A5_3 -->
+          <label>#{i18n.getText('OEM003_19')}</label>
+        </div>
+      </div>
+    </ui:define>
+  </ui:composition>
+</body>
+</html>

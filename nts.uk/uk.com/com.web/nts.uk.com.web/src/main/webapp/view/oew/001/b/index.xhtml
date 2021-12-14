@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+  <ui:composition template="../../../../master/dialog.xhtml">
+    <ui:define name="htmlHead">
+      <script>
+        var dialogSize = {
+          width: 700,
+          height: 460
+        };
+      </script>
+      <com:stylefile path="oew001.b.style.css" />
+      <com:scriptfile set="IGNITE" />
+      <com:scriptfile path="../share/model.js" />
+      <com:scriptfile path="oew001.b.vm.js" />
+      <com:ValidatorScript>
+        nts.uk.ctx.office.dom.equipment.data.UseTextItem
+        nts.uk.ctx.office.dom.equipment.data.UseNumericItem
+        nts.uk.ctx.office.dom.equipment.data.UseTimeItem
+      </com:ValidatorScript>
+    </ui:define>
+
+    <ui:define name="content">
+      <div id="contents-area" data-bind="with: data">
+        <div class="static-zone ml-10">
+          <div class="div-line flex valign-center">
+            <div id="B1_1" class="name-label" data-bind="ntsFormLabel: {}">#{i18n.getText('OEW001_30')}</div>
+            <label id="B1_2" data-bind="text: equipmentClsName"></label>
+          </div>
+          <div class="div-line flex valign-center">
+            <div id="B1_3" class="name-label" data-bind="ntsFormLabel: {}">#{i18n.getText('OEW001_31')}</div>
+            <label id="B1_4" data-bind="text: employeeName"></label>
+          </div>
+          <div class="div-line flex valign-center">
+            <div id="B1_5" class="name-label" data-bind="ntsFormLabel: {}">#{i18n.getText('OEW001_32')}</div>
+            <div class="flex valign-center">
+              <label id="B1_6" data-bind="text: equipmentInfoCode"></label>
+              <label id="B1_7" class="ml-10" data-bind="text: equipmentInfoName"></label>
+            </div>
+          </div>
+          <div class="div-line flex valign-center">
+            <div id="B2_1" class="name-label" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('OEW001_33')}</div>
+            <div id="B2_2" data-bind="ntsDatePicker: {
+              name: '#[OEW001_34]',
+              value: useDate,
+              enable: isNewMode,
+              required: isNewMode,
+              dateFormat: 'YYYY/MM/DD',
+              showJumpButtons: true
+            }" tabindex="1"></div>
+          </div>
+        </div>
+        <div class="dynamic-zone ml-10">
+          <table>
+            <tbody data-bind="foreach: optionalItems">
+              <tr>
+                <td>
+                  <div class="flex valign-center">
+                    <div class="B3_1" data-bind="ntsFormLabel: { text: itemName, required: required }"></div>
+                    <com:ko-if bind="displayOrder === 1">
+                      <button class="B3_4" data-bind="ntsHelpButton: { textId: helpContent, position: 'right center+25' }">?</button>
+                    </com:ko-if>
+                    <com:ko-if bind="displayOrder !== 1">
+                      <button class="B3_4" data-bind="ntsHelpButton: { textId: helpContent, position: 'right center-15' }">?</button>
+                    </com:ko-if>
+                  </div>
+                </td>
+                <td>
+                  <div class="flex valign-center ml-10">
+                    <!-- 文字項目 -->
+                    <com:ko-if bind="itemCls === nts.uk.com.view.oew001.share.model.enums.ItemClassification.TEXT">
+                      <input class="B2_2_1 mr-10" data-bind="ntsTextEditor: {
+                      name: itemName,
+                      value: value,
+                      constraint: 'UseTextItem',
+                      option: { width: width }
+                    }" tabindex="2" />
+                    </com:ko-if>
+                    <!-- 数字項目 -->
+                    <com:ko-if bind="itemCls === nts.uk.com.view.oew001.share.model.enums.ItemClassification.NUMBER">
+                      <input class="B2_2_1 mr-10" data-bind="ntsNumberEditor: {
+                      name: itemName,
+                      value: value,
+                      constraint: 'UseNumericItem',
+                      option: { width: width }
+                    }" tabindex="2" />
+                    </com:ko-if>
+                    <!-- 時間項目 -->
+                    <com:ko-if bind="itemCls === nts.uk.com.view.oew001.share.model.enums.ItemClassification.TIME">
+                      <input class="B2_2_1 mr-10" data-bind="ntsTimeEditor: {
+                      name: itemName,
+                      value: value,
+                      mode: 'time',
+                      inputFormat: 'time',
+                      constraint: 'UseTimeItem',
+                      option: { width: width }
+                    }" tabindex="2" />
+                    </com:ko-if>
+                    <com:ko-if bind="itemCls !== nts.uk.com.view.oew001.share.model.enums.ItemClassification.TIME &amp;&amp; !!unit">
+                      <label class="B3_3 mr-10" data-bind="text: unit"></label>
+                    </com:ko-if>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="functions-area-bottom">
+        <button id="B4_1" class="proceed" data-bind="click: processSave"
+          tabindex="3">#{i18n.getText('OEW001_35')}</button>
+        <button id="B4_2" class="danger" data-bind="click: processDelete, 
+          enable: ko.computed(function() { return !data().isNewMode; })"
+          tabindex="4">#{i18n.getText('OEW001_36')}</button>
+        <button id="B4_3" data-bind="click: processCancel" tabindex="5">#{i18n.getText('OEW001_37')}</button>
+      </div>
+    </ui:define>
+  </ui:composition>
+</body>
+
+</html>

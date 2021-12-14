@@ -73,7 +73,9 @@ public class AnnualLeaveUndigestNumber extends LeaveUndigestNumber {
 								.mapToDouble(x -> x.getDetails().getRemainingNumber().getDays().v())
 								.sum());
 		LeaveUndigestTime time = new LeaveUndigestTime(expiredList.stream()
-								.mapToInt(x -> x.getDetails().getRemainingNumber().getMinutes().get().v())
+								.mapToInt(x -> 
+								x.getDetails().getRemainingNumber().getMinutes().isPresent()?
+										x.getDetails().getRemainingNumber().getMinutes().get().v() : 0)
 								.sum());
 		
 		return new AnnualLeaveUndigestNumber(day,Optional.of(time));

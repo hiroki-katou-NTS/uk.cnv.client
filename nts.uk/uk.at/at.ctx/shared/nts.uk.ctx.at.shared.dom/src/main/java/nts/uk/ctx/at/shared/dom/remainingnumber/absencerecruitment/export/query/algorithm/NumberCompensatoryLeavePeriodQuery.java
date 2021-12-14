@@ -43,11 +43,11 @@ public class NumberCompensatoryLeavePeriodQuery {
 		val sequentialVacaDetail = GetSequentialVacationDetail.process(require, inputParam.getCid(),
 				inputParam.getSid(), inputParam.getDateData(), inputParam.getFixManaDataMonth(),
 				inputParam.getInterimMng(), inputParam.getProcessDate(), inputParam.getOptBeforeResult());
-		List<AccumulationAbsenceDetail> lstAbsRec = sequentialVacaDetail.getLstAcctAbsenDetail();
+		List<AccumulationAbsenceDetail> lstAbsRec = sequentialVacaDetail.getVacationDetail().getLstAcctAbsenDetail();
 
 		// 振休振出から月初の繰越数を計算
 		val calcNumCarry = CalcNumCarryAtBeginMonthFromHol.calculate(require, inputParam.getCid(), inputParam.getSid(),
-				inputParam.getDateData(), sequentialVacaDetail, inputParam.isMode());
+				inputParam.getDateData(), sequentialVacaDetail.getVacationDetail(), inputParam.isMode());
 		result.setCarryoverDay(calcNumCarry);
 	
 		// 「振出振休明細」をソートする
@@ -56,7 +56,9 @@ public class NumberCompensatoryLeavePeriodQuery {
 		// 振出と振休の相殺処理
 		Pair<Optional<DayOffError>, List<SeqVacationAssociationInfo>> lstSeqVacation = CompenSuspensionOffsetProcess.process(require,
 				inputParam.getCid(), inputParam.getSid(), inputParam.getDateData().end(), lstAbsRec);
-		result.setLstSeqVacation(lstSeqVacation.getRight());
+		 List<SeqVacationAssociationInfo> linkData = lstSeqVacation.getRight();
+		 linkData.addAll(sequentialVacaDetail.getSeqVacInfoList().getSeqVacInfoList());
+		result.setLstSeqVacation(linkData);
 		lstSeqVacation.getLeft().ifPresent(x -> result.getPError().add(PauseError.PREFETCH_ERROR));
 		// 残数と未消化を集計する
 		AbsDaysRemain absRemain = TotalRemainUndigest.process(lstAbsRec, inputParam.getScreenDisplayDate(),

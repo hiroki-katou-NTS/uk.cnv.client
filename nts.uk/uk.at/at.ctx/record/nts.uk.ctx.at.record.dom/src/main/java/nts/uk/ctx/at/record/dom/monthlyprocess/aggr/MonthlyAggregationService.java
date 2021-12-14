@@ -135,7 +135,7 @@ public class MonthlyAggregationService {
 					require, cacheCarrier, asyncContext,
 					companyId, employeeId, date.get(), empCalAndSumExecLogID, reAggrAtr, companySets);
 			ProcessState coStatus = aggrStatus.getStatus().getState();
-			atomTasks.addAll(aggrStatus.getAtomTasks());
+//			atomTasks.addAll(aggrStatus.getAtomTasks());
 			stateHolder.add(coStatus);
 
 			ConcurrentStopwatches.stop("10000:社員ごと：" + employeeId);
@@ -144,9 +144,11 @@ public class MonthlyAggregationService {
 			if (coStatus == ProcessState.SUCCESS){
 				
 				// 成功時、ログ情報（実行内容の完了状態(（社員別））を更新する
-				atomTasks.add(AtomTask.of(() -> require.updateLogWithContent(employeeId, empCalAndSumExecLogID,
+				aggrStatus.getAtomTasks().add(AtomTask.of(() -> require.updateLogWithContent(employeeId, empCalAndSumExecLogID,
 						ExecutionContent.MONTHLY_AGGREGATION.value, EmployeeExecutionStatus.COMPLETE.value)));
 				
+				/** 永続化 */
+				require.transaction(AtomTask.bundle(aggrStatus.getAtomTasks()));
 				dataSetter.updateData("monthlyAggregateCount", stateHolder.count());
 			}
 			if (coStatus == ProcessState.INTERRUPTION){
@@ -266,6 +268,8 @@ public class MonthlyAggregationService {
 		ManagedParallelWithContext parallelContext();
 		
 		void updateLogWithContent(String employeeID, String empCalAndSumExecLogId, int executionContent, int state);
+		
+		void transaction(AtomTask task);
 	}
 	
 	public static interface RequireM2 extends MonthlyAggregationErrorService.RequireM1 {}

@@ -24,6 +24,7 @@ module kcp009.viewmodel {
         isShowEmpList: KnockoutObservable<boolean>;
         tabIndex: number;
         componentWrapperId: string;
+        isDisplayNumberOfEmployee: boolean;
 
         constructor() {
             var self = this;
@@ -86,6 +87,7 @@ module kcp009.viewmodel {
                 else {//input.初期選択社員IDに値がある場合
                     self.selectedItem = data.selectedItem;
                 }
+              self.isDisplayNumberOfEmployee = data.isDisplayNumberOfEmployee || false;
             } else {
                 // message 184
                 nts.uk.ui.dialog.info({ messageId: "Msg_184" });
@@ -343,6 +345,7 @@ module kcp009.viewmodel {
         selectedItem?: KnockoutObservable<string>;
         tabIndex: number;
         baseDate?: KnockoutObservable<Date>;
+        isDisplayNumberOfEmployee: boolean;
     }
 
     /**

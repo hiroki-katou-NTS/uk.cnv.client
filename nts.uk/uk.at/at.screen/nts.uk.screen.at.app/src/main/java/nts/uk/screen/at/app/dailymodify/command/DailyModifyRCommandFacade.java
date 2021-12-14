@@ -35,7 +35,6 @@ import nts.uk.ctx.at.record.app.command.dailyperform.month.UpdateMonthDailyParam
 import nts.uk.ctx.at.record.app.find.dailyperform.DailyRecordDto;
 import nts.uk.ctx.at.record.app.find.dailyperform.editstate.EditStateOfDailyPerformanceDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyRecordWorkDto;
-import nts.uk.ctx.at.record.dom.actualworkinghours.AttendanceTimeOfDailyPerformance;
 import nts.uk.ctx.at.record.dom.approvalmanagement.dailyperformance.algorithm.ContentApproval;
 import nts.uk.ctx.at.record.dom.approvalmanagement.dailyperformance.algorithm.ParamDayApproval;
 import nts.uk.ctx.at.record.dom.approvalmanagement.dailyperformance.algorithm.RegisterDayApproval;
@@ -774,14 +773,6 @@ public class DailyModifyRCommandFacade {
 			// Acquire closing date corresponding to employee
 			List<IntegrationOfDaily> dailyOfEmp = domainDailyEditAll.stream()
 					.filter(x -> x.getEmployeeId().equals(emp)).collect(Collectors.toList());
-			List<AttendanceTimeOfDailyPerformance> lstAttendanceTimeData = dailyOfEmp.stream()
-					.filter(x -> x.getAttendanceTimeOfDailyPerformance().isPresent())
-					.map(x -> new AttendanceTimeOfDailyPerformance(x.getEmployeeId(),x.getYmd(), x.getAttendanceTimeOfDailyPerformance().get())).collect(Collectors.toList());
-
-			List<WorkInfoOfDailyPerformance> lstWorkInfor = dailyOfEmp.stream()
-					.filter(x -> x.getWorkInformation() != null).map(x -> new WorkInfoOfDailyPerformance(x.getEmployeeId(),x.getYmd(), x.getWorkInformation()))
-					.collect(Collectors.toList()).stream().sorted((x, y) -> x.getYmd().compareTo(y.getYmd()))
-					.collect(Collectors.toList());
 
 			Optional<GeneralDate> date = getClosureStartForEmployee.getDataClosureStart(emp);
 			List<EmployeeMonthlyPerError> lstEmpMonthError = new ArrayList<>();
@@ -790,7 +781,7 @@ public class DailyModifyRCommandFacade {
 					TimeOffRemainErrorInputParam param = new TimeOffRemainErrorInputParam(companyId, emp,
 							new DatePeriod(date.get(), date.get().addYears(1).addDays(-1)),
 							new DatePeriod(dateRange.getStartDate(), dateRange.getEndDate()), false,
-							lstAttendanceTimeData, lstWorkInfor, month.getAttendanceTime());
+							dailyOfEmp, month.getAttendanceTime());
 					// monthPer.addAll(timeOffRemainErrorInfor.getErrorInfor(param));
 					lstEmpMonthError.addAll(timeOffRemainErrorInfor.getErrorInfor(param));
 				}
@@ -801,8 +792,8 @@ public class DailyModifyRCommandFacade {
 						: domainMonthNew.get(0).getAttendanceTime();
 				TimeOffRemainErrorInputParam param = new TimeOffRemainErrorInputParam(companyId, emp,
 						new DatePeriod(date.get(), date.get().addYears(1).addDays(-1)),
-						new DatePeriod(dateRange.getStartDate(), dateRange.getEndDate()), false, lstAttendanceTimeData,
-						lstWorkInfor, optMonthlyData);
+						new DatePeriod(dateRange.getStartDate(), dateRange.getEndDate()), false,
+						dailyOfEmp, optMonthlyData);
 				lstEmpMonthError.addAll(timeOffRemainErrorInfor.getErrorInfor(param));
 				// monthPer.addAll(timeOffRemainErrorInfor.getErrorInfor(param));
 			}

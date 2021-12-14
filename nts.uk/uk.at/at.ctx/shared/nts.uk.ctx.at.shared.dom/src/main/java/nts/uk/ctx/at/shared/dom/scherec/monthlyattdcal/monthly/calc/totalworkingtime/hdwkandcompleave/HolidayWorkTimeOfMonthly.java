@@ -362,9 +362,11 @@ public class HolidayWorkTimeOfMonthly implements Cloneable, Serializable {
 			case HOLIDAY_WORK:
 				timeSeriesWork.addHolidayWorkTimeInLegalHolidayWorkTime(legalWorkTimeWithDiv);
 				timeSeriesWork.addHolidayWorkTimeInHolidayWorkTime(workTimeWithDiv);
+				break;
 			case TRANSFER:
 				timeSeriesWork.addTransferTimeInLegalHolidayWorkTime(legalWorkTimeWithDiv);
 				timeSeriesWork.addTransferTimeInHolidayWorkTime(workTimeWithDiv);
+				break;
 		}
 		return timeAfterCalc;
 	}
@@ -375,8 +377,10 @@ public class HolidayWorkTimeOfMonthly implements Cloneable, Serializable {
 		switch (holidayWorkAndTransferAtr){
 		case HOLIDAY_WORK:
 			timeSeriesWork.addHolidayWorkTimeInHolidayWorkTime(holidayWorkFrameTime.getHolidayWorkTime().get());
+			break;
 		case TRANSFER:
 			timeSeriesWork.addTransferTimeInHolidayWorkTime(holidayWorkFrameTime.getTransferTime().get());
+			break;
 		}
 	}
 	

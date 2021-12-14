@@ -32,9 +32,6 @@ public class InsertMobileCommandHandler extends CommandHandlerWithResult<InsertC
 			appOverTime = param.appOverTimeUpdate.toDomain();
 		}
 		
-		if (appOverTime.getDetailOverTimeOp().isPresent()) {
-			appOverTime.getDetailOverTimeOp().get().setAppId(application.getAppID());
-		}
 		appOverTime.setApplication(application);
 		return overTimeRegisterService.insertMobile(
 				param.companyId,

@@ -11,8 +11,8 @@ import javax.inject.Inject;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.YearMonthPeriod;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.MonthlyDayoffRemainData;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.remainmerge.RemainMerge;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.MonthlyDayoffRemainData;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.MonthlyDayoffRemainDataRepository;
 @Stateless
 public class MonthlyDayoffRemainExportImpl implements MonthlyDayoffRemainExport{
@@ -41,14 +41,14 @@ public class MonthlyDayoffRemainExportImpl implements MonthlyDayoffRemainExport{
 				//残数は締め期間．終了日が遅い方だけ返し、
 				if(data.getEndDate().afterOrEquals(endDateRemainingMax)) {
 					endDateRemainingMax = data.getEndDate();
-					dataOutput.setRemainingDays(data.getRemainingDayTimes().getDays().v());
-					dataOutput.setRemainingTimes(data.getRemainingDayTimes().getTimes().isPresent() ? data.getRemainingDayTimes().getTimes().get().v() : null);
+					dataOutput.setRemainingDays(data.getRemainingDayTimes().getDay().v());
+					dataOutput.setRemainingTimes(data.getRemainingDayTimes().getTime().isPresent() ? data.getRemainingDayTimes().getTime().get().v() : null);
 				}
 				//繰越数は、締め期間．終了日が早い方だけ返します。
 				if(data.getEndDate().before(endDatecarryMax)) {
 					endDatecarryMax = data.getEndDate();
-					dataOutput.setCarryForWardDays(data.getCarryForWardDayTimes().getDays().v());
-					dataOutput.setCarryForWordTimes(data.getCarryForWardDayTimes().getTimes().isPresent() ? data.getCarryForWardDayTimes().getTimes().get().v() : null);
+					dataOutput.setCarryForWardDays(data.getCarryForWardDayTimes().getDay().v());
+					dataOutput.setCarryForWordTimes(data.getCarryForWardDayTimes().getTime().isPresent() ? data.getCarryForWardDayTimes().getTime().get().v() : null);
 				}
 				dataOutput.setOccurrenceDays(dataOutput.getOccurrenceDays() + data.getOccurrenceDayTimes().getDay().v());
 				if(data.getOccurrenceDayTimes().getTime().isPresent()) {
@@ -94,14 +94,14 @@ public class MonthlyDayoffRemainExportImpl implements MonthlyDayoffRemainExport{
 				//残数は締め期間．終了日が遅い方だけ返し、
 				if(data.getEndDate().afterOrEquals(endDateRemainingMax)) {
 					endDateRemainingMax = data.getEndDate();
-					dataOutput.setRemainingDays(data.getRemainingDayTimes().getDays().v());
-					dataOutput.setRemainingTimes(data.getRemainingDayTimes().getTimes().isPresent() ? data.getRemainingDayTimes().getTimes().get().v() : null);
+					dataOutput.setRemainingDays(data.getRemainingDayTimes().getDay().v());
+					dataOutput.setRemainingTimes(data.getRemainingDayTimes().getTime().isPresent() ? data.getRemainingDayTimes().getTime().get().v() : null);
 				}
 				//繰越数は、締め期間．終了日が早い方だけ返します。
 				if(data.getEndDate().before(endDatecarryMax)) {
 					endDatecarryMax = data.getEndDate();
-					dataOutput.setCarryForWardDays(data.getCarryForWardDayTimes().getDays().v());
-					dataOutput.setCarryForWordTimes(data.getCarryForWardDayTimes().getTimes().isPresent() ? data.getCarryForWardDayTimes().getTimes().get().v() : null);
+					dataOutput.setCarryForWardDays(data.getCarryForWardDayTimes().getDay().v());
+					dataOutput.setCarryForWordTimes(data.getCarryForWardDayTimes().getTime().isPresent() ? data.getCarryForWardDayTimes().getTime().get().v() : null);
 				}
 				dataOutput.setOccurrenceDays(dataOutput.getOccurrenceDays() + data.getOccurrenceDayTimes().getDay().v());
 				if(data.getOccurrenceDayTimes().getTime().isPresent()) {

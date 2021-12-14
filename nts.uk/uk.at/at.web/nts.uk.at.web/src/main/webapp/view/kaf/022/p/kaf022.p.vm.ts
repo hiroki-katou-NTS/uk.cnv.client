@@ -103,7 +103,7 @@ module nts.uk.at.view.kaf022.p.viewmodel {
             block.invisible();
             service.getOptionalItems().done((data: Array<any>) => {
                 const items = data || [];
-                self.optionalItemsBak = items.filter(i => i.usageAtr == 1).map(i => ({no: i.itemNo, name: i.itemName}));
+                self.optionalItemsBak = items.filter(i => i.usageAtr == 1 && i.calcAtr == 0 && i.performanceAtr == 1).map(i => ({no: i.itemNo, name: i.itemName}));
                 self.optionalItems(_.cloneDeep(self.optionalItemsBak));
                 self.getData().done(() => {
                     dfd.resolve();

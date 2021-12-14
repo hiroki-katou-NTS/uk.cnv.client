@@ -12,6 +12,7 @@ import javax.transaction.Transactional;
 import org.apache.logging.log4j.util.Strings;
 
 import nts.arc.time.GeneralDate;
+import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.ApplicationApprovalService;
 import nts.uk.ctx.at.request.dom.application.common.adapter.workflow.dto.ApprovalPhaseStateImport_New;
@@ -76,19 +77,19 @@ public class WorkChangeRegisterServiceImpl implements IWorkChangeRegisterService
 		GeneralDate endDateParam = application.getOpAppEndDate().isPresent()
 				? application.getOpAppEndDate().get().getApplicationDate()
 				: application.getAppDate().getApplicationDate();
-		List<GeneralDate> listDate = new ArrayList<>();
+		List<GeneralDate> listDate = new DatePeriod(startDateParam, endDateParam).datesBetween();
 
-		for (GeneralDate loopDate = startDateParam; loopDate
-				.beforeOrEquals(endDateParam); loopDate = loopDate.addDays(1)) {
-			if (lstDateHd != null ) {
-				if (!lstDateHd.contains(loopDate)) {
-					listDate.add(loopDate);
-				}
-			} else {
-				listDate.add(loopDate);
-			}
-			
-		}
+//		for (GeneralDate loopDate = startDateParam; loopDate
+//				.beforeOrEquals(endDateParam); loopDate = loopDate.addDays(1)) {
+//			if (lstDateHd != null ) {
+//				if (!lstDateHd.contains(loopDate)) {
+//					listDate.add(loopDate);
+//				}
+//			} else {
+//				listDate.add(loopDate);
+//			}
+//			
+//		}
 
 		// 暫定データの登録
 		interimRemainDataMngRegisterDateChange.registerDateChange(companyId, application.getEmployeeID(), listDate);

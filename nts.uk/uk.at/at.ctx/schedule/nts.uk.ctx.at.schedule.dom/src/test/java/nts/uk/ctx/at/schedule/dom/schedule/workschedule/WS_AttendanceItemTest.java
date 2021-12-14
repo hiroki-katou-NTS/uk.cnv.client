@@ -53,9 +53,6 @@ public class WS_AttendanceItemTest {
 		// 10
 		assertThat(WS_AttendanceItem.isBreakTime(WS_AttendanceItem.StartBreakTime10.ID)).isTrue();
 		assertThat(WS_AttendanceItem.isBreakTime(WS_AttendanceItem.EndBreakTime10.ID)).isTrue();
-		
-		// breakTime
-		assertThat(WS_AttendanceItem.isBreakTime(WS_AttendanceItem.BreakTime.ID)).isTrue();
 	}
 
 	@Test

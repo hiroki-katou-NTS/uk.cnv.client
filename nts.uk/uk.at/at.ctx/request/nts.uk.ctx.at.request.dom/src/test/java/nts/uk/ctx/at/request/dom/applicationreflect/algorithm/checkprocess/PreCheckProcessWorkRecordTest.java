@@ -2,7 +2,9 @@ package nts.uk.ctx.at.request.dom.applicationreflect.algorithm.checkprocess;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -15,12 +17,13 @@ import mockit.Mocked;
 import mockit.integration.junit4.JMockit;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.request.dom.adapter.workrecod.actuallock.dto.AchievementAtrImport;
+import nts.uk.ctx.at.request.dom.adapter.workrecod.actuallock.dto.IgnoreFlagDuringLockImport;
 import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.ApplicationType;
 import nts.uk.ctx.at.request.dom.application.PrePostAtr;
 import nts.uk.ctx.at.request.dom.application.ReasonNotReflectDaily;
-import nts.uk.ctx.at.request.dom.application.common.adapter.record.actuallock.DetermineActualResultLockAdapter.LockStatus;
-import nts.uk.ctx.at.request.dom.application.common.adapter.record.actuallock.DetermineActualResultLockAdapter.PerformanceType;
+import nts.uk.ctx.at.request.dom.application.common.adapter.workplace.EmploymentHistoryImported;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.checkprocess.CheckAchievementConfirmation.ConfirmClsStatus;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.checkprocess.PreCheckProcessWorkSchedule.PreCheckProcessResult;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.common.ReflectApplicationHelper;
@@ -63,6 +66,7 @@ public class PreCheckProcessWorkRecordTest {
 	 * → 実績がロックされている
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testLockActual() {
 
@@ -72,12 +76,13 @@ public class PreCheckProcessWorkRecordTest {
 
 		new Expectations() {
 			{
-				require.lockStatus(anyString, (GeneralDate) any, closureId, PerformanceType.DAILY);
-				result = LockStatus.LOCK;
+				require.getPeriodProcess(anyString, (DatePeriod) any, (List<EmploymentHistoryImported>) any,
+						(IgnoreFlagDuringLockImport) any, (AchievementAtrImport) any);
+				result = new ArrayList<>();
 			}
 		};
 		PreCheckProcessResult check = PreCheckProcessWorkRecord.preCheck(require, companyId, application, closureId,
-				false, reflectStatus, dateRefer);
+				false, reflectStatus, dateRefer, new ArrayList<>());
 
 		assertThat(check.getProcessFlag()).isEqualTo(NotUseAtr.NOT_USE);
 
@@ -97,6 +102,7 @@ public class PreCheckProcessWorkRecordTest {
 	 * → 申請が事前の残業申請
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testBeforeZangyo() {
 
@@ -105,8 +111,15 @@ public class PreCheckProcessWorkRecordTest {
 
 		ReflectStatusResult reflectStatus = ReflectApplicationHelper.createReflectStatusResult();
 
+		new Expectations() {
+			{
+				require.getPeriodProcess(anyString, (DatePeriod) any, (List<EmploymentHistoryImported>) any,
+						(IgnoreFlagDuringLockImport) any, (AchievementAtrImport) any);
+				result = Arrays.asList(new DatePeriod(GeneralDate.min(), GeneralDate.max()));
+			}
+		};
 		PreCheckProcessResult check = PreCheckProcessWorkRecord.preCheck(require, companyId, application, closureId,
-				true, reflectStatus, dateRefer);
+				true, reflectStatus, dateRefer, new ArrayList<>());
 
 		assertThat(check.getProcessFlag()).isEqualTo(NotUseAtr.USE);
 	}
@@ -123,6 +136,7 @@ public class PreCheckProcessWorkRecordTest {
 	 * → 対象期間内で本人確認をした
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testDayConfirm() {
 
@@ -133,13 +147,17 @@ public class PreCheckProcessWorkRecordTest {
 
 		new Expectations() {
 			{
+				require.getPeriodProcess(anyString, (DatePeriod) any, (List<EmploymentHistoryImported>) any,
+						(IgnoreFlagDuringLockImport) any, (AchievementAtrImport) any);
+				result = Arrays.asList(new DatePeriod(GeneralDate.min(), GeneralDate.max()));
+				
 				require.getProcessingYMD(anyString, anyString, (DatePeriod) any);
 				result = Arrays.asList(dateRefer);// 予定確定区分
 			}
 		};
 
 		PreCheckProcessResult check = PreCheckProcessWorkRecord.preCheck(require, companyId, application, closureId,
-				true, reflectStatus, dateRefer);
+				true, reflectStatus, dateRefer, new ArrayList<>());
 
 		assertThat(check.getProcessFlag()).isEqualTo(NotUseAtr.NOT_USE);
 
@@ -160,6 +178,7 @@ public class PreCheckProcessWorkRecordTest {
 	 * → 実績の締め確定した
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testAchievementConfirmation(@Mocked CheckAchievementConfirmation mockedConfirm) {
 
@@ -170,6 +189,10 @@ public class PreCheckProcessWorkRecordTest {
 
 		new Expectations() {
 			{
+				require.getPeriodProcess(anyString, (DatePeriod) any, (List<EmploymentHistoryImported>) any,
+						(IgnoreFlagDuringLockImport) any, (AchievementAtrImport) any);
+				result = Arrays.asList(new DatePeriod(GeneralDate.min(), GeneralDate.max()));
+				
 				//実績の締め確定した
 				CheckAchievementConfirmation.check(require, companyId, anyString, (GeneralDate) any, anyInt);
 				result = ConfirmClsStatus.Confirm;
@@ -177,7 +200,7 @@ public class PreCheckProcessWorkRecordTest {
 		};
 
 		PreCheckProcessResult check = PreCheckProcessWorkRecord.preCheck(require, companyId, application, closureId,
-				true, reflectStatus, dateRefer);
+				true, reflectStatus, dateRefer, new ArrayList<>());
 
 		assertThat(check.getProcessFlag()).isEqualTo(NotUseAtr.NOT_USE);
 
@@ -197,6 +220,7 @@ public class PreCheckProcessWorkRecordTest {
 	 * → すべて、ロックされていません
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testAll(@Mocked CheckAchievementConfirmation mockedConfirm) {
 
@@ -207,6 +231,9 @@ public class PreCheckProcessWorkRecordTest {
 
 		new Expectations() {
 			{
+				require.getPeriodProcess(anyString, (DatePeriod) any, (List<EmploymentHistoryImported>) any,
+						(IgnoreFlagDuringLockImport) any, (AchievementAtrImport) any);
+				result = Arrays.asList(new DatePeriod(GeneralDate.min(), GeneralDate.max()));
 				//実績の締め確定した
 				CheckAchievementConfirmation.check(require, companyId, anyString, (GeneralDate) any, anyInt);
 				result = ConfirmClsStatus.Pending;
@@ -214,7 +241,7 @@ public class PreCheckProcessWorkRecordTest {
 		};
 
 		PreCheckProcessResult check = PreCheckProcessWorkRecord.preCheck(require, companyId, application, closureId,
-				true, reflectStatus, dateRefer);
+				true, reflectStatus, dateRefer, new ArrayList<>());
 
 		assertThat(check.getProcessFlag()).isEqualTo(NotUseAtr.USE);
 	}

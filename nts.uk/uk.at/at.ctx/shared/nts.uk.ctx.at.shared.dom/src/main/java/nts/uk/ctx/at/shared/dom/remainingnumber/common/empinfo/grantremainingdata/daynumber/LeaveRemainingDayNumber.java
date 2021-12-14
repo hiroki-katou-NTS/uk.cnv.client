@@ -36,4 +36,5 @@ public class LeaveRemainingDayNumber extends HalfIntegerPrimitiveValue<LeaveRema
 		// 日付加算
 		return new LeaveRemainingDayNumber( v() + aLeaveRemainingDayNumber.v() );
 	}
+	
 }

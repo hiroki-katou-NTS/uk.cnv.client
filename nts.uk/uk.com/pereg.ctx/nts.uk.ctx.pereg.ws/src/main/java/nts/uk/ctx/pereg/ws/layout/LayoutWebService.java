@@ -21,6 +21,8 @@ import nts.uk.ctx.pereg.app.find.layout.RegisterLayoutFinder;
 import nts.uk.ctx.pereg.app.find.layout.dto.EmpMaintLayoutDto;
 import nts.uk.ctx.pereg.app.find.layoutdef.NewLayoutDto;
 import nts.uk.ctx.pereg.app.find.person.category.PerInfoCtgFullDto;
+import nts.uk.ctx.pereg.app.find.processor.GetNameWorkTime;
+import nts.uk.ctx.pereg.app.find.processor.GetNameWorkTimeOutput;
 import nts.uk.ctx.pereg.app.find.processor.PeregProcessor;
 import nts.uk.shr.pereg.app.find.PeregQuery;
 
@@ -49,6 +51,9 @@ public class LayoutWebService extends WebService {
 	
 	@Inject 
 	private GetSPHolidayNextGrantDate getSPHolidayNextGrantDate;
+	
+	@Inject
+	private GetNameWorkTime getNameWorkTime;
 	
 	@Path("getByCreateType")
 	@POST
@@ -138,5 +143,11 @@ public class LayoutWebService extends WebService {
 	@Path("getSPHolidayGrantDateBySids")
 	public Map<String, GeneralDate> getSPHolidayGrantDateBySids(List<SpecialleaveInformation> params){
 		return getSPHolidayNextGrantDate.getAllSPHolidayGrantDateBySids(params);
+	}
+	
+	@Path("find/nameWorkTime/{workTimeCode}")
+	@POST
+	public GetNameWorkTimeOutput getWorkTimeName(@PathParam("workTimeCode")String workTimeCode){
+		return this.getNameWorkTime.getNameWorkTime(workTimeCode);
 	}
 }

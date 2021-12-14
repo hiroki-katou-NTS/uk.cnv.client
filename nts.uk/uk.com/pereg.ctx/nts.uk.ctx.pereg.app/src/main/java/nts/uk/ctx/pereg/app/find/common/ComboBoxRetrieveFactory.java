@@ -6,6 +6,7 @@ package nts.uk.ctx.pereg.app.find.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,9 @@ import nts.uk.ctx.at.shared.dom.workingcondition.NotUseAtr;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkScheduleBasicCreMethod;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkScheduleMasterReferenceAtr;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingSystem;
+import nts.uk.ctx.at.shared.dom.worktime.common.AbolishAtr;
 import nts.uk.ctx.at.shared.dom.worktime.workplace.WorkTimeWorkplaceRepository;
+import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSetting;
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSettingRepository;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeRepository;
@@ -316,15 +319,20 @@ public class ComboBoxRetrieveFactory {
 						workplaceId = null;
 					}
 				}
-
+				
+				// Get all workTime installed at Kmk017
 				List<String> workTimeCodeList = workTimePlaceRepo.getWorkTimeWorkplaceById(companyId, workplaceId)
 						.stream().map(x -> x.getWorktimeCode().v()).collect(Collectors.toList());
+
+				// Lấy tên tương ứng của WorkTime được cài đặt ở màn Kmk017
+				// tương ứng với list workTimeCodeList được lấy từ step trước
+				// đó.
 				return workTimeSettingRepo.getListWorkTimeSetByListCode(companyId, workTimeCodeList).stream()
 						.map(workTimeSetting -> new ComboBoxObject(workTimeSetting.getWorktimeCode().v(),
 								workTimeSetting.getWorktimeCode() + JP_SPACE
 										+ workTimeSetting.getWorkTimeDisplayName().getWorkTimeName().v()))
 						.collect(Collectors.toList());
-
+					
 			}
 
 		case "M00010":

@@ -1,5 +1,7 @@
 package nts.uk.ctx.at.request.ws.application.businesstrip;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -20,6 +22,7 @@ import nts.uk.ctx.at.request.app.find.application.businesstrip.businesstripdto.B
 import nts.uk.ctx.at.request.app.find.application.businesstrip.businesstripdto.DetailScreenDto;
 import nts.uk.ctx.at.request.app.find.application.businesstrip.businesstripdto.DetailStartScreenInfoDto;
 import nts.uk.ctx.at.request.app.find.application.businesstrip.businesstripdto.ParamStartKDL003;
+import nts.uk.ctx.at.request.dom.application.common.service.newscreen.output.ConfirmMsgOutput;
 import nts.uk.ctx.at.request.dom.application.common.service.other.output.ProcessResult;
 
 
@@ -71,8 +74,8 @@ public class BusinessTripWebServiceSmartphone extends WebService {
 	// A:出張の申請（スマホ）.A2.申請内容を登録する
 	@POST
 	@Path("checkBeforeRegister")
-	public void checkBeforeRegister(DetailScreenDto param){
-		this.businessTripFinder.checkBeforeRegisterMobile(param);
+	public List<ConfirmMsgOutput> checkBeforeRegister(DetailScreenDto param){
+		return this.businessTripFinder.checkBeforeRegisterMobile(param);
 	}
 	
 	//Register A2

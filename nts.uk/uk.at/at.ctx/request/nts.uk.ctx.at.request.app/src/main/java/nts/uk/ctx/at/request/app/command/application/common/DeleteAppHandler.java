@@ -2,6 +2,7 @@ package nts.uk.ctx.at.request.app.command.application.common;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -52,7 +53,8 @@ public class DeleteAppHandler extends CommandHandlerWithResult<AppDetailBehavior
 		List<String> destinationLst = afterProcessDelete.screenAfterDelete(
 				appID, 
 				application, 
-				appDispInfoStartupOutput);
+				appDispInfoStartupOutput, 
+				cmd.getHdsubRecLinkData() != null ? Optional.of(cmd.getHdsubRecLinkData().toDomain()) : Optional.empty());
 		processResult.setProcessDone(true);
 		// IF文を参照
 		AppTypeSetting appTypeSetting = appDispInfoStartupOutput.getAppDispInfoNoDateOutput().getApplicationSetting().getAppTypeSettings()

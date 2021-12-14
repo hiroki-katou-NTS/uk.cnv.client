@@ -32,7 +32,7 @@ import { vmOf } from 'vue/types/umd';
 export class KafS08AComponent extends Vue {
     public step: string = 'KAFS08_10';
 
-    @Prop({default : () => {}}) public readonly params!: any;
+    @Prop({default : () => {}}) public readonly params: any;
 
     //public paramsFromA1: any | null = null;
     public actualContent: [] = [];

@@ -16,7 +16,7 @@ html {
 .control-group.valign-center > * { vertical-align: middle; }
 .control-group.valign-top > * { vertical-align: top; }
 .control-group.valign-bottom > * { vertical-align: bottom; }
-.control-group .form-label {width: 100px;}
+.control-group .form-label {width: 144px;}
 .b73-desc{
     width: 300px;
     display: inline-block;
@@ -36,7 +36,7 @@ html {
 }
 
 #colorpicker{
-	margin-left: -5px !important;
+	margin-left: 40px;
 }
 
 /* B9_2_2 */
@@ -68,4 +68,16 @@ html {
 .caret-right, .caret-inline{
 	margin-left: 2px !important;
 	color: #666 !important;
+}
+
+.form-label > svg {
+	margin-left: 5px !important;
+}
+
+.import-cd > .form-label {
+	width: 90px;
+}
+
+.color-pick > .form-label {
+	width: 100px;
 }

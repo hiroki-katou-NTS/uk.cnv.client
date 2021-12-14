@@ -35,8 +35,8 @@ import nts.uk.ctx.at.request.dom.application.common.service.setting.CommonAlgori
 import nts.uk.ctx.at.request.dom.application.common.service.setting.output.AppDispInfoStartupOutput;
 import nts.uk.ctx.at.request.dom.setting.company.appreasonstandard.AppStandardReasonCode;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.InterimRemainDataMngRegisterDateChange;
+import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
 import nts.uk.shr.com.context.AppContexts;
-import nts.uk.shr.com.time.TimeWithDayAttr;
 
 @Stateless
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -95,7 +95,9 @@ public class UpdateBusinessTripCommandHandler extends CommandHandlerWithResult<U
                     infoOutput.getAppDispInfoStartup(), 
                     businessTrip.getInfos().stream().map(x -> x.getWorkInformation().getWorkTypeCode().v()).collect(Collectors.toList()), 
                     Optional.empty(), 
-                    false
+                    false, 
+                    Optional.of(i.getWorkInformation().getWorkTypeCode().v()), 
+                    i.getWorkInformation().getWorkTimeCodeNotNull().map(WorkTimeCode::v)
             );
         });
 
@@ -134,9 +136,9 @@ public class UpdateBusinessTripCommandHandler extends CommandHandlerWithResult<U
             Integer workTimeStart = null;
             Integer workTimeEnd = null;
 
-            if (i.getWorkingHours().isPresent() && !i.getWorkingHours().get().isEmpty()) {
-                workTimeStart = i.getWorkingHours().get().get(0).getTimeZone().getStartTime().v();
-                workTimeEnd = i.getWorkingHours().get().get(0).getTimeZone().getEndTime().v();
+            if (!i.getWorkingHours().isEmpty()) {
+                workTimeStart = i.getWorkingHours().get(0).getStartDate().isPresent() ? i.getWorkingHours().get(0).getStartDate().get().v() : null;
+                workTimeEnd = i.getWorkingHours().get(0).getEndDate().isPresent() ? i.getWorkingHours().get(0).getEndDate().get().v() : null;
             }
 
             // アルゴリズム「出張申請就業時間帯チェック」を実行する
@@ -159,6 +161,9 @@ public class UpdateBusinessTripCommandHandler extends CommandHandlerWithResult<U
                                     .getAppDispInfoWithDateOutput()
                                     .getOpActualContentDisplayLst().get() : Collections.emptyList()
             );
+            
+            // 勤務種類により出退勤時刻をチェックする
+            businessTripService.checkTimeByWorkType(i.getDate(), wkTypeCd, workTimeStart, workTimeEnd);
         });
 
     }

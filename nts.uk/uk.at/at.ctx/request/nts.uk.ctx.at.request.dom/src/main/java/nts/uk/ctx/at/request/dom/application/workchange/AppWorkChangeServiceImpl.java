@@ -411,18 +411,16 @@ public class AppWorkChangeServiceImpl implements AppWorkChangeService {
 		// 申請期間から休日の申請日を取得する
 		result = otherCommonAlgorithm.lstDateIsHoliday(employeeID, period, Collections.emptyList());
 
-		if (result.size() == period.datesBetween().size()) {
-			// 日付一覧(output)の件数 > 0
-			String dateListString = "";
-
-			for (int i = 0; i < result.size(); i++) {
-				if (dateListString != "") {
-					dateListString += "、";
-				}
-				dateListString += result.get(i).toString("yyyy/MM/dd");
-			}
-			throw new BusinessException("Msg_1459",dateListString);
-		}
+		// http://192.168.50.4:3000/issues/120857
+        /*
+         * if (result.size() == period.datesBetween().size()) { // 日付一覧(output)の件数 > 0
+         * String dateListString = "";
+         * 
+         * for (int i = 0; i < result.size(); i++) { if (dateListString != "") {
+         * dateListString += "、"; } dateListString +=
+         * result.get(i).toString("yyyy/MM/dd"); } throw new
+         * BusinessException("Msg_1459",dateListString); }
+         */
         return result;
 	}
 
@@ -521,7 +519,9 @@ public class AppWorkChangeServiceImpl implements AppWorkChangeService {
 				appDispInfoStartupOutput, 
 				appWorkChange.getOpWorkTypeCD().isPresent() ? Arrays.asList(appWorkChange.getOpWorkTypeCD().get().v()) : new ArrayList<String>(), 
 				Optional.empty(), 
-				false);
+				false, 
+				appWorkChange.getOpWorkTypeCD().map(WorkTypeCode::v), 
+				appWorkChange.getOpWorkTimeCD().map(WorkTimeCode::v));
 		// 登録時チェック処理（勤務変更申請）
 		this.checkRegisterWorkChange(application, appWorkChange);
 		return result;

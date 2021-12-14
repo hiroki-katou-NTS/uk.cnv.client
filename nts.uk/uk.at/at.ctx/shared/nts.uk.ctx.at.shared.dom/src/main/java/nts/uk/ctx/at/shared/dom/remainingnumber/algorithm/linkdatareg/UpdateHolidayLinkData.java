@@ -28,58 +28,19 @@ public class UpdateHolidayLinkData {
 	public static AtomTask updateProcess(Require require, String sid, List<GeneralDate> lstDate,
 			List<InterimAbsMng> lstAbsMng, List<InterimRecMng> lstRecMng) {
 
-		// $紐付いている発生一覧
-		val lstInterimRecMng = getOccurTempDataFromAssoci(require, sid, lstDate).stream()
-						.filter(x -> lstRecMng.stream().noneMatch(y -> y.getYmd().equals(x.getYmd())))
-						.collect(Collectors.toList());
-
-		// $紐付いている消化一覧
-		val lstInterimAbsMng = getDigestTempDataFromAssoci(require, sid, lstDate).stream()
-						.filter(x -> lstAbsMng.stream().noneMatch(y -> y.getYmd().equals(x.getYmd())))
-						.collect(Collectors.toList());
-
-		lstRecMng.addAll(lstInterimRecMng);
-		lstAbsMng.addAll(lstInterimAbsMng);
-		
-		
-		// ＄逐次消化一覧
-		val lstDigest = lstAbsMng.stream().map(x -> x.convertSeqVacationState()).collect(Collectors.toList());
-
-		// ＄逐次発生一覧
-		val lstOccr = lstRecMng.stream().map(x -> x.convertUnoffset()).collect(Collectors.toList());
-
-		// $消化の変更要求
-		val changeDigest = RequestChangeDigestOccr.createChangeRequestbyDate(lstDate, new VacationDetails(lstDigest));
-
-		// $発生の変更要求/
-		val changeOccr = RequestChangeDigestOccr.createChangeRequestbyDate(lstDate, new VacationDetails(lstOccr));
-
+		//	$期間 
 		DatePeriod period = new DatePeriod(GeneralDate.min(), GeneralDate.max());
 		// $変更後の振休振出情報=
-		AfterChangeHolidayInfoResult afterResult = GetModifiOutbreakDigest.get(require, sid, period, changeDigest,
-				changeOccr);
+		AfterChangeHolidayInfoResult afterResult = updateAfterChange(require, sid, period, lstDate, lstRecMng, lstAbsMng);
+		//＄暫定振出
+		List<InterimRecMng> furisyutsu = updateNumberUnoffOccur(afterResult, lstRecMng);
 
+		//暫定振休
+		List<InterimAbsMng> furikyu = updateNumberUnoffDigest(afterResult, lstAbsMng);
+		
 		// ＄紐付け情報
 		val linkCouple = afterResult.getSeqVacInfoList().getSeqVacInfoList().stream()
 				.map(x -> PayoutSubofHDManagement.of(sid, x)).collect(Collectors.toList());
-		
-		//	$変更後の発生一覧 
-		List<AccumulationAbsenceDetail>  furisyutsuChange = afterResult.getVacationDetail().getLstAcctAbsenDetail().stream()
-				.filter(x -> x.getOccurrentClass() == OccurrenceDigClass.OCCURRENCE).collect(Collectors.toList());
-		//$変更後の消化一覧
-		List<AccumulationAbsenceDetail> furikyuChange = afterResult.getVacationDetail().getLstAcctAbsenDetail().stream()
-				.filter(x -> x.getOccurrentClass() == OccurrenceDigClass.DIGESTION).collect(Collectors.toList());
-
-		List<InterimRecMng> furisyutsu = lstRecMng.stream().map(x -> {
-			val dataTemp = furisyutsuChange.stream().filter(y -> y.getManageId().equals(x.getRemainManaID()))
-					.findFirst();
-			return dataTemp.map(z -> x.updateUnoffsetNum(z)).orElse(null);
-		}).collect(Collectors.toList());
-
-		List<InterimAbsMng> furikyu = lstAbsMng.stream().map(x -> {
-			val dataTemp = furikyuChange.stream().filter(y -> y.getManageId().equals(x.getRemainManaID())).findFirst();
-			return dataTemp.map(z -> x.updateUnoffsetNum(z)).orElse(null);
-		}).collect(Collectors.toList());
 		
 		//$暫定振出管理を削除する年月日一覧
 		List<GeneralDate> lstFurisyutsu = furisyutsu.stream().map(x -> x.getYmd()).filter(x -> !lstDate.contains(x)).collect(Collectors.toList());
@@ -130,6 +91,79 @@ public class UpdateHolidayLinkData {
 				linkData.stream().map(x -> x.getAssocialInfo().getDateOfUse()).collect(Collectors.toList()));
 	}
 
+	// [3] 発生変更要求を作成する
+	private static RequestChangeDigestOccr createOccrChangeRequest(Require require, String sid,
+			List<GeneralDate> lstDate, List<InterimRecMng> lstRecMng) {
+		// $紐付いている発生一覧
+		val lstInterimRecMng = getOccurTempDataFromAssoci(require, sid, lstDate).stream()
+				.filter(x -> lstRecMng.stream().noneMatch(y -> y.getYmd().equals(x.getYmd())))
+				.collect(Collectors.toList());
+		lstRecMng.addAll(lstInterimRecMng);
+		// ＄逐次発生一覧
+		val lstOccr = lstRecMng.stream().map(x -> x.convertUnoffset()).collect(Collectors.toList());
+		// $発生の変更要求
+		return RequestChangeDigestOccr.createChangeRequestbyDate(lstDate, new VacationDetails(lstOccr));
+	}
+		
+	// [4] 消化変更要求を作成する]
+	private static RequestChangeDigestOccr createDigestChangeRequest(Require require, String sid,
+			List<GeneralDate> lstDate, List<InterimAbsMng> lstAbsMng) {
+		// $紐付いている消化一覧
+		val lstInterimAbsMng = getDigestTempDataFromAssoci(require, sid, lstDate).stream()
+				.filter(x -> lstAbsMng.stream().noneMatch(y -> y.getYmd().equals(x.getYmd())))
+				.collect(Collectors.toList());
+		lstAbsMng.addAll(lstInterimAbsMng);
+		// ＄逐次消化一覧
+		val lstDigest = lstAbsMng.stream().map(x -> x.convertSeqVacationState()).collect(Collectors.toList());
+		// $消化の変更要求
+		return RequestChangeDigestOccr.createChangeRequestbyDate(lstDate, new VacationDetails(lstDigest));
+
+	}
+		
+		//	[5] 変更する
+		private static AfterChangeHolidayInfoResult updateAfterChange(Require require, String sid,
+				DatePeriod period,
+				List<GeneralDate> lstDate, List<InterimRecMng> lstRecMng, List<InterimAbsMng> lstAbsMng) {
+			
+			// $発生の変更要求
+			val changeOccr = createOccrChangeRequest(require, sid, lstDate, lstRecMng);
+
+			// $消化の変更要求
+			val changeDigest = createDigestChangeRequest(require, sid, lstDate, lstAbsMng);
+			
+			return  GetModifiOutbreakDigest.getAndOffset(require, sid, period,
+					changeDigest, changeOccr);
+			
+		}
+
+		// [6] 発生一覧の未相殺数を更新する
+	private static List<InterimRecMng> updateNumberUnoffOccur(AfterChangeHolidayInfoResult afterResult,
+			List<InterimRecMng> lstRecMng) {
+		// $変更後の発生一覧
+		List<AccumulationAbsenceDetail> furisyutsuChange = afterResult.getVacationDetail().getLstAcctAbsenDetail()
+				.stream().filter(x -> x.getOccurrentClass() == OccurrenceDigClass.OCCURRENCE)
+				.collect(Collectors.toList());
+		return lstRecMng.stream().map(x -> {
+			val dataTemp = furisyutsuChange.stream().filter(y -> y.getManageId().equals(x.getRemainManaID()))
+					.findFirst();
+			return dataTemp.map(z -> x.updateUnoffsetNum(z)).orElse(null);
+		}).collect(Collectors.toList());
+
+	}
+		
+	// [7] 消化一覧の未相殺数を更新する]
+	private static List<InterimAbsMng> updateNumberUnoffDigest(AfterChangeHolidayInfoResult afterResult,
+			List<InterimAbsMng> lstAbsMng) {
+		// $変更後の消化一覧
+		List<AccumulationAbsenceDetail> furikyuChange = afterResult.getVacationDetail().getLstAcctAbsenDetail().stream()
+				.filter(x -> x.getOccurrentClass() == OccurrenceDigClass.DIGESTION).collect(Collectors.toList());
+		return lstAbsMng.stream().map(x -> {
+			val dataTemp = furikyuChange.stream().filter(y -> y.getManageId().equals(x.getRemainManaID())).findFirst();
+			return dataTemp.map(z -> x.updateUnoffsetNum(z)).orElse(null);
+		}).collect(Collectors.toList());
+	}
+		
+		
 	public static interface Require extends GetModifiOutbreakDigest.Require {
 
 		// [R-1] 振出振休紐付け管理を削除する

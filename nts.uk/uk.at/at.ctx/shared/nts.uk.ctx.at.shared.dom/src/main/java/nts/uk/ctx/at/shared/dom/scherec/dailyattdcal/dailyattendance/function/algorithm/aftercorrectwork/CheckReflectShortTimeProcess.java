@@ -33,7 +33,7 @@ public class CheckReflectShortTimeProcess {
 			WorkInfoOfDailyAttendance workInfo, TimeLeavingOfDailyAttd timeLeavingOfDailyPerformance) {
 
 		// ドメイン「勤務種類」を取得する(lấy domain 「勤務種類」)
-		Optional<WorkType> workTypeOpt = workTypeRepo.findByDeprecated(companyId,
+		Optional<WorkType> workTypeOpt = workTypeRepo.findByPK(companyId,
 				workInfo.getRecordInfo().getWorkTypeCode().v());
 
 		// 取得できない

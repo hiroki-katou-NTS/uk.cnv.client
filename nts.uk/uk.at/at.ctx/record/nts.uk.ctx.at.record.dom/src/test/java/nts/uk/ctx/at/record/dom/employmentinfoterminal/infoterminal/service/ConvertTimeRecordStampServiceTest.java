@@ -38,6 +38,7 @@ import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampTypeDisplay;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.StampDataReflectResult;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
 import nts.uk.ctx.at.shared.dom.common.CompanyId;
 import nts.uk.ctx.at.shared.dom.workrule.goingout.GoingOutReason;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
@@ -107,8 +108,9 @@ public class ConvertTimeRecordStampServiceTest {
 				require.getEmpInfoTerminal((EmpInfoTerminalCode) any, (ContractCode) any);
 				result = empInfoTer;
 
-				require.getStampRecord((ContractCode) any, (StampNumber) any, (GeneralDateTime) any);
-				result = stampRecord;
+				require.existsStamp((ContractCode) any, (StampNumber) any,
+						(GeneralDateTime) any, (ChangeClockArt) any);
+				result = true;
 	
 			}
 		};
@@ -153,12 +155,12 @@ public class ConvertTimeRecordStampServiceTest {
 				require.getEmpInfoTerminal((EmpInfoTerminalCode) any, (ContractCode) any);
 				result = empInfoTer;
 
-				require.getStampRecord(contractCode, (StampNumber) any, (GeneralDateTime) any);
-				result = Optional.empty();
-
 				require.getByCardNoAndContractCode(contractCode, (StampNumber) any);
 				result = Optional.of(new StampCard(contractCode, new StampNumber("1"), "1", GeneralDate.today(), "2"));
-
+				
+				require.existsStamp((ContractCode) any, (StampNumber) any,
+						(GeneralDateTime) any, (ChangeClockArt) any);
+				result = false;
 			}
 		};
 

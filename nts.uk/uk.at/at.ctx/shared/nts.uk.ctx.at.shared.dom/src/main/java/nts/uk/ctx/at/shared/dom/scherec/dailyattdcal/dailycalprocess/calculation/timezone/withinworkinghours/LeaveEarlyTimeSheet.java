@@ -335,23 +335,29 @@ public class LeaveEarlyTimeSheet {
 	 * 早退計上時間の計算
 	 * @param leaveEarly 計算区分
 	 * @param deductOffset 相殺時間控除区分
+	 * @param roundAtr 丸めを行う
 	 * @return 早退計上時間
 	 */
-	public TimeWithCalculation calcForRecordTime(boolean leaveEarly, boolean deductOffset){
-		//早退時間の計算
+	public TimeWithCalculation calcForRecordTime(boolean leaveEarly, boolean deductOffset, NotUseAtr roundAtr){
+		
 		AttendanceTime calcforRecordTime = AttendanceTime.ZERO;
-		if(this.forRecordTimeSheet.isPresent()) {
-			calcforRecordTime = this.forRecordTimeSheet.get().calcTotalTime(
-					deductOffset ? NotUseAtr.USE : NotUseAtr.NOT_USE, NotUseAtr.USE);
+		//早退時間←0：00
+		AttendanceTime earlyTimeForRecord = AttendanceTime.ZERO;
+		if (!this.forRecordTimeSheet.isPresent()) {
+			return TimeWithCalculation.createTimeWithCalculation(earlyTimeForRecord, calcforRecordTime);
 		}
+		// 計算区分を取得
+		if (leaveEarly) {
+			//早退時間の計算
+			earlyTimeForRecord = this.forRecordTimeSheet.get()
+					.calcTotalTime(deductOffset ? NotUseAtr.USE : NotUseAtr.NOT_USE, roundAtr);
+		}
+
+		// 計算早退時間の計算
+		calcforRecordTime = this.forRecordTimeSheet.get().calcTotalTime(NotUseAtr.NOT_USE, roundAtr);
 		
-		//インターバル免除時間を控除する
+		return TimeWithCalculation.createTimeWithCalculation(earlyTimeForRecord, calcforRecordTime);
 		
-		//早退計上時間の作成
-		TimeWithCalculation leaveEarlyTime = leaveEarly ?
-				TimeWithCalculation.sameTime(calcforRecordTime) :
-					TimeWithCalculation.createTimeWithCalculation(new AttendanceTime(0), calcforRecordTime);	
-		return leaveEarlyTime;
 	}
 	
 	/**

@@ -16,6 +16,7 @@ module nts.uk.at.view.ktg004.a.viewmodel {
 		itemsSetting: KnockoutObservableArray<any> = ko.observableArray([]);
 		attendanceInfor = new AttendanceInfor();
 		remainingNumberInfor = new RemainingNumberInfor();
+		vacationSetting = new VacationSetting();
 		detailedWorkStatusSettings = ko.observable(false);
 		specialHolidaysRemainings: KnockoutObservableArray<SpecialHolidaysRemainings> = ko.observableArray([]);
 
@@ -38,6 +39,7 @@ module nts.uk.at.view.ktg004.a.viewmodel {
 				self.itemsSetting(data.itemsSetting);
 				self.attendanceInfor.update(data.attendanceInfor);
 				self.remainingNumberInfor.update(data.remainingNumberInfor);
+				self.vacationSetting = data.vacationSetting;
 				let tg: SpecialHolidaysRemainings[] = [];
 				_.forEach(data.remainingNumberInfor.specialHolidaysRemainings, function(c){
 					tg.push(new SpecialHolidaysRemainings(c));
@@ -225,6 +227,34 @@ module nts.uk.at.view.ktg004.a.viewmodel {
 			}
 		}
 				
+	}
+	class VacationSetting {
+		// 60H超休残数管理する
+		holiday60HManage: boolean;
+    
+		// 介護残数管理する
+		nursingManage: boolean;
+		
+		// 公休残数管理する
+		publicHolidayManage: boolean;
+		
+		// 子の看護残数管理する
+		childCaremanage: boolean;
+		
+		// 振休残数管理する
+		accomoManage: boolean;
+		
+		// 積立年休残数管理する
+		accumAnnualManage: boolean;
+		
+		// 代休残数管理する
+		substituteManage: boolean;
+		
+		// 代休時間残数管理する
+		substituteTimeManage: boolean;
+		
+		// 年休残数管理する
+		annualManage: boolean;
 	}
 	
 	const ZERO_TIME = "0:00";

@@ -274,22 +274,25 @@ export class KafS12ApplyTimeComponent extends Vue {
                     && self.appDispInfoStartupOutput
                     && self.appDispInfoStartupOutput.appDispInfoNoDateOutput.managementMultipleWorkCycles;
             case AppTimeType.OFFWORK2:
-                return self.calculatedData
+                return (self.calculatedData
                     && self.calculatedData.timeAfterWork2 > 0
                     && self.reflectSetting
                     && self.reflectSetting.destination.secondAfterWork == 1
                     && self.appDispInfoStartupOutput
-                    && self.appDispInfoStartupOutput.appDispInfoNoDateOutput.managementMultipleWorkCycles;
+                    && self.appDispInfoStartupOutput.appDispInfoNoDateOutput.managementMultipleWorkCycles) 
+                    || self.checkTimeParam(self.params);
             case AppTimeType.PRIVATE:
-                return self.calculatedData
+                return (self.calculatedData
                     && self.calculatedData.privateOutingTime > 0
                     && self.reflectSetting
-                    && self.reflectSetting.destination.privateGoingOut == 1;
+                    && self.reflectSetting.destination.privateGoingOut == 1) 
+                    || self.checkTimeParam(self.params);
             case AppTimeType.UNION:
-                return self.calculatedData
+                return (self.calculatedData
                     && self.calculatedData.unionOutingTime > 0
                     && self.reflectSetting
-                    && self.reflectSetting.destination.unionGoingOut == 1;
+                    && self.reflectSetting.destination.unionGoingOut == 1) 
+                    || self.checkTimeParam(self.params);
             default:
                 return false;
         }
@@ -361,5 +364,26 @@ export class KafS12ApplyTimeComponent extends Vue {
             && self.reflectSetting.condition.specialVacationTime == 1
             && self.timeLeaveManagement
             && self.timeLeaveManagement.timeSpecialLeaveMng.timeSpecialLeaveMngAtr;
+    }
+
+    public checkTimeParam(param: any) {
+        if (param.substituteAppTime) {
+            return true;
+        }
+        if (param.annualAppTime) {
+            return true;
+        }
+        if (param.childNursingAppTime) {
+            return true;
+        }
+        if (param.nursingAppTime) {
+            return true;
+        }
+        if (param.super60AppTime) {
+            return true;
+        }
+        if (param.specialAppTime) {
+            return true;
+        }
     }
 }

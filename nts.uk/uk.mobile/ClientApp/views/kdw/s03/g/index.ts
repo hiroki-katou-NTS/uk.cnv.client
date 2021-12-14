@@ -25,6 +25,7 @@ export class KdwS03GComponent extends Vue {
         manageCompensatory: false,
         compensatoryRemain: 0,
         compensatoryRemainTime: 0,
+        manageTimeOff: false,
         manageSubStitute: false,
         substituteRemain: 0,
         nextGrantDate: null,
@@ -69,6 +70,7 @@ export class KdwS03GComponent extends Vue {
                 manageCompensatory: data.compensatoryLeave.manageCompenLeave,
                 compensatoryRemain: _.isNull(data.compensatoryLeave.compenLeaveRemain) ? 0 : data.compensatoryLeave.compenLeaveRemain,
                 compensatoryRemainTime: _.isNull(data.compensatoryLeave.timeRemain) ? 0 : data.compensatoryLeave.timeRemain,
+                manageTimeOff: data.compensatoryLeave.manageTimeOff,
                 manageSubStitute: data.substitutionLeave.manageAtr,
                 substituteRemain: data.substitutionLeave.holidayRemain,
                 nextGrantDate: data.nextGrantDate,
@@ -111,8 +113,34 @@ export class KdwS03GComponent extends Vue {
     get nextGrantDateStr() {
         const vm = this;
 
-        return (_.isNull(vm.remainNumber.nextGrantDate) ? '' : vm.$dt(vm.remainNumber.nextGrantDate, 'YYYY/MM/DD')) + 
+        return (_.isNull(vm.remainNumber.nextGrantDate) ? '' : vm.$dt(vm.remainNumber.nextGrantDate, 'YYYY/MM/DD')) + '　' +
                 (_.isNull(vm.remainNumber.grantDays) ? 0 : vm.remainNumber.grantDays) + '日';
+    }
+
+    public formathmm(value) {
+        let absValue = Math.abs(value),
+            hour = Math.floor(absValue / 60),
+            minute = Math.floor(absValue % 60);
+        if (value < 0) {
+            return '-' + (hour.toString() + ':' + _.padStart(minute.toString(), 2, '0'));
+        } else {
+            return hour.toString() + ':' + _.padStart(minute.toString(), 2, '0');
+        }
+    }
+
+    public getFormatTime(time) {
+        const self = this;
+
+        if (time) {
+            let timeStr: string = self.$dt.timedr(time);
+            if (timeStr.startsWith('0')) {
+                return timeStr.substr(1, timeStr.length);
+            } else {
+                return timeStr;
+            }
+        }
+
+        return '0:00';
     }
 }
 const servicePath = {
@@ -127,7 +155,8 @@ interface IRemainNumber {
     reserveRemain: number;//積立年休残数						
     manageCompensatory: boolean;//代休管理する
     compensatoryRemain: number;//代休残数
-    compensatoryRemainTime: number; // 時間代休残数				
+    compensatoryRemainTime: number; // 時間代休残数	
+    manageTimeOff: boolean;			
     manageSubStitute: boolean;//振休管理する
     substituteRemain: number;//振休残数						
     nextGrantDate: Date;//次回付与日

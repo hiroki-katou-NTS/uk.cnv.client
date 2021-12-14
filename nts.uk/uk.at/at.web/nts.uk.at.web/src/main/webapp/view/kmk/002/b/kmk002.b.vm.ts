@@ -162,7 +162,7 @@ module nts.uk.at.view.kmk002.b {
                             key: 'empName', dataType: 'string'
                         },
                         {
-                            headerText: nts.uk.resource.getText("KMK002_50"), width: '153px',
+                            headerText: nts.uk.resource.getText("KMK002_50"), width: '164px',
                             key: 'empApplicableAtr', dataType: 'number', ntsControl: 'SwitchButtons'
                         },
                     ],

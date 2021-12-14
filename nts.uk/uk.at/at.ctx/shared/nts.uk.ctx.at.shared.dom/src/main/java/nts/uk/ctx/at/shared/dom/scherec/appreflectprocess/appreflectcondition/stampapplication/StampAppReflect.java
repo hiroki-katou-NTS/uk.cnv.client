@@ -111,7 +111,7 @@ public class StampAppReflect extends AggregateRoot {
 		if (application.getPrePostAtr() == PrePostAtrShare.POSTERIOR) {
 			// 事後
 			// 打刻申請の反映
-			lstItemId.addAll(reflectStampApp(application, dailyApp));
+			lstItemId.addAll(reflectStampApp(require, application, dailyApp));
 			// 応援の反映
 			lstItemId.addAll(reflectSupport(require, application, dailyApp));
 		} else {
@@ -161,8 +161,8 @@ public class StampAppReflect extends AggregateRoot {
 	 *
 	 *         打刻申請を反映する（勤務予定）
 	 */
-	public Collection<Integer> reflectSchedule(AppStampShare application, DailyRecordOfApplication dailyApp) {
-		return reflectStampApp(application, dailyApp);
+	public Collection<Integer> reflectSchedule(Require require, AppStampShare application, DailyRecordOfApplication dailyApp) {
+		return reflectStampApp(require, application, dailyApp);
 	}
 
 	/**
@@ -171,13 +171,13 @@ public class StampAppReflect extends AggregateRoot {
 	 *         打刻申請の反映
 	 */
 
-	public Collection<Integer> reflectStampApp(AppStampShare application, DailyRecordOfApplication dailyApp) {
+	public Collection<Integer> reflectStampApp(Require require, AppStampShare application, DailyRecordOfApplication dailyApp) {
 		Set<Integer> lstItemId = new HashSet<>();
 		// [出退勤を反映する]をチェック
 
 		if (this.getWorkReflectAtr() == NotUseAtr.USE) {
 			// 出退勤の反映
-			lstItemId.addAll(ReflectAttendanceLeav.reflect(dailyApp,
+			lstItemId.addAll(ReflectAttendanceLeav.reflect(require, companyId, dailyApp,
 					application.getListTimeStampApp().stream()
 							.filter(x -> x.getDestinationTimeApp()
 									.getTimeStampAppEnum() == TimeStampAppEnumShare.ATTEENDENCE_OR_RETIREMENT)
@@ -302,7 +302,7 @@ public class StampAppReflect extends AggregateRoot {
 		return lstItemId;
 	}
 
-	public static interface Require extends ReflectSupportStartEnd.Require, ReflectStartEndWork.Require {
+	public static interface Require extends ReflectSupportStartEnd.Require, ReflectStartEndWork.Require, ReflectAttendanceLeav.Require {
 
 	}	
 

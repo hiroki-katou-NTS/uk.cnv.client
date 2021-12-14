@@ -327,23 +327,30 @@ public class LateTimeSheet {
 	 * 遅刻計上時間の計算
 	 * @param late 計算区分
 	 * @param deductOffset 相殺時間控除区分
+	 * @param roundAtr 丸めを行う
 	 * @return 遅刻計上時間
 	 */
-	public TimeWithCalculation calcForRecordTime(boolean late, boolean deductOffset){
+	public TimeWithCalculation calcForRecordTime(boolean late, boolean deductOffset, NotUseAtr roundAtr){
 		//遅刻時間の計算
 		AttendanceTime calcforRecordTime = AttendanceTime.ZERO;
-		if(this.forRecordTimeSheet.isPresent()) {
-			calcforRecordTime = this.forRecordTimeSheet.get().calcTotalTime(
-					deductOffset ? NotUseAtr.USE : NotUseAtr.NOT_USE, NotUseAtr.USE);
+		//遅刻時間←0：00
+		AttendanceTime lateTimeForRecord = AttendanceTime.ZERO;
+		if (!this.forRecordTimeSheet.isPresent()) {
+			return TimeWithCalculation.createTimeWithCalculation(lateTimeForRecord, calcforRecordTime);
 		}
+		// 計算区分を取得
+		if (late) {
+			// 遅刻時間の計算
+			lateTimeForRecord = this.forRecordTimeSheet.get()
+					.calcTotalTime(deductOffset ? NotUseAtr.USE : NotUseAtr.NOT_USE, roundAtr);
+		}
+
+		// 計算遅刻時間の計算
+		calcforRecordTime = this.forRecordTimeSheet.get().calcTotalTime(NotUseAtr.NOT_USE, roundAtr);
 		
-		//インターバル免除時間を控除する
+		// インターバル免除時間を控除する
+		return TimeWithCalculation.createTimeWithCalculation(lateTimeForRecord, calcforRecordTime);
 		
-		//遅刻計上時間の作成
-		TimeWithCalculation lateTime = late ?
-				TimeWithCalculation.sameTime(calcforRecordTime) :
-					TimeWithCalculation.createTimeWithCalculation(new AttendanceTime(0), calcforRecordTime);	
-		return lateTime;
 	}
 	
 	/**

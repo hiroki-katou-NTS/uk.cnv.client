@@ -154,7 +154,7 @@ public class LeaveGrantRemainingData extends AggregateRoot {
 	 */
 	public static Optional<LeaveGrantRemainingData> digest(LeaveRemainingNumber.RequireM3 require,
 			List<LeaveGrantRemainingData> targetRemainingDatas, RemNumShiftListWork remNumShiftListWork,
-			LeaveUsedNumber leaveUsedNumber, String companyId, String employeeId, GeneralDate date) {
+			LeaveUsedNumber leaveUsedNumber, String companyId, String employeeId, GeneralDate baseDate) {
 
 		// 取得した「付与残数」でループ
 		for (val targetRemainingData : targetRemainingDatas) {
@@ -163,20 +163,20 @@ public class LeaveGrantRemainingData extends AggregateRoot {
 			remNumShiftListWork.AddLeaveGrantRemainingData(targetRemainingData);
 
 			// 休暇使用数を消化できるかチェック
-			if (remNumShiftListWork.canDigest(require, leaveUsedNumber, companyId, employeeId, date)) {
+			if (remNumShiftListWork.canDigest(require, leaveUsedNumber, companyId, employeeId, baseDate)) {
 				// 消化できないときはループ
 				break;
 			}
 		}
 
 		// 休暇使用数を消化する
-		remNumShiftListWork.digest(require, leaveUsedNumber, companyId, employeeId, date);
+		remNumShiftListWork.digest(require, leaveUsedNumber, companyId, employeeId, baseDate);
 
 		// 残数不足で一部消化できなかったとき
 		if (remNumShiftListWork.getUnusedNumber().isLargerThanZero()) {
 
 			// 消化できなかった休暇使用数をもとに、付与残数ダミーデータを作成する
-			return Optional.of(LeaveGrantRemainingData.of(employeeId, date, date, LeaveExpirationStatus.AVAILABLE,
+			return Optional.of(LeaveGrantRemainingData.of(employeeId, baseDate, baseDate, LeaveExpirationStatus.AVAILABLE,
 					GrantRemainRegisterType.MONTH_CLOSE, remNumShiftListWork.toDetails()));
 
 		}

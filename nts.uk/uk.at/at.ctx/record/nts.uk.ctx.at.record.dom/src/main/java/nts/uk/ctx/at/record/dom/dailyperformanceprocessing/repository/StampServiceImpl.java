@@ -155,7 +155,8 @@ public class StampServiceImpl implements StampDomainService {
 			for(Stamp stampRf :listStampHasReflected) {
 				if(stamp.getStampDateTime().equals(stampRf.getStampDateTime()) && 
 						stampRf.getType().getChangeClockArt()== stamp.getType().getChangeClockArt()
-						&& stampRf.getCardNumber().equals(stamp.getCardNumber())) {
+						&& stampRf.getCardNumber().equals(stamp.getCardNumber())
+						&& stampRf.getImprintReflectionStatus().isReflectedCategory()) {
 					listRemove.add(stamp);
 				}
 			}

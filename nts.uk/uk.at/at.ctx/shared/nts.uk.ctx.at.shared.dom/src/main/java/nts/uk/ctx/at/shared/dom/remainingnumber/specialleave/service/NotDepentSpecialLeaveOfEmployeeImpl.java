@@ -53,7 +53,7 @@ public class NotDepentSpecialLeaveOfEmployeeImpl implements NotDepentSpecialLeav
 		//・端数消滅：ドメインモデル「特別休暇．付与情報．取得できなかった端数は消滅する」
 		outputData.setChkDisappear(true);
 		//・蓄積上限日数：
-		outputData.setUpLimiDays(Optional.of(speHoliday.getGrantRegular().getLimitAccumulationDays()));
+		outputData.setUpLimiDays(Optional.of(speHoliday.getGrantRegular().getLimitCarryoverDays()));
 
 		return outputData;
 	}

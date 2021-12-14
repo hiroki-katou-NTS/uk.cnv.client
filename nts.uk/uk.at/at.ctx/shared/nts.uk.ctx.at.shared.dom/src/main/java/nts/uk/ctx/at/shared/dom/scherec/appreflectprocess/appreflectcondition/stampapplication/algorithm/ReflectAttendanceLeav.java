@@ -1,25 +1,16 @@
 package nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.stampapplication.algorithm;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
-
-import lombok.val;
-import nts.uk.ctx.at.shared.dom.scherec.application.stamp.StartEndClassificationShare;
 import nts.uk.ctx.at.shared.dom.scherec.application.stamp.TimeStampAppShare;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.DailyRecordOfApplication;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.condition.UpdateEditSttCreateBeforeAppReflect;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingOfDailyAttd;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingWork;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.WorkTimes;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.TimeActualStamp;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.ReasonTimeChange;
+import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
+import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.condition.ReflectAttendance;
+import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.condition.TimeReflectFromApp;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.TimeChangeMeans;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkStamp;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkTimeInformation;
 import nts.uk.ctx.at.shared.dom.worktime.predset.WorkNo;
 
 /**
@@ -29,107 +20,23 @@ import nts.uk.ctx.at.shared.dom.worktime.predset.WorkNo;
  */
 public class ReflectAttendanceLeav {
 
-	public static List<Integer> reflect(DailyRecordOfApplication dailyApp, List<TimeStampAppShare> listTimeStampApp) {
+	// 反映する
+	public static List<Integer> reflect(Require require, String cid, DailyRecordOfApplication dailyApp,
+			List<TimeStampAppShare> listTimeStampApp) {
 		List<Integer> lstItemId = new ArrayList<>();
-		// input. 出退勤（List）でループする
-		listTimeStampApp.stream().forEach(data -> {
+		// 申請から反映する時刻を作成する
+		List<TimeReflectFromApp> reflectTimeLst = listTimeStampApp.stream()
+				.map(x -> new TimeReflectFromApp(new WorkNo(x.getDestinationTimeApp().getEngraveFrameNo()),
+						x.getDestinationTimeApp().getStartEndClassification(), x.getTimeOfDay(), x.getWorkLocationCd()))
+				.collect(Collectors.toList());
 
-			if (dailyApp.getAttendanceLeave().isPresent()) {
-				// 日別勤怠(work）の[出退勤]をチェック
-				Optional<TimeLeavingWork> timeLeavOpt = dailyApp.getAttendanceLeave().get().getTimeLeavingWorks()
-						.stream()
-						.filter(x -> x.getWorkNo().v() == data.getDestinationTimeApp().getEngraveFrameNo().intValue())
-						.findFirst();
-				if (!timeLeavOpt.isPresent()) {
-					// 該当の打刻枠NOをキーに[出退勤]を作成する
-					Pair<TimeLeavingWork, List<Integer>> result = createTimeLeav(data);
-					dailyApp.getAttendanceLeave().get().getTimeLeavingWorks().add(result.getLeft());
-					dailyApp.getAttendanceLeave().get().setCountWorkTime();
-					lstItemId.addAll(result.getRight());
-				} else {
-					lstItemId.addAll(updateTimeLeav(timeLeavOpt.get(), data));
-				}
-			} else {
-				List<TimeLeavingWork> lst = new ArrayList<>();
-				Pair<TimeLeavingWork, List<Integer>> result = createTimeLeav(data);
-				lst.add(result.getLeft());
-				dailyApp.setAttendanceLeave(Optional.of(new TimeLeavingOfDailyAttd(lst, new WorkTimes(0))));
-				dailyApp.getAttendanceLeave().get().setCountWorkTime();
-				lstItemId.addAll(result.getRight());
-			}
-
-		});
-
-		UpdateEditSttCreateBeforeAppReflect.update(dailyApp, lstItemId);
+		// 時刻を反映する
+		lstItemId.addAll(ReflectAttendance.reflectTime(require, cid, dailyApp, ScheduleRecordClassifi.RECORD, reflectTimeLst,
+				Optional.of(TimeChangeMeans.APPLICATION)));
 		return lstItemId;
 	}
 
-	public static TimeActualStamp createTimeActualStamp(TimeStampAppShare data) {
-		return new TimeActualStamp(null, new WorkStamp(
-				new WorkTimeInformation(new ReasonTimeChange(TimeChangeMeans.APPLICATION, Optional.empty()), data.getTimeOfDay()),
-				data.getWorkLocationCd()), 0);
+	public static interface Require extends ReflectAttendance.Require {
+
 	}
-
-	public static Pair<TimeLeavingWork, List<Integer>> createTimeLeav(TimeStampAppShare data) {
-		List<Integer> itemIds = new ArrayList<Integer>();
-		boolean start = (data.getDestinationTimeApp().getStartEndClassification() == StartEndClassificationShare.START);
-		if (start) {
-			itemIds.addAll(Arrays.asList(
-					CancelAppStamp.createItemId(31, data.getDestinationTimeApp().getEngraveFrameNo().intValue(), 10),
-					CancelAppStamp.createItemId(30, data.getDestinationTimeApp().getEngraveFrameNo().intValue(), 10)));
-		} else {
-			itemIds.addAll(Arrays.asList(
-					CancelAppStamp.createItemId(34, data.getDestinationTimeApp().getEngraveFrameNo().intValue(), 10),
-					CancelAppStamp.createItemId(33, data.getDestinationTimeApp().getEngraveFrameNo().intValue(), 10)));
-		}
-		return Pair.of(
-				new TimeLeavingWork(new WorkNo(data.getDestinationTimeApp().getEngraveFrameNo().intValue()),
-						start ? createTimeActualStamp(data) : null, //
-						start ? null : createTimeActualStamp(data)), //
-				itemIds);//
-	}
-
-	public static List<Integer> updateTimeLeav(TimeLeavingWork timeLeav, TimeStampAppShare data) {
-
-		List<Integer> lstItemId = new ArrayList<>();
-		boolean start = (data.getDestinationTimeApp().getStartEndClassification() == StartEndClassificationShare.START);
-		if (start) {
-			if(!timeLeav.getAttendanceStamp().isPresent()) {
-				timeLeav.setAttendanceStamp(Optional.of(TimeActualStamp.createDefaultWithReason(TimeChangeMeans.APPLICATION)));
-			}
-			if(!timeLeav.getAttendanceStamp().get().getStamp().isPresent()) {
-				timeLeav.getAttendanceStamp().get().setStamp(Optional.of(WorkStamp.createDefault()));
-			}
-			val y = timeLeav.getAttendanceStamp().get().getStamp().get();
-			if (data.getWorkLocationCd().isPresent()) {
-				lstItemId.addAll(Arrays.asList(CancelAppStamp.createItemId(30,
-						data.getDestinationTimeApp().getEngraveFrameNo().intValue(), 10)));
-				y.setLocationCode(data.getWorkLocationCd());
-			}
-			y.getTimeDay().getReasonTimeChange().setTimeChangeMeans(TimeChangeMeans.APPLICATION);
-			y.getTimeDay().setTimeWithDay(Optional.ofNullable(data.getTimeOfDay()));
-			lstItemId.addAll(Arrays.asList(
-					CancelAppStamp.createItemId(31, data.getDestinationTimeApp().getEngraveFrameNo().intValue(), 10)));
-		} else {
-			if (!timeLeav.getLeaveStamp().isPresent()) {
-				timeLeav.setLeaveStamp(
-						Optional.of(TimeActualStamp.createDefaultWithReason(TimeChangeMeans.APPLICATION)));
-			}
-			if(!timeLeav.getLeaveStamp().get().getStamp().isPresent()) {
-				timeLeav.getLeaveStamp().get().setStamp(Optional.of(WorkStamp.createDefault()));
-			}
-			val y = timeLeav.getLeaveStamp().get().getStamp().get();
-			if (data.getWorkLocationCd().isPresent()) {
-				lstItemId.addAll(Arrays.asList(CancelAppStamp.createItemId(33,
-						data.getDestinationTimeApp().getEngraveFrameNo().intValue(), 10)));
-				y.setLocationCode(data.getWorkLocationCd());
-			}
-			y.getTimeDay().getReasonTimeChange().setTimeChangeMeans(TimeChangeMeans.APPLICATION);
-			y.getTimeDay().setTimeWithDay(Optional.ofNullable(data.getTimeOfDay()));
-			lstItemId.addAll(Arrays.asList(
-					CancelAppStamp.createItemId(34, data.getDestinationTimeApp().getEngraveFrameNo().intValue(), 10)));
-		}
-		return lstItemId;
-	}
-
 }

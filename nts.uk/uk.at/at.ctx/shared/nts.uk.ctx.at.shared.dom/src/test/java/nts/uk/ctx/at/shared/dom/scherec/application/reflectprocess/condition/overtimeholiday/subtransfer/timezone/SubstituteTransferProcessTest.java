@@ -11,10 +11,10 @@ import org.junit.Test;
 
 import nts.arc.testing.assertion.NtsAssert;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.MaximumTimeZone;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.OvertimeHourTransfer;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.SubstituteTransferProcess;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.TransferResultAllFrame;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.createremain.subtransfer.MaximumTimeZone;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.createremain.subtransfer.OvertimeHdHourTransfer;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.createremain.subtransfer.SubstituteTransferProcess;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.createremain.subtransfer.TransferResultAllFrame;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.TimeSpanForDailyCalc;
 import nts.uk.ctx.at.shared.dom.workrule.outsideworktime.overtime.overtimeframe.OverTimeFrameNo;
 import nts.uk.shr.com.time.TimeWithDayAttr;
@@ -42,10 +42,10 @@ public class SubstituteTransferProcessTest {
 		MaximumTimeZone maxTimeZone = new MaximumTimeZone();
 		maxTimeZone.getTimeSpan().add(Pair.of(new OverTimeFrameNo(1), new TimeSpanForDailyCalc(new TimeWithDayAttr(600), new TimeWithDayAttr(800))));// 最大時間帯(List）：最大時間帯
 
-		List<OvertimeHourTransfer> timeAfterReflectApp = Arrays
-				.asList(new OvertimeHourTransfer(1, new AttendanceTime(666), new AttendanceTime(444)));// 最大の時間(List)：時間外労働時間（振替用）
+		List<OvertimeHdHourTransfer> timeAfterReflectApp = Arrays
+				.asList(new OvertimeHdHourTransfer(1, new AttendanceTime(666), new AttendanceTime(444)));// 最大の時間(List)：時間外労働時間（振替用）
 
-		List<OvertimeHourTransfer> maxTime = Arrays.asList(new OvertimeHourTransfer(1, new AttendanceTime(666), new AttendanceTime(444)));// 振替をした後の時間(List）：時間外労働時間（振替用）
+		List<OvertimeHdHourTransfer> maxTime = Arrays.asList(new OvertimeHdHourTransfer(1, new AttendanceTime(666), new AttendanceTime(444)));// 振替をした後の時間(List）：時間外労働時間（振替用）
 
 		TransferResultAllFrame result = NtsAssert.Invoke.staticMethod(SubstituteTransferProcess.class,
 				"processTransferFromTransTimeZone", new AttendanceTime(0), maxTimeZone, maxTime, timeAfterReflectApp);
@@ -73,12 +73,12 @@ public class SubstituteTransferProcessTest {
 		maxTimeZone.getTimeSpan().add(Pair.of(new OverTimeFrameNo(1), new TimeSpanForDailyCalc(new TimeWithDayAttr(0), new TimeWithDayAttr(900))));// 最大時間帯(List）：最大時間帯
 		maxTimeZone.getTimeSpan().add(Pair.of(new OverTimeFrameNo(2),  new TimeSpanForDailyCalc(new TimeWithDayAttr(900), new TimeWithDayAttr(1440))));
 
-		List<OvertimeHourTransfer> timeAfterReflectApp = Arrays
-				.asList(new OvertimeHourTransfer(1, new AttendanceTime(360), new AttendanceTime(0)),
-						 new OvertimeHourTransfer(2, new AttendanceTime(480), new AttendanceTime(0)));// 最大の時間(List)：時間外労働時間（振替用）
+		List<OvertimeHdHourTransfer> timeAfterReflectApp = Arrays
+				.asList(new OvertimeHdHourTransfer(1, new AttendanceTime(360), new AttendanceTime(0)),
+						 new OvertimeHdHourTransfer(2, new AttendanceTime(480), new AttendanceTime(0)));// 最大の時間(List)：時間外労働時間（振替用）
 
-		List<OvertimeHourTransfer> maxTime = Arrays.asList(new OvertimeHourTransfer(0, new AttendanceTime(780), new AttendanceTime(120)),
-																						  new OvertimeHourTransfer(1, new AttendanceTime(180), new AttendanceTime(360)));// 振替をした後の時間(List）：時間外労働時間（振替用）
+		List<OvertimeHdHourTransfer> maxTime = Arrays.asList(new OvertimeHdHourTransfer(0, new AttendanceTime(780), new AttendanceTime(120)),
+																						  new OvertimeHdHourTransfer(1, new AttendanceTime(180), new AttendanceTime(360)));// 振替をした後の時間(List）：時間外労働時間（振替用）
 
 		TransferResultAllFrame result = NtsAssert.Invoke.staticMethod(SubstituteTransferProcess.class,
 				"processTransferFromTransTimeZone", new AttendanceTime(480), maxTimeZone, maxTime, timeAfterReflectApp);
@@ -104,10 +104,10 @@ public class SubstituteTransferProcessTest {
 		MaximumTimeZone maxTimeZone = new MaximumTimeZone();
 		maxTimeZone.getTimeSpan().add(Pair.of(new OverTimeFrameNo(1), new TimeSpanForDailyCalc(new TimeWithDayAttr(600), new TimeWithDayAttr(800))));// 最大時間帯(List）：最大時間帯
 
-		List<OvertimeHourTransfer> timeAfterReflectApp = Arrays
-				.asList(new OvertimeHourTransfer(1, new AttendanceTime(0), new AttendanceTime(444)));// 最大の時間(List)：時間外労働時間（振替用）
+		List<OvertimeHdHourTransfer> timeAfterReflectApp = Arrays
+				.asList(new OvertimeHdHourTransfer(1, new AttendanceTime(0), new AttendanceTime(444)));// 最大の時間(List)：時間外労働時間（振替用）
 
-		List<OvertimeHourTransfer> maxTime = Arrays.asList(new OvertimeHourTransfer(1, new AttendanceTime(666), new AttendanceTime(444)));// 振替をした後の時間(List）：時間外労働時間（振替用）
+		List<OvertimeHdHourTransfer> maxTime = Arrays.asList(new OvertimeHdHourTransfer(1, new AttendanceTime(666), new AttendanceTime(444)));// 振替をした後の時間(List）：時間外労働時間（振替用）
 
 		TransferResultAllFrame result = NtsAssert.Invoke.staticMethod(SubstituteTransferProcess.class,
 				"processTransferFromTransTimeZone", new AttendanceTime(100), maxTimeZone, maxTime, timeAfterReflectApp);
@@ -133,10 +133,10 @@ public class SubstituteTransferProcessTest {
 		MaximumTimeZone maxTimeZone = new MaximumTimeZone();
 		maxTimeZone.getTimeSpan().add(Pair.of(new OverTimeFrameNo(1), new TimeSpanForDailyCalc(new TimeWithDayAttr(600), new TimeWithDayAttr(800))));// 最大時間帯(List）：最大時間帯
 
-		List<OvertimeHourTransfer> timeAfterReflectApp = Arrays
-				.asList(new OvertimeHourTransfer(1, new AttendanceTime(666), new AttendanceTime(444)));// 最大の時間(List)：時間外労働時間（振替用）
+		List<OvertimeHdHourTransfer> timeAfterReflectApp = Arrays
+				.asList(new OvertimeHdHourTransfer(1, new AttendanceTime(666), new AttendanceTime(444)));// 最大の時間(List)：時間外労働時間（振替用）
 
-		List<OvertimeHourTransfer> maxTime = Arrays.asList(new OvertimeHourTransfer(1, new AttendanceTime(666), new AttendanceTime(444)));// 振替をした後の時間(List）：時間外労働時間（振替用）
+		List<OvertimeHdHourTransfer> maxTime = Arrays.asList(new OvertimeHdHourTransfer(1, new AttendanceTime(666), new AttendanceTime(444)));// 振替をした後の時間(List）：時間外労働時間（振替用）
 
 		TransferResultAllFrame result = NtsAssert.Invoke.staticMethod(SubstituteTransferProcess.class,
 				"processTransferFromTransTimeZone", new AttendanceTime(100), maxTimeZone, maxTime, timeAfterReflectApp);

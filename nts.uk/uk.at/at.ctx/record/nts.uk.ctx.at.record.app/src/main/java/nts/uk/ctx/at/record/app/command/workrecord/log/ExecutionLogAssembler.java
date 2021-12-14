@@ -162,7 +162,7 @@ public class ExecutionLogAssembler {
 				// objectPeriod param Screen C
 				GeneralDate.fromString(command.getPeriodStartDate(), "yyyy/MM/dd"),
 				GeneralDate.fromString(command.getPeriodEndDate(), "yyyy/MM/dd"),
-        command.getIsCalWhenLock()==null?null:new Boolean(command.getIsCalWhenLock()==1?true:false));
+				Optional.ofNullable(command.getIsCalWhenLock() == null ? null : command.getIsCalWhenLock() ==1 ));
 		return executionLog;
 	}
 	

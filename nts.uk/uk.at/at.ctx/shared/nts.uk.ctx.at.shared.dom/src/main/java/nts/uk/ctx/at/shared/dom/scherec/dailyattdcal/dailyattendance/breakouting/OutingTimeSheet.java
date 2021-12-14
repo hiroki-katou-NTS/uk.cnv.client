@@ -139,4 +139,21 @@ public class OutingTimeSheet extends DomainObject {
 				reason,
 				Optional.of(WorkStamp.createDefault()));
 	}
+	
+	public boolean leakageCheck() {
+		Optional<TimeWithDayAttr> goOutTimeAtr = getGoOutWithTimeDay();
+		Optional<TimeWithDayAttr> goComeBack = getComeBackWithTimeDay();
+
+		return (goOutTimeAtr.isPresent() && goComeBack.isPresent())
+				|| (!goOutTimeAtr.isPresent() && !goComeBack.isPresent());
+
+	}
+
+	public Optional<TimeWithDayAttr> getGoOutWithTimeDay() {
+		return this.getGoOut().flatMap(x -> x.getWithTimeDay());
+	}
+
+	public Optional<TimeWithDayAttr> getComeBackWithTimeDay() {
+		return this.getComeBack().flatMap(x -> x.getWithTimeDay());
+	}
 }

@@ -50,21 +50,17 @@ public class WorkChangeUpdateServiceImpl implements IWorkChangeUpdateService {
 		GeneralDate endDateParam = application.getOpAppEndDate().isPresent()
 				? application.getOpAppEndDate().get().getApplicationDate()
 				: application.getAppDate().getApplicationDate();
-		List<GeneralDate> listDate = new ArrayList<>();
-		// 申請期間から休日の申請日を取得する
-		List<GeneralDate> lstHoliday = otherCommonAlg.lstDateIsHoliday(application.getEmployeeID(),
-				new DatePeriod(startDateParam, endDateParam), Collections.emptyList());
-		// 年月日Listを作成する
-		for (GeneralDate loopDate = startDateParam; loopDate
-				.beforeOrEquals(endDateParam); loopDate = loopDate.addDays(1)) {
-			if (lstHoliday != null ) {
-				if (!lstHoliday.contains(loopDate)) {
-					listDate.add(loopDate);
-				}
-			} else {
-				listDate.add(loopDate);
-			}
-		}
+		List<GeneralDate> listDate = new DatePeriod(startDateParam, endDateParam).datesBetween();
+		// http://192.168.50.4:3000/issues/120857
+        /*
+         * // 申請期間から休日の申請日を取得する List<GeneralDate> lstHoliday =
+         * otherCommonAlg.lstDateIsHoliday(application.getEmployeeID(), new
+         * DatePeriod(startDateParam, endDateParam), Collections.emptyList()); //
+         * 年月日Listを作成する for (GeneralDate loopDate = startDateParam; loopDate
+         * .beforeOrEquals(endDateParam); loopDate = loopDate.addDays(1)) { if
+         * (lstHoliday != null ) { if (!lstHoliday.contains(loopDate)) {
+         * listDate.add(loopDate); } } else { listDate.add(loopDate); } }
+         */
 		// 暫定データの登録
 		interimRemainDataMngRegisterDateChange.registerDateChange(companyId, application.getEmployeeID(), listDate);
 

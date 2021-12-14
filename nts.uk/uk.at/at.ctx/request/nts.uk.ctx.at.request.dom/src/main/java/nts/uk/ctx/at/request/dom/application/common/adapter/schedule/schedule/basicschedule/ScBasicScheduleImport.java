@@ -38,5 +38,8 @@ public class ScBasicScheduleImport {
 	private Integer childTime;
 	// 短時間勤務時間帯
 	private List<ShortWorkingTimeSheetImport> listShortWorkingTimeSheetExport = new ArrayList<>();
+	
+	// 休憩時間帯時間帯
+    private List<BreakTimeSheetImport> listBreakTimeSheetExports = new ArrayList<BreakTimeSheetImport>();
 
 }

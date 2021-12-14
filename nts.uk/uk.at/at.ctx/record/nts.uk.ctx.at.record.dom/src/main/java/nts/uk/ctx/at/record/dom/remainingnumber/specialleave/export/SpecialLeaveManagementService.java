@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import lombok.val;
@@ -40,7 +39,6 @@ import nts.uk.ctx.at.shared.dom.specialholiday.export.NextSpecialLeaveGrant;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.TypeTime;
 import nts.uk.ctx.at.shared.dom.workrule.closure.service.GetClosureStartForEmployee;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
-import nts.uk.ctx.at.shared.dom.yearholidaygrant.GrantNum;
 
 /**
  * UKDesign.ドメインモデル.NittsuSystem.UniversalK.就業.contexts.勤務実績.残数管理.残数管理.特別休暇管理.Export
@@ -127,7 +125,8 @@ public class SpecialLeaveManagementService {
 					specialHolidayInterimMngData,
 					param.getSpecialLeaveCode(),
 					employee.getEntryDate(),
-					outputData
+					outputData,
+					param.getBaseDate()
 					);
 		}
 
@@ -481,39 +480,22 @@ public class SpecialLeaveManagementService {
 			= new HashMap<GeneralDate, SpecialLeaveDividedDayEachProcess>();
 
 		for( SpecialLeaveGrantRemainingData c : sortedLstSpeData ){
-
-			// 期限日
-			val deadline = c.getDeadline();
-
-			// 期限日>=開始日 && 期限日<=終了日 が処理対象
-			if (!aggrPeriod.contains(deadline)) continue;
-
-			// 消滅情報WORKを作成
-			SpecialLeaveLapsedWork specialLeaveLapsedWork = new SpecialLeaveLapsedWork();
-			// 消滅情報WORK.期間の開始日に消滅するかどうか←true
-			specialLeaveLapsedWork.setLapsedAtr(true);
-
-			// 年月日←期限日の翌日
-			GeneralDate nextDayOfDeadLine = deadline;
-			if (deadline.before(GeneralDate.max())){
-				nextDayOfDeadLine = deadline.addDays(1);
-			}
-
-			// ※既に同じ年月日がある場合は、追加せずに消滅情報WORKのみセット
-			if ( dividedDayMap.containsKey(nextDayOfDeadLine)){
-				SpecialLeaveDividedDayEachProcess specialLeaveDividedDayEachProcess
-					= dividedDayMap.get(nextDayOfDeadLine);
-				if ( specialLeaveDividedDayEachProcess != null ){
-					specialLeaveDividedDayEachProcess.setLapsedWork(specialLeaveLapsedWork);
-				}
-			} else {
-				SpecialLeaveDividedDayEachProcess specialLeaveDividedDayEachProcess
-					= new SpecialLeaveDividedDayEachProcess(nextDayOfDeadLine);
-				specialLeaveDividedDayEachProcess.setLapsedWork(specialLeaveLapsedWork);
-				// リストへ追加
-				dividedDayMap.put(nextDayOfDeadLine, specialLeaveDividedDayEachProcess);
-			}
-
+			//消滅情報WORKを作成
+			createLapsedWork(aggrPeriod, c.getDeadline(), dividedDayMap);
+		}
+		
+		
+		//次回特別休暇付与から消滅情報を作成
+		Comparator<NextSpecialLeaveGrant> comparatorNextSLGrant= 
+				  Comparator.comparing(NextSpecialLeaveGrant::getDeadLine).thenComparing(NextSpecialLeaveGrant::getGrantDate);
+		
+		// ソート処理 　期限日、付与日
+		List<NextSpecialLeaveGrant> sortedLstNextSLGrant
+			= nextSpecialLeaveGrantList.stream().sorted(comparatorNextSLGrant).collect(Collectors.toList());
+		
+		for( NextSpecialLeaveGrant c : sortedLstNextSLGrant ){
+			//消滅情報WORKを作成
+			createLapsedWork(aggrPeriod, c.getDeadLine(), dividedDayMap);
 		}
 
 
@@ -731,6 +713,48 @@ public class SpecialLeaveManagementService {
 	}
 
 
+	/**
+	 * 消滅情報WORKを作成
+	 * @param aggrPeriod
+	 * @param deadline
+	 * @param dividedDayMap
+	 */
+	private static void  createLapsedWork(DatePeriod aggrPeriod, GeneralDate deadline, 
+			Map<GeneralDate, SpecialLeaveDividedDayEachProcess> dividedDayMap){
+		
+		// 期限日>=開始日 && 期限日<=終了日 が処理対象
+		if (!aggrPeriod.contains(deadline)) 
+			return;
+
+		// 消滅情報WORKを作成
+		SpecialLeaveLapsedWork specialLeaveLapsedWork = new SpecialLeaveLapsedWork();
+		// 消滅情報WORK.期間の開始日に消滅するかどうか←true
+		specialLeaveLapsedWork.setLapsedAtr(true);
+
+		// 年月日←期限日の翌日
+		GeneralDate nextDayOfDeadLine = deadline;
+		if (deadline.before(GeneralDate.max())){
+			nextDayOfDeadLine = deadline.addDays(1);
+		}
+
+		// ※既に同じ年月日がある場合は、追加せずに消滅情報WORKのみセット
+		if ( dividedDayMap.containsKey(nextDayOfDeadLine)){
+			SpecialLeaveDividedDayEachProcess specialLeaveDividedDayEachProcess
+				= dividedDayMap.get(nextDayOfDeadLine);
+			if ( specialLeaveDividedDayEachProcess != null ){
+				specialLeaveDividedDayEachProcess.setLapsedWork(specialLeaveLapsedWork);
+			}
+		} else {
+			SpecialLeaveDividedDayEachProcess specialLeaveDividedDayEachProcess
+				= new SpecialLeaveDividedDayEachProcess(nextDayOfDeadLine);
+			specialLeaveDividedDayEachProcess.setLapsedWork(specialLeaveLapsedWork);
+			// リストへ追加
+			dividedDayMap.put(nextDayOfDeadLine, specialLeaveDividedDayEachProcess);
+		}
+	}
+	
+	
+	
 	/**
 	 * 特休付与残数データから特休情報を作成
 	 * @param cId 会社ID

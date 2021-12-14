@@ -71,6 +71,13 @@ module nts.uk.at.view.ksu001.u {
                 }
             });
         }
+        mounted(): void {
+            if(screen.height <= 768) {
+                this.$window.size(620, 600);
+                $('#content-area').css('height', '500px');
+            }
+                
+        }
         getDataToOneMonth(yearMonth: number): void {
             let self = this;
             self.$blockui("grayout");

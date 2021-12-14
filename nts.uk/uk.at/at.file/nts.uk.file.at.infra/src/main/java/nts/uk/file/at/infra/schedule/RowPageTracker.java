@@ -175,4 +175,8 @@ public class RowPageTracker {
 		}
 		return countItem;
 	}
+	
+	public boolean isNewPage() {
+		return this.remainingRow == this.maxRowAllowed;
+	}
 }

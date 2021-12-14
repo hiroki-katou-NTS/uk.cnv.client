@@ -48,7 +48,7 @@ required: true}" />
         </div>
     </div>
     <!-- B9 -->
-    <div class="valign-center control-group">
+    <div class="valign-center control-group color-pick">
         <div data-bind="ntsFormLabel: { required: true, enable: true}">
             #{i18n.getText('KSM015_19')}</div>
         <!-- B9_1_2 -->    
@@ -64,11 +64,23 @@ required: true}" />
     <div class="valign-center control-group">
         <div data-bind="ntsFormLabel: {required: false, enable: true, constraint: 'Remarks'}">
             #{i18n.getText('KSM015_20')}</div>
-            <input tabindex="10" data-bind="ntsTextEditor: {	
+            <input tabindex="12" data-bind="ntsTextEditor: {
                 name: '#[KSM015_20]',
                 constraint: 'Remarks',
                 value: registrationForm().note,
                 option: { width: '260px', textalign: 'left' },
+                required: false}" />
+    </div>
+    <!-- B11 -->
+    <div class="valign-center control-group import-cd">
+        <div data-bind="ntsFormLabel: {required: false, enable: true, constraint: 'ShiftMasterImportCode'}">
+            #{i18n.getText('KSM015_37')}</div>
+        <button tabindex="13" id="help-button-2" data-bind="ntsHelpButton: {textId: 'KSM015_38', textParams:['{#KSM015_38}'], position: 'right center' }">？</button>
+        <input style="margin-left: 20px" tabindex="14" data-bind="ntsTextEditor: {
+                name: '#[KSM015_37]',
+                constraint: 'ShiftMasterImportCode',
+                value: registrationForm().importCode,
+                option: { width: '70px', textalign: 'left' },
                 required: false}" />
     </div>
 </div>

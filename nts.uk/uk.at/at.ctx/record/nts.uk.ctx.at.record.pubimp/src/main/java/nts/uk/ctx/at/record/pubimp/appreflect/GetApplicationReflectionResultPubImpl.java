@@ -332,11 +332,6 @@ public class GetApplicationReflectionResultPubImpl implements GetApplicationRefl
 		}
 
 		@Override
-		public String getCId() {
-			return companyId;
-		}
-
-		@Override
 		public Optional<PredetemineTimeSetting> findByWorkTimeCode(String companyId, String workTimeCode) {
 			return predetemineTimeSettingRepository.findByWorkTimeCode(companyId, workTimeCode);
 		}
@@ -359,6 +354,11 @@ public class GetApplicationReflectionResultPubImpl implements GetApplicationRefl
 		@Override
 		public Optional<SubstituteLeaveAppReflect> findSubLeaveAppReflectByCompany(String companyId) {
 			return subLeaveAppReflectRepository.findSubLeaveAppReflectByCompany(companyId);
+		}
+
+		@Override
+		public Optional<WorkTimeSetting> getWorkTime(String cid, String workTimeCode) {
+			return workTimeSettingRepository.findByCode(cid, workTimeCode);
 		}
 	}
 

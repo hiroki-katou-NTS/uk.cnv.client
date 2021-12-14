@@ -3,6 +3,7 @@ package nts.uk.ctx.at.request.dom.cancelapplication.algorithm;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -15,18 +16,21 @@ import mockit.Mocked;
 import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
 import nts.arc.time.GeneralDate;
+import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.ApplicationType;
 import nts.uk.ctx.at.request.dom.application.PrePostAtr;
 import nts.uk.ctx.at.request.dom.application.ReasonNotReflect;
 import nts.uk.ctx.at.request.dom.application.ReflectedState;
 import nts.uk.ctx.at.request.dom.application.businesstrip.BusinessTrip;
+import nts.uk.ctx.at.request.dom.application.common.adapter.bs.dto.SEmpHistImport;
 import nts.uk.ctx.at.request.dom.applicationreflect.AppReflectExecutionCondition;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.checkprocess.PreCheckProcessWorkSchedule;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.checkprocess.PreCheckProcessWorkSchedule.PreCheckProcessResult;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.common.ReflectApplicationHelper;
 import nts.uk.ctx.at.request.dom.applicationreflect.object.PreApplicationWorkScheReflectAttr;
 import nts.uk.ctx.at.request.dom.applicationreflect.object.ReflectStatusResult;
+import nts.uk.ctx.at.shared.dom.adapter.employment.EmploymentHistShareImport;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.ApplicationShare;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 
@@ -58,7 +62,8 @@ public class SCApplicationCancellationProcessTest {
 
 		SCCancelProcessOneDayOutput actualResult = SCApplicationCancellationProcess.processSchedule(require, "",
 				application, GeneralDate.ymd(2021, 4, 20), 1,
-				ReflectApplicationHelper.createReflectStatusResult(ReflectedState.REFLECTED), NotUseAtr.NOT_USE);
+				ReflectApplicationHelper.createReflectStatusResult(ReflectedState.REFLECTED), NotUseAtr.NOT_USE,
+				new EmploymentHistShareImport("", "", new DatePeriod(GeneralDate.min(), GeneralDate.max())));
 		assertThat(actualResult.getStatusWorkSchedule().getReflectStatus()).isEqualTo(ReflectedState.CANCELED);
 		new Verifications() {
 			{
@@ -94,7 +99,7 @@ public class SCApplicationCancellationProcessTest {
 		SCCancelProcessOneDayOutput actualResult = SCApplicationCancellationProcess.processSchedule(require, "",
 				application, GeneralDate.ymd(2021, 4, 20), 1,
 				ReflectApplicationHelper.createReflectStatusResult(ReflectedState.NOTREFLECTED), // 反映状態=未反映
-				NotUseAtr.NOT_USE);
+				NotUseAtr.NOT_USE, new EmploymentHistShareImport("", "", new DatePeriod(GeneralDate.min(), GeneralDate.max())));
 
 		assertThat(actualResult.getStatusWorkSchedule().getReflectStatus()).isEqualTo(ReflectedState.CANCELED);
 		new Verifications() {
@@ -130,7 +135,7 @@ public class SCApplicationCancellationProcessTest {
 
 		SCApplicationCancellationProcess.processSchedule(require, "", application, GeneralDate.ymd(2021, 4, 20), 1,
 				ReflectApplicationHelper.createReflectStatusResult(ReflectedState.REFLECTED), // 反映状態=反映済み
-				NotUseAtr.NOT_USE);
+				NotUseAtr.NOT_USE, new EmploymentHistShareImport("", "", new DatePeriod(GeneralDate.min(), GeneralDate.max())));
 
 		new Verifications() {
 			{
@@ -175,7 +180,7 @@ public class SCApplicationCancellationProcessTest {
 		};
 		SCApplicationCancellationProcess.processSchedule(require, "", application, GeneralDate.ymd(2021, 4, 20), 1,
 				ReflectApplicationHelper.createReflectStatusResult(ReflectedState.REFLECTED), // 反映状態=未反映
-				NotUseAtr.USE);
+				NotUseAtr.USE, new EmploymentHistShareImport("", "", new DatePeriod(GeneralDate.min(), GeneralDate.max())));
 
 		new Verifications() {
 			{
@@ -205,6 +210,7 @@ public class SCApplicationCancellationProcessTest {
 	 * →事前申請の処理ができる
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void test5(@Mocked PreCheckProcessWorkSchedule pre) {
 
@@ -220,14 +226,14 @@ public class SCApplicationCancellationProcessTest {
 						NotUseAtr.NOT_USE, // 務予定が確定状態でも反映する
 						NotUseAtr.NOT_USE));
 				PreCheckProcessWorkSchedule.preCheck(require, "", (Application) any, anyInt, anyBoolean,
-						(ReflectStatusResult) any, (GeneralDate) any);
+						(ReflectStatusResult) any, (GeneralDate) any, (List<SEmpHistImport>) any);
 				result = new PreCheckProcessResult(NotUseAtr.USE, null);// 前申請の処理ができる
 
 			}
 		};
 		SCApplicationCancellationProcess.processSchedule(require, "", application, GeneralDate.ymd(2021, 4, 20), 1,
 				ReflectApplicationHelper.createReflectStatusResult(ReflectedState.REFLECTED), // 反映状態=未反映
-				NotUseAtr.USE);
+				NotUseAtr.USE, new EmploymentHistShareImport("", "", new DatePeriod(GeneralDate.min(), GeneralDate.max())));
 
 		new Verifications() {
 			{
@@ -257,6 +263,7 @@ public class SCApplicationCancellationProcessTest {
 	 * →事前申請の処理ができない
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void test6(@Mocked PreCheckProcessWorkSchedule pre) {
 
@@ -272,7 +279,7 @@ public class SCApplicationCancellationProcessTest {
 						NotUseAtr.NOT_USE, // 務予定が確定状態でも反映する
 						NotUseAtr.NOT_USE));
 				PreCheckProcessWorkSchedule.preCheck(require, "", (Application) any, anyInt, anyBoolean,
-						(ReflectStatusResult) any, (GeneralDate) any);
+						(ReflectStatusResult) any, (GeneralDate) any, (List<SEmpHistImport>) any);
 				result = new PreCheckProcessResult(NotUseAtr.NOT_USE, ReflectApplicationHelper
 						.createReflectStatusResult(ReflectedState.REFLECTED, ReasonNotReflect.ACHIEVEMENTS_LOCKED));// 事前申請の処理ができない
 
@@ -281,7 +288,7 @@ public class SCApplicationCancellationProcessTest {
 		SCCancelProcessOneDayOutput actualResult = SCApplicationCancellationProcess.processSchedule(require, "",
 				application, GeneralDate.ymd(2021, 4, 20), 1,
 				ReflectApplicationHelper.createReflectStatusResult(ReflectedState.REFLECTED), // 反映状態=未反映
-				NotUseAtr.USE);
+				NotUseAtr.USE, new EmploymentHistShareImport("", "", new DatePeriod(GeneralDate.min(), GeneralDate.max())));
 
 		assertThat(actualResult.getStatusWorkSchedule().getReasonNotReflectWorkSchedule())
 				.isEqualTo(ReasonNotReflect.ACHIEVEMENTS_LOCKED);

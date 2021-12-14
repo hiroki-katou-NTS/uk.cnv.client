@@ -100,6 +100,13 @@ public class JpaWorkTypeRepository extends JpaRepository implements WorkTypeRepo
 			+ " AND c.kshmtWorkTypePK.workTypeCode IN :codes AND c.deprecateAtr = 0"
 			+ " ORDER BY c.kshmtWorkTypePK.workTypeCode ASC";
 
+	private static final String FIND_ALL_BY_LIST_CODE = SELECT_FROM_WORKTYPE
+			+ " LEFT JOIN KshmtWorkTypeOrder o"
+			+ " ON c.kshmtWorkTypePK.companyId = o.kshmtWorkTypeDispOrderPk.companyId AND c.kshmtWorkTypePK.workTypeCode = o.kshmtWorkTypeDispOrderPk.workTypeCode"
+			+ " WHERE c.kshmtWorkTypePK.companyId = :companyId"
+			+ " AND c.kshmtWorkTypePK.workTypeCode IN :codes "
+			+ " ORDER BY c.kshmtWorkTypePK.workTypeCode ASC";
+	
 	private static final String FIND_NOT_DEPRECATED = SELECT_FROM_WORKTYPE + " LEFT JOIN KshmtWorkTypeOrder o"
 			+ " ON c.kshmtWorkTypePK.workTypeCode = o.kshmtWorkTypeDispOrderPk.workTypeCode"
 			+ " WHERE c.kshmtWorkTypePK.companyId = :companyId" + " AND c.deprecateAtr = 0"
@@ -600,6 +607,19 @@ public class JpaWorkTypeRepository extends JpaRepository implements WorkTypeRepo
 		List<WorkType> resultList = new ArrayList<>();
 		CollectionUtil.split(codes, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subList -> {
 			resultList.addAll(this.queryProxy().query(FIND_NOT_DEPRECATED_BY_LIST_CODE, KshmtWorkType.class)
+								.setParameter("companyId", companyId)
+								.setParameter("codes", subList)
+								.getList(c -> toDomain(c)));
+		});
+		resultList.sort(Comparator.comparing(WorkType::getWorkTypeCode));
+		return resultList;
+	}
+	
+	@Override
+	public List<WorkType> findAllByListCode(String companyId, List<String> codes) {
+		List<WorkType> resultList = new ArrayList<>();
+		CollectionUtil.split(codes, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subList -> {
+			resultList.addAll(this.queryProxy().query(FIND_ALL_BY_LIST_CODE, KshmtWorkType.class)
 								.setParameter("companyId", companyId)
 								.setParameter("codes", subList)
 								.getList(c -> toDomain(c)));

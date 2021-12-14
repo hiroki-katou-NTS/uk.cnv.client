@@ -46,7 +46,7 @@ public interface SpecialHolidayRepository {
 	
 	Optional<SpecialHoliday> findBySingleCD(String companyID, int specialHolidayCD);
 	/**
-	 * 欠勤枠CDから特別休暇CDを取得する
+	 * 欠勤枠Noから特別休暇CDを取得する
 	 * @param cid
 	 * @param absFrameNo 特別休暇枠NO
 	 * @return
@@ -60,7 +60,7 @@ public interface SpecialHolidayRepository {
 	List<SpecialHoliday> findByCompanyIdWithTargetItem(String companyId);
 	
 	/**
-	 * 特別休暇枠CDから特別休暇CDを取得する
+	 * 特別休暇枠Noから特別休暇CDを取得する
 	 * @param cid
 	 * @param absFrameNo 特別休暇枠NO
 	 * @return

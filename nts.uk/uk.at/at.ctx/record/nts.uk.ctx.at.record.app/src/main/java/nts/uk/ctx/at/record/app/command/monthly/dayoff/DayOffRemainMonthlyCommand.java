@@ -3,8 +3,8 @@ package nts.uk.ctx.at.record.app.command.monthly.dayoff;
 import lombok.Getter;
 import nts.uk.ctx.at.record.app.command.monthly.MonthlyWorkCommonCommand;
 import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyDayoffRemainDataDto;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.MonthlyDayoffRemainData;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ConvertibleAttendanceItem;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.MonthlyDayoffRemainData;
 
 public class DayOffRemainMonthlyCommand extends MonthlyWorkCommonCommand{
 

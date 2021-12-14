@@ -25,5 +25,6 @@ public interface ExecutionLogExportPub {
 	void updateLogInfo(String employeeID, String empCalAndSumExecLogId, int executionContent, int state);
 	
 	void updateLogInfo(String empCalAndSumExecLogID, int executionContent, int processStatus);
-	Boolean isCalWhenLock(String empCalAndSumExecLogId, int executionContent);
+	
+	boolean isCalWhenLock(String empCalAndSumExecLogId, int executionContent);
 }

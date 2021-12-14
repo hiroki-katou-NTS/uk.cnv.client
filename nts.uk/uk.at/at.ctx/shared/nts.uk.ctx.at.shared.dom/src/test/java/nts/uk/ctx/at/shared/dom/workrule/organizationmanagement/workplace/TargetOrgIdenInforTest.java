@@ -1,11 +1,10 @@
 package nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,11 +19,10 @@ import nts.arc.testing.assertion.NtsAssert;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.TargetOrgIdenInfor.Require;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.WorkplaceGroupImport;
-import nts.uk.ctx.at.shared.dom.workrule.shiftmaster.ShiftMasterOrgHelper;
 
 @RunWith(JMockit.class)
 public class TargetOrgIdenInforTest {
-	
+
 	@Injectable
 	private Require require;
 
@@ -51,10 +49,10 @@ public class TargetOrgIdenInforTest {
 
 	@Test
 	public void getters() {
-		TargetOrgIdenInfor targetOrgIdenInfor = ShiftMasterOrgHelper.getTargetOrgIdenInforEmpty();
+		TargetOrgIdenInfor targetOrgIdenInfor = TargetOrgIdenInfor.creatIdentifiWorkplace("workplaceId");
 		NtsAssert.invokeGetters(targetOrgIdenInfor);
 	}
-	
+
 	@Test
 	public void testCreatIdentifiWorkplaceGroup() {
 		String workplaceGroupId = "workplaceGroupId";
@@ -63,7 +61,7 @@ public class TargetOrgIdenInforTest {
 		assertThat(targetOrgIdenInfor.getWorkplaceId().isPresent()).isFalse();
 		assertThat(targetOrgIdenInfor.getWorkplaceGroupId().get()).isEqualTo(workplaceGroupId);
 	}
-	
+
 	@Test
 	public void testCreatIdentifiWorkplace() {
 		String workplaceId = "workplaceId";
@@ -72,7 +70,7 @@ public class TargetOrgIdenInforTest {
 		assertThat(targetOrgIdenInfor.getWorkplaceId().get()).isEqualTo(workplaceId);
 		assertThat(targetOrgIdenInfor.getWorkplaceGroupId().isPresent()).isFalse();
 	}
-	
+
 	/**
 	 * WORKPLACE_GROUP
 	 * require.職場グループIDを指定して職場グループを取得する( list: @職場グループID ) is empty
@@ -82,18 +80,18 @@ public class TargetOrgIdenInforTest {
 		String workplaceGroupId = "workplaceGroupId";
 		TargetOrgIdenInfor targetOrgIdenInfor = TargetOrgIdenInfor.creatIdentifiWorkplaceGroup(workplaceGroupId);
 		GeneralDate referenceDate = GeneralDate.today();
-		
+
 		new Expectations() {
 			{
 				require.getSpecifyingWorkplaceGroupId(Arrays.asList(workplaceGroupId));
-				
+
 			}
 		};
-		NtsAssert.businessException("Msg_37", 
+		NtsAssert.businessException("Msg_37",
 				() -> { targetOrgIdenInfor.getDisplayInfor(require, referenceDate); });
-		
+
 	}
-	
+
 	/**
 	 * WORKPLACE_GROUP
 	 * require.職場グループIDを指定して職場グループを取得する( list: @職場グループID ) is not empty
@@ -104,12 +102,12 @@ public class TargetOrgIdenInforTest {
 		TargetOrgIdenInfor targetOrgIdenInfor = TargetOrgIdenInfor.creatIdentifiWorkplaceGroup(workplaceGroupId);
 		GeneralDate referenceDate = GeneralDate.today();
 		WorkplaceGroupImport workplaceGroupImport = new WorkplaceGroupImport(workplaceGroupId, "workplaceGroupCode", "workplaceGroupName", 1);
-		
+
 		new Expectations() {
 			{
 				require.getSpecifyingWorkplaceGroupId(Arrays.asList(workplaceGroupId));
 				result = Arrays.asList(workplaceGroupImport);
-				
+
 			}
 		};
 		new MockUp<I18NText>() {
@@ -125,7 +123,7 @@ public class TargetOrgIdenInforTest {
 		assertThat(displayInfoOrganization.getDisplayName()).isEqualTo(workplaceGroupImport.getWorkplaceGroupName());
 		assertThat(displayInfoOrganization.getGenericTerm()).isEqualTo(workplaceGroupImport.getWorkplaceGroupName());
 	}
-	
+
 	/**
 	 * WORKPLACE
 	 * require.運用している職場をすべて取得する( list: @職場ID, 基準日 ) is empty
@@ -135,16 +133,16 @@ public class TargetOrgIdenInforTest {
 		String workplaceId = "workplaceId";
 		TargetOrgIdenInfor targetOrgIdenInfor = TargetOrgIdenInfor.creatIdentifiWorkplace(workplaceId);
 		GeneralDate referenceDate = GeneralDate.today();
-		
+
 		new Expectations() {
 			{
 				require.getWorkplaceInforFromWkpIds(Arrays.asList(workplaceId), referenceDate);
-				
+
 			}
 		};
-		NtsAssert.businessException("Msg_37", 
+		NtsAssert.businessException("Msg_37",
 				() -> { targetOrgIdenInfor.getDisplayInfor(require, referenceDate); });
-		
+
 	}
 	/**
 	 * WORKPLACE
@@ -158,12 +156,12 @@ public class TargetOrgIdenInforTest {
 		WorkplaceInfo workplaceInfo = new WorkplaceInfo(workplaceId, Optional.of("workplaceCd"),
 				Optional.of("workplaceName"), Optional.of("outsideWkpCd"), Optional.of("wkpGenericName"),
 				Optional.of("wkpDisplayName"), Optional.of("tierCd"));
-		
+
 		new Expectations() {
 			{
 				require.getWorkplaceInforFromWkpIds(Arrays.asList(workplaceId), referenceDate);
 				result = Arrays.asList(workplaceInfo);
-				
+
 			}
 		};
 		new MockUp<I18NText>() {
@@ -179,7 +177,7 @@ public class TargetOrgIdenInforTest {
 		assertThat(displayInfoOrganization.getDisplayName()).isEqualTo(workplaceInfo.getWkpDisplayName().get());
 		assertThat(displayInfoOrganization.getGenericTerm()).isEqualTo(workplaceInfo.getWkpGenericName().get());
 	}
-	
+
 	/**
 	 * WORKPLACE
 	 */
@@ -187,7 +185,7 @@ public class TargetOrgIdenInforTest {
 	public void testGetWorkplaceBelongsOrganization() {
 		String workplaceId = "workplaceId";
 		TargetOrgIdenInfor targetOrgIdenInfor = TargetOrgIdenInfor.creatIdentifiWorkplace(workplaceId);
-		
+
 		List<String> listData = targetOrgIdenInfor.getWorkplaceBelongsOrganization(require);
 		assertThat(listData)
 		.extracting(d->d)
@@ -202,16 +200,16 @@ public class TargetOrgIdenInforTest {
 		TargetOrganizationUnit unit = TargetOrganizationUnit.WORKPLACE_GROUP;
 		String workplaceGroupId = "workplaceGroupId";
 		TargetOrgIdenInfor targetOrgIdenInfor = new TargetOrgIdenInfor(unit, Optional.empty(), Optional.of(workplaceGroupId));
-		
+
 		new Expectations() {
 			{
 				require.getWKPID(workplaceGroupId);
-				
+
 			}
 		};
 		List<String> listData = targetOrgIdenInfor.getWorkplaceBelongsOrganization(require);
 		assertThat(listData.isEmpty()).isTrue();
-		
+
 	}
 	/**
 	 * WORKPLACE_GROUP
@@ -227,16 +225,16 @@ public class TargetOrgIdenInforTest {
 			{
 				require.getWKPID(workplaceGroupId);
 				result = listResult;
-				
+
 			}
 		};
 		List<String> listData = targetOrgIdenInfor.getWorkplaceBelongsOrganization(require);
 		assertThat( listData ).containsExactlyElementsOf( listResult );
 		assertThat( listData ).containsExactlyInAnyOrderElementsOf( listResult );
-		
+
 	}
-	
-	
+
+
 
 }
 

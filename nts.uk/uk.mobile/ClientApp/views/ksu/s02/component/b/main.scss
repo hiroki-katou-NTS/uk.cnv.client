@@ -474,10 +474,11 @@ body { font-family: "Meiryo UI"; }
   border: 1px solid #ced4da;
   margin-top: 20px;
   height: 22px;
-  white-space: nowrap;
+  
   width: auto !important;
   padding: 0px;
   padding-top: 2px;
+  overflow: hidden;
 }
 
 .uk-bg-green:hover {
@@ -504,6 +505,34 @@ font-size:5px;
 }
 
 .caret-bottom1:after {
+  content: '';
+  display: inline-block;
+  width: 0;
+  height: 0;
+  vertical-align: middle;
+  font-size: 1em;
+}
+
+.caret-helpbutton.caret-bottom2:after {
+  left: 10px;
+font-size:5px;
+  border-top: 2em solid;
+  border-right: 1em solid transparent;
+  border-left: 1em solid transparent;
+}
+
+
+.caret-helpbutton.caret-bottom2:before {
+  left: 10px;
+font-size:5px;
+  border-top: 2.1em solid;
+  border-right: 1.1em solid transparent;
+  border-left: 1.1em solid transparent;
+  margin-left: -0.1em;
+  margin-bottom: -0.1em;
+}
+
+.caret-bottom2:after {
   content: '';
   display: inline-block;
   width: 0;

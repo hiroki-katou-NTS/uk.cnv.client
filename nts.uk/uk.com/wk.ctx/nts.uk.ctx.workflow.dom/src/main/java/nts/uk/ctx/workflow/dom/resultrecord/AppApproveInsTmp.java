@@ -16,8 +16,7 @@ public class AppApproveInsTmp {
 	private String approverChildID;
 	
 	public boolean equalOther(AppApproveInsTmp appApproveInsTmp) {
-		if(rootID.equals(appApproveInsTmp.getRootID()) &&
-			phaseOrder==appApproveInsTmp.getPhaseOrder() &&
+		if(phaseOrder==appApproveInsTmp.getPhaseOrder() &&
 			frameOrder==appApproveInsTmp.getFrameOrder() &&
 			approverChildID.equals(appApproveInsTmp.getApproverChildID())) {
 			return true;

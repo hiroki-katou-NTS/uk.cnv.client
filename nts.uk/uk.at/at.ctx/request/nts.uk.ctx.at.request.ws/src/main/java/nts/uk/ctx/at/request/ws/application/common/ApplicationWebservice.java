@@ -38,10 +38,7 @@ import nts.uk.ctx.at.request.app.find.application.common.AppDispInfoWithDateDto;
 import nts.uk.ctx.at.request.app.find.application.common.AppPrintQuery;
 import nts.uk.ctx.at.request.app.find.application.common.ApplicationExportService;
 import nts.uk.ctx.at.request.app.find.application.common.ApplicationFinder;
-import nts.uk.ctx.at.request.app.find.application.common.ApprovalRootOfSubjectRequestDto;
-import nts.uk.ctx.at.request.app.find.application.common.GetDataApprovalRootOfSubjectRequest;
 import nts.uk.ctx.at.request.app.find.application.common.GetDataCheckDetail;
-import nts.uk.ctx.at.request.app.find.application.common.ObjApprovalRootInput;
 import nts.uk.ctx.at.request.app.find.application.common.OutputDetailCheckDto;
 import nts.uk.ctx.at.request.app.find.application.common.dto.AppDateParamCommon;
 import nts.uk.ctx.at.request.app.find.application.common.dto.ApplicationMetaDto;
@@ -56,7 +53,6 @@ import nts.uk.ctx.at.request.dom.application.common.service.application.output.A
 import nts.uk.ctx.at.request.dom.application.common.service.detailscreen.InputGetDetailCheck;
 import nts.uk.ctx.at.request.dom.application.common.service.detailscreen.after.RemandCommand;
 import nts.uk.ctx.at.request.dom.application.common.service.detailscreen.before.DetailBeforeUpdate;
-import nts.uk.ctx.at.request.dom.application.common.service.detailscreen.output.MailSenderResult;
 import nts.uk.ctx.at.request.dom.application.common.service.newscreen.output.ConfirmMsgOutput;
 import nts.uk.ctx.at.request.dom.application.common.service.other.output.AchievementOutput;
 import nts.uk.ctx.at.request.dom.application.common.service.other.output.ApproveProcessResult;
@@ -72,10 +68,6 @@ import nts.uk.shr.infra.web.util.StartPageLogService;
 @Path("at/request/application")
 @Produces("application/json")
 public class ApplicationWebservice extends WebService {
-	
-	
-	@Inject 
-	private GetDataApprovalRootOfSubjectRequest getDataApprovalRoot;
 	
 	@Inject 
 	private GetDataAppCfDetailFinder getDataAppCfDetailFinder;
@@ -131,7 +123,7 @@ public class ApplicationWebservice extends WebService {
 	 */
 	@POST
 	@Path("remandapp")
-	public MailSenderResult remandApp(RemandCommand command){
+	public ProcessResult remandApp(RemandCommand command){
 		return remandApplicationHandler.handle(command);
 	}
 	
@@ -146,16 +138,6 @@ public class ApplicationWebservice extends WebService {
 		return this.getDataAppCfDetailFinder.getDataConfigDetail(application);
 	}*/
 	//new InputMessageDeadline("000000000000-0005",null,1,null)
-	
-	/**
-	 * get data  ApprovalRootOfSubjectRequest
-	 * @return
-	 */
-	@POST
-	@Path("getdataapprovalroot")
-	public List<ApprovalRootOfSubjectRequestDto> getDataApprovalRoot(ObjApprovalRootInput objApprovalRootInput) {
-		return this.getDataApprovalRoot.getApprovalRootOfSubjectRequest(objApprovalRootInput);
-	}
 	
 	/**
 	 * get getDetailedScreenPreBootMode (check)

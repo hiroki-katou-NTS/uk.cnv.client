@@ -32,6 +32,15 @@ public class JpaBPTimeItemSettingRepository extends JpaRepository implements BPT
 			+ " WHERE k.kbpstBonusPayTimeItemPK.timeItemTypeAtr = 1 " + " AND k.useAtr = 1 "
 			+ " AND c.kbpstBPTimeItemSettingPK.companyId = :companyId "
 			+ " ORDER BY k.kbpstBonusPayTimeItemPK.timeItemNo";
+	
+	private static final String SELECT_ALL_BPTIMEITEMSET_BY_COMPANYID = "SELECT c " + " FROM KbpstBPTimeItemSetting c "
+			+ " JOIN KbpstBonusPayTimeItem k "
+			+ " ON c.kbpstBPTimeItemSettingPK.timeItemNo = k.kbpstBonusPayTimeItemPK.timeItemNo "
+			+ " AND c.kbpstBPTimeItemSettingPK.timeItemTypeAtr = k.kbpstBonusPayTimeItemPK.timeItemTypeAtr "
+			+ " AND c.kbpstBPTimeItemSettingPK.companyId = k.kbpstBonusPayTimeItemPK.companyId "
+			+ " WHERE k.useAtr = 1 "
+			+ " AND c.kbpstBPTimeItemSettingPK.companyId = :companyId "
+			+ " ORDER BY k.kbpstBonusPayTimeItemPK.timeItemNo";
 
 	@Override
 	public List<BPTimeItemSetting> getListSetting(String companyId) {
@@ -42,6 +51,12 @@ public class JpaBPTimeItemSettingRepository extends JpaRepository implements BPT
 	@Override
 	public List<BPTimeItemSetting> getListSpecialSetting(String companyId) {
 		return this.queryProxy().query(SELECT_SPEC_BPTIMEITEMSET_BY_COMPANYID, KbpstBPTimeItemSetting.class)
+				.setParameter("companyId", companyId).getList(x -> this.toBPTimeItemSettingDomain(x));
+	}
+	
+	@Override
+	public List<BPTimeItemSetting> getListAllSetting(String companyId) {
+		return this.queryProxy().query(SELECT_ALL_BPTIMEITEMSET_BY_COMPANYID, KbpstBPTimeItemSetting.class)
 				.setParameter("companyId", companyId).getList(x -> this.toBPTimeItemSettingDomain(x));
 	}
 

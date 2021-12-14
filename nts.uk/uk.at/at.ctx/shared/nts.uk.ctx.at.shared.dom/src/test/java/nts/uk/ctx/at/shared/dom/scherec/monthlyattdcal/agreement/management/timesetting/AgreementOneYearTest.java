@@ -22,7 +22,7 @@ public class AgreementOneYearTest {
     public void getters() {
         AgreementOneYear agreementOneYear = new AgreementOneYear(
                  OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20)),
-                 OneYearTime.of( OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20))
+                 OneYearTime.createWithCheck( OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20))
                         ,new AgreementOneYearTime(20))
         );
         NtsAssert.invokeGetters(agreementOneYear);
@@ -32,7 +32,7 @@ public class AgreementOneYearTest {
 
         AgreementOneYear agreementOneYear = new AgreementOneYear(
                  OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20)),
-                 OneYearTime.of( OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20))
+                 OneYearTime.createWithCheck( OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20))
                         ,new AgreementOneYearTime(20))
         );
         val agreementOneYearTime = new AgreementOneYearTime(60);
@@ -51,7 +51,7 @@ public class AgreementOneYearTest {
     public void calculateAlarmTimeTest() {
         AgreementOneYear agreementOneYear = new AgreementOneYear(
                  OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20)),
-                 OneYearTime.of( OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20))
+                 OneYearTime.createWithCheck( OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20))
                         ,new AgreementOneYearTime(20))
         );
         val agreementOneYearTime = new AgreementOneYearTime(20);
@@ -118,7 +118,7 @@ public class AgreementOneYearTest {
 
         AgreementOneYear agreementOneYear = new AgreementOneYear(
                 OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20)),
-                OneYearTime.of( OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20))
+                OneYearTime.createWithCheck( OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20))
                         ,new AgreementOneYearTime(20))
         );
         val specConditionLimit=   agreementOneYear.getSpecConditionLimit();
@@ -138,7 +138,7 @@ public class AgreementOneYearTest {
 
         AgreementOneYear agreementOneYear = new AgreementOneYear(
                 OneYearErrorAlarmTime.of(new AgreementOneYearTime(21),new AgreementOneYearTime(20)),
-                OneYearTime.of( OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20))
+                OneYearTime.createWithCheck( OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20))
                         ,new AgreementOneYearTime(20))
         );
         val specConditionLimit=   agreementOneYear.getSpecConditionLimit();
@@ -158,7 +158,7 @@ public class AgreementOneYearTest {
 
         AgreementOneYear agreementOneYear = new AgreementOneYear(
                 OneYearErrorAlarmTime.of(new AgreementOneYearTime(18),new AgreementOneYearTime(15)),
-                OneYearTime.of( OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20))
+                OneYearTime.createWithCheck( OneYearErrorAlarmTime.of(new AgreementOneYearTime(20),new AgreementOneYearTime(20))
                         ,new AgreementOneYearTime(20))
         );
         val specConditionLimit=   agreementOneYear.getSpecConditionLimit();

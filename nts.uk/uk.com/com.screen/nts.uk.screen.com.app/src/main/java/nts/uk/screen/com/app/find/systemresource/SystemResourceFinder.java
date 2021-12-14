@@ -40,7 +40,7 @@ public class SystemResourceFinder {
 		String companyId = AppContexts.user().companyId();
 		
 		List<String> listResourceIds = Arrays.asList("Com_Person", "Com_Employment", "Com_Class", "Com_Jobtitle",
-				  "Com_Department", "Com_Workplace", "Com_Office", "Com_Company",
+				  "Com_Department", "Com_Workplace", "Com_EquipmentClass", "Com_EquipmentItem", "Com_Office", "Com_Company",
 				  "Com_Contract", "Com_User", "Com_Project", "Com_AdHocWork",
 				  "Com_BindingTime", "Com_AttendanceDays", "Com_AbsenceDays", "Com_PaidHoliday",
 				  "Com_FundedPaidHoliday", "Com_SubstituteWork", "Com_CompensationHoliday", "Com_ExsessHoliday",

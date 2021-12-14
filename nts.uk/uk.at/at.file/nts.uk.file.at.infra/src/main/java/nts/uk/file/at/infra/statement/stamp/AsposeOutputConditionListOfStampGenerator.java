@@ -1,9 +1,11 @@
 package nts.uk.file.at.infra.statement.stamp;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -199,9 +201,12 @@ public class AsposeOutputConditionListOfStampGenerator extends AsposeCellsReport
 		Map<String, List<StampList>> cardGroup = employeeInfor.getStampList().stream()
 				.collect(Collectors.groupingBy(StampList::getCardNo));
 		
-		AtomicInteger rows = new AtomicInteger(startRow);
+		List<String> cardSort = cardGroup.entrySet().stream().map(c->c.getKey()).sorted().collect(Collectors.toList());
 		
-		cardGroup.forEach((k, v) -> {
+		AtomicInteger rows = new AtomicInteger(startRow);
+
+		for (String k : cardSort) {
+			List<StampList> v = cardGroup.get(k);
 			int height = 0;
 			this.pageBreaks(rows, cell, employeeInfor, v.get(0));
 			for (StampList data : v) {
@@ -216,7 +221,8 @@ public class AsposeOutputConditionListOfStampGenerator extends AsposeCellsReport
 				rows.set(rows.get() + 1);
 			}
 			reportContext.getWorkbook().getWorksheets().get(0).getHorizontalPageBreaks().add(rows.get());
-		});
+		}
+		
 		reportContext.getWorkbook().getWorksheets().get(0).getHorizontalPageBreaks().add(rows.get());
 		return rows.get();
 	}

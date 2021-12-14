@@ -1,12 +1,16 @@
 package nts.uk.ctx.at.request.dom.application.common.adapter.bs.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import nts.arc.time.calendar.period.DatePeriod;
 /**
  * @author loivt
  * 所属雇用履歴を取得
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SEmpHistImport {
 	
 	/** The employee id. */

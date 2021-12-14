@@ -6,7 +6,6 @@ package nts.uk.screen.at.app.dailyperformance.correction.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nts.arc.time.GeneralDate;
 
 /**
  * @author hungnm - 代休残数
@@ -16,7 +15,10 @@ import nts.arc.time.GeneralDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CompensLeaveComDto {
-
+	
+	/**
+	 * 代休管理する
+	 */
 	private boolean manageCompenLeave;
 
 	private boolean manageTimeOff;

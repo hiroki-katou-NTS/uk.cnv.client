@@ -220,8 +220,8 @@
 		                                </tbody>
 		                            </table>
 		                            <div style="width: 350px">
-		                            <label data-bind="text: dataHoliday().dispSysDate, visible: referenceVacation().allVacation()" style="max-width: 100px"></label>
-		                            <label style="max-width: 125px" data-bind="text: dataHoliday().dispNextGrantDate, visible: referenceVacation().yearHoliday20()"></label>
+		                            <label data-bind="text: dataHoliday().dispSysDate, visible: dataHoliday().displayAllUI" style="max-width: 100px"></label>
+		                            <label style="max-width: 125px" data-bind="text: dataHoliday().dispNextGrantDate, visible: dataHoliday().dispAnnualDayUI"></label>
 		                            </div>
 		                        </div>
 		                        <div class="agree-column" data-bind="let: { fst: agreementInfomation() }">

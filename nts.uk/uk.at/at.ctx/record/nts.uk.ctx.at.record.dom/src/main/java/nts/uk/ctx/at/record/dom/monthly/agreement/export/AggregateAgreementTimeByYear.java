@@ -14,6 +14,7 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.AgreementTimeOf
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.AgreementTimeOfYear;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.AgreementTimeYear;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.management.oneyear.AgreementOneYearTime;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.management.oneyear.OneYearTime;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.management.setting.AgreementOperationSetting;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.management.timesetting.BasicAgreementSettingForCalc;
 import nts.uk.shr.com.context.AppContexts;
@@ -64,7 +65,7 @@ public class AggregateAgreementTimeByYear {
 			current = current.addMonths(1);
 		}
 		
-		/** 36協定年間時間を作成して返す */
+		/** 36協定時間状態を確認する */
 		val state = agreementSet.checkForOneYear(yearTime.getAgreementTime(), yearTime.getLegalLimitTime());
 		
 		/** 36協定年間時間を作成して返す */
@@ -73,7 +74,7 @@ public class AggregateAgreementTimeByYear {
 											oneYearSet.getSpecConditionLimit()),
 									AgreementTimeOfYear.of(
 											new AgreementOneYearTime(yearTime.getAgreementTime().valueAsMinutes()), 
-											oneYearSet.getSpecConditionLimit()), 
+											OneYearTime.createWithNoUpperLimit(oneYearSet.getBasic())),
 									state);
 	}
 	

@@ -96,10 +96,10 @@ public class LateLeaveEarlyTimeSheet extends TimeVacationOffSetItem{
 			}
 			return this.getTimeSheet().getEnd().backByMinutes(diffMinutes);
 		}
-		// 開始から丸め後の遅刻時間分加算した時刻を求める　→　遅刻時間帯
+		// 開始から丸め前の遅刻時間分加算した時刻を求める　→　遅刻時間帯
 		TimeSpanForDailyCalc lateTimeSheet = new TimeSpanForDailyCalc(
 				this.getTimeSheet().getStart(),
-				this.getTimeSheet().getStart().forwardByMinutes(afterRounding.valueAsMinutes()));
+				this.getTimeSheet().getStart().forwardByMinutes(beforeRounding.valueAsMinutes()));
 		// 控除時間帯を取得　（開始時刻でソート）
 		List<TimeSheetOfDeductionItem> deductItems = deductTimeSheet.getForDeductionTimeZoneList().stream()
 				.sorted((time1,time2) -> time1.getTimeSheet().getStart().compareTo(time2.getTimeSheet().getStart()))
@@ -158,9 +158,9 @@ public class LateLeaveEarlyTimeSheet extends TimeVacationOffSetItem{
 			}
 			return this.getTimeSheet().getStart().forwardByMinutes(diffMinutes);
 		}
-		// 終了から丸め後の早退時間分減算した時刻を求める　→　早退時間帯
+		// 終了から丸め前の早退時間分減算した時刻を求める　→　早退時間帯
 		TimeSpanForDailyCalc leaveTimeSheet = new TimeSpanForDailyCalc(
-				this.getTimeSheet().getEnd().backByMinutes(afterRounding.valueAsMinutes()),
+				this.getTimeSheet().getEnd().backByMinutes(beforeRounding.valueAsMinutes()),
 				this.getTimeSheet().getEnd());
 		// 控除時間帯を取得　（開始時刻で逆ソート）
 		List<TimeSheetOfDeductionItem> deductItems = new ArrayList<>(
@@ -216,6 +216,28 @@ public class LateLeaveEarlyTimeSheet extends TimeVacationOffSetItem{
 		this.grantRoundingDeductionOrAppropriateForLate(actualAtr, DeductionAtr.Appropriate, commonSet);
 		// 控除用控除時間帯に丸め設定を付与
 		this.grantRoundingDeductionOrAppropriateForLate(actualAtr, DeductionAtr.Deduction, commonSet);
+	}
+	
+	/**
+	 * 丸め後の遅刻時間帯を取得する
+	 * @return 丸め後の遅刻時間帯
+	 */
+	public TimeSpanForDailyCalc getAfterRoundingAsLate() {
+		//丸め差分
+		int roundDiff = this.calcTotalTime(NotUseAtr.USE, NotUseAtr.USE).valueAsMinutes() - this.calcTotalTime(NotUseAtr.USE, NotUseAtr.NOT_USE).valueAsMinutes();
+		TimeSpanForDailyCalc result = this.timeSheet.shiftEndAhead(roundDiff);
+		return result;
+	}
+	
+	/**
+	 * 丸め後の早退時間帯を取得する
+	 * @return 丸め後の早退時間帯
+	 */
+	public TimeSpanForDailyCalc getAfterRoundingAsLeaveEarly() {
+		//丸め差分
+		int roundDiff = this.calcTotalTime(NotUseAtr.USE, NotUseAtr.USE).valueAsMinutes() - this.calcTotalTime(NotUseAtr.USE, NotUseAtr.NOT_USE).valueAsMinutes();
+		TimeSpanForDailyCalc result = this.timeSheet.shiftStartBack(roundDiff);
+		return result;
 	}
 	
 	/**

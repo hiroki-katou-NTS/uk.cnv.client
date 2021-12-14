@@ -23,7 +23,7 @@ public class OneMonthTimeTest {
         NtsAssert.businessException("Msg_59", () -> {
             OneMonthErrorAlarmTime oneMonthErrorAlarmTime = OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(30),
                     new AgreementOneMonthTime(20));
-            OneMonthTime.of(oneMonthErrorAlarmTime, new AgreementOneMonthTime(10));
+            OneMonthTime.createWithCheck(oneMonthErrorAlarmTime, new AgreementOneMonthTime(10));
         });
     }
 
@@ -31,7 +31,7 @@ public class OneMonthTimeTest {
     public void createTest_2() {
         OneMonthErrorAlarmTime errorTimeInMonth = OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30));
 
-        OneMonthTime target = OneMonthTime.of(errorTimeInMonth,new AgreementOneMonthTime(50));
+        OneMonthTime target = OneMonthTime.createWithCheck(errorTimeInMonth,new AgreementOneMonthTime(50));
 
         assertThat(target.getErAlTime().getError()).isEqualTo(errorTimeInMonth.getError());
         assertThat( target.getErAlTime().getAlarm()).isEqualTo(errorTimeInMonth.getAlarm());
@@ -40,7 +40,7 @@ public class OneMonthTimeTest {
 
     @Test
     public void errorCheckTest_Normal() {
-        OneMonthTime target = OneMonthTime.of(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
+        OneMonthTime target = OneMonthTime.createWithCheck(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
                 new AgreementOneMonthTime(50));
         ExcessState result = target.check(new AttendanceTimeMonth(30));
 
@@ -49,7 +49,7 @@ public class OneMonthTimeTest {
 
     @Test
     public void errorCheckTest_AlarmOver() {
-        OneMonthTime target = OneMonthTime.of(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
+        OneMonthTime target = OneMonthTime.createWithCheck(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
                 new AgreementOneMonthTime(50));
         ExcessState result = target.check(new AttendanceTimeMonth(40));
 
@@ -58,7 +58,7 @@ public class OneMonthTimeTest {
 
     @Test
     public void errorCheckTest_ErrorOver() {
-        OneMonthTime target = OneMonthTime.of(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
+        OneMonthTime target = OneMonthTime.createWithCheck(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
                 new AgreementOneMonthTime(50));
         ExcessState result = target.check(new AttendanceTimeMonth(45));
 
@@ -67,7 +67,7 @@ public class OneMonthTimeTest {
 
     @Test
     public void errorCheckTest_MaxTime() {
-        OneMonthTime target = OneMonthTime.of(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
+        OneMonthTime target = OneMonthTime.createWithCheck(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
                 new AgreementOneMonthTime(50));
         ExcessState result = target.check(new AttendanceTimeMonth(60));
 
@@ -76,7 +76,7 @@ public class OneMonthTimeTest {
 
     @Test
     public void checkErrorTimeExceededTest_1() {
-        OneMonthTime target = OneMonthTime.of(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
+        OneMonthTime target = OneMonthTime.createWithCheck(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
                 new AgreementOneMonthTime(50));
         Pair<Boolean, AgreementOneMonthTime> result = target.isErrorTimeOver(new AgreementOneMonthTime(60));
 
@@ -86,7 +86,7 @@ public class OneMonthTimeTest {
 
     @Test
     public void checkErrorTimeExceededTest_2() {
-        OneMonthTime target = OneMonthTime.of(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
+        OneMonthTime target = OneMonthTime.createWithCheck(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
                 new AgreementOneMonthTime(50));
         Pair<Boolean, AgreementOneMonthTime> result = target.isErrorTimeOver(new AgreementOneMonthTime(35));
 
@@ -96,7 +96,7 @@ public class OneMonthTimeTest {
 
     @Test
     public void calculateAlarmTimeTest_1() {
-        OneMonthTime target = OneMonthTime.of(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
+        OneMonthTime target = OneMonthTime.createWithCheck(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
                 new AgreementOneMonthTime(50));
         AgreementOneMonthTime result = target.calcAlarmTime(new AgreementOneMonthTime(50));
 
@@ -105,7 +105,7 @@ public class OneMonthTimeTest {
 
     @Test
     public void calculateAlarmTimeTest_2() {
-        OneMonthTime target = OneMonthTime.of(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
+        OneMonthTime target = OneMonthTime.createWithCheck(OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(40), new AgreementOneMonthTime(30)),
                 new AgreementOneMonthTime(50));
         AgreementOneMonthTime result = target.calcAlarmTime(new AgreementOneMonthTime(10));
 

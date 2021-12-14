@@ -67,7 +67,6 @@ public class ScheduleCreateContent extends AggregateRoot{
 		memento.setConfirm(this.confirm);
 		memento.setcreationType(this.implementAtr);
 		memento.setExecutionId(this.executionId);
-		memento.setCopyStartDate(this.specifyCreation.getCopyStartDate().orElse(null));
 		memento.setSpecifyCreation(this.specifyCreation);
 		memento.setRecreateCondition(this.recreateCondition);
 	}

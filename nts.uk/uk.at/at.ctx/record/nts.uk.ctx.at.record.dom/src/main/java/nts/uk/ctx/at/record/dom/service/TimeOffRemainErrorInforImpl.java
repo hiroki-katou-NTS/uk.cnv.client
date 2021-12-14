@@ -29,11 +29,12 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.InterimRemainOffPeriod
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.RecordRemainCreateInfor;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.RemainErrors;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.RemainInputParam;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.createremain.subtransfer.SubsTransferProcessMode;
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.export.CreateInterimAnnualMngData;
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.interim.TempAnnualLeaveMngs;
 import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.InterimRemain;
 import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.primitive.CreateAtr;
-import nts.uk.ctx.at.shared.dom.remainingnumber.work.service.RemainCreateInforByRecordData;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.CreateWorkRecordScheduleRemain;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.export.pererror.CreatePerErrorsFromLeaveErrors;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.erroralarm.AnnualLeaveError;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.erroralarm.EmployeeMonthlyPerError;
@@ -48,8 +49,6 @@ public class TimeOffRemainErrorInforImpl implements TimeOffRemainErrorInfor{
 	private InterimRemainDataMngCheckRegister checkRegisterService;
 	@Inject
 	private RecordDomRequireService requireService;
-	@Inject
-	private RemainCreateInforByRecordData remainCreateInforByRecordData;
 	@Inject
 	private InterimRemainDataMngCheckRegister InterimRemainCheckRegister;
 	
@@ -66,17 +65,14 @@ public class TimeOffRemainErrorInforImpl implements TimeOffRemainErrorInfor{
 		val cacheCarrier = new CacheCarrier();
 
 		//残数作成元情報を作成する
-		List<RecordRemainCreateInfor> recordInfor = remainCreateInforByRecordData.lstResultFromRecord(
-				param.getSid(),
-				DailyResultCreator.create(param.getLstWorkInfor(), param.getLstAttendanceTimeData()));
+		List<RecordRemainCreateInfor> recordInfor = CreateWorkRecordScheduleRemain.createRemain(require, param.getCid(), param.getLstDomainDaily(), SubsTransferProcessMode.DAILY);
 		//指定期間の暫定残数管理データを作成する（差分のみ）
 		InterimRemainCreateDataInputPara createInterimDataParam = new InterimRemainCreateDataInputPara(param.getCid(),
 				param.getSid(),
 				param.getObjDate(),
 				recordInfor,
 				Collections.emptyList(),
-				Collections.emptyList(),
-				param.isUseDayoff());
+				Collections.emptyList());
 		Map<GeneralDate, DailyInterimRemainMngData> interimRemainData = InterimRemainOffPeriodCreateData
 				.createInterimRemainByScheRecordApp(require, cacheCarrier, createInterimDataParam);
 		Optional<DailyInterimRemainMngData> optDaily = Optional.empty();

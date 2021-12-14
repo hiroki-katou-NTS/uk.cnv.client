@@ -1,22 +1,16 @@
 package nts.uk.ctx.at.shared.dom.remainingnumber.work;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import nts.arc.time.GeneralDate;
+import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.primitive.CreateAtr;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeClassification;
 /**
  * 残数作成元情報
  * @author do_dt
  *
  */
-@AllArgsConstructor
-@NoArgsConstructor
-@Setter
 @Getter
 public class InforFormerRemainData {
 	/** 社員ID */
@@ -26,15 +20,38 @@ public class InforFormerRemainData {
 	/** 時間代休を利用する */
 	private boolean dayOffTimeIsUse;
 	/** 勤務種類別 */
-	private List<WorkTypeRemainInfor> workTypeRemain;
+	private Optional<WorkTypeRemainInfor> workTypeRemain;
 	/** 時間休暇 */
 	private List<VacationTimeInfor> vactionTime;
 	/** 代休振替 */
-	private List<DayoffTranferInfor> dayOffTranfer;
+	private Optional<DayoffTranferInfor> dayOffTranfer;
 	/** 会社別休暇管理設定 */
 	private CompanyHolidayMngSetting companyHolidaySetting;
 	/** 雇用別休暇管理設定 */
 	private EmploymentHolidayMngSetting employmentHolidaySetting;
+	
+	//[C-1] 作る
+	public InforFormerRemainData(String sid, GeneralDate ymd, boolean dayOffTimeIsUse,
+			Optional<WorkTypeRemainInfor> workTypeRemain, List<VacationTimeInfor> vactionTime,
+			Optional<DayoffTranferInfor> dayOffTranfer, CompanyHolidayMngSetting companyHolidaySetting,
+			EmploymentHolidayMngSetting employmentHolidaySetting) {
+		this.sid = sid;
+		this.ymd = ymd;
+		this.dayOffTimeIsUse = dayOffTimeIsUse;
+		this.workTypeRemain = workTypeRemain;
+		this.vactionTime = vactionTime;
+		this.dayOffTranfer = dayOffTranfer;
+		this.companyHolidaySetting = companyHolidaySetting;
+		this.employmentHolidaySetting = employmentHolidaySetting;
+		validate();
+	}
+	
+	// inv-1
+	private void validate() {
+		if (workTypeRemain.isPresent() || dayOffTranfer.isPresent() || !vactionTime.isEmpty())
+			return;
+		throw new RuntimeException("InforFormerRemainData validate");
+	}
 	/**
 	 * 分類を指定して発生使用明細を取得する
 	 * @param inforData
@@ -42,38 +59,23 @@ public class InforFormerRemainData {
 	 * @return
 	 */
 	public Optional<OccurrenceUseDetail> getOccurrenceUseDetail(WorkTypeClassification workTypeClass) {
+		
+		if(!this.getWorkTypeRemain().isPresent())
+			return Optional.empty();
+		
 		//勤務種類別残数情報をチェックする
-		Optional<WorkTypeRemainInfor> optWorkTypeRemainInfor = this.getWorkTypeRemain().stream()
-				.filter(x -> x.getOccurrenceDetailData().stream().filter(od -> od.getWorkTypeAtr().equals(workTypeClass)&& od.isUseAtr() && od.getDays() > 0).findFirst().isPresent()).findFirst();
-		if(!optWorkTypeRemainInfor.isPresent()) {
-			return Optional.empty();
-		}
-		List<OccurrenceUseDetail> lstOccurrenceUseDetail = optWorkTypeRemainInfor.get().getOccurrenceDetailData();
-		List<OccurrenceUseDetail> lstTmp = lstOccurrenceUseDetail.stream()
-				.filter(a ->a.getWorkTypeAtr().equals(workTypeClass) && a.isUseAtr() && a.getDays() > 0)
-				.collect(Collectors.toList());
-		if(!lstTmp.isEmpty()) {
-			return Optional.of(lstTmp.get(0));
-		} else {
-			return Optional.empty();
-		}
+		return this.getWorkTypeRemain().get().getOccurrenceDetailData().stream()
+				.filter(od -> od.getWorkTypeAtr().equals(workTypeClass)&& od.isUseAtr() && od.getDays() > 0).findFirst();
 	}
 	
-	public WorkTypeRemainInfor getWorkTypeRemainInforByOd(WorkTypeClassification workTypeClass) {
-		Optional<WorkTypeRemainInfor> optWorkTypeRemainInfor = this.getWorkTypeRemain().stream()
-				.filter(x -> x.getOccurrenceDetailData().stream()
-						.filter(od -> od.getWorkTypeAtr().equals(workTypeClass) && od.isUseAtr() && od.getDays() > 0)
-						.findFirst().isPresent())
-				.findFirst();
-		return optWorkTypeRemainInfor.get();
-	}
-	
-	public Optional<WorkTypeRemainInfor> getWorkTypeRemainInfor(WorkTypeClassification workTypeClass) {
-		List<WorkTypeRemainInfor> lstWorkTypeRemainInfor = this.getWorkTypeRemain().stream()
-				.filter(x -> x.getWorkTypeClass().equals(workTypeClass)).collect(Collectors.toList());
-		if(lstWorkTypeRemainInfor.isEmpty()) {
-			return Optional.empty();
-		}
-		return Optional.of(lstWorkTypeRemainInfor.get(0));
+	//日数単位の作成元区分を取得する
+	public Optional<CreateAtr> getCreateAtrOfDaysUnit() {
+		validate();
+		if(this.getWorkTypeRemain().isPresent())
+			return Optional.of(this.getWorkTypeRemain().get().getCreateData());
+		if(this.getDayOffTranfer().isPresent())
+			return  Optional.of(this.getDayOffTranfer().get().getCreateAtr());
+		
+		return Optional.empty();
 	}
 }

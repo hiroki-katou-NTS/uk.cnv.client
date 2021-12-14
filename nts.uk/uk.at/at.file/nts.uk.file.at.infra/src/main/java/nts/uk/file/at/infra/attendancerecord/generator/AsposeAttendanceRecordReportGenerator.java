@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -19,11 +20,14 @@ import javax.ejb.TransactionAttributeType;
 import com.aspose.cells.BorderType;
 import com.aspose.cells.Cell;
 import com.aspose.cells.CellBorderType;
+import com.aspose.cells.Cells;
 import com.aspose.cells.Color;
 import com.aspose.cells.HorizontalPageBreakCollection;
 import com.aspose.cells.PageOrientationType;
 import com.aspose.cells.PageSetup;
 import com.aspose.cells.PaperSizeType;
+import com.aspose.cells.PasteOptions;
+import com.aspose.cells.PasteType;
 import com.aspose.cells.Range;
 import com.aspose.cells.Style;
 import com.aspose.cells.TextAlignmentType;
@@ -34,9 +38,11 @@ import com.aspose.cells.WorksheetCollection;
 
 import lombok.val;
 import nts.arc.layer.infra.file.export.FileGeneratorContext;
+import nts.gul.text.StringUtil;
 import nts.uk.ctx.at.function.dom.attendancerecord.export.setting.ExportFontSize;
 import nts.uk.file.at.app.export.attendancerecord.AttendanceRecordReportDatasource;
 import nts.uk.file.at.app.export.attendancerecord.AttendanceRecordReportGenerator;
+import nts.uk.file.at.app.export.attendancerecord.TempAbsenceData;
 import nts.uk.file.at.app.export.attendancerecord.data.AttendanceRecordReportColumnData;
 import nts.uk.file.at.app.export.attendancerecord.data.AttendanceRecordReportDailyData;
 import nts.uk.file.at.app.export.attendancerecord.data.AttendanceRecordReportData;
@@ -157,6 +163,11 @@ public class AsposeAttendanceRecordReportGenerator extends AsposeCellsReportGene
 	
 	/** The Constant END_REPORT_PAGE_BREAK_FS. */
 	private static final String END_REPORT_PAGE_BREAK_FS = "BF";
+	
+	// B8_1~B8_33
+	private static final String REPORT_HEADER_INFO_ADDR = "A%d:AB%d";
+	private static final String REPORT_HEADER_INFO_ADDR_FM = "A%d:AJ%d";
+	private static final String REPORT_HEADER_INFO_ADDR_FS = "A%d:AL%d";
 
 	/** The Constant REPORT_LEFT_COL_ADDR. font size large */
 	private static final String REPORT_LEFT_COL_ADDR = "A%d:T%d";
@@ -220,6 +231,9 @@ public class AsposeAttendanceRecordReportGenerator extends AsposeCellsReportGene
 
 	/** The Constant REPORT_ROW_START_RIGHT_COUNT. */
 	private static final int REPORT_ROW_START_RIGHT_COUNT = 1;
+	
+	private static final int BLANK_ROW_INDEX = 7;
+	private static final int FIRST_DATA_ROW_INDEX = 10;
 
 	/** The Constant EXPORT_EXCEL. */
 	private static final int EXPORT_EXCEL = 2;
@@ -326,13 +340,32 @@ public class AsposeAttendanceRecordReportGenerator extends AsposeCellsReportGene
 	/** The report SEAL_RANGE_COPY_FS */
 	private static final String SEAL_RANGE_COPY_FS = "AT%d:BE%d";
 	
-	private static final int MONTHLY_ACTUAL_DEADLINE_START = 5;
+	// Merge cells B8_1~B8_33
+	// Define columns count of each merge columns
+	// which row to start from will be passed as variable later
+	// will always merge 1 row at a time
+	private static final ColumnsToMerge[] REPORT_HEADER_INFO_MERGE_COLS = new ColumnsToMerge[] {
+			new ColumnsToMerge(10, 18), 
+			new ColumnsToMerge(10, 9, 9), 
+			new ColumnsToMerge(28) };
+
+	private static final ColumnsToMerge[] REPORT_HEADER_INFO_MERGE_COLS_FM = new ColumnsToMerge[] {
+			new ColumnsToMerge(10, 26), 
+			new ColumnsToMerge(10, 9, 17), 
+			new ColumnsToMerge(36) };
+
+	private static final ColumnsToMerge[] REPORT_HEADER_INFO_MERGE_COLS_FS = new ColumnsToMerge[] {
+			new ColumnsToMerge(10, 28), 
+			new ColumnsToMerge(10, 9, 19), 
+			new ColumnsToMerge(38) };
 	
 	private static final int SIDE_HEADER_FONT_SIZE = 9;
 	
 	private static final int SIDE_HEADER_FONT_SIZE_FM = 8;
 	
 	private static final int SIDE_HEADER_FONT_SIZE_FS = 7;
+	
+	private static final int MAXIMUM_ABSENCE_PERIOD = 3;
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -569,6 +602,8 @@ public class AsposeAttendanceRecordReportGenerator extends AsposeCellsReportGene
 		String dailyTitleFixRight = "";
 		String sealRangeCopyFix = "";
 		String sealRangeCopy = "";
+		String headerInfoAddr = "";
+		ColumnsToMerge[] headerMergeCols = null;
 		if (fontSize == ExportFontSize.CHAR_SIZE_LARGE.value) {
 			monthlyDataAddr = MONTHLY_DATA_ADDR;
 			
@@ -593,6 +628,10 @@ public class AsposeAttendanceRecordReportGenerator extends AsposeCellsReportGene
 			sealRangeCopyFix = SEAL_RANGE_COPY_FIX;
 			
 			sealRangeCopy = SEAL_RANGE_COPY;
+			
+			headerInfoAddr = REPORT_HEADER_INFO_ADDR;
+			
+			headerMergeCols = REPORT_HEADER_INFO_MERGE_COLS;
 		} else if (fontSize == ExportFontSize.CHAR_SIZE_MEDIUM.value) {
 			monthlyDataAddr = MONTHLY_DATA_ADDR_FM;
 			
@@ -617,6 +656,10 @@ public class AsposeAttendanceRecordReportGenerator extends AsposeCellsReportGene
 			sealRangeCopyFix = SEAL_RANGE_COPY_FIX_FM;
 			
 			sealRangeCopy = SEAL_RANGE_COPY_FM;
+			
+			headerInfoAddr = REPORT_HEADER_INFO_ADDR_FM;
+			
+			headerMergeCols = REPORT_HEADER_INFO_MERGE_COLS_FM;
 		} else {
 			monthlyDataAddr = MONTHLY_DATA_ADDR_FS;
 			
@@ -641,6 +684,10 @@ public class AsposeAttendanceRecordReportGenerator extends AsposeCellsReportGene
 			sealRangeCopyFix = SEAL_RANGE_COPY_FIX_FS;
 			
 			sealRangeCopy = SEAL_RANGE_COPY_FS;
+			
+			headerInfoAddr = REPORT_HEADER_INFO_ADDR_FS;
+			
+			headerMergeCols = REPORT_HEADER_INFO_MERGE_COLS_FS;
 		}
 		// Add monthly data
 		Range monththDataRange = worksheet.getCells().createRange(String.format(monthlyDataAddr,
@@ -648,51 +695,57 @@ public class AsposeAttendanceRecordReportGenerator extends AsposeCellsReportGene
 		
 		// if case next page: copy monthly header
 		if (startNewPage > 0) {
+			PasteOptions opts = new PasteOptions();
+			opts.setPasteType(PasteType.ALL);
 			// copy monthly header 
 			Range fixMonthyHeader = worksheet.getCells().createRange(monthlyTitleFix);
 			Range monthTitleRange = worksheet.getCells().createRange(String.format(monthlyDataAddr,
 					(startNewPage + MONTHLY_TITLE_START_ROW), (startNewPage + MONTHLY_TITLE_START_ROW + 1)));
 			monthTitleRange.copyData(fixMonthyHeader);
-			monthTitleRange.copy(fixMonthyHeader);
+			monthTitleRange.copy(fixMonthyHeader, opts);
 			
 			// copy layout content monthly 
 			Range fixMonthyLayoutContent = worksheet.getCells().createRange(monthlyContentFix); 
-			monththDataRange.copy(fixMonthyLayoutContent);
+			monththDataRange.copy(fixMonthyLayoutContent, opts);
 			
 			// copy lai KWR002_221 月間累計
 			Range fixCumulativeTotal = worksheet.getCells().createRange(MONTHLY_CUMULATIVE_TOTAL_FIX);
 			Range monthCumulativeRange = worksheet.getCells().createRange(String.format(REPORT_CUMULATIVE_FIX,
 					(startNewPage + MONTHLY_TITLE_START_ROW), (startNewPage + MONTHLY_TITLE_START_ROW + 3)));
-			monthCumulativeRange.copy(fixCumulativeTotal);
+			monthCumulativeRange.copy(fixCumulativeTotal, opts);
 			monthCumulativeRange.copyData(fixCumulativeTotal);
 			
 			// copy daily header left
 			Range fixLeftDailyHeader = worksheet.getCells().createRange(dailyTitelFixLeft);
 			Range leftDailyTitleRange = worksheet.getCells().createRange(String.format(reportLeftColAddr,
 					(startNewPage + DAILY_TITLE_START_ROW), (startNewPage + DAILY_TITLE_START_ROW + 1)));
-			leftDailyTitleRange.copy(fixLeftDailyHeader);
+			leftDailyTitleRange.copy(fixLeftDailyHeader, opts);
 			leftDailyTitleRange.copyData(fixLeftDailyHeader);
 			
 			// copy daily header right 
 			Range fixRightDailyHeader = worksheet.getCells().createRange(dailyTitleFixRight);
 			Range rightDailyTitleRange = worksheet.getCells().createRange(String.format(reportRightColAddr,
 					(startNewPage + DAILY_TITLE_START_ROW), (startNewPage + DAILY_TITLE_START_ROW + 1)));
-			rightDailyTitleRange.copy(fixRightDailyHeader);
+			rightDailyTitleRange.copy(fixRightDailyHeader, opts);
 			rightDailyTitleRange.copyData(fixRightDailyHeader);
 			
 			// copy seal range 
 			Range fixSealRange = worksheet.getCells().createRange(sealRangeCopyFix);
 			Range sealRangeCopylayout = worksheet.getCells().createRange(String.format(sealRangeCopy,
 					(startNewPage + START_EMPLOYEE_DATA_ROW), (startNewPage + START_EMPLOYEE_DATA_ROW + 3)));
-			sealRangeCopylayout.copy(fixSealRange);
+			sealRangeCopylayout.copy(fixSealRange, opts);
 			sealRangeCopylayout.copyData(fixSealRange);
 			
 			// copy approval - copy dau xac nhan - monthly display mark
 			Range fixApprovalRange  = worksheet.getCells().createRange(reportApproval);
 			Range approvalCopy = worksheet.getCells().createRange(String.format(rangeApprovalCopy,
 					(startNewPage + APPROVAL_START_ROW), (startNewPage + APPROVAL_START_ROW)));
-			approvalCopy.copy(fixApprovalRange);
+			approvalCopy.copy(fixApprovalRange, opts);
 			approvalCopy.copyData(fixApprovalRange);
+			
+			// copy blank row
+			double blankRowHeight = worksheet.getCells().getRowHeight(BLANK_ROW_INDEX);
+			worksheet.getCells().setRowHeight(startNewPage + BLANK_ROW_INDEX, blankRowHeight);
 		} 
 		// fill data monthly column
 		List<AttendanceRecordReportColumnData> monthLyData = employeeData.getEmployeeMonthlyData();
@@ -702,11 +755,11 @@ public class AsposeAttendanceRecordReportGenerator extends AsposeCellsReportGene
 		}
 
 		// Add employee info
-		Range employeeInfoL = worksheet.getCells().createRange(String.format(reportLeftColAddr,
+		Range employeeInfoL = worksheet.getCells().createRange(String.format(headerInfoAddr,
 				(startNewPage + START_EMPLOYEE_DATA_ROW), (startNewPage + START_EMPLOYEE_DATA_ROW)));
-		Range employeeInfoR = worksheet.getCells().createRange(String.format(reportLeftColAddr,
+		Range employeeInfoR = worksheet.getCells().createRange(String.format(headerInfoAddr,
 				(startNewPage + START_EMPLOYEE_CENTER_DATA_ROW), (startNewPage + START_EMPLOYEE_CENTER_DATA_ROW)));
-		Range employeeYearInfo = worksheet.getCells().createRange(String.format(reportLeftColAddr,
+		Range employeeYearInfo = worksheet.getCells().createRange(String.format(headerInfoAddr,
 				(startNewPage + START_EMPLOYEE_BOTTOM_DATA_ROW), (startNewPage + START_EMPLOYEE_BOTTOM_DATA_ROW)));
 
 		employeeInfoL.setOutlineBorder(BorderType.BOTTOM_BORDER, CellBorderType.THIN, Color.getBlack());
@@ -717,7 +770,26 @@ public class AsposeAttendanceRecordReportGenerator extends AsposeCellsReportGene
 		this.setFontBold(employeeInfoL.get(0, EMPL_WORKPLACE_INDEX));
 		DateFormat df = new SimpleDateFormat("yyyy/MM"); 
 		Date startDate = df.parse(employeeData.getYearMonth());
-		String yearMonth = df.format(startDate);
+
+		// Build B8_12~B8_33
+		final String PERIOD_TEMPLATE = "%s　%s";
+		String yearMonth = TextResource.localize("KWR002_217") + df.format(startDate);
+		String deadlineDay = TextResource.localize("KWR002_235")
+				+ (employeeData.isLastDayOfMonth() ? TextResource.localize("KWR002_236")
+						: (employeeData.getClosureDay() + TextResource.localize("KWR002_237")).toString());
+
+		// Only print the first 3 periods
+		List<TempAbsenceData> tempAbsenceDatas = employeeData.getTempAbsenceDatas()
+				.subList(0, Math.min(employeeData.getTempAbsenceDatas().size(), MAXIMUM_ABSENCE_PERIOD));
+		String periodInfoText = tempAbsenceDatas.stream()
+				.map(data -> data.getTempAbsenceFrameName() + TextResource.localize("KWR002_238")
+						+ data.getPeriodStart() + TextResource.localize("KWR002_239") + data.getPeriodEnd())
+				.collect(Collectors.joining("　"));
+		String periodText = String.format(PERIOD_TEMPLATE, yearMonth, deadlineDay);
+		if (!StringUtil.isNullOrEmpty(periodInfoText, true)) {
+			periodText = periodText.concat("　　" + periodInfoText);
+		}
+		
 		employeeInfoL.get(0, EMPL_INVIDUAL_INDEX)
 				.setValue(TextResource.localize("KWR002_212") + employeeData.getInvidual());
 		employeeInfoL.get(0, EMPL_WORKPLACE_INDEX)
@@ -729,11 +801,18 @@ public class AsposeAttendanceRecordReportGenerator extends AsposeCellsReportGene
 		employeeInfoR.get(0, EMPL_WORKTYPE_INDEX)
 				.setValue(TextResource.localize("KWR002_216") + employeeData.getWorkType());
 		employeeYearInfo.get(0, EMPL_YEARMONTH_INDEX)
-				.setValue(TextResource.localize("KWR002_217") + yearMonth);
-		// ver8 report , print deadline B8_17 B8_18
-		String deadlineDay = employeeData.isLastDayOfMonth() ? TextResource.localize("KWR002_236") : (employeeData.getClosureDay() + TextResource.localize("KWR002_237")).toString();
-		employeeYearInfo.get(0, MONTHLY_ACTUAL_DEADLINE_START)
-				.setValue(TextResource.localize("KWR002_235") + deadlineDay);
+				.setValue(periodText);
+		
+		// Merge range
+		for (int i = 0; i < headerMergeCols.length; i++) {
+			// Because first page has already been merged, skip page 1
+			if (startNewPage == 0)
+				break;
+			int row = startNewPage + i;
+			headerMergeCols[i].getIndexes().forEach(indexes -> this.mergeCells(worksheet.getCells(), row,
+					indexes.getStartColumn(), 1, indexes.getNumberToMerge()));
+		}
+		
 		// Create weekly data
 		List<AttendanceRecordReportWeeklyData> weeklyDatas = employeeData.getWeeklyDatas();
 		Map<String, Integer> dataRow = new HashMap<>();
@@ -804,6 +883,7 @@ public class AsposeAttendanceRecordReportGenerator extends AsposeCellsReportGene
 		}
 		List<AttendanceRecordReportDailyData> dailyDatas = weeklyData.getDailyDatas();
 		boolean isWhiteBackground = dataRow.get(REPORT_ROW_BG) == REPORT_ROW_BG_WHITE;
+		double dataRowHeight = worksheet.getCells().getRowHeight(FIRST_DATA_ROW_INDEX);
 		for (int i = 1, j = dailyDatas.size(); i <= j; i++) {
 			Range dailyRange;
 			AttendanceRecordReportDailyData data = dailyDatas.get(i - 1);
@@ -828,6 +908,7 @@ public class AsposeAttendanceRecordReportGenerator extends AsposeCellsReportGene
 
 				dataRow.put(REPORT_RIGHT_ROW, row + 2);
 			}
+			dailyRange.setRowHeight(dataRowHeight);
 
 			// fill data data
 			dailyRange.get(0, 0).setValue(data.getDate());
@@ -907,4 +988,13 @@ public class AsposeAttendanceRecordReportGenerator extends AsposeCellsReportGene
 		cell.setStyle(style);
 	}
 	
+	private void mergeCells(Cells cells, int startRow, int startCol, int rowCount, int colCount) {
+		cells.merge(startRow, startCol, rowCount, colCount);
+		Cell cell = cells.get(startRow, startCol);
+		Style style = cell.getStyle();
+		style.setShrinkToFit(true);
+		style.setHorizontalAlignment(TextAlignmentType.LEFT);
+		style.setVerticalAlignment(TextAlignmentType.CENTER);
+		cell.setStyle(style);
+	}
 }

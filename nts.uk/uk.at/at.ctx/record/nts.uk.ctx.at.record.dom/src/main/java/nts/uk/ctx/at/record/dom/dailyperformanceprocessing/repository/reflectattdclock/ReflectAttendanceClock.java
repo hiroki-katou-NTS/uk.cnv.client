@@ -15,6 +15,7 @@ import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.output.TimePrintDesti
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.ReflectWorkInformationDomainService;
 import nts.uk.ctx.at.record.dom.require.RecordDomRequireService;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.SetPreClockArt;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampType;
 import nts.uk.ctx.at.shared.dom.WorkInformation;
 import nts.uk.ctx.at.shared.dom.calculationsetting.StampReflectionManagement;
@@ -32,6 +33,9 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.time
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkStamp;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkTimeInformation;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.editstate.EditStateOfDailyAttd;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.editstate.EditStateSetting;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.NotUseAttribute;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.WorkInfoOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingConditionItemService;
 import nts.uk.ctx.at.shared.dom.worktime.algorithm.getcommonset.GetCommonSet;
@@ -85,8 +89,12 @@ public class ReflectAttendanceClock {
 		if(reflectStampOuput == ReflectStampOuput.REFLECT ) {
 			//休日打刻時に勤務種類を変更する
 			checkHolidayChange(integrationOfDaily, companyId,stamp);
-			// 打刻を反映する
-			reflectStampOuput =  reflectStamping(actualStampAtr, stamp, integrationOfDaily, attendanceAtr, workNo);
+			
+			//直行直帰反映する
+			if(!reflectDirectBounce(stamp, integrationOfDaily)) {
+				// 打刻を反映する
+				reflectStampOuput =  reflectStamping(actualStampAtr, stamp, integrationOfDaily, attendanceAtr, workNo);
+			}
 		}
 		TimeLeavingWork timeLeavingWork = integrationOfDaily.getAttendanceLeave().get().getTimeLeavingWorks().stream()
 				.filter(c -> c.getWorkNo().v().intValue() == workNo).findFirst().get();
@@ -102,6 +110,45 @@ public class ReflectAttendanceClock {
 		
 		return reflectStampOuput;
 		
+	}
+	
+	/**
+	 * 直行直帰反映する
+	 * @param stamp
+	 * @param integrationOfDaily
+	 * @return boolean (true : 反映した  / false : 反映されない)
+	 */
+	public boolean reflectDirectBounce(Stamp stamp,IntegrationOfDaily integrationOfDaily ) {
+		//区分＝直帰
+		if(stamp.getType().getSetPreClockArt() == SetPreClockArt.BOUNCE ) {
+			//直帰区分=ONにする
+			integrationOfDaily.getWorkInformation().setBackStraightAtr(NotUseAttribute.Use);
+			//打刻.打刻反映状態.反映された年月日を更新する() 
+			stamp.getImprintReflectionStatus().markAsReflected(integrationOfDaily.getYmd());
+			//編集状態を追加する
+			Optional<EditStateOfDailyAttd> editState = integrationOfDaily.getEditState().stream()
+					.filter(c->c.getAttendanceItemId() == 860).findFirst();
+			if(!editState.isPresent()) {
+				integrationOfDaily.getEditState().add(new EditStateOfDailyAttd(860, EditStateSetting.IMPRINT));
+			}
+			return true;
+		
+		//区分＝直行
+		}else if(stamp.getType().getSetPreClockArt() == SetPreClockArt.DIRECT ) {
+			//直行区分=ONにする
+			integrationOfDaily.getWorkInformation().setGoStraightAtr(NotUseAttribute.Use);
+			//打刻.打刻反映状態.反映された年月日を更新する() 
+			stamp.getImprintReflectionStatus().markAsReflected(integrationOfDaily.getYmd());
+			//編集状態を追加する
+			Optional<EditStateOfDailyAttd> editState = integrationOfDaily.getEditState().stream()
+					.filter(c->c.getAttendanceItemId() == 859).findFirst();
+			if(!editState.isPresent()) {
+				integrationOfDaily.getEditState().add(new EditStateOfDailyAttd(859, EditStateSetting.IMPRINT));
+			}
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -457,7 +504,7 @@ public class ReflectAttendanceClock {
 		}
 		
 		//反映済み区分をtrueにする (反映済み区分 = true)
-		stamp.setReflectedCategory(true);
+		stamp.getImprintReflectionStatus().markAsReflected(integrationOfDaily.getYmd());
 		return ReflectStampOuput.REFLECT;
 	}
 	

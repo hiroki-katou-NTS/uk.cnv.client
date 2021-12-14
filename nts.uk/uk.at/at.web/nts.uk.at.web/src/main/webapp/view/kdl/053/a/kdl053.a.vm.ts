@@ -12,6 +12,7 @@ module nts.uk.at.view.kdl053.a {
         hasError: KnockoutObservable<boolean> = ko.observable(true);
         registrationErrorList: KnockoutObservable<any> = ko.observable([]);
         registrationErrorListCsv: KnockoutObservable<any> = ko.observable([]);
+        dispItemCol: true;
         constructor(private params: any) {
             super();
             const self = this;
@@ -43,9 +44,15 @@ module nts.uk.at.view.kdl053.a {
             if (_.isNull(data) || _.isEmpty(data)) {
                 self.closeDialog();
             }
+            if (!nts.uk.util.isNullOrUndefined(data.dispItemCol)) {
+                self.dispItemCol = data.dispItemCol;
+            } else {
+                self.dispItemCol = true;
+            }
 			if(_.isNil(data.errorRegistrationList)){
-				if(!_.isNil(data.dataShareDialogKDL053.errorRegistrationList))
-				errorRegistrationListTmp = data.dataShareDialogKDL053.errorRegistrationList;
+				if(!_.isNil(data.dataShareDialogKDL053.errorRegistrationList)) {
+                    errorRegistrationListTmp = data.dataShareDialogKDL053.errorRegistrationList;
+                }
 				employeeIds = data.dataShareDialogKDL053.employeeIds;
 			} else {
 				errorRegistrationListTmp = data.errorRegistrationList;
@@ -62,6 +69,7 @@ module nts.uk.at.view.kdl053.a {
                 })               
                 errorRegistrationList = _.union(errorRegistrationList, _.sortBy(temp, item => item.date));
             });
+            errorRegistrationList = _.sortBy(errorRegistrationList, ['scd', 'date'])
 
             self.hasError(data.isRegistered == 1); 
 
@@ -100,70 +108,85 @@ module nts.uk.at.view.kdl053.a {
                 countNo = countNo + 1;
             })
 
-            let listIds: Array<any> = _.map(errorRegistrationList, item => { return item.attendanceItemId }); 
+            self.registrationErrorListCsv(errorRegistrationList);
+            self.registrationErrorList(errorRegistrationList);
 
-            this.$blockui("invisible");
-            self.$ajax(Paths.GET_ATENDANCENAME_BY_IDS, listIds).done((data: Array<any>) => {
-                if (data && data.length > 0) {
-                    let index = 0, idx = 0;
-                    _.each(errorRegistrationList, item => {                        
-                        idx++;
-                        _.each(data, itemName => {
-                            if (item.attendanceItemId == itemName.attendanceItemId) {
-                                errorRegistrationList[index].errName = itemName.attendanceItemName;
-                                index++;
-                            }
+            if (self.dispItemCol) {
+                //勤怠項目に対応する名称を生成する
+                this.$blockui("invisible");
+                let listIds: Array<any> = _.map(errorRegistrationList, item => { return item.attendanceItemId });
+                self.$ajax(Paths.GET_ATENDANCENAME_BY_IDS, listIds).done((data: Array<any>) => {
+                    if (data && data.length > 0) {
+                        let index = 0, idx = 0;
+                        _.each(errorRegistrationList, item => {
+                            idx++;
+                            _.each(data, itemName => {
+                                if (item.attendanceItemId == itemName.attendanceItemId) {
+                                    errorRegistrationList[index].errName = itemName.attendanceItemName;
+                                    index++;
+                                }
+                            })
                         })
-                    })
-                    self.registrationErrorListCsv(errorRegistrationList);
-                    self.registrationErrorList(errorRegistrationList);
-                } else {
-                    _.each(errorRegistrationList, item => {
-                        item.errName = "";
-                    })
-                    self.registrationErrorListCsv(errorRegistrationList);
-                    self.registrationErrorList(errorRegistrationList);
-                }
-
-                $("#grid").igGrid({
-                    width: "780px",
-                    height: "330px",
-                    dataSource: self.registrationErrorList(),
-                    dataSourceType: "json",
-                    primaryKey: "id",
-                    autoGenerateColumns: false,
-                    responseDatakey: "results",
-                    columns: [    
-                        { headerText: "", key: "id", dataType: "string", hidden: true },          
-                        { headerText: getText('KDL053_5'), key: "employeeCdName", dataType: "string", width: "30%" },
-                        { headerText: getText('KDL053_6'), key: "dateCss", dataType: "string", width: "16%" },
-                        { headerText: getText('KDL053_7'), key: "errName", dataType: "string", width: "18%" },
-                        { headerText: getText('KDL053_8'), key: "errorMessage", width: "34%" }
-                    ],
-                    features: [
-                        {
-                            name: 'Paging',
-                            type: "local",
-                            pageSize: 10
-                        },
-                        {
-                            name: 'Resizing',
-                            columnSettings: [
-                                { columnKey: "employeeCdName", allowResizing: true },
-                                { columnKey: "dateCss", allowResizing: true },
-                                { columnKey: "errName", allowResizing: true },
-                                { columnKey: "errorMessage", allowResizing: true }
-                            ],
-                        }
-                    ]
-                });
-                $('#btnClose').focus();
-                self.$blockui("hide");
-            })
-                .always(() => {
+                        self.registrationErrorListCsv(errorRegistrationList);
+                        self.registrationErrorList(errorRegistrationList);
+                    } else {
+                        _.each(errorRegistrationList, item => {
+                            item.errName = "";
+                        })
+                        self.registrationErrorListCsv(errorRegistrationList);
+                        self.registrationErrorList(errorRegistrationList);
+                    }
+                    self.initGrid();
                     self.$blockui("hide");
-                });
-        }  
+                }).always(() => {
+                        self.$blockui("hide");
+                    });
+            } else {
+                self.initGrid();
+            }
+        }
+
+        initGrid(): void {
+            let self = this;
+            let gridColumns = [
+                {headerText: "", key: "id", dataType: "string", hidden: true},
+                {headerText: getText('KDL053_5'), key: "employeeCdName", dataType: "string", width: "30%"},
+                {headerText: getText('KDL053_6'), key: "dateCss", dataType: "string", width: "16%"},
+                {headerText: getText('KDL053_7'), key: "errName", dataType: "string", width: "18%"},
+                {headerText: getText('KDL053_8'), key: "errorMessage", width: "34%"}
+            ];
+            if (!self.dispItemCol) {
+                gridColumns.splice(3, 1);
+            }
+            $("#grid").igGrid({
+                width: "780px",
+                height: "330px",
+                dataSource: self.registrationErrorList(),
+                dataSourceType: "json",
+                primaryKey: "id",
+                autoGenerateColumns: false,
+                responseDatakey: "results",
+                columns: gridColumns,
+                features: [
+                    {
+                        name: 'Paging',
+                        type: "local",
+                        pageSize: 10
+                    },
+                    {
+                        name: 'Resizing',
+                        columnSettings: [
+                            {columnKey: "employeeCdName", allowResizing: true},
+                            {columnKey: "dateCss", allowResizing: true},
+                            {columnKey: "errName", allowResizing: true},
+                            {columnKey: "errorMessage", allowResizing: true}
+                        ],
+                    }
+                ]
+            });
+            $('#btnClose').focus();
+        }
+
         exportCsv(): void {
             const self = this;
             self.$blockui("invisible"); 

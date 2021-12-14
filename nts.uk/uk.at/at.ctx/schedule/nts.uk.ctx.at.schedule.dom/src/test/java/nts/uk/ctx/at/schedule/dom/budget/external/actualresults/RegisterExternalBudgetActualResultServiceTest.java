@@ -14,7 +14,6 @@ import nts.uk.ctx.at.schedule.dom.budget.external.acceptance.ExtBudgetNumberPers
 import nts.uk.ctx.at.schedule.dom.budget.external.acceptance.ExtBudgetNumericalVal;
 import nts.uk.ctx.at.schedule.dom.budget.external.acceptance.ExtBudgetUnitPrice;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.TargetOrgIdenInfor;
-import nts.uk.ctx.at.shared.dom.workrule.shiftmaster.ShiftMasterOrgHelper;
 
 @RunWith(JMockit.class)
 public class RegisterExternalBudgetActualResultServiceTest {
@@ -27,7 +26,7 @@ public class RegisterExternalBudgetActualResultServiceTest {
 	 */
 	@Test
 	public void testSignUp_1() {
-		TargetOrgIdenInfor targetOrg = ShiftMasterOrgHelper.getTargetOrgIdenInforEmpty();
+		TargetOrgIdenInfor targetOrg = Helper.createDummyTargetOrgIdenInfor();
 		ExternalBudgetCd itemCode = new ExternalBudgetCd("itemCode");
 		GeneralDate ymd = GeneralDate.today();
 		Optional<ExternalBudgetValues> extBudgetActualValue = Optional.empty();
@@ -42,7 +41,7 @@ public class RegisterExternalBudgetActualResultServiceTest {
 	 */
 	@Test
 	public void testSignUp_2() {
-		TargetOrgIdenInfor targetOrg = ShiftMasterOrgHelper.getTargetOrgIdenInforEmpty();
+		TargetOrgIdenInfor targetOrg = Helper.createDummyTargetOrgIdenInfor();
 		ExternalBudgetCd itemCode = new ExternalBudgetCd("itemCode");
 		GeneralDate ymd = GeneralDate.today();
 		Optional<ExternalBudgetValues> extBudgetActualValue = Optional.of(new ExternalBudgetMoneyValue(999));
@@ -57,7 +56,7 @@ public class RegisterExternalBudgetActualResultServiceTest {
 	 */
 	@Test
 	public void testSignUp_3() {
-		TargetOrgIdenInfor targetOrg = ShiftMasterOrgHelper.getTargetOrgIdenInforEmpty();
+		TargetOrgIdenInfor targetOrg = Helper.createDummyTargetOrgIdenInfor();
 		ExternalBudgetCd itemCode = new ExternalBudgetCd("itemCode");
 		GeneralDate ymd = GeneralDate.today();
 		Optional<ExternalBudgetValues> extBudgetActualValue = Optional.of(new ExtBudgetUnitPrice(999));
@@ -72,7 +71,7 @@ public class RegisterExternalBudgetActualResultServiceTest {
 	 */
 	@Test
 	public void testSignUp_4() {
-		TargetOrgIdenInfor targetOrg = ShiftMasterOrgHelper.getTargetOrgIdenInforEmpty();
+		TargetOrgIdenInfor targetOrg = Helper.createDummyTargetOrgIdenInfor();
 		ExternalBudgetCd itemCode = new ExternalBudgetCd("itemCode");
 		GeneralDate ymd = GeneralDate.today();
 		Optional<ExternalBudgetValues> extBudgetActualValue = Optional.of(new ExtBudgetNumericalVal(999));
@@ -87,7 +86,7 @@ public class RegisterExternalBudgetActualResultServiceTest {
 	 */
 	@Test
 	public void testSignUp_5() {
-		TargetOrgIdenInfor targetOrg = ShiftMasterOrgHelper.getTargetOrgIdenInforEmpty();
+		TargetOrgIdenInfor targetOrg = Helper.createDummyTargetOrgIdenInfor();
 		ExternalBudgetCd itemCode = new ExternalBudgetCd("itemCode");
 		GeneralDate ymd = GeneralDate.today();
 		Optional<ExternalBudgetValues> extBudgetActualValue = Optional.of(new ExtBudgetNumberPerson(999));
@@ -102,7 +101,7 @@ public class RegisterExternalBudgetActualResultServiceTest {
 	 */
 	@Test
 	public void testSignUp_6() {
-		TargetOrgIdenInfor targetOrg = ShiftMasterOrgHelper.getTargetOrgIdenInforEmpty();
+		TargetOrgIdenInfor targetOrg = Helper.createDummyTargetOrgIdenInfor();
 		ExternalBudgetCd itemCode = new ExternalBudgetCd("itemCode");
 		GeneralDate ymd = GeneralDate.today();
 		Optional<ExternalBudgetValues> extBudgetActualValue = Optional.of(new ExternalBudgetTimeValue(999));
@@ -110,6 +109,14 @@ public class RegisterExternalBudgetActualResultServiceTest {
 		NtsAssert.atomTask(
 				() -> RegisterExternalBudgetActualResultService.signUp(require, targetOrg, itemCode, ymd, extBudgetActualValue),
 				any -> require.delete(targetOrg, itemCode, ymd), any -> require.insert(any.get()));
+	}
+
+
+
+	private static class Helper {
+		public static TargetOrgIdenInfor createDummyTargetOrgIdenInfor() {
+			return TargetOrgIdenInfor.creatIdentifiWorkplace("workplaceId");
+		}
 	}
 
 }

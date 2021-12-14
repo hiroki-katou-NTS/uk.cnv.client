@@ -15,6 +15,8 @@ import nts.arc.task.tran.AtomTask;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
 import nts.uk.ctx.at.record.dom.adapter.application.reflect.RCRequestSettingAdapter;
+import nts.uk.ctx.at.record.dom.adapter.employmentinfoterminal.infoterminal.EmpDataImport;
+import nts.uk.ctx.at.record.dom.adapter.employmentinfoterminal.infoterminal.GetMngInfoFromEmpIDListAdapter;
 import nts.uk.ctx.at.record.dom.adapter.request.application.state.RCReasonNotReflect;
 import nts.uk.ctx.at.record.dom.adapter.request.application.state.RCReasonNotReflectDaily;
 import nts.uk.ctx.at.record.dom.adapter.request.application.state.RCReflectStatusResult;
@@ -22,7 +24,6 @@ import nts.uk.ctx.at.record.dom.adapter.request.application.state.RCReflectedSta
 import nts.uk.ctx.at.record.dom.applicationcancel.ReflectApplicationWorkRecord;
 import nts.uk.ctx.at.record.dom.daily.DailyRecordAdUpService;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.ExecutionTypeDaily;
-import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.createdailyoneday.EmbossingExecutionFlag;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.createdailyoneday.createdailyresults.CreateDailyResults;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.createdailyresults.OutputCreateDailyOneDay;
 import nts.uk.ctx.at.record.dom.dailyprocess.calc.CalculateDailyRecordServiceCenter;
@@ -30,8 +31,10 @@ import nts.uk.ctx.at.record.dom.dailyprocess.calc.attendancetime.reflectleavingw
 import nts.uk.ctx.at.record.dom.dailyprocess.calc.attendancetime.reflectwork.CheckRangeReflectAttd;
 import nts.uk.ctx.at.record.dom.dailyprocess.calc.attendancetime.reflectwork.OutputCheckRangeReflectAttd;
 import nts.uk.ctx.at.record.dom.dailyresultcreationprocess.creationprocess.creationclass.dailywork.TemporarilyReflectStampDailyAttd;
+import nts.uk.ctx.at.record.dom.stamp.card.stampcard.ContractCode;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampCard;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampCardRepository;
+import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.pub.appreflect.ReflectApplicationWorkRecordPub;
 import nts.uk.ctx.at.record.pub.appreflect.export.RCReasonNotReflectDailyExport;
@@ -175,9 +178,6 @@ public class ReflectApplicationWorkRecordPubImpl implements ReflectApplicationWo
     private ReflectWorkChangeAppRepository reflectWorkChangeAppRepository;
 	
 	@Inject
-	private CreateDailyResults createDailyResults;
-
-	@Inject
 	private TimeLeaveAppReflectRepository timeLeaveAppReflectRepository;
 	
 	@Inject
@@ -200,7 +200,13 @@ public class ReflectApplicationWorkRecordPubImpl implements ReflectApplicationWo
 	
 	@Inject
 	private CompensLeaveComSetRepository compensLeaveComSetRepository;
-
+	
+	@Inject
+	private GetMngInfoFromEmpIDListAdapter getMngInfoFromEmpIDListAdapter;
+	
+	@Inject
+	private CreateDailyResults createDailyResults;
+	
 	@Override
 	public Pair<RCReflectStatusResultExport, Optional<AtomTask>> process(Object application, GeneralDate date,
 			RCReflectStatusResultExport reflectStatus, GeneralDateTime reflectTime) {
@@ -212,11 +218,11 @@ public class ReflectApplicationWorkRecordPubImpl implements ReflectApplicationWo
 				convertDailyRecordToAd, calculateDailyRecordServiceCenter, dailyRecordAdUpService,
 				requestSettingAdapter, flexWorkSettingRepository, predetemineTimeSettingRepository,
 				fixedWorkSettingRepository, flowWorkSettingRepository, goBackReflectRepository,
-				stampAppReflectRepository, lateEarlyCancelReflectRepository, reflectWorkChangeAppRepository, createDailyResults,
+				stampAppReflectRepository, lateEarlyCancelReflectRepository, reflectWorkChangeAppRepository,
 				timeLeaveAppReflectRepository, appReflectOtHdWorkRepository, vacationApplicationReflectRepository, timePriorityRepository,
 				compensLeaveComSetRepository, subLeaveAppReflectRepository, substituteWorkAppReflectRepository,
-				applicationReflectHistoryRepo);
-		val result = ReflectApplicationWorkRecord.process(impl ,(ApplicationShare) application, date, convertToDom(reflectStatus), reflectTime);
+				applicationReflectHistoryRepo, getMngInfoFromEmpIDListAdapter, createDailyResults);
+		val result = ReflectApplicationWorkRecord.process(impl , AppContexts.user().companyId(), (ApplicationShare) application, date, convertToDom(reflectStatus), reflectTime);
 		return Pair.of(convertToExport(result.getLeft()), result.getRight());
 	}
 
@@ -294,8 +300,6 @@ public class ReflectApplicationWorkRecordPubImpl implements ReflectApplicationWo
         
         private final ReflectWorkChangeAppRepository reflectWorkChangeAppRepository;
         
-        private CreateDailyResults createDailyResults;
-
         private final TimeLeaveAppReflectRepository timeLeaveAppReflectRepository;
         
         private final AppReflectOtHdWorkRepository appReflectOtHdWorkRepository;
@@ -311,6 +315,10 @@ public class ReflectApplicationWorkRecordPubImpl implements ReflectApplicationWo
     	private final SubstituteWorkAppReflectRepository substituteWorkAppReflectRepository;
     	
     	private final ApplicationReflectHistoryRepo applicationReflectHistoryRepo;
+    	
+    	private final GetMngInfoFromEmpIDListAdapter getMngInfoFromEmpIDListAdapter;
+    	
+    	private final CreateDailyResults createDailyResults;
 
 		@Override
 		public List<StampCard> getLstStampCardBySidAndContractCd(String sid) {
@@ -457,19 +465,6 @@ public class ReflectApplicationWorkRecordPubImpl implements ReflectApplicationWo
 		}
 
 		@Override
-		public OutputCreateDailyOneDay createDailyResult(String cid, String employeeId, GeneralDate ymd,
-				ExecutionTypeDaily executionType, EmbossingExecutionFlag flag,
-				IntegrationOfDaily integrationOfDaily) {
-			return this.createDailyResults.createDailyResult(cid, employeeId, ymd, executionType, integrationOfDaily);
-		}
-
-		@Override
-		public OutputTimeReflectForWorkinfo get(String companyId, String employeeId, GeneralDate ymd,
-				WorkInfoOfDailyAttendance workInformation) {
-			return this.timeReflectFromWorkinfo.get(companyId, employeeId, ymd, workInformation);
-		}
-
-		@Override
 		public Optional<TimeLeaveApplicationReflect> findReflectTimeLeav(String companyId) {
 			return timeLeaveAppReflectRepository.findByCompany(companyId);
 		}
@@ -492,11 +487,6 @@ public class ReflectApplicationWorkRecordPubImpl implements ReflectApplicationWo
 		@Override
 		public Optional<WorkType> findByPK(String companyId, String workTypeCd) {
 			return workTypeRepo.findByPK(companyId, workTypeCd);
-		}
-
-		@Override
-		public String getCId() {
-			return companyId;
 		}
 
 		@Override
@@ -529,6 +519,38 @@ public class ReflectApplicationWorkRecordPubImpl implements ReflectApplicationWo
 		@Override
 		public Optional<SubstituteLeaveAppReflect> findSubLeaveAppReflectByCompany(String companyId) {
 			return subLeaveAppReflectRepository.findSubLeaveAppReflectByCompany(companyId);
+		}
+
+		@Override
+		public Optional<StampCard> getByCardNoAndContractCode(ContractCode contractCode, StampNumber stampNumber) {
+			return stampCardRepository.getByCardNoAndContractCode(stampNumber.v(), contractCode.v());
+		}
+
+		@Override
+		public List<EmpDataImport> getEmpData(List<String> empIDList) {
+			return getMngInfoFromEmpIDListAdapter.getEmpData(empIDList);
+		}
+
+		@Override
+		public Optional<IntegrationOfDaily> find(String employeeId, GeneralDate date) {
+			return dailyRecordShareFinder.find(employeeId, date);
+		}
+
+		@Override
+		public Optional<OutputCreateDailyOneDay> createDailyResult(String companyId, String employeeId, GeneralDate ymd,
+				ExecutionTypeDaily executionType) {
+			return createDailyResults.createDailyResult(companyId, employeeId, ymd, executionType);
+		}
+
+		@Override
+		public OutputTimeReflectForWorkinfo get(String companyId, String employeeId, GeneralDate ymd,
+				WorkInfoOfDailyAttendance workInformation) {
+			return timeReflectFromWorkinfo.get(companyId, employeeId, ymd, workInformation);
+		}
+		
+		@Override
+		public Optional<WorkTimeSetting> getWorkTime(String cid, String workTimeCode) {
+			return workTimeSettingRepository.findByCode(cid, workTimeCode);
 		}
 	}
 }

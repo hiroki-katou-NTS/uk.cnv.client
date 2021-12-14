@@ -124,6 +124,15 @@ public class TimeSpanForDailyCalc implements Cloneable {
 	}
 	
 	/**
+	 * 開始時刻だけを戻す（前にずらす）
+	 * @param minutesToShiftAhead
+	 * @return
+	 */
+	public TimeSpanForDailyCalc shiftStartBack(int minutesToShiftAhead) {
+		return new TimeSpanForDailyCalc(this.timeSpan.shiftStartBack(minutesToShiftAhead));
+	}
+	
+	/**
 	 * 比較元と比較したい時間帯の位置関係を判定する
 	 * @param other 比較したい時間帯
 	 * @return　重複状態区分
@@ -198,16 +207,16 @@ public class TimeSpanForDailyCalc implements Cloneable {
 	 * @return ズラした後の指定時刻
 	 */
 	public TimeWithDayAttr forwardByDeductionTime(List<TimeSheetOfDeductionItem> timeSheetOfDeductionItems) {
-		//重複している時間帯
-		List<TimeSpanForDailyCalc> overlapptingTimes = timeSheetOfDeductionItems.stream()
-				.filter(item -> item.getTimeSheet().getDuplicatedWith(this).isPresent())
-				.map(item -> item.getTimeSheet().getDuplicatedWith(this).get())
-				.collect(Collectors.toList());
-		
-		//控除時間分、終了時刻を遅くする
-		return this.getTimeSpan().getEnd().forwardByMinutes(overlapptingTimes.stream()
-				.mapToInt(time -> time.getTimeSpan().lengthAsMinutes())
-				.sum());
+		timeSheetOfDeductionItems = timeSheetOfDeductionItems.stream().sorted((x , y) -> x.start().compareTo(y.start())).collect(Collectors.toList());
+		TimeWithDayAttr startTime = this.getTimeSpan().getStart();
+		TimeWithDayAttr endTime = this.getTimeSpan().getEnd();
+		for (TimeSheetOfDeductionItem item : timeSheetOfDeductionItems) {
+			Optional<TimeSpanForDailyCalc> timeSpan = item.getTimeSheet().getDuplicatedWith(new TimeSpanForDailyCalc(startTime, endTime));
+			if (timeSpan.isPresent()) {
+				endTime = endTime.forwardByMinutes(item.calcTotalTime().v());
+			}
+		}
+		return endTime;
 	}
 	
 	/**

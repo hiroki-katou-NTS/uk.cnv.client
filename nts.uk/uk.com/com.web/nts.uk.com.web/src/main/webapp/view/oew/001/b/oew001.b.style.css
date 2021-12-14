@@ -1,0 +1,33 @@
+#contents-area {
+  overflow-y: hidden !important;
+}
+
+.dynamic-zone {
+  height: 210px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.dynamic-zone .flex.valign-center {
+  margin-bottom: 10px;
+}
+
+.dynamic-zone td {
+  min-width: 108px;
+}
+
+.name-label {
+  width: 110px;
+}
+
+.dynamic-item {
+  width: 100px;
+}
+
+.ml-10 {
+  margin-left: 10px;
+}
+
+.mr-10 {
+  margin-right: 10px;
+}

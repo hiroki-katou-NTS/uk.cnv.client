@@ -32,6 +32,7 @@ import nts.uk.ctx.pereg.app.find.layoutdef.classification.LayoutPersonInfoValueD
 import nts.uk.ctx.pereg.app.find.layoutdef.classification.definition.LayoutPersonInfoClsDefFinder;
 import nts.uk.ctx.pereg.app.find.person.info.item.PerInfoItemDefDto;
 import nts.uk.ctx.pereg.app.find.processor.LayoutingProcessor;
+import nts.uk.ctx.pereg.app.find.processor.PeregProcessor;
 import nts.uk.ctx.pereg.dom.person.additemdata.category.EmInfoCtgDataRepository;
 import nts.uk.ctx.pereg.dom.person.additemdata.category.EmpInfoCtgData;
 import nts.uk.ctx.pereg.dom.person.additemdata.item.EmpInfoItemDataRepository;
@@ -55,6 +56,7 @@ import nts.uk.ctx.pereg.dom.roles.auth.category.PersonInfoCategoryAuthRepository
 import nts.uk.ctx.pereg.dom.roles.auth.item.PersonInfoItemAuth;
 import nts.uk.ctx.pereg.dom.roles.auth.item.PersonInfoItemAuthRepository;
 import nts.uk.shr.com.context.AppContexts;
+import nts.uk.shr.com.context.LoginUserContext;
 import nts.uk.shr.pereg.app.find.PeregQuery;
 import nts.uk.shr.pereg.app.find.dto.OptionalItemDataDto;
 import nts.uk.shr.pereg.app.find.dto.PeregDto;
@@ -178,6 +180,11 @@ public class LayoutFinder {
 		List<LayoutPersonInfoClsDto> authItemClasList = new ArrayList<>();
 		String roleId = AppContexts.user().roles().forPersonalInfo();
 
+		LoginUserContext loginUser = AppContexts.user();
+		String loginEmpId = loginUser.employeeId();
+		String employeeId = layoutQuery.getBrowsingEmpId();
+		boolean isSelfAuth = loginEmpId.equals(employeeId);
+
 		Set<String> setCategories = itemClassList.stream().map(classItem -> classItem.getPersonInfoCategoryID())
 				.collect(Collectors.toSet());
 		List<String> categoryIdList = new ArrayList<>(setCategories);
@@ -240,6 +247,8 @@ public class LayoutFinder {
 			classItemList.forEach(classItem -> {
 				checkActionRoleItemData(itemAuthMap.get(classItem.getPersonInfoCategoryID()), classItem, selfBrowsing);
 			});
+			
+			PeregProcessor.setItemAuthForCategoryHistory(perInfoCtgAuthRepo, perInfoCategory, classItemList, roleId, isSelfAuth);
 
 		}
 

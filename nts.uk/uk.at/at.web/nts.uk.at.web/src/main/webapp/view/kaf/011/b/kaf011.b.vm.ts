@@ -117,9 +117,9 @@ module nts.uk.at.view.kaf011.b.viewmodel {
 		}
 
 		openKDL009() {
-			let self = this;
+			const vm = this;
 			nts.uk.ui.windows.setShared('KDL009_DATA', {
-				employeeIds: [__viewContext.user.employeeId],
+				employeeIds: [vm.appDispInfoStartupOutput().appDetailScreenInfo.application.employeeID],
 				baseDate: moment(new Date()).format("YYYYMMDD")
 			});
 			

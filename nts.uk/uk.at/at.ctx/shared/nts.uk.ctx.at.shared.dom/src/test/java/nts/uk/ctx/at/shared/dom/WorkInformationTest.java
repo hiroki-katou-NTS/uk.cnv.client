@@ -1255,4 +1255,88 @@ public class WorkInformationTest {
 
 	}
 	
+	@Test
+	public void testIsGoStraight_WorkTypeNotExist() {
+		WorkInformation target = new WorkInformation(new WorkTypeCode("k01"), new WorkTimeCode("s01") );
+		
+		new Expectations() {{
+			require.getWorkType(target.getWorkTypeCode().v());
+			
+		}};
+		
+		assertThat(target.isGoStraight(require)).isFalse();
+	}
+	
+	@Test
+	public void testIsGoStraight_false(@Injectable WorkType workType) {
+		WorkInformation target = new WorkInformation(new WorkTypeCode("k01"), new WorkTimeCode("s01") );
+		
+		new Expectations() {{
+			require.getWorkType(target.getWorkTypeCode().v());
+			result = Optional.of(workType);
+			
+			workType.isAttendanceTimeAutoSet();
+			result = false;
+		}};
+		
+		assertThat(target.isGoStraight(require)).isFalse();
+	}
+	
+	@Test
+	public void testIsGoStraight_true(@Injectable WorkType workType) {
+		WorkInformation target = new WorkInformation(new WorkTypeCode("k01"), new WorkTimeCode("s01") );
+		
+		new Expectations() {{
+			require.getWorkType(target.getWorkTypeCode().v());
+			result = Optional.of(workType);
+			
+			workType.isAttendanceTimeAutoSet();
+			result = true;
+		}};
+		
+		assertThat(target.isGoStraight(require)).isTrue();
+	}
+	
+	@Test
+	public void testIsBackStraight_WorkTypeNotExist() {
+		WorkInformation target = new WorkInformation(new WorkTypeCode("k01"), new WorkTimeCode("s01") );
+		
+		new Expectations() {{
+			require.getWorkType(target.getWorkTypeCode().v());
+			
+		}};
+		
+		assertThat(target.isBackStraight(require)).isFalse();
+	}
+	
+	@Test
+	public void testIsBackStraight_false(@Injectable WorkType workType) {
+		WorkInformation target = new WorkInformation(new WorkTypeCode("k01"), new WorkTimeCode("s01") );
+		
+		new Expectations() {{
+			require.getWorkType(target.getWorkTypeCode().v());
+			result = Optional.of(workType);
+			
+			workType.isLeaveTimeAutoSet();
+			result = false;
+		}};
+		
+		assertThat(target.isBackStraight(require)).isFalse();
+	}
+	
+	@Test
+	public void testIsBackStraight_true(@Injectable WorkType workType) {
+		WorkInformation target = new WorkInformation(new WorkTypeCode("k01"), new WorkTimeCode("s01") );
+		
+		new Expectations() {{
+			require.getWorkType(target.getWorkTypeCode().v());
+			result = Optional.of(workType);
+			
+			workType.isLeaveTimeAutoSet();
+			result = true;
+		}};
+		
+		assertThat(target.isBackStraight(require)).isTrue();
+	}
+	
 }

@@ -16,12 +16,16 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.algorithm.param.UnbalanceCompensation;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.interim.InterimAbsMng;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.interim.InterimRecMng;
-import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.RemainingMinutes;
 import nts.uk.ctx.at.shared.dom.remainingnumber.base.CompensatoryDayoffDate;
 import nts.uk.ctx.at.shared.dom.remainingnumber.base.DigestionAtr;
 import nts.uk.ctx.at.shared.dom.remainingnumber.base.HolidayAtr;
 import nts.uk.ctx.at.shared.dom.remainingnumber.base.ManagementDataRemainUnit;
 import nts.uk.ctx.at.shared.dom.remainingnumber.base.TargetSelectionAtr;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffDayAndTimes;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffDayTimeUnUse;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffDayTimeUse;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffRemainCarryForward;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffRemainDayAndTimes;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.DayOffError;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.AccumulationAbsenceDetail;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.AccumulationAbsenceDetail.AccuVacationBuilder;
@@ -32,19 +36,18 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numb
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.VacationDetails;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.interim.InterimBreakMng;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.interim.InterimDayOffMng;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveRemainingDayNumber;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveRemainingTime;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveUsedDayNumber;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveUsedTime;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.MonthVacationGrantDay;
+import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.MonthVacationGrantTime;
 import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.InterimRemain;
 import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.primitive.CreateAtr;
 import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.primitive.OccurrenceDay;
-import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.primitive.OccurrenceTime;
 import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.primitive.RemainType;
-import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.primitive.RequiredDay;
-import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.primitive.RequiredTime;
-import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.primitive.UnOffsetDay;
-import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.primitive.UnOffsetTime;
 import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.primitive.UnUsedDay;
-import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.primitive.UnUsedTime;
 import nts.uk.ctx.at.shared.dom.remainingnumber.paymana.PayoutSubofHDManagement;
-import nts.uk.ctx.at.shared.dom.remainingnumber.reserveleave.empinfo.grantremainingdata.daynumber.ReserveLeaveRemainingDayNumber;
 import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveComDayOffManagement;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.breakinfo.FixedManagementDataMonth;
 
@@ -181,12 +184,14 @@ public class DaikyuFurikyuHelper {
 			Double remainDay, Integer remainTime, Double dayUse, Integer timeUse, Double occurrenceDay,
 			Integer occurrenceTime, Double carryoverDay, Integer carryoverTime, Double unusedDay, Integer unusedTime,
 			List<DayOffError> dayOffErrors, GeneralDate nextDay) {
-		return new SubstituteHolidayAggrResult(new VacationDetails(lstAccDetail),
-				new ReserveLeaveRemainingDayNumber(remainDay), new RemainingMinutes(remainTime),
-				new ReserveLeaveRemainingDayNumber(dayUse), new RemainingMinutes(timeUse),
-				new ReserveLeaveRemainingDayNumber(occurrenceDay), new RemainingMinutes(occurrenceTime),
-				new ReserveLeaveRemainingDayNumber(carryoverDay), new RemainingMinutes(carryoverTime),
-				new ReserveLeaveRemainingDayNumber(unusedDay), new RemainingMinutes(unusedTime), dayOffErrors,
+	      return new SubstituteHolidayAggrResult(
+	    		new VacationDetails(lstAccDetail),
+				new DayOffRemainDayAndTimes(new LeaveRemainingDayNumber(remainDay), Optional.of(new LeaveRemainingTime(remainTime))),//残日数, 残時間
+				new DayOffDayTimeUse(new LeaveUsedDayNumber(dayUse), Optional.of(new LeaveUsedTime(timeUse))),
+				new DayOffDayAndTimes(new MonthVacationGrantDay(occurrenceDay), Optional.of(new MonthVacationGrantTime(occurrenceTime))),
+				new DayOffRemainCarryForward(new LeaveRemainingDayNumber(carryoverDay), Optional.of(new LeaveRemainingTime(carryoverTime))),
+				new DayOffDayTimeUnUse(new LeaveRemainingDayNumber(unusedDay), Optional.of(new LeaveRemainingTime(unusedTime))),
+				dayOffErrors,
 				Finally.of(nextDay), Collections.emptyList());
 	}
 
@@ -197,13 +202,15 @@ public class DaikyuFurikyuHelper {
 
 	public static SubstituteHolidayAggrResult createDefaultResult(List<AccumulationAbsenceDetail> lstAccDetail, Double carryDay,
 			GeneralDate nextDay) {
-		return new SubstituteHolidayAggrResult(new VacationDetails(lstAccDetail),
-				new ReserveLeaveRemainingDayNumber(0.0), new RemainingMinutes(0),
-				new ReserveLeaveRemainingDayNumber(0.0), new RemainingMinutes(0),
-				new ReserveLeaveRemainingDayNumber(0.0), new RemainingMinutes(0),
-				new ReserveLeaveRemainingDayNumber(carryDay), new RemainingMinutes(0),
-				new ReserveLeaveRemainingDayNumber(0.0), new RemainingMinutes(0), new ArrayList<>(),
-				Finally.of(nextDay), Collections.emptyList());
+		  return new SubstituteHolidayAggrResult(
+		    		new VacationDetails(lstAccDetail),
+					new DayOffRemainDayAndTimes(new LeaveRemainingDayNumber(0.0), Optional.of(new LeaveRemainingTime(0))),//残日数, 残時間
+					new DayOffDayTimeUse(new LeaveUsedDayNumber(0.0), Optional.of(new LeaveUsedTime(0))),
+					new DayOffDayAndTimes(new MonthVacationGrantDay(0.0), Optional.of(new MonthVacationGrantTime(0))),
+					new DayOffRemainCarryForward(new LeaveRemainingDayNumber(carryDay), Optional.of(new LeaveRemainingTime(0))),
+					new DayOffDayTimeUnUse(new LeaveRemainingDayNumber(0.0), Optional.of(new LeaveRemainingTime(0))),
+					new ArrayList<>(),
+					Finally.of(nextDay), Collections.emptyList());
 	}
 
 	public static BreakDayOffRemainMngRefactParam inputParamDaikyu(DatePeriod dateData, boolean mode,

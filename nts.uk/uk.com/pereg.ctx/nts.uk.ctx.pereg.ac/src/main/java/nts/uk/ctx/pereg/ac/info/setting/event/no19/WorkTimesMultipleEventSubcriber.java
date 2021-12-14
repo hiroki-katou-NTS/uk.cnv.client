@@ -50,10 +50,10 @@ public class WorkTimesMultipleEventSubcriber implements DomainEventSubscriber<Wo
 
 	@Override
 	public void handle(WorkManagementMultipleDomainEvent domainEvent) {
-		List<PersonInfoItemDefinition> itemUpdateLst = new ArrayList<>();
-		itemUpdateLst.addAll(setAbolition( getItemLst() , domainEvent.isUseAtr()));
-		if (itemUpdateLst.size() > 0)
-			this.itemRepo.updateAbolitionItem(itemUpdateLst);
+//		List<PersonInfoItemDefinition> itemUpdateLst = new ArrayList<>();
+//		itemUpdateLst.addAll(setAbolition( getItemLst() , domainEvent.isUseAtr()));
+//		if (itemUpdateLst.size() > 0)
+//			this.itemRepo.updateAbolitionItem(itemUpdateLst);
 	}
 	
 	private List<PersonInfoItemDefinition> getItemLst() {

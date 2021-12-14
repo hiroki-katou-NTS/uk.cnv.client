@@ -154,6 +154,21 @@ public class EmployeeRequestAdapterImpl implements EmployeeRequestAdapter {
 		return null;
 	}
 
+	// 社員の雇用履歴を全て取得する
+	@Override
+	public List<SEmpHistImport> getEmpHist(String companyId, String employeeId) {
+		
+		List<SEmpHistExport> sEmpHistExport = this.employmentPub.findSEmpHistBySid(companyId, employeeId);
+		return sEmpHistExport.stream().map(x -> {
+			SEmpHistImport sEmpHistImport = new SEmpHistImport();
+			sEmpHistImport.setEmployeeId(x.getEmployeeId());
+			sEmpHistImport.setEmploymentCode(x.getEmploymentCode());
+			sEmpHistImport.setEmploymentName(x.getEmploymentName());
+			sEmpHistImport.setPeriod(x.getPeriod());
+			return sEmpHistImport;
+		}).collect(Collectors.toList());
+	}
+		
 	@Override
 	public SWkpHistImport getSWkpHistByEmployeeID(String employeeId, GeneralDate baseDate) {
 		Optional<SWkpHistExport> sWkpHistExport = this.workplacePub.findBySid(employeeId, baseDate);

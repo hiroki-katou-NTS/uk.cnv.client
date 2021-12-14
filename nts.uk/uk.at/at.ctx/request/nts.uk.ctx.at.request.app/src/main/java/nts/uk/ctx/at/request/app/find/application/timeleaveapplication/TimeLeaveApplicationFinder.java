@@ -384,13 +384,12 @@ public class TimeLeaveApplicationFinder {
         }
         
         if (params.getApplicationNew() != null) {
-            String employeeId = AppContexts.user().employeeId();
             application = Application.createFromNew(
                     EnumAdaptor.valueOf(params.getApplicationNew().getPrePostAtr(), PrePostAtr.class),
-                    employeeId,
+                    params.getApplicationNew().getEmployeeID(),
                     EnumAdaptor.valueOf(params.getApplicationNew().getAppType(), ApplicationType.class),
                     new ApplicationDate(GeneralDate.fromString(params.getApplicationNew().getAppDate(), "yyyy/MM/dd")),
-                    employeeId,
+                    params.getApplicationNew().getEnteredPerson(),
                     Optional.empty(),
                     Optional.empty(),
                     Optional.of(new ApplicationDate(GeneralDate.fromString(params.getApplicationNew().getOpAppStartDate(), "yyyy/MM/dd"))),
@@ -436,7 +435,9 @@ public class TimeLeaveApplicationFinder {
                     output.getAppDispInfoStartup(), 
                     new ArrayList<String>(), 
                     Optional.of(new TimeDigestionParam(over60h, nursingTime, childCareTime, subHolidayTime, annualTime, 0, params.getDetails().stream().map(TimeLeaveAppDetailDto::toShare).collect(Collectors.toList()))), 
-                    false
+                    false, 
+                    Optional.empty(), 
+                    Optional.empty()
             );
             confirmMsgOutputs = new ArrayList<>();
         }

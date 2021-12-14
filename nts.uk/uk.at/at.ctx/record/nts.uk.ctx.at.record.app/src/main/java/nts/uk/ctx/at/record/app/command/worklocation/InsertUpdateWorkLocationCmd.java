@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.record.app.command.worklocation;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
@@ -40,7 +41,7 @@ public class InsertUpdateWorkLocationCmd {
 	private List<Ipv4AddressDto> listIPAddress;
 	
 	/** 職場*/
-	private List<WorkplacePossibleCmd>  listWorkplace;
+	private WorkplacePossibleCmd workplace;
 	
 	public WorkLocation toDomain() {
 		return new WorkLocation(
@@ -51,7 +52,7 @@ public class InsertUpdateWorkLocationCmd {
 						RadiusAtr.toEnum(this.radius), 
 						new GeoCoordinate(this.latitude, this.longitude)),
 				this.listIPAddress.stream().map(c->c.toDomain()).collect(Collectors.toList()),
-				this.listWorkplace.stream().map(c->c.toDomain()).collect(Collectors.toList()));
+				this.workplace == null ? Optional.empty() : Optional.of(this.workplace.toDomain()));
 	}
 	
 	public static InsertUpdateWorkLocationCmd toDto(WorkLocation domain) {
@@ -62,6 +63,6 @@ public class InsertUpdateWorkLocationCmd {
 				domain.getStampRange().getGeoCoordinate().getLatitude(),
 				domain.getStampRange().getGeoCoordinate().getLongitude(),
 				domain.getListIPAddress().stream().map(c-> new Ipv4AddressDto(c)).collect(Collectors.toList()),
-				domain.getListWorkplace().stream().map(c-> WorkplacePossibleCmd.toDto(c)).collect(Collectors.toList()));
+				domain.getWorkplace().map(c-> WorkplacePossibleCmd.toDto(c)).orElse(null));
 	}
 }

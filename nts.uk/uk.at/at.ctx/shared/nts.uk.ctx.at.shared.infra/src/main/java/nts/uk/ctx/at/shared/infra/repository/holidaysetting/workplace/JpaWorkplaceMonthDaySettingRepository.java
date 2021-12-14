@@ -199,12 +199,9 @@ public class JpaWorkplaceMonthDaySettingRepository extends JpaRepository impleme
 		
 		for(Year year:years){
 			List<KshmtHdpubDPerMWkp> result = this.findBy(companyId, workplaceId, year, null, null);
-			// Check continue
-			if (result.isEmpty()) {
-				continue;
+			if (!result.isEmpty()) {	
+				domain.add(new WorkplaceMonthDaySetting(new JpaWorkplaceMonthDaySettingGetMemento(result)));
 			}
-		
-			domain.add(new WorkplaceMonthDaySetting(new JpaWorkplaceMonthDaySettingGetMemento(result)));
 		}
 		return domain;
 	}

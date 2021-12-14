@@ -328,20 +328,20 @@ module nts.uk.at.view.kaf007_ref.a.viewmodel {
 				})
 				.done(result => {
 					if (result != undefined) {
-						if (_.isEmpty(holidayDateLst)) {
-							return vm.$dialog.info({ messageId: "Msg_15" }).then(() => {
-								nts.uk.request.ajax("at", API.reflectApp, result.reflectAppIdLst);
-								CommonProcess.handleAfterRegister(result, vm.isSendMail(), vm, false, vm.appDispInfoStartupOutput().appDispInfoNoDateOutput.employeeInfoLst);
-							});
-						} else {
-							let dispMsg = nts.uk.resource.getMessage('Msg_15') + "\n";
-							let x = nts.uk.resource.getMessage('Msg_1663', [holidayDateLst.join('、')]);
-							dispMsg += x;
-							return vm.$dialog.info(dispMsg).then(() => {
-								nts.uk.request.ajax("at", API.reflectApp, result.reflectAppIdLst);
-								CommonProcess.handleAfterRegister(result, vm.isSendMail(), vm, false, vm.appDispInfoStartupOutput().appDispInfoNoDateOutput.employeeInfoLst);
-							})
-						}
+						return vm.$dialog.info({ messageId: "Msg_15" }).then(() => {
+							nts.uk.request.ajax("at", API.reflectApp, result.reflectAppIdLst);
+							CommonProcess.handleAfterRegister(result, vm.isSendMail(), vm, false, vm.appDispInfoStartupOutput().appDispInfoNoDateOutput.employeeInfoLst);
+						});
+						// if (_.isEmpty(holidayDateLst)) {
+						// } else {
+						// 	let dispMsg = nts.uk.resource.getMessage('Msg_15') + "\n";
+						// 	let x = nts.uk.resource.getMessage('Msg_1663', [holidayDateLst.join('、')]);
+						// 	dispMsg += x;
+						// 	return vm.$dialog.info(dispMsg).then(() => {
+						// 		nts.uk.request.ajax("at", API.reflectApp, result.reflectAppIdLst);
+						// 		CommonProcess.handleAfterRegister(result, vm.isSendMail(), vm, false, vm.appDispInfoStartupOutput().appDispInfoNoDateOutput.employeeInfoLst);
+						// 	})
+						// }
 					}
 				})
 				.fail(err => {

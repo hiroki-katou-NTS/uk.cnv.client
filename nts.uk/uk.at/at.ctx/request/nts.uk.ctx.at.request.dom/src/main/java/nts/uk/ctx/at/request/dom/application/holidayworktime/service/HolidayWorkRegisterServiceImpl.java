@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -26,7 +25,6 @@ import nts.uk.ctx.at.request.dom.application.common.service.setting.output.AppDi
 import nts.uk.ctx.at.request.dom.application.holidayworktime.AppHolidayWork;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.AppHolidayWorkRepository;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.service.dto.AppHdWorkDispInfoOutput;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOvertimeDetail;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.applicationtypesetting.AppTypeSetting;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.InterimRemainDataMngRegisterDateChange;
 
@@ -91,8 +89,7 @@ public class HolidayWorkRegisterServiceImpl implements HolidayWorkRegisterServic
 	@Override
 	public ProcessResult registerMulti(String companyId, List<String> empList, AppTypeSetting appTypeSetting,
 			AppHdWorkDispInfoOutput appHdWorkDispInfoOutput, AppHolidayWork appHolidayWork,
-			Map<String, ApprovalRootContentImport_New> approvalRootContentMap,
-			Map<String, AppOvertimeDetail> appOvertimeDetailMap) {
+			Map<String, ApprovalRootContentImport_New> approvalRootContentMap) {
 		List<String> applicationIdList = new ArrayList<String>();
 		List<String> reflectAppIdLst = new ArrayList<>();
 		//	INPUT．申請者リストをループする
@@ -103,7 +100,6 @@ public class HolidayWorkRegisterServiceImpl implements HolidayWorkRegisterServic
 			String appId = IdentifierUtil.randomUniqueId();
 			empAppHolidayWork.setAppID(appId);
 			List<ApprovalPhaseStateImport_New> listApprovalPhaseState = approvalRootContentMap.get(empId).getApprovalRootState().getListApprovalPhaseState();
-			empAppHolidayWork.setAppOvertimeDetail(Optional.ofNullable(appOvertimeDetailMap.get(empId)));
 			//	List＜申請ID＞．Add(新しいGUID)
 			applicationIdList.add(appId);
 			

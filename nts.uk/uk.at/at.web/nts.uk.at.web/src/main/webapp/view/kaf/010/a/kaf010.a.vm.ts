@@ -811,14 +811,7 @@ module nts.uk.at.view.kaf010.a.viewmodel {
 			// 		workHours2.end(hdWorkDispInfoWithDateOutput.workHours.endTimeOp2);
 			// 	}
 			// } else {
-				let workHours1 = self.workInfo().workHours1;
-				let workHours2 = self.workInfo().workHours2;
-				if(hdWorkDispInfoWithDateOutput && hdWorkDispInfoWithDateOutput.workHours){
-					workHours1.start(hdWorkDispInfoWithDateOutput.workHours.startTimeOp1);
-					workHours1.end(hdWorkDispInfoWithDateOutput.workHours.endTimeOp1);
-					workHours2.start(hdWorkDispInfoWithDateOutput.workHours.startTimeOp2);
-					workHours2.end(hdWorkDispInfoWithDateOutput.workHours.endTimeOp2);
-				}
+				
 			// }
 			
 			let workInfo = new WorkInfo();
@@ -828,6 +821,14 @@ module nts.uk.at.view.kaf010.a.viewmodel {
 			} else {
 				workInfo = self.workInfo();
 			}
+			let workHours1 = self.workInfo().workHours1;
+				let workHours2 = self.workInfo().workHours2;
+				if(hdWorkDispInfoWithDateOutput && hdWorkDispInfoWithDateOutput.workHours){
+					workHours1.start(hdWorkDispInfoWithDateOutput.workHours.startTimeOp1);
+					workHours1.end(hdWorkDispInfoWithDateOutput.workHours.endTimeOp1);
+					workHours2.start(hdWorkDispInfoWithDateOutput.workHours.startTimeOp2);
+					workHours2.end(hdWorkDispInfoWithDateOutput.workHours.endTimeOp2);
+				}
 			workInfo.workHours1 = workHours1;
 			workInfo.workHours2 = workHours2;
 			self.workInfo(workInfo);

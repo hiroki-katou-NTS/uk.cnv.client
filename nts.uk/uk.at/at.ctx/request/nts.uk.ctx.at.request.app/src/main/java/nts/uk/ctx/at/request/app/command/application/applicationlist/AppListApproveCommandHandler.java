@@ -164,6 +164,7 @@ public class AppListApproveCommandHandler extends CommandHandlerWithResult<AppLi
 		}
 	}
 	
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public AppListApproveResult approverAfterConfirm(List<ListOfApplicationCmd> listOfApplicationCmds, List<ListOfAppTypes> listOfAppTypes) {
 		String companyID = AppContexts.user().companyId();
 		AppListApproveResult result = new AppListApproveResult(new HashMap<String, String>(), new HashMap<String, String>());

@@ -291,7 +291,7 @@ export class KafS10Step1Component extends Vue {
     public handleTimeWithDay(time: number) {
         const self = this;
         const nameTime = '当日';
-        if (!time) {
+        if (_.isNil(time)) {
 
             return;
         }

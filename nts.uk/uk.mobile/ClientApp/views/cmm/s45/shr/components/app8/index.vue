@@ -7,8 +7,8 @@
                         || (data.appTimeType === 1 && params.appDetail.reflectSetting.destination.firstAfterWork == 1)
                         || (data.appTimeType === 2 && params.appDispInfoStartupOutput.appDispInfoNoDateOutput.managementMultipleWorkCycles && params.appDetail.reflectSetting.destination.secondBeforeWork == 1)
                         || (data.appTimeType === 3 && params.appDispInfoStartupOutput.appDispInfoNoDateOutput.managementMultipleWorkCycles && params.appDetail.reflectSetting.destination.secondAfterWork == 1)
-                        || (data.appTimeType === 4 && params.appDetail.reflectSetting.destination.privateGoingOut == 1)
-                        || (data.appTimeType === 5 && params.appDetail.reflectSetting.destination.unionGoingOut == 1)">
+                        || (data.appTimeType === 4 && params.appDetail.reflectSetting.destination.privateGoingOut == 1 && params.appDetail.reflectSetting.destination.privateGoingOut == 1)
+                        || (data.appTimeType === 5 && params.appDetail.reflectSetting.destination.unionGoingOut == 1 && params.appDetail.reflectSetting.destination.unionGoingOut == 1)">
                 <div class="card-header uk-bg-accordion">
                     <span>{{title(data.appTimeType) | i18n}}</span>
                 </div>

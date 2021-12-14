@@ -1062,13 +1062,13 @@ module nts.uk.at.view.ksm004.a {
                     && nts.uk.util.isNullOrUndefined(__viewContext.user.role.payroll)
                     && nts.uk.util.isNullOrUndefined(__viewContext.user.role.officeHelper)
                     && nts.uk.util.isNullOrUndefined(__viewContext.user.role.personnel)) {
-                    $("#print-button_1").hide();
-                    $("#print-button_2").hide();
-                    $("#print-button_3").hide();
+                    // $("#print-button_1").hide();
+                    // $("#print-button_2").hide();
+                    // $("#print-button_3").hide();
                 } else {
-                    $("#print-button_1").show();
-                    $("#print-button_2").show();
-                    $("#print-button_3").show();
+                    // $("#print-button_1").show();
+                    // $("#print-button_2").show();
+                    // $("#print-button_3").show();
                 }
             }
 

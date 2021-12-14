@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.scherec.application.appabsence.ApplyForLeaveShare;
-import nts.uk.ctx.at.shared.dom.scherec.application.bussinesstrip.BusinessTripShare;
+import nts.uk.ctx.at.shared.dom.scherec.application.bussinesstrip.BusinessTripInfoShare;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.ApplicationShare;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.ApplicationTypeShare;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.StampRequestModeShare;
@@ -43,9 +43,8 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime.At
  */
 public class RCCreateDailyAfterApplicationeReflect {
 
-	public static DailyAfterAppReflectResult process(Require require, ApplicationShare application,
+	public static DailyAfterAppReflectResult process(Require require, String companyId, ApplicationShare application,
 			DailyRecordOfApplication dailyApp, GeneralDate date) {
-		String companyId = require.getCId();
 		//各申請反映条件のドメインモデルを取得する
 		Object domainSetReflect = GetDomainReflectModelApp.process(require, companyId, application.getAppType(),
 				application.getAppType() != ApplicationTypeShare.COMPLEMENT_LEAVE_APPLICATION ? Optional.empty()
@@ -72,7 +71,7 @@ public class RCCreateDailyAfterApplicationeReflect {
 		case BUSINESS_TRIP_APPLICATION:
 			// 3：出張申請の反映（勤務実績）
 			itemIds.addAll(((ReflectBusinessTripApp) domainSetReflect).reflectRecord(require,
-					(BusinessTripShare) application, dailyApp, date));
+					(BusinessTripInfoShare) application, dailyApp));
 			break;
 		case GO_RETURN_DIRECTLY_APPLICATION:
 			// 4：直行直帰申請を反映する(勤務実績）

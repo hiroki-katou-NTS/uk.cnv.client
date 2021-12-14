@@ -165,7 +165,8 @@ module nts.uk.ui.ktg004.a {
                         detailedWorkStatusSettings,
                         itemsSetting,
                         attendanceInfor,
-                        remainingNumberInfor
+                        remainingNumberInfor, 
+                        vacationSetting
                     } = data;
                     const {
                         dailyErrors,
@@ -190,6 +191,18 @@ module nts.uk.ui.ktg004.a {
 						grantDays, 
                         subHolidayTimeManage
                     } = remainingNumberInfor;
+
+                    const {
+                        holiday60HManage,
+                        nursingManage,
+                        publicHolidayManage,
+                        childCaremanage,
+                        accomoManage,
+                        accumAnnualManage,
+                        substituteManage,
+                        substituteTimeManage,
+                        annualManage,
+                    } = vacationSetting;
 
                     const itemsDisplay: ItemDisplay[] = [];
                     const itemsHolidaysRemainings: SpecialHolidaysRemaining[] = [];
@@ -253,75 +266,87 @@ module nts.uk.ui.ktg004.a {
                                         })
                                     break;
                                 case 27:
-                                    itemsDisplay
-                                        .push({
-                                            name: 'KTG004_9',
-                                            text: 
-												numberOfAnnualLeaveRemain.time == ZERO_TIME
-												?
-												vm.$i18n('KTG004_15', [`${numberOfAnnualLeaveRemain.day}`])
-												:
-												vm.$i18n('KTG004_28', [`${numberOfAnnualLeaveRemain.day}`, `${numberOfAnnualLeaveRemain.time}`]),
-											grantDay:
-												_.isNil(grantDate)
-												?
-												`${vm.$i18n('KTG004_26')} ${vm.$i18n('KTG004_27')}`
-												:
-												`${vm.$i18n('KTG004_26')}${moment(grantDate).format("YYYY/MM/DD")}　${grantDays}日`
-												
-													
-                                        })
+                                    if (vacationSetting.annualManage) {
+                                        itemsDisplay
+                                            .push({
+                                                name: 'KTG004_9',
+                                                text: 
+                                                    numberOfAnnualLeaveRemain.time == ZERO_TIME
+                                                    ?
+                                                    vm.$i18n('KTG004_15', [`${numberOfAnnualLeaveRemain.day}`])
+                                                    :
+                                                    vm.$i18n('KTG004_28', [`${numberOfAnnualLeaveRemain.day}`, `${numberOfAnnualLeaveRemain.time}`]),
+                                                grantDay:
+                                                    _.isNil(grantDate)
+                                                    ?
+                                                    `${vm.$i18n('KTG004_26')} ${vm.$i18n('KTG004_27')}`
+                                                    :
+                                                    `${vm.$i18n('KTG004_26')}${moment(grantDate).format("YYYY/MM/DD")}　${grantDays}日`
+                                                    
+                                                        
+                                            })
+                                    }
                                     break;
                                 case 28:
-                                    itemsDisplay
-                                        .push({
-                                            name: 'KTG004_10',
-                                            text: vm.$i18n('KTG004_15', [`${numberAccumulatedAnnualLeave}`])
-                                        })
+                                    if (vacationSetting.accumAnnualManage) {
+                                        itemsDisplay
+                                            .push({
+                                                name: 'KTG004_10',
+                                                text: vm.$i18n('KTG004_15', [`${numberAccumulatedAnnualLeave}`])
+                                            })
+                                    }
                                     break;
                                 case 29:
-                                    itemsDisplay
-                                        .push({
-                                            name: 'KTG004_11',
-                                            text: 
-                                            numberOfSubstituteHoliday.day <= 0 && numberOfSubstituteHoliday.time != ZERO_TIME
-                                            ?
-                                            `${numberOfSubstituteHoliday.time}`
-                                            : numberOfSubstituteHoliday.day == 0 && numberOfSubstituteHoliday.time == ZERO_TIME && subHolidayTimeManage == 1 ?
-                                            `${numberOfSubstituteHoliday.time}` :
-                                            vm.$i18n('KTG004_15', [`${numberOfSubstituteHoliday.day}`])
-                                        })
+                                    if (vacationSetting.substituteManage) {
+                                        itemsDisplay
+                                            .push({
+                                                name: 'KTG004_11',
+                                                text: 
+                                                numberOfSubstituteHoliday.day <= 0 && numberOfSubstituteHoliday.time != ZERO_TIME
+                                                ?
+                                                `${numberOfSubstituteHoliday.time}`
+                                                : numberOfSubstituteHoliday.day == 0 && numberOfSubstituteHoliday.time == ZERO_TIME && subHolidayTimeManage == 1 ?
+                                                `${numberOfSubstituteHoliday.time}` :
+                                                vm.$i18n('KTG004_15', [`${numberOfSubstituteHoliday.day}`])
+                                            })
+                                    }
                                     break;
                                 case 30:
-                                    itemsDisplay
-                                        .push({
-                                            name: 'KTG004_12',
-                                            text: vm.$i18n('KTG004_15', [`${remainingHolidays}`])
-                                        })
+                                    if (vacationSetting.accomoManage) {
+                                        itemsDisplay
+                                            .push({
+                                                name: 'KTG004_12',
+                                                text: vm.$i18n('KTG004_15', [`${remainingHolidays}`])
+                                            })
+                                    }
                                     break;
                                 case 31:
-                                    itemsDisplay
-                                        .push({
-                                            name: 'KTG004_13',
-                                            text: 
-												nursingRemainingNumberOfChildren.time == ZERO_TIME
-												?
-												vm.$i18n('KTG004_15', [`${nursingRemainingNumberOfChildren.day}`])
-												:
-												vm.$i18n('KTG004_28', [`${nursingRemainingNumberOfChildren.day}`, `${nursingRemainingNumberOfChildren.time}`])
-                                        })
+                                    if (vacationSetting.childCaremanage) {
+                                        itemsDisplay
+                                            .push({
+                                                name: 'KTG004_13',
+                                                text: 
+                                                    nursingRemainingNumberOfChildren.time == ZERO_TIME
+                                                    ?
+                                                    vm.$i18n('KTG004_15', [`${nursingRemainingNumberOfChildren.day}`])
+                                                    :
+                                                    vm.$i18n('KTG004_28', [`${nursingRemainingNumberOfChildren.day}`, `${nursingRemainingNumberOfChildren.time}`])
+                                            })
+                                    }
                                     break;
                                 case 32:
-                                    itemsDisplay
-                                        .push({
-                                            name: 'KTG004_14',
-                                            text:
-												longTermCareRemainingNumber.time == ZERO_TIME
-												? 
-												vm.$i18n('KTG004_15', [`${longTermCareRemainingNumber.day}`])
-												:
-												vm.$i18n('KTG004_28', [`${longTermCareRemainingNumber.day}`, `${longTermCareRemainingNumber.time}`])
-                                        })
+                                    if (vacationSetting.nursingManage) {
+                                        itemsDisplay
+                                            .push({
+                                                name: 'KTG004_14',
+                                                text:
+                                                    longTermCareRemainingNumber.time == ZERO_TIME
+                                                    ? 
+                                                    vm.$i18n('KTG004_15', [`${longTermCareRemainingNumber.day}`])
+                                                    :
+                                                    vm.$i18n('KTG004_28', [`${longTermCareRemainingNumber.day}`, `${longTermCareRemainingNumber.time}`])
+                                            })
+                                    }
                                     break;
                             }
                         })
@@ -417,6 +442,7 @@ module nts.uk.ui.ktg004.a {
         nextMonthClosingInformation: any | null;
 
         remainingNumberInfor: RemainingNumberInfor;
+        vacationSetting: VacationSetting;
     }
 
     interface ItemSetting {
@@ -460,6 +486,35 @@ module nts.uk.ui.ktg004.a {
         subHolidayTimeManage: number;
 
     }
+
+    interface VacationSetting {
+		// 60H超休残数管理する
+		holiday60HManage: boolean;
+    
+		// 介護残数管理する
+		nursingManage: boolean;
+		
+		// 公休残数管理する
+		publicHolidayManage: boolean;
+		
+		// 子の看護残数管理する
+		childCaremanage: boolean;
+		
+		// 振休残数管理する
+		accomoManage: boolean;
+		
+		// 積立年休残数管理する
+		accumAnnualManage: boolean;
+		
+		// 代休残数管理する
+		substituteManage: boolean;
+		
+		// 代休時間残数管理する
+		substituteTimeManage: boolean;
+		
+		// 年休残数管理する
+		annualManage: boolean;
+	}
 
     interface SpecialHolidaysRemainings {
         code: number;

@@ -8,6 +8,7 @@ import lombok.Value;
  * 
  * @author xuannt
  *
+ * 社員データ
  */
 @Value
 public class EmpDataImport {

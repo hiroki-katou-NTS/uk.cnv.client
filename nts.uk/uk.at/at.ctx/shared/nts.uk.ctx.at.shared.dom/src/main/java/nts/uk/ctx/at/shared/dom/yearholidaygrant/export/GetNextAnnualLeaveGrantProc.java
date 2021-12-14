@@ -72,6 +72,13 @@ public class GetNextAnnualLeaveGrantProc {
 			DatePeriod period, boolean isSingleDay, Optional<GrantHdTblSet> grantHdTblSetParam,
 			Optional<List<LengthServiceTbl>> lengthServiceTblsParam, Optional<GeneralDate> closureStartDate
 			){
+		
+		// ドメインモデル「年休設定」を取得する
+		AnnualPaidLeaveSetting annualSetting = require.annualPaidLeaveSetting(companyId);
+		if(annualSetting == null){
+			return new ArrayList<>();
+		}
+		
 
 		List<NextAnnualLeaveGrant> nextAnnualLeaveGrantList = new ArrayList<>();
 
@@ -104,26 +111,8 @@ public class GetNextAnnualLeaveGrantProc {
 				, period.start().addYears(2));
 		}
 
-//		// 「年休付与テーブル設定」を取得する
-//		Optional<GrantHdTblSet> grantHdTblSetOpt = Optional.empty();
-//		if (grantHdTblSetParam.isPresent()){
-//			grantHdTblSetOpt = grantHdTblSetParam;
-//		}
-//		else {
-//			grantHdTblSetOpt = this.yearHolidayRepo.findByCode(companyId, grantTableCode);
-//		}
-//		if (!grantHdTblSetOpt.isPresent()) return nextAnnualLeaveGrantList;
-//		val grantHdTblSet = grantHdTblSetOpt.get();
-//
-//		// 一斉付与日　確認
-//		this.simultaneousGrantMDOpt = Optional.empty();
-//		if (grantHdTblSet.getUseSimultaneousGrant() == UseSimultaneousGrant.USE){
-//			this.simultaneousGrantMDOpt = Optional.of(grantHdTblSet.getSimultaneousGrandMonthDays());
-//		}
-//
 
 		// 「年休付与テーブル設定」を取得する
-		/** TODO: ??? */
 		Optional<GrantHdTblSet> grantHdTblSetOpt = Optional.empty();
 		if (grantHdTblSetParam.isPresent()){
 			grantHdTblSetOpt = grantHdTblSetParam;
@@ -158,31 +147,28 @@ public class GetNextAnnualLeaveGrantProc {
 
 		// １日に相当する契約時間を取得する
 		Optional<LaborContractTime> laborContractTimeOpt
-			= LeaveRemainingNumber.getContractTime(require, companyId, employeeId, criteriaDate);
+			= LeaveRemainingNumber.getContractTime(require, companyId, employeeId, period.start());
 
-		// 契約時間を取得する
-		int contractTimeTmp = 0;
-		if (laborContractTimeOpt.isPresent()) {
-			contractTimeTmp = laborContractTimeOpt.get().v();
-		}
-
-		final int contractTime = contractTimeTmp;
 		for (val nextAnnualLeaveGrant : nextAnnualLeaveGrantList){
 
 			// 付与回数をもとに年休付与テーブルを取得
 			val grantTimes = nextAnnualLeaveGrant.getTimes().v();
 			val grantHdTblOpt = require.grantHdTbl(companyId, 1, grantTableCode, grantTimes);
 
+			if(!grantHdTblOpt.isPresent())
+				continue;
+			
 			// 次回年休付与に付与日数・半日年休上限回数・時間年休上限日数をセット
-			if (!grantHdTblOpt.isPresent()) continue;
 			val grantHdTbl = grantHdTblOpt.get();
-			nextAnnualLeaveGrant.setGrantDays(nts.gul.util.value.Finally.of(grantHdTbl.getGrantDays().toLeaveGrantDayNumber()));
-			nextAnnualLeaveGrant.setHalfDayAnnualLeaveMaxTimes(grantHdTbl.getLimitDayYear());
-			nextAnnualLeaveGrant.setTimeAnnualLeaveMaxDays(grantHdTbl.getLimitTimeHd());
-
-			// 契約時間を取得する
+			nextAnnualLeaveGrant
+					.setGrantDays(nts.gul.util.value.Finally.of(grantHdTbl.getGrantDays().toLeaveGrantDayNumber()));
+			nextAnnualLeaveGrant
+					.setHalfDayAnnualLeaveMaxTimes(annualSetting.getLimitedHalfCount(grantHdTbl.getLimitDayYear()));
+			nextAnnualLeaveGrant
+					.setTimeAnnualLeaveMaxDays(annualSetting.getLimitedTimeHdDays(grantHdTbl.getLimitTimeHd()));
 			nextAnnualLeaveGrant.setTimeAnnualLeaveMaxTime(
-					grantHdTbl.getLimitTimeHd().map(c->new LimitedTimeHdTime(c.v() * contractTime)));
+					annualSetting.getLimitedTimeHdTime(grantHdTbl.getLimitTimeHd(), laborContractTimeOpt));
+
 		}
 
 		// 期間がNULLであった場合は取得した付与年月日の最初の1件にする

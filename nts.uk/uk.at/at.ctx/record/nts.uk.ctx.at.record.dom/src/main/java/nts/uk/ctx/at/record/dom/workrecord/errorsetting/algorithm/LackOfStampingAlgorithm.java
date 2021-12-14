@@ -10,16 +10,16 @@ import javax.inject.Inject;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.record.dom.workinformation.WorkInfoOfDailyPerformance;
 import nts.uk.ctx.at.record.dom.worktime.TimeLeavingOfDailyPerformance;
-import nts.uk.ctx.at.shared.dom.schedule.basicschedule.BasicScheduleService;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.WorkStyle;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingWork;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkStamp;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.erroralarm.EmployeeDailyPerError;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.erroralarm.ErrorAlarmWorkRecordCode;
 import nts.uk.ctx.at.shared.dom.worktime.common.AmPmAtr;
 import nts.uk.ctx.at.shared.dom.worktime.predset.PredetemineTimeSetting;
 import nts.uk.ctx.at.shared.dom.worktime.predset.PredetemineTimeSettingRepository;
 import nts.uk.ctx.at.shared.dom.worktime.predset.WorkNo;
+import nts.uk.ctx.at.shared.dom.worktype.WorkType;
+import nts.uk.ctx.at.shared.dom.worktype.algorithm.GetWorkTypeServiceShare;
 import nts.uk.shr.com.time.TimeWithDayAttr;
 
 /*
@@ -29,7 +29,7 @@ import nts.uk.shr.com.time.TimeWithDayAttr;
 public class LackOfStampingAlgorithm {
 
 	@Inject
-	private BasicScheduleService basicScheduleService;
+	private GetWorkTypeServiceShare  getWorkTypeService;
 	
 	@Inject
 	private PredetemineTimeSettingRepository predetemineTimeSettingRepository;
@@ -40,9 +40,12 @@ public class LackOfStampingAlgorithm {
 
 		EmployeeDailyPerError employeeDailyPerError = null;
 
-		WorkStyle workStyle = basicScheduleService
-				.checkWorkDay(workInfoOfDailyPerformance.getWorkInformation().getRecordInfo().getWorkTypeCode().v());
+		Optional<WorkType> workType = getWorkTypeService
+				.getWorkType(workInfoOfDailyPerformance.getWorkInformation().getRecordInfo().getWorkTypeCode().v());
+		if (!workType.isPresent())
+			return Optional.empty();
 
+		WorkStyle workStyle = workType.get().checkWorkDay();
 		if (workStyle != WorkStyle.ONE_DAY_REST) {
 
 			if (timeLeavingOfDailyPerformance != null && timeLeavingOfDailyPerformance.getAttendance()!=null

@@ -30,7 +30,7 @@ public class AgreementOneMonth {
 	/** 社員の３６協定年月設定を取り込む　*/
 	public void updateWithEmpSet(OneMonthErrorAlarmTime erAlTime) {
 		
-		this.specConditionLimit = OneMonthTime.of(erAlTime, this.specConditionLimit.getUpperLimit());
+		this.specConditionLimit = OneMonthTime.createWithCheck(erAlTime, this.specConditionLimit.getUpperLimit());
 	}
 	
 	/** エラーチェック */

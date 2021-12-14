@@ -9,8 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nts.arc.time.calendar.period.DatePeriod;
-import nts.uk.ctx.at.record.dom.actualworkinghours.AttendanceTimeOfDailyPerformance;
-import nts.uk.ctx.at.record.dom.workinformation.WorkInfoOfDailyPerformance;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.AttendanceTimeOfMonthly;
 
 @Setter
@@ -39,13 +38,9 @@ public class TimeOffRemainErrorInputParam {
 	 */
 	private boolean useDayoff;
 	/**
-	 * 日別実績の勤怠時間
+	 * 日別実績
 	 */
-	private List<AttendanceTimeOfDailyPerformance> lstAttendanceTimeData;
-	/**
-	 * 日別実績の勤務情報
-	 */
-	private List<WorkInfoOfDailyPerformance> lstWorkInfor;
+	private List<IntegrationOfDaily> lstDomainDaily;
 	/**
 	 * 月別実績（Work）
 	 */

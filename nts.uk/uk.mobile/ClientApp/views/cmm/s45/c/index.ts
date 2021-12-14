@@ -293,8 +293,28 @@ export class CmmS45CComponent extends Vue {
             .then((v) => {
                 if (v == 'yes') {
                     self.$mask('show');
+                    let hdsubRecLinkData: any = null;
+
+                    // delete for KAFS11: START
+
+                    if (self.appType == 10) {
+                        let appDetailKAFS11 = self.appTransferData.appDetail;
+                        if (appDetailKAFS11.abs && appDetailKAFS11.rec) {
+                            hdsubRecLinkData = {
+                                absId: appDetailKAFS11.abs.application.appID, 
+                                recId: appDetailKAFS11.rec.application.appID,
+                                linkApp: appDetailKAFS11.appDispInfoStartup.appDetailScreenInfo.application.appID == appDetailKAFS11.abs.application.appID 
+                                    ? appDetailKAFS11.rec.application : appDetailKAFS11.abs.application
+                            };
+                        }
+                    }
+
+                    // delete for KAFS11: END
+
+
                     self.$http.post('at', API.delete, {
-                        appDispInfoStartupOutput: self.appTransferData.appDispInfoStartupOutput
+                        appDispInfoStartupOutput: self.appTransferData.appDispInfoStartupOutput, 
+                        hdsubRecLinkData
                     }).then((resDelete: any) => {
                         self.$mask('hide');
                         self.$modal.info('Msg_16').then(() => {

@@ -172,12 +172,24 @@ module nts.uk.com.view.ccg034.d {
       // FileAttachmentSettingDto
       for (const partDataDto of flowData.fileAttachmentData) {
         const newPartData = vm.createPartDataFromDtoFileAttachment(partDataDto);
-        vm.$ajax("/shr/infra/file/storage/infor/" + newPartData.fileId)
-          .then(res => {
-            newPartData.fileName = res.originalName;
-            // Set part data to layout
-            $partDOMs.push(vm.createDOMFromData(newPartData));
-          })
+        if (LayoutUtils.isValidFile(newPartData.fileId)) {
+          vm.$ajax("/shr/infra/file/storage/isexist/" + newPartData.fileId).then((isExist: boolean) => {
+            if (isExist) {
+              vm.$ajax("/shr/infra/file/storage/infor/" + newPartData.fileId)
+              .then(res => {
+                newPartData.fileName = res.originalName;
+                // Set part data to layout
+                $partDOMs.push(vm.createDOMFromData(newPartData));
+              });
+            } else {
+              // Set part data to layout
+              $partDOMs.push(vm.createDOMFromData(newPartData));
+            }
+          });
+        } else {
+          // Set part data to layout
+          $partDOMs.push(vm.createDOMFromData(newPartData));
+        }
       }
       // ImageSettingDto
       for (const partDataDto of flowData.imageData) {
@@ -906,22 +918,36 @@ module nts.uk.com.view.ccg034.d {
           break;
         case MenuPartType.PART_ATTACHMENT:
           newPartData = new PartDataAttachmentModel(originPartData);
-          vm.$ajax(nts.uk.text.format(API.copyFile, (originPartData as PartDataAttachmentModel).fileId))
+          const attachmentFileId = (originPartData as PartDataAttachmentModel).fileId;
+          if (LayoutUtils.isValidFile(attachmentFileId)) {
+            vm.$ajax(nts.uk.text.format(API.copyFile, (originPartData as PartDataAttachmentModel).fileId))
             .then(res => {
               (newPartData as PartDataAttachmentModel).fileId = res.fileId;
               (newPartData as PartDataAttachmentModel).originalFileId = null;
               vm.modifiedPartList.added.push(res.fileId);
             });
+          } else {
+            (newPartData as PartDataAttachmentModel).fileId = "";
+            (newPartData as PartDataAttachmentModel).originalFileId = null;
+            vm.modifiedPartList.added.push(null);
+          }
           break;
         case MenuPartType.PART_IMAGE:
           newPartData = new PartDataImageModel(originPartData);
-          if ((originPartData as PartDataImageModel).isFixed === 1 && (originPartData as PartDataImageModel).fileId) {
-            vm.$ajax(nts.uk.text.format(API.copyFile, (originPartData as PartDataImageModel).fileId))
+          const imageFileId = (originPartData as PartDataImageModel).fileId;
+          if ((originPartData as PartDataImageModel).isFixed === 1) {
+            if (LayoutUtils.isValidFile(imageFileId)) {
+              vm.$ajax(nts.uk.text.format(API.copyFile, (originPartData as PartDataImageModel).fileId))
               .then(res => {
                 (newPartData as PartDataImageModel).fileId = res.fileId;
                 (newPartData as PartDataImageModel).originalFileId = null;
                 vm.modifiedPartList.added.push(res.fileId);
               });
+            } else {
+              (newPartData as PartDataImageModel).fileId = "";
+              (newPartData as PartDataImageModel).originalFileId = null;
+              vm.modifiedPartList.added.push(null);
+            }
           }
           break;
         case MenuPartType.PART_ARROW:
@@ -1679,7 +1705,7 @@ module nts.uk.com.view.ccg034.d {
         $imageContent = $("<img>", { 'class': 'part-image-content' });
       }
       $imageContent
-        .attr('src', (partData.isFixed === 0) ? partData.fileName : (partData.fileId ? (nts.uk.request as any).liveView(partData.fileId) : ''));
+        .attr('src', (partData.isFixed === 0) ? partData.fileName : (this.isValidFile(partData.fileId) ? (nts.uk.request as any).liveView(partData.fileId) : ''));
       // Set image scale by original ratio
       const partRatio = partData.height / partData.width;
       const imageRatio = partData.ratio;
@@ -2031,6 +2057,10 @@ module nts.uk.com.view.ccg034.d {
           break;
       }
       return $partHTML;
+    }
+
+    static isValidFile(fileId: string): boolean {
+      return !nts.uk.text.isNullOrEmpty(fileId);
     }
   }
 

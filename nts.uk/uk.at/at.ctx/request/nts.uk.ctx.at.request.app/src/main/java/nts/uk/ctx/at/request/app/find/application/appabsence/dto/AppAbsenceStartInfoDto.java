@@ -81,6 +81,11 @@ public class AppAbsenceStartInfoDto {
 	public boolean workTypeNotRegister;
 	
 	/**
+     * 就業時間帯を変更フラグ
+     */
+    public boolean workTimeChange;
+	
+	/**
 	 * 特別休暇表示情報
 	 */
 	public SpecAbsenceDispInfoDto specAbsenceDispInfo;
@@ -119,6 +124,7 @@ public class AppAbsenceStartInfoDto {
 		result.workTypeLst = CollectionUtil.isEmpty(absenceStartInfoOutput.getWorkTypeLst()) ? Collections.emptyList() : absenceStartInfoOutput.getWorkTypeLst().stream().map(x -> WorkTypeDto.fromDomain(x)).collect(Collectors.toList());
 		result.workTimeLst = absenceStartInfoOutput.getWorkTimeLst().stream().map(x -> TimeZoneUseDto.fromDomain(x)).collect(Collectors.toList());
 		result.workTypeNotRegister = absenceStartInfoOutput.isWorkTypeNotRegister();
+		result.workTimeChange = absenceStartInfoOutput.isWorkTimeChange();
 		result.specAbsenceDispInfo = absenceStartInfoOutput.getSpecAbsenceDispInfo().map(x -> SpecAbsenceDispInfoDto.fromDomain(x)).orElse(null);
 		result.selectedWorkTypeCD = absenceStartInfoOutput.getSelectedWorkTypeCD().orElse(null);
 		result.selectedWorkTimeCD = absenceStartInfoOutput.getSelectedWorkTimeCD().orElse(null);
@@ -140,6 +146,7 @@ public class AppAbsenceStartInfoDto {
 				CollectionUtil.isEmpty(workTypeLst) ? Collections.emptyList() : workTypeLst.stream().map(x -> x.toDomain()).collect(Collectors.toList()), 
 				CollectionUtil.isEmpty(workTimeLst) ? Collections.emptyList() : workTimeLst.stream().map(x -> x.toDomain()).collect(Collectors.toList()), 
 				workTypeNotRegister, 
+				workTimeChange, 
 				specAbsenceDispInfo == null ? Optional.empty() : Optional.of(specAbsenceDispInfo.toDomain()), 
 				Optional.ofNullable(workInfomationForApplication == null ? null : workInfomationForApplication.toDomain()),
 				Optional.ofNullable(selectedWorkTypeCD), 

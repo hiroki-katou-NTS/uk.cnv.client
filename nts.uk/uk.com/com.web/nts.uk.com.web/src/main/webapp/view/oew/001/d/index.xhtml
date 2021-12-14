@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="../../../../master/dialog.xhtml">
+		<ui:define name="htmlHead">
+			<script>
+				var dialogSize = {
+					width: 340,
+					height: 440
+				};
+			</script>
+			<com:scriptfile set="IGNITE" />
+			<com:stylefile path="oew001.d.style.css" />
+      <com:scriptfile path="../share/model.js" />
+			<com:scriptfile path="oew001.d.vm.js" />
+		</ui:define>
+
+		<ui:define name="content">
+			<div id="contents-area">
+        <div id="D1_1" data-bind="ntsSearchBox: {
+          mode: 'igGrid',
+          comId: 'D2',
+          targetKey: 'code',
+          items: equipmentClsList,
+          selected: selectedEquipmentClsCode,
+          selectedKey: 'code',
+          fields: ['code', 'name']
+        }" tabindex="1"></div>
+        <table id="D2" data-bind="ntsGridList: {
+          height: '245px',
+          options: equipmentClsList,
+          optionsValue: 'code',
+          columns: columns,
+          multiple: false,
+          value: selectedEquipmentClsCode,
+        }" tabindex="2"></table>
+      </div>
+      <div id="functions-area-bottom">
+        <button id="D4_1" class="x-large proceed" data-bind="click: closeDialog, enable: enableSave" tabindex="3">#{i18n.getText('OEW001_52')}</button>
+        <button id="D4_2" class="large" data-bind="click: cancel" tabindex="4">#{i18n.getText('OEW001_53')}</button>
+      </div>
+    </ui:define>
+  </ui:composition>
+</body>
+</html>

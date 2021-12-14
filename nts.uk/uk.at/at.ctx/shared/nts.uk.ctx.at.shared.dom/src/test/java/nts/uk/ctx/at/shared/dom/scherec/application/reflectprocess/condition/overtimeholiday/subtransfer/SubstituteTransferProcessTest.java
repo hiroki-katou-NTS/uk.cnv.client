@@ -17,10 +17,10 @@ import mockit.Injectable;
 import mockit.Mocked;
 import mockit.integration.junit4.JMockit;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.createremain.subtransfer.MaximumTimeZone;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.createremain.subtransfer.OvertimeHdHourTransfer;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.createremain.subtransfer.SubstituteTransferProcess;
 import nts.uk.ctx.at.shared.dom.scherec.application.reflectprocess.common.ReflectApplicationHelper;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.MaximumTimeZone;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.OvertimeHourTransfer;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.SubstituteTransferProcess;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.TimeSpanForDailyCalc;
 import nts.uk.ctx.at.shared.dom.workrule.outsideworktime.overtime.overtimeframe.OverTimeFrameNo;
 import nts.uk.ctx.at.shared.dom.worktime.common.CompensatoryOccurrenceDivision;
@@ -48,9 +48,9 @@ public class SubstituteTransferProcessTest {
 	public void test1(@Mocked GetSubHolOccurrenceSetting setting) {
 
 		MaximumTimeZone maxTimeZone = new MaximumTimeZone();
-		List<OvertimeHourTransfer> maxTime = Arrays.asList(new OvertimeHourTransfer(1, new AttendanceTime(0), new AttendanceTime(0)));// 振替時間=0
-		List<OvertimeHourTransfer> timeAfterReflectApp = Arrays
-				.asList(new OvertimeHourTransfer(1, new AttendanceTime(666), new AttendanceTime(999)));
+		List<OvertimeHdHourTransfer> maxTime = Arrays.asList(new OvertimeHdHourTransfer(1, new AttendanceTime(0), new AttendanceTime(0)));// 振替時間=0
+		List<OvertimeHdHourTransfer> timeAfterReflectApp = Arrays
+				.asList(new OvertimeHdHourTransfer(1, new AttendanceTime(666), new AttendanceTime(999)));
 
 		new Expectations() {
 			{
@@ -87,9 +87,9 @@ public class SubstituteTransferProcessTest {
 		MaximumTimeZone maxTimeZone = new MaximumTimeZone();
 		maxTimeZone.getTimeSpan().add(Pair.of(new OverTimeFrameNo(1), new TimeSpanForDailyCalc(new TimeWithDayAttr(100), new TimeWithDayAttr(200))));
 
-		List<OvertimeHourTransfer> maxTime = Arrays.asList(new OvertimeHourTransfer(1, new AttendanceTime(10), new AttendanceTime(10)));
-		List<OvertimeHourTransfer> timeAfterReflectApp = Arrays
-				.asList(new OvertimeHourTransfer(1, new AttendanceTime(9), new AttendanceTime(16)));
+		List<OvertimeHdHourTransfer> maxTime = Arrays.asList(new OvertimeHdHourTransfer(1, new AttendanceTime(10), new AttendanceTime(10)));
+		List<OvertimeHdHourTransfer> timeAfterReflectApp = Arrays
+				.asList(new OvertimeHdHourTransfer(1, new AttendanceTime(9), new AttendanceTime(16)));
 
 		new Expectations() {
 			{

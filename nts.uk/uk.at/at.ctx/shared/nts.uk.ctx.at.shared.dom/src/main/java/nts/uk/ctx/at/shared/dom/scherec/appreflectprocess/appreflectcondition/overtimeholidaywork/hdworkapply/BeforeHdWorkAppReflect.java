@@ -12,6 +12,7 @@ import nts.uk.ctx.at.shared.dom.scherec.application.holidayworktime.AppHolidayWo
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.ReflectAppDestination;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.BreakApplication;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.reflectbreak.ReflectApplicationTime;
+import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.TranferHdWorkCompensatoryApp;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.DailyRecordOfApplication;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.condition.DailyAfterAppReflectResult;
@@ -69,6 +70,8 @@ public class BeforeHdWorkAppReflect extends DomainObject {
 			// 休出時間の反映
 			ReflectApplicationTime.process(holidayApp.getApplicationTime().getApplicationTime(), dailyApp,
 					Optional.of(ReflectAppDestination.RECORD));
+			//休日出勤時間の代休振替(申請用)
+			TranferHdWorkCompensatoryApp.process(require, cid, dailyApp.getDomain());
 		}
 		//ドメイン「休憩の申請反映」を作成する
 		//休憩の申請反映
@@ -76,7 +79,7 @@ public class BeforeHdWorkAppReflect extends DomainObject {
 		return new DailyAfterAppReflectResult(dailyApp, lstId);
 	}
 
-	public static interface Require extends ReflectWorkInformation.Require,ReflectStartEndWork.Require {
+	public static interface Require extends ReflectWorkInformation.Require,ReflectStartEndWork.Require, TranferHdWorkCompensatoryApp.Require {
 
 	}
 

@@ -50,7 +50,7 @@ public class StampAppReflectTest {
 
 		StampAppReflect reflectApp = noReflect();//// 応援開始、終了を反映する
 
-		Collection<Integer> actualResult = reflectApp.reflectStampApp(application, dailyApp);
+		Collection<Integer> actualResult = reflectApp.reflectStampApp(require, application, dailyApp);
 
 		assertThat(actualResult).isEmpty();
 
@@ -76,7 +76,7 @@ public class StampAppReflectTest {
 		StampAppReflect reflectApp = reflectTimeLeav(NotUseAtr.USE);
 
 		List<Integer> actualResult = new ArrayList<Integer>();
-		actualResult.addAll(reflectApp.reflectStampApp(application, dailyApp));
+		actualResult.addAll(reflectApp.reflectStampApp(require, application, dailyApp));
 
 		assertThat(actualResult).isEqualTo(Arrays.asList(30, 31));
 
@@ -85,7 +85,7 @@ public class StampAppReflectTest {
 
 		List<Integer> actualResult1 = new ArrayList<Integer>();
 		application = ReflectApplicationHelper.createAppStamp(TimeStampAppEnumShare.ATTEENDENCE_OR_RETIREMENT, TimeZoneStampClassificationShare.PARENT);
-		actualResult1.addAll(reflectApp1.reflectStampApp(application, dailyApp));
+		actualResult1.addAll(reflectApp1.reflectStampApp(require, application, dailyApp));
 
 		assertThat(actualResult1).isEqualTo(Arrays.asList(759, 760, 763, 764));
 
@@ -94,7 +94,7 @@ public class StampAppReflectTest {
 
 		List<Integer> actualResult2 = new ArrayList<Integer>();
 		application = ReflectApplicationHelper.createAppStamp(TimeStampAppEnumShare.EXTRAORDINARY, TimeZoneStampClassificationShare.PARENT);
-		actualResult2.addAll(reflectApp2.reflectStampApp(application, dailyApp));
+		actualResult2.addAll(reflectApp2.reflectStampApp(require, application, dailyApp));
 
 		assertThat(actualResult2).isEqualTo(Arrays.asList(50, 51));
 
@@ -103,7 +103,7 @@ public class StampAppReflectTest {
 
 		List<Integer> actualResult4 = new ArrayList<Integer>();
 		application = ReflectApplicationHelper.createAppStamp(null, TimeZoneStampClassificationShare.NURSE);
-		actualResult4.addAll(reflectApp4.reflectStampApp(application, dailyApp));
+		actualResult4.addAll(reflectApp4.reflectStampApp(require, application, dailyApp));
 
 		assertThat(actualResult4).isEqualTo(Arrays.asList(759, 760, 763, 764));
 
@@ -112,7 +112,7 @@ public class StampAppReflectTest {
 
 		List<Integer> actualResult5 = new ArrayList<Integer>();
 		application = ReflectApplicationHelper.createAppStamp(TimeStampAppEnumShare.GOOUT_RETURNING, null);
-		actualResult5.addAll(reflectApp5.reflectStampApp(application, dailyApp));
+		actualResult5.addAll(reflectApp5.reflectStampApp(require, application, dailyApp));
 
 		assertThat(actualResult5).isEqualTo(Arrays.asList(87, 88));
 
@@ -121,7 +121,7 @@ public class StampAppReflectTest {
 
 		List<Integer> actualResult6 = new ArrayList<Integer>();
 		application = ReflectApplicationHelper.createAppStamp(null, TimeZoneStampClassificationShare.BREAK);
-		actualResult6.addAll(reflectApp6.reflectStampApp(application, dailyApp));
+		actualResult6.addAll(reflectApp6.reflectStampApp(require, application, dailyApp));
 
 		assertThat(actualResult6).isEqualTo(Arrays.asList(157, 159));
 

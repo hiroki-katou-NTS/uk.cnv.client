@@ -68,9 +68,7 @@ public class PClogOnOffLackOfStamp {
 					for (LogOnInfo logOnInfo : logOnInfos) {//start for 2
 						if(logOnInfo.getWorkNo().v().intValue() == number) {
 							// ログオフのみ存在している(only has Logoff time)
-							if ((logOnInfo.getLogOff() != null && logOnInfo.getLogOff().isPresent() && !logOnInfo.getLogOn().isPresent())
-									|| (logOnInfo.getLogOff() != null && logOnInfo.getLogOff().isPresent()
-										&& logOnInfo.getLogOn().isPresent() && logOnInfo.getLogOn().get() == null)) {
+							if (!logOnInfo.leakageCheck() && !logOnInfo.getLogOn().isPresent()) {
 								if (logOnInfo.getWorkNo().v() == 1) {
 									attendanceItemIDList.add(794);
 								} else if (logOnInfo.getWorkNo().v() == 2) {
@@ -78,27 +76,13 @@ public class PClogOnOffLackOfStamp {
 								}
 							}
 							// ログオンのみ存在している(only has Logon time)
-							if ((logOnInfo.getLogOn() != null && logOnInfo.getLogOn().isPresent() && !logOnInfo.getLogOff().isPresent())
-									|| (logOnInfo.getLogOn() != null && logOnInfo.getLogOn().isPresent() 
-									&& logOnInfo.getLogOff().isPresent() && logOnInfo.getLogOff().get() == null)) {
+							if (!logOnInfo.leakageCheck() && !logOnInfo.getLogOff().isPresent()) {
 								if (logOnInfo.getWorkNo().v() == 1) {
 									attendanceItemIDList.add(795);
 								} else if (logOnInfo.getWorkNo().v() == 2) {
 									attendanceItemIDList.add(797);
 								}
 							}
-							// 両方存在しない(both has not data)
-		//					if ((!logOnInfo.getLogOn().isPresent() && !logOnInfo.getLogOff().isPresent())
-		//							|| (logOnInfo.getLogOn().isPresent() && logOnInfo.getLogOff().isPresent()
-		//							&& logOnInfo.getLogOn().get() == null && logOnInfo.getLogOff().get() == null)) {
-		//						if (logOnInfo.getWorkNo().v() == 1) {
-		//							attendanceItemIDList.add(794);
-		//							attendanceItemIDList.add(795);
-		//						} else if (logOnInfo.getWorkNo().v() == 2) {
-		//							attendanceItemIDList.add(796);
-		//							attendanceItemIDList.add(797);
-		//						}
-		//					}
 						}
 					}
 				}

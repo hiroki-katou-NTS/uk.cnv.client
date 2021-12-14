@@ -96,8 +96,19 @@
 										<td><button style = "margin-left: 30px;" data-bind=" click : openB,enable: !isCreate()">#{i18n.getText('CMM040_16')}</button></td>
 									</tr>
 								</table>
+								<div style = " font-weight: bold; margin-top: 20px; margin-bottom: 10px;">#{i18n.getText('CMM040_30')}</div>
+								<hr
+									style="height: 2px; border-width: 0; color: gray; background-color: gray"></hr>
+								<table>
+									<tr>
+										<td><div data-bind="ntsFormLabel: {}">#{i18n.getText('CMM040_42')}
+											</div></td>
+										<td><button style = "margin-left: 73px;" data-bind=" click : openDialogCDL008">#{i18n.getText('CMM040_30')}</button></td>
+										<td><div style = "margin-left: 30px;" data-bind="text: $vm.workplaceCode"></div></td>
+										<td><div style = "margin-left: 30px;" data-bind="text: $vm.workplaceDisplayName"></div></td>
+									</tr>
+								</table>
 							</div>
-
 							<div class="tab-content-2" style="height: 540px;">
 								<table>
 									<tr>
@@ -154,9 +165,7 @@
 									deleteOptions : {visible : true, deleteField: 'deletable'},		
 									value: currentCode
 								}"></table> -->
-								<div id = "grid"><table id="grid2"></table></div>
-								
-								
+								<!-- <div id = "grid"><table id="grid2"></table></div> -->
 							</div>
 						</div>
 					</div>

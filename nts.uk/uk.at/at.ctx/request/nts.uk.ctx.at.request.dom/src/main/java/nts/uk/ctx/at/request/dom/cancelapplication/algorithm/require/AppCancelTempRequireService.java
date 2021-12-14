@@ -9,6 +9,9 @@ import javax.inject.Inject;
 import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.request.dom.adapter.workrecod.actuallock.GetPeriodCanProcesseAdapter;
+import nts.uk.ctx.at.request.dom.adapter.workrecod.actuallock.dto.AchievementAtrImport;
+import nts.uk.ctx.at.request.dom.adapter.workrecod.actuallock.dto.IgnoreFlagDuringLockImport;
 import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.ApplicationRepository;
 import nts.uk.ctx.at.request.dom.application.common.adapter.bs.EmployeeRequestAdapter;
@@ -24,6 +27,7 @@ import nts.uk.ctx.at.request.dom.application.common.adapter.record.workfixed.Wor
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.workrecord.identificationstatus.IdentificationAdapter;
 import nts.uk.ctx.at.request.dom.application.common.adapter.schedule.schedule.basicschedule.BasicScheduleConfirmImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.schedule.schedule.basicschedule.ScBasicScheduleAdapter;
+import nts.uk.ctx.at.request.dom.application.common.adapter.workplace.EmploymentHistoryImported;
 import nts.uk.ctx.at.request.dom.applicationreflect.AppReflectExeConditionRepository;
 import nts.uk.ctx.at.request.dom.applicationreflect.AppReflectExecutionCondition;
 import nts.uk.ctx.at.request.dom.applicationreflect.object.ReflectStatusResult;
@@ -89,6 +93,9 @@ public class AppCancelTempRequireService {
 	
 	@Inject
 	protected RecoverRCBeforeAppReflectAdaper recoverRCBeforeAppReflectAdaper;
+	
+	@Inject
+	private GetPeriodCanProcesseAdapter getPeriodCanProcesseAdapter;
 	
 	public ApplicationCancellationProcess.Require createRequire() {
 		return new ApplicationCancellationProcess.Require() {
@@ -184,6 +191,13 @@ public class AppCancelTempRequireService {
 			@Override
 			public List<Closure> closureActive(String companyId, UseClassification useAtr) {
 				return closureRepo.findAllActive(companyId, useAtr);
+			}
+
+			@Override
+			public List<DatePeriod> getPeriodProcess(String employeeId, DatePeriod period,
+					List<EmploymentHistoryImported> listEmploymentHis, IgnoreFlagDuringLockImport ignoreFlagDuringLock,
+					AchievementAtrImport achievementAtr) {
+				return getPeriodCanProcesseAdapter.get(employeeId, period, listEmploymentHis, ignoreFlagDuringLock, achievementAtr);
 			}
 		};
 	}

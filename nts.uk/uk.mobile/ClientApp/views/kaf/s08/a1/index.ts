@@ -5,7 +5,7 @@ import { StepwizardComponent } from '@app/components';
 import { KafS00BComponent } from '../../../kaf/s00/b';
 import { KafS00CComponent } from '../../../kaf/s00/c';
 import { KafS08A2Component } from '../../../kaf/s08/a2';
-import { KafS00ShrComponent, AppType } from '../../../kaf/s00/shr';
+import { KafS00ShrComponent, AppType, Application } from '../../../kaf/s00/shr';
 import * as moment from 'moment';
 
 
@@ -44,60 +44,38 @@ export class KAFS08A1Component extends KafS00ShrComponent {
 
     public returnTime: number = null;
 
-    @Prop({ default: '' }) public readonly appReason!: string;
+    @Prop({ default: '' }) public readonly appReason: string;
 
     public user: any;
     public title: String = 'KafS08A1';
     public data: any = 'data';
-    public application: any = {
-        version: 1,
-        // appID: '939a963d-2923-4387-a067-4ca9ee8808zz',
-        prePostAtr: 1,
-        // employeeID: '',
-        appType: 3,
-        appDate: this.$dt(new Date(), 'YYYY/MM/DD'),
-        enteredPerson: '1',
-        inputDate: this.$dt(new Date(), 'YYYY/MM/DD HH:mm:ss'),
-        reflectionStatus: {
-            listReflectionStatusOfDay: [{
-                actualReflectStatus: 1,
-                scheReflectStatus: 1,
-                targetDate: '2020/01/07',
-                opUpdateStatusAppReflect: {
-                    opActualReflectDateTime: '2020/01/07 20:11:11',
-                    opScheReflectDateTime: '2020/01/07 20:11:11',
-                    opReasonActualCantReflect: 1,
-                    opReasonScheCantReflect: 0
-
-                },
-                opUpdateStatusAppCancel: {
-                    opActualReflectDateTime: '2020/01/07 20:11:11',
-                    opScheReflectDateTime: '2020/01/07 20:11:11',
-                    opReasonActualCantReflect: 1,
-                    opReasonScheCantReflect: 0
-                }
-            }]
-        },
-    };
-
+    public application: Application;
 
     public created() {
         const vm = this;
         if (vm.params) {
             this.data = vm.params;
+            vm.appDispInfoStartupOutput = vm.params.businessTripInfoOutputDto.appDispInfoStartup;
             vm.derpartureTime = vm.params.businessTripDto.departureTime;
             vm.returnTime = vm.params.businessTripDto.returnTime;
+            vm.appDispInfoStartupOutput = vm.params.businessTripInfoOutputDto.appDispInfoStartup;
+            vm.application = vm.appDispInfoStartupOutput.appDetailScreenInfo.application;
+        } else {
+            vm.application = vm.createApplicationInsert(AppType.BUSINESS_TRIP_APPLICATION);
         }
+
         vm.fetchStart();
 
         vm.$watch('params', (newV, oldV) => {
             if (newV) {
                 vm.data.businessTrip = vm.params.businessTripDto;
                 vm.data.businessTripInfoOutput = vm.params.businessTripInfoOutputDto;
-                vm.updateKaf000_A_Params(vm.user);
-                vm.updateKaf000_B_Params(vm.mode);
-                vm.updateKaf000_C_Params(vm.mode);
+                vm.appDispInfoStartupOutput = vm.params.businessTripInfoOutputDto.appDispInfoStartup;
+                vm.application = vm.appDispInfoStartupOutput.appDetailScreenInfo.application;
             }
+            vm.updateKaf000_A_Params(vm.user);
+            vm.updateKaf000_B_Params(vm.mode);
+            vm.updateKaf000_C_Params(vm.mode);
         });
     }
 
@@ -113,7 +91,11 @@ export class KAFS08A1Component extends KafS00ShrComponent {
         vm.$auth.user.then((usr: any) => {
             vm.user = usr;
         }).then(() => {
-            return vm.loadCommonSetting(AppType.BUSINESS_TRIP_APPLICATION);
+            if (vm.mode) {
+                return vm.loadCommonSetting(AppType.BUSINESS_TRIP_APPLICATION);
+            }
+
+            return true;
         }).then((loadData: any) => {
             if (loadData) {
                 let params = vm.mode ? {
@@ -198,8 +180,6 @@ export class KAFS08A1Component extends KafS00ShrComponent {
         }
         //check date when press next
         if (vm.mode) {
-            //let day = this.kaf000_B_Params.output.endDate.getDate() - this.kaf000_B_Params.output.startDate.getDate();
-            // let Difference_In_Time = this.kaf000_B_Params.output.endDate.getTime() - this.kaf000_B_Params.output.startDate.getTime();
             let Difference_In_Days = moment(vm.application.opAppEndDate).diff(moment(vm.application.opAppStartDate), 'days');
             //check day > 31 days between 2 Dates
             if (Difference_In_Days > 31) {
@@ -214,15 +194,6 @@ export class KAFS08A1Component extends KafS00ShrComponent {
             //gửi comment sang màn hình A2
             let commentSet = vm.data.businessTripInfoOutput.setting.appCommentSet;
             let appReason = vm.application.opAppReason;
-            
-            // vm.application.prePostAtr = vm.kaf000_B_Params.output.prePostAtr;
-            // vm.application.appDate = vm.$dt.date(vm.kaf000_B_Params.output.startDate, 'YYYY/MM/DD');
-            // vm.application.opAppStartDate = vm.$dt.date(vm.kaf000_B_Params.output.startDate, 'YYYY/MM/DD');
-            // if (vm.kaf000_B_Params.newModeContent.initSelectMultiDay) {
-            //     vm.application.opAppEndDate = vm.$dt.date(vm.kaf000_B_Params.output.endDate, 'YYYY/MM/DD');
-            // } else {
-            //     vm.application.opAppEndDate = vm.$dt.date(vm.kaf000_B_Params.output.startDate, 'YYYY/MM/DD');
-            // }
 
             vm.$mask('show');
 
@@ -251,8 +222,6 @@ export class KAFS08A1Component extends KafS00ShrComponent {
             });
         }
 
-        vm.checkNextButton();
-
         //mode edit
         if (!vm.mode) {
             vm.data.businessTrip = vm.params.businessTripDto;
@@ -279,12 +248,6 @@ export class KAFS08A1Component extends KafS00ShrComponent {
         window.scrollTo(500, 0);
     }
 
-    //check button next
-    public checkNextButton() {
-        const vm = this;
-        vm.bindBusinessTripRegister();
-    }
-
     //handle message error
     public handleErrorMessage(res: any) {
         const self = this;
@@ -309,29 +272,6 @@ export class KAFS08A1Component extends KafS00ShrComponent {
         } else {
             x.style.display = 'none';
         }
-    }
-
-    public bindBusinessTripRegister() {
-        if (this.kaf000_B_Params) {
-            if (this.mode) {
-                // this.application.appDate = this.$dt.date(this.kaf000_B_Params.output.startDate, 'YYYY/MM/DD');
-                // this.application.opAppStartDate = this.$dt.date(this.kaf000_B_Params.output.startDate, 'YYYY/MM/DD');
-                if (this.kaf000_B_Params.newModeContent.initSelectMultiDay) {
-                    // this.application.opAppEndDate = this.$dt.date(this.kaf000_B_Params.output.endDate, 'YYYY/MM/DD');
-                } else {
-                    // this.application.opAppEndDate = this.$dt.date(this.kaf000_B_Params.output.startDate, 'YYYY/MM/DD');
-                }
-            }
-
-            // this.application.prePostAtr = this.kaf000_B_Params.output.prePostAtr;
-        }
-
-        if (this.kaf000_C_Params.output) {
-            // this.application.opAppStandardReasonCD = this.kaf000_C_Params.output.opAppStandardReasonCD;
-            // this.application.opAppReason = this.kaf000_C_Params.output.opAppReason;
-        }
-        this.application.enteredPerson = this.user.employeeId;
-        
     }
 
     public handleConfirmMessage(listMes: any, res: any) {

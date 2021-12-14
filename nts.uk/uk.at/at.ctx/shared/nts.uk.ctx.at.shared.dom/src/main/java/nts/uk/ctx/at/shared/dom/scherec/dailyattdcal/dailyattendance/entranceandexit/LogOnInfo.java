@@ -2,7 +2,6 @@ package nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.entrancean
 
 import java.util.Optional;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.shared.dom.worktime.common.GoLeavingWorkAtr;
@@ -58,5 +57,12 @@ public class LogOnInfo {
 		this.logOn = logOn;
 	}
 	
-	
+	public boolean leakageCheck() {
+		Optional<TimeWithDayAttr> on = this.logOn;
+		Optional<TimeWithDayAttr> off = this.logOff;
+
+		return (on.isPresent() && off.isPresent())
+				|| (!on.isPresent() && !off.isPresent());
+
+	}
 }

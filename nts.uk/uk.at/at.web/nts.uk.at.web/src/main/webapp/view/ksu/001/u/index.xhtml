@@ -6,7 +6,7 @@
 <body>
     <ui:composition template="../../../../master/dialog.xhtml">
         <ui:define name="htmlHead">
-            <script>var dialogSize = { width: 600, height: 760 };</script>
+            <script>var dialogSize = { width: 600, height: 780 };</script>
 
             <com:scriptfile set="IGNITE" />            
             <com:stylefile path="/view/kcp/006/a/fullcalendar-lib/nts-calendar.css" of="/nts.uk.at.web" />
@@ -28,12 +28,12 @@
                 <div style="margin-left: 6%; margin-top: 10px;" data-bind="text: workplaceName"></div>
                 <hr id="line" />
                 <div class="container-custom">
-                    <button id="prev-btn" tabindex="4" class="auto-height" data-bind="click: Prev, enable: isEnableBtn">                        
+                    <button id="prev-btn" tabindex="4" class="normal"  data-bind="click: Prev, enable: isEnableBtn">                        
                         <div class="flex valign-center btn-extra" style="white-space: nowrap;" ><i data-bind="ntsIcon: { no: 156 }"></i> #{i18n.getText('KSU001_4008')}</div>                        
                     </button>
                     <div tabindex="5" data-bind="ntsPanel:{width: '140px', height: '16px', direction: 'bottom', showIcon: false, visible: true}"
                         style="margin: 0px 10px;">
-                        <div style="margin-top: 9px;" data-bind="ntsSwitchButton:{
+                        <div  data-bind="ntsSwitchButton:{
                                                                 name:'#[KSU001_4009]',
                                                                 options: $vm.lstStep,
                                                                 optionsValue: 'code',
@@ -43,7 +43,7 @@
                                                                 enable: true  }">
                         </div>
                     </div>
-                    <button id="next-btn" tabindex="6" class="auto-height" data-bind="click: Forward, enable: isEnableBtn">                        
+                    <button id="next-btn" tabindex="6" class="normal"  data-bind="click: Forward, enable: isEnableBtn">                        
                         <div class="flex valign-center btn-extra" style="white-space: nowrap;">#{i18n.getText('KSU001_4012')} <i data-bind="ntsIcon: { no: 157 }"></i></div>                         
                     </button>
                 </div>

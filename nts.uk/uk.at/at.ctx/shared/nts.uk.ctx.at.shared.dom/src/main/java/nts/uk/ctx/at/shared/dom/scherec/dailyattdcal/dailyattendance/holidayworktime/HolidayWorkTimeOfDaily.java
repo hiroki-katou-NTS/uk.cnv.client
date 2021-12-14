@@ -13,6 +13,7 @@ import lombok.val;
 import nts.arc.time.GeneralDate;
 import nts.gul.util.value.Finally;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.createremain.subtransfer.SubsTransferProcessMode;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalSetting;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.TimeLimitUpperLimitSetting;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.BonusPayAtr;
@@ -273,27 +274,29 @@ public class HolidayWorkTimeOfDaily implements Cloneable{
 	 * 全枠の休出時間の合計の算出
 	 * @return　休出時間
 	 */
-	public int calcTotalFrameTime() {
-		int totalTime = 0;
-		for(HolidayWorkFrameTime holidayWorkFrameTime : holidayWorkFrameTime) {
-			totalTime += holidayWorkFrameTime.getHolidayWorkTime().get().getTime().valueAsMinutes();
-		}
-		return totalTime;
+	public AttendanceTime calcTotalFrameTime() {
+		int sumHdTime = this.holidayWorkFrameTime.stream().filter(x -> x.getHolidayWorkTime().isPresent())
+				.collect(Collectors.summingInt(x -> x.getHolidayWorkTime().get().getTime().v()));
+		return new AttendanceTime(sumHdTime);
 	}
 	
 	/**
 	 * 全枠の振替休出時間の合計の算出
 	 * @return　休出時間
 	 */
-	public int calcTransTotalFrameTime() {
-		int transTotalTime = 0;
-		for(HolidayWorkFrameTime holidayWorkFrameTime : holidayWorkFrameTime) {
-			transTotalTime += holidayWorkFrameTime.getTransferTime().get().getTime().valueAsMinutes();
-		}
-		return transTotalTime ;
+	public AttendanceTime calcTransTotalFrameTime() {
+		int sumHdTranferTime = this.holidayWorkFrameTime.stream().filter(x -> x.getTransferTime().isPresent())
+				.collect(Collectors.summingInt(x -> x.getTransferTime().get().getTime().v()));
+		return new AttendanceTime(sumHdTranferTime);
 	}
 	
-
+   //全枠の事前申請時間の合計の算出
+	public AttendanceTime calcTotalAppTime() {
+		int sumApp = this.holidayWorkFrameTime.stream().filter(x -> x.getBeforeApplicationTime().isPresent())
+				.collect(Collectors.summingInt(x -> x.getBeforeApplicationTime().get().v()));
+		return new AttendanceTime(sumApp);
+	}
+	
 	/**
 	 * 休出時間 実績超過チェック
 	 * @return　社員のエラー一覧
@@ -471,5 +474,15 @@ public class HolidayWorkTimeOfDaily implements Cloneable{
 				holidayMidNightWorkClone, holidayTimeSpentAtWorkClone);
 	}
 	
-	
+	// 事前申請時間から代休振替を行うか判断する
+	public boolean tranferHdWorkCompenCall(SubsTransferProcessMode processMode) {
+		AttendanceTime sumHdTime = calcTotalFrameTime();
+		AttendanceTime sumHdTranferTime = calcTransTotalFrameTime();
+		AttendanceTime sumApp = calcTotalAppTime();
+		if ((sumHdTime.valueAsMinutes() + sumHdTranferTime.valueAsMinutes()) <= 0
+				&& processMode == SubsTransferProcessMode.DAILY && sumApp.valueAsMinutes() > 0) {
+			return true;
+		}
+		return false;
+	}
 }

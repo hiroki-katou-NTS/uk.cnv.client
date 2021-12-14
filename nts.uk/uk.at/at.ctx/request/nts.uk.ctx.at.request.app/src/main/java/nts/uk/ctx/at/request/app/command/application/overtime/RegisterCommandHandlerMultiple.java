@@ -28,9 +28,6 @@ public class RegisterCommandHandlerMultiple extends CommandHandlerWithResult<Reg
 		RegisterCommand param = context.getCommand();
 		Application application = param.appOverTime.application.toDomain();
 		AppOverTime appOverTime = param.appOverTime.toDomain();
-		if (appOverTime.getDetailOverTimeOp().isPresent()) {
-			appOverTime.getDetailOverTimeOp().get().setAppId(application.getAppID());
-		}
 		appOverTime.setApplication(application);
 		
 		Map<String, ApprovalRootContentImport_New> approvalRootContentMap = new HashMap<String, ApprovalRootContentImport_New>();

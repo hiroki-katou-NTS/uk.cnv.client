@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkStamp;
 import nts.uk.ctx.at.shared.dom.worktime.predset.WorkNo;
+import nts.uk.shr.com.time.TimeWithDayAttr;
 
 /** 入退門 */
 @Getter
@@ -39,4 +40,20 @@ public class AttendanceLeavingGate {
 		this.leaving = leaving;
 	}	
 	
+	public Optional<TimeWithDayAttr> getAttendanceTime() {
+		return this.getAttendance().flatMap(x -> x.getWithTimeDay());
+	}
+
+	public Optional<TimeWithDayAttr> getLeavingTime() {
+		return this.getLeaving().flatMap(x -> x.getWithTimeDay());
+	}
+	
+	public boolean leakageCheck() {
+		Optional<TimeWithDayAttr> attdTimeAtr = getAttendanceTime();
+		Optional<TimeWithDayAttr> leaveTimeAtr = getLeavingTime();
+
+		return (attdTimeAtr.isPresent() && leaveTimeAtr.isPresent())
+				|| (!attdTimeAtr.isPresent() && !leaveTimeAtr.isPresent());
+
+	}
 }

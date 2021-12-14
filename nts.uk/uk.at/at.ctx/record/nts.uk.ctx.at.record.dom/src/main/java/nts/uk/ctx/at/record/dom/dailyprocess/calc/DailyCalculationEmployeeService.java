@@ -30,7 +30,7 @@ public interface DailyCalculationEmployeeService {
 	 * @return 排他エラーが発生したフラグ
 	 */
 	@SuppressWarnings("rawtypes")
-	List<Boolean> calculate(List<String> employeeId,DatePeriod datePeriod, Consumer<ProcessState> counter, ExecutionType reCalcAtr, String empCalAndSumExecLogID, Boolean isCalWhenLock );
+	List<Boolean> calculate(List<String> employeeId,DatePeriod datePeriod, Consumer<ProcessState> counter, ExecutionType reCalcAtr, String empCalAndSumExecLogID, boolean isCalWhenLock );
 	
 	/**
 	 * 社員の日別実績を計算(承認一覧から呼び出す用)
@@ -44,7 +44,7 @@ public interface DailyCalculationEmployeeService {
 	 * @param companyCommonSetting 
 	 */
 	@SuppressWarnings("rawtypes")
-	ProcessState calculateForOnePerson(String employeeId,DatePeriod datePeriod, Optional<Consumer<ProcessState>> counter,String executeLogId,Boolean isCalWhenLock );
+	ProcessState calculateForOnePerson(String employeeId,DatePeriod datePeriod, Optional<Consumer<ProcessState>> counter,String executeLogId,boolean isCalWhenLock );
 	
 	/**
 	 * 計算状態の更新

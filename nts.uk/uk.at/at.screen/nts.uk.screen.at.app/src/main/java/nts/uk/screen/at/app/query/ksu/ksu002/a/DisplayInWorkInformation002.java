@@ -2,6 +2,7 @@ package nts.uk.screen.at.app.query.ksu.ksu002.a;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -11,7 +12,7 @@ import nts.uk.ctx.at.shared.dom.schedule.basicschedule.BasicScheduleService;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.SetupType;
 import nts.uk.ctx.at.shared.dom.worktype.AttendanceHolidayAttr;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
-import nts.uk.ctx.at.shared.dom.worktype.algorithm.JudgeHdSystemOneDayService;
+import nts.uk.ctx.at.shared.dom.worktype.algorithm.GetWorkTypeServiceShare;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.dto.DisplayInWorkInfoDto;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.dto.WorkScheduleWorkInforDto;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.dto.WorkTypeDto;
@@ -28,7 +29,7 @@ public class DisplayInWorkInformation002 {
 	@Inject
 	private BasicScheduleService basicScheduleService;
 	@Inject
-	private JudgeHdSystemOneDayService judgeHdSystemOneDayService;
+	private GetWorkTypeServiceShare getWorkTypeService;
 	@Inject
 	private GetScheduleActualOfWorkInfo002 getScheduleActualOfWorkInfo002;
 
@@ -55,8 +56,10 @@ public class DisplayInWorkInformation002 {
 
 			// 1日半日出勤・1日休日系の判定 - (Thực hiện thuật toán [Kiểm tra hệ thống đi làm
 			// nửa ngày・ nghỉ cả ngày ])
-			AttendanceHolidayAttr attHdAtr = judgeHdSystemOneDayService
-					.judgeHdOnDayWorkPer(listWorkTypeDto.get(i).getWorkTypeCode());
+			Optional<WorkType>worktype = getWorkTypeService.getWorkType(listWorkTypeDto.get(i).getWorkTypeCode());
+			if(!worktype.isPresent())
+				continue;
+			AttendanceHolidayAttr attHdAtr = worktype.get().chechAttendanceDay().toAttendanceHolidayAttr();
 
 			WorkTypeInfomation workTypeInfomation = new WorkTypeInfomation(workTypeDto, workTimeSetting.value,
 					attHdAtr.value);

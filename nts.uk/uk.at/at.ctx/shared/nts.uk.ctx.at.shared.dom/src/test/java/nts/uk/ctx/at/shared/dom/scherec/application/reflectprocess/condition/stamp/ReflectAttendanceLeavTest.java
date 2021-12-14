@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import mockit.Injectable;
 import mockit.integration.junit4.JMockit;
 import nts.uk.ctx.at.shared.dom.scherec.application.reflectprocess.common.ReflectApplicationHelper;
 import nts.uk.ctx.at.shared.dom.scherec.application.stamp.StartEndClassificationShare;
@@ -18,6 +19,9 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.time
 
 @RunWith(JMockit.class)
 public class ReflectAttendanceLeavTest {
+	
+	@Injectable
+	private ReflectAttendanceLeav.Require require;
 
 	/*
 	 * テストしたい内容
@@ -36,8 +40,7 @@ public class ReflectAttendanceLeavTest {
 
 		DailyRecordOfApplication dailyApp = ReflectApplicationHelper
 				.createRCWithTimeLeav(ScheduleRecordClassifi.SCHEDULE, 1);//打刻NO= 1
-		
-		List<Integer> actualResult = ReflectAttendanceLeav.reflect(dailyApp,
+		List<Integer> actualResult = ReflectAttendanceLeav.reflect(require, "", dailyApp,
 				ReflectApplicationHelper.createlstTimeStamp(StartEndClassificationShare.START, //開始終了区分
 						540));//時刻
 
@@ -76,12 +79,12 @@ public class ReflectAttendanceLeavTest {
 				.createRCWithTimeLeav(ScheduleRecordClassifi.SCHEDULE, 
 						1);//打刻NO= 1
 		
-		List<Integer> actualResult = ReflectAttendanceLeav.reflect(dailyApp,
+		List<Integer> actualResult = ReflectAttendanceLeav.reflect(require, "", dailyApp,
 				ReflectApplicationHelper.createlstTimeStamp(StartEndClassificationShare.START, //開始終了区分
 						540, //時刻
 						2));// 打刻枠NO
 
-		assertThat(actualResult).isEqualTo(Arrays.asList(41, 40));
+		assertThat(actualResult).isEqualTo(Arrays.asList(40, 41));
 
 		// compare 時刻
 		assertThat(dailyApp.getAttendanceLeave().get().getAttendanceLeavingWork(2).get().getAttendanceStamp().get()
@@ -113,7 +116,7 @@ public class ReflectAttendanceLeavTest {
 		DailyRecordOfApplication dailyApp = ReflectApplicationHelper
 				.createRCWithTimeLeav(ScheduleRecordClassifi.SCHEDULE, 1);//打刻NO= 1
 		
-		List<Integer> actualResult = ReflectAttendanceLeav.reflect(dailyApp,
+		List<Integer> actualResult = ReflectAttendanceLeav.reflect(require, "", dailyApp,
 				ReflectApplicationHelper.createlstTimeStamp(StartEndClassificationShare.END, //開始終了区分
 						540));//時刻
 
@@ -151,12 +154,12 @@ public class ReflectAttendanceLeavTest {
 				.createRCWithTimeLeav(ScheduleRecordClassifi.SCHEDULE, 
 						1);//打刻NO= 1
 		
-		List<Integer> actualResult = ReflectAttendanceLeav.reflect(dailyApp,
+		List<Integer> actualResult = ReflectAttendanceLeav.reflect(require, "", dailyApp,
 				ReflectApplicationHelper.createlstTimeStamp(StartEndClassificationShare.END, //開始終了区分
 						540, //時刻
 						2));// 打刻枠NO
 
-		assertThat(actualResult).isEqualTo(Arrays.asList(44, 43));
+		assertThat(actualResult).isEqualTo(Arrays.asList(43, 44));
 
 		// compare 時刻
 		assertThat(dailyApp.getAttendanceLeave().get().getAttendanceLeavingWork(2).get().getLeaveStamp().get()

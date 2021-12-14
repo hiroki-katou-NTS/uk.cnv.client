@@ -45,4 +45,9 @@ public class ChangeDailyAttendance {
 		return new ChangeDailyAttendance(workInfo, attendance, false, workInfo, classification,
 				directBounceClassifi);
 	}
+	
+	//ディフォルトの作成
+	public static ChangeDailyAttendance createDefault(ScheduleRecordClassifi scheduleRecordClassifi) {
+		return new ChangeDailyAttendance(false, false, false, false, scheduleRecordClassifi, false);
+	}
 }

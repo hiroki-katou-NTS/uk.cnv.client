@@ -145,82 +145,37 @@ module nts.uk.at.view.ksc001.h {
                 let spaceString = "　";
                 //実施区分= 通常作成
                 if (data.implementAtr == ImplementAtr.GENERALLY_CREATED) {
-                    str.push(getText("KSC001_35"));
+                    str.push(getText("KSC001_74"));
                 } else {//実施区分= 再作成
-                    str.push(getText("KSC001_36"));
-                    
-                    //処理実行区分 = もう一度作り直す
-                    if (data.processExecutionAtr == ProcessExecutionAtr.REBUILD) {
-                        str.push(getText("KSC001_37") + getText("KSC001_7"));
-
-                        if (data.rebuildTargetAtr == 0) {
-                            str.push("　" + getText("KSC001_38")
-                                + getText("KSC001_89"));
-                        } else {
-                            str.push("　" + getText("KSC001_38")
-                                + getText("KSC001_90"));
+                    str.push(getText("KSC001_75"));
+                    if (!data.reTargetAtr) {
+                        str.push(getText("KSC001_37") + getText("KSC001_89"));
+                    } else {
+                        str.push(getText("KSC001_37") + getText("KSC001_90"));
+                        if (data.transfer) {
+                            str.push("　" + getText("KSC001_38") + getText("KSC001_91"));
                         }
-
-                        if (data.recreateConverter) {
-                            str.push("　　" + getText("KSC001_38")
-                                + getText("KSC001_91"));
+                        if (data.leaveOfAbsence) {
+                            str.push("　" + getText("KSC001_38") + getText("KSC001_92"));
                         }
-
-                        if (data.recreateEmployeeOffWork) {
-                            str.push("　　" + getText("KSC001_38")
-                                + getText("KSC001_92"));
+                        if (data.shortWorkingHours) {
+                            str.push("　" + getText("KSC001_38") + getText("KSC001_93"));
                         }
-
-                        if (data.recreateDirectBouncer) {
-                            str.push("　　" + getText("KSC001_38")
-                                + getText("KSC001_93"));
-                        }
-
-                        if (data.recreateShortTermEmployee) {
-                            str.push("　　" + getText("KSC001_38")
-                                + getText("KSC001_94"));
-                        }
-
-                        if (data.recreateWorkTypeChange) {
-                            str.push("　　" + getText("KSC001_38")
-                                + getText("KSC001_95"));
-                        }
-                    } else {//処理実行区分 = 再設定する
-                        str.push(getText("KSC001_37") + getText("KSC001_8"));
-
-                        if (data.resetWorkingHours) {
-                            str.push("　" + getText("KSC001_38")
-                                + getText("KSC001_96"));
-                        }
-
-                        if (data.resetMasterInfo) {
-                            str.push("　" + getText("KSC001_38")
-                                + getText("KSC001_97"));
-                        }
-
-                        if (data.resetStartEndTime) {
-                            str.push("　" + getText("KSC001_38")
-                                + getText("KSC001_98"));
-                        }
-
-                        if (data.resetTimeAssignment) {
-                            str.push("　" + getText("KSC001_38")
-                                + getText("KSC001_99"));
+                        if (data.changedWorkingConditions) {
+                            str.push("　" + getText("KSC001_38") + getText("KSC001_94"));
                         }
                     }
-                    
-                    //再作成区分 = 全件
-                    if (data.reCreateAtr == ReCreateAtr.ALLCASE) {
-                        str.push(getText("KSC001_37") + getText("KSC001_4"));
-                    } else {//再作成区分 = 未確定データのみ
-                        str.push(getText("KSC001_37") + getText("KSC001_5"));
+                    if (data.reOverwriteConfirmed || data.reOverwriteRevised) {
+                        str.push(getText("KSC001_37") + getText("KSC001_104"));
+                        if (data.reOverwriteConfirmed) {
+                            str.push("　" + getText("KSC001_38") + getText("KSC001_105"));
+                        }
+                        if (data.reOverwriteRevised) {
+                            str.push("　" + getText("KSC001_38") + getText("KSC001_106"));
+                        }
                     }
                 }
-                //作成時に確定済みにする true
-                if (data.confirm) {
-                    str.push(getText("KSC001_17"));
-                }
-                //return
+
                 return str;
             }
 
@@ -230,19 +185,26 @@ module nts.uk.at.view.ksc001.h {
             private loadDetailCreateMethod(data: any): string[] {
                 let self = this;
                 let str: string[] = [];
-                if (data.createMethodAtr == null) {
-                    return str;
+                if (data.createMethodAtr == 0) {
+                    str.push(getText("KSC001_22"));
+                } else if (data.createMethodAtr == 1) {
+                    str.push(getText("KSC001_23"));
+                    if (data.referenceMaster == 0) {
+                        str.push(getText("KSC001_37") + getText("KSC001_113") + getText("KSC001_114") + getText("KSC001_108"));
+                    } else if (data.referenceMaster == 1) {
+                        str.push(getText("KSC001_37") + getText("KSC001_113") + getText("KSC001_114") + getText("KSC001_109"));
+                    } else if (data.referenceMaster == 2) {
+                        str.push(getText("KSC001_37") + getText("KSC001_113") + getText("KSC001_114") + getText("KSC001_110"));
+                    } else if (data.referenceMaster == 3) {
+                        str.push(getText("KSC001_37") + getText("KSC001_113") + getText("KSC001_114") + getText("KSC001_111"));
+                        str.push(getText("KSC001_37") + getText("KSC001_111") + data.monthlyPatternCode + "　" + data.monthlyPatternName);
+                    }
+                } else if (data.createMethodAtr == 2) {
+                    str.push(getText("KSC001_24"));
+                    str.push(getText("KSC001_37") + getText("KSC001_26") + getText("KSC001_114") + data.copyStartDate);
                 }
-                if (!((data.implementAtr == ImplementAtr.RECREATE) && (data.processExecutionAtr == ProcessExecutionAtr.RECONFIG))) {
-                    if (data.createMethodAtr == 0) {
-                        str.push(getText("KSC001_22"));
-                    }
-                    if (data.createMethodAtr == 1) {
-                        str.push(getText("KSC001_23"));
-                    }
-                    if (data.createMethodAtr == 2) {
-                        str.push(getText("KSC001_39", [data.copyStartDate]));
-                    }
+                if (data.confirm) {
+                    str.push(getText("KSC001_17"));
                 }
                 return str;
             }

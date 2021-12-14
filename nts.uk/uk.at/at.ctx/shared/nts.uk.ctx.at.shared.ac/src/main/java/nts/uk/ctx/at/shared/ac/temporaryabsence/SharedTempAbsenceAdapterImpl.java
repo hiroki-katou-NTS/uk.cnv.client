@@ -1,14 +1,20 @@
 package nts.uk.ctx.at.shared.ac.temporaryabsence;
 
-import nts.arc.time.calendar.period.DatePeriod;
-import nts.uk.ctx.at.shared.dom.adapter.temporaryabsence.*;
-import nts.uk.ctx.bs.employee.pub.temporaryabsence.TempAbsenceExport;
-import nts.uk.ctx.bs.employee.pub.temporaryabsence.TempAbsencePub;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.shared.dom.adapter.temporaryabsence.DateHistoryItemImport;
+import nts.uk.ctx.at.shared.dom.adapter.temporaryabsence.SharedTempAbsenceAdapter;
+import nts.uk.ctx.at.shared.dom.adapter.temporaryabsence.TempAbsenceFrameImport;
+import nts.uk.ctx.at.shared.dom.adapter.temporaryabsence.TempAbsenceHisItemImport;
+import nts.uk.ctx.at.shared.dom.adapter.temporaryabsence.TempAbsenceHistoryImport;
+import nts.uk.ctx.at.shared.dom.adapter.temporaryabsence.TempAbsenceImport;
+import nts.uk.ctx.bs.employee.pub.temporaryabsence.TempAbsenceExport;
+import nts.uk.ctx.bs.employee.pub.temporaryabsence.TempAbsencePub;
 
 @Stateless
 public class SharedTempAbsenceAdapterImpl implements SharedTempAbsenceAdapter {
@@ -46,5 +52,13 @@ public class SharedTempAbsenceAdapterImpl implements SharedTempAbsenceAdapter {
 	@Override
 	public List<String> getAbsenceEmpsByPeriod(List<String> sids, DatePeriod period) {
 		return this.tempAbsencePub.getAbsenceEmpsByPeriod(sids, period);
+	}
+
+	@Override
+	public List<TempAbsenceFrameImport> getTempAbsenceFrameByListNo(String cid, List<Integer> tempAbsenceFrameNos) {
+		return this.tempAbsencePub.getTempAbsenceFrameByListNo(cid, tempAbsenceFrameNos).stream()
+				.map(data -> new TempAbsenceFrameImport(data.getCompanyId(), data.getTempAbsenceFrNo(),
+						data.getUseClassification(), data.getTempAbsenceFrName()))
+				.collect(Collectors.toList());
 	}
 }

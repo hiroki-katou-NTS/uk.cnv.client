@@ -20,11 +20,9 @@ import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.record.app.find.dailyperform.DailyRecordDto;
-import nts.uk.ctx.at.record.dom.actualworkinghours.AttendanceTimeOfDailyPerformance;
 import nts.uk.ctx.at.record.dom.require.RecordDomRequireService;
 import nts.uk.ctx.at.record.dom.service.TimeOffRemainErrorInfor;
 import nts.uk.ctx.at.record.dom.service.TimeOffRemainErrorInputParam;
-import nts.uk.ctx.at.record.dom.workinformation.WorkInfoOfDailyPerformance;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.TimeChangeMeans;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
@@ -81,15 +79,6 @@ public class DailyModifyResCommandFacade {
 			// Acquire closing date corresponding to employee
 			List<IntegrationOfDaily> dailyOfEmp = domainDailyEditAll.stream()
 					.filter(x -> x.getEmployeeId().equals(emp)).collect(Collectors.toList());
-			List<AttendanceTimeOfDailyPerformance> lstAttendanceTimeData = dailyOfEmp.stream()
-					.filter(x -> x.getAttendanceTimeOfDailyPerformance().isPresent())
-					.map(x -> new AttendanceTimeOfDailyPerformance(x.getEmployeeId(),x.getYmd(), x.getAttendanceTimeOfDailyPerformance().get())).collect(Collectors.toList());
-
-			List<WorkInfoOfDailyPerformance> lstWorkInfor = dailyOfEmp.stream()
-					.filter(x -> x.getWorkInformation() != null)
-					.map(x -> new WorkInfoOfDailyPerformance(x.getEmployeeId(), x.getYmd(), x.getWorkInformation()))
-					.collect(Collectors.toList()).stream().sorted((x, y) -> x.getYmd().compareTo(y.getYmd()))
-					.collect(Collectors.toList());
 
 			Optional<GeneralDate> date = GetClosureStartForEmployee.algorithm(
 					require, cacheCarrier, emp);
@@ -99,7 +88,7 @@ public class DailyModifyResCommandFacade {
 					TimeOffRemainErrorInputParam param = new TimeOffRemainErrorInputParam(companyId, emp,
 							new DatePeriod(date.get(), date.get().addYears(1).addDays(-1)),
 							new DatePeriod(dateRange.getStartDate(), dateRange.getEndDate()), false,
-							lstAttendanceTimeData, lstWorkInfor, month.getAttendanceTime());
+							dailyOfEmp, month.getAttendanceTime());
 					// monthPer.addAll(timeOffRemainErrorInfor.getErrorInfor(param));
 					lstEmpMonthError.addAll(timeOffRemainErrorInfor.getErrorInfor(param));
 				}
@@ -110,8 +99,8 @@ public class DailyModifyResCommandFacade {
 						: domainMonthNew.get(0).getAttendanceTime();
 				TimeOffRemainErrorInputParam param = new TimeOffRemainErrorInputParam(companyId, emp,
 						new DatePeriod(date.get(), date.get().addYears(1).addDays(-1)),
-						new DatePeriod(dateRange.getStartDate(), dateRange.getEndDate()), false, lstAttendanceTimeData,
-						lstWorkInfor, optMonthlyData);
+						new DatePeriod(dateRange.getStartDate(), dateRange.getEndDate()), false,dailyOfEmp, 
+						optMonthlyData);
 				lstEmpMonthError.addAll(timeOffRemainErrorInfor.getErrorInfor(param));
 				// monthPer.addAll(timeOffRemainErrorInfor.getErrorInfor(param));
 			}

@@ -1,12 +1,16 @@
 package nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange;
 
 import java.util.List;
+import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import nts.arc.time.GeneralDate;
+import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.OccurrenceDigClass;
+import nts.uk.ctx.at.shared.dom.remainingnumber.base.ManagementDataRemainUnit;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.AccumulationAbsenceDetail;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.AccumulationAbsenceDetail.NumberConsecuVacation;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.UnbalanceVacation;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.processten.SettingSubstituteHolidayProcess;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.processten.SubstitutionHolidayOutput;
@@ -42,47 +46,64 @@ public class TotalRemainUndigestNumber {
 				continue;
 			}
 
-			UnbalanceVacation vacation = (UnbalanceVacation) accuAbsence;
+			if(substitutionHolidayOutput == null) {
+				continue;
+			}
 
+			UnbalanceVacation vacation = (UnbalanceVacation) accuAbsence;
 			// isMode = true => 月次
 			if ((isMode && vacation.getDeadline().beforeOrEquals(baseDate))
 					|| (!isMode && vacation.getDeadline().before(baseDate))) {
-				if (substitutionHolidayOutput == null)
-					continue;
-				// 時間代休管理区分がtrue
-				if (substitutionHolidayOutput.isTimeOfPeriodFlg()) {
-					// 未消化時間 += ループ中の「休出の未使用」．未使用時間
-					undigestTime += accuAbsence.getUnbalanceNumber().getTime().isPresent()
-							? accuAbsence.getUnbalanceNumber().getTime().get().v()
-							: 0;
-
-				} else {
-					// 未消化日数 += ループ中の「休出の未使用」．未使用日数
-					undigestDay += accuAbsence.getUnbalanceNumber().getDay().v();
-					if (accuAbsence.getUnbalanceNumber().getDay().v() == 1) {
-						// 未消化時間 += ループ中の「休出の未使用」．１日相当時間
-						undigestTime += vacation.getTimeOneDay().v();
-						continue;
-					}
-
-					if (accuAbsence.getUnbalanceNumber().getDay().v() == 0.5d) {
-						// 未消化時間 += ループ中の「休出の未使用」．半日相当時間
-						undigestTime += vacation.getTimeHalfDay().v();
-						continue;
-					}
-				}
-
+				// 未消化数を加算
+				NumberConsecuVacation undigestDayTime = addUndigestNumber(accuAbsence,
+						substitutionHolidayOutput.isTimeOfPeriodFlg());
+				undigestTime += undigestDayTime.getTime().map(x -> x.v()).orElse(0);
+				undigestDay += undigestDayTime.getDay().v();
 			} else {
 				remainingDay += accuAbsence.getUnbalanceNumber().getDay().v();
 				remainingTime += accuAbsence.getUnbalanceNumber().getTime().isPresent()
 						? accuAbsence.getUnbalanceNumber().getTime().get().v()
 						: 0;
+				if (!isMode && vacation.getDeadline().equals(baseDate)) {
+					NumberConsecuVacation undigestDayTime = addUndigestNumber(accuAbsence,
+							substitutionHolidayOutput.isTimeOfPeriodFlg());
+					undigestTime += undigestDayTime.getTime().map(x -> x.v()).orElse(0);
+					undigestDay += undigestDayTime.getDay().v();
+				}
 			}
 
 		}
 		return new RemainUndigestResult(remainingDay, remainingTime, undigestDay, undigestTime);
 	}
 
+	// 未消化数を加算
+	private static NumberConsecuVacation addUndigestNumber(AccumulationAbsenceDetail accuAbsence,
+			boolean timeOfPeriodFlg) {
+		double undigestDay = 0d;
+		int undigestTime = 0;
+		// input.時間代休管理区分
+		if (timeOfPeriodFlg) {
+			// 未消化時間 += ループ中の「逐次発生の休暇明細」．未相殺．時間
+			undigestTime = accuAbsence.getUnbalanceNumber().getTime().map(x -> x.v()).orElse(0);
+		} else {
+			// 未消化日数 += ループ中の「逐次発生の休暇明細」．未相殺．日数
+			undigestDay = accuAbsence.getUnbalanceNumber().getDay().v();
+
+			// ループ中の「逐次発生の休暇明細」．未相殺．日数をチェックする
+			UnbalanceVacation vacation = (UnbalanceVacation) accuAbsence;
+			if (accuAbsence.getUnbalanceNumber().getDay().v() == 1) {
+				// 未消化時間 += ループ中の「逐次発生の休暇明細」．１日相当時間
+				undigestTime = vacation.getTimeOneDay().v();
+			} else {
+				// 未消化時間 += ループ中の「逐次発生の休暇明細」．半日相当時間
+				undigestTime = vacation.getTimeHalfDay().v();
+			}
+
+		}
+		return new NumberConsecuVacation(new ManagementDataRemainUnit(undigestDay),
+				Optional.of(new AttendanceTime(undigestTime)));
+	}
+	
 	public static interface Require extends SettingSubstituteHolidayProcess.Require {
 
 	}
@@ -109,4 +130,5 @@ public class TotalRemainUndigestNumber {
 		 */
 		private int undigestTime;
 	}
+	
 }

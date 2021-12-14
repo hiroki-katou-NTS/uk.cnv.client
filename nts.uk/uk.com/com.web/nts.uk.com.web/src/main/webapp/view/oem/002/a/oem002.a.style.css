@@ -1,0 +1,35 @@
+#functions-area > .button-group {
+  display: inline;
+}
+
+#contents-area > .left-content {
+  float: left;
+}
+
+.fixed-flex-layout-left, .fixed-flex-layout-right {
+  margin-top: 10px;
+}
+
+.fixed-flex-layout-left {
+  margin-left: 20px;
+}
+
+.fixed-flex-layout-right > .flex.valign-center {
+  margin-bottom: 10px;
+}
+
+.form-label {
+  width: 150px;
+}
+
+.limited-label {
+  color: inherit;
+}
+
+.mr-10 {
+  margin-right: 10px;
+}
+
+#A3_7 {
+  height: 100px;
+}

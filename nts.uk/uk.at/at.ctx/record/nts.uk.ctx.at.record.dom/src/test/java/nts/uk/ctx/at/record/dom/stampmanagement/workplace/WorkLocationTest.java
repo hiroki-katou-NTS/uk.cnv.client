@@ -3,12 +3,15 @@ package nts.uk.ctx.at.record.dom.stampmanagement.workplace;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import mockit.Mock;
 import mockit.MockUp;
+import mockit.integration.junit4.JMockit;
 import nts.arc.testing.assertion.NtsAssert;
 import nts.gul.location.GeoCoordinate;
 
+@RunWith(JMockit.class)
 public class WorkLocationTest {
 	
 	@Test

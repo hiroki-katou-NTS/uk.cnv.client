@@ -85,7 +85,7 @@ public class WorkInfoOfDailyAttendance implements DomainObject {
 			DayOfWeek dayOfWeek
 			) {
 
-		List<TimeZone> timeZoneList = workInfo.getWorkInfoAndTimeZone(require).get().getTimeZones();
+		List<TimeZone> timeZoneList = workInfo.getWorkInfoAndTimeZone(require).map(x -> x.getTimeZones()).orElse(new ArrayList<>());
 		List<ScheduleTimeSheet> scheduleTimeSheets = new ArrayList<>();
 		for ( int index = 0; index < timeZoneList.size(); index++) {
 			scheduleTimeSheets.add(

@@ -67,4 +67,19 @@ public interface WorkLocationRepository {
 	 * [11] Ipv4Address一覧を追加する
 	 */
 	void insertListIP(String contractCode, String workLocationCD,List<Ipv4Address> listIpv4Address);
+	
+	/**
+	 * [12] 契約コード、会社IDと職場IDで職場可能を取得する。（契約コード、会社ID、職場ID）
+	 */
+	List<WorkLocation> findByWorkPlace(String contractCode, String cid, String workPlaceId);
+	
+	/**
+	 * [13]職場可能を削除する。(契約コード、会社ID、コード）
+	 */
+	void deleteByWorkLocationCd(String contractCode, String workLocationCD, String cid);
+	
+	/**
+	 * [14] 契約コード、勤務場所コード、会社IDで職場可能を取得する。（契約コード、会社ID、勤務場所コード）
+	 */
+	Optional<WorkLocation> findByWorkLocationCd(String contractCode, String cid, String workLocationCD);
 }

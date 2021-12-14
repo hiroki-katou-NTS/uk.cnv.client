@@ -12,8 +12,8 @@ import org.junit.runner.RunWith;
 import mockit.integration.junit4.JMockit;
 import nts.arc.testing.assertion.NtsAssert;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.OvertimeHourTransfer;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.SubstituteTransferProcess;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.createremain.subtransfer.OvertimeHdHourTransfer;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.createremain.subtransfer.SubstituteTransferProcess;
 
 /**
  * @author thanh_nx
@@ -36,10 +36,10 @@ public class SubstituteTransferProcessTest {
 	@Test
 	public void test() {
 
-		List<OvertimeHourTransfer> timeAfterReflectApp = Arrays
-				.asList(new OvertimeHourTransfer(1, new AttendanceTime(666), new AttendanceTime(999)));
+		List<OvertimeHdHourTransfer> timeAfterReflectApp = Arrays
+				.asList(new OvertimeHdHourTransfer(1, new AttendanceTime(666), new AttendanceTime(999)));
 
-		List<OvertimeHourTransfer> result = NtsAssert.Invoke.staticMethod(SubstituteTransferProcess.class,
+		List<OvertimeHdHourTransfer> result = NtsAssert.Invoke.staticMethod(SubstituteTransferProcess.class,
 				"processTimeToTimeTransferAll", 0, timeAfterReflectApp);
 
 		assertThat(result).extracting(x -> x.getNo(), x -> x.getTransferTime().v(), //
@@ -59,10 +59,10 @@ public class SubstituteTransferProcessTest {
 	 */
 	@Test
 	public void test2() {
-		List<OvertimeHourTransfer> timeAfterReflectApp = Arrays
-				.asList(new OvertimeHourTransfer(1, new AttendanceTime(666), new AttendanceTime(444)));
+		List<OvertimeHdHourTransfer> timeAfterReflectApp = Arrays
+				.asList(new OvertimeHdHourTransfer(1, new AttendanceTime(666), new AttendanceTime(444)));
 
-		List<OvertimeHourTransfer> result = NtsAssert.Invoke.staticMethod(SubstituteTransferProcess.class,
+		List<OvertimeHdHourTransfer> result = NtsAssert.Invoke.staticMethod(SubstituteTransferProcess.class,
 				"processTimeToTimeTransferAll", 111, timeAfterReflectApp);
 
 		assertThat(result).extracting(x -> x.getNo(), x -> x.getTransferTime().v(), //

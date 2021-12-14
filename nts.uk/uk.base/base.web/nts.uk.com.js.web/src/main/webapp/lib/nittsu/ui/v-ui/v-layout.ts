@@ -100,9 +100,9 @@ module nts.uk.ui.layout {
 
             ko.applyBindingsToDescendants(bindingContext, element);
 
-            $(element)
-                .find('div[id^=functions-area]')
-                .each((__: number, e: HTMLElement) => {
+            let $functionsArea = $(element).find('div[id^=functions-area]'); 
+            if ($functionsArea.length > 0) {
+                $functionsArea.each((__: number, e: HTMLElement) => {
                     ko.applyBindingsToNode(e,
                         {
                             'ui-function-bar': e.id.match(/bottom$/) ? 'bottom' : 'top',
@@ -113,6 +113,13 @@ module nts.uk.ui.layout {
                     e.removeAttribute('data-url');
                     e.removeAttribute('data-title');
                 });
+            } else {
+                $(element)
+                    .find('.sidebar-content-header')
+                    .each((__: number, e: HTMLElement) => {
+                        ko.applyBindingsToNode(e, { 'ui-function-bar': 'top' }, bindingContext);
+                    });
+            }
 
             $(element)
                 .find('div[id^=contents-area]')
@@ -210,11 +217,13 @@ module nts.uk.ui.layout {
             const root: nts.uk.ui.RootViewModel = bindingContext.$root;
             const mode = ko.unwrap<'view' | 'modal'>(root.kiban.mode);
 
-            element.classList.add('functions-area');
+            if (!element.classList.contains('sidebar-content-header')) {
+                element.classList.add('functions-area');
+            }
 
             // top area
             if (!$(element).prev().length && position === 'top') {
-                if (!element.id) {
+                if (!element.id && !element.classList.contains('sidebar-content-header')) {
                     element.id = "functions-area";
                 }
 

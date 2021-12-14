@@ -23,7 +23,8 @@ public class GetOccListOverwriteChangeDaikyu {
 			RequestChangeDigestOccr changeOcc) {
 
 		// $確定データ一覧 = require.振出管理データを取得する(社員ID, 期間)
-		val lstFix = require.getFixLeavByDayOffDatePeriod(sid);
+		val lstFix = require.getFixLeavByDayOffDatePeriod(sid).stream().filter(x -> x.isRemaing())
+				.collect(Collectors.toList());
 
 		// $暫定データ一覧 = require.暫定振出管理データを取得する(社員ID, 期間)
 		val lstTemporary = require.getTempBreakBySidPeriod(sid, dateData);

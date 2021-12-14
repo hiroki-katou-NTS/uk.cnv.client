@@ -37,14 +37,14 @@ public class RegisterTimeWorkPlaceCommandHandler extends CommandHandler<Register
 				new AgreementOneMonthTime(command.getAlarmOneMonth())
 		);
 		AgreementOneMonthTime upperLimitTime = new AgreementOneMonthTime(command.getLimitOneMonth());
-		val basicSettingMonth = OneMonthTime.of(errorTimeInMonth, upperLimitTime);
+		val basicSettingMonth = OneMonthTime.createWithCheck(errorTimeInMonth, upperLimitTime);
 
 		val errorTimeInMonthUpper = OneMonthErrorAlarmTime.of(
 				new AgreementOneMonthTime(command.getErrorTwoMonths()),
 				new AgreementOneMonthTime(command.getAlarmTwoMonths())
 		);
 		val upperLimitTimeMonthUpper = new AgreementOneMonthTime(command.getLimitTwoMonths());
-		val upperLimitDueToSpecialProvisionsMonth = OneMonthTime.of(errorTimeInMonthUpper, upperLimitTimeMonthUpper);
+		val upperLimitDueToSpecialProvisionsMonth = OneMonthTime.createWithCheck(errorTimeInMonthUpper, upperLimitTimeMonthUpper);
 
 		val basicYearSetting = OneYearErrorAlarmTime.of(
 				new AgreementOneYearTime(command.getErrorOneYear())
@@ -56,7 +56,7 @@ public class RegisterTimeWorkPlaceCommandHandler extends CommandHandler<Register
 				new AgreementOneYearTime(command.getAlarmTwoYear())
 		);
 		val upperLimitYear = new AgreementOneYearTime(command.getLimitOneYear());
-		val specialYearSetting = OneYearTime.of(errorTimeInYear, upperLimitYear);
+		val specialYearSetting = OneYearTime.createWithCheck(errorTimeInYear, upperLimitYear);
 
 		val multiMonthAvg = OneMonthErrorAlarmTime.of(
 				new AgreementOneMonthTime(command.getUpperMonthAverageError()),

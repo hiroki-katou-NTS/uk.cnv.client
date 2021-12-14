@@ -296,7 +296,7 @@ public class DailyWork extends DomainObject implements Cloneable, Serializable{ 
 
 
 	/**
-	 * 特別休暇の場合であるか
+	 * 1日特別休暇の場合であるか
 	 * @return 特別休暇である
 	 */
 	public boolean isOneOrHalfDaySpecHoliday() {
@@ -306,6 +306,20 @@ public class DailyWork extends DomainObject implements Cloneable, Serializable{ 
 		else {
 			return this.getMorning().isSpecialHoliday() && this.getAfternoon().isSpecialHoliday();
 		}
+	}
+	
+	/**
+	 * 特別休暇であるか
+	 * @return
+	 */
+	public boolean isSpecHoliday() {
+		if(this.workTypeUnit.isOneDay()) {
+			return this.getOneDay().isSpecialHoliday();
+		}
+		if (this.workTypeUnit.isMonringAndAfternoon()) {
+			return this.getMorning().isSpecialHoliday() || this.getAfternoon().isSpecialHoliday();
+		}
+		return false;
 	}
 
 	/**
@@ -512,5 +526,16 @@ public class DailyWork extends DomainObject implements Cloneable, Serializable{ 
 	    
 	    // return $休暇種類    
 	    return holiday;
+	}
+	
+	public WorkTypeClassification getWorkTypeClassification(WorkAtr atr) {
+		switch (atr) {
+		case Monring:
+			return this.morning;
+		case Afternoon:
+			return this.afternoon;
+		default:
+			return this.oneDay;
+		}
 	}
 }

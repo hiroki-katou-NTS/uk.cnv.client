@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import nts.uk.file.at.app.export.attendancerecord.TempAbsenceData;
 
 /**
  * The Class AttendanceRecordReportEmployeeData.
@@ -52,4 +53,5 @@ public class AttendanceRecordReportEmployeeData {
 	/** The closure day. deadline day */
 	private int closureDay;
 
+	private List<TempAbsenceData> tempAbsenceDatas;
 }

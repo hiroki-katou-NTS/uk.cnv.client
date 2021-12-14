@@ -45,7 +45,7 @@ implements PeregUpdateListCommandHandler<UpdateAnnuaLeaveCommand>{
 		List<AnnualLeaveEmpBasicInfo>  updateEmpBasic = new ArrayList<>();
 		// sidsPidsMap
 		List<String> sids = cmd.stream().map(c -> c.getEmployeeId()).collect(Collectors.toList());
-		List<AnnualLeaveMaxData> aLeaveMaxData = maxDataRepo.getAll(cid, sids);
+		List<AnnualLeaveMaxData> aLeaveMaxData = maxDataRepo.getAll(sids);
 		List<AnnualLeaveEmpBasicInfo> aLeaveEmpBasicInfo =  annLeaBasicInfoRepo.getAll(cid, sids);
 		
 		cmd.stream().forEach(c ->{

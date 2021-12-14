@@ -615,7 +615,7 @@ module nts.uk.com.view.cmm048.a {
           $.when(
             vm.$ajax(API.updateEmployeeContact, contactCommand),
             vm.$ajax(API.updatePersonInformation, personalCommand),
-            vm.$ajax(API.changeOwnLoginPassword, changeOwnLoginPasswordCommand)
+            vm.changeOwnLoginPassword(changeOwnLoginPasswordCommand)
           ).then(() => {
             vm.$blockui('clear');
             vm.$dialog.info({ messageId: 'Msg_15' });
@@ -626,6 +626,13 @@ module nts.uk.com.view.cmm048.a {
             .always(() => vm.$blockui('clear'));
         }
       });
+    }
+
+    private changeOwnLoginPassword(command: ChangeOwnLoginPasswordCommand): JQueryPromise<any> {
+      const vm = this;
+      if (vm.isUseOfPassword() && (!nts.uk.text.isNullOrEmpty(command.newPassword) || !nts.uk.text.isNullOrEmpty(command.confirmPassword))) {
+        return vm.$ajax(API.changeOwnLoginPassword, command);
+      }
     }
   }
 

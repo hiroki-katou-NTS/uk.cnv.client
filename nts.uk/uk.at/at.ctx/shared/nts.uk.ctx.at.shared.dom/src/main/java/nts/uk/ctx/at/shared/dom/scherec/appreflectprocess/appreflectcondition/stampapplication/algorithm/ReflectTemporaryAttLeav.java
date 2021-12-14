@@ -16,8 +16,10 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancet
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingWork;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.WorkTimes;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.TimeActualStamp;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.ReasonTimeChange;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.TimeChangeMeans;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkStamp;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkTimeInformation;
 import nts.uk.ctx.at.shared.dom.worktime.predset.WorkNo;
 
 /**
@@ -83,11 +85,17 @@ public class ReflectTemporaryAttLeav {
 		}
 		return Pair.of(
 				new TimeLeavingWork(new WorkNo(data.getDestinationTimeApp().getEngraveFrameNo().intValue()),
-						start ? ReflectAttendanceLeav.createTimeActualStamp(data) : null, //
-						start ? null : ReflectAttendanceLeav.createTimeActualStamp(data)), //
+						start ? createTimeActualStamp(data) : null, //
+						start ? null : createTimeActualStamp(data)), //
 				itemIds);//
 	}
 
+	private static TimeActualStamp createTimeActualStamp(TimeStampAppShare data) {
+		return new TimeActualStamp(null, new WorkStamp(
+				new WorkTimeInformation(new ReasonTimeChange(TimeChangeMeans.APPLICATION, Optional.empty()), data.getTimeOfDay()),
+				data.getWorkLocationCd()), 0);
+	}
+	
 	public static List<Integer> updateTimeLeav(TimeLeavingWork timeLeav, TimeStampAppShare data) {
 
 		List<Integer> lstItemId = new ArrayList<>();

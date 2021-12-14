@@ -131,6 +131,10 @@ public enum Unit {
 		/** 単位を求める */
 		int unit = this.asTime();
 		
+		if (this == Unit.ROUNDING_TIME_1MIN) {
+			return timeAsMinutes;
+		}
+		
 		/** 【時間】÷単位の余りチェック */
 		int remain = Math.abs(timeAsMinutes % unit);
 		
@@ -178,6 +182,10 @@ public enum Unit {
 		/** 単位を求める */
 		int unit = this.asTime();
 		
+		if (this == Unit.ROUNDING_TIME_1MIN) {
+			return timeAsMinutes;
+		}
+		
 		/** 【時間】÷単位の余りチェック */
 		int remain = Math.abs(timeAsMinutes % unit);
 		
@@ -217,25 +225,38 @@ public enum Unit {
 	/**
 	 * 未満切捨以上切上
 	 * @param timeAsMinutes
-	 * @param roundingDirection
 	 * @return
 	 */
 	public int roundDownOver(int timeAsMinutes) {
 		
 		/** 単位を求める */
 		int unit = this.asTime();
-
-		/** 60分単位で余りを求める */
-		int remain = Math.abs(timeAsMinutes % 60);
 		
-		if (remain < unit) {
-
-			/** 時間を切り捨て */
-			return downByUnit(timeAsMinutes, 60);
+		
+		if (this != Unit.ROUNDING_TIME_15MIN && this != Unit.ROUNDING_TIME_30MIN) {
+			return timeAsMinutes;
 		}
+		
+		
+		/** 切捨て～切り上げの範囲を求める */
+		int border = unit * 2;
 
-		/** 時間を切り上げする */
-		return upByUnit(timeAsMinutes, 60);
+		/** 対象時間から範囲の倍数を求める */
+		int multiple = timeAsMinutes / border;
+
+		/** 切捨ての位置と切り上の位置を求める */
+		int botBorder = multiple * border - unit;
+		int topBorder = multiple * border + unit;
+
+		/** 切り上げ、切捨てかを判断する */
+		if (botBorder <= timeAsMinutes && timeAsMinutes < topBorder) {
+
+			/** 切捨て */
+			return multiple * border;
+		} else {
+			/**　切上げ */
+			return timeAsMinutes > 0 ? (multiple + 1) * border : (multiple - 1) * border;
+		}
 	}
 
 	/** 時間を切り捨てする */
@@ -244,7 +265,7 @@ public enum Unit {
 		int perUnit = timeAsMinutes / unit;
 		
 		/** 時間を切り捨て */
-		return timeAsMinutes < 0 ? unit * (perUnit + 1) : unit * perUnit;
+		return timeAsMinutes < 0 ? unit * (perUnit - 1) : unit * perUnit;
 	}
 
 	/** 時間を切り上げする */

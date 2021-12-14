@@ -57,8 +57,7 @@ public class GetAnnualLeaveUsedNumberFromRemDataService {
 					require, 							// WorkingConditionItem:労働条件取得
 					remainingData, 				//年休付与残数データ
 					remNumShiftListWork, 	// 複数の付与残数の消化処理を行う一時変数
-					//currentProcess.getUsedNumber(), // 作成した「暫定休暇管理データ．年休使用数」
-					usedNumber,				// 年休使用数
+					new LeaveUsedNumber(currentProcess), // 作成した「暫定休暇管理データ．年休使用数」
 					companyId,
 					employeeId,
 					currentProcess.getYmd()); 				// 作成した「暫定休暇管理データ．対象日」

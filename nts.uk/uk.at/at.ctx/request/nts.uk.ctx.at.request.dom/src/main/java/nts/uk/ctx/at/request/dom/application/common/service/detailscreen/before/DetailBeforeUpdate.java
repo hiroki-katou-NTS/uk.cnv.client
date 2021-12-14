@@ -29,7 +29,7 @@ public interface DetailBeforeUpdate {
 	 */
 	public void processBeforeDetailScreenRegistration(String companyID, String employeeID, GeneralDate appDate, int employeeRouteAtr, String appID, 
 			PrePostAtr postAtr, int version,String wkTypeCD, String wkTimeCd, AppDispInfoStartupOutput appDispInfoStartupOutput, List<String> workTypeCds, 
-            Optional<TimeDigestionParam> timeDigestionUsageInfo, boolean flag);
+            Optional<TimeDigestionParam> timeDigestionUsageInfo, boolean flag, Optional<String> workTypeRemainChk, Optional<String> workTimeRemainChk);
 	
 	/**
 	 * 1.排他チェック

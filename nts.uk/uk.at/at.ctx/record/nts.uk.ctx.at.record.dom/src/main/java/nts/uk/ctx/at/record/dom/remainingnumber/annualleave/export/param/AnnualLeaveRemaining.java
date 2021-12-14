@@ -280,7 +280,7 @@ public class AnnualLeaveRemaining implements Cloneable {
 		// 年休残数がマイナスかチェック
 		// 年休(マイナスあり)．残数．合計をチェック
 
-		// 合計残日数>=0
+		// 合計残日数>=0 and 合計残時間 >= 0
 		if ( !annualLeaveWithMinus.getRemainingNumberInfo().getRemainingNumber().isMinus() ) {
 			return Optional.empty();
 		}
@@ -288,7 +288,7 @@ public class AnnualLeaveRemaining implements Cloneable {
 		// 合計残日数<0
 
 		// 付与前付与後を判断する
-		if ( aggregatePeriodWork.getGrantWork().getGrantPeriodAtr()
+		if ( aggregatePeriodWork.getGrantWork().judgeGrantPeriodAtr()
 				== GrantBeforeAfterAtr.BEFORE_GRANT ) { // 付与前
 			// 「年休エラー．年休不足エラー（付与前）」を返す
 			return Optional.of(AnnualLeaveError.SHORTAGE_AL_OF_UNIT_DAY_BFR_GRANT);

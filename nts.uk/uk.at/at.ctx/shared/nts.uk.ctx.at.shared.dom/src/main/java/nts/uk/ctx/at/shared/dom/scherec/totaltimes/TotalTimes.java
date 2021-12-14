@@ -146,7 +146,7 @@ public class TotalTimes extends AggregateRoot {
 		}
 		
 		/** ○出勤状態の判断 */
-		if (!attendanceState) {
+		if (!checkAttendance(attendanceState)) {
 			return;
 		}
 		
@@ -157,6 +157,20 @@ public class TotalTimes extends AggregateRoot {
 		
 		/** ○時間・回数を取得 */
 		addTotalCount(require, dailyWork, totalCount);
+	}
+	
+	/** 出勤状態の判断 */
+	private boolean checkAttendance(boolean attendanceState) {
+		
+		/** ○回数集計区分を判断 */
+		if (summaryAtr == SummaryAtr.DUTYTYPE) { /** 勤務種類　の場合 */
+			
+			/** ○trueを返す */
+			return true;
+		}
+		
+		/** ○出勤状態を判断する */
+		return attendanceState;
 	}
 	
 	/** ○時間・回数を取得 */

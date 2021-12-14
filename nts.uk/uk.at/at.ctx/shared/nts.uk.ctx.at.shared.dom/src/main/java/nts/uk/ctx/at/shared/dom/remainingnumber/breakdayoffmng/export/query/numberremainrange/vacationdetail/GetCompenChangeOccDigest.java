@@ -18,9 +18,30 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveComDayOffManageme
  */
 public class GetCompenChangeOccDigest {
 
+	// 取得して相殺する
+	public static AfterChangeHolidayDaikyuInfoResult getAndOffset(Require require, String sid, DatePeriod dateData,
+			RequestChangeDigestOccr changeDigest, RequestChangeDigestOccr changeOccr) {
+		// ＄変更後
+		val afterChangeResult = changeAccordChangeRequest(require, sid, dateData, changeDigest, changeOccr);
+
+		// ＄変更後．紐付けされている休出の未相殺数を更新する（）
+		afterChangeResult.updateUnoffsetAssociVacation();
+
+		// ＄変更後．紐付けされている代休の未相殺数を更新する（）
+		afterChangeResult.updateUnoffsetsAssociSubstVacation();
+
+		return afterChangeResult;
+	}
+	
 	// 取得する
 	public static AfterChangeHolidayDaikyuInfoResult get(Require require, String sid, DatePeriod dateData,
 			RequestChangeDigestOccr changeDigest, RequestChangeDigestOccr changeOccr) {
+		return changeAccordChangeRequest(require, sid, dateData, changeDigest, changeOccr);
+	}
+	
+	// 変更要求に従って変更する
+	private static AfterChangeHolidayDaikyuInfoResult changeAccordChangeRequest(Require require, String sid,
+			DatePeriod dateData, RequestChangeDigestOccr changeDigest, RequestChangeDigestOccr changeOccr) {
 
 		// $消化一覧 =
 		val digest = GetDigestListOverwriteChangeDaikyu.get(require, sid, dateData, changeDigest);
@@ -44,13 +65,6 @@ public class GetCompenChangeOccDigest {
 
 		// ＄変更後
 		val afterChangeResult = new AfterChangeHolidayDaikyuInfoResult(digestOcc, assocAfterCorr);
-
-		// ＄変更後．紐付けされている休出の未相殺数を更新する（）
-		afterChangeResult.updateUnoffsetAssociVacation();
-
-		// ＄変更後．紐付けされている代休の未相殺数を更新する（）
-		afterChangeResult.updateUnoffsetsAssociSubstVacation();
-
 		return afterChangeResult;
 	}
 

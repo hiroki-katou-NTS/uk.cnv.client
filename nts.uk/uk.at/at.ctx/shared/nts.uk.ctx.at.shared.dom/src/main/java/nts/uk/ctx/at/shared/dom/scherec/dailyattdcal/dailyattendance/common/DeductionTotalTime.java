@@ -37,6 +37,10 @@ public class DeductionTotalTime {
 									,excessOfStatutoryTotalTime);
 	}
 	
+	/**
+	 * デフォルト値で作成
+	 * @return 控除合計時間
+	 */
 	public static DeductionTotalTime defaultValue() {
 		return new DeductionTotalTime(TimeWithCalculation.sameTime(AttendanceTime.ZERO)
 										,TimeWithCalculation.sameTime(AttendanceTime.ZERO)

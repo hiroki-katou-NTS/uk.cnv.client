@@ -8,7 +8,6 @@ import nts.uk.ctx.at.request.dom.application.common.service.other.output.Process
 import nts.uk.ctx.at.request.dom.application.common.service.setting.output.AppDispInfoStartupOutput;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.AppHolidayWork;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.service.dto.AppHdWorkDispInfoOutput;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOvertimeDetail;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.applicationtypesetting.AppTypeSetting;
 
 /**
@@ -46,8 +45,7 @@ public interface HolidayWorkRegisterService {
 	 */
 	public ProcessResult registerMulti(String companyId, List<String> empList, AppTypeSetting appTypeSetting, 
 			AppHdWorkDispInfoOutput appHdWorkDispInfoOutput,
-			AppHolidayWork appHolidayWork, Map<String, ApprovalRootContentImport_New> approvalRootContentMap,
-			Map<String, AppOvertimeDetail> appOvertimeDetailMap);
+			AppHolidayWork appHolidayWork, Map<String, ApprovalRootContentImport_New> approvalRootContentMap);
 
 	/**
 	 * UKDesign.UniversalK.就業.KAF_申請.KAF010_休日出勤時間申請.アルゴリズム.8.休出申請（詳細）登録処理.8.休出申請（詳細）登録処理

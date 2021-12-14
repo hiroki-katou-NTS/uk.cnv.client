@@ -96,6 +96,7 @@ module nts.uk.at.view.kmk009.a.viewmodel {
                     self.attendanceModel.attendanceItemName('');
                     return;
                 }
+				self.attendanceModel.update(null, null);
                 self.enableSave(true);
                 self.enableSwitch(true);
                 //self.enableAtdBtn(true);
@@ -359,7 +360,12 @@ module nts.uk.at.view.kmk009.a.viewmodel {
                     }
 
                     self.attendanceModel.attendanceItemId(data.totalCondition.attendanceItemId);
-                    self.isAllowShowAttendance(data.totalCondition.attendanceItemId < 426 || data.totalCondition.attendanceItemId > 435);
+					if(data.totalCondition.attendanceItemId) {
+						self.isAllowShowAttendance(data.totalCondition.attendanceItemId < 426 || data.totalCondition.attendanceItemId > 435);	
+					} else {
+						self.isAllowShowAttendance(false);	
+					}
+      
                     self.switchCheckbox(data.countAtr);
 
                     self.loadListWorkType().done(function () {
@@ -802,11 +808,14 @@ module nts.uk.at.view.kmk009.a.viewmodel {
                 saveData.updateData(self.stash.toDto());
                 saveData.useAtr(0);
             }
-            if (self.selectUse() == SelectUseConst.Use && _.isNumber(self.attendanceModel.attendanceItemId())) { //(self.enableUnder() == true || self.enableUpper() == true) 
-                saveData.totalCondition.attendanceItemId(self.attendanceModel.attendanceItemId());
-            } else {
-                // saveData.totalCondition.attendanceItemId(SelectUseConst.NO_SELECT);
-            }
+
+			if(self.selectUse() == SelectUseConst.Use) {
+				if(_.isNaN(_.toNumber(self.attendanceModel.attendanceItemId()))) {
+					saveData.totalCondition.attendanceItemId(null);	
+				} else {
+					saveData.totalCondition.attendanceItemId(_.toNumber(self.attendanceModel.attendanceItemId()));	
+				}
+			}
         }
 
         private switchCheckbox(value: number): void {

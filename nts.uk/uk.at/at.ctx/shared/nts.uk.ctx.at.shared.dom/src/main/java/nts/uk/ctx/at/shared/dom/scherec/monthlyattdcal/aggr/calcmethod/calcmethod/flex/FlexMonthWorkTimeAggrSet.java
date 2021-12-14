@@ -28,4 +28,9 @@ public abstract class FlexMonthWorkTimeAggrSet extends AggregateRoot implements 
 	protected FlexTimeHandle flexTimeHandle;
 	
 	protected FlexMonthWorkTimeAggrSet () {}
+
+	/** 清算期間が複数月か判断する */
+	public boolean isMultiMonthSettlePeriod() {
+		return insufficSet.getSettlePeriod() == SettlePeriod.MULTI_MONTHS;
+	}
 }

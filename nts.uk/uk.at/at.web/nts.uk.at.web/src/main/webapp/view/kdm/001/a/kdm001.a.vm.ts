@@ -864,7 +864,7 @@ module nts.uk.at.view.kdm001.a.viewmodel {
             }
 
             if (params.dayLetf > 0) {
-                this.dayLetf = getText("KDM001_27");
+                this.dayLetfText = getText("KDM001_27");
                 this.dayLetf = params.dayLetf.toFixed(1);
             } else {
                 this.dayLetf = "";

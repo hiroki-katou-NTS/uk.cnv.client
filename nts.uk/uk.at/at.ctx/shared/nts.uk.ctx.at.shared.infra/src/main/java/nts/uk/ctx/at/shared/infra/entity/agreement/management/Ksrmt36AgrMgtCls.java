@@ -183,11 +183,11 @@ public class Ksrmt36AgrMgtCls extends ContractUkJpaEntity implements Serializabl
         val erAlTime =  OneMonthErrorAlarmTime.of(new AgreementOneMonthTime((int) entity.getBasicMArlTime()), new AgreementOneMonthTime((int) entity.getBasicMAllTime()));
         val upperLimit = new AgreementOneMonthTime((int) entity.getBasicMLimitTime());
 
-        val basic =  OneMonthTime.of(erAlTime, upperLimit);
+        val basic =  OneMonthTime.createWithCheck(erAlTime, upperLimit);
 
         val erAlTimeSp =  OneMonthErrorAlarmTime.of(new AgreementOneMonthTime((int) entity.getSpMErTime()), new AgreementOneMonthTime((int) entity.getSpMAlTime()));
         val upperLimitSp = new AgreementOneMonthTime((int) entity.getSpMLimitTime());
-        val specConditionLimit =  OneMonthTime.of(erAlTimeSp, upperLimitSp);
+        val specConditionLimit =  OneMonthTime.createWithCheck(erAlTimeSp, upperLimitSp);
 
         val oneMonth = new AgreementOneMonth(basic, specConditionLimit);
 
@@ -197,7 +197,7 @@ public class Ksrmt36AgrMgtCls extends ContractUkJpaEntity implements Serializabl
 
         val upperLimitSpY = new AgreementOneYearTime((int) entity.getSpYLimitTime());
 
-        val specConditionLimitY =  OneYearTime.of(erAlTimeSpY, upperLimitSpY);
+        val specConditionLimitY =  OneYearTime.createWithCheck(erAlTimeSpY, upperLimitSpY);
         val oneYear = new AgreementOneYear(basicY, specConditionLimitY);
 
 

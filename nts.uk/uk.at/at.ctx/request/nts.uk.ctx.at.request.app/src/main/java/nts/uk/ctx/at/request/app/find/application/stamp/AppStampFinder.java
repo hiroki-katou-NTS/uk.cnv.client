@@ -26,6 +26,7 @@ import nts.uk.ctx.at.request.dom.application.common.service.newscreen.output.Con
 import nts.uk.ctx.at.request.dom.application.common.service.other.output.AchievementDetail;
 import nts.uk.ctx.at.request.dom.application.common.service.other.output.ActualContentDisplay;
 import nts.uk.ctx.at.request.dom.application.common.service.other.output.StampRecordOutput;
+import nts.uk.ctx.at.request.dom.application.common.service.other.output.TrackRecordAtr;
 import nts.uk.ctx.at.request.dom.application.common.service.setting.CommonAlgorithm;
 import nts.uk.ctx.at.request.dom.application.common.service.setting.output.AppDispInfoStartupOutput;
 import nts.uk.ctx.at.request.dom.application.common.service.setting.output.AppDispInfoWithDateOutput;
@@ -145,17 +146,21 @@ public class AppStampFinder {
 		if(!changeDateParam.isRecorderFlag()) {
 //		実績の打刻のチェック
 		    StampRecordOutput stampRecordOutput = null;
+		    Optional<String> workTypeCd = Optional.empty();
 		    Optional<List<ActualContentDisplay>> listActualContentDisplay = appStampOutput.getAppDispInfoStartupOutput().getAppDispInfoWithDateOutput().getOpActualContentDisplayLst();
 		    if (listActualContentDisplay.isPresent()) {
 		        if (!CollectionUtil.isEmpty(listActualContentDisplay.get())) {
 		            ActualContentDisplay actualContentDisplay = listActualContentDisplay.get().get(0);
 		            Optional<AchievementDetail> opAchievementDetail = actualContentDisplay.getOpAchievementDetail();
 		            if (opAchievementDetail.isPresent()) {
-		                stampRecordOutput = opAchievementDetail.get().getStampRecordOutput();
-		            }
+                        stampRecordOutput = opAchievementDetail.get().getStampRecordOutput();
+                        if (opAchievementDetail.get().getTrackRecordAtr().equals(TrackRecordAtr.DAILY_RESULTS)) {
+                            workTypeCd = Optional.ofNullable(opAchievementDetail.get().getWorkTypeCD());
+                        }
+                    }
 		        }
 		    }
-		    List<ErrorStampInfo> listErrorStampInfo = appCommonStampDomainService.getErrorStampList(stampRecordOutput);
+		    List<ErrorStampInfo> listErrorStampInfo = appCommonStampDomainService.getErrorStampList(stampRecordOutput, workTypeCd);
 		    appStampOutput.setErrorListOptional(Optional.ofNullable(listErrorStampInfo));
 		}
 		

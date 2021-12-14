@@ -12,6 +12,7 @@ import nts.uk.ctx.at.record.app.find.monthly.root.common.DatePeriodDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.common.DayAndTimeDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.common.MonthlyItemCommon;
 import nts.uk.ctx.at.shared.dom.attendance.util.item.AttendanceItemDataGate;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.MonthlyDayoffRemainData;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.ItemConst;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.AttendanceItemUtil.AttendanceItemType;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.anno.AttendanceItemLayout;
@@ -20,7 +21,6 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.u
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ValueType;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.ClosureStatus;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.MonthlyDayoffRemainData;
 
 /** 代休月別残数データ */
 @Data
@@ -89,11 +89,11 @@ public class MonthlyDayoffRemainDataDto extends MonthlyItemCommon {
 				closureStatus == ClosureStatus.PROCESSED.value ? ClosureStatus.PROCESSED : ClosureStatus.UNTREATED,
 				datePeriod == null ? null : datePeriod.getStart(), 
 				datePeriod == null ? null : datePeriod.getEnd(), 
-				occurrenceDayTimes == null ? new DayAndTimeDto().toOff() : occurrenceDayTimes.toOff(), 
-				useDayTimes == null ? new DayAndTimeDto().toOff() : useDayTimes.toOff(),
-				remainingDayTimes == null ? new DayAndTimeDto().toOffRemain() : remainingDayTimes.toOffRemain(), 
-				carryForWardDayTimes == null ? new DayAndTimeDto().toOffRemain() : carryForWardDayTimes.toOffRemain(),
-				unUsedDayTimes == null ? new DayAndTimeDto().toOff() : unUsedDayTimes.toOff());
+				occurrenceDayTimes == null ? new DayAndTimeDto().toOccr() : occurrenceDayTimes.toOccr(), 
+				useDayTimes == null ? new DayAndTimeDto().toUse() : useDayTimes.toUse(),
+				remainingDayTimes == null ? new DayAndTimeDto().toRemain(): remainingDayTimes.toRemain(), 
+				carryForWardDayTimes == null ? new DayAndTimeDto().toCarry() : carryForWardDayTimes.toCarry(),
+				unUsedDayTimes == null ? new DayAndTimeDto().toUnUse() : unUsedDayTimes.toUnUse());
 	}
 	@Override
 	public YearMonth yearMonth() {

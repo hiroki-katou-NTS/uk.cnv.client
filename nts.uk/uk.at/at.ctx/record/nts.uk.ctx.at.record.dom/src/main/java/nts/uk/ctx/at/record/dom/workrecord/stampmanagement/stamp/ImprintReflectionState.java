@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import nts.arc.layer.dom.objecttype.DomainValue;
 import nts.arc.time.GeneralDate;
 
@@ -17,7 +16,6 @@ import nts.arc.time.GeneralDate;
  * path: UKDesign.ドメインモデル.NittsuSystem.UniversalK.就業.contexts.勤務実績.打刻管理.打刻.打刻反映状態
  */
 @Getter
-@Setter
 @AllArgsConstructor
 public class ImprintReflectionState implements DomainValue, Cloneable {
 
@@ -32,6 +30,10 @@ public class ImprintReflectionState implements DomainValue, Cloneable {
 		if(!this.reflectedCategory)
 			return true;
 		
+		if(!this.reflectedDate.isPresent()) {
+			return true;
+		}
+		
 		if(this.reflectedDate.isPresent() && this.reflectedDate.get().afterOrEquals(baseDate))
 			return true;
 		
@@ -43,6 +45,18 @@ public class ImprintReflectionState implements DomainValue, Cloneable {
 		if(!this.reflectedCategory)
 			return;
 		this.reflectedDate = Optional.of(baseDate);
+	}
+	
+	/** [3] 反映された */
+	public void markAsReflected(GeneralDate  baseDate) {
+		this.reflectedCategory = true;
+		this.reflectedDate = Optional.of(baseDate);
+	}
+	
+	/** [4] 反映状態をクレアする */
+	public void clearReflect() {
+		this.reflectedCategory = false;
+		this.reflectedDate = Optional.empty();
 	}
 	
 	@Override

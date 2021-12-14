@@ -35,7 +35,6 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.work.CompanyHolidayMngSetting;
 import nts.uk.ctx.at.shared.dom.remainingnumber.work.service.RemainCreateInforByApplicationData;
 import nts.uk.ctx.at.shared.dom.remainingnumber.work.service.RemainCreateInforByRecordData;
 import nts.uk.ctx.at.shared.dom.remainingnumber.work.service.RemainCreateInforByScheData;
-import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensLeaveComSetRepository;
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensatoryLeaveComSetting;
 import nts.uk.ctx.at.shared.dom.vacation.setting.subst.ComSubstVacationRepository;
@@ -45,8 +44,6 @@ import nts.uk.ctx.at.shared.dom.vacation.setting.subst.ComSubstVacationRepositor
 public class InterimRemainDataMngRegisterDateChangeImpl implements InterimRemainDataMngRegisterDateChange{
 	@Inject
 	private RemainCreateInforByScheData remainScheData;
-	@Inject
-	private RemainCreateInforByRecordData remainRecordData;
 	@Inject
 	private RemainCreateInforByApplicationData remainAppData;
 	@Inject
@@ -71,6 +68,9 @@ public class InterimRemainDataMngRegisterDateChangeImpl implements InterimRemain
 	private ComSubstVacationRepository subRepos;
 	@Inject
 	private LinkDataRegisterImpl linkDataRegisterImpl;
+	
+	@Inject
+	private RemainCreateInforByRecordData remainCreateInforByRecordData;
 
 	@Override
 	public void registerDateChange(String cid, String sid, List<GeneralDate> lstDate) {
@@ -79,11 +79,11 @@ public class InterimRemainDataMngRegisterDateChangeImpl implements InterimRemain
 		CompensatoryLeaveComSetting comSubset =  leaveSetRepos.find(cid);
 
 		//暫定データを作成する為の勤務予定を取得する
-		List<ScheRemainCreateInfor> lstScheData = this.remainScheData.createRemainInforNew(sid, lstDate);
+		List<ScheRemainCreateInfor> lstScheData = this.remainScheData.createRemainInforNew(cid, sid, lstDate);
 
 		//暫定データを作成する為の日別実績を取得する
 
-		List<RecordRemainCreateInfor> lstRecordData = this.remainRecordData.lstRecordRemainData(sid, lstDate);
+		List<RecordRemainCreateInfor> lstRecordData = remainCreateInforByRecordData.lstRecordRemainData(new CacheCarrier(), cid, sid, lstDate);
 
 		List<InterimRemain> interimRemains  = new ArrayList<InterimRemain>();
 
@@ -101,8 +101,7 @@ public class InterimRemainDataMngRegisterDateChangeImpl implements InterimRemain
 					datePeriod,
 					lstRecordData,
 					lstScheData,
-					lstAppData,
-					comSubset.getCompensatoryDigestiveTimeUnit().getIsManageByTime().equals(ManageDistinct.YES));
+					lstAppData);
 
 				Map<GeneralDate, DailyInterimRemainMngData> dailyMap = InterimRemainOffPeriodCreateData.createInterimRemainDataMng(requireService.createRequire(), new CacheCarrier(), inputParam, new CompanyHolidayMngSetting(cid , subRepos.findById(cid), comSubset));
 

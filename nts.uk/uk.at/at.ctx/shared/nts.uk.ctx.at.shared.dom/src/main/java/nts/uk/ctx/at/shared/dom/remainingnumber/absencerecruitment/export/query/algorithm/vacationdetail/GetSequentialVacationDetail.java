@@ -6,7 +6,6 @@ import java.util.Optional;
 import lombok.val;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.algorithm.param.CompenLeaveAggrResult;
-import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.VacationDetails;
 import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.InterimRemain;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.breakinfo.FixedManagementDataMonth;
 
@@ -27,7 +26,7 @@ public class GetSequentialVacationDetail {
 	 * @param optBeforeResult  前回集計結果
 	 * @return
 	 */
-	public static VacationDetails process(Require require, String cid, String sid, DatePeriod dateData,
+	public static AfterChangeHolidayInfoResult process(Require require, String cid, String sid, DatePeriod dateData,
 			FixedManagementDataMonth fixManaDataMonth, List<InterimRemain> interimMng, Optional<DatePeriod> processDate,
 			Optional<CompenLeaveAggrResult> optBeforeResult) {
 
@@ -40,7 +39,7 @@ public class GetSequentialVacationDetail {
 				createDigestOccurr.getChangeDigest(), createDigestOccurr.getChangeOccr());
 
 		// 変更後の振休振出情報を返す
-		return afterChangeHolidayResult.getVacationDetail();
+		return afterChangeHolidayResult;
 	}
 
 	public static interface Require extends GetModifiOutbreakDigest.Require {

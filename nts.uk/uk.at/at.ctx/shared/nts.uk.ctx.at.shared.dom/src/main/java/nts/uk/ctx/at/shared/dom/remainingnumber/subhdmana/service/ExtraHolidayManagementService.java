@@ -18,6 +18,8 @@ import nts.uk.ctx.at.shared.dom.adapter.employee.PersonEmpBasicInfoImport;
 import nts.uk.ctx.at.shared.dom.adapter.employment.EmploymentHistShareImport;
 import nts.uk.ctx.at.shared.dom.adapter.employment.ShareEmploymentAdapter;
 import nts.uk.ctx.at.shared.dom.remainingnumber.base.DigestionAtr;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.interim.InterimBreakDayOffMngRepository;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.interim.InterimDayOffMng;
 import nts.uk.ctx.at.shared.dom.remainingnumber.paymana.DisplayRemainingNumberDataInformation;
 import nts.uk.ctx.at.shared.dom.remainingnumber.paymana.EmploymentManageDistinctDto;
 import nts.uk.ctx.at.shared.dom.remainingnumber.paymana.PresentClosingPeriodExport;
@@ -82,6 +84,9 @@ public class ExtraHolidayManagementService {
 
 	@Inject
 	private ClosureRepository closureRepo;
+	
+	@Inject
+	private InterimBreakDayOffMngRepository interimBreakDayOffMngRepository;
 
 	public ExtraHolidayManagementOutput dataExtractionProcessing(int searchMode, String employeeId) {
 		String cid = AppContexts.user().companyId();
@@ -348,7 +353,6 @@ public class ExtraHolidayManagementService {
 												, List<LeaveComDayOffManagement> listLeaveComDayOffManagement
 												, GeneralDate startDate) {
 		List<RemainInfoData> lstRemainInfoData = new ArrayList<RemainInfoData>();
-		String cid = AppContexts.user().companyId();
 		Integer mergeCell = 0;
 		// Input．List＜休出管理データ＞をループする
 		for (LeaveManagementData leaveData : listLeaveData) {
@@ -383,32 +387,50 @@ public class ExtraHolidayManagementService {
 			}
 			
 			// 「代休管理データ」を絞り込み Filter "Dữ liệu quản lý nghỉ bù"
-			List<GeneralDate> lstGeneralDate = lCOMSub.stream()
+			GeneralDate useDate = lCOMSub.stream()
 					.map(x -> x.getAssocialInfo().getDateOfUse())
-					.collect(Collectors.toList());
-			List<CompensatoryDayOffManaData> cdomSub = listCompensatoryData.stream()
-					.filter(item -> lstGeneralDate.contains(item.getDayOffDate().getDayoffDate().orElse(null)))
-					.collect(Collectors.toList());
+					.filter(Objects::nonNull).findFirst().orElse(null);
+			Optional<CompensatoryDayOffManaData> optCompenDayOffData = listCompensatoryData.stream()
+					.filter(item -> item.getDayOffDate().getDayoffDate()
+							.map(date -> date.equals(useDate)).orElse(false))
+					.findFirst();
+			Optional<InterimDayOffMng> optInterimDayOff = Optional.empty();
 			
 			// 絞り込みした「代休管理データ」をチェック Check dữ liệu đã filter
-			if (cdomSub.isEmpty()) { // ないの場合 Không có
+			if (!optCompenDayOffData.isPresent()) { // ないの場合 Không có
 				// ドメインモデル「代休管理データ」を取得 get domain model 「代休管理データ」
-				List<GeneralDate> lstDate = lCOMSub.stream().map(x -> x.getAssocialInfo().getDateOfUse()).collect(Collectors.toList());
-				cdomSub = comDayOffManaDataRepository.getByLstDate(cid, lstDate);
+				optCompenDayOffData = comDayOffManaDataRepository.findBySidAndDate(sid, useDate);
+				// 取得したドメインモデル「代休管理データ」をチェック
+				if (!optCompenDayOffData.isPresent()) {
+					// ドメインモデル「暫定代休管理データ」を取得する
+					optInterimDayOff = this.interimBreakDayOffMngRepository
+							.getDayOffByDate(sid, useDate);
+				}
 			}
-			
-			for (CompensatoryDayOffManaData item : cdomSub) {
+
+			if (optCompenDayOffData.isPresent() || optInterimDayOff.isPresent()) {
+				Optional<LeaveComDayOffManagement> optComDayOff = lCOMSub.stream()
+						.filter(data -> data.getAssocialInfo().getDateOfUse().equals(useDate))
+						.findFirst();
+				Optional<GeneralDate> digestionDay = optComDayOff.map(data -> data.getAssocialInfo().getDateOfUse());
+				Optional<Double> digestionDays = optComDayOff.map(data -> data.getAssocialInfo().getDayNumberUsed().v());
+				Optional<Integer> digestionTimes = Optional.ofNullable(optCompenDayOffData
+						.map(data -> data.getRemainTimes().v())
+						.orElse(optInterimDayOff.map(data -> data.getRequiredTime().v()).orElse(null)));
+				Optional<String> digestionId = Optional.of(optCompenDayOffData
+						.map(data -> data.getComDayOffID())
+						.orElse(optInterimDayOff.map(data -> data.getRemainManaID()).orElse(null)));
 				// 残数データ情報を作成 Tạo thông tin dữ liệu số dư
 				RemainInfoData remainInfo = RemainInfoData.builder()
 						.accrualDate(leaveData.getComDayOffDate().getDayoffDate())
 						.deadLine(Optional.of(leaveData.getExpiredDate()))
 						.occurrenceDay(Optional.of(leaveData.getOccurredDays().v()))
 						.occurrenceHour(Optional.of(leaveData.getOccurredTimes().v()))
-						.digestionDay(item.getDayOffDate().getDayoffDate())
-						.digestionDays(Optional.of(item.getRequireDays().v()))
-						.digestionTimes(Optional.of(item.getRemainTimes().v()))
+						.digestionDay(digestionDay)
+						.digestionDays(digestionDays)
+						.digestionTimes(digestionTimes)
 						.occurrenceId(Optional.of(leaveData.getID()))
-						.digestionId(Optional.of(item.getComDayOffID()))
+						.digestionId(digestionId)
 						.dayLetf(leaveData.getExpiredDate().afterOrEquals(startDate) ? leaveData.getUnUsedDays().v() : 0d)
 						.remainingHours(Optional.of(leaveData.getExpiredDate().beforeOrEquals(startDate) ? leaveData.getUnUsedTimes().v() : 0))
 						.usedDay(leaveData.getExpiredDate().before(startDate) ? leaveData.getUnUsedDays().v() : 0d)
@@ -424,8 +446,8 @@ public class ExtraHolidayManagementService {
 			// Input．List<休出代休紐付け管理＞に絞り込みした「休出代休紐付け管理」を除く
 			listLeaveComDayOffManagement.removeIf(x -> lCOMSub.contains(x));
 			//Input．List＜代休管理データ＞に絞り込みした「代休管理データ」を除く
-			final List<CompensatoryDayOffManaData> finalCdomSub = cdomSub;
-			listCompensatoryData.removeIf(x -> finalCdomSub.contains(x));
+			CompensatoryDayOffManaData manaData = optCompenDayOffData.orElse(null);
+			listCompensatoryData.removeIf(x -> x.equals(manaData));
 		}
 		
 		// List＜代休管理データ＞をループする Loop List＜代休管理データ＞

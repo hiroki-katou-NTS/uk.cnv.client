@@ -41,6 +41,10 @@ public interface EmployeeRequestAdapter {
 	
 	SEmpHistImport getEmpHist(String companyId, String employeeId,
 			GeneralDate baseDate);
+	
+	//社員の雇用履歴を全て取得する
+	List<SEmpHistImport> getEmpHist(String companyId, String employeeId);
+	
 	SWkpHistImport getSWkpHistByEmployeeID(String employeeId, GeneralDate baseDate);
 	
 	/**

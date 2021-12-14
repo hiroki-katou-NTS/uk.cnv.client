@@ -137,7 +137,7 @@ public class DailyHolidayWorkPubImpl implements DailyHolidayWorkPub{
 		
 		private String cid;
 		/** 代休を管理する年月日かどうかを判断する */
-		private CheckDateForManageCmpLeaveService checkDateForManageCmpLeaveService;
+		//private CheckDateForManageCmpLeaveService checkDateForManageCmpLeaveService;
 		
 		public TransProcRequireImpl(
 				String cid, 
@@ -147,14 +147,14 @@ public class DailyHolidayWorkPubImpl implements DailyHolidayWorkPub{
 				CompensLeaveEmSetRepository compensLeaveEmSetRepo){
 			
 			super(sysEmploymentHisAdapter, compensLeaveComSetRepo, compensLeaveEmSetRepo);
-			this.checkDateForManageCmpLeaveService = checkDateForManageCmpLeaveService;
+			//this.checkDateForManageCmpLeaveService = checkDateForManageCmpLeaveService;
 			this.cid = cid;
 		}
 		
 		@Override
 		public boolean checkDateForManageCmpLeave(
 				Require require, String companyId, String employeeId, GeneralDate ymd) {
-			return this.checkDateForManageCmpLeaveService.check(require, companyId, employeeId, ymd);
+			return CheckDateForManageCmpLeaveService.check(require, companyId, employeeId, ymd);
 		}
 
 		@Override
@@ -168,7 +168,7 @@ public class DailyHolidayWorkPubImpl implements DailyHolidayWorkPub{
 		}
 
 		@Override
-		public Optional<WorkTimeSetting> getWorkTime(String workTimeCode) {
+		public Optional<WorkTimeSetting> getWorkTime(String cid, String workTimeCode) {
 			return workTimeSettingRepository.findByCode(cid, workTimeCode);
 		}
 

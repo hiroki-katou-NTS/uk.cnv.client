@@ -7,9 +7,9 @@ import org.junit.Test;
 import lombok.val;
 import nts.arc.testing.assertion.NtsAssert;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.OvertimeHourTransfer;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.SubstituteTransferProcess;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.algorithm.subtransfer.TransferResultFrame;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.createremain.subtransfer.OvertimeHdHourTransfer;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.createremain.subtransfer.SubstituteTransferProcess;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.createremain.subtransfer.TransferResultFrame;
 
 /**
  * @author thanh_nx
@@ -30,7 +30,7 @@ public class SubstituteTransferProcessTest {
 	@Test
 	public void test1() {
 
-		val timeAfterReflectApp = new OvertimeHourTransfer(1, new AttendanceTime(666), new AttendanceTime(444));
+		val timeAfterReflectApp = new OvertimeHdHourTransfer(1, new AttendanceTime(666), new AttendanceTime(444));
 
 		TransferResultFrame result = NtsAssert.Invoke.staticMethod(SubstituteTransferProcess.class,
 				"processTimeZoneDetail", 700, 800, timeAfterReflectApp);
@@ -53,7 +53,7 @@ public class SubstituteTransferProcessTest {
 	@Test
 	public void test2() {
 
-		val timeAfterReflectApp = new OvertimeHourTransfer(1, new AttendanceTime(900), new AttendanceTime(444));
+		val timeAfterReflectApp = new OvertimeHdHourTransfer(1, new AttendanceTime(900), new AttendanceTime(444));
 		TransferResultFrame result = NtsAssert.Invoke.staticMethod(SubstituteTransferProcess.class,
 				"processTimeZoneDetail", 700, 800, timeAfterReflectApp);
 		assertThat(result.getTime().v()).isEqualTo(0);
@@ -75,7 +75,7 @@ public class SubstituteTransferProcessTest {
 	@Test
 	public void test3() {
 
-		val timeAfterReflectApp = new OvertimeHourTransfer(1, new AttendanceTime(600), new AttendanceTime(444));
+		val timeAfterReflectApp = new OvertimeHdHourTransfer(1, new AttendanceTime(600), new AttendanceTime(444));
 		TransferResultFrame result = NtsAssert.Invoke.staticMethod(SubstituteTransferProcess.class,
 				"processTimeZoneDetail", 800, 700, timeAfterReflectApp);
 		assertThat(result.getTime().v()).isEqualTo(200);
@@ -97,7 +97,7 @@ public class SubstituteTransferProcessTest {
 	@Test
 	public void test4() {
 
-		val timeAfterReflectApp = new OvertimeHourTransfer(1, new AttendanceTime(900), new AttendanceTime(444));
+		val timeAfterReflectApp = new OvertimeHdHourTransfer(1, new AttendanceTime(900), new AttendanceTime(444));
 		TransferResultFrame result = NtsAssert.Invoke.staticMethod(SubstituteTransferProcess.class,
 				"processTimeZoneDetail", 800, 700, timeAfterReflectApp);
 		assertThat(result.getTime().v()).isEqualTo(100);

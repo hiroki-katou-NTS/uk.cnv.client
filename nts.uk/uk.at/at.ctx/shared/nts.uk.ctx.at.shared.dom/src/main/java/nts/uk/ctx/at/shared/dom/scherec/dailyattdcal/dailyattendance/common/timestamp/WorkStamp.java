@@ -183,4 +183,8 @@ public class WorkStamp extends DomainObject{
 
 		return;
 	}
+	
+	public Optional<TimeWithDayAttr> getWithTimeDay(){
+		return this.getTimeDay().getTimeWithDay();
+	}
 }

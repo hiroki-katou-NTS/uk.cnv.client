@@ -38,7 +38,7 @@ import nts.uk.ctx.at.shared.dom.workrecord.workperfor.dailymonthlyprocessing.enu
  */
 public class ReflectApplicationWorkRecord {
 
-	public static Pair<RCReflectStatusResult, Optional<AtomTask>> process(Require require, ApplicationShare application,
+	public static Pair<RCReflectStatusResult, Optional<AtomTask>> process(Require require, String cid, ApplicationShare application,
 			GeneralDate date, RCReflectStatusResult reflectStatus, GeneralDateTime reflectTime) {
 
 		// [input.申請.打刻申請モード]をチェック
@@ -47,8 +47,8 @@ public class ReflectApplicationWorkRecord {
 		if (application.getOpStampRequestMode().isPresent()
 				&& application.getOpStampRequestMode().get() == StampRequestModeShare.STAMP_ONLINE_RECORD) {
 			// レコーダイメージ申請の対象日を取得する
-			Pair<Optional<GeneralDate>, Optional<Stamp>> dateOpt = GetTargetDateRecordApplication.getTargetDate(require, require.getCId(), 
-					(AppRecordImageShare) application);
+			Pair<Optional<GeneralDate>, Optional<Stamp>> dateOpt = GetTargetDateRecordApplication.getTargetDate(require,
+					cid, (AppRecordImageShare) application);
 			if (dateOpt.getLeft().isPresent()) {
 				dateTarget = dateOpt.getLeft().get();
 				stamp = dateOpt.getRight();
@@ -73,11 +73,11 @@ public class ReflectApplicationWorkRecord {
 				&& application.getOpStampRequestMode().get() == StampRequestModeShare.STAMP_ONLINE_RECORD) {
 			changeAtt = new ChangeDailyAttendance(true, true, false, false, ScheduleRecordClassifi.RECORD, true);
 			/// 打刻申請（NRモード）を反映する -- itemId
-			TimeStampApplicationNRMode.process(require, require.getCId(), dateTarget,
+			TimeStampApplicationNRMode.process(require, cid, dateTarget,
 					(AppRecordImageShare) application, dailyRecordApp, stamp, changeAtt);
 		} else {
 			/// 申請の反映（勤務実績） in process
-			val affterReflect = RCCreateDailyAfterApplicationeReflect.process(require, application, dailyRecordApp, dateTarget);
+			val affterReflect = RCCreateDailyAfterApplicationeReflect.process(require, cid, application, dailyRecordApp, dateTarget);
 
 			changeAtt = ChangeDailyAttendance.createChangeDailyAtt(affterReflect.getLstItemId(), ScheduleRecordClassifi.RECORD);
 		}

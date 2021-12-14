@@ -10,7 +10,8 @@ import nts.arc.layer.app.command.CommandHandlerWithResult;
 import nts.uk.ctx.at.request.dom.application.common.service.detailscreen.after.DetailAfterRemand;
 import nts.uk.ctx.at.request.dom.application.common.service.detailscreen.after.RemandCommand;
 import nts.uk.ctx.at.request.dom.application.common.service.detailscreen.before.DetailBeforeUpdate;
-import nts.uk.ctx.at.request.dom.application.common.service.detailscreen.output.MailSenderResult;
+import nts.uk.ctx.at.request.dom.application.common.service.other.output.MailResult;
+import nts.uk.ctx.at.request.dom.application.common.service.other.output.ProcessResult;
 import nts.uk.shr.com.context.AppContexts;
 /**
  * 
@@ -18,7 +19,7 @@ import nts.uk.shr.com.context.AppContexts;
  *
  */
 @Stateless
-public class RemandApplicationHandler extends CommandHandlerWithResult<RemandCommand, MailSenderResult>{
+public class RemandApplicationHandler extends CommandHandlerWithResult<RemandCommand, ProcessResult>{
 	
 	@Inject
 	private DetailBeforeUpdate detailBeforeUpdate;
@@ -27,7 +28,7 @@ public class RemandApplicationHandler extends CommandHandlerWithResult<RemandCom
 	private DetailAfterRemand detailAfterRemand;
 	//差し戻し実行
 	@Override
-	protected MailSenderResult handle(CommandHandlerContext<RemandCommand> context) {
+	protected ProcessResult handle(CommandHandlerContext<RemandCommand> context) {
 		String companyID =  AppContexts.user().companyId();
 		RemandCommand remandCommand = context.getCommand();
 		List<String> lstAppID = remandCommand.getAppID();
@@ -38,6 +39,11 @@ public class RemandApplicationHandler extends CommandHandlerWithResult<RemandCom
 		}
 		//共通アルゴリズム「詳細画面差し戻し後の処理」を実行する(xử lý màn hình chi tiết sau khi refer back)
 		//11-2.詳細画面差し戻し後の処理
-		return detailAfterRemand.doRemand(companyID, remandCommand);
+		MailResult mailResult = detailAfterRemand.doRemand(companyID, remandCommand);
+		ProcessResult processResult = new ProcessResult();
+		processResult.setAutoSuccessMail(mailResult.getSuccessList());
+		processResult.setAutoFailMail(mailResult.getFailList());
+		processResult.setAutoFailServer(mailResult.getFailServerList());
+		return processResult;
 	}
 }

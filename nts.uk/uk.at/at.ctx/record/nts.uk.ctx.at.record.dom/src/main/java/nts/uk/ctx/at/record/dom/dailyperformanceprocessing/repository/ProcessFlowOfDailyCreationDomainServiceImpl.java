@@ -156,9 +156,8 @@ public class ProcessFlowOfDailyCreationDomainServiceImpl implements ProcessFlowO
 				}
 
 			}
-			Optional<Boolean> checkLock = dailyCreationLog.isPresent()
-					? Optional.ofNullable(dailyCreationLog.get().getIsCalWhenLock())
-					: Optional.empty();
+			Optional<Boolean> checkLock = dailyCreationLog.flatMap(c -> c.getIsCalWhenLock());
+			
 			finalStatus =createDailyResultDomainServiceNew.createDailyResult(asyncContext, employeeIdList, periodTime, executionAttr,
 					companyId, executionTypeDaily,empCalAndSumExeLog, checkLock).value ==0?ProcessState.INTERRUPTION:ProcessState.SUCCESS;
 

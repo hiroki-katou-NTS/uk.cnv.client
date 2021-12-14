@@ -41,31 +41,13 @@ public class HolidayStampCheck {
 					&& !timeLeavingOfDailyPerformance.getAttendance().getTimeLeavingWorks().isEmpty()) {
 				boolean errorBoolean = false;
 				for(TimeLeavingWork timeLeaving : timeLeavingOfDailyPerformance.getAttendance().getTimeLeavingWorks()) {
-					if ((timeLeaving != null
-					&& ((timeLeaving.getAttendanceStamp().isPresent()
-							&& timeLeaving.getAttendanceStamp().get().getStamp().isPresent())
-							|| (timeLeaving.getLeaveStamp().isPresent()
-							&& timeLeaving.getLeaveStamp().get().getStamp().isPresent()))))
-						errorBoolean = true;
+					if (timeLeaving != null) {
+						errorBoolean = timeLeaving.existsTimeWithDay();	
+					}
 				}
 				if(errorBoolean)
 					employeeDailyPerError = new EmployeeDailyPerError(companyID, employeeID, processingDate,
 																	  new ErrorAlarmWorkRecordCode("S005"), Arrays.asList(28));
-					
-//				if ((timeLeavingOfDailyPerformance.getTimeLeavingWorks().get(0) != null
-//						&& ((timeLeavingOfDailyPerformance.getTimeLeavingWorks().get(0).getAttendanceStamp().isPresent()
-//								&& timeLeavingOfDailyPerformance.getTimeLeavingWorks().get(0).getAttendanceStamp().get().getStamp().isPresent())
-//								|| (timeLeavingOfDailyPerformance.getTimeLeavingWorks().get(0).getLeaveStamp().isPresent()
-//								&& timeLeavingOfDailyPerformance.getTimeLeavingWorks().get(0).getLeaveStamp().get().getStamp().isPresent())))
-//						|| (timeLeavingOfDailyPerformance.getTimeLeavingWorks().get(1) != null
-//								&& ((timeLeavingOfDailyPerformance.getTimeLeavingWorks().get(1).getAttendanceStamp().isPresent()
-//								&& timeLeavingOfDailyPerformance.getTimeLeavingWorks().get(1).getAttendanceStamp().get().getStamp().isPresent())
-//								|| (timeLeavingOfDailyPerformance.getTimeLeavingWorks().get(1).getLeaveStamp().isPresent()
-//								&& timeLeavingOfDailyPerformance.getTimeLeavingWorks().get(1).getLeaveStamp().get().getStamp().isPresent())))) {
-//					List<Integer> attendanceItemIds = new ArrayList<>();
-//					attendanceItemIds.add(28);
-//					employeeDailyPerError = new EmployeeDailyPerError(companyID, employeeID, processingDate,
-//							new ErrorAlarmWorkRecordCode("S005"), attendanceItemIds);
 			}
 		}
 		return employeeDailyPerError;

@@ -29,7 +29,7 @@ public class AgreementOneYear {
 	/**　３６協定年度設定を取り込む　*/
 	public void updateWithEmpSet(OneYearErrorAlarmTime erAlTime) {
 		
-		this.specConditionLimit = OneYearTime.of(erAlTime, this.specConditionLimit.getUpperLimit());
+		this.specConditionLimit = OneYearTime.createWithCheck(erAlTime, this.specConditionLimit.getUpperLimit());
 	}
 	
 	/** エラーチェック */

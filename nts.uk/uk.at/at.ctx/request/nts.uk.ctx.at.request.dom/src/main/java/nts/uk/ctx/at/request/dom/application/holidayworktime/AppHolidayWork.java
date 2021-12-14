@@ -7,12 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOvertimeDetail;
+import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.overtime.ApplicationTime;
 import nts.uk.ctx.at.shared.dom.WorkInformation;
 import nts.uk.ctx.at.shared.dom.common.TimeZoneWithWorkNo;
 import nts.uk.ctx.at.shared.dom.workdayoff.frame.NotUseAtr;
-import nts.uk.ctx.at.request.dom.application.Application;
 
 
 /**
@@ -55,11 +54,6 @@ public class AppHolidayWork extends Application{
 	 * 勤務時間帯
 	 */
 	private Optional<List<TimeZoneWithWorkNo>> workingTimeList = Optional.empty();
-	
-	/**
-	 * 時間外時間の詳細
-	 */
-	private Optional<AppOvertimeDetail> appOvertimeDetail = Optional.empty();
 	
 	public AppHolidayWork(Application application) {
 		super(application);

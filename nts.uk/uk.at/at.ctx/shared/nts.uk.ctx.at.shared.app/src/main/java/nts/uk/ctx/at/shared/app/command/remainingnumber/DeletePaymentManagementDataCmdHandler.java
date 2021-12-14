@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.shared.app.command.remainingnumber;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -8,11 +9,16 @@ import javax.inject.Inject;
 
 import nts.arc.layer.app.command.CommandHandler;
 import nts.arc.layer.app.command.CommandHandlerContext;
+import nts.arc.time.GeneralDate;
+import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.InterimRemainDataMngRegisterDateChange;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.interim.InterimBreakDayOffMngRepository;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.interim.InterimDayOffMng;
 import nts.uk.ctx.at.shared.dom.remainingnumber.paymana.PayoutManagementData;
 import nts.uk.ctx.at.shared.dom.remainingnumber.paymana.PayoutManagementDataRepository;
 import nts.uk.ctx.at.shared.dom.remainingnumber.paymana.PayoutSubofHDManaRepository;
 import nts.uk.ctx.at.shared.dom.remainingnumber.paymana.SubstitutionOfHDManaDataRepository;
 import nts.uk.ctx.at.shared.dom.remainingnumber.paymana.SubstitutionOfHDManagementData;
+import nts.uk.shr.com.context.AppContexts;
 
 /*
  * 振休振出管理データを削除 
@@ -29,6 +35,12 @@ public class DeletePaymentManagementDataCmdHandler extends CommandHandler<Delete
 	
 	@Inject
 	private PayoutSubofHDManaRepository payoutSubofHDManaRepository;
+	
+	@Inject
+	private InterimBreakDayOffMngRepository interimBreakDayOffMngRepository;
+	
+	@Inject
+	private InterimRemainDataMngRegisterDateChange interimRemainDataMngRegisterDateChange;
 	
 	@Override
 	protected void handle(CommandHandlerContext<DeletePaymentManagementDataCommand> context) {
@@ -52,6 +64,21 @@ public class DeletePaymentManagementDataCmdHandler extends CommandHandler<Delete
 				dataSub.size() > 0 ? dataSub.get(0).getSID() : null,
 				dataPayout.stream().map(x -> x.getPayoutDate().getDayoffDate().orElse(null)).collect(Collectors.toList()),
 				dataSub.stream().map(x -> x.getHolidayDate().getDayoffDate().orElse(null)).collect(Collectors.toList()));
+		}
+		// ドメインモデル「暫定振休管理データ」を取得する
+		List<InterimDayOffMng> interimDayOffMngList = this.interimBreakDayOffMngRepository
+				.getDayOffByIds(command.getSubOfHDID());
+		// 取得した暫定振休管理データをチェック
+		if (!interimDayOffMngList.isEmpty()) {
+			String cid = AppContexts.user().companyId();
+			Map<String, List<InterimDayOffMng>> dataMap = interimDayOffMngList.stream()
+					.collect(Collectors.groupingBy(InterimDayOffMng::getSID));
+			// 暫定データの登録
+			dataMap.entrySet().forEach(entry -> {
+				List<GeneralDate> dates = entry.getValue().stream().map(InterimDayOffMng::getYmd)
+						.collect(Collectors.toList());
+				this.interimRemainDataMngRegisterDateChange.registerDateChange(cid, entry.getKey(), dates);
+			});
 		}
 	}
 

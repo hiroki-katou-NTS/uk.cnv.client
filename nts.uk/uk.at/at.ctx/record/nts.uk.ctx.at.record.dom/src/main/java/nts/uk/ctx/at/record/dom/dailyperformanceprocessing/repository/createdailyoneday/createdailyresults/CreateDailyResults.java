@@ -1,7 +1,6 @@
 package nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.createdailyoneday.createdailyresults;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,6 +23,7 @@ import nts.uk.ctx.at.shared.dom.dailyperformanceprocessing.ReflectWorkInforDomai
 import nts.uk.ctx.at.shared.dom.dailyperformanceprocessing.output.PeriodInMasterList;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.configuration.DayOfWeek;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.setting.BonusPaySetting;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.breaking.BreakTimeOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.DailyRecordConverter;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.DailyRecordToAttendanceItemConverter;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
@@ -67,20 +67,21 @@ public class CreateDailyResults {
 	@Inject
 	private CreateDailyResultDomainServiceNew createDailyResultDomainServiceNew;
 	
-	public OutputCreateDailyOneDay createDailyResult(String companyId, String employeeId, GeneralDate ymd,
-			ExecutionTypeDaily executionType,
-			IntegrationOfDaily integrationOfDaily) {
+	//マスターデータを取得して、日別実績を作成する
+	public Optional<OutputCreateDailyOneDay> createDailyResult(String companyId, String employeeId, GeneralDate ymd,
+			ExecutionTypeDaily executionType) {
 		    DatePeriod period = new DatePeriod(ymd, ymd);
 		    Optional<EmployeeGeneralAndPeriodMaster> masterData = createDailyResultDomainServiceNew.getMasterData(companyId, employeeId, period);
 		if (!masterData.isPresent()) {
-			return new OutputCreateDailyOneDay(
-					Arrays.asList(new ErrorMessageInfo(companyId, employeeId, ymd, ExecutionContent.DAILY_CREATION,
-							new ErrMessageResource("020"), new ErrMessageContent(TextResource.localize("Msg_1156")))),
-					integrationOfDaily, new ArrayList<>());
+			return Optional.empty();
 		}
-		return createDailyResult(companyId, employeeId, ymd, executionType,
+		OutputCreateDailyOneDay result = createDailyResult(companyId, employeeId, ymd, executionType,
 				masterData.get().getEmployeeGeneralInfoImport(),
-				masterData.get().getPeriodInMasterList(), integrationOfDaily);
+				masterData.get().getPeriodInMasterList(), Optional.empty());
+	    if(!result.getListErrorMessageInfo().isEmpty()) {
+	    	return Optional.empty();
+	    }
+	    return Optional.of(result);
 	}
 	
 	/**
@@ -95,9 +96,10 @@ public class CreateDailyResults {
 	 */
 	public OutputCreateDailyOneDay createDailyResult(String companyId, String employeeId, GeneralDate ymd,
 			ExecutionTypeDaily executionType, EmployeeGeneralInfoImport employeeGeneralInfoImport,
-			PeriodInMasterList periodInMasterList, IntegrationOfDaily integrationOfDaily) {
+			PeriodInMasterList periodInMasterList, Optional<IntegrationOfDaily> integrationOfDailyOpt) {
 		List<ErrorMessageInfo> listErrorMessageInfo = new ArrayList<>();
 
+		IntegrationOfDaily integrationOfDaily = integrationOfDailyOpt.orElse(createDefault(employeeId, ymd));
 		// 日別実績の「情報系」のドメインを取得する
 		List<Integer> attendanceItemIdList = integrationOfDaily.getEditState().stream()
 				.map(editState -> editState.getAttendanceItemId()).distinct().collect(Collectors.toList());
@@ -173,4 +175,27 @@ public class CreateDailyResults {
 		return converter.toDomain();
 	}
 
+	//日別実績のディフォルトを作成する
+		private IntegrationOfDaily createDefault(String sid, GeneralDate dateData) {
+			return new IntegrationOfDaily(
+					sid,
+					dateData,
+					null, 
+					null, 
+					null,
+					Optional.empty(), 
+					new ArrayList<>(), 
+					Optional.empty(), 
+					new BreakTimeOfDailyAttd(), 
+					Optional.empty(), 
+					Optional.empty(), 
+					Optional.empty(), 
+					Optional.empty(), 
+					Optional.empty(), 
+					Optional.empty(), 
+					new ArrayList<>(),
+					Optional.empty(),
+					new ArrayList<>(),
+					Optional.empty());
+		}
 }

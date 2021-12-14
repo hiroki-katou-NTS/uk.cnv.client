@@ -20,7 +20,6 @@ import nts.uk.ctx.at.shared.dom.calculationsetting.repository.StampReflectionMan
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingWork;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.OutingFrameNo;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.OutingTimeSheet;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.TimeActualStamp;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.TimeChangeMeans;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkStamp;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.erroralarm.EmployeeDailyPerError;
@@ -56,97 +55,92 @@ public class GoingOutStampLeakageChecking {
 
 			for (OutingTimeSheet outingTimeSheet : outingTimeSheets) {
 
-				if ((outingTimeSheet.getGoOut() != null && outingTimeSheet.getGoOut().isPresent())
-						|| (outingTimeSheet.getComeBack() != null && outingTimeSheet.getComeBack().isPresent())) {
+				if (!outingTimeSheet.leakageCheck() && !outingTimeSheet.getGoOutWithTimeDay().isPresent()) {
+					List<Integer> attendanceItemIDList = new ArrayList<>();
 
-					if (outingTimeSheet.getGoOut() == null || !outingTimeSheet.getGoOut().isPresent()) {
-
-						List<Integer> attendanceItemIDList = new ArrayList<>();
-
-						if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(1))) {
-							attendanceItemIDList.add(88);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(2))) {
-							attendanceItemIDList.add(95);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(3))) {
-							attendanceItemIDList.add(102);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(4))) {
-							attendanceItemIDList.add(109);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(5))) {
-							attendanceItemIDList.add(116);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(6))) {
-							attendanceItemIDList.add(123);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(7))) {
-							attendanceItemIDList.add(130);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(8))) {
-							attendanceItemIDList.add(137);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(9))) {
-							attendanceItemIDList.add(144);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(10))) {
-							attendanceItemIDList.add(151);
-						}
-
-						// 外出に打刻漏れ補正する
-						CorrectionResult correctionResult = stampLeakageCorrect(companyID, employeeID, processingDate,
-								outingTimeSheet);
-						if (correctionResult == CorrectionResult.FAILURE) {
-							if (!attendanceItemIDList.isEmpty()) {
-								EmployeeDailyPerError employeeDailyPerError = new EmployeeDailyPerError(companyID,
-										employeeID, processingDate, new ErrorAlarmWorkRecordCode("S001"),
-										attendanceItemIDList);
-								employeeDailyPerErrorList.add(employeeDailyPerError);
-							}
-							// if (!attendanceItemIDList.isEmpty()) {
-							// createEmployeeDailyPerError.createEmployeeDailyPerError(companID,
-							// employeeID, processingDate,
-							// new ErrorAlarmWorkRecordCode("S001"),
-							// attendanceItemIDList);
-							// }
-						}
+					if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(1))) {
+						attendanceItemIDList.add(88);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(2))) {
+						attendanceItemIDList.add(95);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(3))) {
+						attendanceItemIDList.add(102);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(4))) {
+						attendanceItemIDList.add(109);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(5))) {
+						attendanceItemIDList.add(116);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(6))) {
+						attendanceItemIDList.add(123);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(7))) {
+						attendanceItemIDList.add(130);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(8))) {
+						attendanceItemIDList.add(137);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(9))) {
+						attendanceItemIDList.add(144);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(10))) {
+						attendanceItemIDList.add(151);
 					}
 
-					if (outingTimeSheet.getComeBack() == null || !outingTimeSheet.getComeBack().isPresent()) {
-
-						List<Integer> newAttendanceItemIDList = new ArrayList<>();
-
-						if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(1))) {
-							newAttendanceItemIDList.add(91);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(2))) {
-							newAttendanceItemIDList.add(98);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(3))) {
-							newAttendanceItemIDList.add(105);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(4))) {
-							newAttendanceItemIDList.add(112);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(5))) {
-							newAttendanceItemIDList.add(119);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(6))) {
-							newAttendanceItemIDList.add(126);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(7))) {
-							newAttendanceItemIDList.add(133);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(8))) {
-							newAttendanceItemIDList.add(140);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(9))) {
-							newAttendanceItemIDList.add(147);
-						} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(10))) {
-							newAttendanceItemIDList.add(154);
+					// 外出に打刻漏れ補正する
+					CorrectionResult correctionResult = stampLeakageCorrect(companyID, employeeID, processingDate,
+							outingTimeSheet);
+					if (correctionResult == CorrectionResult.FAILURE) {
+						if (!attendanceItemIDList.isEmpty()) {
+							EmployeeDailyPerError employeeDailyPerError = new EmployeeDailyPerError(companyID,
+									employeeID, processingDate, new ErrorAlarmWorkRecordCode("S001"),
+									attendanceItemIDList);
+							employeeDailyPerErrorList.add(employeeDailyPerError);
 						}
+						// if (!attendanceItemIDList.isEmpty()) {
+						// createEmployeeDailyPerError.createEmployeeDailyPerError(companID,
+						// employeeID, processingDate,
+						// new ErrorAlarmWorkRecordCode("S001"),
+						// attendanceItemIDList);
+						// }
+					}
+				}
 
-						// 戻りに打刻漏れ補正する
-						CorrectionResult returnCorrectionResult = returnStampLeakageCorrect(companyID, employeeID,
-								processingDate, outingTimeSheet);
-						if (returnCorrectionResult == CorrectionResult.FAILURE) {
-							if (!newAttendanceItemIDList.isEmpty()) {
-								EmployeeDailyPerError employeeDailyPerError = new EmployeeDailyPerError(companyID,
-										employeeID, processingDate, new ErrorAlarmWorkRecordCode("S001"),
-										newAttendanceItemIDList);
-								employeeDailyPerErrorList.add(employeeDailyPerError);
-							}
-							// if (!newAttendanceItemIDList.isEmpty()) {
-							// createEmployeeDailyPerError.createEmployeeDailyPerError(companID,
-							// employeeID, processingDate,
-							// new ErrorAlarmWorkRecordCode("S001"),
-							// newAttendanceItemIDList);
-							// }
+				if (!outingTimeSheet.leakageCheck() && !outingTimeSheet.getComeBackWithTimeDay().isPresent()) {
+
+					List<Integer> newAttendanceItemIDList = new ArrayList<>();
+
+					if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(1))) {
+						newAttendanceItemIDList.add(91);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(2))) {
+						newAttendanceItemIDList.add(98);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(3))) {
+						newAttendanceItemIDList.add(105);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(4))) {
+						newAttendanceItemIDList.add(112);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(5))) {
+						newAttendanceItemIDList.add(119);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(6))) {
+						newAttendanceItemIDList.add(126);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(7))) {
+						newAttendanceItemIDList.add(133);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(8))) {
+						newAttendanceItemIDList.add(140);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(9))) {
+						newAttendanceItemIDList.add(147);
+					} else if (outingTimeSheet.getOutingFrameNo().equals(new OutingFrameNo(10))) {
+						newAttendanceItemIDList.add(154);
+					}
+
+					// 戻りに打刻漏れ補正する
+					CorrectionResult returnCorrectionResult = returnStampLeakageCorrect(companyID, employeeID,
+							processingDate, outingTimeSheet);
+					if (returnCorrectionResult == CorrectionResult.FAILURE) {
+						if (!newAttendanceItemIDList.isEmpty()) {
+							EmployeeDailyPerError employeeDailyPerError = new EmployeeDailyPerError(companyID,
+									employeeID, processingDate, new ErrorAlarmWorkRecordCode("S001"),
+									newAttendanceItemIDList);
+							employeeDailyPerErrorList.add(employeeDailyPerError);
 						}
+						// if (!newAttendanceItemIDList.isEmpty()) {
+						// createEmployeeDailyPerError.createEmployeeDailyPerError(companID,
+						// employeeID, processingDate,
+						// new ErrorAlarmWorkRecordCode("S001"),
+						// newAttendanceItemIDList);
+						// }
 					}
 				}
 			}

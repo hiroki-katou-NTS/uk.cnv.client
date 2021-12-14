@@ -131,7 +131,7 @@ public class AnnualLeaveRemainingNumber implements Cloneable {
 	}
 
 	/**
-	 * 残数がマイナスかチェックしてマイナスのときにはtrueを返す
+	 * 残数がマイナスかチェック
 	 * @return
 	 */
 	public boolean isMinus(){

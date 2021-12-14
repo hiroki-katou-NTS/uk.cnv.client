@@ -31,9 +31,9 @@ public class AgreementOneMonthTest {
     public void checkErrorTest() {
 
         AgreementOneMonth agreementsOneYear = new AgreementOneMonth(
-                OneMonthTime.of( OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(20), new AgreementOneMonthTime(20))
+                OneMonthTime.createWithCheck( OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(20), new AgreementOneMonthTime(20))
                         , new AgreementOneMonthTime(20)),
-                OneMonthTime.of( OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(20), new AgreementOneMonthTime(20))
+                OneMonthTime.createWithCheck( OneMonthErrorAlarmTime.of(new AgreementOneMonthTime(20), new AgreementOneMonthTime(20))
                         , new AgreementOneMonthTime(20))
         );
         AgreementOneMonthTime agreementOneMonthTime = new AgreementOneMonthTime(30);

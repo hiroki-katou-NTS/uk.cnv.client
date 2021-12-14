@@ -77,11 +77,11 @@ public class CreateDetailOfArbitraryScheduleQuery {
         List<StatusOfEmployee> employees = affComHistAdapter.getListAffComHist(lisSids, period);
         List<AttendanceItemToPrint> outputItemList = ofArbitrary != null ?
                 ofArbitrary.getOutputItemList() : Collections.emptyList();
-        val listAttIds = outputItemList.stream().map(AttendanceItemToPrint::getAttendanceId).distinct()
+        val listAttId = outputItemList.stream().map(AttendanceItemToPrint::getAttendanceId).distinct()
                 .collect(Collectors.toList());
         //2.  ①: <call> 任意期間別実績を取得する
-        val values = attendanceItemServiceAdapter.getRecordValues(lisSids, aggrFrameCode, listAttIds);
-        val listAttId = listAttIds.stream().sorted(Integer::compareTo).collect(Collectors.toList());
+        val values = attendanceItemServiceAdapter.getRecordValues(lisSids, aggrFrameCode, listAttId);
+        //val listAttId = listAttIds.stream().sorted(Integer::compareTo).collect(Collectors.toList());
         //3. [①.isEmpty()]
         if (values.values().isEmpty()) {
             throw new BusinessException("Msg_1894");

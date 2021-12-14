@@ -23,4 +23,13 @@ public class SpecialHolidayUseDetail {
 	 * 日数
 	 */
 	private double days;
+	
+	public SpecialHolidayUseDetail clone(){
+		SpecialHolidayUseDetail clone = new SpecialHolidayUseDetail();
+		clone.setSpecialHolidayCode(this.specialHolidayCode);
+		clone.setDays(this.days);
+		
+		return clone;
+	}
+	
 }

@@ -21,6 +21,7 @@ import nts.uk.ctx.at.schedule.dom.executionlog.ScheduleCreatorRepository;
 import nts.uk.ctx.at.schedule.dom.executionlog.ScheduleErrorLogRepository;
 import nts.uk.ctx.at.schedule.dom.executionlog.ScheduleExecutionLog;
 import nts.uk.ctx.at.schedule.dom.executionlog.ScheduleExecutionLogRepository;
+import nts.uk.ctx.at.schedule.dom.shift.pattern.monthly.MonthlyPatternRepository;
 import nts.uk.shr.com.context.AppContexts;
 
 /**
@@ -44,6 +45,9 @@ public class ScheduleCreateContentFinder {
 	/** The schedule error log repository. */
 	@Inject
 	private ScheduleErrorLogRepository scheduleErrorLogRepository;
+
+	@Inject
+	private MonthlyPatternRepository monthlyPatternRepo;
 
 	/**
 	 * Find by execution id.
@@ -79,6 +83,11 @@ public class ScheduleCreateContentFinder {
 			dto.setExecutionEnd(exeEnd);
 			dto.setCountExecution(lstCreator == null ? BigDecimal.ZERO.intValue() : lstCreator.size());
 			dto.setCountError(cntError);
+			if (dto.monthlyPatternCode != null) {
+				monthlyPatternRepo.findById(companyId, dto.monthlyPatternCode).ifPresent(pattern -> {
+					dto.setMonthlyPatternName(pattern.getMonthlyPatternName().v());
+				});
+			}
 			return dto;
 		}
 

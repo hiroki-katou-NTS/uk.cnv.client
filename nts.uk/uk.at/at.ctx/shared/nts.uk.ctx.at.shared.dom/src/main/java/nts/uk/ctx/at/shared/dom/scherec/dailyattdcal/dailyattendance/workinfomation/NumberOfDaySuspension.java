@@ -19,4 +19,15 @@ public class NumberOfDaySuspension {
 	//振休振出区分
 	private FuriClassifi classifiction;
 
+	public boolean isSuspension() {
+		return this.classifiction.equals(FuriClassifi.SUSPENSION);
+	}
+	
+	public boolean isDrawer() {
+		return this.classifiction.equals(FuriClassifi.DRAWER);
+	}
+	
+	public boolean isUseable() {
+		return this.getDays().greaterThan(0.0);
+	}
 }

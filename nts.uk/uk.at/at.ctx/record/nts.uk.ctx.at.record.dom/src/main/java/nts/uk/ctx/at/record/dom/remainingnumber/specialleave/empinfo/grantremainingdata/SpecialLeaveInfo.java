@@ -29,6 +29,7 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.service.SpecialHoli
 import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.service.SpecialLeaveError;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHoliday;
 import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.GrantDeadline;
+import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.LimitAccumulationDays;
 
 /**
  * 特別休暇情報
@@ -125,14 +126,15 @@ public class SpecialLeaveInfo implements Cloneable {
 			SpecialLeaveAggregatePeriodWork specialLeaveAggregatePeriodWork,
 			SpecialHolidayInterimMngData specialHolidayInterimMngData,
 			int specialLeaveCode, GeneralDate entryDate,
-			InPeriodOfSpecialLeaveResultInfor aggrResult){
+			InPeriodOfSpecialLeaveResultInfor aggrResult,
+			GeneralDate baseDate){
 
 		/** 特別休暇情報．年月日を開始日に更新 */
 		this.ymd = specialLeaveAggregatePeriodWork.getPeriod().start();
 
 		/** 付与処理 */
 		aggrResult = this.grantProcess(require, companyId, employeeId,
-				specialLeaveAggregatePeriodWork, aggrResult, specialLeaveCode, entryDate);
+				specialLeaveAggregatePeriodWork, aggrResult, specialLeaveCode, entryDate, baseDate);
 
 		/** 消化処理 */
 		aggrResult = this.digestProcess(
@@ -302,7 +304,8 @@ public class SpecialLeaveInfo implements Cloneable {
 			SpecialLeaveAggregatePeriodWork aggregatePeriodWork,
 			InPeriodOfSpecialLeaveResultInfor aggrResult,
 			int specialLeaveCode,
-			GeneralDate entryDate){
+			GeneralDate entryDate,
+			GeneralDate baseDate){
 
 		/** 付与をチェック */
 		if (!aggregatePeriodWork.getGrantWork().isGrantAtr()) return aggrResult;
@@ -311,7 +314,7 @@ public class SpecialLeaveInfo implements Cloneable {
 		this.deleteDummy();
 
 		/** 特別休暇を付与する */
-		grantSpecialHoliday(require, companyId, employeeId, aggregatePeriodWork, specialLeaveCode);
+		grantSpecialHoliday(require, companyId, employeeId, aggregatePeriodWork, specialLeaveCode, baseDate);
 
 		/** 付与前付与後を判断する */
 		GrantBeforeAfterAtr grantPeriodAtr = aggregatePeriodWork.judgeGrantPeriodAtr(entryDate);
@@ -331,7 +334,7 @@ public class SpecialLeaveInfo implements Cloneable {
 
 	/** 特別休暇を付与する */
 	private SpecialLeaveInfo grantSpecialHoliday(SpecialLeaveManagementService.RequireM5 require, String companyId,
-			String employeeId, SpecialLeaveAggregatePeriodWork aggregatePeriodWork, int specialLeaveCode) {
+			String employeeId, SpecialLeaveAggregatePeriodWork aggregatePeriodWork, int specialLeaveCode, GeneralDate baseDate) {
 
 		// 特別休暇を付与する
 
@@ -362,10 +365,12 @@ public class SpecialLeaveInfo implements Cloneable {
 
 			// 繰越上限日数
 			int limitCarryoverDays = 0;
-			Optional<GrantDeadline> grantPeriodic = specialHolidayOpt.get().getGrantRegular().getGrantPeriodic();
-			if ( grantPeriodic.isPresent() ) {
-				if ( grantPeriodic.get().getLimitAccumulationDays().isPresent()) {
-					limitCarryoverDays = grantPeriodic.get().getLimitAccumulationDays().get().getLimitCarryoverDays().get().v();
+			Optional<LimitAccumulationDays> limitAccumulationDays = specialHolidayOpt.get().getGrantRegular().getLimitAccumulationDays();
+			if ( limitAccumulationDays.isPresent() ) {
+				if(limitAccumulationDays.get().isLimit()){
+					if (limitAccumulationDays.get().getLimitCarryoverDays().isPresent()) {
+						limitCarryoverDays = limitAccumulationDays.get().getLimitCarryoverDays().get().v();
+					}
 				}
 			}
 
@@ -403,13 +408,20 @@ public class SpecialLeaveInfo implements Cloneable {
 							time = specialLeaveGrantRemainingData.getDetails().getRemainingNumber().getMinutes().get().v();
 						}
 
+						// 付与残数データ.使用数.上限超過消滅日数←　付与残数データ.使用数.上限超過消滅日数　＋　差分
+						if(specialLeaveGrantRemainingData.getDetails().getUsedNumber().getLeaveOverLimitNumber().isPresent()){
+							specialLeaveGrantRemainingData.getDetails().getUsedNumber().getLeaveOverLimitNumber().get()
+									.add(new LeaveOverNumber(diff, time));
+						}else{
+							specialLeaveGrantRemainingData.getDetails().getUsedNumber()
+									.setLeaveOverLimitNumber(Optional.of(new LeaveOverNumber(diff, time)));
+						}
+						
 						// 付与残数データ.残数←　付与残数データ.残数　ー　差分
-						specialLeaveGrantRemainingData.getDetails().setRemainingNumber(
+						specialLeaveGrantRemainingData.getDetails().setRemainingNumber(require, companyId, employeeId, baseDate,
 								new LeaveRemainingNumber(daysDiff, time));
 
-						// 付与残数データ.使用数.上限超過消滅日数←　付与残数データ.使用数.上限超過消滅日数　＋　差分
-						specialLeaveGrantRemainingData.getDetails().getUsedNumber().getLeaveOverLimitNumber().get()
-								.add(new LeaveOverNumber(daysDiff, time));
+
 
 					}
 				}
@@ -494,7 +506,7 @@ public class SpecialLeaveInfo implements Cloneable {
 						leaveUsedNumber,
 						companyId,
 						employeeId,
-						aggregatePeriodWork.getPeriod().start()
+						interimSpecialHolidayMng.getYmd()
 						);
 
 				// 付与残数データにダミーデータリストを追加
@@ -525,7 +537,8 @@ public class SpecialLeaveInfo implements Cloneable {
 
 				// 実特休（特休（マイナスあり））に使用数を加算する
 				this.remainingNumber.getSpecialLeaveWithMinus().addUsedNumber(
-						SpecialLeaveUseNumber.of(interimSpecialHolidayMng.getUseDays().map(x -> x.v()).orElse(0.0),interimSpecialHolidayMng.getUseTimes().map(x -> x.v()).orElse(0)),
+						SpecialLeaveUseNumber.of(interimSpecialHolidayMng.getUseDays().map(x -> x.v()).orElse(0.0),
+								interimSpecialHolidayMng.getUseTimes().map(x -> x.v()).orElse(0)),
 						grantPeriodAtr);
 
 				// 特休情報残数を更新

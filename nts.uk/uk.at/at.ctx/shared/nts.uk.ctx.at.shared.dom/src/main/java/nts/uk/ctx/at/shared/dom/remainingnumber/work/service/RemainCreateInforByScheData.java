@@ -14,5 +14,5 @@ public interface RemainCreateInforByScheData {
 	 * @param ymd 年月日
 	 * @return
 	 */
-	List<ScheRemainCreateInfor> createRemainInforNew(String sid, List<GeneralDate> dates);
+	List<ScheRemainCreateInfor> createRemainInforNew(String cid, String sid, List<GeneralDate> dates);
 }

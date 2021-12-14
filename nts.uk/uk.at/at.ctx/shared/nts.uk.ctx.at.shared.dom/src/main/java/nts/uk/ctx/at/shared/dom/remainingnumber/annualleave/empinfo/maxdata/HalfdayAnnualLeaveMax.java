@@ -1,9 +1,14 @@
 package nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata;
 
+import java.util.List;
+import java.util.Optional;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.interim.TempAnnualLeaveMngs;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.erroralarm.AnnualLeaveError;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.GrantBeforeAfterAtr;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.AnnualNumberDay;
 
 /**
@@ -157,4 +162,20 @@ public class HalfdayAnnualLeaveMax {
 				new RemainingTimes(remainingTimes.v()));
 	}
 
+	/**
+	 * 半日年休上限超過チェック
+	 * @param grantAtr　付与前、付与後の区分
+	 * @return Optional<AnnualLeaveError> 年休エラー
+	 */
+	public Optional<AnnualLeaveError>  ExcessMaxErroeCheck(GrantBeforeAfterAtr grantAtr){
+		if(!this.IsExceed()){
+			return Optional.empty();
+		}
+		
+		if(grantAtr == GrantBeforeAfterAtr.BEFORE_GRANT){
+			return Optional.of(AnnualLeaveError.EXCESS_MAX_HALFDAY_BEFORE_GRANT);
+		}else{
+			return Optional.of(AnnualLeaveError.EXCESS_MAX_HALFDAY_AFTER_GRANT);
+		}
+	}
 }

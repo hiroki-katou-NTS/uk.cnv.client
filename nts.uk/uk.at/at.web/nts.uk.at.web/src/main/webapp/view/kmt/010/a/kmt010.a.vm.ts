@@ -152,7 +152,7 @@ module nts.uk.at.view.kmt010.a {
 
         openDialogCDL023() {
             const vm = this;
-            const wkp = _.find(vm.workplaceDataSource(), w => w.id == vm.multiSelectedId());
+            const wkp = vm.findWorkPlaceById(vm.multiSelectedId());
             let params: any = {
                 code: wkp.code,
                 name: vm.workplaceName(),
@@ -228,6 +228,23 @@ module nts.uk.at.view.kmt010.a {
         goback() {
             const vm = this;
             vm.$jump("/view/kmt/011/a/index.xhtml", {screen: "KMT010"});
+        }
+
+        findWorkPlaceById(id: string): UnitModel {
+          const vm = this;
+          const workplaces = vm.flatMap(vm.workplaceDataSource());
+          return _.find(workplaces, { id: id });
+        }
+
+        flatMap(workplaces: UnitModel[]) {
+          const vm = this;
+          return _.reduce(workplaces, (acc, wkp) => {
+            if (!_.isEmpty(wkp.children)) {
+              acc = acc.concat(vm.flatMap(wkp.children));
+            }
+            acc.push(wkp);
+            return acc;
+          }, []);
         }
     }
 

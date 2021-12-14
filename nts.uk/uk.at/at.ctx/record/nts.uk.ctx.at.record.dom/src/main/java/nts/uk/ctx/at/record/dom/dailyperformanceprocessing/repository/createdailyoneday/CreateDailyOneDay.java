@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.createdailyoneday;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +19,6 @@ import nts.uk.ctx.at.shared.dom.adapter.generalinfo.dtoimport.EmployeeGeneralInf
 import nts.uk.ctx.at.shared.dom.dailyattdcal.dailyattendance.IntegrationOfDailyGetter;
 import nts.uk.ctx.at.shared.dom.dailyperformanceprocessing.output.PeriodInMasterList;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.breaking.BreakTimeOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.function.algorithm.ChangeDailyAttendance;
 import nts.uk.ctx.at.shared.dom.workrecord.workperfor.dailymonthlyprocessing.ErrorMessageInfo;
@@ -38,6 +38,8 @@ public class CreateDailyOneDay {
 	@Inject
 	private IntegrationOfDailyGetter integrationGetter;
 	
+	private static List<Integer> WORKTYPE_WORKTIME_ID = Arrays.asList(28, 29);
+	
 	/**
 	 * 
 	 * @param companyId 会社ID
@@ -55,49 +57,28 @@ public class CreateDailyOneDay {
 		//ドメインモデル「日別実績の勤務情報」を取得する (Lấy dữ liệu từ domain)
         // 日別実績の「情報系」のドメインを取得する
  		List<IntegrationOfDaily> integrationOfDailys = integrationGetter.getIntegrationOfDaily(employeeId, new DatePeriod(ymd, ymd));
- 		IntegrationOfDaily integrationOfDaily = integrationOfDailys.isEmpty() ? createNull(employeeId, ymd) : integrationOfDailys.get(0);
+ 		Optional<IntegrationOfDaily> integrationOfDaily = integrationOfDailys.stream().findFirst();
         //「勤務種類」と「実行タイプ」をチェックする
         //日別実績が既に存在しない場合OR「作成する」の場合	
  		ChangeDailyAttendance changeDailyAtt;
-        if(integrationOfDailys.isEmpty() || executionType == ExecutionTypeDaily.CREATE) {
-        	
+        if(!integrationOfDaily.isPresent() || executionType == ExecutionTypeDaily.CREATE) {
+        	//処理前の編集状態を取得
+			boolean isEditSateBefore = integrationOfDaily.isPresent() ? integrationOfDaily.get().getEditState().stream()
+					.filter(x -> WORKTYPE_WORKTIME_ID.contains(x.getAttendanceItemId())).findFirst().map(x -> true)
+					.orElse(false) : false;
+
         	//日別実績を作成する 
 			OutputCreateDailyOneDay outputCreate = createDailyResults.createDailyResult(companyId, employeeId, ymd,
 					executionType, employeeGeneralInfoImport, periodInMasterList, integrationOfDaily);
         	listErrorMessageInfo.addAll(outputCreate.getListErrorMessageInfo());
-        	integrationOfDaily = outputCreate.getIntegrationOfDaily();
-        	changeDailyAtt = new ChangeDailyAttendance(true, true, true, false, ScheduleRecordClassifi.RECORD, false);
+        	integrationOfDaily = Optional.of(outputCreate.getIntegrationOfDaily());
+        	changeDailyAtt = new ChangeDailyAttendance(true, true, true, isEditSateBefore, ScheduleRecordClassifi.RECORD, false);
         } else { 
         	
         	changeDailyAtt = new ChangeDailyAttendance(false, false, false, false, ScheduleRecordClassifi.RECORD, false);
         }
         
-		return new OutputCreateDailyOneDay( listErrorMessageInfo,integrationOfDaily,new ArrayList<>(),changeDailyAtt);
+		return new OutputCreateDailyOneDay( listErrorMessageInfo, integrationOfDaily.get(), new ArrayList<>(), changeDailyAtt);
 		
 	}
-	
-	private IntegrationOfDaily createNull(String sid, GeneralDate dateData) {
-		
-		return new IntegrationOfDaily(
-				sid,
-				dateData,
-				null, 
-				null, 
-				null,
-				Optional.empty(), 
-				new ArrayList<>(), 
-				Optional.empty(), 
-				new BreakTimeOfDailyAttd(), 
-				Optional.empty(), 
-				Optional.empty(), 
-				Optional.empty(), 
-				Optional.empty(), 
-				Optional.empty(), 
-				Optional.empty(), 
-				new ArrayList<>(),
-				Optional.empty(),
-				new ArrayList<>(),
-				Optional.empty());
-	}
-
 }

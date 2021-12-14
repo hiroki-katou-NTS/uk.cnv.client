@@ -12,6 +12,8 @@ import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensLeaveC
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensLeaveEmSetRepository;
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensatoryLeaveComSetting;
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensatoryLeaveEmSetting;
+import nts.uk.ctx.at.shared.dom.vacation.setting.sixtyhours.Com60HourVacation;
+import nts.uk.ctx.at.shared.dom.vacation.setting.sixtyhours.Com60HourVacationRepository;
 import nts.uk.ctx.at.shared.dom.vacation.setting.subst.ComSubstVacation;
 import nts.uk.ctx.at.shared.dom.vacation.setting.subst.ComSubstVacationRepository;
 import nts.uk.ctx.at.shared.dom.vacation.setting.subst.EmpSubstVacation;
@@ -34,6 +36,9 @@ public class AbsenceTenProcessCommon {
 
 	@Inject
 	private ComSubstVacationRepository comSubstVacationRepository;
+	
+	@Inject
+    private Com60HourVacationRepository com60HourVacationRepo;
 
 	/**
 	 * 10-2.代休の設定を取得する
@@ -73,11 +78,13 @@ public class AbsenceTenProcessCommon {
 	 * @return
 	 */
 	public SixtyHourSettingOutput getSixtyHourSetting(String companyId, String employeeId, GeneralDate baseDate) {
-		// TODO fix data algorithm
-		if (employeeId.equals("a9822333-49ea-4302-aba2-5adc10ae7618")) {
-			return new SixtyHourSettingOutput(false, 0);
-		}
-		return new SixtyHourSettingOutput(true, 2);
+	    Com60HourVacation com60HourVacation = com60HourVacationRepo.findById(companyId).orElse(null);
+	    SixtyHourSettingOutput super60HLeaveMng = new SixtyHourSettingOutput(
+                com60HourVacation != null && com60HourVacation.isManaged(),
+                com60HourVacation == null ? null : com60HourVacation.getSetting().getDigestiveUnit().value
+        );
+	    
+	    return super60HLeaveMng;
 	}
 
 	public class RequireImp implements GetSettingCompensaLeave.Require, SettingSubstituteHolidayProcess.Require {

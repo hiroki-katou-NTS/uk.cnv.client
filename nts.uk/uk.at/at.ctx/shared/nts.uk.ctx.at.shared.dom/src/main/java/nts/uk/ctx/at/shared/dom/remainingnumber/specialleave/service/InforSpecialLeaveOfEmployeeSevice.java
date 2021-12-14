@@ -65,7 +65,7 @@ public class InforSpecialLeaveOfEmployeeSevice {
 		GrantDaysInforByDates grantDayInfors = getGrantDays(require, cacheCarrier, cid, sid,
 				complileDate, specialHoliday, leaverBasicInfo);
 		// 「付与日数一覧」の件数をチェックする
-		int upLimiDays = specialHoliday.getGrantRegular().getLimitAccumulationDays();
+		int upLimiDays = specialHoliday.getGrantRegular().getLimitCarryoverDays();
 
 		if(grantDayInfors == null || grantDayInfors.getNextSpecialLeaveGrant().isEmpty()) {
 			// 状態：「付与なし」を返す

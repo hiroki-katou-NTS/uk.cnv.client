@@ -103,4 +103,8 @@ public class FlexTime implements Cloneable{
 	public FlexTime clone() {
 		return new FlexTime(flexTime.clone(), new AttendanceTime(beforeApplicationTime.v()));
 	}
+	
+	public AttendanceTime getFlexOverTime() {
+			return new AttendanceTime(this.getFlexTime().getTime().v());
+	}
 }

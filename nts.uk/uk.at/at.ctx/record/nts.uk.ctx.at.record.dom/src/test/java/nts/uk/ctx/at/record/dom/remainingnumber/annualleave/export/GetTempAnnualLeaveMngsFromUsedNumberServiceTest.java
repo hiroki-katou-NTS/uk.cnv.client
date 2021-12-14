@@ -277,7 +277,7 @@ public class GetTempAnnualLeaveMngsFromUsedNumberServiceTest {
 				TempAnnualLeaveMngs.of("000001","900001", GeneralDate.ymd(2020, 10, 16), CreateAtr.RECORD, RemainType.ANNUAL, RemainAtr.SINGLE, new WorkTypeCode("1"), new TempAnnualLeaveUsedNumber(1.0, null), Optional.ofNullable(DigestionHourlyTimeType.of(false, Optional.of(AppTimeType.OFFWORK))) ),
 				TempAnnualLeaveMngs.of("000001","900001", GeneralDate.ymd(2020, 10, 17), CreateAtr.RECORD, RemainType.ANNUAL, RemainAtr.SINGLE, new WorkTypeCode("1"), new TempAnnualLeaveUsedNumber(1.0, null), Optional.ofNullable(DigestionHourlyTimeType.of(false, Optional.of(AppTimeType.OFFWORK))) ),
 				TempAnnualLeaveMngs.of("000001","900001", GeneralDate.ymd(2020, 10, 18), CreateAtr.RECORD, RemainType.ANNUAL, RemainAtr.SINGLE, new WorkTypeCode("1"), new TempAnnualLeaveUsedNumber(1.0, null), Optional.ofNullable(DigestionHourlyTimeType.of(false, Optional.of(AppTimeType.OFFWORK))) ),
-				TempAnnualLeaveMngs.of("000001","900001", GeneralDate.ymd(2020, 10, 19), CreateAtr.RECORD, RemainType.ANNUAL, RemainAtr.SINGLE, new WorkTypeCode("1"), new TempAnnualLeaveUsedNumber(0.0, 120), Optional.ofNullable(DigestionHourlyTimeType.of(false, Optional.of(AppTimeType.OFFWORK)))) );
+				TempAnnualLeaveMngs.of("000001","900001", GeneralDate.ymd(2020, 10, 19), CreateAtr.RECORD, RemainType.ANNUAL, RemainAtr.SINGLE, new WorkTypeCode("1"), new TempAnnualLeaveUsedNumber(null, 120), Optional.ofNullable(DigestionHourlyTimeType.of(false, Optional.of(AppTimeType.OFFWORK)))) );
 	}
 
 	// 暫定年休管理データ
@@ -296,6 +296,6 @@ public class GetTempAnnualLeaveMngsFromUsedNumberServiceTest {
 		return Arrays.asList(
 				TempAnnualLeaveMngs.of("000001","900001", GeneralDate.ymd(2020, 10, 16), CreateAtr.RECORD, RemainType.ANNUAL, RemainAtr.SINGLE, new WorkTypeCode("1"), new TempAnnualLeaveUsedNumber(1.0, null),  Optional.ofNullable(DigestionHourlyTimeType.of(false, Optional.of(AppTimeType.OFFWORK)))),
 				TempAnnualLeaveMngs.of("000001","900001", GeneralDate.ymd(2020, 10, 16), CreateAtr.RECORD, RemainType.ANNUAL, RemainAtr.SINGLE, new WorkTypeCode("1"), new TempAnnualLeaveUsedNumber(0.5, null),  Optional.ofNullable(DigestionHourlyTimeType.of(false, Optional.of(AppTimeType.OFFWORK)))),
-				TempAnnualLeaveMngs.of("000001","900001", GeneralDate.ymd(2020, 10, 17), CreateAtr.RECORD, RemainType.ANNUAL, RemainAtr.SINGLE, new WorkTypeCode("1"), new TempAnnualLeaveUsedNumber(0.0, 60),  Optional.ofNullable(DigestionHourlyTimeType.of(false, Optional.of(AppTimeType.OFFWORK)))));
+				TempAnnualLeaveMngs.of("000001","900001", GeneralDate.ymd(2020, 10, 17), CreateAtr.RECORD, RemainType.ANNUAL, RemainAtr.SINGLE, new WorkTypeCode("1"), new TempAnnualLeaveUsedNumber(null, 60),  Optional.ofNullable(DigestionHourlyTimeType.of(false, Optional.of(AppTimeType.OFFWORK)))));
 	}
 }

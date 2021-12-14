@@ -34,20 +34,20 @@ public class TotalCountDay {
 	private int predeterminedDay;	
 	
 	/** The all day count. */
-	public List<Integer> allDayCount = new ArrayList<>();
+	public List<String> allDayCount = new ArrayList<>();
 	
 	/**
 	 * Inits all day count.
 	 */
 	public void initAllDayCount() {
-		allDayCount.add(predeterminedDay);	// 所定日数
-		allDayCount.add(holidayDay);		// 休日日数
-		allDayCount.add(offDay);			// 休出日数
-		allDayCount.add(yearOffUsage);		// 年休使用数
-		allDayCount.add(heavyHolDay);		// 積休使用数
-		allDayCount.add(specialHoliday);	// 特休日数
-		allDayCount.add(absenceDay);		// 欠勤日数
-		allDayCount.add(lateComeDay);		// 遅刻回数
-		allDayCount.add(earlyLeaveDay);		// 早退回数
+		allDayCount.add(predeterminedDay + "日");	// 所定日数
+		allDayCount.add(holidayDay + "日");			// 休日日数
+		allDayCount.add(offDay + "日");				// 休出日数
+		allDayCount.add(yearOffUsage + "日");		// 年休使用数
+		allDayCount.add(heavyHolDay + "日");			// 積休使用数
+		allDayCount.add(specialHoliday + "日");		// 特休日数
+		allDayCount.add(absenceDay + "日");			// 欠勤日数
+		allDayCount.add(lateComeDay + "回");			// 遅刻回数
+		allDayCount.add(earlyLeaveDay + "回");		// 早退回数
 	}
 }

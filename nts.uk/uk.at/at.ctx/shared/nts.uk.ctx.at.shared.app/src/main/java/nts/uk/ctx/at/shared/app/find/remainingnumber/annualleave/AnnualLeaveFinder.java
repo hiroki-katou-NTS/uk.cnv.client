@@ -139,7 +139,7 @@ public class AnnualLeaveFinder implements PeregFinder<AnnualLeaveDto> {
 		Map<String, List<AnnualLeaveEmpBasicInfo>> basicInfoOptLst = annLeaBasicInfoRepo.getAll( cid, sids).stream().collect(Collectors.groupingBy(c -> c.getEmployeeId()));
 		
 		// 年休上限データ
-		Map<String, List<AnnualLeaveMaxData>> maxDataOptLst =  maxDataRepo.getAll(cid, sids).stream().collect(Collectors.groupingBy(c -> c.getEmployeeId()));
+		Map<String, List<AnnualLeaveMaxData>> maxDataOptLst =  maxDataRepo.getAll(sids).stream().collect(Collectors.groupingBy(c -> c.getEmployeeId()));
 		
 		// 積立年休残数
 		Map<String, List<ReserveLeaveGrantRemainingData>> rervLeaveDataList = rervLeaDataRepo.getAll(cid, sids).stream().collect(Collectors.groupingBy(c -> c.getEmployeeId()));
@@ -226,7 +226,7 @@ public class AnnualLeaveFinder implements PeregFinder<AnnualLeaveDto> {
 				.collect(Collectors.groupingBy(c -> c.getEmployeeId()));
 
 		// 年休上限データ
-		Map<String, List<AnnualLeaveMaxData>> maxDataOptLst = maxDataRepo.getAll(cid, sids).stream()
+		Map<String, List<AnnualLeaveMaxData>> maxDataOptLst = maxDataRepo.getAll(sids).stream()
 				.collect(Collectors.groupingBy(c -> c.getEmployeeId()));
 
 		// 積立年休残数

@@ -56,8 +56,8 @@ public interface SyEmployeePub {
 	 */
 	// RequestList126
 	List<EmployeeBasicInfoExport> findBySIds(List<String> sIds);
-	
-	
+
+
 	/** Get list employees in the workplace by baseDate and employeeID
 	 * @param sid
 	 * @param baseDate
@@ -65,17 +65,17 @@ public interface SyEmployeePub {
 	 */
 	//  RequestList #243
 	List<String> GetListSid(String sid , GeneralDate baseDate);
-	
-	
+
+
 	/**
-	 * Get List EmployeeCode 
+	 * Get List EmployeeCode
 	 * @param sid
 	 * @param basedate
 	 * @return
 	 */
 	// RequestList #212
 	List<String> getEmployeeCode(String sid , GeneralDate basedate);
-	
+
 	/**
 	 * Gets the sdata mng info.
 	 *
@@ -84,17 +84,25 @@ public interface SyEmployeePub {
 	 */
 	// Redmine #87534
 	Optional<EmployeeDataMngInfoExport> getSdataMngInfo(String sid);
-	
+
 	/**
-	 * 
+	 *
 	 * 削除されていない社員を取得
-	 * 
+	 *
 	 * @param companyId
 	 * @param employeeCode
 	 * @return
 	 */
 	Optional<EmployeeDataMngInfoExport> getSdataMngInfoByEmployeeCode(String companyId, String employeeCode);
-	
+
+	/**
+	 * 社員コードから社員データ管理情報を取得する
+	 * @param companyId 会社ID
+	 * @param employeeCodes 社員コード(List)
+	 * @return 社員データ管理情報(List)
+	 */
+	List<EmployeeDataMngInfoExport> findSdataMngInfoByEmployeeCodes(String companyId, List<String> employeeCodes);
+
 	/**
 	 * Find by emp ids.
 	 * 社員ID（List）から社員コードと表示名を取得
@@ -103,8 +111,8 @@ public interface SyEmployeePub {
 	 */
 	// RequestList228
 	List<EmployeeInfoExport> getByListSid(List<String> sIds);
-	
-	
+
+
 	/**
 	 * Get List EmployeeId By WorkPlace and Employment and TemporaryLeaveAbsenceHistory
 	 * @param sIds
@@ -112,7 +120,7 @@ public interface SyEmployeePub {
 	 */
 	// RequestList335
 	List<String> getListEmpByWkpAndEmpt(List<String> wkps , List<String> lstempts , DatePeriod dateperiod);
-	
+
 	/**
 	 * Get List EmployeeId By CompanyId
 	 * @param sIds
@@ -120,7 +128,7 @@ public interface SyEmployeePub {
 	 */
 	// RequestList52
 	List<EmpOfLoginCompanyExport> getListEmpOfLoginCompany(String cid);
-	
+
 	/**
 	 * Find by emp id.
 	 *
@@ -129,22 +137,22 @@ public interface SyEmployeePub {
 	 */
 	// RequestList377
 	EmployeeBasicExport getEmpBasicBySId(String sId);
-	
+
 	/**
-	 * RequestList 
+	 * RequestList
 	 * @param sid
 	 * @return status of Employee
 	 */
 	StatusOfEmployeeExport getStatusOfEmployee(String sid);
-	
+
 	/**
-	 * 社員が削除されたかを取得			
+	 * 社員が削除されたかを取得
 	 * RequestList248
 	 * @param sid
 	 * @return
 	 */
 	boolean isEmployeeDelete(String sid);
-	
+
 	/**
 	 * 社員ID(List)から個人社員基本情報を取得
 	 * @param lstSid
@@ -152,7 +160,7 @@ public interface SyEmployeePub {
 	 */
 	// RequestList61
 	List<EmpInfoExport> getEmpInfo(List<String> lstSid);
-	
+
 	/**
 	 * 期間内に特定の職場（List）に所属している社員一覧を取得
 	 * RequestList462, RequestList466 trỏ đến RequestList462
@@ -161,7 +169,7 @@ public interface SyEmployeePub {
 	 * @return list sid đang làm việc
 	 */
 	List<String> getListEmployeeId(List<String> wkpIds, DatePeriod dateperiod);
-	
+
 	/**
 	 * Find by S id and company id.
 	 *
@@ -170,20 +178,20 @@ public interface SyEmployeePub {
 	 * @return the employee basic info export
 	 */
 	EmployeeBasicInfoExport findBySIdAndCompanyId(String sId, String comanpyId);
-	
+
 	/**
 	 * 職位ID（List）と基準日から該当する社員一覧を取得する
 	 * RequestList515, RequestList466 trỏ đến RequestList515
 	 */
 	List<String> getListEmployee(List<String> jobTitleIds, GeneralDate baseDate);
-	
+
 	/**
 	 * RequestList101
 	 * @param cid
 	 * @param pid
 	 */
 	Optional<EmpInfoRegistered> getEmpInfo(String cid, String pid);
-	
+
 	/**
 	 * Gets the sid cd pname by S ids.
 	 *
@@ -192,7 +200,7 @@ public interface SyEmployeePub {
 	 */
 	// RequestList126-2
 	List<EmployeIdCdPnameExport> getSidCdPnameBySIds(List<String> sIdsInput);
-	
+
 	/**
 	 * RequestList546
 	 * 会社IDから使用する休業枠（休職を除く）を取得する
@@ -200,7 +208,7 @@ public interface SyEmployeePub {
 	 * @return
 	 */
 	List<TempAbsenceFrameExport> getTempAbsenceFrameByCid(String cid);
-	
+
 	/**
 	 * [RQ614]社員CD、ビジネスネーム、カナから検索キーワードをもとに社員IDを取得する
 	 */
@@ -212,17 +220,17 @@ public interface SyEmployeePub {
 	 * @return
 	 */
 	List<ResultRequest596Export> getEmpDeletedLstBySids(List<String> sids);
-	
+
 	/**
 	 * RequestList600 社員ID（List）から社員コードと表示名を取得（削除社員考慮）
 	 * @param sids - 社員一覧　：　List＜社員ID＞
 	 * @param isDelete - 削除社員を取り除く：boolean
-	 * @param period -  期間：期間 
+	 * @param period -  期間：期間
 	 * @param isGetAffCompany - 会社に所属していない社員を取り除く：boolean
 	 * @return
 	 */
 	List<ResultRequest600Export> getEmpInfoLstBySids(List<String> sids, DatePeriod period, boolean isDelete, boolean isGetAffCompany);
-	
+
 	/**
 	 * RequestList493
 	 * 社員（List）と期間から１日でも在職している社員を取得する
@@ -231,7 +239,7 @@ public interface SyEmployeePub {
 	 * @return
 	 */
 	List<String> filterSidLstByDatePeriodAndSids(List<String> sids, DatePeriod period);
-	
+
 	/**
 	 * 期間内に特定の会社に所属している社員一覧を取得する
 	 * @param cid
@@ -239,11 +247,11 @@ public interface SyEmployeePub {
 	 * @return
 	 */
 	List<String> filterSidByCidAndPeriod(String cid, DatePeriod period);
-	
+
 	Map<String, String> getAllSidAndScdBySids(List<String> sid);
-	
+
 	/**
-	 * 
+	 *
 	 * 社員IDから個人社員基本情報を取得
 	 * @param sid
 	 * @return
@@ -252,13 +260,13 @@ public interface SyEmployeePub {
 
 	/**
 	 * request list 515
-	 * 
+	 *
 	 * @param sid
 	 * @return
 	 */
 	List<EmployeeDataMngInfoExport> findBySidNotDel(List<String> sids);
-	
+
 	List<ResultRequest596Export> getEmpNotDeletedLstBySids(List<String> sids);
-	
+
 	Optional<EmployeeDataMngInfoExport> findByScdNotDel(String employeeCd, String companyId);
 }

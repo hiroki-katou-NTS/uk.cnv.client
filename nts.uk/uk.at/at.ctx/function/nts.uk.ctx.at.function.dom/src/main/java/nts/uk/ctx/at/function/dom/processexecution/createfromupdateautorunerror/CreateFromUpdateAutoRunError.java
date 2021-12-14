@@ -62,6 +62,7 @@ public class CreateFromUpdateAutoRunError {
 						.displaySId(sid)
 						.displayAtr(1) // 上長
 						.subEmployeeIds(Collections.emptyList()) //#116503
+						.noErrEmployeeIds(Collections.emptyList())
 						.patternCode(Optional.empty())
 						.patternName(Optional.empty())
 						.linkUrl(Optional.empty())

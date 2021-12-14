@@ -51,7 +51,6 @@ import nts.uk.ctx.at.shared.dom.dailyperformanceprocessing.output.MasterList;
 import nts.uk.ctx.at.shared.dom.dailyperformanceprocessing.output.PeriodInMasterList;
 import nts.uk.ctx.at.shared.dom.employeeworkway.businesstype.employee.BusinessTypeOfEmployeeHis;
 import nts.uk.ctx.at.shared.dom.employeeworkway.businesstype.employee.BusinessTypeOfEmployeeService;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.InterimRemainDataMngRegisterDateChange;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.BaseAutoCalSetting;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.enums.UseAtr;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.primitives.BonusPaySettingCode;
@@ -127,9 +126,6 @@ public class CreateDailyResultDomainServiceNew {
 	private RecSpecificDateSettingAdapter recSpecificDateSettingAdapter;
 
 	@Inject
-	private InterimRemainDataMngRegisterDateChange interimRemainDataMngRegisterDateChange;
-
-	@Inject
 	private EmployeeRecordAdapter employeeRecordAdapter;
 
 	@Inject
@@ -153,21 +149,15 @@ public class CreateDailyResultDomainServiceNew {
 	 * ③日別実績の作成処理
 	 *  (search : 日別作成Mgrクラス .アルゴリズム)
 	 * 
-	 * @param companyId
-	 *            会社ID
-	 * @param listEmployeeId
-	 *            社員ID<List>
-	 * @param period
-	 *            期間
-	 * @param empCalAndSumExeLogId
-	 *            就業計算と集計実行ログ
-	 * @param executionAttr
-	 *            再作成区分 : 手動 - 自動
-	 * @param executionType
-	 *            実行タイプ （作成する、打刻反映する、実績削除する）
-	 * @param checkLock
-	 *            ロック中の計算/集計できるか(true,false)
+	 * @param companyId 会社ID
+	 * @param listEmployeeId 社員ID<List>
+	 * @param period 期間
+	 * @param empCalAndSumExeLogId 就業計算と集計実行ログ
+	 * @param executionAttr 再作成区分 : 手動 - 自動
+	 * @param executionType 実行タイプ （作成する、打刻反映する、実績削除する）
+	 * @param checkLock ロック中の計算/集計できるか(true,false)
 	 */
+	@SuppressWarnings("rawtypes")
 	public ProcessState createDailyResult(AsyncCommandHandlerContext asyncContext, List<String> emloyeeIds,
 			DatePeriod periodTime, ExecutionAttr executionAttr, String companyId,
 			ExecutionTypeDaily executionType,Optional<EmpCalAndSumExeLog> empCalAndSumExeLog, Optional<Boolean> checkLock) {
@@ -546,8 +536,8 @@ public class CreateDailyResultDomainServiceNew {
 				mapDateHistoryItem, periodInMasterList, executionType, checkLock);
 
 		// 暫定データの登録
-		this.interimRemainDataMngRegisterDateChange.registerDateChange(companyId, employeeId,
-				periodTime.datesBetween());
+//		this.interimRemainDataMngRegisterDateChange.registerDateChange(companyId, employeeId,
+//				periodTime.datesBetween());
 		if(empCalAndSumExeLog.isPresent() && cStatus.getProcessState() == ProcessState.SUCCESS ) {
 			// ログ情報（実行内容の完了状態）を更新する
 			updateExecutionStatusOfDailyCreation(employeeId, executionAttr.value, empCalAndSumExeLog.get().getEmpCalAndSumExecLogID());
@@ -768,6 +758,7 @@ public class CreateDailyResultDomainServiceNew {
 		}
 	}
 
+	//マスターデータを取得する
 	public Optional<EmployeeGeneralAndPeriodMaster> getMasterData(String companyId, String employeeId,
 			DatePeriod periodTime) {
 

@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.request.dom.application.common.service.newscreen.output.ConfirmMsgOutput;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOvertimeDetail;
 
 /**
  * Refactor5
@@ -18,10 +17,6 @@ import nts.uk.ctx.at.request.dom.application.overtime.AppOvertimeDetail;
 @NoArgsConstructor
 @Data
 public class CheckBeforeOutput {
-	/**
-	 * 時間外時間の詳細
-	 */
-	private AppOvertimeDetail appOvertimeDetail;
 	/**
 	 * 確認メッセージリスト
 	 */

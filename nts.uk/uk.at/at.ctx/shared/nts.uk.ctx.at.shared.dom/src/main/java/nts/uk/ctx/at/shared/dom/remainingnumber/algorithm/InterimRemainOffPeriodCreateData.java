@@ -89,18 +89,18 @@ public class InterimRemainOffPeriodCreateData {
 
 
 			//アルゴリズム「指定日の暫定残数管理データを作成する」
-			DailyInterimRemainMngData outPutdata = InterimRemainOffDateCreateData.createData(
+			Optional<DailyInterimRemainMngData> outPutdata = InterimRemainOffDateCreateData.createData(
 					require,
 					inputParam.getCid(),
 					inputParam.getSid(),
 					loopDate,
-					inputParam.isDayOffTimeIsUse(),
+					comHolidaySetting.getDayOffSetting().isManagedTime(),
 					dataCreate,
 					comHolidaySetting,
 					employmentHolidaySetting,
 					inputParam.getCallFunction());
-			if(outPutdata != null) {
-				dataOutput.put(loopDate, outPutdata);
+			if(outPutdata.isPresent()) {
+				dataOutput.put(loopDate, outPutdata.get());
 			}
 		}
 
@@ -193,7 +193,7 @@ public class InterimRemainOffPeriodCreateData {
 		//Input「予定」がNULLかどうかチェック
 		if(param.getScheData().isEmpty()) {
 			//(Imported)「残数作成元の勤務予定を取得する」
-			param.setScheData(require.scheRemainCreateInfor(param.getSid(), param.getDateData()));
+			param.setScheData(require.scheRemainCreateInfor(param.getCid(), param.getSid(), param.getDateData()));
 		}
 		//Input「実績」がNULLかどうかチェック
 		if(param.getRecordData().isEmpty()) {
@@ -214,16 +214,13 @@ public class InterimRemainOffPeriodCreateData {
 				param.getDateData(),
 				param.getRecordData(),
 				param.getScheData(),
-				param.getAppData(),
-				param.isDayOffTimeIsUse());
+				param.getAppData());
 		return createInterimRemainDataMng(require, cacheCarrier, createDataParam, comHolidaySetting);
 	}
 
 	public static interface RequireM4 extends RequireM1, RequireM3, InterimRemainOffDateCreateData.RequireM9 {
 
 		List<SharedSidPeriodDateEmploymentImport> employmentHistory(CacheCarrier cacheCarrier, List<String> sids , DatePeriod datePeriod);
-
-		List<RecordRemainCreateInfor> lstResultFromRecord(String sid, List<DailyResult> dailyResults);
 	}
 
 	public static interface RequireM3 extends WorkTypeIsClosedService.RequireM1 {
@@ -232,7 +229,7 @@ public class InterimRemainOffPeriodCreateData {
 	}
 
 	public static interface RequireM2 extends RequireM4 {
-		List<ScheRemainCreateInfor> scheRemainCreateInfor(String sid, DatePeriod dateData);
+		List<ScheRemainCreateInfor> scheRemainCreateInfor(String cid, String sid, DatePeriod dateData);
 
 		List<RecordRemainCreateInfor> recordRemainCreateInfor(CacheCarrier cacheCarrier, String cid, String sid, DatePeriod dateData);
 

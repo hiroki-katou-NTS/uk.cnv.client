@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.inject.Inject;
 
 import lombok.val;
 import nts.arc.layer.infra.data.DbConsts;
@@ -20,9 +19,9 @@ import nts.arc.layer.infra.data.jdbc.NtsStatement;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.gul.collection.CollectionUtil;
-import nts.uk.ctx.at.record.dom.monthly.TimeOfMonthlyRepository;
 import nts.uk.ctx.at.record.infra.entity.monthly.mergetable.KrcdtMonMergePk;
 import nts.uk.ctx.at.record.infra.entity.monthly.mergetable.KrcdtMonRemain;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.MonthlyDayoffRemainData;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.remainmerge.MonthMergeKey;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.remainmerge.RemainMerge;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.remainmerge.RemainMergeRepository;
@@ -31,7 +30,6 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.absencel
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.annualleave.AnnLeaRemNumEachMonth;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.care.CareRemNumEachMonth;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.childcare.ChildcareRemNumEachMonth;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.dayoff.MonthlyDayoffRemainData;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.reserveleave.RsvLeaRemNumEachMonth;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.specialholiday.SpecialHolidayRemainData;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureId;
@@ -43,9 +41,6 @@ import nts.uk.shr.com.time.calendar.date.ClosureDate;
  */
 @Stateless
 public class JpaRemainMerge extends JpaRepository implements RemainMergeRepository {
-
-	@Inject
-	private TimeOfMonthlyRepository timeRepo;
 
 	private static final String DELETE_BY_PK = String.join(" ", "DELETE FROM KrcdtMonRemain a ",
 			"WHERE  a.krcdtMonRemainPk.employeeId = :employeeId ",
@@ -536,7 +531,6 @@ public class JpaRemainMerge extends JpaRepository implements RemainMergeReposito
 		KrcdtMonRemain entity = this.getEntityManager().find(KrcdtMonRemain.class, key);
 		if (entity != null) {
 			remove.accept(entity);
-			this.markMonTimeDirty(entity.krcdtMonRemainPk);
 		}
 	}
 
@@ -549,7 +543,6 @@ public class JpaRemainMerge extends JpaRepository implements RemainMergeReposito
 
 		for (val entity : entitys) {
 			remove.accept(entity);
-			this.markMonTimeDirty(entity.krcdtMonRemainPk);
 		}
 	}
 
@@ -562,15 +555,9 @@ public class JpaRemainMerge extends JpaRepository implements RemainMergeReposito
 			entity.setKrcdtMonRemainPk(entityKey);
 			update.accept(entity);
 			this.getEntityManager().persist(entity);
-			markMonTimeDirty(entityKey);
 		}
 		else {
 			update.accept(entity);
-			this.markMonTimeDirty(entityKey);
 		}
-	}
-
-	private void markMonTimeDirty(KrcdtMonMergePk entityKey){
-		this.timeRepo.dirtying(() -> entityKey);
 	}
 }

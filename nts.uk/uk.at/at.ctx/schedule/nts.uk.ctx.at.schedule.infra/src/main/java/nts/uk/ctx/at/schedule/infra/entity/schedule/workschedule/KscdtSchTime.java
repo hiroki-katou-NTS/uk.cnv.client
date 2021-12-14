@@ -498,9 +498,9 @@ public class KscdtSchTime extends ContractUkJpaEntity {
 		HolidayOfDaily holidayOfDaily = new HolidayOfDaily(new AbsenceOfDaily(new AttendanceTime(absenceTime)),
 				timeDigest, yearlyReserved, substitute, overSalary, specialHoliday, annual, new TransferHolidayOfDaily(new AttendanceTime(0)));
 
-		DeductionTotalTime deductionTotalTime = DeductionTotalTime
+		DeductionTotalTime toRecordTotalTime = DeductionTotalTime
 				.of(TimeWithCalculation.sameTime(new AttendanceTime(this.brkTotalTime)), TimeWithCalculation.sameTime(AttendanceTime.ZERO), TimeWithCalculation.sameTime(AttendanceTime.ZERO));
-		BreakTimeOfDaily breakTimeOfDaily = new BreakTimeOfDaily(null, deductionTotalTime, new BreakTimeGoOutTimes(0), new AttendanceTime(0), new ArrayList<>());
+		BreakTimeOfDaily breakTimeOfDaily = new BreakTimeOfDaily(toRecordTotalTime, null, new BreakTimeGoOutTimes(0), new AttendanceTime(0), new ArrayList<>());
 
 		TemporaryTimeOfDaily temporaryTime = new TemporaryTimeOfDaily(new ArrayList<>());
 		IntervalTimeOfDaily intervalTime = IntervalTimeOfDaily.of(new AttendanceClock(0), new AttendanceTime(0));

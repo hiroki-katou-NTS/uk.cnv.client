@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import lombok.val;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.WorkInfoOfDailyAttendance;
-import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.GetEmpCanReferBySpecOrganizationService;
+import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.GetEmpCanReferService;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.GetTargetIdentifiInforService;
 /**
  * 社員を指定して同日に出勤する社員を取得する
@@ -24,7 +24,7 @@ public class GetWorkTogetherEmpOnDayBySpecEmpService {
 	 */
 	public static List<String> get(Require require, String sid, GeneralDate baseDate) {
 		val targetOrg = GetTargetIdentifiInforService.get(require, baseDate, sid);
-		val targetEmps = GetEmpCanReferBySpecOrganizationService.getListEmpID(require, baseDate, sid, targetOrg);
+		val targetEmps = GetEmpCanReferService.getByOrg(require, baseDate, sid, targetOrg);
 		val workSchedules = require.getWorkSchedule(targetEmps, baseDate);
 		val workTogetherList = workSchedules.stream()
 				.filter(workSchedule -> workSchedule.getWorkInfo().isAttendanceRate(require))
@@ -35,7 +35,7 @@ public class GetWorkTogetherEmpOnDayBySpecEmpService {
 				.collect(Collectors.toList());
 	}
 	
-	public static interface Require extends GetTargetIdentifiInforService.Require, GetEmpCanReferBySpecOrganizationService.Require, WorkInfoOfDailyAttendance.Require{
+	public static interface Require extends GetTargetIdentifiInforService.Require, GetEmpCanReferService.Require, WorkInfoOfDailyAttendance.Require{
 		/**
 		 * [R-1] 勤務予定を取得する
 		 * @param sids 社員IDリスト

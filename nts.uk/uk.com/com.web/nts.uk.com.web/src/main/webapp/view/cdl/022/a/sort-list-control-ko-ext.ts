@@ -39,7 +39,7 @@ module nts.custombinding {
             }
 
             .sortable-container .sort-row-item.ui-sortable-placeholder {
-                background-color: #007fff;
+                background-color: #fff;
                 visibility: visible !important;
             }
           </style>`;

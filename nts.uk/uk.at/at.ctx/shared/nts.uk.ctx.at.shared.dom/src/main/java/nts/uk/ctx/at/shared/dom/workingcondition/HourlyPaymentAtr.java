@@ -59,4 +59,12 @@ public enum HourlyPaymentAtr {
 		// Not found.
 		return null;
 	}
+
+	/**
+	 * 時給者か
+	 * @return 時給者である
+	 */
+	public boolean isHourlyPay() {
+		return this.equals(HOURLY_PAY);
+	}
 }

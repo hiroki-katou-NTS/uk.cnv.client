@@ -1,15 +1,12 @@
 package nts.uk.screen.at.app.query.kdp.kdp001.a;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import nts.uk.ctx.at.record.dom.stampmanagement.workplace.WorkLocation;
 import nts.uk.ctx.at.record.dom.stampmanagement.workplace.WorkLocationRepository;
-import nts.uk.shr.com.context.AppContexts;
 
 /**
  * 打刻入力の場所を取得する
@@ -27,8 +24,6 @@ public class LocationStampInput {
 
 	public LocationStampInputDto get(LocationStampInputParam param) {
 
-		String cid = AppContexts.user().companyId();
-
 		LocationStampInputDto dto = new LocationStampInputDto();
 
 		Optional<WorkLocation> optWorkLocation = locationRepository.findByCode(param.contractCode,
@@ -41,11 +36,10 @@ public class LocationStampInput {
 		WorkLocation workLocation = optWorkLocation.get();
 
 		dto.setWorkLocationName(workLocation.getWorkLocationName().toString());
-
-		List<String> workplaces = workLocation.getListWorkplace().stream().filter(x -> x.getCompanyId().equals(cid))
-				.map(m -> m.getWorkpalceId())
-				.collect(Collectors.toList());
-		dto.setWorkpalceId(workplaces);
+		
+		if (workLocation.getWorkplace().isPresent()) {
+			dto.getWorkpalceId().add(workLocation.getWorkplace().get().getWorkpalceId());
+		}
 
 		return dto;
 	}

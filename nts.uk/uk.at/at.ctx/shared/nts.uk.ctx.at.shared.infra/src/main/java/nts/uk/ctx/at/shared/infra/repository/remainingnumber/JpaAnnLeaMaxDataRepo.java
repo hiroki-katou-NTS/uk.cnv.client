@@ -95,16 +95,15 @@ public class JpaAnnLeaMaxDataRepo extends JpaRepository implements AnnLeaMaxData
 	}
 
 	@Override
-	public List<AnnualLeaveMaxData> getAll(String cid, List<String> sids) {
+	public List<AnnualLeaveMaxData> getAll(List<String> sids) {
 		List<AnnualLeaveMaxData> result = new ArrayList<>();
 		
 		CollectionUtil.split(sids, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subList -> {
-			String sql = "SELECT * FROM KRCDT_HDPAID_MAX WHERE CID = ? AND SID IN (" + NtsStatement.In.createParamsString(subList) + ")";
+			String sql = "SELECT * FROM KRCDT_HDPAID_MAX WHERE  SID IN (" + NtsStatement.In.createParamsString(subList) + ")";
 			
 			try (PreparedStatement stmt = this.connection().prepareStatement(sql)) {
-				stmt.setString( 1, cid);
 				for (int i = 0; i < subList.size(); i++) {
-					stmt.setString( 2 + i, subList.get(i));
+					stmt.setString( 1 + i, subList.get(i));
 				}
 				
 				List<AnnualLeaveMaxData> annualLeavelst = new NtsResultSet(stmt.executeQuery()).getList(r -> {
@@ -124,11 +123,11 @@ public class JpaAnnLeaMaxDataRepo extends JpaRepository implements AnnLeaMaxData
 	@Override
 	public void addAll(List<AnnualLeaveMaxData> domains) {
 		String INS_SQL = "INSERT INTO KRCDT_HDPAID_MAX (INS_DATE, INS_CCD , INS_SCD , INS_PG,"
-				+ " UPD_DATE , UPD_CCD , UPD_SCD , UPD_PG," + " SID, CID, MAX_TIMES, USED_TIMES, REMAINING_TIMES,"
+				+ " UPD_DATE , UPD_CCD , UPD_SCD , UPD_PG," + " SID, MAX_TIMES, USED_TIMES, REMAINING_TIMES,"
 				+ " MAX_MINUTES, USED_MINUTES, REMAINING_MINUTES)"
 				+ " VALUES (INS_DATE_VAL, INS_CCD_VAL, INS_SCD_VAL, INS_PG_VAL,"
 				+ " UPD_DATE_VAL, UPD_CCD_VAL, UPD_SCD_VAL, UPD_PG_VAL," 
-				+ " SID_VAL, CID_VAL, MAX_TIMES_VAL, USED_TIMES_VAL, REMAINING_TIMES_VAL,"
+				+ " SID_VAL, MAX_TIMES_VAL, USED_TIMES_VAL, REMAINING_TIMES_VAL,"
 				+ " MAX_MINUTES_VAL, USED_MINUTES_VAL,  REMAINING_MINUTES_VAL); ";
 		String insCcd = AppContexts.user().companyCode();
 		String insScd = AppContexts.user().employeeCode();
@@ -189,7 +188,7 @@ public class JpaAnnLeaMaxDataRepo extends JpaRepository implements AnnLeaMaxData
 		String UP_SQL = "UPDATE KRCDT_HDPAID_MAX SET UPD_DATE = UPD_DATE_VAL, UPD_CCD = UPD_CCD_VAL, UPD_SCD = UPD_SCD_VAL, UPD_PG = UPD_PG_VAL,"
 				+ " MAX_TIMES = MAX_TIMES_VAL , USED_TIMES = USED_TIMES_VAL, REMAINING_TIMES = REMAINING_TIMES_VAL, "
 				+ " MAX_MINUTES = MAX_MINUTES_VAL, USED_MINUTES = USED_MINUTES_VAL, REMAINING_MINUTES = REMAINING_MINUTES_VAL"
-				+ " WHERE SID = SID_VAL AND CID = CID_VAL;";
+				+ " WHERE SID = SID_VAL;";
 		String updCcd = AppContexts.user().companyCode();
 		String updScd = AppContexts.user().employeeCode();
 		String updPg = AppContexts.programId();

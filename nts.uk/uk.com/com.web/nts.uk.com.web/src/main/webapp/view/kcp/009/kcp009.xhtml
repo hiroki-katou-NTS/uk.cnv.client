@@ -10,6 +10,7 @@
 	<div data-bind="attr: {id: componentWrapperId}">
 		<div id="function-panel">
 			<table id="employ_view">
+      <tbody class="border-right">
 				<tr id="function-tr">
 					<td id="tbl_left"  class="bg-green border-left employment-tdpad">
 					<button class="btn_show_list" data-bind="text: targetBtnText, attr: {tabindex: tabIndex, id: 'btn_show_list-' + prefix()}"></button>
@@ -37,14 +38,14 @@
 							<span class="limited-label kcp009-display-content" data-bind="text: empBusinessName"></span>
 						</div>
 					</td>
-					<td class="none_border employment-tdpad"><div
+					<td class="none_border employment-tdpad" data-bind="visible: isDisplayNumberOfEmployee"><div
 							data="enable: isActivePersonalProfile" class="icon"
 							 data-bind="attr: {tabindex: tabIndex,
 											   id: 'profile-icon-'+ prefix()}"></div></td>
-					<td class="none_border em_display employment-tdpad"><div>
+					<td class="none_border em_display employment-tdpad" data-bind="visible: isDisplayNumberOfEmployee"><div>
 							<span data-bind="text: selectedNumberOfPeople"></span><span>#{i18n.getText('KCP009_1')}</span>
 						</div></td>
-					<td class="border-right employment-tdpad"><input type="search"
+					<td class="border-right employment-tdpad" data-bind="visible: isDisplayNumberOfEmployee"><input type="search"
 						class="search-input"
 						data-bind=" ntsTextEditor: {
 								value: keySearch,
@@ -71,6 +72,7 @@
 						</div>
 					</td>
 				</tr>
+      </tbody>
 			</table>
 		</div>
 		<div class="items-list" data-bind="attr: {id: 'item-list-'+ prefix()}" style="visibility: hidden;">

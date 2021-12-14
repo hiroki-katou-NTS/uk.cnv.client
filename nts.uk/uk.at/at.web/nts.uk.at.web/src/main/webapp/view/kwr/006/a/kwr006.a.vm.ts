@@ -726,7 +726,7 @@ module nts.uk.at.view.kwr006.a {
                     settingCount++;
                 }
                 if (settingCount == 0) {
-                    nts.uk.ui.dialog.alertError({ messageId: 'Msg_1167' });
+                    nts.uk.ui.dialog.alertError({ messageId: 'Msg_2309' });
                     return true;
                 }
                 return false;

@@ -12,7 +12,6 @@ import nts.uk.ctx.at.request.app.find.application.ApplicationDto;
 import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.overtime.AppOverTime;
 import nts.uk.ctx.at.request.dom.application.overtime.OvertimeAppAtr;
-import nts.uk.shr.com.context.AppContexts;
 
 @NoArgsConstructor
 public class AppOverTimeUpdateCommand {
@@ -31,9 +30,6 @@ public class AppOverTimeUpdateCommand {
 	// 勤務情報
 	public WorkInformationCommand workInfoOp;
 	
-	// 時間外時間の詳細
-	public AppOvertimeDetailCommand detailOverTimeOp;
-	
 	public ApplicationUpdateCmd application;
 	
 	public AppOverTimeUpdateCommand(
@@ -41,8 +37,7 @@ public class AppOverTimeUpdateCommand {
 			ApplicationTimeCommand applicationTime,
 			List<TimeZoneWithWorkNoCommand> breakTimeOp,
 			List<TimeZoneWithWorkNoCommand> workHoursOp,
-			WorkInformationCommand workInfoOp,
-			AppOvertimeDetailCommand detailOverTimeOp
+			WorkInformationCommand workInfoOp
 			) {
 		
 		this.overTimeClf = overTimeClf;
@@ -50,7 +45,6 @@ public class AppOverTimeUpdateCommand {
 		this.breakTimeOp = breakTimeOp;
 		this.workHoursOp = workHoursOp;
 		this.workInfoOp = workInfoOp;
-		this.detailOverTimeOp = detailOverTimeOp;
 		
 	}
 	public Application toDomainApplication(ApplicationDto applicationDto) {
@@ -72,7 +66,6 @@ public class AppOverTimeUpdateCommand {
 							Optional.of(workHoursOp.stream()
 									.map(x -> x.toDomain())
 									.collect(Collectors.toList())),
-				workInfoOp == null ? Optional.empty() : Optional.of(workInfoOp.toDomain()),
-				detailOverTimeOp == null ? Optional.empty() : Optional.of(detailOverTimeOp.toDomain(AppContexts.user().companyId(), "")));
+				workInfoOp == null ? Optional.empty() : Optional.of(workInfoOp.toDomain()));
 	}
 }

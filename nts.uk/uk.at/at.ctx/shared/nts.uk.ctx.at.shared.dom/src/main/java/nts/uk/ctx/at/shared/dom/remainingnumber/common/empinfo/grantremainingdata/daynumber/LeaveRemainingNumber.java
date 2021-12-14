@@ -5,8 +5,6 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import nts.arc.time.GeneralDate;
-import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.grantremainingdata.daynumber.AnnualLeaveUsedNumber;
-import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.interim.TempAnnualLeaveUsedNumber;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.AnnualPaidLeaveSetting;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.TimeAnnualLeaveTimeDay;
 import nts.uk.ctx.at.shared.dom.workingcondition.LaborContractTime;
@@ -132,6 +130,18 @@ public class LeaveRemainingNumber {
 			}
 		}
 	}
+	public LeaveUsedNumber digestLeaveUsedNumber(
+			RequireM3 require,
+			LeaveRemainingNumber leaveRemainNumber,
+			String companyId,
+			String employeeId,
+			GeneralDate baseDate){
+		
+		LeaveUsedNumber usedNumber = new LeaveUsedNumber(leaveRemainNumber.getDays().v(),leaveRemainNumber.getMinutesOrZero().v());
+		
+		return this.digestLeaveUsedNumber(require, usedNumber, companyId, employeeId, baseDate);
+	}
+	
 
 	/**
 	 * 休暇使用数を消化する
@@ -140,6 +150,9 @@ public class LeaveRemainingNumber {
 	 * @param companyId 会社ID
 	 * @param employeeId 社員ID
 	 * @param baseDate 基準日
+	 * 
+	 * ※戻り値は、「消化しきれない日数」を返す。
+	 * 消化後の残数は、パラメータのインスタンスをそのまま更新します。
 	 */
 	public LeaveUsedNumber digestLeaveUsedNumber(
 			RequireM3 require,
@@ -297,6 +310,18 @@ public class LeaveRemainingNumber {
 
 		// 労働条件取得
 		Optional<WorkingConditionItem> workingConditionItem(String employeeId, GeneralDate baseDate);
+	}
+	
+	public LeaveUsedNumber toLeaveUsedNumber(Optional<LeaveUsedDayNumber> stowageDays,
+			Optional<LeaveOverNumber> leaveOverLimitNumber) {
+		if (this.isShortageRemain()) {
+			return LeaveUsedNumber.of(new LeaveUsedDayNumber(0.0), Optional.empty(), stowageDays, leaveOverLimitNumber);
+		}
+
+		return LeaveUsedNumber.of(
+				new LeaveUsedDayNumber(this.getDays().v()), this.getMinutes().isPresent()
+						? Optional.of(new LeaveUsedTime(this.getMinutesOrZero().v())) : Optional.empty(),
+				stowageDays, leaveOverLimitNumber);
 	}
 
 }

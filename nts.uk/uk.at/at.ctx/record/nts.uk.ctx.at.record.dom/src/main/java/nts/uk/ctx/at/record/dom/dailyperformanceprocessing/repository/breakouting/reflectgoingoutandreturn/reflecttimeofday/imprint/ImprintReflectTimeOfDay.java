@@ -69,7 +69,7 @@ public class ImprintReflectTimeOfDay {
 				}
 				if(check) {
 					//実打刻と打刻反映する
-					return reflectActualStampAndStamp.reflect(end.get(), stamp, true, timeFrame, ymd, workTimeCode);
+					return reflectActualStampAndStamp.reflect(end.get(), stamp, true, timeFrame, ymd, workTimeCode,isStartTime);
 				}
 				
 			}else {
@@ -79,7 +79,7 @@ public class ImprintReflectTimeOfDay {
 						&& end.get().getStamp().get().getTimeDay().getTimeWithDay().get().valueAsMinutes() 
 							== stamp.getStampDateTime().clockHourMinute().valueAsMinutes()) {
 					//実打刻と打刻反映する
-					return reflectActualStampAndStamp.reflect(end.get(), stamp, false, timeFrame, ymd, workTimeCode);
+					return reflectActualStampAndStamp.reflect(end.get(), stamp, false, timeFrame, ymd, workTimeCode,isStartTime);
 				}
 			}
 			
@@ -89,7 +89,7 @@ public class ImprintReflectTimeOfDay {
 			TimeActualStamp newTimeActualStamp = new TimeActualStamp(Optional.empty(), Optional.empty(), 0, Optional.empty(), Optional.empty());
 			end = Optional.of(newTimeActualStamp);
 			//実打刻と打刻反映する
-			return reflectActualStampAndStamp.reflect(end.get(), stamp, true, timeFrame, ymd, workTimeCode);
+			return reflectActualStampAndStamp.reflect(end.get(), stamp, true, timeFrame, ymd, workTimeCode,isStartTime);
 		
 	}
 

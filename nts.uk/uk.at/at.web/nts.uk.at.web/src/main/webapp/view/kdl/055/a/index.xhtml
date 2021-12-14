@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+    <ui:composition template="../../../../master/dialog.xhtml">
+        <ui:define name="htmlHead">
+            <script>var dialogSize = { width: 720, height: 420 };</script>
+
+            <com:scriptfile set="IGNITE" />
+            <com:scriptfile path="kdl055.a.vm.js" />
+            <com:stylefile path="kdl055.a.style.css" />
+            <com:ValidatorScript>
+                nts.uk.ctx.at.shared.dom.workrule.shiftmaster.CaptureSheetName
+			</com:ValidatorScript>
+        </ui:define>
+
+        <ui:define name="content">       
+            <div id="functions-area">		
+                <!-- A1_1	 -->
+                <button tabindex="1" class="proceed" data-bind="click: intakeInput, enable: $root.errors.isEmpty">#{i18n.getText('KDL055_4')}</button>
+                <!-- A1_3    -->
+                <button tabindex="3" data-bind="click: outputExcel">#{i18n.getText('KDL055_6')}</button>
+                <!-- A1_2    -->
+                <button tabindex="2" data-bind="click: close">#{i18n.getText('KDL055_5')}</button>
+            </div>     
+            <div id="contents-area" style="overflow:hidden">               
+                <div class="table" style="margin: 30px 20px;">
+                    <!-- A2_1 -->
+                    <div class="cell col-1 valign-center" data-bind="ntsFormLabel:{ required: true }, text: $i18n('KDL055_7')"></div>
+                    <!-- A2_2 -->
+                    <div style="width: 450px;" tabindex="4" class="cell" id="file-upload" data-bind="ntsFileUpload:{
+                        filename: filename,
+                        text: 'KDL055_9',
+                        name: 'KDL055_8',
+                        aslink: false,
+                        enable: true,
+                        required: true
+                    }"></div>
+                </div>
+                <div class="mv-17">
+                    <div class="table">
+                        <!-- A3_1 -->
+                        <div class="cell col-1 valign-center" data-bind="ntsFormLabel:{}, text: $i18n('KDL055_10')"></div>
+                        <div class="cell valign-center">
+                            <!-- A3_2 -->
+                            <div style="width: 195px;" tabindex="5" data-bind="ntsCheckBox: { 
+                                checked: scheduleImport.captureCheckSheet, 
+                                text: $i18n('KDL055_11'), 
+                                enable: isEnable }"></div>
+                                <!-- A3_3 -->
+                            <input style="width: 190px;" tabindex="6" data-bind="ntsTextEditor: {
+                                value: scheduleImport.captureSheet, 
+                                enable: isEnable &amp;&amp; scheduleImport.captureCheckSheet, 
+                                constraint: 'CaptureSheetName', 
+                                name:  $i18n('KDL055_13'), 
+                                option: {
+                                    width: '190px', 
+                                    placeholder: $i18n('KDL055_31')
+                                }}" />
+                        </div>
+                    </div>
+                    <div class="table">
+                        <div class="cell col-1 valign-center"></div>
+                        <!-- A3_2_1 -->
+                        <div class="cell valign-center" data-bind="text: $i18n('KDL055_12')"></div>
+                    </div>
+                </div>
+                <div class="mv-17">
+                    <div class="table">
+                        <!-- A4_1 -->
+                        <div class="cell col-1 valign-center" data-bind="ntsFormLabel:{}, text: $i18n('KDL055_14')"></div>
+                        <div class="cell valign-center">
+                            <!-- A4_2 -->
+                            <div style="width: 195px;" tabindex="7" data-bind="ntsCheckBox: { 
+                                checked: scheduleImport.captureCheckCell, 
+                                text: $i18n('KDL055_15'), 
+                                enable: isEnable }"></div>
+                                <!-- A4_3 -->
+                            <input style="width: 40px;" tabindex="8" data-bind="ntsTextEditor: {
+                                value: scheduleImport.captureCell, 
+                                enable: isEnable &amp;&amp; scheduleImport.captureCheckCell, 
+                                name: $i18n('KDL055_17'), 
+                                option: {
+                                    placeholder: $i18n('KDL055_19')
+                                }}" />
+                        </div>
+                    </div>
+                    <div class="table">
+                        <div class="cell col-1 valign-center"></div>
+                        <!-- A4_2_1 -->
+                        <div class="cell valign-center" data-bind="text: $i18n('KDL055_16')"></div>
+                    </div>
+                </div>
+                <div class="table mv-17">
+                    <!-- A5_1 -->
+                    <div class="cell col-1 valign-center" data-bind="ntsFormLabel:{}, text: $i18n('KDL055_18')"></div>
+                    <!-- A5_2 -->
+                    <div tabindex="9" id="overwrite" class="cell valign-center" data-bind="ntsSwitchButton: {
+                        name: $i18n('KDL055_18'),
+                        options: overwriteOptions,
+                        optionsValue: 'overwrite',
+                        optionsText: 'name',
+                        value: scheduleImport.overwrite, 
+                        enable: isEnable}"></div>
+                </div>
+            </div>           
+        </ui:define>
+    </ui:composition>
+</body>
+</html>

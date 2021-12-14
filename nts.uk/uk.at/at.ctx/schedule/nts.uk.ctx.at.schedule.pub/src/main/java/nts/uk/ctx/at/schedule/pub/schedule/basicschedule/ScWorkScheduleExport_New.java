@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nts.arc.time.GeneralDate;
+import nts.uk.ctx.at.schedule.pub.schedule.workschedule.BreakTimeSheetExport;
 import nts.uk.shr.com.time.TimeWithDayAttr;
 
 @AllArgsConstructor
@@ -45,5 +46,8 @@ public class ScWorkScheduleExport_New {
 	
 	// 短時間勤務時間帯
 	private List<ShortWorkingTimeSheetExport> listShortWorkingTimeSheetExport = new ArrayList<>();
+	
+	// 休憩時間帯時間帯
+	private List<BreakTimeSheetExport> listBreakTimeSheetExports = new ArrayList<BreakTimeSheetExport>();
 		
 }

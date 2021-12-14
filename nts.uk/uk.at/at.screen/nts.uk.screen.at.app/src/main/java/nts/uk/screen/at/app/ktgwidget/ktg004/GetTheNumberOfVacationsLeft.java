@@ -24,6 +24,7 @@ import nts.uk.ctx.at.shared.dom.adapter.employment.EmploymentHistShareImport;
 import nts.uk.ctx.at.shared.dom.adapter.employment.ShareEmploymentAdapter;
 import nts.uk.ctx.at.shared.dom.adapter.employment.SharedSidPeriodDateEmploymentImport;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
+import nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeOfExistMinus;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.AbsenceReruitmentMngInPeriodQuery;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.interim.InterimAbsMng;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.interim.InterimRecAbasMngRepository;
@@ -281,7 +282,7 @@ public class GetTheNumberOfVacationsLeft {
 					new RemainingDaysAndTimeDto(
 							inPeriodOfSpecialLeave.getAsOfPeriodEnd()
 							.getRemainingNumber().getSpecialLeaveWithMinus().getRemainingNumberInfo()
-							.getRemainingNumberBeforeGrant().getDayNumberOfRemain().v(), new AttendanceTime(0)),
+							.getRemainingNumberBeforeGrant().getDayNumberOfRemain().v(), new AttendanceTimeOfExistMinus(0)),
 					specialHoliday.getSpecialHolidayCode().v(),
 					specialHoliday.getSpecialHolidayName().v()));
 		}

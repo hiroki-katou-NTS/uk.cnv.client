@@ -5,6 +5,7 @@
 package nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -12,6 +13,10 @@ import lombok.Getter;
 import nts.arc.layer.dom.AggregateRoot;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
+import nts.uk.ctx.at.shared.dom.workingcondition.LaborContractTime;
+import nts.uk.ctx.at.shared.dom.yearholidaygrant.LimitedHalfHdCnt;
+import nts.uk.ctx.at.shared.dom.yearholidaygrant.LimitedTimeHdDays;
+import nts.uk.ctx.at.shared.dom.yearholidaygrant.LimitedTimeHdTime;
 
 /**
  * The Class AnnualVacationSetting.
@@ -84,23 +89,67 @@ public class AnnualPaidLeaveSetting extends AggregateRoot implements Serializabl
 		memento.setManageAnnualSetting(this.manageAnnualSetting);
 		memento.setTimeSetting(this.timeSetting);
 	}
-	
+
 	/**
 	 * 期限日計算
-	 * @param grantDate 付与日
+	 * 
+	 * @param grantDate
+	 *            付与日
 	 * @return 期限日
 	 */
 	// 2018.7.24 add shuichi_ishida
-	public GeneralDate calcDeadline(GeneralDate grantDate){
-		
+	public GeneralDate calcDeadline(GeneralDate grantDate) {
+
 		// 保持年数を取得
 		int retentionYear = this.manageAnnualSetting.getRemainingNumberSetting().retentionYear.v();
-		
+
 		// 期限日を計算する
-		if (grantDate.after(GeneralDate.max().addYears(-retentionYear))) return GeneralDate.max();
+		if (grantDate.after(GeneralDate.max().addYears(-retentionYear)))
+			return GeneralDate.max();
 		GeneralDate deadline = grantDate.addYears(retentionYear).addDays(-1);
-		
+
 		// 期限日を返す
 		return deadline;
 	}
+	/**
+	 * [6]時間年休上限日数を取得する
+	 * @param fromGrantTableDays
+	 * @return
+	 */
+	public Optional<LimitedTimeHdDays> getLimitedTimeHdDays(Optional<LimitedTimeHdDays> fromGrantTableDays) {
+		if (!this.isManaged())
+			return Optional.empty();
+
+		return this.getTimeSetting().getLimitedTimeHdDays(fromGrantTableDays);
+	}
+	/**
+	 * [7] 半日年休上限回数を取得
+	 * @param fromGrantTableCount
+	 * @return
+	 */
+	public Optional<LimitedHalfHdCnt> getLimitedHalfCount(Optional<LimitedHalfHdCnt> fromGrantTableCount) {
+		if (!this.isManaged())
+			return Optional.empty();
+
+		return this.getManageAnnualSetting().getLimitedHalfCount(fromGrantTableCount);
+	}
+
+	/**
+	 * [8] 時間年休上限時間を求める
+	 * @param fromGrantTableDays
+	 * @param laborContractTimeOpt
+	 * @return
+	 */
+	public Optional<LimitedTimeHdTime> getLimitedTimeHdTime(Optional<LimitedTimeHdDays> fromGrantTableDays,
+			Optional<LaborContractTime> laborContractTimeOpt) {
+
+		Optional<LimitedTimeHdDays> limitedTimeHdDays = getLimitedTimeHdDays(fromGrantTableDays);
+		if (!limitedTimeHdDays.isPresent() || !laborContractTimeOpt.isPresent()) {
+			return Optional.empty();
+		}
+
+		return Optional.of(new LimitedTimeHdTime(limitedTimeHdDays.get().v() * laborContractTimeOpt.get().v()));
+
+	}
+
 }

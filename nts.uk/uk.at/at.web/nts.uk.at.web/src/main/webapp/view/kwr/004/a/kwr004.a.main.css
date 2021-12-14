@@ -68,3 +68,7 @@
 .w-50 {
   width: 50px;
 }
+.kwr-004 .panel .switchbox-wrappers .radio-wrapper span {
+  width: 65px;
+  text-align: center;
+}

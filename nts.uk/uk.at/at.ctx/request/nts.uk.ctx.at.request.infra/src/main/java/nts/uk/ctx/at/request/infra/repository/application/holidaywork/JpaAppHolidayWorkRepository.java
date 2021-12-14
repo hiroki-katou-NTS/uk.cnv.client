@@ -1,27 +1,25 @@
 package nts.uk.ctx.at.request.infra.repository.application.holidaywork;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 
 import nts.arc.layer.infra.data.JpaRepository;
-import nts.arc.time.GeneralDate;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.AppHolidayWork;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.AppHolidayWorkRepository;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOvertimeDetail;
 import nts.uk.ctx.at.request.dom.application.overtime.OvertimeApplicationSetting;
 import nts.uk.ctx.at.request.dom.application.overtime.ReasonDivergence;
-import nts.uk.ctx.at.request.dom.application.overtime.time36.Time36Agree;
-import nts.uk.ctx.at.request.dom.application.overtime.time36.Time36AgreeUpperLimit;
 import nts.uk.ctx.at.request.infra.entity.application.holidaywork.KrqdtAppHdWork;
-import nts.uk.ctx.at.request.infra.entity.application.holidaywork.KrqdtAppHolidayWorkPK;
 import nts.uk.ctx.at.request.infra.entity.application.holidaywork.KrqdtAppHdWorkTime;
+import nts.uk.ctx.at.request.infra.entity.application.holidaywork.KrqdtAppHolidayWorkPK;
 import nts.uk.ctx.at.request.infra.entity.application.holidaywork.KrqdtHolidayWorkInputPK;
-import nts.uk.ctx.at.request.infra.entity.application.overtime.KrqdtAppOverTimeDetM;
-import nts.uk.ctx.at.request.infra.entity.application.overtime.KrqdtAppOvertimeDetail;
-import nts.uk.ctx.at.request.infra.entity.application.overtime.KrqdtAppOvertimeDetailPk;
 import nts.uk.ctx.at.shared.dom.common.TimeZoneWithWorkNo;
 import nts.uk.ctx.at.shared.dom.workrule.outsideworktime.holidaywork.StaturoryAtrOfHolidayWork;
 import nts.uk.shr.com.context.AppContexts;
@@ -227,36 +225,6 @@ public class JpaAppHolidayWorkRepository extends JpaRepository implements AppHol
 				.collect(Collectors.toList());				
 		}
 		
-		AppOvertimeDetail appOvertimeDetail = domain.getAppOvertimeDetail().orElse(null);
-		if (appOvertimeDetail != null) {
-			Time36Agree time36Agree = appOvertimeDetail.getTime36Agree();
-			Time36AgreeUpperLimit time36AgreeUpperLimit = appOvertimeDetail.getTime36AgreeUpperLimit();
-			List<KrqdtAppOverTimeDetM> KrqdtAppOverTimeDetMs = new ArrayList<KrqdtAppOverTimeDetM>();
-			KrqdtAppOvertimeDetail krqdtAppOvertimeDetail = new KrqdtAppOvertimeDetail(
-					new KrqdtAppOvertimeDetailPk(
-							AppContexts.user().companyId(),
-							domain.getAppID()),
-					time36Agree.getApplicationTime().v(),
-					appOvertimeDetail.getYearMonth().v(),
-					time36Agree.getAgreeMonth().getActualTime().v(),
-					time36Agree.getAgreeMonth().getLimitErrorTime().v(),
-					time36Agree.getAgreeMonth().getLimitAlarmTime().v(),
-					time36Agree.getAgreeMonth().getExceptionLimitErrorTime().map(x -> x.v()).orElse(null),
-					time36Agree.getAgreeMonth().getExceptionLimitAlarmTime().map(x -> x.v()).orElse(null),
-					time36Agree.getAgreeMonth().getNumOfYear36Over().v(),
-					time36Agree.getAgreeAnnual().getActualTime().v(),
-					time36Agree.getAgreeAnnual().getLimitTime().v(),
-					time36AgreeUpperLimit.getApplicationTime().v(),
-					time36AgreeUpperLimit.getAgreeUpperLimitMonth().getOverTime().v(),
-					time36AgreeUpperLimit.getAgreeUpperLimitMonth().getUpperLimitTime().v(),
-					time36AgreeUpperLimit.getAgreeUpperLimitAverage().getUpperLimitTime().v(),
-					null,
-					null,
-					KrqdtAppOverTimeDetMs
-					);
-			entity.appOvertimeDetail = krqdtAppOvertimeDetail;
-		}
-
 		return entity;
 	}
 

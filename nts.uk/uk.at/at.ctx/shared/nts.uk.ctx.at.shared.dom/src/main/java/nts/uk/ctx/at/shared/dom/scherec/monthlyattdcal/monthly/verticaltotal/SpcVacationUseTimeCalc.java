@@ -16,7 +16,7 @@ public class SpcVacationUseTimeCalc {
 
 	/** 計算する */
 	public static AttendanceTime calc(Require require, String cid, String sid, GeneralDate baseDate,
-			WorkInformation workInfo, int spcNo, AttendanceTimeOfDailyAttendance dailyAttendance) {
+			WorkInformation workInfo, int spcNo, Optional<AttendanceTimeOfDailyAttendance> dailyAttendance) {
 		
 		/** $日単位の特別休暇使用時間 = [prv-1]日単位の使用時間を取得 */
 		val dailyUse = getUseInfoOfDaily(require, cid, sid, baseDate, workInfo, spcNo);
@@ -63,10 +63,12 @@ public class SpcVacationUseTimeCalc {
 	}
 	
 	/** 時間単位の使用時間を取得 */
-	private static AttendanceTime getUseInfoOfTime(int spcNo, AttendanceTimeOfDailyAttendance dailyAttendance) {
+	private static AttendanceTime getUseInfoOfTime(int spcNo, Optional<AttendanceTimeOfDailyAttendance> dailyAttendance) {
 		
 		/** 勤怠時間.時間特別休暇の使用時間を取得(特別休暇枠NO) */
-		return dailyAttendance.getActualWorkingTimeOfDaily().getTotalWorkingTime().getTotalTimeSpecialVacation(spcNo);
+		return dailyAttendance.map(c -> c.getActualWorkingTimeOfDaily()
+											.getTotalWorkingTime().getTotalTimeSpecialVacation(spcNo))
+				.orElse(AttendanceTime.ZERO);
 	}
 	
 	public static interface Require extends RefDesForAdditionalTakeLeave.Require {

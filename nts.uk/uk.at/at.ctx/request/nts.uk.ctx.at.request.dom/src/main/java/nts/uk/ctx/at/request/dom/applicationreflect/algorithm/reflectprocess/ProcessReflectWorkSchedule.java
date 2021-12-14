@@ -1,5 +1,6 @@
 package nts.uk.ctx.at.request.dom.applicationreflect.algorithm.reflectprocess;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -10,6 +11,7 @@ import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.PrePostAtr;
 import nts.uk.ctx.at.request.dom.application.ReflectedState;
+import nts.uk.ctx.at.request.dom.application.common.adapter.bs.dto.SEmpHistImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.scherec.convert.ConvertApplicationToShare;
 import nts.uk.ctx.at.request.dom.applicationreflect.AppReflectExecutionCondition;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.checkprocess.PreCheckProcessWorkSchedule;
@@ -28,7 +30,7 @@ public class ProcessReflectWorkSchedule {
 
 	public static Pair<ReflectStatusResult, Optional<AtomTask>> processReflect(Require require, String companyId,
 			int closureId, Application application, boolean isCalWhenLock,
-			GeneralDate targetDate, ReflectStatusResult statusWorkSchedule) {
+			GeneralDate targetDate, ReflectStatusResult statusWorkSchedule, List<SEmpHistImport> empHist) {
 
 		// [input. 処理中の申請. 事前事後区分]をチェック
 		if (application.getPrePostAtr() == PrePostAtr.POSTERIOR) {
@@ -49,13 +51,13 @@ public class ProcessReflectWorkSchedule {
 		if (appReFlectExec.get().getEvenIfScheduleConfirmed() == NotUseAtr.NOT_USE) {
 			// 事前チェック処理
 			PreCheckProcessResult preCheckProcessResult = PreCheckProcessWorkSchedule.preCheck(require, companyId,
-					application, closureId, isCalWhenLock, statusWorkSchedule, targetDate);
+					application, closureId, isCalWhenLock, statusWorkSchedule, targetDate, empHist);
 			if (preCheckProcessResult.getProcessFlag() == NotUseAtr.NOT_USE)
 				return Pair.of(statusWorkSchedule, Optional.empty());
 		}
 
 		// 勤務予定に反映
-		Pair<ReflectStatusResult, AtomTask> result = require.process(ConvertApplicationToShare.toAppliction(application), targetDate,
+		Pair<ReflectStatusResult, AtomTask> result = require.process(ConvertApplicationToShare.toAppliction(application, targetDate), targetDate,
 				statusWorkSchedule,
 				appReFlectExec.get().getApplyBeforeWorkSchedule().value);
 		return Pair.of(statusResult(result.getLeft(), statusWorkSchedule), Optional.of(result.getRight()));

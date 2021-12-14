@@ -37,6 +37,7 @@ import nts.uk.ctx.at.request.dom.application.overtime.AppOverTimeRepository;
 import nts.uk.ctx.at.request.dom.application.stamp.StampFrameNo;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeOfExistMinus;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakgoout.BreakFrameNo;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.breaking.BreakTimeSheet;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.shortworktime.ShortWorkingTimeSheet;
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSettingRepository;
@@ -192,6 +193,12 @@ public class CollectAchievementImpl implements CollectAchievement {
 					scBasicScheduleImport.getScheduleStartClock2(),
 					scBasicScheduleImport.getScheduleEndClock1(),
 					scBasicScheduleImport.getScheduleEndClock2());
+			breakTimeSheets = scBasicScheduleImport.getListBreakTimeSheetExports().stream().map(x -> {
+			    return new BreakTimeSheet(
+			            new BreakFrameNo(x.getBreakFrameNo()), 
+			            new TimeWithDayAttr(x.getStartTime()), 
+			            new TimeWithDayAttr(x.getEndTime()));
+			}).collect(Collectors.toList());
 		} else {//取得件数＝1件(số data lấy được = 1)
 			// 実績スケ区分＝日別実績 (Phân loại thực tế = Thực tế hàng ngày )
 			trackRecordAtr = TrackRecordAtr.DAILY_RESULTS;

@@ -136,6 +136,7 @@ public class RegisterWhenChangeDateHolidayShipmentCommandHandler {
 	 */
 	public ProcessResult registerProcess(String companyId, DisplayInforWhenStarting displayInforWhenStarting, AbsenceLeaveApp absNew) {
 		Optional<AbsenceLeaveApp> absOld = absenceLeaveAppRepository.findByAppId(displayInforWhenStarting.abs.application.getAppID());
+		LinkingManagementInforDto linkingManagementInfor = null;
 		// 申請の組み合わせをチェックする
 		if (displayInforWhenStarting.existRec()) {
 			Optional<RecruitmentApp> rec = recruitmentAppRepository.findByAppId(displayInforWhenStarting.rec.application.getAppID());
@@ -148,6 +149,9 @@ public class RegisterWhenChangeDateHolidayShipmentCommandHandler {
 				x.setActualReflectStatus(ReflectedState.CANCELED);
 			});
 			applicationRepository.update(absOld.get().getApplication());
+			//振出振休紐付け管理を作り直す
+	        linkingManagementInfor = this.recreateTheTieUpManagement(absNew.getAppDate().getApplicationDate(), displayInforWhenStarting.substituteManagement, displayInforWhenStarting.holidayManage, displayInforWhenStarting.abs.leaveComDayOffMana, displayInforWhenStarting.abs.payoutSubofHDManagements);
+	        
 			// 暫定データの登録
 			interimRemainDataMngRegisterDateChange.registerDateChange(
 					companyId, 
@@ -159,6 +163,9 @@ public class RegisterWhenChangeDateHolidayShipmentCommandHandler {
 				x.setActualReflectStatus(ReflectedState.CANCELED);
 			});
 			applicationRepository.update(absOld.get().getApplication());
+			//振出振休紐付け管理を作り直す
+	        linkingManagementInfor = this.recreateTheTieUpManagement(absNew.getAppDate().getApplicationDate(), displayInforWhenStarting.substituteManagement, displayInforWhenStarting.holidayManage, displayInforWhenStarting.abs.leaveComDayOffMana, displayInforWhenStarting.abs.payoutSubofHDManagements);
+	        
 			// 暫定データの登録
 			interimRemainDataMngRegisterDateChange.registerDateChange(
 					companyId, 
@@ -167,7 +174,7 @@ public class RegisterWhenChangeDateHolidayShipmentCommandHandler {
 		}
 		
 		//振出振休紐付け管理を作り直す
-		LinkingManagementInforDto linkingManagementInfor = this.recreateTheTieUpManagement(absNew.getAppDate().getApplicationDate(), displayInforWhenStarting.substituteManagement, displayInforWhenStarting.holidayManage, displayInforWhenStarting.abs.leaveComDayOffMana, displayInforWhenStarting.abs.payoutSubofHDManagements);
+//		LinkingManagementInforDto linkingManagementInfor = this.recreateTheTieUpManagement(absNew.getAppDate().getApplicationDate(), displayInforWhenStarting.substituteManagement, displayInforWhenStarting.holidayManage, displayInforWhenStarting.abs.leaveComDayOffMana, displayInforWhenStarting.abs.payoutSubofHDManagements);
 		
 		Optional<RecruitmentAppCmd> recNew = displayInforWhenStarting.existRec()?Optional.of(displayInforWhenStarting.rec):Optional.empty();
 		recNew.ifPresent(c->c.applicationInsert = new ApplicationInsertCmd(c.application.toDomain()));

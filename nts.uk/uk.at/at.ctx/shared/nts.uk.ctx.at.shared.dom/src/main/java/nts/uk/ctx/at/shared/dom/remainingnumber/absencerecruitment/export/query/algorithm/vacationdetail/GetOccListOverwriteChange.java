@@ -22,7 +22,8 @@ public class GetOccListOverwriteChange {
 			RequestChangeDigestOccr changeOcc) {
 
 		// $確定データ一覧 = require.振出管理データを取得する(社員ID, 期間)
-		val payoutMagData = require.getPayoutMana(sid);
+		val payoutMagData = require.getPayoutMana(sid).stream().filter(x -> x.isRemaing())
+				.collect(Collectors.toList());
 
 		// $暫定データ一覧 = require.暫定振出管理データを取得する(社員ID, 期間)
 		val lstTemporary = require.getRecBySidDatePeriod(sid, dateData);

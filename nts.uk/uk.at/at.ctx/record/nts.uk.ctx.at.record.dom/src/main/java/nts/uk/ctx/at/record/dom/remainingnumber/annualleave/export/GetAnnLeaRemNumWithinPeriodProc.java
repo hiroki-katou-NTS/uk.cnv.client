@@ -45,6 +45,7 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.GrantBef
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.annualleave.AttendanceRate;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.AnnualPaidLeaveSetting;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.OperationStartSetDailyPerform;
+import nts.uk.ctx.at.shared.dom.workingcondition.LaborContractTime;
 import nts.uk.ctx.at.shared.dom.workrule.closure.Closure;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureId;
 import nts.uk.ctx.at.shared.dom.workrule.closure.service.ClosureService;
@@ -242,80 +243,82 @@ public class GetAnnLeaRemNumWithinPeriodProc {
 
 		// 次回年休付与日を計算
 		List<NextAnnualLeaveGrant> nextAnnualLeaveGrantList = new ArrayList<>();
-		{
-			// 次回年休付与を計算
-			nextAnnualLeaveGrantList = CalcNextAnnualLeaveGrantDate.algorithm(
-					require, cacheCarrier,
-					companyId, employeeId, Optional.of(period.get()),
-					Optional.ofNullable(employee), annualLeaveEmpBasicInfoOpt,
-					grantHdTblSetOpt, lengthServiceTblsOpt);
 
-//			// 「出勤率計算フラグ」をチェック
-//			if (isCalcAttendanceRate){
+		nextAnnualLeaveGrantList = CalcNextAnnualLeaveGrantDate.algorithm(
+				require, cacheCarrier,
+				companyId, employeeId, Optional.of(period.get()),
+				Optional.ofNullable(employee), annualLeaveEmpBasicInfoOpt,
+				grantHdTblSetOpt, lengthServiceTblsOpt);
+		
+		// １日に相当する契約時間を取得する
+		Optional<LaborContractTime> laborContractTimeOpt
+			= LeaveRemainingNumber.getContractTime(require, companyId, employeeId, criteriaDate);
 
-				// 勤務実績によって次回年休付与を更新
-				for (val nextAnnualGrantList : nextAnnualLeaveGrantList){
-					if (!grantHdTblSetOpt.isPresent()) continue;
-					if (!lengthServiceTblsOpt.isPresent()) continue;
+		// 勤務実績によって次回年休付与を更新
+		for (val nextAnnualGrantList : nextAnnualLeaveGrantList){
+			if (!grantHdTblSetOpt.isPresent()) continue;
+			if (!lengthServiceTblsOpt.isPresent()) continue;
 
-					// 次回年休付与の付与日数を条件によって更新する
-					{
-						Optional<CalYearOffWorkAttendRate> resultRateOpt = Optional.of(new CalYearOffWorkAttendRate());
-						if(mode == InterimRemainMngMode.MONTHLY){
-						// 年休出勤率を計算する
-							resultRateOpt = CalcAnnLeaAttendanceRate.algorithm(require, cacheCarrier,
-								companyId, employeeId,
-								nextAnnualGrantList.getGrantDate(),
-								Optional.of(nextAnnualGrantList.getTimes().v()),
-								Optional.of(annualLeaveSet), Optional.of(employee), annualLeaveEmpBasicInfoOpt,
-								grantHdTblSetOpt, lengthServiceTblsOpt, operationStartSetOpt);
-						}else{
-							resultRateOpt = Optional.of(new CalYearOffWorkAttendRate(100.0,0.0,365.0,0.0));
-						}
+			// 次回年休付与の付与日数を条件によって更新する
+			Optional<CalYearOffWorkAttendRate> resultRateOpt = Optional.of(new CalYearOffWorkAttendRate());
+			if(mode == InterimRemainMngMode.MONTHLY){
+			// 年休出勤率を計算する
+				resultRateOpt = CalcAnnLeaAttendanceRate.algorithm(require, cacheCarrier,
+					companyId, employeeId,
+					nextAnnualGrantList.getGrantDate(),
+					Optional.of(nextAnnualGrantList.getTimes().v()),
+					Optional.of(annualLeaveSet), Optional.of(employee), annualLeaveEmpBasicInfoOpt,
+					grantHdTblSetOpt, lengthServiceTblsOpt, operationStartSetOpt);
+			}else{
+				resultRateOpt = Optional.of(new CalYearOffWorkAttendRate(100.0,0.0,365.0,0.0));
+			}
 
-						if (resultRateOpt.isPresent()){
-							val resultRate = resultRateOpt.get();
-							nextAnnualGrantList.setAttendanceRate(Optional.of(
-									new AttendanceRate(resultRate.getAttendanceRate())));
-							nextAnnualGrantList.setPrescribedDays(Optional.of(
-									new YearlyDays(resultRate.getPrescribedDays())));
-							nextAnnualGrantList.setWorkingDays(Optional.of(
-									new YearlyDays(resultRate.getWorkingDays())));
-							nextAnnualGrantList.setDeductedDays(Optional.of(
-									new YearlyDays(resultRate.getDeductedDays())));
+			if (!resultRateOpt.isPresent())
+				continue;
+			
+			val resultRate = resultRateOpt.get();
+			nextAnnualGrantList.setAttendanceRate(Optional.of(
+					new AttendanceRate(resultRate.getAttendanceRate())));
+			nextAnnualGrantList.setPrescribedDays(Optional.of(
+					new YearlyDays(resultRate.getPrescribedDays())));
+			nextAnnualGrantList.setWorkingDays(Optional.of(
+					new YearlyDays(resultRate.getWorkingDays())));
+			nextAnnualGrantList.setDeductedDays(Optional.of(
+					new YearlyDays(resultRate.getDeductedDays())));
 
-							// 日数と出勤率から年休付与テーブルを取得する
-							val grantConditionOpt = grantHdTblSetOpt.get().getGrantCondition(
-									resultRate.getAttendanceRate(),
-									resultRate.getPrescribedDays(),
-									resultRate.getWorkingDays(),
-									resultRate.getDeductedDays());
+			// 日数と出勤率から年休付与テーブルを取得する
+			val grantConditionOpt = grantHdTblSetOpt.get().getGrantCondition(
+					resultRate.getAttendanceRate(),
+					resultRate.getPrescribedDays(),
+					resultRate.getWorkingDays(),
+					resultRate.getDeductedDays());
 
-							if (grantConditionOpt.isPresent()){
-								val grantCondition = grantConditionOpt.get();
-								val conditionNo = grantCondition.getConditionNo();
+			if (!grantConditionOpt.isPresent()){
+				// 出勤率に応じたテーブルがない場合（出勤率が足りなくて年休が付与されないケース）
+				nextAnnualGrantList.setGrantDays(Finally.of(new LeaveGrantDayNumber(0.0)));
+				//出勤率が足りない場合は、条件NO=1のテーブルの時間年休上限、半日年休上限の情報を使用する。
+				//その為、CalcNextAnnualLeaveGrantDateにて計算した値をそのまま使用する。（ここでは何も更新しない）
+				continue;
+			}
+			
+			// 付与日数を計算
+			val grantHdTblOpt = require.grantHdTbl(companyId, grantConditionOpt.get().getConditionNo(),
+												grantTableCode, nextAnnualGrantList.getTimes().v());
 
-								// 付与日数を計算
-								val grantHdTblOpt = require.grantHdTbl(companyId, conditionNo,
-																	grantTableCode, nextAnnualGrantList.getTimes().v());
-
-								if (grantHdTblOpt.isPresent()){
-									val grantHdTbl = grantHdTblOpt.get();
-									nextAnnualGrantList.setGrantDays(Finally.of(grantHdTbl.getGrantDays().toLeaveGrantDayNumber()));
-									nextAnnualGrantList.setHalfDayAnnualLeaveMaxTimes(grantHdTbl.getLimitDayYear());
-									nextAnnualGrantList.setTimeAnnualLeaveMaxDays(grantHdTbl.getLimitTimeHd());
-								}
-							}
-							else {
-
-								// 次回年休付与．付与日数　←　0
-								nextAnnualGrantList.setGrantDays(Finally.of(new LeaveGrantDayNumber(0.0)));
-							}
-						}
-					}
-				}
-//			}
+			if (grantHdTblOpt.isPresent()){
+				val grantHdTbl = grantHdTblOpt.get();
+				nextAnnualGrantList
+						.setGrantDays(Finally.of(grantHdTbl.getGrantDays().toLeaveGrantDayNumber()));
+				nextAnnualGrantList.setHalfDayAnnualLeaveMaxTimes(
+						annualLeaveSet.getLimitedHalfCount(grantHdTbl.getLimitDayYear()));
+				nextAnnualGrantList.setTimeAnnualLeaveMaxDays(
+						annualLeaveSet.getLimitedTimeHdDays(grantHdTbl.getLimitTimeHd()));
+				nextAnnualGrantList.setTimeAnnualLeaveMaxTime(annualLeaveSet
+						.getLimitedTimeHdTime(grantHdTbl.getLimitTimeHd(), laborContractTimeOpt));
+				
+			}
 		}
+
 
 		// 年休集計期間を作成
 		List<AggregatePeriodWork> aggregateWork = createAggregatePeriod(
@@ -835,26 +838,13 @@ public class GetAnnLeaRemNumWithinPeriodProc {
 			if (isOverWriteOpt.get()){
 				if(isOverWritePeriod.isPresent()){
 
-					//上書き対象期間内の暫定年休管理データを削除(日数単位のデータ)
-					results.removeIf(x -> isOverWritePeriod.get().contains(x.getYmd()) && x.getUsedNumber().isUseDay());
+					//上書き対象期間内の暫定年休管理データを削除
+					results.removeIf(x -> isOverWritePeriod.get().contains(x.getYmd()));
 
 					// 上書き用データがある時、追加する
 					if (forOverWriteListOpt.isPresent()){
 						val overWrites = forOverWriteListOpt.get();
 						for (val overWrite : overWrites){
-
-							// 時間休暇の場合は、addする前に、時間休暇の種類を参照し、同じ種類がすでに存在する場合は削除してから上書きする。
-							if (!overWrite.getUsedNumber().isUseDay() && overWrite.getAppTimeTypeEnum().isPresent()) {
-								val sameDatas = results.stream()
-										.filter(x -> x.getYmd().equals(overWrite.getYmd())
-												&& x.getAppTimeTypeEnum().isPresent())
-										.collect(java.util.stream.Collectors.toList());
-								for (val sameData : sameDatas) {
-									if (sameData.getAppTimeTypeEnum().get()
-											.equals(overWrite.getAppTimeTypeEnum().get()))
-										results.removeIf(x -> x.getRemainManaID().equals(sameData.getRemainManaID()));
-								}
-							}
 
 							// 上書き用データを追加
 							results.add(overWrite);

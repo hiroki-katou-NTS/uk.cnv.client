@@ -11,18 +11,24 @@ import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import mockit.Expectations;
 import mockit.Injectable;
 import mockit.integration.junit4.JMockit;
-import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.WorkInformation;
-import nts.uk.ctx.at.shared.dom.common.TimeZoneWithWorkNo;
 import nts.uk.ctx.at.shared.dom.scherec.application.bussinesstrip.BusinessTripInfoShare;
-import nts.uk.ctx.at.shared.dom.scherec.application.bussinesstrip.BusinessTripShare;
+import nts.uk.ctx.at.shared.dom.scherec.application.bussinesstrip.BusinessTripWorkTime;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.PrePostAtrShare;
 import nts.uk.ctx.at.shared.dom.scherec.application.reflectprocess.common.ReflectApplicationHelper;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.businesstrip.ReflectBusinessTripApp;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.DailyRecordOfApplication;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
+import nts.uk.ctx.at.shared.dom.worktime.predset.WorkNo;
+import nts.uk.ctx.at.shared.dom.worktype.DailyWork;
+import nts.uk.ctx.at.shared.dom.worktype.WorkType;
+import nts.uk.ctx.at.shared.dom.worktype.WorkTypeClassification;
+import nts.uk.ctx.at.shared.dom.worktype.WorkTypeCode;
+import nts.uk.ctx.at.shared.dom.worktype.WorkTypeUnit;
+import nts.uk.shr.com.time.TimeWithDayAttr;
 
 /**
  * @author thanh_nx
@@ -49,6 +55,8 @@ public class ReflectBusinessTripAppTest {
 	 * →[出張勤務情報. 勤務時間帯] がない
 	 * 
 	 * →対象となる日に出張勤務情報を持っている
+	 * 
+	 * 勤務情報が同じ
 	 */
 	@Test
 	public void testNoReflectAll() {
@@ -57,8 +65,8 @@ public class ReflectBusinessTripAppTest {
 				2);
 
 		List<Integer> actualResult = new ArrayList<>();
-		actualResult.addAll((new ReflectBusinessTripApp("1")).reflectSchedule(require, createTripInfo(Collections.emptyList()), dailyApp,
-				 GeneralDate.ymd(2020, 10, 11)));
+		actualResult.addAll((new ReflectBusinessTripApp("1")).reflectSchedule(require,
+				createTripInfoSameWork(Collections.emptyList()), dailyApp));
 
 		assertThat(actualResult).isEmpty();
 
@@ -86,8 +94,7 @@ public class ReflectBusinessTripAppTest {
 				2);
 
 		List<Integer> actualResult = new ArrayList<>();
-		actualResult.addAll((new ReflectBusinessTripApp("1")).reflectSchedule(require, createTripInfo(Collections.emptyList()), dailyApp,
-				GeneralDate.ymd(2020, 10, 10)));
+		actualResult.addAll((new ReflectBusinessTripApp("1")).reflectSchedule(require, createTripInfo(Collections.emptyList()), dailyApp));
 
 		assertThat(actualResult).isEqualTo(Arrays.asList(28, 1292, 1293, 29));
 
@@ -98,8 +105,6 @@ public class ReflectBusinessTripAppTest {
 	 * 
 	 * 
 	 * →出退勤の反映があります
-	 * 
-	 * →直行直帰区分の反映があります
 	 * 
 	 * 準備するデータ
 	 * 
@@ -112,29 +117,41 @@ public class ReflectBusinessTripAppTest {
 				2);
 
 		List<Integer> actualResult = new ArrayList<>();
-		actualResult.addAll((new ReflectBusinessTripApp("1")).reflectSchedule(require, createTripInfoWorkHour(), dailyApp,
-				GeneralDate.ymd(2020, 10, 10)));
+		new Expectations() {
+			{
+				require.getWorkType(anyString);
+				result = Optional.of(new WorkType(new WorkTypeCode("001"), null, null, null, null,
+						new DailyWork(WorkTypeUnit.OneDay, WorkTypeClassification.HolidayWork, null, null)));
+			}
+		};
+		actualResult.addAll((new ReflectBusinessTripApp("1")).reflectSchedule(require, createTripInfoWorkHour(), dailyApp));
 
-		assertThat(actualResult).isEqualTo(Arrays.asList(28, 1292, 1293, 29, 31, 34, 41, 44, 859, 860));
+		assertThat(actualResult).isEqualTo(Arrays.asList(28, 1292, 1293, 29, 31, 34, 41, 44));
 
 	}
 
-	private BusinessTripShare createTripInfoWorkHour() {
+	private BusinessTripInfoShare createTripInfoWorkHour() {
 
-		List<TimeZoneWithWorkNo> workingHours = new ArrayList<>();
-		workingHours.add(new TimeZoneWithWorkNo(1, 1, 1));
-		workingHours.add(new TimeZoneWithWorkNo(2, 2, 2));
+		List<BusinessTripWorkTime> workingHours = new ArrayList<>();
+		workingHours.add(new BusinessTripWorkTime(new WorkNo(1), Optional.of(new TimeWithDayAttr(1)), Optional.of(new TimeWithDayAttr(1))));
+		workingHours.add(new BusinessTripWorkTime(new WorkNo(2), Optional.of(new TimeWithDayAttr(2)), Optional.of(new TimeWithDayAttr(2))));
 
 		return createTripInfo(workingHours);
 	}
 
-	private BusinessTripShare createTripInfo(List<TimeZoneWithWorkNo> workingHours) {
-		List<BusinessTripInfoShare> lstResult = new ArrayList<>();
-		BusinessTripInfoShare info = new BusinessTripInfoShare(new WorkInformation("1", "2"),
-				GeneralDate.ymd(2020, 10, 10), Optional.of(workingHours));
-		lstResult.add(info);
+	private BusinessTripInfoShare createTripInfo(List<BusinessTripWorkTime> workingHours) {
+		BusinessTripInfoShare info = new BusinessTripInfoShare(
+				ReflectApplicationHelper.createAppShare(PrePostAtrShare.PREDICT), new WorkInformation("1", "2"),
+				workingHours);
 
-		return new BusinessTripShare(lstResult, null, null,
-				ReflectApplicationHelper.createAppShare(PrePostAtrShare.PREDICT));
+		return info;
+	}
+	
+	private BusinessTripInfoShare createTripInfoSameWork(List<BusinessTripWorkTime> workingHours) {
+		BusinessTripInfoShare info = new BusinessTripInfoShare(
+				ReflectApplicationHelper.createAppShare(PrePostAtrShare.PREDICT), new WorkInformation("001", "001"),
+				workingHours);
+
+		return info;
 	}
 }

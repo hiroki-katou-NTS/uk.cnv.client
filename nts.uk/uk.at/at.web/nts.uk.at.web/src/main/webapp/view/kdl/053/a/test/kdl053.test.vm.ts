@@ -15,6 +15,7 @@ module nts.uk.at.view.kdl053.test {
 			itemList: KnockoutObservableArray<any>;
 			selectedId: KnockoutObservable<number>;
 			enable: KnockoutObservable<boolean>;
+			dispItemCol: KnockoutObservable<number> = ko.observable(null);
 
 			errorRegistrations = ko.observable( [
 						{id: 0,sid: 'b4496e4d-2c79-4611-85c1-e251a72c8ce8', scd:'000001', empName:'天海　春香',  date:'2020/12/08', attendanceItemId: 163, errorMessage: '開始時刻と終了時刻が逆転してします。'}, 
@@ -85,6 +86,7 @@ module nts.uk.at.view.kdl053.test {
 					errorRegistrationList.push(self.errorRegistrations()[id]);
 				})
 				request.errorRegistrationList = errorRegistrationList;
+				request.dispItemCol = self.dispItemCol() != null ? self.dispItemCol() == 1 : null;
 				// setShare('dataShareDialogKDL053', request);
 				// self.currentScreen = nts.uk.ui.windows.sub.modal('/view/kdl/053/a/index.xhtml');
 				vm.$window.modal('at', '/view/kdl/053/a/index.xhtml', request);

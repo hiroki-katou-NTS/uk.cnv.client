@@ -1,5 +1,6 @@
 package nts.uk.ctx.at.request.dom.cancelapplication.algorithm;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import lombok.val;
@@ -7,12 +8,14 @@ import nts.arc.task.tran.AtomTask;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.ReflectedState;
+import nts.uk.ctx.at.request.dom.application.common.adapter.bs.dto.SEmpHistImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.cancelapplication.RQRecoverAppReflectOutputImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.scherec.convert.ConvertApplicationToShare;
 import nts.uk.ctx.at.request.dom.applicationreflect.AppReflectExecutionCondition;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.checkprocess.PreCheckProcessWorkRecord;
 import nts.uk.ctx.at.request.dom.applicationreflect.algorithm.checkprocess.PreCheckProcessWorkSchedule.PreCheckProcessResult;
 import nts.uk.ctx.at.request.dom.applicationreflect.object.ReflectStatusResult;
+import nts.uk.ctx.at.shared.dom.adapter.employment.EmploymentHistShareImport;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.ApplicationShare;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 
@@ -24,7 +27,7 @@ import nts.uk.shr.com.enumcommon.NotUseAtr;
 public class RCApplicationCancellationProcess {
 
 	public static RCCancelProcessOneDayOutput processRecord(Require require, String cid, Application app,
-			GeneralDate date, int closureId, ReflectStatusResult statusWorkRecord, NotUseAtr dbRegisterClassfi) {
+			GeneralDate date, int closureId, ReflectStatusResult statusWorkRecord, NotUseAtr dbRegisterClassfi, EmploymentHistShareImport empHist) {
 
 		// [input.反映状態.反映状態]をチェック
 		if (statusWorkRecord.getReflectStatus() != ReflectedState.REFLECTED) {
@@ -41,7 +44,7 @@ public class RCApplicationCancellationProcess {
 					&& appReflectCond.get().getEvenIfWorkRecordConfirmed() == NotUseAtr.NOT_USE) {
 				// 事前チェック処理
 				PreCheckProcessResult preCheck = PreCheckProcessWorkRecord.preCheck(require, cid, app, closureId, false,
-						statusWorkRecord, date);
+						statusWorkRecord, date, Arrays.asList(new SEmpHistImport(empHist.getEmployeeId(), empHist.getEmploymentCode(), "", empHist.getPeriod())));
 				if (preCheck.getProcessFlag() == NotUseAtr.NOT_USE) {
 					return new RCCancelProcessOneDayOutput(preCheck.getReflectStatus(), Optional.empty(), AtomTask.none());
 				}

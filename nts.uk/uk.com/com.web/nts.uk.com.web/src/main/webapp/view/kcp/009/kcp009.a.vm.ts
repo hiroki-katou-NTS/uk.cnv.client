@@ -10,6 +10,7 @@ module kcp009.a.viewmodel {
         setBaseDate: KnockoutObservable<boolean>;
         baseDate: KnockoutObservable<Date>;
         targetBtnText: string;
+        isDisplayNumberOfEmployee: KnockoutObservable<boolean>;
 
         systemReferenceList: KnockoutObservableArray<any>;
         selectedSystem: KnockoutObservable<number>;
@@ -57,6 +58,9 @@ module kcp009.a.viewmodel {
 //                    self.reloadComponent();
 //                }
 //            });
+
+            self.isDisplayNumberOfEmployee = ko.observable(false);
+            self.isDisplayNumberOfEmployee.subscribe(() => self.reloadComponent());
             
             self.targetBtnText = nts.uk.resource.getText("KCP009_3");
             self.selectedItem = ko.observable(null);
@@ -87,7 +91,8 @@ module kcp009.a.viewmodel {
                 targetBtnText: self.targetBtnText,
                 selectedItem: self.selectedItem,
                 tabIndex: self.tabindex,
-                baseDate: self.baseDate
+                baseDate: self.baseDate,
+                isDisplayNumberOfEmployee: self.isDisplayNumberOfEmployee()
             };
             
             // Initial listComponentOption
@@ -98,7 +103,8 @@ module kcp009.a.viewmodel {
                 targetBtnText: self.targetBtnText,
                 selectedItem: self.selectedItem1,
                 tabIndex: self.tabindex,
-                baseDate: self.baseDate
+                baseDate: self.baseDate,
+                isDisplayNumberOfEmployee: self.isDisplayNumberOfEmployee()
             };
             
             self.isLoading = false;
@@ -117,6 +123,7 @@ module kcp009.a.viewmodel {
             }
             self.listComponentOption.targetBtnText = self.targetBtnText;
             self.listComponentOption.employeeInputList(self.empList());
+            self.listComponentOption.isDisplayNumberOfEmployee = self.isDisplayNumberOfEmployee();
             // Load listComponent
             $('#emp-component').ntsLoadListComponent(self.listComponentOption);
             
@@ -129,6 +136,7 @@ module kcp009.a.viewmodel {
             }
             self.listComponentOption1.targetBtnText = self.targetBtnText;
             self.listComponentOption1.employeeInputList(self.empList());
+            self.listComponentOption1.isDisplayNumberOfEmployee = self.isDisplayNumberOfEmployee();
             // Load listComponent
             $('#emp-component1').ntsLoadListComponent(self.listComponentOption1);
         }

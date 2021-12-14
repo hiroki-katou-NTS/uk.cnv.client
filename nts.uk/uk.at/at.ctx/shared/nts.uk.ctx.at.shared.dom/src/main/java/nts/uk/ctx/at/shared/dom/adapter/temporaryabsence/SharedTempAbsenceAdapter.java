@@ -1,8 +1,8 @@
 package nts.uk.ctx.at.shared.dom.adapter.temporaryabsence;
 
-import nts.arc.time.calendar.period.DatePeriod;
-
 import java.util.List;
+
+import nts.arc.time.calendar.period.DatePeriod;
 
 public interface SharedTempAbsenceAdapter {
     /**
@@ -22,4 +22,13 @@ public interface SharedTempAbsenceAdapter {
      * @return
      */
     List<String> getAbsenceEmpsByPeriod(List<String> sids, DatePeriod period);
+    
+    /**
+     * 枠番号から該当する休職休業枠を取得する
+     * 
+     * @param cid					会社ID
+     * @param tempAbsenceFrameNos	枠NO（List）
+     * @return
+     */
+    List<TempAbsenceFrameImport> getTempAbsenceFrameByListNo(String cid, List<Integer> tempAbsenceFrameNos);
 }

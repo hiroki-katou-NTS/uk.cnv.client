@@ -98,4 +98,9 @@ public class CompensatoryDayOffManaData extends AggregateRoot {
 								Optional.of(new AttendanceTime(this.remainTimes.v()))))
 						.build();
 	}
+	
+	// 2] 残数が残っている
+	public boolean isRemaing() {
+		return this.remainDays.v() > 0.0 || this.remainTimes.v() > 0;
+	}
 }

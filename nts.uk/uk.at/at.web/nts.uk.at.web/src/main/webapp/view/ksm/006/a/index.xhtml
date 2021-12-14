@@ -28,7 +28,7 @@
 		</ui:define>
 
 		<ui:define name="sidebar-content">
-			<div id="companyWide-tab" role="tabpanel" data-bind="if: isShowCompanyTab()">
+			<div id="companyWide-tab" role="tabpanel">
 				<div class="sidebar-content-header">
 					<span class="title">#{i18n.getText('Com_Company')}</span>
 					<button class="proceed" data-bind="click: registerByCompany, enable: true" tabindex="1">#{i18n.getText('KSM006_2')}</button>
@@ -102,7 +102,7 @@
 				</div>
 			</div>
 
-			<div id="workplace-tab" role="tabpanel" data-bind="if: isShowWorkplaceTab()">
+			<div id="workplace-tab" role="tabpanel">
 				<div class="sidebar-content-header">
 					<span class="title">#{i18n.getText('Com_Workplace')}</span>
 					<button class="proceed"
@@ -201,7 +201,7 @@
 				</div>
 			</div>
 
-			<div id="classification-tab" role="tabpanel" data-bind="if: isShowClassifyTab()">
+			<div id="classification-tab" role="tabpanel">
 				<div class="sidebar-content-header">
 					<span class="title">#{i18n.getText('Com_Class')}</span>
 					<button class="proceed"

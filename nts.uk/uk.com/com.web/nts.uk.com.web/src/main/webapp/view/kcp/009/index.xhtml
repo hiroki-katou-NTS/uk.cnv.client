@@ -37,12 +37,12 @@
 						<br></br>
 						<div style="margin-left: 10px; padding-top: 10px">
 							<p>
-								<b>Display Organization Name:</b>
+								<b>Display Options:</b>
 							</p>
 							<br></br>
 							<div data-bind="ntsCheckBox:{checked: isDisplayOrganizationName}">Display
 								Organization Name</div>
-
+              <div data-bind="ntsCheckBox: { checked: isDisplayNumberOfEmployee }">Display Number Of Employee</div>
 						</div>
 						<br></br>
 						<div style="margin-left: 10px; padding-top: 10px">
@@ -137,6 +137,7 @@ Example:
         listComponentOption: ComponentOption;
         selectedItem: KnockoutObservable<string>;
         tabindex: number;
+        isDisplayNumberOfEmployee: KnockoutObservable<boolean>;
         constructor() {
             let self = this;
             self.employeeInputList = ko.observableArray([
@@ -157,6 +158,7 @@ Example:
             self.targetBtnText = nts.uk.resource.getText("KCP009_3");
             self.selectedItem = ko.observable(null);
             self.tabindex = 1;
+            self.isDisplayNumberOfEmployee = ko.observable(false);
             // Initial listComponentOption
             self.listComponentOption = {
                 systemReference: self.systemReference(),
@@ -176,6 +178,7 @@ Example:
         selectedItem: KnockoutObservable<string>;
         tabIndex: number;
         baseDate?: KnockoutObservable<Date>;
+        isDisplayNumberOfEmployee: boolean;
     }
     export interface EmployeeModel {
         id: string;

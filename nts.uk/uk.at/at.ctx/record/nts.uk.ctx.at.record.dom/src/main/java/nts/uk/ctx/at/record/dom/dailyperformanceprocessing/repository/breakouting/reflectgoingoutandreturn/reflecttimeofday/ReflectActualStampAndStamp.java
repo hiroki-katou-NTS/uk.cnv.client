@@ -53,8 +53,9 @@ public class ReflectActualStampAndStamp {
 	 * @param timeFrame 反映先時間帯枠（Temporary）
 	 * @param ymd  処理中の年月日
 	 * @param workTimeCode 処理中の年月日の就業時間帯コード
+	 * @param isStartTime 開始区分
 	 */
-	public TimeActualStamp reflect(TimeActualStamp timeActualStamp,Stamp stamp,boolean isReflectTimeStamp,TimeFrame timeFrame,GeneralDate ymd,WorkTimeCode workTimeCode) {
+	public TimeActualStamp reflect(TimeActualStamp timeActualStamp,Stamp stamp,boolean isReflectTimeStamp,TimeFrame timeFrame,GeneralDate ymd,WorkTimeCode workTimeCode, boolean isStartTime) {
 		//if not (False←普通打刻反映するか＝False　AND　勤怠打刻(実打刻付き)．実打刻に値が入っている)
 		if(!(!isReflectTimeStamp && (timeActualStamp.getActualStamp().isPresent() 
 										&& timeActualStamp.getActualStamp().get().getTimeDay().getTimeWithDay().isPresent() ))) {
@@ -68,8 +69,10 @@ public class ReflectActualStampAndStamp {
 			WorkTimeInformation timeDay = new WorkTimeInformation(new ReasonTimeChange(TimeChangeMeans.REAL_STAMP, Optional.of(EngravingMethod.TIME_RECORD_ID_INPUT)), timeWithDayAttr);
 			WorkStamp workStamp = new WorkStamp(timeDay, stamp.getRefActualResults().getWorkInforStamp().isPresent() ? stamp.getRefActualResults().getWorkInforStamp().get().getWorkLocationCD() : null);
 			timeStampCopy.setActualStamp(Optional.of(workStamp));
-			//時間帯枠（Temporary）。理由←外出理由
-			timeFrame.setGoOutReason(stamp.getType().getGoOutArt());
+			if(isStartTime || !timeFrame.getGoOutReason().isPresent() ) {
+				//時間帯枠（Temporary）。理由←外出理由
+				timeFrame.setGoOutReason(stamp.getType().getGoOutArt());
+			}
 			//普通打刻反映＝True
 			if(isReflectTimeStamp) {
 				timeStampCopy.setStamp(timeStampCopy.getActualStamp());
@@ -81,7 +84,7 @@ public class ReflectActualStampAndStamp {
 		timeFrame.setNumberOfReflections(number);
 		timeActualStamp.setNumberOfReflectionStamp(number);
 		//反映済み区分　←　true
-		stamp.setReflectedCategory(true);
+		stamp.getImprintReflectionStatus().markAsReflected(ymd);
 		
 		return timeActualStamp;
 	}

@@ -216,9 +216,9 @@ public class CreateDailyApproverImpl implements CreateDailyApprover {
 					.collect(Collectors.toList()));
 			if(appRootInstance.getRight().start().after(loopDate)){
 				// ドメインモデル「承認ルート中間データ」を取得する
-				Optional<AppRootInstance> opAppIns = appRootInstanceRepository.findByContainDate(companyID, employeeID, loopDate, rootType);
-				if(opAppIns.isPresent()){
-					compareAppInsID = opAppIns.get().getRootID();
+				String opAppInsID = appRootInstanceRepository.findIDByContainDate(companyID, employeeID, loopDate, rootType);
+				if(Strings.isNotBlank(opAppInsID)){
+					compareAppInsID = opAppInsID;
 				}
 			}
 			// output．承認ルートの内容は取得したドメインモデル「承認ルート中間データ」を比較する

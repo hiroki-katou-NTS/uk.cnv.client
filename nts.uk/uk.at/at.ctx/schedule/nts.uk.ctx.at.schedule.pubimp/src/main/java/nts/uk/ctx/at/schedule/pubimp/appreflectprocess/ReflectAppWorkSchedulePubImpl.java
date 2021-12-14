@@ -64,8 +64,11 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.D
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.function.algorithm.ChangeDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.function.algorithm.ICorrectionAttendanceRule;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.ManagePerCompanySet;
 import nts.uk.ctx.at.shared.dom.scherec.dailyprocess.calc.CalculateDailyRecordServiceCenterNew;
 import nts.uk.ctx.at.shared.dom.scherec.dailyprocess.calc.CalculateOption;
+import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensLeaveComSetRepository;
+import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensatoryLeaveComSetting;
 import nts.uk.ctx.at.shared.dom.workrecord.workperfor.dailymonthlyprocessing.enums.ExecutionType;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
 import nts.uk.ctx.at.shared.dom.worktime.fixedset.FixedWorkSetting;
@@ -160,6 +163,9 @@ public class ReflectAppWorkSchedulePubImpl implements ReflectApplicationWorkSche
 
 	@Inject
 	private StampReflectionManagementRepository timePriorityRepository;
+	
+	@Inject
+	private CompensLeaveComSetRepository compensLeaveComSetRepository;
 
 	@Override
 	public Pair<SCReflectStatusResultExport, AtomTask> process(Object application, GeneralDate date, SCReflectStatusResultExport reflectStatus, int preAppWorkScheReflectAttr) {
@@ -172,7 +178,7 @@ public class ReflectAppWorkSchedulePubImpl implements ReflectApplicationWorkSche
 				goBackReflectRepository, stampAppReflectRepository, lateEarlyCancelReflectRepository,
 				reflectWorkChangeAppRepository, timeLeaveAppReflectRepository, appReflectOtHdWorkRepository,
 				vacationApplicationReflectRepository, timePriorityRepository, subLeaveAppReflectRepository, substituteWorkAppReflectRepository,
-				applicationReflectHistoryRepo);
+				applicationReflectHistoryRepo, compensLeaveComSetRepository);
 		Pair<SCReflectStatusResult, AtomTask> result = ReflectApplicationWorkSchedule.process(impl, companyId,
 				(ApplicationShare) application, date, convertToDom(reflectStatus),
 				preAppWorkScheReflectAttr);
@@ -254,6 +260,8 @@ public class ReflectAppWorkSchedulePubImpl implements ReflectApplicationWorkSche
     	private final SubstituteWorkAppReflectRepository substituteWorkAppReflectRepository;
     	
     	private final ApplicationReflectHistoryRepo applicationReflectHistoryRepo;
+    	
+    	private CompensLeaveComSetRepository compensLeaveComSetRepository;
 
 		@Override
 		public Optional<WorkType> getWorkType(String workTypeCd) {
@@ -265,6 +273,11 @@ public class ReflectAppWorkSchedulePubImpl implements ReflectApplicationWorkSche
 			return workTimeSettingRepository.findByCode(companyId, workTimeCode);
 		}
 
+		@Override
+		public Optional<WorkTimeSetting> getWorkTime(String cid, String workTimeCode) {
+			return workTimeSettingRepository.findByCode(companyId, workTimeCode);
+		}
+		
 		@Override
 		public SetupType checkNeededOfWorkTimeSetting(String workTypeCode) {
 			return service.checkNeededOfWorkTimeSetting(workTypeCode);
@@ -409,6 +422,23 @@ public class ReflectAppWorkSchedulePubImpl implements ReflectApplicationWorkSche
 		@Override
 		public Optional<SubstituteLeaveAppReflect> findSubLeaveAppReflectByCompany(String companyId) {
 			return subLeaveAppReflectRepository.findSubLeaveAppReflectByCompany(companyId);
+		}
+
+		@Override
+		public Optional<PredetemineTimeSetting> findByWorkTimeCode(String companyId, String workTimeCode) {
+			return predetemineTimeSettingRepository.findByWorkTimeCode(companyId, workTimeCode);
+		}
+
+		@Override
+		public List<IntegrationOfDaily> calculateForRecord(CalculateOption calcOption,
+				List<IntegrationOfDaily> integrationOfDaily, Optional<ManagePerCompanySet> companySet,
+				ExecutionType reCalcAtr) {
+			return calculateForSchedule(reCalcAtr, calcOption, integrationOfDaily);
+		}
+
+		@Override
+		public CompensatoryLeaveComSetting findCompensatoryLeaveComSet(String companyId) {
+			return compensLeaveComSetRepository.find(companyId);
 		}
 
 	}

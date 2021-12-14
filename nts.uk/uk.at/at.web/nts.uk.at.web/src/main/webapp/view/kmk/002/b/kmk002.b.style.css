@@ -15,3 +15,7 @@ td {
 .nts-switch-button {
 	min-width: 62px;
 }
+
+.nts-switch-container {
+	display: inline-flex;
+}

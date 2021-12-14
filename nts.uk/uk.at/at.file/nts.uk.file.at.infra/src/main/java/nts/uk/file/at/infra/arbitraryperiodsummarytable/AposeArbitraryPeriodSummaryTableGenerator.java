@@ -537,11 +537,15 @@ public class AposeArbitraryPeriodSummaryTableGenerator extends AsposeCellsReport
         for (int i = 1; i <= source.length(); i++) {
             if (i > maxLength) break;
             destination.append(source.charAt(i - 1));
-            if (i == 4 || i == 8) destination.append("\n");
+            if(source.length()>4){
+                if (i == 4) destination.append("\n");
+                if(source.length()>8){
+                    if (i == 8) destination.append("\n");
+                }
+            }
         }
         return destination.toString();
     }
-
     private void setTopBorder(Cells cells, int row) {
         for (int col = 0; col < 21; col++) {
             Cell cell = cells.get(row, col);

@@ -3,7 +3,7 @@ package nts.uk.ctx.at.request.dom.application.common.service.detailscreen.after;
 import java.util.List;
 
 import nts.uk.ctx.at.request.dom.application.Application;
-import nts.uk.ctx.at.request.dom.application.common.service.detailscreen.output.MailSenderResult;
+import nts.uk.ctx.at.request.dom.application.common.service.other.output.MailResult;
 
 /**
  * 11-2.詳細画面差し戻し後の処理
@@ -21,7 +21,7 @@ public interface DetailAfterRemand {
 	 * @param returnReason
 	 * @return
 	 */
-	public MailSenderResult doRemand(String companyID, RemandCommand remandCm);
+	public MailResult doRemand(String companyID, RemandCommand remandCm);
 	
 	/**
 	 * 申請者本人にメール送信する
@@ -32,6 +32,6 @@ public interface DetailAfterRemand {
 	 * @param isSendMail
 	 * @return
 	 */
-	public MailSenderResult getMailSenderResult(Application application, List<String> employeeList, String returnReason, boolean isSendMail);
+	public MailResult getMailSenderResult(Application application, List<String> employeeList, String returnReason, boolean isSendMail);
 	
 }

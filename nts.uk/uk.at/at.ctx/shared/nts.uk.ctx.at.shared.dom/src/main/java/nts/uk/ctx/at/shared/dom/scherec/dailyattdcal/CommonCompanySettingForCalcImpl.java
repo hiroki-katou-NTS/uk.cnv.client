@@ -9,6 +9,7 @@ import lombok.val;
 import nts.uk.ctx.at.shared.dom.ot.frame.NotUseAtr;
 import nts.uk.ctx.at.shared.dom.ot.frame.OvertimeWorkFrameRepository;
 import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.HolidayAddtionRepository;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.repository.BPTimeItemSettingRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.repository.BPUnitUseSettingRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.calculationsettings.shorttimework.CalcOfShortTimeWorkRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worklabor.defor.DeformLaborOTRepository;
@@ -49,9 +50,9 @@ public class CommonCompanySettingForCalcImpl implements CommonCompanySettingForC
 	//乖離
 	@Inject 
 	private DivergenceTimeRepository divergenceTimeRepository;
-	//加給設定の利用単位
+	//加給自動計算設定
 	@Inject
-	private BPUnitUseSettingRepository bPUnitUseSettingRepository; 
+	private BPTimeItemSettingRepository bPTimeItemSettingRepository;
 	//0時跨ぎ
 	@Inject
 	private ZeroTimeRepository zeroTimeRepository;
@@ -111,7 +112,7 @@ public class CommonCompanySettingForCalcImpl implements CommonCompanySettingForC
 									  compensLeaveComSetRepository.find(companyId),
 									  divergenceTimeRepository.getAllDivTime(companyId),
 //									  errorAlerms,
-									  bPUnitUseSettingRepository.getSetting(companyId),
+									  bPTimeItemSettingRepository.getListAllSetting(companyId),
 									  optionalItems,
 									  formulaRepository.find(companyId),
 									  formulaOrderRepository.findAll(companyId),

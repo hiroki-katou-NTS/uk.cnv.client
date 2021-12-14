@@ -221,6 +221,10 @@ public class TimeLeavingWork extends DomainObject{
 		return getStampOfLeave().flatMap(c -> c.getTimeDay().getTimeWithDay());
 	}
 	
+	public boolean existsTimeWithDay() {
+		return this.getAttendanceTime().isPresent() || this.getLeaveTime().isPresent();
+	}
+	
 	//NOとデフォルトを作成する
 	public static TimeLeavingWork createDefaultWithNo(int no, TimeChangeMeans reason) {
 		return new TimeLeavingWork(new WorkNo(no),

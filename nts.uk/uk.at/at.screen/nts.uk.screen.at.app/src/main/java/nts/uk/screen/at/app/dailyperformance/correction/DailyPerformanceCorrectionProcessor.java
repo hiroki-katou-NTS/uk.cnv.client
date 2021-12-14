@@ -82,6 +82,7 @@ import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureEmployment;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureEmploymentRepository;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureId;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosurePeriod;
+import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureRepository;
 import nts.uk.ctx.at.shared.dom.workrule.closure.service.ClosureService;
 import nts.uk.ctx.at.shared.pub.workrule.closure.PresentClosingPeriodExport;
 import nts.uk.ctx.at.shared.pub.workrule.closure.ShClosurePub;
@@ -241,6 +242,9 @@ public class DailyPerformanceCorrectionProcessor {
 	
 	@Inject 
 	private RecordDomRequireService requireService;
+	
+	@Inject
+	private ClosureRepository closureRepository;
 	
     static final Integer[] DEVIATION_REASON  = {436, 438, 439, 441, 443, 444, 446, 448, 449, 451, 453, 454, 456, 458, 459, 799, 801, 802, 804, 806, 807, 809, 811, 812, 814, 816, 817, 819, 821, 822};
 	public static final Map<Integer, Integer> DEVIATION_REASON_MAP = IntStream.range(0, DEVIATION_REASON.length-1).boxed().collect(Collectors.toMap(x -> DEVIATION_REASON[x], x -> x/3 +1));
@@ -1286,7 +1290,7 @@ public class DailyPerformanceCorrectionProcessor {
 				// アルゴリズム「社員の権限に対応する表示項目を取得する」を実行する
 				// kiem tra thong tin rieng biet user
 				if (correct == null) {
-					if (formatCodeSelects.isEmpty()) {
+					if (formatCodeSelects == null || formatCodeSelects.isEmpty()) {
 						List<AuthorityFormatInitialDisplayDto> initialDisplayDtos = repo
 								.findAuthorityFormatInitialDisplay(companyId);
 						if (!initialDisplayDtos.isEmpty()) {
@@ -1859,6 +1863,9 @@ public class DailyPerformanceCorrectionProcessor {
 	public DatePeriodInfo updatePeriod(Optional<YearMonth> yearMonthOpt, Optional<Integer> closureIdShare, Optional<GeneralDate> dateTransfer, int displayFormat, String empTarget, DatePeriod period) {
 		GeneralDate today = GeneralDate.today();
 		DateRange result = new DateRange(today, today);
+		if(period != null) {
+			result = new DateRange(period.start(), period.end());
+		}
 		ClosureId closureId = null;
 		YearMonth yearMonth = null;
 		List<nts.uk.ctx.at.record.dom.monthlycommon.aggrperiod.ClosurePeriod> lstClosurePeriod  = new ArrayList<>();
@@ -1890,7 +1897,7 @@ public class DailyPerformanceCorrectionProcessor {
 								empTarget, dateRefer, ym));
 			}
 //			if(lstClosurePeriod.isEmpty()) return null;
-			if(lstClosurePeriod.isEmpty()) return new DatePeriodInfo(new ArrayList<>(), result, yearMonth == null ? 0 : yearMonth.v(), closureId, lstClosureCache, lstPeriod);;
+			if(lstClosurePeriod.isEmpty()) return new DatePeriodInfo(new ArrayList<>(), result, yearMonth == null ? 0 : yearMonth.v(), closureId, lstClosureCache, lstPeriod);
 			
 			List<AggrPeriodEachActualClosure> lstAggrPeriod = lstClosurePeriod.stream().flatMap(x -> x.getAggrPeriods().stream())
 					    .sorted((x, y) -> x.getPeriod().start().compareTo(y.getPeriod().end()))

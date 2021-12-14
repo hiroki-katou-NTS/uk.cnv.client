@@ -12,7 +12,6 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.StringUtils;
@@ -172,10 +171,6 @@ public class KrqdtAppOverTime extends ContractUkJpaEntity implements Serializabl
 	@OneToMany(targetEntity = KrqdtAppOvertimeInput.class, mappedBy = "appOvertime", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinTable(name = "KRQDT_APP_OVERTIME_INPUT")
 	public List<KrqdtAppOvertimeInput> overtimeInputs;
-	
-	@OneToOne(targetEntity = KrqdtAppOvertimeDetail.class, mappedBy = "appOvertime", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinTable(name = "KRQDT_APP_OVERTIME_DETAIL")
-	public KrqdtAppOvertimeDetail appOvertimeDetail;
 
 	@Override
 	protected Object getKey() {
@@ -378,9 +373,6 @@ public class KrqdtAppOverTime extends ContractUkJpaEntity implements Serializabl
 			if (!appOverTime.getBreakTimeOp().isPresent()) {
 				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));				
 			}
-		}
-		if (appOvertimeDetail != null) {
-			appOverTime.setDetailOverTimeOp(Optional.of(appOvertimeDetail.toDomain()));
 		}
 		appOverTime.setApplicationTime(applicationTime);
 		if (!CollectionUtil.isEmpty(overtimeInputs)) {

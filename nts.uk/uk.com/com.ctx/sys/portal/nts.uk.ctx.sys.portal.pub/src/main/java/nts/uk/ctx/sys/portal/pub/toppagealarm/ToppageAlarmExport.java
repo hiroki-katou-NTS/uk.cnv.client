@@ -49,4 +49,9 @@ public class ToppageAlarmExport {
 	 * 表示メッセージ
 	 */
 	private Optional<String> displayMessage;
+	
+	/**
+	 * 部下のエラーがない社員ID
+	 */
+	private List<String> noErrEmployeeIds;
 }

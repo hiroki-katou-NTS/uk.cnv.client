@@ -50,6 +50,7 @@ public class ToppageAlarmPubImpl implements ToppageAlarmPub {
 						.displaySId(mapper.getDisplaySId())
 						.displayEmpClassfication(EnumAdaptor.valueOf(mapper.getDisplayEmpClassfication().value, DisplayAtr.class))
 						.subSids(mapper.getSubSids()) //#116503
+						.noErrSids(mapper.getNoErrEmployeeIds())
 						.patternCode(Optional.ofNullable(mapper.getPatternCode().map(i -> new AlarmListPatternCode(i)).orElse(null)))
 						.linkUrl(Optional.ofNullable(mapper.getLinkUrl().map(i -> new LinkURL(i)).orElse(null)))
 						.displayMessage(Optional.ofNullable(mapper.getDisplayMessage().map(i -> new DisplayMessage(i)).orElse(null)))

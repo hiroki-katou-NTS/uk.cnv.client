@@ -147,10 +147,10 @@ public class CorrectionAttendanceRule implements ICorrectionAttendanceRule {
 		
 		//出退勤変更後の補正
 		if(changeAtt.attendance) {
-			SupportDataWorkImport workImport = supportAdapter.correctionAfterChangeAttendance(domainDaily);
+			SupportDataWorkImport workImport = supportAdapter.correctionAfterChangeAttendance(afterDomain);
 			
 			if(workImport != null)
-				afterDomain = workImport.getIntegrationOfDaily();
+				afterDomain = workImport.getIntegrationOfDaily().orElse(afterDomain);
 		}
 		
 		if(changeAtt.workInfo || changeAtt.isDirectBounceClassifi() || changeAtt.attendance) {
@@ -215,7 +215,7 @@ public class CorrectionAttendanceRule implements ICorrectionAttendanceRule {
 			@Override
 			public Optional<WorkType> workType(String companyId, String workTypeCd) {
 
-				return workTypeRepo.findByDeprecated(companyId, workTypeCd);
+				return workTypeRepo.findByPK(companyId, workTypeCd);
 			}
 			
 			@Override

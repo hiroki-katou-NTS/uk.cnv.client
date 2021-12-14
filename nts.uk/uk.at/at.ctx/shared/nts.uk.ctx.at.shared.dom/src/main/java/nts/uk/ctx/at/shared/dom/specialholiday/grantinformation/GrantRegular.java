@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nts.arc.layer.dom.DomainObject;
 import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.GrantDeadline;
+import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.LimitAccumulationDays;
 
 /**
  * 付与・期限情報
@@ -69,7 +70,7 @@ public class GrantRegular extends DomainObject {
 	}
 
 	/** 「付与日数一覧」の件数をチェックする */
-	public int getLimitAccumulationDays() {
+	public int getLimitCarryoverDays() {
 
 		if(this.typeTime==TypeTime.REFER_GRANT_DATE_TBL) {
 
@@ -97,6 +98,24 @@ public class GrantRegular extends DomainObject {
 			default:
 				return Optional.empty();
 		}
+	}
+	/**
+	 * 繰越上限日数を取得
+	 * @return
+	 */
+	public Optional<LimitAccumulationDays> getLimitAccumulationDays(){
+		if(this.typeTime==TypeTime.REFER_GRANT_DATE_TBL) {
+			if(this.getGrantPeriodic().isPresent()){
+				return this.getGrantPeriodic().get().getLimitAccumulationDays();
+			}
+		}
+		
+		if(this.typeTime==TypeTime.GRANT_SPECIFY_DATE) {
+			if(this.getFixGrantDate().isPresent()){
+				return this.getFixGrantDate().get().getGrantPeriodic().getLimitAccumulationDays();
+			}
+		}
+		return Optional.empty();
 	}
 
 }

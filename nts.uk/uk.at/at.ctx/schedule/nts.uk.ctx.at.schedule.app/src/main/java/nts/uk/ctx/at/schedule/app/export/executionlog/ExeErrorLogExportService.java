@@ -81,19 +81,11 @@ public class ExeErrorLogExportService extends ExportService<String> {
 					dto.setEmployeeName(employee.getEmployeeName());
                     return dto;
                 }).collect(Collectors.toList());
-        
-        // The Schedule error log comparator. 
-    	Comparator<ScheduleErrorLogDto> ScheduleErrorLogComparator = new Comparator<ScheduleErrorLogDto>() {
 
-    		@Override
-    		public int compare(ScheduleErrorLogDto arg0, ScheduleErrorLogDto arg1) {
-    			String employeeCode0 = arg0.getEmployeeCode().toUpperCase();
-    			String employeeCode1 = arg1.getEmployeeCode().toUpperCase();
-    			return employeeCode0.compareTo(employeeCode1);
-    		}
-    	};
-        //sort by employee code
-        List<ScheduleErrorLogDto> afterSort = lstErrorDto.stream().sorted(ScheduleErrorLogComparator).collect(Collectors.toList());
+        //sort by employee code, date asc
+        List<ScheduleErrorLogDto> afterSort = lstErrorDto.stream()
+                .sorted(Comparator.comparing(ScheduleErrorLogDto::getEmployeeCode).thenComparing(ScheduleErrorLogDto::getDate))
+                .collect(Collectors.toList());
         // set data export
         ExportData exportData = ExportData.builder()
                 .employeeId(AppContexts.user().employeeId())

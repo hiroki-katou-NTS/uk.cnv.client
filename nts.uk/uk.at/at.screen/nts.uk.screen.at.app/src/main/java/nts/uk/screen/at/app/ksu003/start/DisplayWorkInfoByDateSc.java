@@ -200,7 +200,7 @@ public class DisplayWorkInfoByDateSc {
 				// Lấy ID để so sánh ở \\192.168.50.4\share\500_新構想開発\04_設計\40_ドメイン設計\ドメイン仕様書\UK\at_就業\shared.scherec_shared(勤務予定、勤務実績)
 				// 休憩時間帯編集状態 = 勤務予定．編集状態．編集状態
 				Optional<EditStateOfDailyAttd> editStateDaily = value.get().getLstEditState().stream()
-						.filter(x -> x.getAttendanceItemId() == 535).findFirst();
+						.filter(x -> x.getAttendanceItemId() == 157).findFirst();
 				breakTimeStatus = editStateDaily.isPresent() && editStateDaily.get().getEditStateSetting() != null ? editStateDaily.get().getEditStateSetting().value : null;
 
 				// 開始時刻 1= 勤務予定．出退勤．出退勤．出勤

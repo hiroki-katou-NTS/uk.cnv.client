@@ -35,7 +35,8 @@
                       v-bind:key="index"
                       :value="index"
                     >
-                      <td class="text-center" v-if="c2" style="padding-bottom: 0">{{'KAFS06_40' | i18n([item.subHdRemain])}}</td>
+                      <td class="text-center" v-if="c2 && c2_1" style="padding-bottom: 0">{{formatTimeFromMinute(item.subVacaHourRemain)}}</td>
+                      <td class="text-center" v-if="c2 && !c2_1" style="padding-bottom: 0">{{'KAFS06_40' | i18n([item.subHdRemain])}}</td>
                       <td class="text-center" v-if="c3" style="padding-bottom: 0">{{'KAFS06_40' | i18n([item.subVacaRemain])}}</td>
                       <td class="text-center" v-if="c4" style="padding-bottom: 0">{{'KAFS06_40' | i18n([item.yearRemain])}}</td>
                       <td class="text-center" v-if="c5" style="padding-bottom: 0">{{'KAFS06_40' | i18n([item.remainingHours])}}</td>
@@ -46,7 +47,8 @@
                       :value="index"
                     >
                       <!-- A2_12 -->
-                      <td style="border-top: none; padding-top: 5px;"><div class="text-center" v-if="c2 && c2_1" >{{formatTimeFromMinute(item.subVacaHourRemain)}}</div></td>
+                      <!-- <td style="border-top: none; padding-top: 5px;"><div class="text-center" v-if="c2 && c2_1" >{{formatTimeFromMinute(item.subVacaHourRemain)}}</div></td> -->
+                      <td class="text-center" v-if="c2" style="border-top: none; padding-top: 5px;">{{''}}</td>
                       <td class="text-center" v-if="c3" style="border-top: none; padding-top: 5px;">{{''}}</td>
                       <!-- A2_13 -->
                       <td style="border-top: none; padding-top: 5px;"><div class="text-center" v-if="c4 && c4_1" >{{formatTimeFromMinute(item.yearHourRemain)}}</div></td>

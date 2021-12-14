@@ -8,7 +8,7 @@ import nts.arc.task.tran.AtomTask;
 import nts.uk.ctx.at.record.dom.adapter.employee.EmployeeDataMngInfoImport;
 import nts.uk.ctx.at.record.dom.stamp.card.stamcardedit.StampCardEditing;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.StampDataReflectProcessService;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.RegisterStampData;
 import nts.uk.ctx.at.shared.dom.adapter.holidaymanagement.CompanyImport622;
 
 /**
@@ -128,7 +128,7 @@ public class AutoCreateStampCardNumberService {
 		return Optional.ofNullable(stampCardNumberOpt.get());
 	}
 
-	public static interface Require extends StampDataReflectProcessService.Require {
+	public static interface Require extends RegisterStampData.Require {
 		// [R-1] 社員情報を取得する
 		List<EmployeeDataMngInfoImport> findBySidNotDel(List<String> sid);
 

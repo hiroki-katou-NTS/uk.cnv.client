@@ -37,23 +37,23 @@ public class CorrectSupportDataWork {
 		
 		// Check list lỗi (Không có trong EA nhưng đã comfirm vs Tín)
 		if(!workinfo.getError().isEmpty())
-			return new SupportDataWork(null, workinfo.getError().get(0).getMessageError().v());
+			return new SupportDataWork(Optional.empty(), Optional.of(workinfo.getError().get(0).getMessageError().v()));
 		
 		// 終了状態が正常以外の場合
 		if(workinfo.getEndStatus() != EndStatus.NORMAL) {
 			switch(workinfo.getEndStatus()) {
 			// 就業時間帯なしの場合：「Msg_591」
 			case NO_WORK_TIME: 
-				return new SupportDataWork(null, "Msg_591");
+				return new SupportDataWork(Optional.empty(), Optional.of("Msg_591"));
 			// 勤務種類なしの場合：「Msg_590」
 			case NO_WORK_TYPE: 
-				return new SupportDataWork(null, "Msg_590");
+				return new SupportDataWork(Optional.empty(), Optional.of("Msg_590"));
 			// 休日出勤設定なしの場合：「Msg_1678」
 			case NO_HOLIDAY_SETTING: 
-				return new SupportDataWork(null, "Msg_1678");
+				return new SupportDataWork(Optional.empty(), Optional.of("Msg_1678"));
 			// 労働条件なしの場合：「Msg_430」
 			case NO_WORK_CONDITION: 
-				return new SupportDataWork(null, "Msg_430");
+				return new SupportDataWork(Optional.empty(), Optional.of("Msg_430"));
 			default:
 				break;
 			}
@@ -71,7 +71,7 @@ public class CorrectSupportDataWork {
 				ReflectionAtr reflectionAtr = this.supportCorrectWork(companyId, leavingWork, workinfo.getStampReflectRangeOutput(), integrationOfDaily);
 				// 反映状態を確認する - 反映済みの場合
 				if(reflectionAtr == ReflectionAtr.REFLECTED) {
-					return new SupportDataWork(integrationOfDaily, null);
+					return new SupportDataWork(Optional.of(integrationOfDaily), Optional.empty());
 				}
 			}
 			
@@ -88,7 +88,7 @@ public class CorrectSupportDataWork {
 			}
 			
 		}
-		return new SupportDataWork(integrationOfDaily, null);
+		return new SupportDataWork(Optional.of(integrationOfDaily), Optional.empty());
 	}
 	
 	// 出退勤で応援補正する

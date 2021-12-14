@@ -19,7 +19,8 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomat
 import nts.uk.ctx.at.shared.dom.workingcondition.NotUseAtr;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingConditionItem;
 import nts.uk.ctx.at.shared.dom.worktype.AttendanceHolidayAttr;
-import nts.uk.ctx.at.shared.dom.worktype.algorithm.JudgeHdSystemOneDayService;
+import nts.uk.ctx.at.shared.dom.worktype.WorkType;
+import nts.uk.ctx.at.shared.dom.worktype.algorithm.GetWorkTypeServiceShare;
 
 /**
  * @author ThanhNX
@@ -33,7 +34,7 @@ public class ConfirmSetSpecifiTimeZone {
 	private DetermineAutoSetFutureDayStamp determineAutoSetFutureDayStamp;
 
 	@Inject
-	private JudgeHdSystemOneDayService judgeHdSystemOneDayService;
+	private GetWorkTypeServiceShare getWorkTypeService;
 
 	// 所定時間帯をセットするか確認する
 	public ConfirmSetSpecifiResult confirmset(String companyId, WorkingConditionItem workCondItem,
@@ -54,8 +55,10 @@ public class ConfirmSetSpecifiTimeZone {
 			return new ConfirmSetSpecifiResult();
 		}
 		// 1日半日出勤・1日休日系の判定
-		AttendanceHolidayAttr attHolidayAttr = judgeHdSystemOneDayService
-				.judgeHdOnDayWorkPer(workInformation.getRecordInfo().getWorkTypeCode().v());
+		Optional<WorkType> worktype = getWorkTypeService.getWorkType(workInformation.getRecordInfo().getWorkTypeCode().v());
+		if (!worktype.isPresent())
+			return new ConfirmSetSpecifiResult();
+		AttendanceHolidayAttr attHolidayAttr = worktype.get().chechAttendanceDay().toAttendanceHolidayAttr();
 
 		if (attHolidayAttr == AttendanceHolidayAttr.HOLIDAY) {
 			return new ConfirmSetSpecifiResult();

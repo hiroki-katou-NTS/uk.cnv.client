@@ -19,7 +19,7 @@
 }
 #search-bar {
   display: inline-block;
-  width: 250px;
+  width: 240px;
 }
 #search-bar button.search-btn.caret-bottom.ntsSearchBox_Component {
   display: none;
@@ -33,7 +33,6 @@
   top: 0px;
   position: absolute;
   cursor: pointer;
-  right: 15px;
   top: 3px;
 }
 .result-search {
@@ -170,10 +169,10 @@ div#user-image {
 }
 .ccg002-panel {
   background: white;
-  width: 40px;
+  width: 30px;
   height: 30px;
   position: absolute !important;
-  right: 0;
+  right: 10px;
   top: 0;
   padding: 0px !important;
 }

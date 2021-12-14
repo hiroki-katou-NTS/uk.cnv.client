@@ -257,7 +257,7 @@ export class CmmS45ShrComponentsApp10Component extends Vue {
             return false;
         }
         if (workType.workAtr == 0) {
-            return false;
+            return true;
         }
         if (workType.morningCls == 8 || workType.afternoonCls == 8) {
             return true;

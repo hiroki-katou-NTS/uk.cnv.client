@@ -15,8 +15,8 @@ import nts.uk.ctx.at.shared.dom.ot.frame.OvertimeWorkFrame;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.ActualWorkTimeSheetAtr;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalOvertimeSetting;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalSetting;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.BonusPayAutoCalcSet;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.BonusPayAtr;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.timeitem.BPTimeItemSetting;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.ConditionAtr;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.calcategory.CalAttrOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.TimeDivergenceWithCalculation;
@@ -41,7 +41,6 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.timezone.service.ActualWorkTimeSheetListService;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.timezone.withinworkinghours.WithinWorkTimeSheet;
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CheckDateForManageCmpLeaveService;
-import nts.uk.ctx.at.shared.dom.workrule.outsideworktime.AutoCalRaisingSalarySetting;
 import nts.uk.ctx.at.shared.dom.workrule.outsideworktime.StatutoryAtr;
 import nts.uk.ctx.at.shared.dom.workrule.outsideworktime.overtime.overtimeframe.OverTimeFrameNo;
 import nts.uk.ctx.at.shared.dom.worktime.IntegrationOfWorkTime;
@@ -50,6 +49,7 @@ import nts.uk.ctx.at.shared.dom.worktime.common.GetSubHolOccurrenceSetting;
 import nts.uk.ctx.at.shared.dom.worktime.common.SubHolTransferSet;
 import nts.uk.ctx.at.shared.dom.worktime.common.SubHolTransferSetAtr;
 import nts.uk.ctx.at.shared.dom.worktime.flowset.FlowOTTimezone;
+import nts.uk.ctx.at.shared.dom.worktime.predset.WorkNo;
 import nts.uk.ctx.at.shared.dom.worktype.AttendanceDayAttr;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
 import nts.uk.shr.com.time.TimeWithDayAttr;
@@ -466,10 +466,10 @@ public class OverTimeSheet {
 	 * @return 控除時間
 	 */
 	public AttendanceTime getDeductionTime(
-			ConditionAtr conditionAtr, DeductionAtr dedAtr, TimeSheetRoundingAtr roundAtr) {
+			ConditionAtr conditionAtr, DeductionAtr dedAtr, TimeSheetRoundingAtr roundAtr, nts.uk.shr.com.enumcommon.NotUseAtr canOffset) {
 		
 		return ActualWorkTimeSheetListService.calcDeductionTime(conditionAtr, dedAtr, roundAtr,
-				this.frameTimeSheets.stream().map(tc -> (ActualWorkingTimeSheet)tc).collect(Collectors.toList()));
+				this.frameTimeSheets.stream().map(tc -> (ActualWorkingTimeSheet)tc).collect(Collectors.toList()), canOffset);
 	}
 
 	/**
@@ -523,17 +523,11 @@ public class OverTimeSheet {
 	/**
 	 * 残業時間帯に入っている加給時間の計算
 	 * アルゴリズム：加給時間の計算
-	 * @param raisingAutoCalcSet 加給の自動計算設定
-	 * @param bonusPayAutoCalcSet 加給自動計算設定
-	 * @param bonusPayAtr 加給区分
+	 * @param bpTimeItemSets 加給自動計算設定
 	 * @param calcAtrOfDaily 日別実績の計算区分
 	 * @return 加給時間(List)
 	 */
-	public List<BonusPayTime> calcBonusPayTimeInOverWorkTime(
-			AutoCalRaisingSalarySetting raisingAutoCalcSet,
-			BonusPayAutoCalcSet bonusPayAutoCalcSet,
-			BonusPayAtr bonusPayAtr,
-			CalAttrOfDailyAttd calcAtrOfDaily) {
+	public List<BonusPayTime> calcBonusPayTimeInOverWorkTime(List<BPTimeItemSetting> bpTimeItemSets, CalAttrOfDailyAttd calcAtrOfDaily) {
 		
 		List<BonusPayTime> bonusPayList = new ArrayList<>();
 		ActualWorkTimeSheetAtr sheetAtr;
@@ -545,7 +539,7 @@ public class OverTimeSheet {
 					sheetAtr = ActualWorkTimeSheetAtr.EarlyWork;
 				}
 			}
-			bonusPayList.addAll(timeFrame.calcBonusPay(sheetAtr,raisingAutoCalcSet,bonusPayAutoCalcSet,calcAtrOfDaily,bonusPayAtr));
+			bonusPayList.addAll(timeFrame.calcBonusPay(sheetAtr, bpTimeItemSets, calcAtrOfDaily));
 		}
 		return sumBonusPayTime(bonusPayList);
 	}
@@ -559,11 +553,7 @@ public class OverTimeSheet {
 	 * @param calcAtrOfDaily 日別実績の計算区分
 	 * @return 特定加給時間(List)
 	 */
-	public List<BonusPayTime> calcSpecBonusPayTimeInOverWorkTime(
-			AutoCalRaisingSalarySetting raisingAutoCalcSet,
-			BonusPayAutoCalcSet bonusPayAutoCalcSet,
-			BonusPayAtr bonusPayAtr,
-			CalAttrOfDailyAttd calcAtrOfDaily) {
+	public List<BonusPayTime> calcSpecBonusPayTimeInOverWorkTime(List<BPTimeItemSetting> bpTimeItemSets, CalAttrOfDailyAttd calcAtrOfDaily) {
 		
 		List<BonusPayTime> bonusPayList = new ArrayList<>();
 		ActualWorkTimeSheetAtr sheetAtr;
@@ -575,7 +565,7 @@ public class OverTimeSheet {
 					sheetAtr = ActualWorkTimeSheetAtr.EarlyWork;
 				}
 			}
-			bonusPayList.addAll(timeFrame.calcSpacifiedBonusPay(sheetAtr,raisingAutoCalcSet,bonusPayAutoCalcSet,calcAtrOfDaily,bonusPayAtr));
+			bonusPayList.addAll(timeFrame.calcSpacifiedBonusPay(sheetAtr, bpTimeItemSets, calcAtrOfDaily));
 		}
 		return sumBonusPayTime(bonusPayList);
 	}
@@ -668,6 +658,7 @@ public class OverTimeSheet {
 	 * @param predetermineTimeSetForCalc 計算用所定時間設定
 	 * @param deductTimeSheet 控除時間帯
 	 * @param createdWithinWorkTimeSheet 就業時間内時間帯
+	 * @param timeLeavingOfDaily 日別勤怠の出退勤
 	 * @return 残業時間帯
 	 */
 	public static Optional<OverTimeSheet> createAsFlow(
@@ -678,10 +669,11 @@ public class OverTimeSheet {
 			IntegrationOfDaily integrationOfDaily,
 			PredetermineTimeSetForCalc predetermineTimeSetForCalc,
 			DeductionTimeSheet deductTimeSheet,
-			WithinWorkTimeSheet createdWithinWorkTimeSheet) {
+			WithinWorkTimeSheet createdWithinWorkTimeSheet,
+			TimeLeavingOfDailyAttd timeLeavingOfDaily) {
 		
 		// 計算範囲の取得
-		Optional<TimeSpanForDailyCalc> calcRange = getStartEnd(integrationOfDaily, createdWithinWorkTimeSheet);
+		Optional<TimeSpanForDailyCalc> calcRange = getStartEnd(timeLeavingOfDaily, createdWithinWorkTimeSheet);
 		if(!calcRange.isPresent()) return Optional.empty();
 		// 指定時間帯に含まれる控除時間帯リストを取得
 		List<TimeSheetOfDeductionItem> itemsWithinCalc = deductTimeSheet.getDupliRangeTimeSheet(
@@ -746,18 +738,18 @@ public class OverTimeSheet {
 	
 	/**
 	 * 残業開始終了時刻を取得する
-	 * @param integrationOfDaily 日別実績(Work)
+	 * @param timeLeavingOfDaily 日別勤怠の出退勤
 	 * @param withinWorkTimeSheet 就業時間内時間帯
 	 * @return 残業開始終了時刻
 	 */
-	private static Optional<TimeSpanForDailyCalc> getStartEnd(IntegrationOfDaily integrationOfDaily, WithinWorkTimeSheet withinWorkTimeSheet) {
+	private static Optional<TimeSpanForDailyCalc> getStartEnd(TimeLeavingOfDailyAttd timeLeavingOfDaily, WithinWorkTimeSheet withinWorkTimeSheet) {
 		//残業開始時刻
-		Optional<TimeWithDayAttr> start = withinWorkTimeSheet.getStartEndToWithinWorkTimeFrame().map(span -> span.getEnd());
+		Optional<TimeWithDayAttr> start = withinWorkTimeSheet.getFirstStartAndLastEnd().map(span -> span.getEnd());
 		if (!start.isPresent()) {
 			return Optional.empty();
 		}
 		//残業終了時刻
-		Optional<TimeWithDayAttr> end = integrationOfDaily.getAttendanceLeave().flatMap(attd -> attd.getLastLeaveTime());
+		Optional<TimeWithDayAttr> end = timeLeavingOfDaily.getAttendanceLeavingWork(new WorkNo(1)).flatMap(t -> t.getLeaveTime());
 		if (!end.isPresent()) {
 			return Optional.empty();
 		}

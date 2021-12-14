@@ -45,7 +45,7 @@ public class AgreementTimeOfMonthlyDto implements ItemConst, AttendanceItemDataG
 
 	public AgreementTimeOfMonthly toDomain() {
 		return AgreementTimeOfMonthly.of(new AttendanceTimeMonth(agreementTime),
-										OneMonthTime.of(OneMonthErrorAlarmTime.of(
+										OneMonthTime.createWithCheck(OneMonthErrorAlarmTime.of(
 															new AgreementOneMonthTime(errorTime), 
 															new AgreementOneMonthTime(alarmTime)), 
 														new AgreementOneMonthTime(exceptionLimitTime)));

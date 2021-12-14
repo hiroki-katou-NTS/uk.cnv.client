@@ -259,7 +259,7 @@ module nts.uk.at.view.ksp001.b.viewmodel {
                 roleType: 3
             };
             setShared("CDL023Input", object);
-            nts.uk.ui.windows.sub.modal('/view/cdl/023/a/index.xhtml').onClosed(function() {
+            nts.uk.ui.windows.sub.modal('com', '/view/cdl/023/a/index.xhtml').onClosed(function() {
                 block.grayout();
                 let lstSelection = getShared("CDL023Output");
                 if (nts.uk.util.isNullOrEmpty(lstSelection)) {

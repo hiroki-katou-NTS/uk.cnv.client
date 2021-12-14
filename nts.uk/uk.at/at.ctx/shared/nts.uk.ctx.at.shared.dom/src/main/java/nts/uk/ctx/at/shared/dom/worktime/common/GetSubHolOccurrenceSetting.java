@@ -19,9 +19,19 @@ public class GetSubHolOccurrenceSetting {
 
 	public static Optional<SubHolTransferSet> process(Require require, String cid, Optional<String> workTimeCode,
 			CompensatoryOccurrenceDivision originAtr) {
+		
+		//	$代休管理設定
+		val comLeavSet = require.findCompensatoryLeaveComSet(cid);
+		//	if($代休管理設定.is not Present())
+		if (comLeavSet == null)
+			return Optional.empty();
+		if (originAtr.equals(CompensatoryOccurrenceDivision.FromOverTime) && !comLeavSet.isManagedTime()) {
+			return Optional.empty();
+		}
+
 		Optional<WorkTimezoneCommonSet> commonset = Optional.empty();
 		if (workTimeCode.isPresent()) {
-			Optional<WorkTimeSetting> workTimeSet = require.getWorkTime(workTimeCode.get());
+			Optional<WorkTimeSetting> workTimeSet = require.getWorkTime(cid, workTimeCode.get());
 			commonset = workTimeSet.map(x -> {
 				WorkSetting workSetting = x.getWorkSetting(require);
 				if (workSetting instanceof FlowWorkSetting) {
@@ -43,9 +53,6 @@ public class GetSubHolOccurrenceSetting {
 					.filter(x -> x.getOriginAtr() == originAtr).map(x -> x.getSubHolTimeSet()).findFirst();
 		}
 		
-		val comLeavSet = require.findCompensatoryLeaveComSet(cid);
-		if (comLeavSet == null)
-			return Optional.empty();
 		SubHolTransferSet result = comLeavSet.getCompensatoryOccurrenceSetting().stream()
 				.filter(x -> x.getOccurrenceType().value == originAtr.value).map(x -> x.getTransferSetting())
 				.findFirst().orElse(null);
@@ -55,7 +62,7 @@ public class GetSubHolOccurrenceSetting {
 	public static interface Require extends WorkTimeSetting.Require{
 
 		//WorkTimeSettingRepository.findByCode
-		public Optional<WorkTimeSetting> getWorkTime(String workTimeCode);
+		public Optional<WorkTimeSetting> getWorkTime(String cid, String workTimeCode);
 		
 		// CompensLeaveComSetRepository
 		CompensatoryLeaveComSetting findCompensatoryLeaveComSet(String companyId);

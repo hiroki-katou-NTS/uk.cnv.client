@@ -702,7 +702,7 @@ module nts.uk.at.view.ksu001.a.viewmodel {
                 self.getSettingDisplayWhenStart('shift', false);
                 //WORKPLACE(0), //WORKPLACE_GROUP(1);
                 __viewContext.viewModel.viewAC.workplaceModeName(data.dataBasicDto.designation);
-                $($("#Aa1_2 > button")[1]).html(data.dataBasicDto.designation);
+                 $('#Aa1_2 > label:nth-child(2) > span').html(data.dataBasicDto.designation);
 
                 self.saveShiftMasterToLocalStorage(data.shiftMasterWithWorkStyleLst);
                 // set data shiftPallet
@@ -4339,9 +4339,9 @@ module nts.uk.at.view.ksu001.a.viewmodel {
                     __viewContext.viewModel.viewAB.workplaceIdKCP013(input.unit == 0 ? input.workplaceId : input.workplaceGroupID);
                 } else {
                     if (input.unit == 0) {
-                        $($("#Aa1_2 > button")[1]).html(getText('Com_Workplace'));
+                        $('#Aa1_2 > label:nth-child(2) > span').html(getText('Com_Workplace'));
                     } else {
-                        $($("#Aa1_2 > button")[1]).html(getText('Com_WorkplaceGroup'));
+                        $('#Aa1_2 > label:nth-child(2) > span').html(getText('Com_WorkplaceGroup'));
                     }
 
                     self.saveShiftMasterToLocalStorage(data.shiftMasterWithWorkStyleLst);
@@ -4525,6 +4525,135 @@ module nts.uk.at.view.ksu001.a.viewmodel {
                 }
                 dfd.resolve();
             }).fail(function() {
+                dfd.reject();
+            });
+            return dfd.promise();
+        }
+        
+        btnOpenKDL055(): void {
+            let self = this;
+            let item = uk.localStorage.getItem(self.KEY);
+            let userInfor: IUserInfor = JSON.parse(item.get());
+            let arrCellUpdated = $("#extable").exTable("updatedCells");
+            let arrTmp = _.clone(arrCellUpdated);
+            let lockCells = $("#extable").exTable("lockCells");
+
+            if (lockCells.length > 0 || arrCellUpdated.length > 0) {
+                nts.uk.ui.dialog.confirm({ messageId: "Msg_447" }).ifYes(() => {
+                    // hiện tại mới chỉ đăng ký đc ở mode edit thôi
+                    if (self.mode() == 'edit') {
+                        self.saveDataInModeEdit();
+                    } else {
+                        self.openKDL055();
+                    }
+                }).ifNo(() => { self.openKDL055(); });
+            } else {
+                self.openKDL055();
+            }
+        }
+
+        openKDL055(): void {
+            let self = this, dfd = $.Deferred();
+            let item = uk.localStorage.getItem(self.KEY);
+            let userInfor: IUserInfor = JSON.parse(item.get());
+            let param: any = { sIDs: self.sids(), startDate: moment(self.dateTimePrev()).format('YYYY/MM/DD'), endDate: moment(self.dateTimeAfter()).format('YYYY/MM/DD') };
+            setShared('dataShareDialogKDL055A', param);
+            nts.uk.ui.windows.sub.modal("/view/kdl/055/a/index.xhtml").onClosed(() => {
+                let paramB = getShared('paramB');
+                setShared('paramB', paramB);
+                if (paramB) {
+                    setShared('dataShareDialogKDL055B', paramB);
+                    nts.uk.ui.windows.sub.modal("/view/kdl/055/b/index.xhtml").onClosed(() => {
+                        let resultB = getShared('statusKDL055');
+                        console.log(resultB);
+                        let openAKDL055 = getShared('openA');
+                        if (resultB == 'UPDATE') {
+                            nts.uk.ui.block.grayout();
+                            self.getNewData(userInfor.disPlayFormat).done(() => {
+                                if (self.mode() == 'edit' && self.selectedModeDisplayInBody() == 'time') {
+                                    self.diseableCellsTime();
+                                    nts.uk.ui.block.clear();
+                                }
+                                
+                                if(self.mode() == 'confirm'){
+                                    self.confirmMode();    
+                                }
+                            });
+                        } else if (resultB == 'CANCEL' && openAKDL055) {
+                            self.openKDL055();
+                        }
+                    });
+                }
+            });
+        }
+
+        saveDataInModeEdit(): JQueryPromise<any> {
+            let self = this, dfd = $.Deferred();
+            let item = uk.localStorage.getItem(self.KEY);
+            let userInfor: IUserInfor = JSON.parse(item.get());
+            nts.uk.ui.block.grayout();
+            let updatedCells = $("#extable").exTable("updatedCells");
+            let params = [];
+            let cellsGroup;
+            if (userInfor.disPlayFormat == 'shift' && self.hasChangeModeBg == true) {
+                // cập nhật lại list cells change.
+                let updatedCells = $("#extable").exTable("updatedCells");
+                _.forEach(updatedCells, function(cell: any) {
+                    let exit = _.filter(self.listCellUpdatedWhenChangeModeBg, function(o) { return o.rowIndex == cell.rowIndex && o.columnKey == cell.columnKey; });
+                    if (exit.length > 0) {
+                        _.remove(self.listCellUpdatedWhenChangeModeBg, function(e) {
+                            return e.rowIndex == cell.rowIndex && e.columnKey == cell.columnKey;
+                        });
+                        self.listCellUpdatedWhenChangeModeBg.push(cell);
+                    } else {
+                        self.listCellUpdatedWhenChangeModeBg.push(cell);
+                    }
+                });
+
+                cellsGroup = self.groupByRowIndAndColKey(self.listCellUpdatedWhenChangeModeBg, function(cell) {
+                    return [cell.rowIndex, cell.columnKey];
+                });
+            } else {
+                cellsGroup = self.groupByRowIndAndColKey(updatedCells, function(cell) {
+                    return [cell.rowIndex, cell.columnKey];
+                });
+            }
+
+            let data = self.buidDataReg(userInfor.disPlayFormat, cellsGroup);
+
+            if (userInfor.disPlayFormat == 'time') {
+                self.checkCellRetained(data);
+            }
+
+            // check trường hợp starttime|end == ''  thì return luôn. 
+            let validData = self.validData(data, userInfor.disPlayFormat);
+            if (validData == false) {
+                nts.uk.ui.block.clear();
+                return;
+            }
+
+            service.regWorkSchedule(data).done((rs) => {
+                if (rs.hasError == false) {
+                    let $grid = $('div.ex-body-detail');
+                    self.updateAfterSaveData($grid[0]);
+                    nts.uk.ui.block.clear();
+                    nts.uk.ui.dialog.info({ messageId: "Msg_15" }).then(() => {
+                        self.openKDL055();
+                    });
+                } else {
+                    let $grid = $('div.ex-body-detail');
+                    self.updateAfterSaveData($grid[0]);
+                    self.listCellRetained = [];
+                    if(rs.listErrorInfo.length > 0){
+                        self.openKDL053(rs); 
+                        return;   
+                    }
+                }
+                self.hasChangeModeBg = false;
+                self.listCellUpdatedWhenChangeModeBg = [];
+            }).fail(function(error) {
+                nts.uk.ui.block.clear();
+                nts.uk.ui.dialog.alertError(error);
                 dfd.reject();
             });
             return dfd.promise();

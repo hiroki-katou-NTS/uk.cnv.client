@@ -159,7 +159,7 @@ module a5 {
                 input.roundType = self.mainSettingModel.flowWorkSetting.restSetting.flowRestSetting.roundingBreakMultipleWork.rounding();
             }
 
-            let dialogHPath = self.isFlex() ? "/view/kmk/003/h/index2.xhtml" : "/view/kmk/003/h/index.xhtml";
+            let dialogHPath = (self.isFlex() && !self.flexFixedRestTime()) || (self.isFlow() && !self.flowFixedRestTime()) ? "/view/kmk/003/h/index2.xhtml" : "/view/kmk/003/h/index.xhtml";
             nts.uk.ui.windows.setShared("KMK003_DIALOG_H_INPUT", input);
             _.defer(() => nts.uk.ui.windows.sub.modal(dialogHPath).onClosed(() => {
                 let dto: DialogHParam = nts.uk.ui.windows.getShared("KMK003_DIALOG_H_OUTPUT");

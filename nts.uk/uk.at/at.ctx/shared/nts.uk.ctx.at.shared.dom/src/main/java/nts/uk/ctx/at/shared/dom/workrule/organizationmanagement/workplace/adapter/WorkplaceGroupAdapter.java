@@ -39,5 +39,13 @@ public interface WorkplaceGroupAdapter {
 	 * @return
 	 */
 	List<String> getReferableEmp(GeneralDate date,String empId, String workplaceGroupID);
+	
+	/**
+	 * [5] 参照可能な社員をすべて取得する	
+	 * @param date 基準日
+	 * @param employeeId 社員ID
+	 * @return
+	 */
+	List<String> getAllReferableEmp(GeneralDate date, String employeeId);
 
 }

@@ -46,7 +46,6 @@ import nts.uk.ctx.at.request.dom.application.holidayworktime.service.dto.CheckBe
 import nts.uk.ctx.at.request.dom.application.holidayworktime.service.dto.HdWorkBreakTimeSetOutput;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.service.dto.HdWorkDispInfoWithDateOutput;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.service.dto.InitWorkTypeWorkTime;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOvertimeDetail;
 import nts.uk.ctx.at.request.dom.application.overtime.ApplicationTime;
 import nts.uk.ctx.at.request.dom.application.overtime.AttendanceType_Update;
 import nts.uk.ctx.at.request.dom.application.overtime.ExcessState;
@@ -66,8 +65,6 @@ import nts.uk.ctx.at.request.dom.workrecord.dailyrecordprocess.dailycreationwork
 import nts.uk.ctx.at.request.dom.workrecord.remainmanagement.InterimRemainDataMngCheckRegisterRequest;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeOfExistMinus;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.AppRemainCreateInfor;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.EarchInterimRemainCheck;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.InterimRemainCheckInputParam;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.PrePostAtr;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.TimeDigestionParam;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.require.RemainNumberTempRequireService;
@@ -79,12 +76,9 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.Time36ErrorInforList;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.processten.AbsenceTenProcessCommon;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.processten.SubstitutionHolidayOutput;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.AppReflectOtHdWork;
-import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.overtimeholidaywork.AppReflectOtHdWorkRepository;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkTypeByIndividualWorkDay;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingConditionItem;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingConditionItemRepository;
-import nts.uk.ctx.at.shared.dom.workingcondition.WorkingConditionRepository;
 import nts.uk.ctx.at.shared.dom.workrule.closure.service.ClosureService;
 import nts.uk.ctx.at.shared.dom.worktime.common.DeductionTime;
 import nts.uk.ctx.at.shared.dom.worktime.common.TimeZone;
@@ -392,7 +386,6 @@ public class CommonAlgorithmHolidayWorkImpl implements ICommonAlgorithmHolidayWo
 //        	confirmMsgOutputs.add(new ConfirmMsgOutput("Msg_1409", Arrays.asList("代休不足区分"))); //missing param
 //        }
         
-        AppOvertimeDetail appOvertimeDetail = new AppOvertimeDetail();
         BundledBusinessException bundledBusinessExceptions = BundledBusinessException.newInstance();
         //18.３６時間の上限チェック(新規登録)_NEW
         Time36ErrorInforList time36UpperLimitCheckResult = time36UpperLimitCheck.checkRegister(companyId, 
@@ -460,7 +453,6 @@ public class CommonAlgorithmHolidayWorkImpl implements ICommonAlgorithmHolidayWo
     			appHdWorkDispInfoOutput.getAppDispInfoStartupOutput().getAppDispInfoWithDateOutput().getOpActualContentDisplayLst().orElse(Collections.emptyList()));
         
         checkBeforeOutput.setConfirmMsgOutputs(confirmMsgOutputs);
-        checkBeforeOutput.setAppOvertimeDetail(appOvertimeDetail);
 		return checkBeforeOutput;
 	}
 
@@ -1163,25 +1155,25 @@ public class CommonAlgorithmHolidayWorkImpl implements ICommonAlgorithmHolidayWo
 	@Override
 	public void checkContentApp(String companyId, AppHdWorkDispInfoOutput appHdWorkDispInfo,
 			AppHolidayWork appHolidayWork, Boolean mode) {
-		TimeDigestionParam timeDigestionParam = null;
-		if(appHolidayWork.getApplicationTime()!=null) {
-		    int totalOverTime = 0;
+	    int totalOverTime = 0;
+	    if (appHolidayWork.getApplicationTime() != null) {
 	        totalOverTime = appHolidayWork.getApplicationTime().getApplicationTime().stream()
 	                .map(x -> x.getApplicationTime().v())
 	                .mapToInt(Integer::intValue)
 	                .sum();
-	        totalOverTime += appHolidayWork.getApplicationTime().getOverTimeShiftNight().isPresent() ? 
+	        totalOverTime += appHolidayWork.getApplicationTime().getOverTimeShiftNight().isPresent() 
+	                && appHolidayWork.getApplicationTime().getOverTimeShiftNight().get().getOverTimeMidNight() != null ? 
 	                appHolidayWork.getApplicationTime().getOverTimeShiftNight().get().getOverTimeMidNight().v() : 0;
-	        totalOverTime += appHolidayWork.getApplicationTime().getFlexOverTime().map(AttendanceTimeOfExistMinus::v).orElse(0);
-	        timeDigestionParam = new TimeDigestionParam(
-	                0, 
-	                0, 
-	                0, 
-	                0, 
-	                0, 
-	                totalOverTime, 
-	                new ArrayList<TimeLeaveApplicationDetailShare>());
-		}
+	                totalOverTime += appHolidayWork.getApplicationTime().getFlexOverTime().map(AttendanceTimeOfExistMinus::v).orElse(0);
+	    }
+        TimeDigestionParam timeDigestionParam = new TimeDigestionParam(
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                totalOverTime, 
+                new ArrayList<TimeLeaveApplicationDetailShare>());
 		if (mode) { // 新規モード　の場合
 			//2-1.新規画面登録前の処理
 			processBeforeRegister.processBeforeRegister_New(
@@ -1213,7 +1205,9 @@ public class CommonAlgorithmHolidayWorkImpl implements ICommonAlgorithmHolidayWo
 					appHdWorkDispInfo.getAppDispInfoStartupOutput(), 
 					Arrays.asList(appHolidayWork.getWorkInformation().getWorkTypeCode().v()), 
                     Optional.ofNullable(timeDigestionParam), 
-                    false);
+                    false, 
+                    Optional.of(appHolidayWork.getWorkInformation().getWorkTypeCode().v()), 
+                    appHolidayWork.getWorkInformation().getWorkTimeCodeNotNull().map(WorkTimeCode::v));
 		}
 		//	遷移する前のエラーチェック
 		this.checkBeforeMoveToAppTime(companyId, appHdWorkDispInfo, appHolidayWork);

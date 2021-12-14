@@ -2,7 +2,6 @@ package nts.uk.screen.at.ws.cmm040.WorkLocationWS;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -21,12 +20,10 @@ import nts.uk.ctx.at.record.app.command.worklocation.DeleteWorkLocationCmdHandle
 import nts.uk.ctx.at.record.app.command.worklocation.InsertUpdateWorkLocationCmd;
 import nts.uk.ctx.at.record.app.command.worklocation.InsertWorkLocationCmdHandler;
 import nts.uk.ctx.at.record.app.command.worklocation.UpdateWorkLocationCmdHandler;
-import nts.uk.ctx.at.record.app.command.worklocation.WorkplacePossibleCmd;
 import nts.uk.ctx.at.record.app.find.worklocation.Ipv4AddressDto;
 import nts.uk.ctx.at.record.dom.stampmanagement.workplace.RadiusAtr;
-import nts.uk.ctx.at.record.dom.stampmanagement.workplace.WorkLocation;
 import nts.uk.ctx.at.record.dom.stampmanagement.workplace.WorkLocationRepository;
-import nts.uk.ctx.at.shared.dom.vacation.setting.SettingDistinct;
+import nts.uk.screen.at.app.cmm040.worklocation.CheckWorkplace;
 import nts.uk.screen.at.app.cmm040.worklocation.CompanyAndWorkInfoOutput;
 import nts.uk.screen.at.app.cmm040.worklocation.GetCompanyAndWorkInfo;
 import nts.uk.screen.at.app.cmm040.worklocation.GetIPSettings;
@@ -64,6 +61,9 @@ public class WorkLocationWS extends WebService {
 
 	@Inject
 	private GetCompanyAndWorkInfo getCompanyAndWorkInfo;
+	
+	@Inject
+	private CheckWorkplace checkWorkplace;
 
 	@POST
 	@Path("start")
@@ -73,18 +73,18 @@ public class WorkLocationWS extends WebService {
 
 	@POST
 	@Path("getWorkPlace")
-	public CompanyAndWorkInfoOutput getWorkPlace(List<WorkplacePossibleCmd> listWorkplace) {
+	public CompanyAndWorkInfoOutput getWorkPlace(GetWorkPlaceParam param) {
 		List<String> cidLogin = new ArrayList<>();
 		String cid = AppContexts.user().companyId();
 		cidLogin.add(cid);
 		String contractCd = AppContexts.user().contractCode();
-		if(listWorkplace.isEmpty()){
-		return this.getCompanyAndWorkInfo.get(contractCd, listWorkplace,
-				cidLogin);
+		if(param.listWorkplace.isEmpty()){
+		return this.getCompanyAndWorkInfo.get(contractCd, param.listWorkplace,
+				cidLogin, param.workLocationCD);
 		}
 		else{
-			return this.getCompanyAndWorkInfo.get(contractCd, listWorkplace,
-					listWorkplace.stream().map(i -> i.getCompanyId()).distinct().collect(Collectors.toList()));
+			return this.getCompanyAndWorkInfo.get(contractCd, param.listWorkplace,
+					param.listWorkplace.stream().map(i -> i.getCompanyId()).distinct().collect(Collectors.toList()), param.workLocationCD);
 			}
 	}
 
@@ -129,6 +129,18 @@ public class WorkLocationWS extends WebService {
 	@Path("enum")
 	public List<EnumConstant> getVacationExpirationEnum() {
 		return EnumAdaptor.convertToValueNameList(RadiusAtr.class);
+	}
+	
+	@POST
+	@Path("checkWorkplace")
+	public void checkWorkplace(CheckWorkplaceParam param) {
+		this.checkWorkplace.checkWorkPlace(param.workplaceID);
+	}
+	
+	@POST
+	@Path("checkDelete")
+	public boolean checkDelete() {
+		return AppContexts.user().roles().have().systemAdmin();
 	}
 
 }

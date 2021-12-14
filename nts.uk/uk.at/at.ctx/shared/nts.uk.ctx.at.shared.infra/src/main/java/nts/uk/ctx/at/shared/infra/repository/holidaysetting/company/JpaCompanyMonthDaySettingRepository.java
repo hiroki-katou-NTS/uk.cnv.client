@@ -138,12 +138,10 @@ public class JpaCompanyMonthDaySettingRepository extends JpaRepository implement
 		for(Year year:years){
 			List<KshmtHdpubDPerMCom> result = this.findBy(companyId, year, null);
 		
-			// Check connection
-			if (result.isEmpty()) {
-				connection();
+			if (!result.isEmpty()) {
+				domain.add(new CompanyMonthDaySetting(new JpaCompanyMonthDaySettingGetMemento(result)));
 			}
 		
-			domain.add(new CompanyMonthDaySetting(new JpaCompanyMonthDaySettingGetMemento(result)));
 		}
 		return domain;
 	}

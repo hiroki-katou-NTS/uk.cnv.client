@@ -50,16 +50,20 @@ module nts.uk.com.view.ccg034.h {
       vm.fontSize(vm.partData.fontSize);
       vm.isBold(vm.partData.isBold);
       vm.uploadedFileName(vm.partData.fileName);
-      vm.fileSize(vm.partData.fileSize);
+      vm.fileSize(vm.partData.fileSize || 0);
       vm.originalFileId = vm.fileId();
 
       if (!nts.uk.text.isNullOrEmpty(vm.fileId())) {
         vm.isNewMode = false;
-        vm.$ajax("/shr/infra/file/storage/infor/" + vm.fileId())
-          .then((res: any) => {
-            $("#H2_2 .filenamelabel").text(res.originalName);
-            vm.fileSize(Math.round(Number(res.originalSize) / 1024));
-          });
+        vm.$ajax("/shr/infra/file/storage/isexist/" + vm.fileId()).then((isExist: true) => {
+          if (isExist) {
+            vm.$ajax("/shr/infra/file/storage/infor/" + vm.fileId())
+            .then((res: any) => {
+              $("#H2_2 .filenamelabel").text(res.originalName);
+              vm.fileSize(Math.round(Number(res.originalSize) / 1024));
+            });
+          }
+        });
       }
       $("#H1_2").focus();
     }

@@ -20,6 +20,7 @@ import nts.arc.layer.infra.file.storage.StoredFileStreamService;
 import nts.arc.system.ServerSystemProperties;
 import nts.gul.file.FileUtil;
 import nts.gul.security.crypt.commonkey.CommonKeyCrypt;
+import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.infra.file.storage.info.StoredPackInfoRepository;
 
 @Stateless
@@ -33,8 +34,12 @@ public class DefaultStoredFileStreamService implements StoredFileStreamService {
 
 	@Override
 	public void store(StoredFileInfo fileInfo, InputStream streamToStore) {
+
+		String tenantCode = AppContexts.user().contractCode();
 		try {
-			Files.copy(CommonKeyCrypt.encrypt(streamToStore, fileInfo.getOriginalSize()), pathToTargetStoredFile(fileInfo.getId()));
+			Files.copy(
+					CommonKeyCrypt.encrypt(streamToStore, fileInfo.getOriginalSize()),
+					pathToTargetStoredFile(fileInfo.getId(), tenantCode));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -42,7 +47,9 @@ public class DefaultStoredFileStreamService implements StoredFileStreamService {
 	
 	@Override
 	public void storeZipEntry(StoredFileInfo fileInfo, InputStream streamToStore) {
-		val pathToEntry = pathToStoredZipEntry(fileInfo);
+
+		String tenantCode = AppContexts.user().contractCode();
+		val pathToEntry = pathToStoredZipEntry(fileInfo, tenantCode);
 
 		try (val is = CommonKeyCrypt.encrypt(streamToStore, fileInfo.getOriginalSize())){
 			Files.createDirectories(pathToEntry.getParent());
@@ -54,13 +61,14 @@ public class DefaultStoredFileStreamService implements StoredFileStreamService {
 	
 	@Override
 	public InputStream takeOutFromFileId(String fileId) {
+
 		Optional<StoredFileInfo> fileInfo = fileInfoRepository.find(fileId);
 		if(!fileInfo.isPresent()){
 			throw new BusinessException(new RawErrorMessage("file not found"));
 		}
 		
 		return CommonKeyCrypt.decrypt(
-				FileUtil.NoCheck.newInputStream(pathToTargetStoredFile(fileInfo.get().getId())), 
+				FileUtil.NoCheck.newInputStream(getExistingPathToTargetStoredFile(fileInfo.get().getId())),
 				fileInfo.get().getOriginalSize());
 	}
 	
@@ -68,9 +76,9 @@ public class DefaultStoredFileStreamService implements StoredFileStreamService {
 	public InputStream takeOut(StoredFileInfo fileInfo) {
 		Path filePath = null;
 		if (fileInfo.isZipEntryFile()) {
-			filePath = pathToStoredZipEntry(fileInfo);
+			filePath = getExistingPathToStoredZipEntry(fileInfo);
 		} else {
-			filePath = pathToTargetStoredFile(fileInfo.getId());
+			filePath = getExistingPathToTargetStoredFile(fileInfo.getId());
 		}
 		
 		return CommonKeyCrypt.decrypt(
@@ -81,9 +89,9 @@ public class DefaultStoredFileStreamService implements StoredFileStreamService {
 	public InputStream takeOutDeleteOnClosed(StoredFileInfo fileInfo) {
 		Path filePath = null;
 		if (fileInfo.isZipEntryFile()) {
-			filePath = pathToStoredZipEntry(fileInfo);
+			filePath = getExistingPathToStoredZipEntry(fileInfo);
 		} else {
-			filePath = pathToTargetStoredFile(fileInfo.getId());
+			filePath = getExistingPathToTargetStoredFile(fileInfo.getId());
 		}
 		
 		return CommonKeyCrypt.decrypt(
@@ -94,26 +102,80 @@ public class DefaultStoredFileStreamService implements StoredFileStreamService {
 	@Override
 	public void delete(String fileId) {
 		try {
-			Files.deleteIfExists(pathToTargetStoredFile(fileId));
+			Files.deleteIfExists(getExistingPathToTargetStoredFile(fileId));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private static Path pathToTargetStoredFile(String fileId) {
-		return new File(ServerSystemProperties.fileStoragePath()).toPath().resolve(fileId);
+	/**
+	 * すでに存在するはずのファイルへのパスを返す
+	 * @param fileId
+	 * @return
+	 */
+	private static Path getExistingPathToTargetStoredFile(String fileId) {
+
+		// テナントフォルダにあればそれを返す
+		String tenantCode = AppContexts.user().contractCode();
+		val pathByTenant = pathToTargetStoredFile(fileId, tenantCode);
+		if (Files.exists(pathByTenant)) {
+			return pathByTenant;
+		}
+
+		// なければテナントフォルダ対応以前に作られたファイルとみなして、そちらを返す
+		return pathToStorage(null).resolve(fileId);
 	}
-	
-	private Path pathToStoredZipEntry(StoredFileInfo entryInfo) {
+
+	private static Path pathToTargetStoredFile(String fileId, String tenantCode) {
+		return pathToStorage(tenantCode).resolve(fileId);
+	}
+
+	private Path getExistingPathToStoredZipEntry(StoredFileInfo entryInfo) {
+
+		// テナントフォルダにあればそれを返す
+		String tenantCode = AppContexts.user().contractCode();
+		val pathByTenant = pathToStoredZipEntry(entryInfo, tenantCode);
+		if (Files.exists(pathByTenant)) {
+			return pathByTenant;
+		}
+
+		// なければテナントフォルダ対応以前に作られたファイルとみなして、そちらを返す
+		return pathToStoredZipEntry(entryInfo, null);
+	}
+
+	private Path pathToStoredZipEntry(StoredFileInfo entryInfo, String tenantCode) {
 		String packId = this.packInfoRepository.getPackId(entryInfo.getId())
 				.orElseThrow(() -> new RuntimeException("pack not found"));
 		
 		String packsDirectory = "packs";
 		
-		return new File(ServerSystemProperties.fileStoragePath()).toPath()
+		return pathToStorage(tenantCode)
 				.resolve(packsDirectory)
 				.resolve(packId)
 				.resolve(entryInfo.getOriginalName());
 	}
+
+	private static Path pathToStorage(String tenantCode) {
+
+		val path = new File(ServerSystemProperties.fileStoragePath()).toPath();
+
+		// テナントコード別にフォルダを分ける対応をする以前に作った環境でも動作するように・・・
+		if (tenantCode == null) {
+			return path;
+		}
+
+		val pathByTenant = path.resolve(tenantCode);
+
+		if (!Files.exists(pathByTenant)) {
+			try {
+				Files.createDirectory(pathByTenant);
+			} catch (IOException e) {
+				throw new RuntimeException("フォルダ作成に失敗：" + pathByTenant.toString());
+			}
+		}
+
+		return path.resolve(tenantCode);
+	}
+
 
 }
