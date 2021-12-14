@@ -108,14 +108,36 @@ public class LockOutDataUserFinder {
 	 * @param UserId the user id
 	 * @return the lock out data dto
 	 */
-	public LockOutDataDto findLockOutDataByUserId(String UserId) {
+	public LockOutDataUserDto findLockOutDataByUserId(String UserId) {
 		Optional<LockoutData> optLockOutData = lockOutDataRepository.find(UserId);
 		if (!optLockOutData.isPresent()) {
 			return null;
 		}
+		
+		LockOutDataUserDto lockOutDataUserDto = new LockOutDataUserDto();
+		
 		LockoutData lockOutData = optLockOutData.get();
-		return new LockOutDataDto(lockOutData.getUserId(), lockOutData.getLockOutDateTime(),
-				lockOutData.getLogType().value, lockOutData.getContractCode().v(), lockOutData.getLoginMethod().value);
+		lockOutDataUserDto.setLockOutDateTime(lockOutData.getLockOutDateTime());
+		lockOutDataUserDto.setLogType((lockOutData.getLogType().value));
+		lockOutDataUserDto.setUserId(lockOutData.getUserId());
+		
+		UserDto userDto = userAdapter.getUser(Arrays.asList(UserId)).get(0);
+		
+		if (userDto != null) {			
+			lockOutDataUserDto.setLoginId(userDto.getLoginId().trim());
+			lockOutDataUserDto.setUserName(userDto.getUserName());
+			
+			// アルゴリズム「社員が削除されたかを取得」を実行する
+			List<EmpInfoExport> empInfoExportLst = employeeInfoPub
+					.getEmpInfoByPid(userDto.getAssociatedPersonID().trim());
+			if (!CollectionUtil.isEmpty(empInfoExportLst)) {
+				lockOutDataUserDto.setCompanyCode(
+						companyAdapter.findById(empInfoExportLst.get(0).getCompanyId()).getCompanyCode());
+				lockOutDataUserDto.setEmployeeCode(empInfoExportLst.get(0).getEmployeeCode());
+
+			}
+		}
+		return lockOutDataUserDto;
 	}
 
 }

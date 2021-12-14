@@ -73,7 +73,7 @@ public class LockOutDataWebService extends WebService {
 	 */
 	@POST
 	@Path("findByUserId/{userId}")
-	public LockOutDataDto findLockOutByUserId(@PathParam("userId") String userId) {
+	public LockOutDataUserDto findLockOutByUserId(@PathParam("userId") String userId) {
 		
 		 return this.lockOutDataUserFinder.findLockOutDataByUserId(userId);
 	}
