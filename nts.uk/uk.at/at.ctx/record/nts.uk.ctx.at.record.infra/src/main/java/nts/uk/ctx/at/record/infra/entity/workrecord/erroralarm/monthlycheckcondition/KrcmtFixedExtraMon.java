@@ -7,6 +7,8 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.NoArgsConstructor;
 import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.FixedConditionWorkRecordName;
@@ -25,11 +27,10 @@ public class KrcmtFixedExtraMon extends ContractUkJpaEntity implements Serializa
 	public KrcmtFixedExtraMonPK krcmtFixedExtraMonPK;
 	
 	@Column(name = "USE_ATR")
-	public int useAtr;
+	public boolean useAtr;
 	
 	@Column(name = "MESSAGE")
 	public String message;
-	
 	
 	@Override
 	protected Object getKey() {
@@ -39,10 +40,9 @@ public class KrcmtFixedExtraMon extends ContractUkJpaEntity implements Serializa
 	public KrcmtFixedExtraMon(KrcmtFixedExtraMonPK krcmtFixedExtraMonPK, int useAtr, String message) {
 		super();
 		this.krcmtFixedExtraMonPK = krcmtFixedExtraMonPK;
-		this.useAtr = useAtr;
+		this.useAtr = BooleanUtils.toBoolean(useAtr);
 		this.message = message;
 	}
-	
 	
 	public static KrcmtFixedExtraMon toEntity(FixedExtraMon domain) {
 		return new KrcmtFixedExtraMon(
@@ -52,21 +52,14 @@ public class KrcmtFixedExtraMon extends ContractUkJpaEntity implements Serializa
 				domain.isUseAtr()?1:0,
 				!domain.getMessage().isPresent()?null:domain.getMessage().get().v()
 				);
-		
 	}
 	
 	public FixedExtraMon toDomain() {
 		return new FixedExtraMon(
 				this.krcmtFixedExtraMonPK.monAlarmCheckID,
 				EnumAdaptor.valueOf(this.krcmtFixedExtraMonPK.fixedExtraItemMonNo, SysFixedMonPerEral.class),
-				this.useAtr==0?false:true,
+				this.useAtr,
 				new FixedConditionWorkRecordName(this.message)
 				);
-		
 	}
-
-
-
-
-
 }

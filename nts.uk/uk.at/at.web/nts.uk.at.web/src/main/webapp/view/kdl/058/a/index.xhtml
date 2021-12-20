@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="../../../../master/dialog.xhtml">
+		<ui:define name="htmlHead">
+			<com:scriptfile set="IGNITE" />
+			<script>var dialogSize = { width: 770, height: 600 };</script>
+			<com:ValidatorScript>
+					nts.uk.ctx.at.schedule.dom.shift.businesscalendar.holiday.HolidayName
+				</com:ValidatorScript>
+			<com:stylefile path="kdl058.a.style.css" />
+			<com:scriptfile path="kdl058.a.service.js" />
+			<com:scriptfile path="kdl058.a.start.js" />
+			<com:scriptfile path="kdl058.a.vm.js" />
+		</ui:define>
+
+		<ui:define name="content">
+			<div id="functions-area">
+				<button tabindex="1" data-bind="click : createButtonClick">#{i18n.getText('KDL058_2')}</button>
+				<button class="proceed" tabindex="2"
+					data-bind="click : registryButtonClick, enable: $root.errors.isEmpty">#{i18n.getText('KDL058_3')}</button>
+				<button class="danger" tabindex="3"
+					data-bind="click : removePublicHoliday , enable: !isCreate()">#{i18n.getText('KDL058_4')}</button>
+				<button tabindex="4" data-bind="click :  cancel_Dialog">#{i18n.getText('KDL058_5')}</button>
+			</div>
+			<div id="contents-area">
+				<div class="container">
+					<div class="left-contents">
+						<div class="row1-left" >
+							<div tabindex="5" data-bind="ntsDatePicker: { value: year, dateFormat: 'YYYY', valueFormat: 'YYYY', showJumpButtons: true }"></div>
+							<!-- <button tabindex="6">
+								#{i18n.getText('KSM004_22')} <i class="img-icon icon-download"></i>
+							</button> -->
+						</div>
+						<table id="single-list"
+							data-bind="ntsGridList: {								
+								height: 370,
+								dataSource: filterHolidays,
+								primaryKey: 'date',
+								columns: columns,
+								multiple: false,
+								value: currentCode}">
+						</table>
+					</div>
+					<div class="right-contents" data-bind="with: selectedPublicHoliday">
+						<div class="row1-right">
+							<label id="label-head">#{i18n.getText('KDL058_9')}</label>
+						</div>
+						<div class="row2-right">
+							<div id="label2" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('KDL058_10')}</div>
+							<div id="date" tabindex="7" data-bind="ntsDatePicker: {name : '#[KDL058_10]', value: date, inputFormat: 'YYYY/MM/DD', valueFormat: 'YYYYMMDD', enable: $parent.isCreate(), required: true}"></div>
+						</div>
+						<div class="row3-right cf">
+							<div data-bind="ntsFormLabel: { constraint: 'HolidayName', required: true }">#{i18n.getText('KDL058_11')}</div>
+							<input id="name" tabindex="8" data-bind="ntsTextEditor: {value: holidayName, constraint: 'HolidayName', required: true , name : '#[KDL058_11]' }" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

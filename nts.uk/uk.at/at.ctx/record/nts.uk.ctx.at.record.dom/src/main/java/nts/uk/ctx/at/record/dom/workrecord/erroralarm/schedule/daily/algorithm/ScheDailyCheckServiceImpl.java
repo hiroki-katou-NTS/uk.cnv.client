@@ -108,7 +108,7 @@ public class ScheDailyCheckServiceImpl implements ScheDailyCheckService {
 			}
 			
 			// Input．List＜社員ID＞をループ
-			for(String sid : lstSid) {
+			for(String sid : emps) {
 				List<AlarmExtractInfoResult> lstExtractInfoResult = new ArrayList<>();
 				// 任意抽出条件のアラーム値を作成する
 				OutputCheckResult checkTab2 = extractAlarmConditionTab2(
@@ -119,6 +119,7 @@ public class ScheDailyCheckServiceImpl implements ScheDailyCheckService {
 						dPeriod, 
 						getWplByListSidAndPeriod,
 						prepareData.getListWorkType(),
+						prepareData.getListWorktime(),
 						prepareData.getListIntegrationDai(),
 						alarmCheckConditionCode,
 						lstExtractInfoResult,
@@ -222,6 +223,7 @@ public class ScheDailyCheckServiceImpl implements ScheDailyCheckService {
 			DatePeriod dPeriod,
 			List<WorkPlaceHistImportAl> getWplByListSidAndPeriod,
 			List<WorkType> listWorkType,
+			List<WorkTimeSetting> listWorktime,
 			List<IntegrationOfDaily> listIntegrationDai, String alarmCheckConditionCode,
 			List<AlarmExtractInfoResult> lstExtractInfoResult, List<AlarmExtractionCondition> alarmExtractConditions) {
 		OutputCheckResult result = new OutputCheckResult(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
@@ -271,10 +273,13 @@ public class ScheDailyCheckServiceImpl implements ScheDailyCheckService {
 				int continuousPeriod = 0;
 				boolean applicableAtr = false;
 				List<String> lstWorkTypeCode = new ArrayList<>();
+				List<String> lstWorkTimeCode = new ArrayList<>();
 				CheckedCondition checkedCondition = null;
 				
 				// 勤務種類の条件
 				RangeToCheck targetWorkType = scheCondItem.getTargetWrkType();
+				// 時間帯チェック対象の範囲
+				TimeZoneTargetRange targetWorkTime = scheCondItem.getTimeZoneTargetRange();
 				// 勤務種類コード
 				WorkTypeCode workTypeCode = new WorkTypeCode(workSched.getWorkType());
 				
@@ -286,9 +291,10 @@ public class ScheDailyCheckServiceImpl implements ScheDailyCheckService {
 					
 					// 勤務種類でフィルタする
 					applicableAtr = checkWorkType(lstWorkTypeCode, targetWorkType, workTypeCode);
-					
-					// 予定時間をチェック
-					applicableAtr = checkTime(condTime.getCheckedCondition(), workSched);
+					if (applicableAtr) {
+						// 予定時間をチェック
+						applicableAtr = checkTime(condTime.getCheckedCondition(), workSched);
+					}
 				}
 				
 				if (DaiCheckItemType.CONTINUOUS_TIME == scheCondItem.getCheckItemType()) {
@@ -299,9 +305,10 @@ public class ScheDailyCheckServiceImpl implements ScheDailyCheckService {
 					
 					// 勤務種類でフィルタする
 					applicableAtr = checkWorkType(lstWorkTypeCode, targetWorkType, workTypeCode);
-					
-					// 予定時間をチェック
-					applicableAtr = checkTime(condContinuousTime.getCheckedCondition(), workSched);
+					if (applicableAtr) {
+						// 予定時間をチェック
+						applicableAtr = checkTime(condContinuousTime.getCheckedCondition(), workSched);
+					}
 				}
 				
 				// ループ中のスケジュール日次の任意抽出条件．連続時間帯の抽出条件をチェック
@@ -311,6 +318,7 @@ public class ScheDailyCheckServiceImpl implements ScheDailyCheckService {
 					
 					CondContinuousTimeZone condContinuousTimeZone = (CondContinuousTimeZone)scheCondItem.getScheduleCheckCond();
 					lstWorkTypeCode = condContinuousTimeZone.getWrkTypeCds();
+					lstWorkTimeCode = condContinuousTimeZone.getWrkTimeCds();
 					
 					// 勤務種類でフィルタする
 					applicableAtr = checkWorkType(lstWorkTypeCode, targetWorkType, workTypeCode);
@@ -341,7 +349,7 @@ public class ScheDailyCheckServiceImpl implements ScheDailyCheckService {
 					//　・カウント
 					//　・Optional<連続カウント＞
 					boolean errorAtr = applicableAtr;
-					calCountForConsecutivePeriodOutput = calcCountForConsecutivePeriodChecking.getContinuousCount(count, continuousPeriod, errorAtr, exDate);
+					calCountForConsecutivePeriodOutput = calcCountForConsecutivePeriodChecking.getContinuousCount(count, continuousPeriod, errorAtr);
 					count = calCountForConsecutivePeriodOutput.getCount();
 				}
 				
@@ -355,7 +363,9 @@ public class ScheDailyCheckServiceImpl implements ScheDailyCheckService {
 					String alarmContent = createAlarmContent(
 							scheCondItem.getCheckItemType(), 
 							targetWorkType,
+							targetWorkTime,
 							listWorkType, lstWorkTypeCode, 
+							listWorktime, lstWorkTimeCode, 
 							checkedCondition, 
 							continuousPeriod, 
 							optContinuousCount.isPresent() ? optContinuousCount.get().getConsecutiveYears() : 0,
@@ -480,8 +490,11 @@ public class ScheDailyCheckServiceImpl implements ScheDailyCheckService {
 	private String createAlarmContent(
 			DaiCheckItemType dailyCheckType,
 			RangeToCheck targetWorkType,
+			TimeZoneTargetRange targetWorkTime,
 			List<WorkType> listWorkType,
 			List<String> lstWorkTypeCode,
+			List<WorkTimeSetting> listWorktime,
+			List<String> lstWorkTimeCode,
 			CheckedCondition checkedCondition,
 			int conPeriod,
 			int consecutiveYears,
@@ -519,64 +532,131 @@ public class ScheDailyCheckServiceImpl implements ScheDailyCheckService {
 		}
 		
 		// チェック項目種類　＝＝　「時間」　OR　　「連続時間」 #KAL010_1013　※1
-		if (DaiCheckItemType.TIME == dailyCheckType || DaiCheckItemType.CONTINUOUS_TIMEZONE == dailyCheckType) {
+		if (DaiCheckItemType.TIME == dailyCheckType || DaiCheckItemType.CONTINUOUS_TIME == dailyCheckType) {
 			// ※1内容:  対象勤務：{0}条件：予約時間{1}{2}　実績：{3}
 			// {0}: ループ中のスケジュール日次の任意抽出条件．勤務種類の条件．予実比較による絞り込み方法
-			String variable0 = targetWorkType.nameId;			
+			//  ※　== 全て の場合　-> Empty　＃117145
+			String variable0 = targetWorkType == RangeToCheck.ALL ? Strings.EMPTY : targetWorkType.nameId;			
 			
-			// {1}: チェック条件　（例：　＜＞8：00）
+			// {1} ：　ループ中のスケジュール日次の任意抽出条件．勤務種類コード　+　’ ’ + 勤務種類名称
+			// ※　＝＝　Emptyの場合　ー＞　#KAL010_133
+			String variable1 = workTypeMsg(listWorkType, lstWorkTypeCode, "KAL010_133");
+			
+			// {2}: チェック条件　（例：　3：00　＜　Enumチェック項目種類の名称　＜　8：30）
 			String checkCondTypeName = dailyCheckType.nameId;
-			String variable1 = "";
+			String variable2 = "";
 			
 			if (compareOperatorText != null) {
 				if(compare <= 5) {
-					variable1 = checkCondTypeName + compareOperatorText.getCompareLeft() + startValue;
+					variable2 = checkCondTypeName + compareOperatorText.getCompareLeft() + startValue;
 				} else {
 					if (compare == 6 || compare == 7) {
-						variable1 = startValue + compareOperatorText.getCompareLeft() + checkCondTypeName 
+						variable2 = startValue + compareOperatorText.getCompareLeft() + checkCondTypeName 
 								+ compareOperatorText.getCompareright() + endValue;
 					} else {
-						variable1 = checkCondTypeName + compareOperatorText.getCompareLeft() + startValue
+						variable2 = checkCondTypeName + compareOperatorText.getCompareLeft() + startValue
 								+ ", " + checkCondTypeName + compareOperatorText.getCompareright() + endValue;
 					}
 				}
 			}
 			
-			// {2}: 
-				// チェック項目種類　＝＝　「時間」　－＞""
+			// {3}:チェック項目種類　＝＝　「時間」　－＞’’
 				// チェック項目種類　！＝　「時間」  －＞ #KAL010_1015　（{0}: ループ中のスケジュール日次の任意抽出条件．連続期間）
-			String variable2 = DaiCheckItemType.TIME != dailyCheckType ? TextResource.localize("KAL010_1015", conPeriodStr) : Strings.EMPTY;
-			// {3}:
-				// チェック項目種類　＝＝　「時間」　－＞探した勤務予定．勤怠時間．勤務時間．総労働時間
-			String variable3 = "";
+			String variable3 = DaiCheckItemType.TIME != dailyCheckType ? TextResource.localize("KAL010_1015", conPeriodStr) : Strings.EMPTY;
+			
+			// {4}:　チェック項目種類　＝＝　「時間」　－＞探した勤務予定．勤怠時間．勤務時間．総労働時間
+			String variable4 = "";
 			if (DaiCheckItemType.TIME == dailyCheckType) {
 				if (workSched != null && workSched.getOptAttendanceTime().isPresent()) {
 					int actualTime = workSched.getOptAttendanceTime().get().getActualWorkingTimeOfDaily().getTotalWorkingTime().getActualTime();
-					variable3 = formatTime(actualTime);
+					variable4 = formatTime(actualTime);
 				}
 			} else {
 				// チェック項目種類　！＝　「時間」　－＞　取得した連続カウント　+　#KAL010_1017 
-				variable3 = consecutiveYears + TextResource.localize("KAL010_1017");
+				variable4 = consecutiveYears + TextResource.localize("KAL010_1017");
 			}
 			// 例1：対象勤務：選択　条件：予約時間＜＞8：00　実績：10：00
 			// 例２：対象勤務：選択　条件：予約時間＜＞8：00/5日連続　実績：10日連続
-			content = TextResource.localize("KAL010_1013", variable0, variable1, variable2, variable3);
-		} else { 
-			// チェック項目種類　！＝　「時間」　OR　　「連続時間」－＞#KAL010_1016　※2
-			
-			// ※2内容：対象勤務：{0}/{1}日連続　実績：{2}日連続
+			content = TextResource.localize("KAL010_1013", variable0, variable1, variable2, variable3, variable4);
+		}
+		// チェック項目種類　＝＝　「連続勤務」の場合　ー＞#KAL010_1028  issue#117148
+		else if (DaiCheckItemType.CONTINUOUS_WORK == dailyCheckType) {
 			// {0}: ループ中のスケジュール日次の任意抽出条件．勤務種類の条件．予実比較による絞り込み方法
-			String param0 = targetWorkType.nameId;
+			String var0 = targetWorkType.nameId;
 			
-			// {1}: ループ中のスケジュール日次の任意抽出条件．連続期間
-			String param1 = conPeriodStr;
-			// {2}:　取得した連続カウント
-			String param2 = consecutiveYearStr;
-			// 例：対象勤務：選択/5日連続　実績：6日連続
-			content = TextResource.localize("KAL010_1016", param0, param1, param2);
+			// {1}: ループ中のスケジュール日次の任意抽出条件．勤務種類コード　+　’ ’ + 勤務種類名称
+			String var1 = workTypeMsg(listWorkType, lstWorkTypeCode, null);
+			
+			// {2}: ループ中のスケジュール日次の任意抽出条件．連続期間
+			String var2 = conPeriodStr;
+			
+			// {3}:　取得した連続カウント
+			String var3 = consecutiveYearStr;
+			
+			// 内容：{0} 対象勤務：{1}/{2}日連続　実績：{3}日連続
+			content = TextResource.localize("KAL010_1028", var0, var1, var2, var3);
+		} 
+		// チェック項目種類　== 「就業時間帯」　－＞#KAL010_1029 
+		else if (DaiCheckItemType.CONTINUOUS_TIMEZONE == dailyCheckType) {
+			// {0}: ループ中のスケジュール日次の任意抽出条件．勤務種類の条件．予実比較による絞り込み方法
+			// ※　== 全て の場合　-> Empty
+			String var0 = targetWorkType == RangeToCheck.ALL ? Strings.EMPTY : targetWorkType.nameId;
+			
+			// {1}: ループ中のスケジュール日次の任意抽出条件．勤務種類コード　+　’ ’ + 勤務種類名称
+			// ※　＝＝　Emptyの場合　ー＞　#KAL010_133
+			String var1 = workTypeMsg(listWorkType, lstWorkTypeCode, "KAL010_133");
+			
+			// {2}: ループ中のスケジュール日次の任意抽出条件．連続時間帯の抽出条件．対象とする就業時間帯
+			String var2 = targetWorkTime.nameId;
+			
+			// {3}: ループ中のスケジュール日次の任意抽出条件．連続時間帯の抽出条件．就業時間帯コード+' '+就業時間帯名称
+			String var3 = workTimeMsg(listWorktime, lstWorkTimeCode);
+			
+			// {4}: ループ中のスケジュール日次の任意抽出条件．連続期間
+			String var4 = conPeriodStr;
+			
+			// {5}:　取得した連続カウント
+			String var5 = consecutiveYearStr;
+			
+			// 例：選択 対象勤務：001 出勤, 選択 就業時間帯：001 通常出勤/5日連続　実績：6日連続
+			content = TextResource.localize("KAL010_1029", var0, var1, var2, var3, var4, var5);
 		}
 		
 		return content;		
+	}
+	
+	/**
+	 * ループ中のスケジュール日次の任意抽出条件．勤務種類コード　+　’ ’ + 勤務種類名称
+	 * @param listWorkType
+	 * @param lstWorkTypeCode
+	 * @return
+	 */
+	private String workTypeMsg(List<WorkType> lstWorkType, List<String> lstWorkTypeCode, String nullMsg) {
+		if (lstWorkTypeCode.isEmpty()) {
+			return nullMsg != null ? TextResource.localize(nullMsg) : Strings.EMPTY;
+		}
+		
+		return lstWorkType.stream().filter(x -> lstWorkTypeCode.contains(x.getWorkTypeCode().v()))
+				.collect(Collectors.toList())
+				.stream().map(a -> a.getWorkTypeCode().v()+ ' ' + a.getName().v())
+				.collect(Collectors.joining(","));
+	}
+	
+	/**
+	 * ループ中のスケジュール日次の任意抽出条件．連続時間帯の抽出条件．就業時間帯コード+' '+就業時間帯名称
+	 * @param lstWorkTime
+	 * @param lstWorkTimeCode
+	 * @return
+	 */
+	private String workTimeMsg(List<WorkTimeSetting> lstWorkTime, List<String> lstWorkTimeCode) {
+		if (lstWorkTimeCode.isEmpty()) {
+			return Strings.EMPTY;
+		}
+		
+		return lstWorkTime.stream().filter(x -> lstWorkTimeCode.contains(x.getWorktimeCode().v()))
+				.collect(Collectors.toList())
+				.stream().map(x -> x.getWorktimeCode().v() + ' ' + x.getWorkTimeDisplayName().getWorkTimeName().v())
+				.collect(Collectors.joining(","));
 	}
 	
 	/**
@@ -891,9 +971,13 @@ public class ScheDailyCheckServiceImpl implements ScheDailyCheckService {
 				String alarmContent = alarmMessage;
 				String comment = fixScheCondItem.getMessageDisp() != null && fixScheCondItem.getMessageDisp().isPresent() 
 						? fixScheCondItem.getMessageDisp().get().v() : Strings.EMPTY;
+						
+				// アラーム項目　＝　Input．スケジュール月次の固有抽出項目．名称　（NO　＝　ループ中のNO）
+				Optional<FixedExtractionSDailyItems> alarmNameOpt = fixedItems.stream().filter(x -> x.getFixedCheckDayItems().equals(fixedAtr)).findFirst();
+				
 				this.createExtractAlarm(sid,
 						exDate,
-						fixedAtr.nameId,
+						alarmNameOpt.isPresent() ? alarmNameOpt.get().getDailyCheckName().v() : Strings.EMPTY,
 						alarmContent,
 						Optional.ofNullable(comment),
 						checkValue,
@@ -1178,7 +1262,7 @@ public class ScheDailyCheckServiceImpl implements ScheDailyCheckService {
 		
 		// 1日休日じゃないの場合
 		// 職場の特定日設定を取得する (Acquire specific day setting of the workplace)
-		RecSpecificDateSettingImport specificDateSetting = specificDateSettingAdapter.specificDateSettingService(companyId, wplId, exDate);
+		RecSpecificDateSettingImport specificDateSetting = specificDateSettingAdapter.findSpecDateSetByWkpLst(companyId, Arrays.asList(wplId), exDate);
 		
 		// 取得した「特定日」．特定日項目をチェック
 		if (specificDateSetting.getDate() == null) {

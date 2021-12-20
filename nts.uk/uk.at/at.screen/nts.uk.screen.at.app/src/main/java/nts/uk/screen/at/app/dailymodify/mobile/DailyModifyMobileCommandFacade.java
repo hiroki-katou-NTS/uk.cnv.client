@@ -35,6 +35,7 @@ import nts.uk.ctx.at.record.app.find.dailyperform.DailyRecordDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyRecordWorkDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.common.ClosureDateDto;
 import nts.uk.ctx.at.record.dom.daily.itemvalue.DailyItemValue;
+import nts.uk.ctx.at.shared.app.command.scherec.monthlyattendanceitem.RegisterPastMonthTotalResult;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.AttendanceItemUtil;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.CorrectDailyAttendanceService;
@@ -105,6 +106,9 @@ public class DailyModifyMobileCommandFacade {
 
 	@Inject
 	private DailyCorrectEventServiceCenter dailyCorrectEventServiceCenter;
+	
+	@Inject
+	private RegisterPastMonthTotalResult registerPastMonthTotalResult;
 
 	public DataResultAfterIU insertItemDomain(DPMobileAdUpParam dataParent) {
 		// Map<Integer, List<DPItemValue>> resultError = new HashMap<>();
@@ -230,7 +234,7 @@ public class DailyModifyMobileCommandFacade {
 					new DailyCalcParam(mapSidDate, dataParent.getLstNotFoundWorkType(), resultOlds,
 							dataParent.getDateRange(), dataParent.getDailyEdits(), dataParent.getItemValues()),
 					dailyEdits, dailyOlds, dailyItems, querys, monthParam, true,
-					ExecutionType.NORMAL_EXECUTION);
+					ExecutionType.NORMAL_EXECUTION,null); //bên mobile chưa đối ứng nên trên check unlock == null
 			if (daiCalcResult.getResultUI() == null) {
 				return daiCalcResult.getDataResultAfterIU();
 			}
@@ -327,35 +331,42 @@ public class DailyModifyMobileCommandFacade {
 				//// 月別実績の集計
 				DailyCalcResult resultCalcMonth = processMonthlyCalc.processMonthCalc(commandNew, commandOld,
 						domainDailyNew, dailyItems, monthParam, dataParent.getMonthValue(), errorMonthHoliday,
-						dataParent.getDateRange(), dataParent.getMode(), editFlex);
+						dataParent.getDateRange(), dataParent.getMode(), editFlex,null);
 				RCDailyCorrectionResult resultMonth = resultCalcMonth.getResultUI();
-				ErrorAfterCalcDaily errorMonth = resultCalcMonth.getErrorAfterCheck();
-				// map error holiday into result
-				List<DPItemValue> lstItemErrorMonth = errorMonth.getResultErrorMonth().get(TypeError.ERROR_MONTH.value);
-				if (lstItemErrorMonth != null) {
-					List<DPItemValue> itemErrorMonth = dataResultAfterIU.getErrorMap().get(TypeError.ERROR_MONTH.value);
-					if (itemErrorMonth == null) {
-						// dataResultAfterIU.getErrorMap().put(TypeError.ERROR_MONTH.value,
-						// lstItemErrorMonth);
-						resultErrorMonth.put(TypeError.ERROR_MONTH.value, lstItemErrorMonth);
-					} else {
-						lstItemErrorMonth.addAll(itemErrorMonth);
-						// dataResultAfterIU.getErrorMap().put(TypeError.ERROR_MONTH.value,
-						// lstItemErrorMonth);
-						resultErrorMonth.put(TypeError.ERROR_MONTH.value, lstItemErrorMonth);
+				
+				if(resultCalcMonth.getErrorAfterCheck() !=null && resultCalcMonth.getListAggregatePastMonthResult().isEmpty()) {
+					ErrorAfterCalcDaily errorMonth = resultCalcMonth.getErrorAfterCheck();
+					// map error holiday into result
+					List<DPItemValue> lstItemErrorMonth = errorMonth.getResultErrorMonth().get(TypeError.ERROR_MONTH.value);
+					if (lstItemErrorMonth != null) {
+						List<DPItemValue> itemErrorMonth = dataResultAfterIU.getErrorMap().get(TypeError.ERROR_MONTH.value);
+						if (itemErrorMonth == null) {
+							// dataResultAfterIU.getErrorMap().put(TypeError.ERROR_MONTH.value,
+							// lstItemErrorMonth);
+							resultErrorMonth.put(TypeError.ERROR_MONTH.value, lstItemErrorMonth);
+						} else {
+							lstItemErrorMonth.addAll(itemErrorMonth);
+							// dataResultAfterIU.getErrorMap().put(TypeError.ERROR_MONTH.value,
+							// lstItemErrorMonth);
+							resultErrorMonth.put(TypeError.ERROR_MONTH.value, lstItemErrorMonth);
+						}
+					}
+					// 月次登録処理
+					errorMonthAfterCalc = errorMonth.getHasError();
+					if (!errorMonthAfterCalc) {
+						this.insertAllData.handlerInsertAllMonth(resultMonth.getLstMonthDomain(), monthParam);
+						
+						dataResultAfterIU.setDomainMonthOpt(resultMonth.getLstMonthDomain().isEmpty() ? Optional.empty()
+								: resultMonth.getLstMonthDomain().stream()
+										.map(x -> MonthlyRecordWorkDto.fromDtoWithOptional(x, optionalMaster)).findFirst());
+						// }
+						// dataResultAfterIU.setErrorMap(errorMonth.getResultError());
+						dataResultAfterIU.setFlexShortage(errorMonth.getFlexShortage());
 					}
 				}
-				// 月次登録処理
-				errorMonthAfterCalc = errorMonth.getHasError();
-				if (!errorMonthAfterCalc) {
-					this.insertAllData.handlerInsertAllMonth(resultMonth.getLstMonthDomain(), monthParam);
-					
-					dataResultAfterIU.setDomainMonthOpt(resultMonth.getLstMonthDomain().isEmpty() ? Optional.empty()
-							: resultMonth.getLstMonthDomain().stream()
-									.map(x -> MonthlyRecordWorkDto.fromDtoWithOptional(x, optionalMaster)).findFirst());
-					// }
-					// dataResultAfterIU.setErrorMap(errorMonth.getResultError());
-					dataResultAfterIU.setFlexShortage(errorMonth.getFlexShortage());
+				//過去月集計結果を登録する
+				if(resultCalcMonth.getErrorAfterCheck() ==null && !resultCalcMonth.getListAggregatePastMonthResult().isEmpty()) {
+					registerPastMonthTotalResult.register(resultCalcMonth.getListAggregatePastMonthResult());
 				}
 			}
 

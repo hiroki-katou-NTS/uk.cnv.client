@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+>
+<body>
+<ui:composition template="/master/base.xhtml">
+    <ui:define name="htmlHead">
+        <com:scriptfile set="IGNITE"/>
+        <com:scriptfile path="ksu.002.b.test.vm.js"/>
+    </ui:define>
+    <ui:define name="content">
+        <div id="functions-area">
+            <div class="ksu-002a cf">
+                <button tabindex="1" class="proceed" data-bind="i18n: 'KSU002_46', click: openKsu002b"></button>
+            </div>
+        </div>
+        <div id="contents-area">
+            <div class="control-group valign-center" style="margin-bottom: 20px; margin-top: 20px">
+                <div class="valign-center control-group" >
+                    <div data-bind="ntsFormLabel: { required: true }">Target Date:</div>
+                    <div data-bind="ntsDatePicker: { value: targetDate, dateFormat: 'YYYY/MM/DD' }"></div>
+                </div>
+                <div class="valign-center control-group" >
+                    <div data-bind="ntsFormLabel: { required: true }">Start Day:</div>
+                    <!--<input data-bind="ntsNumberEditor: {value: startDay, required: true}"/>-->
+                    <div id="combo-box"
+                         data-bind="ntsComboBox: {
+										options: dayOfWeekList,
+										optionsValue: 'dayOfWeekCode',
+										optionsText: 'dayOfWeekName',
+										value: startDay,
+										visibleItemsCount: 10,
+										selectFirstIfNull: true,
+										required: true}"></div>
+                </div>
+                <div data-bind="ntsFormLabel: {required: true, text: 'Date period'}"/>
+                <div data-bind="ntsDateRangePicker: {
+                      required: true,
+                      enable: true,
+                      showNextPrevious: true,
+                      value: dateValue,
+                      name:'dateRange',
+                      maxRange: 'oneYear'
+                     }"/>
+                <div data-bind="ntsFormLabel: {required: true, text: 'Employee Code'}"/>
+                <input data-bind="ntsTextEditor: {value: empCode, required: true}"/>
+                <div data-bind="ntsFormLabel: {required: true, text: 'Employee Name'}"/>
+                <input data-bind="ntsTextEditor: {value: empName, required: true}"/>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+</body>
+</html>

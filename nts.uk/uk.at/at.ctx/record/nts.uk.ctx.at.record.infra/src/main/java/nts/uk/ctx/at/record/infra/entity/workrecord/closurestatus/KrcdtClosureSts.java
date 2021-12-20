@@ -42,7 +42,7 @@ public class KrcdtClosureSts extends ContractUkJpaEntity {
 			DatePeriod period) {
 		super();
 		this.pk = new KrcdtClosureSttMngPk(yearMonth, employeeId, closureId, closureDate.getClosureDay().v(),
-				closureDate.getLastDayOfMonth() ? 1 : 0);
+				closureDate.getLastDayOfMonth());
 		this.start = period.start();
 		this.end = period.end();
 		// this.status = status;
@@ -55,7 +55,7 @@ public class KrcdtClosureSts extends ContractUkJpaEntity {
 
 	public ClosureStatusManagement toDomain() {
 		return new ClosureStatusManagement(new YearMonth(this.pk.yearMonth), this.pk.employeeId, this.pk.closureId,
-				new ClosureDate(this.pk.closeDay, this.pk.isLastDay == 1), new DatePeriod(this.start, this.end));
+				new ClosureDate(this.pk.closeDay, this.pk.isLastDay), new DatePeriod(this.start, this.end));
 	}
 	
 	public static ClosureStatusManagement toDomain(KrcdtClosureSts entity) {

@@ -9,11 +9,12 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.MappedSuperclass;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.Getter;
 import lombok.Setter;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.calcmethod.calcmethod.other.ExcessOutsideTimeSetReg;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.calcmethod.calcmethod.other.RegularWorkTimeAggrSet;
-import nts.uk.ctx.at.shared.infra.repository.workrecord.monthcal.BooleanGetAtr;
 import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 
 /**
@@ -27,31 +28,31 @@ public abstract class KrcstRegMCalSet extends ContractUkJpaEntity {
 
 	/** The include legal ot. */
 	@Column(name = "INCLUDE_LEGAL_OT")
-	private int includeLegalOt;
+	private boolean includeLegalOt;
 
 	/** The include holiday ot. */
 	@Column(name = "INCLUDE_HOLIDAY_OT")
-	private int includeHolidayOt;
+	private boolean includeHolidayOt;
 
 	/** The include extra ot. */
 	@Column(name = "INCLUDE_EXTRA_OT")
-	private int includeExtraOt;
+	private boolean includeExtraOt;
 
 	/** The except legal holidaywork ot. */
 	@Column(name = "EXC_LEGAL_HDWK_OT")
-	private int exceptLegalHdwkOt;
+	private boolean exceptLegalHdwkOt;
 	
 	/** The include legal aggr. */
 	@Column(name = "INCLUDE_LEGAL_AGGR")
-	private int includeLegalAggr;
+	private boolean includeLegalAggr;
 
 	/** The include holiday aggr. */
 	@Column(name = "INCLUDE_HOLIDAY_AGGR")
-	private int includeHolidayAggr;
+	private boolean includeHolidayAggr;
 
 	/** The include extra aggr. */
 	@Column(name = "INCLUDE_EXTRA_AGGR")
-	private int includeExtraAggr;
+	private boolean includeExtraAggr;
 
 	public void transfer(RegularWorkTimeAggrSet domain) {
 		
@@ -62,39 +63,39 @@ public abstract class KrcstRegMCalSet extends ContractUkJpaEntity {
 	
 	private void setAggregateTimeSet(ExcessOutsideTimeSetReg aggregateTimeSet) {
 		this.includeLegalAggr = 
-				BooleanGetAtr.getAtrByBoolean(aggregateTimeSet.isLegalOverTimeWork());
+				BooleanUtils.toBoolean(aggregateTimeSet.isLegalOverTimeWork());
 		this.includeHolidayAggr =
-				BooleanGetAtr.getAtrByBoolean(aggregateTimeSet.isLegalHoliday());
+				BooleanUtils.toBoolean(aggregateTimeSet.isLegalHoliday());
 		this.includeExtraAggr = 
-				BooleanGetAtr.getAtrByBoolean(aggregateTimeSet.isSurchargeWeekMonth());
+				BooleanUtils.toBoolean(aggregateTimeSet.isSurchargeWeekMonth());
 	}
 	
 	public void setExcessOutsideTimeSet(ExcessOutsideTimeSetReg excessOutsideTimeSet) {
 		this.includeLegalOt = 
-				BooleanGetAtr.getAtrByBoolean(excessOutsideTimeSet.isLegalOverTimeWork());
+				BooleanUtils.toBoolean(excessOutsideTimeSet.isLegalOverTimeWork());
 		this.includeHolidayOt =
-				BooleanGetAtr.getAtrByBoolean(excessOutsideTimeSet.isLegalHoliday());
+				BooleanUtils.toBoolean(excessOutsideTimeSet.isLegalHoliday());
 		this.includeExtraOt =
-				BooleanGetAtr.getAtrByBoolean(excessOutsideTimeSet.isSurchargeWeekMonth());
+				BooleanUtils.toBoolean(excessOutsideTimeSet.isSurchargeWeekMonth());
 		this.exceptLegalHdwkOt =
-				BooleanGetAtr.getAtrByBoolean(excessOutsideTimeSet.isExceptLegalHdwk());
+				BooleanUtils.toBoolean(excessOutsideTimeSet.isExceptLegalHdwk());
 	}
 	
 	public ExcessOutsideTimeSetReg getAggregateTimeSet() {
 		
 		return new ExcessOutsideTimeSetReg(
-				BooleanGetAtr.getAtrByInteger(includeLegalAggr),
-				BooleanGetAtr.getAtrByInteger(includeHolidayAggr), 
-				BooleanGetAtr.getAtrByInteger(includeExtraAggr),
+				BooleanUtils.toBoolean(includeLegalAggr),
+				BooleanUtils.toBoolean(includeHolidayAggr), 
+				BooleanUtils.toBoolean(includeExtraAggr),
 				false);
 	}
 	
 	public ExcessOutsideTimeSetReg getExcessOutsideTimeSet() {
 		
 		return new ExcessOutsideTimeSetReg(
-				BooleanGetAtr.getAtrByInteger(includeLegalOt),
-				BooleanGetAtr.getAtrByInteger(includeHolidayOt), 
-				BooleanGetAtr.getAtrByInteger(includeExtraOt),
-				BooleanGetAtr.getAtrByInteger(exceptLegalHdwkOt));
+				BooleanUtils.toBoolean(includeLegalOt),
+				BooleanUtils.toBoolean(includeHolidayOt), 
+				BooleanUtils.toBoolean(includeExtraOt),
+				BooleanUtils.toBoolean(exceptLegalHdwkOt));
 	}
 }

@@ -75,6 +75,11 @@ public class CheckChangePassDto {
 	
 	// パスワード認証による認証に成功
 	public static CheckChangePassDto successToAuthPassword(AuthenticationResult authen, Optional<String> msg) {
+
+		if (authen.isBuiltInUser()) {
+			return new CheckChangePassDto(false, null, false);
+		}
+
 		val passwordValidation = authen.getPasswordValidation().get();
 		// パスワードの変更が必要な場合
 		if(passwordValidation.getStatus().isNeedToChangePassword()) {

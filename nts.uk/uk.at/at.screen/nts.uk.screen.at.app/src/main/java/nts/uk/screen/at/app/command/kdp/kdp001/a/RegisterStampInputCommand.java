@@ -35,7 +35,7 @@ public class RegisterStampInputCommand {
 	
 	
 	public GeneralDateTime getDatetime() {
-		return GeneralDateTime.now();
+		return GeneralDateTime.fromString(GeneralDateTime.now().toString(), "yyyy/MM/dd HH:mm:ss");
 		
 	}
 }

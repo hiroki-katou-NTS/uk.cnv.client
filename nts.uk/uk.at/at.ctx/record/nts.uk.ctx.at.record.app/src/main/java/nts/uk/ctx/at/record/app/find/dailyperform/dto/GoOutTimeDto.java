@@ -62,12 +62,19 @@ public class GoOutTimeDto implements ItemConst, AttendanceItemDataGate {
 	@Override
 	public void set(String path, AttendanceItemDataGate value) {
 		switch (path) {
-		case (BACK):
-			comeBack = (TimeStampDto) value;
+		case (BACK):{
+			
+			WithActualTimeStampDto timeStamp =  (WithActualTimeStampDto)value; 
+			comeBack = timeStamp.getTime();
 			break;
+		}
 		case (GO_OUT):
-			outing = (TimeStampDto) value;
+		{
+			WithActualTimeStampDto timeStamp =  (WithActualTimeStampDto)value; 
+			outing = timeStamp.getTime();
 			break;
+		}
+			
 		default:
 		}
 	}

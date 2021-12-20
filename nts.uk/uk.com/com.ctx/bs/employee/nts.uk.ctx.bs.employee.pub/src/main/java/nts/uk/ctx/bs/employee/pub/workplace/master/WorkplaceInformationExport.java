@@ -1,6 +1,7 @@
 package nts.uk.ctx.bs.employee.pub.workplace.master;
 
 import lombok.Value;
+import nts.arc.time.calendar.period.DatePeriod;
 
 import java.util.Optional;
 
@@ -56,5 +57,7 @@ public class WorkplaceInformationExport {
 	 * 職場外部コード
 	 */
 	private Optional<String> workplaceExternalCode;
+
+	private DatePeriod period;
 
 }

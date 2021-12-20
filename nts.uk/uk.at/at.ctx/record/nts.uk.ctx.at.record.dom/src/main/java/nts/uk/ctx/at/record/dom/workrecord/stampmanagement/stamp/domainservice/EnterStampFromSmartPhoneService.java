@@ -76,7 +76,7 @@ public class EnterStampFromSmartPhoneService {
 		Relieve relieve = new Relieve(AuthcMethod.ID_AUTHC, StampMeans.SMART_PHONE);
 
 		return CreateStampDataForEmployeesService.create(require, cid, contractCode, employeeID, Optional.ofNullable(null),
-				stampDatetime, relieve, buttonSettingOpt.get().getButtonType(), refActualResults,
+				stampDatetime, relieve, buttonSettingOpt.get().getType(), refActualResults,
 				positionInfor);
 
 	}

@@ -9,10 +9,13 @@ import javax.persistence.Entity;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.at.request.dom.application.holidayshipment.compltleavesimmng.AppHdsubRec;
 import nts.uk.ctx.at.request.dom.application.holidayshipment.compltleavesimmng.SyncState;
 import nts.uk.shr.com.context.AppContexts;
@@ -38,7 +41,7 @@ public class KrqdtAppHdsubRec extends ContractUkJpaEntity implements Serializabl
 
 	@Basic(optional = false)
 	@Column(name = "SYNCING")
-	private int syncing;
+	private boolean syncing;
 
 	@Override
 	protected Object getKey() {
@@ -53,11 +56,14 @@ public class KrqdtAppHdsubRec extends ContractUkJpaEntity implements Serializabl
 	public KrqdtAppHdsubRec(AppHdsubRec domain) {
 		super();
 		this.pk = new KrqdtAppHdsubRecPK(AppContexts.user().companyId(), domain.getRecAppID(), domain.getAbsenceLeaveAppID());
-		this.syncing = domain.getSyncing().value;
+		this.syncing = BooleanUtils.toBoolean(domain.getSyncing().value);
 	}
 	
 	public AppHdsubRec toDomain() {
-		return new AppHdsubRec(this.pk.getRecAppID(), this.pk.getAbsenceLeaveAppID(), this.syncing == 0? SyncState.ASYNCHRONOUS : SyncState.SYNCHRONIZING);
+		return new AppHdsubRec(
+				this.pk.getRecAppID(), 
+				this.pk.getAbsenceLeaveAppID(), 
+				EnumAdaptor.valueOf(BooleanUtils.toInteger(this.syncing), SyncState.class));
 	}
 	
 }

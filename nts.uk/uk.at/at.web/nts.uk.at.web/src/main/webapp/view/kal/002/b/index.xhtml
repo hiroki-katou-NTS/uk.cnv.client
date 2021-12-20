@@ -1,67 +1,166 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:com="http://xmlns.jcp.org/jsf/component"
-	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<html
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:com="http://xmlns.jcp.org/jsf/component"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+>
 <body>
-	<ui:composition template="../../../../master/base.xhtml">
-		<ui:define name="htmlHead">
-			<com:ValidatorScript>
-					nts.uk.ctx.at.function.dom.alarm.mailsettings.MailAddress
-					nts.uk.ctx.at.function.dom.alarm.mailsettings.Subject
-					nts.uk.ctx.at.function.dom.alarm.mailsettings.Content
-				</com:ValidatorScript>
-			<com:stylefile path="kal002.b.style.css" />
-			<com:scriptfile path="kal002.b.service.js" />
-			<com:scriptfile path="kal002.b.start.js" />
-			<com:scriptfile path="kal002.b.vm.js" />
-		</ui:define>
+<ui:composition template="../../../../master/base.xhtml">
+    <ui:define name="htmlHead">
+        <com:ValidatorScript>
+            nts.uk.ctx.at.function.dom.alarm.mailsettings.MailAddress
+            nts.uk.ctx.at.function.dom.alarm.mailsettings.Subject
+            nts.uk.ctx.at.function.dom.alarm.mailsettings.Content
+        </com:ValidatorScript>
+        <com:scriptfile set="IGNITE"/>
+        <com:stylefile path="kal002.b.css"/>
+        <com:scriptfile path="kal002.b.vm.js"/>
+    </ui:define>
 
-		<ui:define name="content">
-			<div id="functions-area">
-				<a class="goback" tabindex="1"
-					data-bind="ntsLinkButton: {jump: '../a/index.xhtml'}">#{i18n.getText('KAL002_4')}</a>
-				<button class="proceed" tabindex="2" data-bind="click: Registration">#{i18n.getText('KAL002_5')}</button>
-			</div>
-			<div id="contents-area">
-				<div class="label">
-					<span>#{i18n.getText('KAL002_6')}</span>
-				</div>
-				<div class="setMail normal">
-					<div class="left">
-						<div data-bind="ntsFormLabel: {}">#{i18n.getText('KAL002_7')}</div>
-					</div>
-					<div class="right">
-						<div class="option">
-							<span>#{i18n.getText('KAL002_10')}</span>
-							<button  tabindex="3" data-bind="click : setMailNormal">#{i18n.getText('KAL002_9')}</button>
-						</div>	
-						<div class="option">
-							<span>#{i18n.getText('KAL002_11')}</span>
-							<button  tabindex="4" data-bind="click : setMailNormalAd">#{i18n.getText('KAL002_9')}</button>
-						</div>	
-					</div>
-					<div class="cf"></div>
-				</div>
-				<div class="setMail auto">
-					<div class="left">
-						<div data-bind="ntsFormLabel: {}">#{i18n.getText('KAL002_8')}</div>
-					</div>
-					<div class="right">
-						<div class="option">
-							<span>#{i18n.getText('KAL002_10')}</span>
-							<button  tabindex="5" data-bind="click : setMailAuto">#{i18n.getText('KAL002_9')}</button>
-						</div>	
-						<div class="option">
-							<span>#{i18n.getText('KAL002_11')}</span>
-							<button tabindex="6" data-bind="click : setMailAutoAd">#{i18n.getText('KAL002_9')}</button>
-						</div>	
-					</div>
-					<div class="cf"></div>
-				</div>
-			</div>
-		</ui:define>
-	</ui:composition>
+    <ui:define name="content">
+        <div id="functions-area">
+            <!--B1_1-->
+            <a class="goback link-button" tabindex="1"
+               data-bind="ntsLinkButton: {jump: '../a/index.xhtml'}">#{i18n.getText('KAL002_4')}</a>
+            <!--B1_2-->
+            <button id="B1_2" class="proceed" tabindex="2" data-bind="enable: $root.errors.isEmpty(), click: $vm.registration">
+                #{i18n.getText('KAL002_5')}
+            </button>
+        </div>
+
+        <div id="contents-area">
+          <div class="mail-dest-setting">
+            <div>
+              <label id="B5_1">#{i18n.getText('KAL002_22')}</label> 
+            </div>
+            <div class="flex valign-center">
+              <div id="B5_2" data-bind="ntsFormLabel: {}">#{i18n.getText('KAL002_23')}</div>
+              <button id="B5_3" data-bind="click: openDialogCDL011" tabindex="3">#{i18n.getText('KAL002_24')}</button>
+            </div>
+          </div>
+            <div id="tab-panel" data-bind="ntsTabPanel: { dataSource: tabs, active: selectedTab}">
+                <div class="tab-content-1">
+                    <!--B2_1-->
+                    <div class="title">
+                        <span>#{i18n.getText('KAL002_6')}</span>
+                    </div>
+                    <!--Normal mail setting-->
+                    <div class="setMail">
+                        <div class="left">
+                            <!--B2_2-->
+                            <div data-bind="ntsFormLabel: {}">
+                                #{i18n.getText('KAL002_7')}
+                            </div>
+                        </div>
+                        <div class="right">
+                            <div class="option">
+                                <!--B2_3-->
+                                <span class="lable person-admin">#{i18n.getText('KAL002_10')}</span>
+                                <!--B2_4-->
+                                <button class="medium" tabindex="3" data-bind="click : manualMailSettingForPersonal">
+                                    #{i18n.getText('KAL002_9')}
+                                </button>
+                                <!--B4_1-->
+                                <span class="lable configured" data-bind="text: statusConfigManualPerson"></span>
+                            </div>
+                            <div class="option">
+                                <!--B2_5-->
+                                <span class="lable person-admin">#{i18n.getText('KAL002_11')}</span>
+                                <!--B2_6-->
+                                <button tabindex="4" data-bind="click : manualMailSettingForManager">
+                                    #{i18n.getText('KAL002_9')}
+                                </button>
+                                <!--B4_2-->
+                                <span class="lable configured" data-bind="text: statusConfigManualAdmin"></span>
+                            </div>
+                        </div>
+                        <div class="cf"></div>
+                    </div>
+                    <!--Auto mail setting-->
+                    <div class="setMail">
+                        <div class="left">
+                            <!--B3_1-->
+                            <div data-bind="ntsFormLabel: {}">#{i18n.getText('KAL002_8')}</div>
+                        </div>
+                        <div class="right">
+                            <div class="option">
+                                <!--B3_2-->
+                                <span class="lable person-admin">#{i18n.getText('KAL002_10')}</span>
+                                <!--B3_3-->
+                                <button tabindex="5" data-bind="click : automaticMailSettingForPersonal">
+                                    #{i18n.getText('KAL002_9')}
+                                </button>
+                                <!--B4_3-->
+                                <span class="lable configured" data-bind="text: statusConfigAutoPerson"></span>
+                            </div>
+                            <div class="option">
+                                <!--B3_4-->
+                                <span class="lable person-admin">#{i18n.getText('KAL002_11')}</span>
+                                <!--B3_5-->
+                                <button class="medium" tabindex="6" data-bind="click : automaticMailSettingForManager">
+                                    #{i18n.getText('KAL002_9')}
+                                </button>
+                                <!--B4_4-->
+                                <span class="label configured" data-bind="text: statusConfigAutoAdmin"></span>
+                            </div>
+                        </div>
+                        <div class="cf"></div>
+                    </div>
+                </div>
+                <div class="tab-content-2 tab-2">
+                    <div class="table custom-table">
+                        <div class="cell valign-center custom-cell">
+                            <!--B8_1-->
+                            <div data-bind="ntsFormLabel: {inline: true, required: true, enable: true}">#{i18n.getText('KAL012_17')}</div>
+                        </div>
+                        <div class="cell valign-center">
+                            <!--B8_2, B8_3-->
+                            <div tabindex="7" class="cf" data-bind="ntsSwitchButton: {
+                            name: $i18n('KAL012_17'),
+                            options: roundingRules,
+                            optionsValue: 'code',
+                            optionsText: 'name',
+                            value: selectedRoleSetting,
+                            required: true,
+                            enable: true }">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table custom-table">
+                        <div class="cell valign-center custom-cell">
+                            <!--B8_4-->
+                            <div data-bind="ntsFormLabel: {}">#{i18n.getText('KAL002_18')}</div>
+                        </div>
+                        <div class="cell valign-center custom-cell">
+                            <!--B8_5-->
+                            <input tabindex="8" data-bind="ntsTextEditor: {
+                                name: $i18n('KAL002_18'),
+                                value: roleName,
+                                required: enableRoleSetting,
+                                enable: false,
+                                readonly: enableRoleSetting}"/>
+                        </div>
+                        <div class="cell valign-center">
+                            <!--B8_6-->
+                            <button tabindex="9"
+                                    data-bind="enable: enableRoleSetting, click:openDialogRoleList">
+                                #{i18n.getText('KAL002_9')}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table custom-table">
+                        <div class="cell valign-center custom-cell"></div>
+                        <div class="cell valign-center">
+                            <!--B8_7-->
+                            <div class="label">#{i18n.getText('KAL002_21')}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
 </body>
 </html>

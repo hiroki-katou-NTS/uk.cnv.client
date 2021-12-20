@@ -20,7 +20,7 @@ public class AddRoleByRoleTiesCommandHandler extends CommandHandler<RoleByRoleTi
 	@Override
 	protected void handle(CommandHandlerContext<RoleByRoleTiesCommand> context) {
 		RoleByRoleTiesCommand role = context.getCommand();
-		RoleByRoleTies newRole = new RoleByRoleTies(role.getRoleId(),new WebMenuCode( role.getWebMenuCd()), AppContexts.user().companyId());
+		RoleByRoleTies newRole = new RoleByRoleTies(role.getRoleId(), AppContexts.user().companyId(), new WebMenuCode( role.getWebMenuCd()));
 		repo.insertRoleByRoleTies(newRole);
 	}
 

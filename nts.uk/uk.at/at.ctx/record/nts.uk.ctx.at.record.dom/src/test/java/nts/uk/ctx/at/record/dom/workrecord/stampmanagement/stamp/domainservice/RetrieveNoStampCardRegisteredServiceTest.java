@@ -13,7 +13,6 @@ import mockit.integration.junit4.JMockit;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampHelper;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordHelper;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.RetrieveNoStampCardRegisteredService.Require;
 /**
  * 
@@ -26,7 +25,7 @@ public class RetrieveNoStampCardRegisteredServiceTest {
 	@Injectable
 	private Require require;
 	
-	private String contractCode = "Contract01";
+//	private String contractCode = "Contract01";
 	
 	/**
 	 * require.getStempRcNotResgistNumber(period) is null
@@ -36,35 +35,30 @@ public class RetrieveNoStampCardRegisteredServiceTest {
 		DatePeriod period = new DatePeriod(GeneralDate.today().addDays(-1), GeneralDate.today().addDays(1));
 		new Expectations() {
 			{
-				require.getStempRcNotResgistNumber(period);
-				result = new ArrayList<>();
-				
-				require.getStempRcNotResgistNumberStamp(anyString, period);
+				require.getStempRcNotResgistNumberStamp( period);
 				result = new ArrayList<>();
 			}
 		};
 		
-		assertThat(RetrieveNoStampCardRegisteredService.get(require, period, contractCode).isEmpty()).isTrue();
+		assertThat(RetrieveNoStampCardRegisteredService.get(require, period).isEmpty()).isTrue();
 	}
-	/**
-	 * require.getStempRcNotResgistNumber(period) not null
-	 * require.getStempRcNotResgistNumberStamp(period) is null
-	 */
-	@Test
-	public void testRetrieveNoStampCardRegisteredService_2() {
-		DatePeriod period = new DatePeriod(GeneralDate.today().addDays(-1), GeneralDate.today().addDays(1));
-		new Expectations() {
-			{
-				require.getStempRcNotResgistNumber(period);
-				result = StampRecordHelper.getListStampRecord();
-				
-				require.getStempRcNotResgistNumberStamp(anyString, period);
-				result = new ArrayList<>();
-			}
-		};
-		
-		assertThat(RetrieveNoStampCardRegisteredService.get(require, period, contractCode).isEmpty()).isFalse();
-	}
+//	/**
+//	 * require.getStempRcNotResgistNumber(period) not null
+//	 * require.getStempRcNotResgistNumberStamp(period) is null
+//	 */
+//	@Test
+//	public void testRetrieveNoStampCardRegisteredService_2() {
+//		DatePeriod period = new DatePeriod(GeneralDate.today().addDays(-1), GeneralDate.today().addDays(1));
+//		new Expectations() {
+//			{
+//				
+//				require.getStempRcNotResgistNumberStamp(period);
+//				result = new ArrayList<>();
+//			}
+//		};
+//		
+//		assertThat(RetrieveNoStampCardRegisteredService.get(require, period).isEmpty()).isFalse();
+//	}
 
 	/**
 	 * require.getStempRcNotResgistNumber(period) not null
@@ -75,13 +69,11 @@ public class RetrieveNoStampCardRegisteredServiceTest {
 		DatePeriod period = new DatePeriod(GeneralDate.today().addDays(-1), GeneralDate.today().addDays(1));
 		new Expectations() {
 			{
-				require.getStempRcNotResgistNumber(period);
-				result = StampRecordHelper.getListStampRecord();
 				
-				require.getStempRcNotResgistNumberStamp(anyString, period);
+				require.getStempRcNotResgistNumberStamp( period);
 				result = StampHelper.getListStampDefault();
 			}
 		};
-		assertThat(RetrieveNoStampCardRegisteredService.get(require, period, contractCode).isEmpty()).isFalse();
+		assertThat(RetrieveNoStampCardRegisteredService.get(require, period).isEmpty()).isFalse();
 	}
 }

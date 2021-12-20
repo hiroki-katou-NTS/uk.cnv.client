@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+	<ui:composition template="../../../../../master/base.xhtml">
+		<ui:define name="htmlHead">
+			<com:scriptfile set="IGNITE" />		
+			<com:stylefile path="/view/ccg/share/style.css" of="/nts.uk.com.web" />			
+			<com:scriptfile path="/view/kcp/share/list.js" of="/nts.uk.com.web" />
+			<com:scriptfile path="/view/kcp/share/tree.js" of="/nts.uk.com.web" />
+			<com:scriptfile path="/view/ccg/share/ccg.service.js" of="/nts.uk.com.web" />
+			<com:scriptfile path="/view/ccg/share/ccg.vm.js" of="/nts.uk.com.web" />
+
+			<com:stylefile path="ksu003.c.test.style.css" />	
+			<com:scriptfile path="ksu003.c.test.vm.js" />	
+            <!-- <com:scriptfile path="ksu003.c.test.start.js" />		 -->
+
+		</ui:define>
+		<ui:define name="content">
+			<div id="functions-area">
+				<button data-bind="click: openDialog">Open KSU003C</button>
+			</div>
+			<div id="content-area">
+				<div id="left-content" style="margin-top: 20px; margin-left: 20px;">					
+                    Chosse reference date:
+                        <div data-bind="ntsDatePicker: {value: date, dateType:'date', dateFormat:'YYYY/MM/DD' }"></div>
+						
+				</div>
+			
+				<div id="right-content">
+					<div style="margin-top:50px; margin-left: 20px;" id="ccgcomponent" tabindex="1" ></div>
+					<div style="margin-left: 380px;" id="component-items-list" ></div>
+				</div>
+
+				<hr/>
+				<div style="display: flex; margin-left: 20px; margin-top: 10px;">
+					Data return from KSU003C: exitStatus =   <div style=" margin-top: 1px; margin-left: 5px;" data-bind="text: dataFromKsu003c()"></div>
+				</div>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+
+</html>

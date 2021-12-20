@@ -1777,7 +1777,7 @@ public class JpaDailyPerformanceScreenRepo extends JpaRepository implements Dail
 		List<ErrorFlexMonthDto> errorFlex = this.queryProxy().query(GET_MONTH_ERROR, KrcdtEmployeeMonthlyPerError.class)
 				.setParameter("errorType", errorType).setParameter("yearMonth", yearMonth)
 				.setParameter("employeeId", employeeId).setParameter("closureId", closureId)
-				.setParameter("closeDay", closeDay).setParameter("isLastDay", isLastDay)
+				.setParameter("closeDay", closeDay).setParameter("isLastDay", isLastDay == 1)
 				.getList(x -> new ErrorFlexMonthDto(x.flex, x.annualHoliday, x.yearlyReserved));
 		return errorFlex;
 	}

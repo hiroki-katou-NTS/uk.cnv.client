@@ -18,8 +18,8 @@ import nts.uk.ctx.at.shared.dom.scherec.application.reflectprocess.common.Reflec
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.groupappabsence.algorithm.DeleteAttendanceProcess;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.TimeChangeMeans;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.vtotalmethod.WorkTypeClassification;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
+import nts.uk.ctx.at.shared.dom.worktype.WorkTypeClassification;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeCode;
 
 @RunWith(JMockit.class)

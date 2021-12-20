@@ -27,12 +27,14 @@ import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.WorkInformationStamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.support.SupportCardNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeCalArt;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.SetPreClockArt;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampType;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.OvertimeDeclaration;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkLocationCD;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.work.WorkCode;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.work.WorkGroup;
 import nts.uk.ctx.at.shared.dom.workrule.goingout.GoingOutReason;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
 import nts.uk.shr.infra.data.entity.UkJpaEntity;
@@ -176,18 +178,46 @@ public class KrcdtStamp extends UkJpaEntity implements Serializable {
 	@Column(name = "TIME_RECORD_CODE")
 	public String timeRecordCode;
 	
+	/**
+	 * 作業コード1
+	 */
+	@Basic(optional = true)
+	@Column(name = "TASK_CD1")
+	public String taskCd1;
+	
+	/**
+	 * 作業コード2
+	 */
+	@Basic(optional = true)
+	@Column(name = "TASK_CD2")
+	public String taskCd2;
+	
+	/**
+	 * 作業コード3
+	 */
+	@Basic(optional = true)
+	@Column(name = "TASK_CD3")
+	public String taskCd3;
+	
+	/**
+	 * 作業コード4
+	 */
+	@Basic(optional = true)
+	@Column(name = "TASK_CD4")
+	public String taskCd4;
+	
+	/**
+	 * 作業コード5
+	 */
+	@Basic(optional = true)
+	@Column(name = "TASK_CD5")
+	public String taskCd5;
+
 	// ver6	ver7		
 	// 反映された年月日
 	@Basic(optional = true)
 	@Column(name = "REFLECTED_INTO_DATE")
 	public GeneralDate reflectedIntoDate;
-
-	/**
-	 * 打刻記録ID
-	 */
-	@Basic(optional = false)
-	@Column(name = "STAMP_RECORD_ID")
-	public String stampRecordId;
 
 	@Override
 	protected Object getKey() {
@@ -221,7 +251,12 @@ public class KrcdtStamp extends UkJpaEntity implements Serializable {
 		this.locationLat = stamp.getLocationInfor().isPresent()? new BigDecimal(stamp.getLocationInfor().get().getLatitude()):null;
 		this.workplaceId = (stamp.getRefActualResults() != null && stamp.getRefActualResults().getWorkInforStamp().isPresent() && stamp.getRefActualResults().getWorkInforStamp().get().getWorkplaceID().isPresent()) ? stamp.getRefActualResults().getWorkInforStamp().get().getWorkplaceID().get() : null;
 		this.timeRecordCode = (stamp.getRefActualResults() != null && stamp.getRefActualResults().getWorkInforStamp().isPresent() && stamp.getRefActualResults().getWorkInforStamp().get().getEmpInfoTerCode().isPresent()) ? stamp.getRefActualResults().getWorkInforStamp().get().getEmpInfoTerCode().get().toString() : null;
-		this.stampRecordId = stamp.getStampRecordId();
+
+		this.taskCd1 = stamp.getRefActualResults().getWorkGroup().map(m -> m.getWorkCD1().v()).orElse(null);
+		this.taskCd2 = stamp.getRefActualResults().getWorkGroup().map(m -> m.getWorkCD2().map(t -> t.v()).orElse(null)).orElse(null);
+		this.taskCd3 = stamp.getRefActualResults().getWorkGroup().map(m -> m.getWorkCD3().map(t -> t.v()).orElse(null)).orElse(null);
+		this.taskCd4 = stamp.getRefActualResults().getWorkGroup().map(m -> m.getWorkCD4().map(t -> t.v()).orElse(null)).orElse(null);
+		this.taskCd5 = stamp.getRefActualResults().getWorkGroup().map(m -> m.getWorkCD5().map(t -> t.v()).orElse(null)).orElse(null);
 		
 		// ver6,ver7
 		this.reflectedIntoDate = stamp.getImprintReflectionStatus().getReflectedDate().orElse(null);
@@ -238,7 +273,7 @@ public class KrcdtStamp extends UkJpaEntity implements Serializable {
 		val relieve = new Relieve(AuthcMethod.valueOf(this.autcMethod), StampMeans.valueOf(this.stampMeans));
 		val stampType = StampType.getStampType(this.changeHalfDay,
 				this.goOutArt == null ? null : GoingOutReason.valueOf(this.goOutArt),
-				SetPreClockArt.valueOf(this.preClockArt), ChangeClockArt.valueOf(this.pk.changeClockArt),
+				SetPreClockArt.valueOf(this.preClockArt), ChangeClockAtr.valueOf(this.pk.changeClockArt),
 				ChangeCalArt.valueOf(this.changeCalArt));
 		
 		OvertimeDeclaration overtime = this.overTime == null ? null
@@ -250,9 +285,19 @@ public class KrcdtStamp extends UkJpaEntity implements Serializable {
 				this.stampPlace == null ? Optional.empty() : Optional.of(new WorkLocationCD(this.stampPlace)), 
 				this.suportCard == null ? Optional.empty() : Optional.of(new SupportCardNumber(this.suportCard)));
 		
+		WorkGroup workGroup = null;
+		
+		if (this.taskCd1 != null) {
+			workGroup = new WorkGroup(new WorkCode(this.taskCd1),
+					Optional.ofNullable(taskCd2 == null ? null : new WorkCode(this.taskCd2)),
+					Optional.ofNullable(taskCd3 == null ? null : new WorkCode(this.taskCd3)),
+					Optional.ofNullable(taskCd4 == null ? null : new WorkCode(this.taskCd4)),
+					Optional.ofNullable(taskCd5 == null ? null : new WorkCode(this.taskCd5)));
+		}
+		
 		val refectActualResult = new RefectActualResult(workInformationStamp,
-				this.workTime == null ? null : new WorkTimeCode(this.workTime),
-				overtime);
+														this.workTime == null ? null : new WorkTimeCode(this.workTime),
+														overtime, workGroup );
 		
 		val imprintReflectionState = new ImprintReflectionState(this.reflectedAtr, Optional.ofNullable(this.reflectedIntoDate));
 		
@@ -260,8 +305,7 @@ public class KrcdtStamp extends UkJpaEntity implements Serializable {
 						stampNumber, 
 						this.pk.stampDateTime,
 						relieve, stampType, refectActualResult,
-						imprintReflectionState, Optional.ofNullable(geoLocation), Optional.empty(),
-						this.stampRecordId);
+						imprintReflectionState, Optional.ofNullable(geoLocation), Optional.empty());
 
 	}
 }

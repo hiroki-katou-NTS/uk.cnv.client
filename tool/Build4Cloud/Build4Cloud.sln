@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Build4Cloud", "Build4Cloud.csproj", "{33F31E8D-1F8D-4717-967D-B5C394D73247}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{33F31E8D-1F8D-4717-967D-B5C394D73247}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33F31E8D-1F8D-4717-967D-B5C394D73247}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33F31E8D-1F8D-4717-967D-B5C394D73247}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33F31E8D-1F8D-4717-967D-B5C394D73247}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CF88500C-BD04-40F9-9DE5-5D64E49633EC}
+	EndGlobalSection
+EndGlobal

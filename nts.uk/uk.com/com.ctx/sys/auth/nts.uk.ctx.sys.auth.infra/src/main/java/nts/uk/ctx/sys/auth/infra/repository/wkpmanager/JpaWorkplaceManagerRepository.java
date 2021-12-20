@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -67,7 +68,6 @@ public class JpaWorkplaceManagerRepository extends JpaRepository implements Work
 
 	private static final String FIND_BY_WKP_AND_BASEDATE = "SELECT wm FROM SacmtWkpManager wm "
 		+ " WHERE wm.workplaceId = :workplaceId " + " AND wm.startDate <= :baseDate AND wm.endDate >= :baseDate ";
-
 	private static final String WORKPLACE_SELECT_ALL_CID;
 	static {
 		StringBuilder builderString = new StringBuilder();
@@ -94,6 +94,11 @@ public class JpaWorkplaceManagerRepository extends JpaRepository implements Work
 
 		WORKPLACE_SELECT_ALL_CID = builderString.toString();
 
+	}
+	
+	@Override
+	public Optional<WorkplaceManager> getWorkplaceManagerByID(String id) {
+		return this.queryProxy().find(new SacmtWorkplaceManagerPK(id),SacmtWkpManager.class).map(SacmtWkpManager::toDomain);
 	}
 
 	/**
@@ -249,6 +254,41 @@ public class JpaWorkplaceManagerRepository extends JpaRepository implements Work
 				rec.getGeneralDate("END_DATE"), 
 				values);
 		return item;
+	}
+
+	@Override
+	public List<WorkplaceManager> getWkpManagerByWorkplaceIdAndSid(String workplaceId, String sid) {
+		String FIND_BY_WKP_WPL_ID_AND_SID = " SELECT wm FROM SacmtWkpManager wm "
+				+ " WHERE wm.workplaceId = :workplaceId "
+				+ " AND wm.employeeId = :sid "
+				+ " ORDER BY wm.startDate ASC ";
+
+		return this.queryProxy().query(FIND_BY_WKP_WPL_ID_AND_SID,SacmtWkpManager.class)
+				.setParameter("workplaceId", workplaceId)
+				.setParameter("sid", sid)
+				.getList(SacmtWkpManager::toDomain);
+	}
+
+	@Override
+	public List<WorkplaceManager> getWkpManagerListBySid(String sid) {
+		String FIND_BY_SID = " SELECT wm FROM SacmtWkpManager wm "
+				+ " WHERE wm.employeeId = :sid ";
+		return this.queryProxy().query(FIND_BY_SID,SacmtWkpManager.class)
+				.setParameter("sid",sid)
+				.getList(SacmtWkpManager::toDomain);
+	}
+
+	@Override
+	public void deleteByWorkplaceIdAndSid(String workplaceId, String sid) {
+		String DEL_BY_WKP_WPL_ID_AND_SID =
+				 " DELETE  FROM SacmtWkpManager wm "
+				+" WHERE wm.workplaceId = :workplaceId  "
+				+" AND wm.employeeId = :sid ";
+		this.getEntityManager().createQuery(DEL_BY_WKP_WPL_ID_AND_SID)
+				.setParameter("workplaceId", workplaceId)
+				.setParameter("sid", sid)
+				.executeUpdate();
+		this.getEntityManager().flush();
 	}
 
 }

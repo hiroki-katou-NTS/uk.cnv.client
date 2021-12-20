@@ -19,24 +19,24 @@ import nts.uk.file.at.app.export.shift.specificdayset.SpecificdaySetWorkplaceRep
 @Stateless
 public class JpaSpecificdaySetReportRepository extends JpaRepository implements SpecificdaySetReportRepository {
 	
-	private static final String GET_COMPANY_SPEC_SET = "SELECT s.SPECIFIC_DATE, s.SPECIFIC_DATE_ITEM_NO, p.NAME  FROM KSCMT_SPEC_DATE_COM s"
+	private static final String GET_COMPANY_SPEC_SET = "SELECT s.YMD, s.SPECIFIC_DATE_ITEM_NO, p.NAME  FROM KSCMT_SPECIFIC_DATE_CMP s"
 			+ " INNER JOIN KSCMT_SPEC_DATE_ITEM p "
 			+ " ON p.SPECIFIC_DATE_ITEM_NO = s.SPECIFIC_DATE_ITEM_NO "
 			+ "	AND s.CID = p.CID "
 			+ " WHERE s.CID = ?companyId AND p.USE_ATR = 1"
-			+ " AND s.SPECIFIC_DATE >= ?startYm"
-			+ " AND s.SPECIFIC_DATE <= ?endYm";
+			+ " AND s.YMD >= ?startYm"
+			+ " AND s.YMD <= ?endYm";
 	
 	private static final String GET_WORKSPACE_SPEC_SET = "SELECT"
-			+ " DISTINCT s.WKPID, s.SPECIFIC_DATE, s.SPECIFIC_DATE_ITEM_NO, w.WKP_CD, p.NAME "
-			+ "	FROM KSCMT_SPEC_DATE_WKP s"
+			+ " DISTINCT s.WKP_ID, s.SPECIFIC_DATE, s.SPECIFIC_DATE_ITEM_NO, w.WKP_CD, p.NAME "
+			+ "	FROM KSCMT_SPECIFIC_DATE_WKP s"
 			+ " LEFT JOIN KSCMT_SPEC_DATE_ITEM p "
 			+ "	ON s.SPECIFIC_DATE_ITEM_NO = p.SPECIFIC_DATE_ITEM_NO "
 			+ " LEFT JOIN BSYMT_WKP_INFO w ON w.CID = ?companyId "
-			+ "	AND w.WKP_ID = s.WKPID"
+			+ "	AND w.WKP_ID = s.WKP_ID"
 			+ " WHERE p.USE_ATR = 1"
-			+ " AND s.SPECIFIC_DATE >= ?startYm"
-			+ " AND s.SPECIFIC_DATE <= ?endYm";
+			+ " AND s.YMD >= ?startYm"
+			+ " AND s.YMD <= ?endYm";
 	
 //	private static final String GET_BEGIN_MONTH_COMPANY = "SELECT a.MONTH_STR FROM BCMMT_COMPANY a WHERE  a.CID = ?companyId";
 	

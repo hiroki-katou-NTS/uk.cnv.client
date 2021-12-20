@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 
 import nts.uk.ctx.exio.app.input.setting.assembly.revise.ReviseItemDto;
 import nts.uk.ctx.exio.app.input.setting.assembly.revise.ReviseItemFinder;
+import nts.uk.ctx.exio.dom.input.domain.ImportingDomainId;
 import nts.uk.ctx.exio.dom.input.setting.ExternalImportCode;
 
 @Path("exio/input/setting/assembly/revise/reviseitem")
@@ -19,12 +20,13 @@ public class ReviseItemWebService {
 	private ReviseItemFinder finder;
 	
 	@POST
-	@Path("get/{settingCode}/{itemNo}")
+	@Path("get/{settingCode}/{domainId}/{itemNo}")
 	public ReviseItemDto get(
 			@PathParam("settingCode") String settingCode,
+			@PathParam("domainId") int domainId,
 			@PathParam("itemNo") int itemNo) {
 		
-		return finder.find(new ExternalImportCode(settingCode), itemNo)
+		return finder.find(new ExternalImportCode(settingCode), ImportingDomainId.valueOf(domainId), itemNo)
 				.orElse(new ReviseItemDto(settingCode, itemNo, null));
 	}
 }

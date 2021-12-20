@@ -24,6 +24,7 @@ import nts.uk.ctx.at.record.app.find.monthly.root.AttendanceTimeOfMonthlyDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyCareHdRemainDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyChildCareHdRemainDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyDayoffRemainDataDto;
+import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyPublicHolidayRemainDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyRecordWorkDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyRemarksDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.RsvLeaRemNumEachMonthDto;
@@ -109,6 +110,7 @@ public class MonthlyRecordWorkFinder extends MonthlyFinderFacade {
 				dto.setSpecialHoliday(SpecialHolidayRemainDataDtoWrap.from(r.getSpecialHolidayRemainData()));
 				dto.setCare(MonthlyCareHdRemainDto.from(r.getMonCareHdRemain()));
 				dto.setChildCare(MonthlyChildCareHdRemainDto.from(r.getMonChildHdRemain()));
+				dto.setPublicHoliday(MonthlyPublicHolidayRemainDto.from(r.getMonPublicHoliday()));
 			});
 
 			dto.setAgreementTime(agreementFinder.find(employeeId, yearMonth, closureId, closureDate));
@@ -173,6 +175,7 @@ public class MonthlyRecordWorkFinder extends MonthlyFinderFacade {
 				dto.setSpecialHoliday(SpecialHolidayRemainDataDtoWrap.from(r.getSpecialHolidayRemainData()));
 				dto.setCare(MonthlyCareHdRemainDto.from(r.getMonCareHdRemain()));
 				dto.setChildCare(MonthlyChildCareHdRemainDto.from(r.getMonChildHdRemain()));
+				dto.setPublicHoliday(MonthlyPublicHolidayRemainDto.from(r.getMonPublicHoliday()));
 			});
 			dto.setAnyItem(filterItem(any, aff));
 			dto.setRemarks(filterItem(remarks, aff));

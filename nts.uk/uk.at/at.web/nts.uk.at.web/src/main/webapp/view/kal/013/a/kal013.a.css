@@ -46,20 +46,12 @@ table td.text-center {
   margin-right: 15px;
 }
 
-#fixedTable  .switchbox-wrappers .radio-wrapper span {
+#fixedTable .nts-input:not(.checkbox-wrapper) {
+  width: 222px !important;
+}
+
+#fixedTable .nts-switch-button {
   width: 60px !important;
-}
-
-#fixedTableCCDT .switchbox-wrappers .radio-wrapper span {
-  width: 60px !important;
-}
-
-#fixedTableCCDT {
-  margin-top: 10px;
-}
-
-#fixedTable .ui-iggrid table thead tr, #fixedTableCCDT .ui-iggrid table thead tr {
-  height: 32px !important;
 }
 
 #fixedTableCCDT .nts-input:not(.radio-wrapper, .radio-wrappers, .checkbox-wrapper) {
@@ -77,4 +69,13 @@ table td.text-center {
 
 .ui-tabs-panel {
   width: fit-content;
+}
+
+.checkbox-wrapper {
+  display: block!important;
+  margin: 0 auto;
+}
+
+.tabs-content thead th {
+  height: 32px;
 }

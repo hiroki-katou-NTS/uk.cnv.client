@@ -15,9 +15,14 @@ module nts.uk.com.view.cmf001.a {
             /**
              * request to create creation screen
              */
-            settingScreen(): void {
+            settingScreenB(): void {
                 let self = this;
                 nts.uk.request.jump("/view/cmf/001/b/index.xhtml");
+            }
+
+            settingScreenE(): void {
+                let self = this;
+                nts.uk.request.jump("/view/cmf/001/e/index.xhtml");
             }
         }
     }

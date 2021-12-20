@@ -32,11 +32,11 @@ public class NumberOfEmployeesByWorkMethodCountingServiceTest {
 		WorkInformation workInfo4 = new WorkInformation(new WorkTypeCode("wtp-code4"), new WorkTimeCode("002") );
 		WorkInformation workInfo5 = new WorkInformation(new WorkTypeCode("wtp-code5"), null );
 		
-		WorkInfoOfDailyAttendance workInfoOfDailyAttendance1 = WorkInfoOfDailyAttendanceHelper.getData(workInfo1);
-		WorkInfoOfDailyAttendance workInfoOfDailyAttendance2 = WorkInfoOfDailyAttendanceHelper.getData(workInfo2);
-		WorkInfoOfDailyAttendance workInfoOfDailyAttendance3 = WorkInfoOfDailyAttendanceHelper.getData(workInfo3);
-		WorkInfoOfDailyAttendance workInfoOfDailyAttendance4 = WorkInfoOfDailyAttendanceHelper.getData(workInfo4);
-		WorkInfoOfDailyAttendance workInfoOfDailyAttendance5 = WorkInfoOfDailyAttendanceHelper.getData(workInfo5);
+		WorkInfoOfDailyAttendance workInfoOfDailyAttendance1 = WorkInfoOfDailyAttendanceHelper.createByWorkInformation(workInfo1);
+		WorkInfoOfDailyAttendance workInfoOfDailyAttendance2 = WorkInfoOfDailyAttendanceHelper.createByWorkInformation(workInfo2);
+		WorkInfoOfDailyAttendance workInfoOfDailyAttendance3 = WorkInfoOfDailyAttendanceHelper.createByWorkInformation(workInfo3);
+		WorkInfoOfDailyAttendance workInfoOfDailyAttendance4 = WorkInfoOfDailyAttendanceHelper.createByWorkInformation(workInfo4);
+		WorkInfoOfDailyAttendance workInfoOfDailyAttendance5 = WorkInfoOfDailyAttendanceHelper.createByWorkInformation(workInfo5);
 		List<WorkInfoOfDailyAttendance> workInfoList = Arrays.asList(
 				workInfoOfDailyAttendance1,
 				workInfoOfDailyAttendance2,

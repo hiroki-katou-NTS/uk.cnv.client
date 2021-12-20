@@ -170,9 +170,11 @@ module nts.uk.at.view.kml002.b {
         vm.countingNumberTimes(data[2].use ? Usage.Use : Usage.NotUse);
         vm.numberCounterSetting(data[2].setting);
         //就業時間帯別の利用人数
-        vm.numberPassengersWorkingHours(data[3].use ? Usage.Use : Usage.NotUse);
+        // vm.numberPassengersWorkingHours(data[3].use ? Usage.Use : Usage.NotUse);
+        vm.numberPassengersWorkingHours(Usage.NotUse);
         //時間帯人数
-        vm.timeZoneNumberPeople(data[4].use ? Usage.Use : Usage.NotUse);
+        // vm.timeZoneNumberPeople(data[4].use ? Usage.Use : Usage.NotUse);
+        vm.timeZoneNumberPeople(Usage.NotUse);
         vm.workplaceTimeZoneSetting(data[4].setting);
         //雇用人数
         vm.numberOfEmployees(data[5].use ? Usage.Use : Usage.NotUse);

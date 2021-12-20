@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+>
+<body>
+<ui:composition template="../../../../master/dialog.xhtml">
+    <ui:define name="htmlHead">
+        <script>
+            var dialogSize = {
+                width: 600,
+                height: 320
+            };
+        </script>
+        <com:ValidatorScript>
+            nts.uk.ctx.pereg.dom.roles.RoleCode
+            nts.uk.ctx.pereg.dom.roles.RoleName
+        </com:ValidatorScript>
+        <com:scriptfile set="IGNITE"/>
+        <com:stylefile path="ksu.002.b.style.css"/>
+        <com:scriptfile path="ksu.002.b.vm.js"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div id='functions-area' style="padding-left: 40px">
+            <!--B1_1-->
+            <button id="B1_1" data-bind='click:exportFile' tabindex="1">#{i18n.getText('KSU002_47')}</button>
+            <!--B1_2-->
+            <button id="B1_2" data-bind='click:closeDialog' tabindex="2">#{i18n.getText('KSU002_48')}</button>
+        </div>
+        <div id="contents-area" style="padding-left: 40px">
+            <div class="table custom-table">
+                <div class="cell valign-center first-column">
+                    <!--B2_1-->
+                    <div data-bind="ntsFormLabel: {}">#{i18n.getText('KSU002_49')}</div>
+                </div>
+                <div class="cell valign-center first-column">
+                    <!--B2_2-->
+                    <div class="label" data-bind="text:model.employeeCode"></div>
+                </div>
+                <div class="cell valign-center ">
+                    <!--B2_3-->
+                    <div class="label" data-bind="text:model.employeeName"></div>
+                </div>
+            </div>
+            <div class="table custom-table">
+                <div class="cell valign-center first-column">
+                    <!--B3_1-->
+                    <div data-bind="ntsFormLabel: {}">#{i18n.getText('KSU002_50')}</div>
+                </div>
+                <div class="cell valign-center ">
+                    <!--B3_2-->
+                    <div class="label" data-bind="text:datePeriod"></div>
+                </div>
+            </div>
+            <div class="table custom-table">
+                <div class="cell valign-center first-column">
+                    <!--B4_1-->
+                    <div data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KSU002_52')}</div>
+                </div>
+                <div class="cell valign-center ">
+                    <!--B4_2-->
+                    <div tabindex="0" id="B4_2" class="cf" data-bind="ntsSwitchButton: {
+                        name: 'Sample Switch',
+                        options: roundingRules,
+                        optionsValue: 'code',
+                        optionsText: 'name',
+                        value: model.isTotalDisplay,
+                        required: true,
+                        enable: enableTotal }"></div>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+</body>
+</html>

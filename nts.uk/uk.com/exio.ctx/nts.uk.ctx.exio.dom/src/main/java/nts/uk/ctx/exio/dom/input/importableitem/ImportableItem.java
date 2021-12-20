@@ -18,11 +18,11 @@ import nts.arc.primitive.StringPrimitiveValue;
 import nts.arc.primitive.TimeClockPrimitiveValue;
 import nts.arc.primitive.TimeDurationPrimitiveValue;
 import nts.gul.reflection.ClassReflection;
+import nts.gul.util.Either;
 import nts.uk.ctx.exio.dom.input.DataItem;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomainId;
 import nts.uk.ctx.exio.dom.input.errors.ErrorMessage;
 import nts.uk.ctx.exio.dom.input.errors.ItemError;
-import nts.uk.ctx.exio.dom.input.util.Either;
 
 /**
  * 受入可能項目
@@ -42,7 +42,7 @@ public class ImportableItem implements DomainAggregate{
 
 	public Optional<ErrorMessage> validate(DataItem dataItem) {
 
-		if(required && dataItem.isEmpty()) {
+		if((required || isPrimaryKey) && dataItem.isEmpty()) {
 			return Optional.of(new ErrorMessage("必須項目ですが受入データがありません。"));
 		}
 

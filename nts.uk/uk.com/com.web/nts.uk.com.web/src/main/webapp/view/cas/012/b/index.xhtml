@@ -1,50 +1,54 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:com="http://xmlns.jcp.org/jsf/component"
-	xmlns:h="http://xmlns.jcp.org/jsf/html">
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
 <body>
-	<ui:composition template="../../../../master/dialog.xhtml">
-		<ui:define name="htmlHead">
-			<com:scriptfile set="IGNITE" />
-			<script>var dialogSize = { width: 430, height: 660 };</script>
-			<com:ValidatorScript>
-					nts.uk.shr.com.primitive.PersonId
-				</com:ValidatorScript>
-			<com:stylefile path="cas012.b.style.css" />
-			<com:scriptfile path="cas012.b.service.js" />
-			<com:scriptfile path="cas012.b.start.js" />
-			<com:scriptfile path="cas012.b.vm.js" />
-		</ui:define>
+<ui:composition template="../../../../master/dialog.xhtml">
+    <ui:define name="htmlHead">
+        <com:scriptfile set="IGNITE"/>
+        <script>var dialogSize = {width: 625, height: 580};</script>
+        <com:ValidatorScript>
+            nts.uk.shr.com.primitive.PersonId
+        </com:ValidatorScript>
+        <com:stylefile path="cas012.b.style.css"/>
+        <com:scriptfile path="cas012.b.vm.js"/>
+        <!-- KCP005 -->
+        <com:scriptfile path="/view/kcp/share/list.js" of="/nts.uk.com.web"/>
+    </ui:define>
 
-		<ui:define name="content">
-
-			<div id="contents-area">
-				<div class="cf">
-					<div class="control-group">
-						<div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CAS012_20')}</div>
-						<input tabindex="1" id="search"
-							data-bind="ntsTextEditor: {value: searchValue, enterkey: enterPress}" />
-						<button tabindex="2" id="searchButton" data-bind="click: search">#{i18n.getText('CAS012_23')}</button>
-					</div>
-					<table tabindex="3" id="grid_container" style="margin: auto;"
-						data-bind="ntsGridList: {
-											height: 450,
-											options: dataSource,
-											optionsValue: 'userID',
-											columns: columns,
-											value: selectUserID}">
-					</table>
-
-				</div>
-			</div>
-			<div id="functions-area-bottom">
-				<button tabindex="4" class="proceed x-large"
-					data-bind="click :decision">#{i18n.getText('CAS012_27')}</button>
-				<button tabindex="5" data-bind="click :cancel_Dialog">#{i18n.getText('CAS012_28')}</button>
-			</div>
-		</ui:define>
-	</ui:composition>
+    <ui:define name="content">
+        <div id="contents-area">
+            <div class="cf">
+                <div class="cas012-b">
+                    <div class="control-group">
+                        <!--B1_1-->
+                        <div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('Com_Company')}</div>
+                        <!--B1_2-->
+                        <div id="combo-box2" tabindex="1"
+                             data-bind="ntsComboBox: {
+								 			width: '524px',
+											options: listCompany,
+											optionsValue: 'id',
+											visibleItemsCount: 20,
+											value: companyId,
+											optionsText: 'name',
+												columns: [
+											{ prop: 'code',length: 4},
+ 											{ prop: 'name', length: 10}]}">
+                        </div>
+                    </div>
+                    <div id="kcp005"  tabindex="3" ></div>
+                </div>
+            </div>
+        </div>
+        <div id="functions-area-bottom">
+            <button class="proceed x-large" tabindex="4"
+                    data-bind="click :decision">#{i18n.getText('CAS012_28')}</button>
+            <button data-bind="click :cancel_Dialog" tabindex="5">#{i18n.getText('CAS012_29')}</button>
+        </div>
+    </ui:define>
+</ui:composition>
 </body>
 </html>

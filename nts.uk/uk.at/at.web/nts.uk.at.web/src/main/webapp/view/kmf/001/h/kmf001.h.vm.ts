@@ -22,6 +22,7 @@ module nts.uk.pr.view.kmf001.h {
 
             // Switch button data source
             vacationExpirationEnums: KnockoutObservableArray<Enum>;
+            defaultVacationExpirationEnums: KnockoutObservableArray<Enum>;
             applyPermissionEnums: KnockoutObservableArray<Enum>;
             manageDistinctEnums: KnockoutObservableArray<Enum>;
             
@@ -58,6 +59,7 @@ module nts.uk.pr.view.kmf001.h {
                 self.alreadySettingList = ko.observableArray([]);
 
                 self.vacationExpirationEnums = ko.observableArray([]);
+                self.defaultVacationExpirationEnums = ko.observableArray([]);
                 self.applyPermissionEnums = ko.observableArray([]);
                 self.manageDistinctEnums = ko.observableArray([]);
                 self.h32 =  ko.observableArray([]);
@@ -73,14 +75,14 @@ module nts.uk.pr.view.kmf001.h {
                         manageDeadline: 0,
                         linkingManagementATR : 1
                         
-                    }));
+                    }, this));
                 self.empSettingModel = ko.observable(
                     new EmpSubstVacationModel({
                         contractTypeCode: "",
                         isManage: 1,
                         expirationDate: 0,
                         allowPrepaidLeave: 1
-                    }));
+                    }, this));
 
                 self.isComManaged = ko.computed(function() {
                     return self.settingModel().isManage() == 1;
@@ -196,7 +198,8 @@ module nts.uk.pr.view.kmf001.h {
                 let self = this;
                 let dfd = $.Deferred();
                 this.service.getVacationExpirationEnum().done(function(res: Array<Enum>) {
-                    self.vacationExpirationEnums(res);
+                    self.defaultVacationExpirationEnums(res);
+                    self.settingModel().manageDeadline.valueHasMutated();
                     dfd.resolve();
                 }).fail(function(res) {
                     nts.uk.ui.dialog.alertError(res.message);
@@ -220,7 +223,7 @@ module nts.uk.pr.view.kmf001.h {
                 let self = this;
                 let dfd = $.Deferred();
                 this.service.getH32().done(function(res: Array<Enum>) {
-                    self.h32(res);
+                    self.h32(_.reverse(res));
                     dfd.resolve();
                 }).fail(function(res) {
                     nts.uk.ui.dialog.alertError(res.message);
@@ -400,11 +403,21 @@ module nts.uk.pr.view.kmf001.h {
             allowPrepaidLeave: KnockoutObservable<number>;
             manageDeadline:  KnockoutObservable<number>;
 
-            constructor(dto: SubstVacationSettingDto) {
+            constructor(dto: SubstVacationSettingDto, context: ScreenModel) {
                 this.isManage = ko.observable(dto.isManage);
                 this.expirationDate = ko.observable(dto.expirationDate);
                 this.allowPrepaidLeave = ko.observable(dto.allowPrepaidLeave);
                 this.manageDeadline = ko.observable(dto.manageDeadline);
+
+                this.manageDeadline.subscribe(value => {
+                  let arr = _.clone(context.defaultVacationExpirationEnums());
+                  if (value === 1) {
+                    arr = _.slice(arr, 3);
+                  }
+                  context.vacationExpirationEnums(arr);
+                  this.expirationDate.valueHasMutated();
+                });
+                this.manageDeadline.valueHasMutated();
             }
 
             public toSubstVacationSettingDto(): SubstVacationSettingDto {
@@ -415,8 +428,8 @@ module nts.uk.pr.view.kmf001.h {
         export class EmpSubstVacationModel extends SubstVacationSettingModel {
             contractTypeCode: KnockoutObservable<string>;
 
-            constructor(dto: EmpSubstVacationDto) {
-                super(new SubstVacationSettingDto(dto.isManage, dto.expirationDate, dto.allowPrepaidLeave));
+            constructor(dto: EmpSubstVacationDto, context: ScreenModel) {
+                super(new SubstVacationSettingDto(dto.isManage, dto.expirationDate, dto.allowPrepaidLeave), context);
                 this.contractTypeCode = ko.observable(dto.contractTypeCode);
             }
 

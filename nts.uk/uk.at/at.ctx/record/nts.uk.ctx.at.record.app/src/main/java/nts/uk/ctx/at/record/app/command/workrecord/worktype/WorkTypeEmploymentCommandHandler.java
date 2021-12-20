@@ -34,6 +34,7 @@ public class WorkTypeEmploymentCommandHandler extends CommandHandler<WorkTypeEmp
 		WorkTypeEmploymentCommand command = context.getCommand();
 		String companyId = AppContexts.user().companyId();
 		String employmentCode = command.getEmploymentCode();
+		if (command.getGroups() == null || command.getGroups().isEmpty()) return;
 		List<ChangeableWorktypeGroup> changeableWorkTypeGroups = command.getGroups().stream()
 				.map(group -> new ChangeableWorktypeGroup(group.getNo(), group.getName() == null ? null : group.getName(), group.getWorkTypeList()))
 				.collect(Collectors.toList());

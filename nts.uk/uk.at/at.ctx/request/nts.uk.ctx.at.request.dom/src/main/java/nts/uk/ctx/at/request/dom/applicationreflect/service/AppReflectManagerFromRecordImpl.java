@@ -23,6 +23,7 @@ import nts.arc.layer.app.command.AsyncCommandHandlerContext;
 import nts.arc.task.parallel.ManagedParallelWithContext;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.gul.text.IdentifierUtil;
 import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.ApplicationRepository;
 import nts.uk.ctx.at.request.dom.application.ApplicationType;
@@ -356,7 +357,7 @@ public class AppReflectManagerFromRecordImpl implements AppReflectManagerFromRec
 					: app.getAppDate().getApplicationDate();
 			GeneralDate endDate = app.getOpAppEndDate().isPresent() ? app.getOpAppEndDate().get().getApplicationDate()
 					: app.getAppDate().getApplicationDate();
-			this.reflectAppOfAppDate("", app.getEmployeeID(), ExecutionTypeExImport.RERUN,
+			this.reflectAppOfAppDate(IdentifierUtil.randomUniqueId(), app.getEmployeeID(), ExecutionTypeExImport.RERUN,
 					new DatePeriod(startDate, endDate));
 		});
 	}

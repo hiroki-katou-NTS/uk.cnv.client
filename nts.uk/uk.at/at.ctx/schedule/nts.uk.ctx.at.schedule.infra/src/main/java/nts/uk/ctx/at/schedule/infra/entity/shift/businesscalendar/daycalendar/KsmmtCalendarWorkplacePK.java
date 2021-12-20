@@ -19,11 +19,11 @@ public class KsmmtCalendarWorkplacePK implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	@Column(name = "WKPID")
+	@Column(name = "WKP_ID")
 	public String workPlaceId;
 
 	
-	@Column(name = "YMD_K")
+	@Column(name = "YMD")
 	public GeneralDate date;
 
 }

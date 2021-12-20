@@ -15,7 +15,7 @@ module nts.uk.at.view.kal003.a.tab {
                 self.listAgreementError(listAgreementError);
             }
 
-            $("#fixed-table-agreement-error").ntsFixedTable({ height: 416, width: 490 });
+            $("#fixed-table-agreement-error").ntsFixedTable({ height: 416, width: 220 });
         }
 
     }

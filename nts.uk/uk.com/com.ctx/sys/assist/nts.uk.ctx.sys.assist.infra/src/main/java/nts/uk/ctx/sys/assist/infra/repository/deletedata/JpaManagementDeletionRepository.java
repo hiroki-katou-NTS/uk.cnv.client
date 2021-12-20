@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.sys.assist.dom.deletedata.ManagementDeletion;
 import nts.uk.ctx.sys.assist.dom.deletedata.ManagementDeletionRepository;
@@ -104,7 +106,7 @@ public class JpaManagementDeletionRepository extends JpaRepository implements Ma
 		if (optEntity.isPresent()) {
 			SspttDeletionMng entity = optEntity.get();
 			entity.operatingCondition = operatingCondition.value;
-			entity.isInterruptedFlg = interruptedFlg;
+			entity.isInterruptedFlg = BooleanUtils.toBoolean(interruptedFlg);
 			this.commandProxy().update(entity);
 		}
 	}

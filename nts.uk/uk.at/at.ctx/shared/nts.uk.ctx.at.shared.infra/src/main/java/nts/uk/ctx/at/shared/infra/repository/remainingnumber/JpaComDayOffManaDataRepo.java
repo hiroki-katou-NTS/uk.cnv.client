@@ -429,8 +429,6 @@ public class JpaComDayOffManaDataRepo extends JpaRepository implements ComDayOff
 				.getList(x -> toDomain(x));
 	}
 	
-
-
 	@Override
 	public Optional<CompensatoryDayOffManaData> findBySidAndDate(String sid, GeneralDate date) {
 		return this.queryProxy().query(SELECT_BY_SID_AND_DAY_OFF, KrcdtHdComMng.class)

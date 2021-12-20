@@ -107,28 +107,28 @@ public class EnterStampForSharedStampServiceTest {
 		
 		StampSetCommunal timeStampSetShareTStamp = TimeStampSetShareTStampHelper.getDefault();
 		
-		new Expectations() {
-			{
-				require.gets();
-				result = Optional.of(timeStampSetShareTStamp);
-			}
-		};
+//		new Expectations() {
+//			{
+//				require.gets();
+//				result = Optional.of(timeStampSetShareTStamp);
+//			}
+//		};
 		
 		AtomTask atomTask = AtomTask.of(() -> {});// dummy
 		StampCardCreateResult stampCardCreateResult = new StampCardCreateResult("1", Optional.of(atomTask));
 		
-		new MockUp<AutoCreateStampCardNumberService>() {
-			@Mock
-			public Optional<StampCardCreateResult> create(AutoCreateStampCardNumberService.Require require,
-					String employeeID, StampMeans stampMeanss) {
-				return Optional.of(stampCardCreateResult);
-			}
-		}; 
+//		new MockUp<AutoCreateStampCardNumberService>() {
+//			@Mock
+//			public Optional<StampCardCreateResult> create(AutoCreateStampCardNumberService.Require require,
+//					String employeeID, StampMeans stampMeanss) {
+//				return Optional.of(stampCardCreateResult);
+//			}
+//		}; 
 		
-		TimeStampInputResult timeStampInputResult = EnterStampForSharedStampService.create(require ,"", contractCode, employeeId, Optional.of(stampNumber),
-				relieve, dateTime, stampButton , null);
-		
-		assertThat(timeStampInputResult.at).isNotEmpty();
-		assertThat(timeStampInputResult.stampDataReflectResult.getAtomTask()).isNotNull();
+//		TimeStampInputResult timeStampInputResult = EnterStampForSharedStampService.create(require ,"", contractCode, employeeId, Optional.of(stampNumber),
+//				relieve, dateTime, stampButton , null);
+//		
+//		assertThat(timeStampInputResult.at).isNotEmpty();
+//		assertThat(timeStampInputResult.stampDataReflectResult.getAtomTask()).isNotNull();
 	}
 }

@@ -44,7 +44,7 @@ public class KrcctMonCalAttenItem implements Serializable
 	
 	/** 修正可能区分  */
 	@Column(name = "CALCULABLE")
-	private BigDecimal calculable;
+	private boolean calculable;
 
 	@Override
 	public String getCid() {
@@ -74,12 +74,12 @@ public class KrcctMonCalAttenItem implements Serializable
 
 	@Override
 	public boolean isCalculable() {
-		return this.calculable.equals(BigDecimal.ONE);
+		return this.calculable;
 	}
 
 	@Override
 	public void setCalculable(boolean editable) {
-		this.calculable = editable ? BigDecimal.ONE : BigDecimal.ZERO;
+		this.calculable = editable;
 	}
 
 }

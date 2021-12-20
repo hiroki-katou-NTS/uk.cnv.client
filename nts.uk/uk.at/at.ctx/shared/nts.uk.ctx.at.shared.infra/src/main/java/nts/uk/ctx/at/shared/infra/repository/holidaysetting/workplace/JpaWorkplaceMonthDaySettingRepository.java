@@ -62,8 +62,8 @@ public class JpaWorkplaceMonthDaySettingRepository extends JpaRepository impleme
 		if (result.isEmpty()) {
 			return new ArrayList<>();
 		}
-		Map<Integer, List<KshmtHdpubDPerMWkp>> entityAll = result.stream()
-				.collect(Collectors.groupingBy(x -> x.getKshmtWkpMonthDaySetPK().getManageYear(), Collectors.toList()));
+		Map<String, List<KshmtHdpubDPerMWkp>> entityAll = result.stream()
+				.collect(Collectors.groupingBy(x -> x.getKshmtWkpMonthDaySetPK().getWkpId(), Collectors.toList()));
 		return entityAll.entrySet().stream().map(x -> new WorkplaceMonthDaySetting(new JpaWorkplaceMonthDaySettingGetMemento(x.getValue())))
 				.collect(Collectors.toList());
 	}

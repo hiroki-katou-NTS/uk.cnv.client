@@ -84,8 +84,6 @@ public class ProcesscrudDataByTable {
 
 	public static Integer NUMBER_ERROR = 0;
 
-	private static final String DATA_STORE_PATH = ServerSystemProperties.fileStoragePath();
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(RecoveryStorageService.class);
 
 	private static final Map<String, Integer> datetimeRange = new HashMap<String, Integer>();

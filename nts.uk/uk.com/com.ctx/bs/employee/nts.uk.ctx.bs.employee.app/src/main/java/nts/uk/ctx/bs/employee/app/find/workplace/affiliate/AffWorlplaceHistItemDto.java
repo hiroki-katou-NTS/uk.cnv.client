@@ -38,10 +38,10 @@ public class AffWorlplaceHistItemDto extends PeregDomainDto {
 	@PeregItem("IS00084")
 	private String workplaceCode;
 
-	/** The normalWorkplaceCode. */
-	// 通常職場コード
-	@PeregItem("IS00085")
-	private String normalWorkplaceCode;
+//	/** The normalWorkplaceCode. */
+//	// 通常職場コード
+//	@PeregItem("IS00085")
+//	private String normalWorkplaceCode;
 
 	private AffWorlplaceHistItemDto(String recordId) {
 		super(recordId);
@@ -65,7 +65,6 @@ public class AffWorlplaceHistItemDto extends PeregDomainDto {
 		AffWorlplaceHistItemDto dto = new AffWorlplaceHistItemDto(affWrkplcHistItem.getHistoryId());
 		dto.setRecordId(affWrkplcHistItem.getHistoryId());
 		dto.setWorkplaceCode(affWrkplcHistItem.getWorkplaceId());
-		dto.setNormalWorkplaceCode(affWrkplcHistItem.getNormalWorkplaceId());
 		dto.setStartDate(startDate);
 		dto.setEndDate(endDate);
 		return dto;

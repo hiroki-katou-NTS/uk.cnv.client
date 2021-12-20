@@ -670,7 +670,7 @@ module nts.uk.ui.kdp001.a {
                         }),
                         vm.$window.shared('screenB', { screen: "KDP001" }),
                     )
-                    .then(() => vm.$window.modal('at', '/view/kdp/002/b/index.xhtml'));
+                    .then(() => vm.$window.modal('at', '/view/kdp/002/b/index.xhtml', {stampTime: moment(new Date()).format("HH:mm")}));
             };
             const openDialogC = (stampDate: string, error: any) => {
                 return $

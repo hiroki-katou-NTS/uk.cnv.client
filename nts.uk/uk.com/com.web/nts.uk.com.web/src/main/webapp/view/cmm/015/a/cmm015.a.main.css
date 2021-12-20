@@ -1,65 +1,129 @@
-.valign-center {
-	vertical-align: middle !important;
+#top-content > span,
+#top-content > button {
+	margin-left: 15px;
 }
 
-.divHeader {
-	margin: 5px;
+#top-content {
+	margin-bottom: 5px;
 }
 
-.btnStyle {
-	width: 70px;
-	margin-right: 5px;
+#functions-area {
+	height: 0px;
 }
 
-.first-row {
-	display: inline-block;
-}
-
-#A_BTN_001 {
-	margin-left: 17px;
-	width: 90px;
-}
-
-#A_BTN_002 {
-	margin-left: 5px;
-	width: 90px;
-}
-
-#A_BTN_003 {
-	margin-left: 22px;
+.center-content {
 	width: 120px;
 }
 
-#A_BTN_004 {
-	margin-left: 110px;
-	width: 90px;
+#A11_1 {
+	margin: auto;
+	font-size: large;
+	width: 95px;
 }
 
-#left-content {
-	margin-left: 10px;
-	margin-top: 12px;
-	padding: 20px;
-	float: left;
-	min-height: 650px;
+#A12_2 {
+	width: 530px !important;
 }
 
-#right-content {
-	margin-left: 80px;
-	float: left;
-	min-height: 600px;
-	width: 60%;
+#ruled-line {
+	height: 1px;
+	background-color: #595959;
+	margin-top: 40px;
 }
 
-#lbl_002 {
-	margin-bottom: 10px;
+#A17_4 {
+	font-size: large;
 }
 
-#memo {
-	margin-top: 12px;
-	width: 446px;
-	height: 180px;
+#A17_2, #A17_3 {
+	margin-left: 15px;
 }
 
-.input_002 {
-	display: inline-block;
+#bottom-content .left {
+	width: 700px;
+}
+
+#bottom-content {
+	margin-bottom: 20px;
+	padding-left: 85px;
+}
+
+#bottom-content .top {
+	margin-bottom: 15px;
+}
+
+.dest-wkp {
+	background-color: #FFDC73 !important;
+}
+
+.text-left {
+	text-align: left !important;
+}
+
+.disabled {
+	pointer-events: none;
+}
+
+.custom-link {
+	text-decoration: underline !important;
+	cursor: pointer;
+	color: #0D86D1 !important;
+}
+
+.red { color: #FF0000 !important; }
+.contents-area .panel { border-radius: 5px; }
+
+#A2_1 .search-filter,
+#A5_1 .search-filter {
+	width: 410px !important;
+}
+
+.ui-state-active > div {
+	color: #30CC40;
+	font-weight: 700;
+}
+.ui-state-hover > div {
+	color: #30CC40;
+}
+.ui-dialog .ui-dialog-content.notice-dialog > .text {
+  max-width: 800px !important;
+	width: auto !important;
+}
+
+#A5_1 .side,
+#A2_1 .side {
+	margin-right: 5px;
+	margin-top: 10px;
+}
+#A5_1.panel-right,
+#A2_1.panel-left {
+	width: 530px;
+}
+#A8_2.panel-left {
+	width: 530px;
+}
+.nowrap {
+	white-space: nowrap;
+}
+#A5_1 .bottom,
+#A2_1 .bottom {
+	height: calc(100% - 100px);
+}
+.group-cbb {
+	margin-left: auto;
+	width: 85px;
+}
+.middle-content .left,
+.middle-content .right {
+	border: 1px solid lightgray;
+}
+#A2_2 {
+	background: #EDFAC2;
+	padding: 5px;
+	width: 105px;
+}
+#A5_2 {
+	background: #FFDC73;
+	padding: 5px;
+	width: 105px;
 }

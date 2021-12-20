@@ -155,7 +155,6 @@ module nts.uk.at.view.kaf022.company.viewmodel {
             };
             data["reasonDisplaySettings"] = dataA.reasonDisplaySettings;
             data["nightOvertimeReflectAtr"] = dataA.nightOvertimeReflectAtr;
-            data["includeConcurrentPersonel"] = dataA.includeConcurrentPersonel;
             data["approvalByPersonAtr"] = dataA.approvalByPersonAtr;
             data["appReflectCondition"] = dataA.appReflectCondition;
             data["overtimeApplicationSetting"] = dataB.overtimeApplicationSetting;

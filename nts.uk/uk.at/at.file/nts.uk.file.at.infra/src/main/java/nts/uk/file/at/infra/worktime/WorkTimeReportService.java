@@ -865,7 +865,7 @@ public class WorkTimeReportService {
              */
             Integer roundingMethodAppro = data.getFixedWorkSetting().getCommonSetting().getGoOutSet()
                     .getDiffTimezoneSetting().getWorkTimezone().getPrivateUnionGoOut().getApproTimeRoundingSetting().getRoundingMethod();
-            cells.get("CU" + (startIndex + 1)).setValue(getApproTimeRoundingAtr(roundingMethodAppro));
+            cells.get("CU" + (startIndex + 1)).setValue("就業" + getApproTimeRoundingAtr(roundingMethodAppro));
             
             /*
              * R4_165
@@ -891,7 +891,7 @@ public class WorkTimeReportService {
              */
             Integer roundingMethodApproOt = data.getFixedWorkSetting().getCommonSetting().getGoOutSet()
                     .getDiffTimezoneSetting().getOttimezone().getPrivateUnionGoOut().getApproTimeRoundingSetting().getRoundingMethod();
-            cells.get("CX" + (startIndex + 1)).setValue(getApproTimeRoundingAtr(roundingMethodApproOt));
+            cells.get("CX" + (startIndex + 1)).setValue("残業" + getApproTimeRoundingAtr(roundingMethodApproOt));
             /*
              * R4_168
              * 私用・組合外出時間.丸め設定

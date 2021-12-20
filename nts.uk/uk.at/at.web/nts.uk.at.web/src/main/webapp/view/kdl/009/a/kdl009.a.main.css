@@ -1,85 +1,83 @@
-#contents-area {
-	padding: 25px;
-}
-
-.date-fixed-table {
-	padding-top: 10px;
-}
-.date-fixed-table .nts-fixed-body-container {
-	overflow-x: hidden;
-}
-.date-fixed-table .scroll-header.nts-fixed-header {
-	height: 30px;
-}
-
-table#date-fixed-table {
-	empty-cells: show;
-}
-
-table.fixed-table th {
-  padding: 3px !important;
-}
-
-table#date-fixed-table tr {
-  height: 25px;
-}
-
-table#date-fixed-table td {
-	padding: 6px 3px;
+table#table-top td {
+	padding-bottom:2vh;
 	border-top: none;
 }
-table#date-fixed-table td.border-dotted {
-	padding: 6px 3px;
-	border-bottom: 1px dotted #CCC !important;
+.color-grid {    
+	background-color: #CFF1A5;
+	border: solid 1px #ccc;
+    padding-left: 5px;
 }
 
-table.summary-table {
-	margin-top: 10px;
-}
-table.summary-table tr:first-child {
-	border-top: 1px solid #CCC;
-}
-table.summary-table tr:last-child {
-	border-top: double #CCC;
-	border-bottom: 1px solid #CCC;
-}
-table.summary-table td {
-	padding: 3px;
-	border-left: 1px solid #CCC;
-	border-right: 1px solid #CCC;
-	border-top: 1px #CCC dotted;
-	border-bottom: 1px #CCC dotted;
-}
-table.summary-table td:first-child {
-  background-color: #CFF1A5;
-}
-table.summary-table td:last-child {
-  border-left: none;
+#table-bottom > thead > tr > td:nth-child(1), #table-bottom > tbody > tr > td:nth-child(1) { width: 33%;}
+#table-bottom > thead > tr > td:nth-child(2), #table-bottom > tbody > tr > td:nth-child(2) { width: 16%;}
+#table-bottom > thead > tr > td:nth-child(3), #table-bottom > tbody > tr > td:nth-child(3) { width: 20%;}
+#table-bottom > thead > tr > td:nth-child(4), #table-bottom > tbody > tr > td:nth-child(4) { width: 30%;}
+
+table#table-bottom >tbody >tr > td{
+	border-left : solid 1px #ccc;
+	border-bottom: 1px #ccc dotted;
 }
 
-.margin-top-20 {
-	margin-top: 20px;
+#table-bottom > tbody {
+    overflow-y:scroll;
+   	height:230px;
+   	display:block;
 }
-.margin-left-20 {
+
+table#table-bottom {
+  width: 100%;
+}
+table#table-bottom> td {
+  border-collapse: collapse;
+  border: 1px solid #000;
+}
+
+table#table-bottom >thead {
+  display: table; /* to take the same width as tr */
+  width: calc(100% - 18px); /* - 17px because of the scrollbar width */
+}
+
+table#table-bottom > tbody {
+  display: block; /* to enable vertical scrolling */
+  max-height: 230px; /* e.g. */
+  overflow-y: scroll; /* keeps the scrollbar even if it doesn't need it; display purpose */
+}
+
+.icon-default{
+	width: 18px;
+    text-align: center;
+}
+.icon-default-1{
+	width: 13px;
+    text-align: center;
+}
+.icon-default-2{
+	width: 30px;
+    text-align: center;
+}
+.border-solid{
+	border-top: solid 1px #ccc !important;
+}
+
+#area-left {
+	float: left;
+}
+
+#input-search{
 	margin-left: 20px;
 }
-.margin-right-20 {
+
+#search-btn {
+	min-width: 80px;
+	margin-top: -32px;
+	float: right;
 	margin-right: 20px;
 }
-.margin-right-40 {
-	margin-right: 40px;
+#kcp005 div {
+    nav-index: -1;
 }
 
-#description {
-	margin-top: 5px;
-}
-#expDate{
-	margin-top: 5px;
-}
-
-.big-text {
-	font-size: 2rem;
-}
-.float-right {
-	float: right;
+#b3 {
+   /*  nav-prev: #b2;*/
+    nav-next: #closeDialog-id; 
 }

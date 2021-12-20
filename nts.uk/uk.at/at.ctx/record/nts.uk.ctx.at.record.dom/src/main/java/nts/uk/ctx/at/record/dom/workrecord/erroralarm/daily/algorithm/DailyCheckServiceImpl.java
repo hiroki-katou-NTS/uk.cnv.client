@@ -216,7 +216,7 @@ public class DailyCheckServiceImpl implements DailyCheckService{
 				}
 			}
 			// get work place id
-			for(String sid : lstSid) {
+			for(String sid : emps) {
 				List<AlarmExtractInfoResult> lstExtractInfoResult = new ArrayList<>();
 				List<GeneralDate> listDate = dPeriod.datesBetween();
 				for(WorkRecordExtractingCondition extCond : prepareData.getWorkRecordCond()) {
@@ -238,16 +238,16 @@ public class DailyCheckServiceImpl implements DailyCheckService{
 					GeneralDate exDate = listDate.get(day);
 					// 社員の会社所属状況をチェック
 					List<StatusOfEmployeeAdapterAl> statusOfEmp = lstStatusEmp.stream()
-							.filter(x -> x.getEmployeeId().equals(sid) 
+							.filter(x -> x.getEmployeeId().equals(sid)
 									&& !x.getListPeriod().stream()
 										.filter(y -> y.start().beforeOrEquals(exDate) && y.end().afterOrEquals(exDate)).collect(Collectors.toList()).isEmpty())
 							.collect(Collectors.toList());
 					if(statusOfEmp.isEmpty()) continue;
-					
+
 					// 日別実績を絞り込む
 					List<IntegrationOfDaily> lstDaily = prepareData.getListIntegrationDai().stream()
 							.filter(x -> x.getEmployeeId().equals(sid) && x.getYmd().equals(exDate))
-							.collect(Collectors.toList());			
+							.collect(Collectors.toList());
 					IntegrationOfDaily integrationDaily = null;
 					if(!lstDaily.isEmpty()) {
 						integrationDaily = lstDaily.get(0);
@@ -255,7 +255,7 @@ public class DailyCheckServiceImpl implements DailyCheckService{
 					if(integrationDaily != null) {
 						// 日別実績のエラーアラームのアラーム値を生成する
 						this.extractAlarmDailyTab2(prepareData.getListError(),
-								prepareData.getListErrorAlarmCon(),
+								prepareData.getErrorMessageAlarmList(),
 								integrationDaily,
 								sid,
 								exDate,
@@ -265,7 +265,7 @@ public class DailyCheckServiceImpl implements DailyCheckService{
 								alarmCheckConditionCode,
 								lstExtractInfoResult);
 					}
-					
+
 					// 日次の固定抽出条件のアラーム値を生成する
 					this.extractAlarmFixTab4(prepareData,
 							integrationDaily,
@@ -340,10 +340,19 @@ public class DailyCheckServiceImpl implements DailyCheckService{
 			listWorkType = workTypeRep.findByCompanyId(cid);
 			// 会社で使用できる就業時間帯を全件を取得する
 			listWorktime = workTimeRep.findByCompanyId(cid);	
-		}	
+		}
+
+		List<ErrorAlarmCondition> errorMessageAlarmList = new ArrayList<>();
+		List<String> eralCheckIds = listError.stream().map(ErrorAlarmWorkRecord::getErrorAlarmCheckID).collect(Collectors.toList());
+		if (!eralCheckIds.isEmpty()) {
+			List<ErrorAlarmCondition> lstErrorAlarmCond = errorConRep.findMessageConByListErAlCheckId(eralCheckIds);
+			if (!lstErrorAlarmCond.isEmpty()){
+				errorMessageAlarmList.addAll(lstErrorAlarmCond);
+			}
+		}
 		
 		PrepareData prepareData = new PrepareData(listWorkType, listIntegrationDai, listErrorAlarmCon, 
-													workRecordCond, listError, dataforDailyFix, listWorktime, lstItemDay);
+													workRecordCond, listError, dataforDailyFix, listWorktime, lstItemDay, errorMessageAlarmList);
 		return prepareData;
 	}
 
@@ -625,6 +634,7 @@ public class DailyCheckServiceImpl implements DailyCheckService{
 					break;
 				}
 				WorkTimeCode workTimeCd = integrationDaily.getWorkInformation().getRecordInfo().getWorkTimeCode();
+				if (workTimeCd == null) isWorkTypeChk = false;
 				if(isWorkTypeChk && workTimeCd != null) {
 					switch (wTimeCom) {
 					case SELECTED:
@@ -650,11 +660,11 @@ public class DailyCheckServiceImpl implements DailyCheckService{
 					}
 				}
 				if(!isWorkTypeChk) {
-					if(renzoku > 1 && renzoku >= errorAlarm.getContinuousPeriod().v()) {
+					if(renzoku != 0 && renzoku >= errorAlarm.getContinuousPeriod().v()) {
 						this.createExtractAlarmRenzoku(sid,
 								lstExtractInfoResult,
 								alarmCheckConditionCode,
-								new DatePeriod(exDate.addDays(-renzoku), exDate),
+								new DatePeriod(exDate.addDays(-renzoku), exDate.addDays(-1)),
 								result.getLstResultCondition(),
 								extCond.getNameWKRecord().v(),
 								alMes,

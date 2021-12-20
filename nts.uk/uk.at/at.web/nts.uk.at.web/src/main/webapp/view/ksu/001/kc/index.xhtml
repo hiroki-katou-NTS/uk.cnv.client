@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>    
+    <ui:composition template="../../../../master/dialog.xhtml">
+        <ui:define name="htmlHead">	
+            <script>var dialogSize = { width: 500, height: 230 };</script>
+            <com:ValidatorScript>
+                nts.uk.ctx.at.aggregation.dom.scheduletable.OutputSettingCode
+                nts.uk.ctx.at.aggregation.dom.scheduletable.OutputSettingName                
+            </com:ValidatorScript>
+			<com:scriptfile set="IGNITE" />
+			<com:stylefile path="ksu001.k.c.style.css" />
+			<com:scriptfile path="ksu001.k.c.vm.js" />
+		</ui:define>
+
+		<!-- PAGE CONTENT -->
+        <ui:define name="content">        
+            <div id="contents-area" style="padding-left: 20px;">
+                <div class="control-group valign-center">
+                    <!--C1-1-->
+                    <div data-bind="ntsFormLabel:{}">#{i18n.getText('KSU001_4123')} </div>
+                    <!--C1-2-->
+                    <span style="margin-left: 12px;" data-bind="text: copySourceCode"></span>
+                    <!--C1-3-->
+                    <span style="margin-left: 44px;" data-bind="text: copySourceName"></span>
+                </div>        
+                <div class="control-group valign-center">
+                    <!--C2-1-->
+                    <div data-bind="ntsFormLabel:{required: true, constraint:['OutputSettingCode', 'OutputSettingName']}">#{i18n.getText('KSU001_4124')} </div>
+                    <!--C2-2-->
+                    <input tabindex="1"
+                           id="outputSettingCopyCode"
+                           data-bind="ntsTextEditor:{
+                                            name:'#[KSU001_4125]',
+                                            required: true,
+                                            constraint: 'OutputSettingCode',
+                                            value: newCode
+                                        }" />
+                    <!--C2-3-->
+                    <input tabindex="2"
+                           id="outputSettingCopyName"
+                           style="margin-left: 20px;"
+                           data-bind="ntsTextEditor:{
+                                            name:'#[KSU001_4126]',
+                                            required: true,
+                                            constraint: 'OutputSettingName',
+                                            value: newName
+                                        }" />
+                </div>                
+            </div>    
+            <div id="functions-area-bottom">
+                <!--C3-1-->
+                <button tabindex="3" class="x-large proceed" id="C3_1" data-bind="click: copy">#{i18n.getText('KSU001_4127')}</button>
+                <!--C3-2-->
+                <button tabindex="4"  id="C3_2" data-bind="click: closeDialog">#{i18n.getText('KSU001_4128')}</button>
+            </div>	 
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

@@ -18,6 +18,6 @@ public class AffAtWorkplaceExport {
     // 履歴ID
     private String historyID;
 
-    //通常職場ID
-    private String normalWorkplaceID;
+//    //通常職場ID
+//    private String normalWorkplaceID;
 }

@@ -1,5 +1,13 @@
 package nts.uk.screen.com.app.find.user.information;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+
 import nts.arc.error.BusinessException;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
@@ -22,8 +30,6 @@ import nts.uk.ctx.bs.person.dom.person.personal.avatar.UserAvatar;
 import nts.uk.ctx.bs.person.dom.person.personal.contact.PersonalContact;
 import nts.uk.ctx.bs.person.dom.person.personal.contact.PersonalContactRepository;
 import nts.uk.ctx.sys.auth.dom.adapter.employee.employeeinfo.EmployeeInfoAdapter;
-import nts.uk.ctx.sys.auth.dom.password.changelog.PasswordChangeLog;
-import nts.uk.ctx.sys.auth.dom.password.changelog.PasswordChangeLogRepository;
 import nts.uk.ctx.sys.auth.pub.role.RoleExportRepo;
 import nts.uk.ctx.sys.env.dom.mailnoticeset.company.UserInformationUseMethod;
 import nts.uk.ctx.sys.env.dom.mailnoticeset.company.UserInformationUseMethodRepository;
@@ -34,6 +40,7 @@ import nts.uk.ctx.sys.gateway.dom.securitypolicy.password.PasswordPolicy;
 import nts.uk.ctx.sys.gateway.dom.securitypolicy.password.PasswordPolicyRepository;
 import nts.uk.ctx.sys.shared.dom.user.User;
 import nts.uk.ctx.sys.shared.dom.user.UserRepository;
+import nts.uk.screen.com.app.find.user.information.anniversary.AnniversaryNoticeDto;
 import nts.uk.screen.com.app.find.user.information.avatar.UserAvatarDto;
 import nts.uk.screen.com.app.find.user.information.employee.contact.EmployeeContactDto;
 import nts.uk.screen.com.app.find.user.information.employee.data.management.information.EmployeeDataMngInfoDto;
@@ -46,14 +53,7 @@ import nts.uk.screen.com.app.find.user.information.setting.ContactSettingDto;
 import nts.uk.screen.com.app.find.user.information.setting.SettingContactInformationDto;
 import nts.uk.screen.com.app.find.user.information.setting.UserInformationUseMethodDto;
 import nts.uk.screen.com.app.find.user.information.user.UserDto;
-import nts.uk.screen.com.app.find.user.information.anniversary.AnniversaryNoticeDto;
 import nts.uk.shr.com.context.AppContexts;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /*
  * UKDesign.UniversalK.共通.CMM_マスタメンテナンス.CMM048_ユーザー情報の設定(Setting thông tin user).A：ユーザー情報の設定.メニュー別OCD.ユーザ情報を取得する.ユーザ情報を取得する.ユーザ情報を取得する
@@ -117,7 +117,6 @@ public class UserInformationScreenQuery {
         //SQ1 - get ユーザー情報の使用方法 from CMM049
         Optional<UserInformationUseMethod> userInfoUseMethod = userInfoUseMethod_repository.findByCId(loginCid);
         UserInformationUseMethodDto settingInformationDto = UserInformationUseMethodDto.builder()
-                .emailDestinationFunctionDtos(new ArrayList<>())
                 .settingContactInformationDto(SettingContactInformationDto.builder()
                         .dialInNumber(ContactSettingDto.builder().build())
                         .companyEmailAddress(ContactSettingDto.builder().build())

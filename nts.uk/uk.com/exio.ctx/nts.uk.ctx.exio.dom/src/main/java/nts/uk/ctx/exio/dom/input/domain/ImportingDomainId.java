@@ -29,6 +29,7 @@ import nts.uk.ctx.exio.dom.input.canonicalize.domains.organization.workplace.Wor
 
 /**
  * 受入グループID
+ * 複数ドメインが設定されている場合、このEnumの定義順に受入処理される
  */
 @RequiredArgsConstructor
 public enum ImportingDomainId {

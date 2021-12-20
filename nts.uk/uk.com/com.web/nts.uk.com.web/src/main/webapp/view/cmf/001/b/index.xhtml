@@ -121,7 +121,7 @@
 						
 						<div class="domain">
 							<div class="divi">受入レイアウト</div><hr />
-							<button class="normal" data-bind="click: selectLayout, text: '項目を追加する'" ></button>
+							<button class="normal" data-bind="click: selectLayout, text: '項目を追加する', enable: canAddItem" ></button>
 							<button class="normal" data-bind="text: '受入項目の詳細設定', click: gotoDetailSetting, enable: canEditDetail" ></button>
 							<table class="check-target" id="layout-list" data-bind="ntsGridList: {
 								height: '300px',

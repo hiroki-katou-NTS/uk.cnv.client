@@ -78,6 +78,10 @@ module nts.uk.at.view.kmf002.e {
                 let _self = this;
                 _.forEach(data, function(newValue) {
                     _self.publicHolidayMonthSettings.push(new PublicHolidayMonthSettingDto(_self.year,newValue.month(),newValue.day()));
+                    // Increment year
+                    if (newValue.month() === 12) {
+                      _self.year = String(Number(_self.year) + 1);
+                    }
                 });
             }
         }

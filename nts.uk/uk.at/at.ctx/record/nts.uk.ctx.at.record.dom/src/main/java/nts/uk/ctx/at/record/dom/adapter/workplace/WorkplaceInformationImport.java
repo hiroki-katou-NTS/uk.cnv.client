@@ -3,6 +3,7 @@ package nts.uk.ctx.at.record.dom.adapter.workplace;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Value;
+import nts.arc.time.calendar.period.DatePeriod;
 
 import java.util.Optional;
 
@@ -59,5 +60,7 @@ public class WorkplaceInformationImport {
 	 * 職場外部コード
 	 */
 	private Optional<String> workplaceExternalCode;
+
+	private DatePeriod period;
 
 }

@@ -2,6 +2,8 @@ package nts.uk.ctx.at.schedule.ws.shift.weeklyworkday;
 
 
 import nts.arc.layer.ws.WebService;
+import nts.uk.ctx.at.schedule.app.command.shift.weeklywrkday.RegisterWeeklyWorkDayCommandHandler;
+import nts.uk.ctx.at.schedule.app.command.shift.weeklywrkday.WeeklyWorkDayCommand;
 import nts.uk.ctx.at.schedule.app.find.shift.weeklyworkday.WeeklyWorkDayDto;
 import nts.uk.ctx.at.schedule.app.find.shift.weeklyworkday.WeeklyWorkDayFinder;
 import nts.uk.shr.com.context.AppContexts;
@@ -18,11 +20,20 @@ public class WeeklyWorkDayWebService extends WebService {
 
     @Inject
     private WeeklyWorkDayFinder weeklyWorkDayFinder;
+    
+    @Inject
+    private RegisterWeeklyWorkDayCommandHandler registerWeeklyWorkDayCommandHandler;
 
     @POST
     @Path("getAll")
     public WeeklyWorkDayDto getWeeklyWorkDay(){
         String companyId = AppContexts.user().companyId();
         return weeklyWorkDayFinder.getWeeklyWorkDay(companyId);
+    }
+    
+    @POST
+    @Path("register")
+    public void register(WeeklyWorkDayCommand command) {
+    	this.registerWeeklyWorkDayCommandHandler.handle(command);
     }
 }

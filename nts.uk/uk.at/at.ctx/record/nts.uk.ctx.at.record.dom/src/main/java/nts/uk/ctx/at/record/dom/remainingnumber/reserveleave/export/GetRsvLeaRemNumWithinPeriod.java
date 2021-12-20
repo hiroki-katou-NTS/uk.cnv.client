@@ -18,7 +18,6 @@ import nts.uk.ctx.at.record.dom.remainingnumber.annualleave.export.GetAnnAndRsvR
 import nts.uk.ctx.at.record.dom.remainingnumber.annualleave.export.param.AnnualLeaveInfo;
 import nts.uk.ctx.at.record.dom.remainingnumber.reserveleave.export.param.AggrResultOfReserveLeave;
 import nts.uk.ctx.at.record.dom.remainingnumber.reserveleave.export.param.GrantWork;
-import nts.uk.ctx.at.record.dom.remainingnumber.reserveleave.export.param.MaxSettingPeriodWork;
 import nts.uk.ctx.at.record.dom.remainingnumber.reserveleave.export.param.NextReserveLeaveGrant;
 import nts.uk.ctx.at.record.dom.remainingnumber.reserveleave.export.param.ReserveLeaveInfo;
 import nts.uk.ctx.at.record.dom.remainingnumber.reserveleave.export.param.ReserveLeaveLapsedWork;
@@ -37,11 +36,10 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.work.MonthlyCalculat
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.GrantBeforeAfterAtr;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.AnnualPaidLeaveSetting;
 import nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.EmptYearlyRetentionSetting;
-import nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.MaxDaysRetention;
 import nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.RetentionYearlySetting;
+import nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.UpperLimitSetting;
 import nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.export.GetUpperLimitSetting;
 import nts.uk.ctx.at.shared.dom.workrule.closure.service.GetClosureStartForEmployee;
-import nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.UpperLimitSetting;
 
 /**
  * 期間中の積立年休残数を取得する
@@ -375,7 +373,6 @@ public class GetRsvLeaRemNumWithinPeriod {
 		List<GrantWork> results = new ArrayList<>();
 		AtomicInteger grantNumber = new AtomicInteger(0);
 		grantTotal.entrySet().stream().forEach(x -> {
-
 			// 積立年休付与WORKを作成 → 端数処理
 			GrantWork grantWork = GrantWork.of(x.getKey(), new LeaveGrantDayNumber(x.getValue()),
 					grantNumber.incrementAndGet());

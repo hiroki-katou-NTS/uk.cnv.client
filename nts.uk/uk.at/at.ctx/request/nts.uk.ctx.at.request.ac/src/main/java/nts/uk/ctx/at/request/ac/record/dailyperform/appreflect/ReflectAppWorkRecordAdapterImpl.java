@@ -31,8 +31,8 @@ public class ReflectAppWorkRecordAdapterImpl implements ReflectApplicationWorkRe
 
 	@Override
 	public Pair<ReflectStatusResult, Optional<AtomTask>> process(Object application, GeneralDate date,
-			ReflectStatusResult reflectStatus, GeneralDateTime reflectTime) {
-		val result =  pub.process(application, date, convertTo(reflectStatus), reflectTime);
+			ReflectStatusResult reflectStatus, GeneralDateTime reflectTime, String execId) {
+		val result =  pub.process(application, date, convertTo(reflectStatus), reflectTime, execId);
 		return Pair.of(convertToDom(result.getLeft()), result.getRight());
 	}
 

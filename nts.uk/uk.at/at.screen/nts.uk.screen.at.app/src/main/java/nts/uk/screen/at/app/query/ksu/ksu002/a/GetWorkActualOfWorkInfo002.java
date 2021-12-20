@@ -18,12 +18,12 @@ import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.record.app.find.dailyperform.DailyRecordDto;
 import nts.uk.ctx.at.record.app.find.dailyperform.DailyRecordWorkFinder;
-import nts.uk.ctx.at.schedule.dom.schedule.workschedule.ScheManaStatuTempo;
-import nts.uk.ctx.at.schedule.dom.workschedule.domainservice.DailyResultAccordScheduleStatusService;
+import nts.uk.ctx.at.record.dom.daily.GetDailyRecordByScheduleManagementService;
 import nts.uk.ctx.at.shared.dom.adapter.employment.employwork.leaveinfo.EmpLeaveHistoryAdapter;
 import nts.uk.ctx.at.shared.dom.adapter.employment.employwork.leaveinfo.EmpLeaveWorkHistoryAdapter;
 import nts.uk.ctx.at.shared.dom.adapter.employment.employwork.leaveinfo.EmpLeaveWorkPeriodImport;
 import nts.uk.ctx.at.shared.dom.adapter.employment.employwork.leaveinfo.EmployeeLeaveJobPeriodImport;
+import nts.uk.ctx.at.shared.dom.employeeworkway.EmployeeWorkingStatus;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingConditionItem;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingConditionItemWithPeriod;
@@ -32,6 +32,8 @@ import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.employeeinfor.em
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.employeeinfor.employmenthistory.imported.EmpEnrollPeriodImport;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.employeeinfor.employmenthistory.imported.EmploymentHisScheduleAdapter;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.employeeinfor.employmenthistory.imported.EmploymentPeriodImported;
+import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.EmpAffiliationInforAdapter;
+import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.EmpOrganizationImport;
 import nts.uk.screen.at.app.ksu001.processcommon.CreateWorkScheduleWorkInforBase;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.dto.EditStateOfDailyAttdDto;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.dto.WorkScheduleWorkInforDto;
@@ -66,16 +68,16 @@ public class GetWorkActualOfWorkInfo002 {
 
 
 	public List<WorkScheduleWorkInforDto> getDataActualOfWorkInfo(DisplayInWorkInfoInput param) {
-		
+
 		List<WorkScheduleWorkInforDto> result = new ArrayList<>();
 
 		// step 1
 		// call 予定管理状態に応じて日別実績を取得する
-		DatePeriod period = new DatePeriod(param.startDate, param.endDate);
+		DatePeriod period = new DatePeriod(param.getStartDate(), param.getEndDate());
 		RequireDailyImpl requireDailyImpl = new RequireDailyImpl(param.listSid, period, dailyRecordWorkFinder,
 				empComHisAdapter, workCondRepo, empLeaveHisAdapter, empLeaveWorkHisAdapter,
 				employmentHisScheduleAdapter);
-		Map<ScheManaStatuTempo, Optional<IntegrationOfDaily>> map = DailyResultAccordScheduleStatusService
+		Map<EmployeeWorkingStatus, Optional<IntegrationOfDaily>> map = GetDailyRecordByScheduleManagementService
 				.get(requireDailyImpl, param.listSid, period);
 
 		// step 2
@@ -91,27 +93,27 @@ public class GetWorkActualOfWorkInfo002 {
 					GetDateInfoDuringThePeriodInput param1 = new GetDateInfoDuringThePeriodInput();
 					param1.setGeneralDate(m.getDate());
 					param1.setSids(sids);
-					
+
 					EditStateOfDailyAttdDto workTypeEditStatus = null;
 					if (m.workTypeEditStatus != null) {
 						workTypeEditStatus = new EditStateOfDailyAttdDto(m.workTypeEditStatus.getAttendanceItemId(), m.workTypeEditStatus.getEditStateSetting());
 					}
-					
+
 					EditStateOfDailyAttdDto workTimeEditStatus = null;
 					if (m.workTimeEditStatus != null) {
 						workTimeEditStatus = new EditStateOfDailyAttdDto(m.workTimeEditStatus.getAttendanceItemId(), m.workTimeEditStatus.getEditStateSetting());
 					}
-					
+
 					EditStateOfDailyAttdDto startTimeEditState = null;
 					if (m.startTimeEditState != null) {
 						startTimeEditState = new EditStateOfDailyAttdDto(m.startTimeEditState.getAttendanceItemId(), m.startTimeEditState.getEditStateSetting());
 					}
-					
+
 					EditStateOfDailyAttdDto endTimeEditState = null;
 					if (m.endTimeEditState != null) {
 						endTimeEditState = new EditStateOfDailyAttdDto(m.endTimeEditState.getAttendanceItemId(), m.endTimeEditState.getEditStateSetting());
 					}
-					
+
 					WorkScheduleWorkInforDto dto = WorkScheduleWorkInforDto.builder()
 							.employeeId(m.getEmployeeId())
 							.date(m.getDate())
@@ -135,12 +137,12 @@ public class GetWorkActualOfWorkInfo002 {
 							.build();
 					return dto;
 				}).collect(Collectors.toList());
-		
+
 		return result;
 	}
-	
+
 	@AllArgsConstructor
-	private static class RequireDailyImpl implements DailyResultAccordScheduleStatusService.Require {
+	private static class RequireDailyImpl implements GetDailyRecordByScheduleManagementService.Require {
 
 		private NestedMapCache<String, GeneralDate, DailyRecordDto> workScheduleCache;
 		private KeyDateHistoryCache<String, EmpEnrollPeriodImport> affCompanyHistByEmployeeCache;
@@ -148,7 +150,9 @@ public class GetWorkActualOfWorkInfo002 {
 		private KeyDateHistoryCache<String, EmployeeLeaveJobPeriodImport> empLeaveJobPeriodCache;
 		private KeyDateHistoryCache<String, EmpLeaveWorkPeriodImport> empLeaveWorkPeriodCache;
 		private KeyDateHistoryCache<String, WorkingConditionItemWithPeriod> workCondItemWithPeriodCache;
-
+		@Inject
+		private EmpAffiliationInforAdapter empAffiliationInforAdapter;
+		
 		public RequireDailyImpl(List<String> empIdList, DatePeriod period, DailyRecordWorkFinder dailyRecordWorkFinder,
 				EmpComHisAdapter empComHisAdapter, WorkingConditionRepository workCondRepo,
 				EmpLeaveHistoryAdapter empLeaveHisAdapter, EmpLeaveWorkHistoryAdapter empLeaveWorkHisAdapter,
@@ -179,7 +183,7 @@ public class GetWorkActualOfWorkInfo002 {
 			Map<String, List<WorkingConditionItemWithPeriod>> data6 = listData.stream().collect(Collectors.groupingBy(item ->item.getWorkingConditionItem().getEmployeeId()));
 			workCondItemWithPeriodCache = KeyDateHistoryCache.loaded(createEntries5(data6));
 		}
-		
+
 		private static Map<String, List<DateHistoryCache.Entry<EmpEnrollPeriodImport>>>  createEntries1(Map<String, List<EmpEnrollPeriodImport>> data) {
 			Map<String, List<DateHistoryCache.Entry<EmpEnrollPeriodImport>>> rs = new HashMap<>();
 			data.forEach( (k,v) -> {
@@ -188,7 +192,7 @@ public class GetWorkActualOfWorkInfo002 {
 			});
 			return rs;
 		}
-		
+
 		private static Map<String, List<DateHistoryCache.Entry<EmploymentPeriodImported>>>  createEntries2(Map<String, List<EmploymentPeriodImported>> data) {
 			Map<String, List<DateHistoryCache.Entry<EmploymentPeriodImported>>> rs = new HashMap<>();
 			data.forEach( (k,v) -> {
@@ -197,7 +201,7 @@ public class GetWorkActualOfWorkInfo002 {
 			});
 			return rs;
 		}
-		
+
 		private static Map<String, List<DateHistoryCache.Entry<EmployeeLeaveJobPeriodImport>>>  createEntries3(Map<String, List<EmployeeLeaveJobPeriodImport>> data) {
 			Map<String, List<DateHistoryCache.Entry<EmployeeLeaveJobPeriodImport>>> rs = new HashMap<>();
 			data.forEach( (k,v) -> {
@@ -206,7 +210,7 @@ public class GetWorkActualOfWorkInfo002 {
 			});
 			return rs;
 		}
-		
+
 		private static Map<String, List<DateHistoryCache.Entry<EmpLeaveWorkPeriodImport>>>  createEntries4(Map<String, List<EmpLeaveWorkPeriodImport>> data) {
 			Map<String, List<DateHistoryCache.Entry<EmpLeaveWorkPeriodImport>>> rs = new HashMap<>();
 			data.forEach( (k,v) -> {
@@ -215,7 +219,7 @@ public class GetWorkActualOfWorkInfo002 {
 			});
 			return rs;
 		}
-		
+
 		private static Map<String, List<DateHistoryCache.Entry<WorkingConditionItemWithPeriod>>>  createEntries5(Map<String, List<WorkingConditionItemWithPeriod>> data) {
 			Map<String, List<DateHistoryCache.Entry<WorkingConditionItemWithPeriod>>> rs = new HashMap<>();
 			data.forEach( (k,v) -> {
@@ -264,6 +268,11 @@ public class GetWorkActualOfWorkInfo002 {
 			Optional<EmploymentPeriodImported> data = employmentPeriodCache.get(sid, startDate);
 			return data;
 		}
+
+		@Override
+		public List<EmpOrganizationImport> getEmpOrganization(GeneralDate baseDate, List<String> lstEmpId) {
+			return empAffiliationInforAdapter.getEmpOrganization(baseDate, lstEmpId);
+		}
 	}
-	
+
 }

@@ -180,3 +180,28 @@ table.table-right th, table.table-right td {
 #b16_7_1, #b16_8, #b16_9, #b16_10 {
 	margin-left: 30px;
 }
+
+#B4_7 {
+  background-color: #F8EFD4;
+  margin-left: -15px;
+}
+
+#B3_11, #B3_12 {
+  margin-left: -10px;
+  display: block;
+  margin-bottom: 10px;
+  font-size: 0.9em;
+}
+
+#b6_1, #b9_1, #b12_1, #b15_1 {
+  margin-left: 0px !important;
+}
+
+#B4_8 {
+  font-size: 0.9em;
+  white-space: pre;
+}
+
+#B4_9 {
+  margin-left: 20px;
+}

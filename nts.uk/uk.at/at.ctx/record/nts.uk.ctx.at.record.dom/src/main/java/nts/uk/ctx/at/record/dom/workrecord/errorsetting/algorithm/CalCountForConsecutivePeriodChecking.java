@@ -22,7 +22,7 @@ public class CalCountForConsecutivePeriodChecking {
 	 * @param ymd 年月日
 	 * 
 	 */
-	public CalCountForConsecutivePeriodOutput getContinuousCount(int count, int continuousPeriod, boolean errorAtr, GeneralDate ymd) {
+	public CalCountForConsecutivePeriodOutput getContinuousCount(int count, int continuousPeriod, boolean errorAtr) {
 		Optional<ContinuousCount> optContinuousCount = Optional.empty();
 		
 		// エラー発生区分をチェック

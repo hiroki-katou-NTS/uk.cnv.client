@@ -60,7 +60,7 @@ public class UnsetHdCfmService {
 
                 // ドメインモデル「職場月間日数設定」を取得する。
                 int year = startYear;
-                Optional<WorkplaceMonthDaySetting> wpMonthDaySetOpt = wpMonthDaySetAll.stream().filter(x -> x.getManagementYear().v() == year).findFirst();
+                Optional<WorkplaceMonthDaySetting> wpMonthDaySetOpt = wpMonthDaySetAll.stream().filter(x -> x.getWorkplaceId().equals(workplaceId) && x.getManagementYear().v() == year).findFirst();
 
                 if (!wpMonthDaySetOpt.isPresent()) {
                     // 「アラーム値メッセージ」を作成します。

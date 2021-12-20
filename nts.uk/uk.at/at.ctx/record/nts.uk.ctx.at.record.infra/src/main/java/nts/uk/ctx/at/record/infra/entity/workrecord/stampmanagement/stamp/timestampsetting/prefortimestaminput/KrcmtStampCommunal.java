@@ -76,21 +76,21 @@ public class KrcmtStampCommunal extends ContractUkJpaEntity implements Serializa
 	 */
 	@Basic(optional = false)
 	@Column(name = "NAME_SELECT_ART")
-	public Integer nameSelectArt;
+	public boolean nameSelectArt;
 	
 	/**
 	 * パスワード必須区分
 	 */
 	@Basic(optional = false)
 	@Column(name = "PASSWORD_REQUIRED_ART")
-	public Integer passwordRequiredArt;
+	public boolean passwordRequiredArt;
 	
 	/**
 	 * 社員コード認証利用するか
 	 */
 	@Basic(optional = false)
 	@Column(name = "EMPLOYEE_AUTHC_USE_ART")
-	public Integer employeeAuthcUseArt;
+	public boolean employeeAuthcUseArt;
 	
 	/**
 	 * 指認証失敗回数
@@ -118,9 +118,9 @@ public class KrcmtStampCommunal extends ContractUkJpaEntity implements Serializa
 				domain.getDisplaySetStampScreen().getCorrectionInterval().v(), 
 				domain.getDisplaySetStampScreen().getResultDisplayTime().v(), 
 				domain.getDisplaySetStampScreen().getSettingDateTimeColor().getTextColor().v(), 
-				domain.isNameSelectArt() ? 1: 0, 
-				domain.isPasswordRequiredArt() ? 1: 0, 
-				domain.isEmployeeAuthcUseArt() ? 1: 0, 
+				domain.isNameSelectArt(), 
+				domain.isPasswordRequiredArt(), 
+				domain.isEmployeeAuthcUseArt(), 
 				domain.getAuthcFailCnt().isPresent()?domain.getAuthcFailCnt().get().v():null,
 				domain.getLstStampPageLayout().stream().map(c-> KrcmtStampPageLayout.toEntity(c, domain.getCid(), 0)).collect(Collectors.toList()));
 	}
@@ -134,9 +134,9 @@ public class KrcmtStampCommunal extends ContractUkJpaEntity implements Serializa
 							new ColorCode(this.textColor)),
 						new ResultDisplayTime(this.resultDisplayTime)),
 					this.listKrcmtStampPageLayout.stream().map(c->c.toDomain()).collect(Collectors.toList()),
-					this.nameSelectArt == 1,
-					this.passwordRequiredArt == 1,
-					this.employeeAuthcUseArt == 1,
+					this.nameSelectArt,
+					this.passwordRequiredArt,
+					this.employeeAuthcUseArt,
 					this.authcFailCnt == null ? Optional.empty() : Optional.of(new NumberAuthenfailures(this.authcFailCnt))
 				);
 	}

@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+
+	<ui:composition template="../../../../master/dialog.xhtml">
+		<ui:define name="htmlHead">
+			<com:scriptfile set="IGNITE" />
+			<script>var dialogSize = { width: 580 , height: 650 };</script>
+			<!-- kcp005 -->
+			<com:scriptfile path="/view/kcp/share/list.js" of="/nts.uk.com.web" />
+			<com:scriptfile path="/view/kcp/share/tree.js" of="/nts.uk.com.web" />
+
+			<!-- kdl029 a-->
+			<com:stylefile path="kdl029.style.css" />
+			<com:scriptfile path="kdl029.a.start.js" />
+			<com:scriptfile path="kdl029.a.service.js" />
+			<com:scriptfile path="kdl029.a.vm.js" />
+		</ui:define>
+		<ui:define name="content">
+			<div id="contents-area">
+				<div id="content-left" data-bind = "visible: displayKCP005">
+					<!-- A1 -->
+					<div class="mt-10 mb-20">
+						<div data-bind="ntsFormLabel: {}">#{i18n.getText('KDL029_2')}</div>
+					</div>
+					<!-- A2 -->
+					<!-- KCP005 -->
+					<div id="component-items-list" class="pull-left"></div>
+				</div>
+				<div id="content-right" style = "margin-left: 20px; float: left">
+					<div id="content-right-top">
+						<div class="div-line line1">
+								<!-- A3_3 -->
+								<div data-bind="ntsFormLabel: {}">#{i18n.getText('KDL029_24')}</div>
+								<!-- A3_1 -->
+								<label data-bind ="text: employeeCode"></label>
+								<!-- A3_2 -->
+								<label class ="margin-left-employee" data-bind ="text: employeeName"> </label>
+						</div>
+						<div class="div-line">
+							<!-- A7_1 -->
+							<label>#{i18n.getText('KDL029_25')}</label>
+							<!-- A7_2 -->
+							<label>#{i18n.getText('KDL029_26')}</label>
+						</div>
+						<com:ko-if bind="isRetentionManage">
+							<div class="table-dta">
+								<!-- A4 -->
+								<table id="table-hd-grant"
+									data-bind="ntsGridList: {
+										name: '#[KDL029_8]',
+										dataSource: dataHolidayGrantInfo,
+										primaryKey: 'code',
+										columns: columnHolidayGrantInfos,
+										multiple: false,
+										value: value,
+										rows: 4
+										}">
+								</table>
+								<div class = "total-css">
+									<!-- A4_9_1 -->
+									<div style = "display: inline-block; margin-left: 5px;">#{i18n.getText('KDL029_21')}</div>
+									<!-- A4_9_6, A4_9_7-->
+									<div class="total-remain" data-bind = "text: totalRemain"></div>
+								</div>
+							</div>
+						</com:ko-if>
+					</div>
+					<com:ko-if bind="isRetentionManage">
+						<div id="content-right-bottom">
+							<div id="content-right-bottom-left">
+								<div class="div-line padding-top-10">
+									<!-- A5_1 -->
+									<div data-bind="ntsFormLabel: {text: title2}"></div>
+								</div>
+								<div class="div-line">
+									<!-- A6 -->
+									<table id="table-tmp"
+										data-bind="ntsGridList: {
+											name: '#[KDL029_16]',
+											dataSource: dataSteadyUseInfor,
+											primaryKey: 'id',
+											columns: columnSteadyUseInfors,
+											multiple: false,
+											value: value,
+											rows: 8
+										}">
+									</table>
+								</div>
+							</div>
+						</div>
+					</com:ko-if>
+					<com:ko-if bind="!isRetentionManage()">
+						<div class="div-line line-width-535">
+							<!-- A11 -->
+							<label class="margin-top-20 font-size-2rem">#{i18n.getText('KDL029_27')}</label>
+					</div>
+					</com:ko-if>
+				</div>
+			</div>
+			<div id="functions-area-bottom">
+				<!-- A10_1 -->
+				<button class="large" data-bind="click: closeDialog">#{i18n.getText('KDL029_20')}</button>
+			</div>
+
+		</ui:define>
+
+	</ui:composition>
+
+</body>
+</html>

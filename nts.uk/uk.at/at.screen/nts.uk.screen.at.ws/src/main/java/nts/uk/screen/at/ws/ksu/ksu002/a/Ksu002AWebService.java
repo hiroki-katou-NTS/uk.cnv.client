@@ -9,7 +9,10 @@ import javax.ws.rs.Produces;
 
 import nts.arc.layer.ws.WebService;
 import nts.arc.time.YearMonth;
+import nts.uk.ctx.at.schedule.app.command.budget.external.actualresult.dto.ExecutionInfor;
 import nts.uk.ctx.at.schedule.app.command.schedule.workschedule.ResultRegisWorkSchedule;
+import nts.uk.ctx.at.shared.app.find.workrule.weekmanage.WeekRuleManagementDto;
+import nts.uk.ctx.at.shared.app.find.workrule.weekmanage.WeekRuleManagementFinder;
 import nts.uk.ctx.at.shared.app.workrule.workinghours.CheckTimeIsIncorrect;
 import nts.uk.ctx.at.shared.app.workrule.workinghours.ContainsResultDto;
 import nts.uk.ctx.at.shared.app.workrule.workinghours.TimeOfDayDto;
@@ -21,9 +24,14 @@ import nts.uk.screen.at.app.query.ksu.ksu002.a.CorrectWorkTimeHalfDayKSu002;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.CorrectWorkTimeHalfDayOutput;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.GetDataDaily;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.GetScheduleActualOfWorkInfo002;
+import nts.uk.screen.at.app.query.ksu.ksu002.a.GetStartupProcessingInformation;
+import nts.uk.screen.at.app.query.ksu.ksu002.a.KSU002Finder;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.ListOfPeriodsClose;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.RegisterWorkSceduleCommandHandler;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.TheInitialDisplayDate;
+import nts.uk.screen.at.app.query.ksu.ksu002.a.dto.GetStartupProcessingInformationDto;
+import nts.uk.screen.at.app.query.ksu.ksu002.a.dto.LegalWorkTimeOfEmployeeDto;
+import nts.uk.screen.at.app.query.ksu.ksu002.a.dto.PlansResultsDto;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.dto.RegisterWorkScheduleInputCommand;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.dto.SystemDateDto;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.dto.WorkScheduleWorkInforDto;
@@ -54,8 +62,8 @@ public class Ksu002AWebService extends WebService {
 	@Inject
 	private CheckTimeIsIncorrect checkTimeIsIncorrect;
 
-	// @Inject
-	// private GetWorkTypeKSU002 getWorkType;
+	 @Inject
+	 private KSU002Finder kSU002Finder;
 
 	// Ver2
 	@Inject
@@ -63,6 +71,12 @@ public class Ksu002AWebService extends WebService {
 
 	@Inject
 	private RegisterWorkSceduleCommandHandler regisWorkSchedule;
+	
+	@Inject
+    private WeekRuleManagementFinder weekRuleManagementFinder;
+	
+	@Inject
+	private GetStartupProcessingInformation getStartupProcessingInformation;
 
 	@POST
 	@Path("getListOfPeriodsClose")
@@ -78,12 +92,27 @@ public class Ksu002AWebService extends WebService {
 	@POST
 	@Path("displayInWorkInformation")
 	public List<WorkScheduleWorkInforDto> getScheduleActualOfWorkInfo(DisplayInWorkInfoInput param) {
+		WeekRuleManagementDto weekRuleManagemento = weekRuleManagementFinder.find();
+		if(weekRuleManagemento != null) {
+			param.startWeekDate = weekRuleManagemento.getDayOfWeek();
+		}
 		return this.getScheduleActualOfWorkInfo002.getDataScheduleAndAactualOfWorkInfo(param);
 	}
-
+	
+	//期間に応じる基本情報を取得する
+	@POST
+	@Path("getlegalworkinghours")
+	public LegalWorkTimeOfEmployeeDto getlegalworkinghours(DisplayInWorkInfoInput param) {
+		return this.getScheduleActualOfWorkInfo002.getlegalworkinghours(param);
+	}
+	
 	@POST
 	@Path("getDataDaily")
 	public List<WorkScheduleWorkInforDto.Achievement> getDataDaily(DisplayInWorkInfoInput param) {
+		WeekRuleManagementDto weekRuleManagemento = weekRuleManagementFinder.find();
+		if(weekRuleManagemento != null) {
+			param.startWeekDate = weekRuleManagemento.getDayOfWeek();
+		}
 		return this.getDataDaily.getDataDaily(param);
 	}
 
@@ -105,7 +134,7 @@ public class Ksu002AWebService extends WebService {
 	// <<Command>> 勤務予定を登録する
 	@POST
 	@Path("regisWorkSchedule")
-	public ResultRegisWorkSchedule regisWorkSchedule(RegisterWorkScheduleInputCommand param) {
+	public ExecutionInfor regisWorkSchedule(RegisterWorkScheduleInputCommand param) {
 		return this.regisWorkSchedule.handle(param);
 	}
 
@@ -117,11 +146,22 @@ public class Ksu002AWebService extends WebService {
 				new TimeZoneDto(new TimeOfDayDto(param.getStartTime(), 0), new TimeOfDayDto(param.getEndTime(), 0)),
 				null);
 	}
-
-	// @POST
-	// @Path("getDateInfo")
-	// public List<DateInformation> getWorkType(GetDateInfoDuringThePeriodInput
-	// param) {
-	// return this.getDateInfoDuringThePeriod.get(param);
-	// }
+	
+	//予定・実績を取得する
+	@POST
+	@Path("getPlansResults")
+	public PlansResultsDto getPlansResults(DisplayInWorkInfoInput param) {
+		WeekRuleManagementDto weekRuleManagemento = weekRuleManagementFinder.find();
+		if(weekRuleManagemento != null) {
+			param.startWeekDate = weekRuleManagemento.getDayOfWeek();
+		}
+		return this.kSU002Finder.getPlansResults(param);
+	}
+	
+	//起動処理情報を取得する
+	@POST
+	@Path("getStartupProcessingInformation")
+	public GetStartupProcessingInformationDto getStartupProcessingInformation() {
+		return this.getStartupProcessingInformation.get();
+	}
 }

@@ -58,7 +58,7 @@
 							class="panel panel-gray-bg panel-custom-font-size">#{i18n.getText('KMF001_303')}</div>
 						<div data-itemno="A3_2" class="label lbl-unit-setting-explanation">#{i18n.getText('KMF001_304')}</div>
 						<div class="btn-icon flex valign-center">
-							<button data-bind = " click : openKMF001F" class="btn-unit-setting" id="A3_3" tabindex="1">#{i18n.getText('KMF001_305')}
+							<button data-bind = " click : openKMF001F" class="btn-unit-setting" id="A3_3">#{i18n.getText('KMF001_305')}
 							</button>
 							<span class="setting_caret caret-right"></span>
 						</div>
@@ -66,7 +66,7 @@
 							class="panel panel-gray-bg panel-custom-font-size">#{i18n.getText('KMF001_306')}</div>
 						<div data-itemno="A3_5" class="label lbl-unit-setting-explanation">#{i18n.getText('KMF001_307')}</div>
 						<div class="btn-icon flex valign-center">
-							<button data-bind = " click : openKMF001H" class="btn-unit-setting" id="A3_6" tabindex="1">#{i18n.getText('KMF001_308')}
+							<button data-bind = " click : openKMF001H" class="btn-unit-setting" id="A3_6">#{i18n.getText('KMF001_308')}
 							</button>
 							<span class="setting_caret caret-right"></span>
 						</div>
@@ -92,6 +92,12 @@
 						<div id="A4-left">
               <div data-itemno="A4_1"
                 class="panel panel-gray-bg panel-custom-font-size">#{i18n.getText('KMF001_309')}</div>
+              <div data-itemno="A4_13" class="label lbl-unit-setting-explanation">#{i18n.getText('KMF001_352')}</div>
+              <div class="btn-icon flex valign-center">
+                <button id="A3_14" data-bind = "click: openKMF001N" class="btn-unit-setting">#{i18n.getText('KMF001_353')}</button>
+                <span class="setting_caret caret-right"></span>
+              </div>
+
               <div data-itemno="A4_9" class="label lbl-unit-setting-explanation">#{i18n.getText('KMF001_324')}</div>
 
               <button class="btn-unit-fix" id="A4_10" data-bind = "click : openKMK007B ">#{i18n.getText('KMF001_323')}
@@ -137,7 +143,7 @@
             class="panel panel-gray-bg panel-custom-font-size">#{i18n.getText('KMF001_317')}</div>
           <div data-itemno="A5_2" class="label lbl-unit-setting-explanation">#{i18n.getText('KMF001_318')}</div>
           <div class="btn-icon flex valign-center">
-            <button data-itemno="A5_3" class="btn-unit-setting" data-bind = "click :openKMF001J">#{i18n.getText('KMF001_319')}
+            <button data-itemno="A5_3" class="btn-unit-setting" data-bind = "click :openKMF001J, enable: false">#{i18n.getText('KMF001_319')}
             </button>
             <span class="setting_caret caret-right"></span>
           </div>

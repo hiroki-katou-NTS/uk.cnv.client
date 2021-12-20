@@ -175,15 +175,14 @@ module a1 {
             })
                                                    
             // Subscribe event update dialog J interlock for A7_4, A7_6, A7_12, A7_13, A7_14
-            self.predseting.startDateClock.subscribe(() => { self.mainSettingModel.updateStampValue(); self.mainSettingModel.updateInterlockDialogJ(); });
-            self.predseting.rangeTimeDay.subscribe(() => { self.mainSettingModel.updateStampValue(); self.mainSettingModel.updateInterlockDialogJ(); });
-            self.timeZoneModelOne.end.subscribe(() => { self.mainSettingModel.updateStampValue(); self.mainSettingModel.updateInterlockDialogJ(); });                
+            self.predseting.startDateClock.subscribe(value => { self.updateAll(value, self.predseting.rangeTimeDay()); });
+            self.predseting.rangeTimeDay.subscribe(value => { self.updateAll(self.predseting.startDateClock(), value); });
+            self.timeZoneModelOne.end.subscribe(() => { self.updateAll(); });                
             self.timeZoneModelTwo.start.subscribe((v: any) => { 
                 if (v == "") {
                     self.timeZoneModelTwo.start(0);
                 }
-                self.mainSettingModel.updateStampValue(); 
-                self.mainSettingModel.updateInterlockDialogJ(); 
+                self.updateAll();
             });
             self.timeZoneModelTwo.end.subscribe((v: any) => { 
                 if (v == "") {
@@ -191,8 +190,7 @@ module a1 {
                 }
             });
             self.timeZoneModelTwo.useAtr.subscribe((v) => {
-                self.mainSettingModel.updateStampValue(); 
-                self.mainSettingModel.updateInterlockDialogJ();
+                self.updateAll();
                 if (!v) {
                     $('#shiftTwoStart').ntsError('clear');
                     $('#shiftTwoEnd').ntsError('clear');
@@ -237,6 +235,15 @@ module a1 {
         private checkLinked(dialogDataObject: any): boolean {
             let self = this;
             return (dialogDataObject.oneDayDialog != self.predseting.predTime.predTime.oneDay()) || (dialogDataObject.morningDialog != self.predseting.predTime.predTime.morning()) || (dialogDataObject.afternoonDialog != self.predseting.predTime.predTime.afternoon());
+        }
+
+        private updateAll(startDateClock?: number, rangeTimeDay?: number) {
+          const self = this;
+          self.mainSettingModel.updateStampValue(); 
+          self.mainSettingModel.updateInterlockDialogJ();
+          if (!_.isNil(startDateClock) && !_.isNil(rangeTimeDay)) {
+            self.mainSettingModel.updatePeriod(startDateClock, rangeTimeDay);
+          }
         }
     }
     export class Item {

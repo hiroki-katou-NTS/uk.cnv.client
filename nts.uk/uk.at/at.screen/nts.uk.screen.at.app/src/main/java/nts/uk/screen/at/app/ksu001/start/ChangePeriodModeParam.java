@@ -33,5 +33,11 @@ public class ChangePeriodModeParam {
 	public List<ShiftMasterMapWithWorkStyle> listShiftMasterNotNeedGetNew;
 	public boolean getActualData;
 	
+	// param them vao cua ver5
+	public String personTotalSelected; // 個人計選択 A11_1
+	public String workplaceSelected;   // 職場計選択A12_1
+	public int day; // 締め日
+	public boolean isLastDay;// 締め日
+	
 	
 }

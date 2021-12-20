@@ -14,6 +14,8 @@ import nts.uk.ctx.sys.auth.dom.role.RoleName;
 import nts.uk.ctx.sys.auth.dom.role.RoleType;
 import nts.uk.shr.com.context.AppContexts;
 
+import java.util.Optional;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -50,8 +52,10 @@ public class AddRoleCommand {
 	// 会社ID
 	private String companyId;
 
+	private Boolean approvalAuthority;
+
 	public AddRoleCommand(String roleId, String roleCode, int roleType, int employeeReferenceRange, String name,
-			String contractCode, int assignAtr, String companyId) {
+			String contractCode, int assignAtr, String companyId,Boolean approvalAuthority) {
 		super();
 		this.roleId = roleId;
 		this.roleCode = roleCode;
@@ -61,25 +65,20 @@ public class AddRoleCommand {
 		this.contractCode = contractCode;
 		this.assignAtr = assignAtr;
 		this.companyId = companyId;
+		this.approvalAuthority = approvalAuthority;
 	}
 	
 	public Role toDomain() {
 		
 		return new Role(
 				IdentifierUtil.randomUniqueId(),
-				new RoleCode(this.roleCode),
-				EnumAdaptor.valueOf(this.roleType,RoleType.class),
-				EnumAdaptor.valueOf(this.employeeReferenceRange,EmployeeReferenceRange.class),
-				new RoleName(this.name),
 				new ContractCode(AppContexts.user().contractCode()),
+				AppContexts.user().companyId(),
+				new RoleCode(this.roleCode),
+				new RoleName(this.name),
+				EnumAdaptor.valueOf(this.roleType,RoleType.class),
 				EnumAdaptor.valueOf(this.assignAtr,RoleAtr.class),
-				AppContexts.user().companyId()
-				);
+				EnumAdaptor.valueOf(this.employeeReferenceRange,EmployeeReferenceRange.class),
+				approvalAuthority == null?Optional.empty():Optional.of(approvalAuthority));
 	}
-
-
-
-	
-	
-	
 }

@@ -1,7 +1,5 @@
 package nts.uk.ctx.sys.portal.app.command.webmenu.webmenulinking;
 
-import java.util.Optional;
-
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -22,8 +20,10 @@ public class UpdateRoleByRoleTiesCommandHandler extends CommandHandler<RoleByRol
 	protected void handle(CommandHandlerContext<RoleByRoleTiesCommand> context) {
 		RoleByRoleTiesCommand role = context.getCommand();
 		
-		RoleByRoleTies newRole = new RoleByRoleTies(role.getRoleId(),new WebMenuCode( role.getWebMenuCd()), AppContexts.user().companyId());
-		Optional<RoleByRoleTies> checkData = repo.getRoleByRoleTiesById(newRole.getRoleId());
+		RoleByRoleTies newRole = new RoleByRoleTies(role.getRoleId(), AppContexts.user().companyId(), new WebMenuCode( role.getWebMenuCd()));
+
+// TODO　修正お願いいたします。
+/*		Optional<RoleByRoleTies> checkData = repo.getRoleByRoleTiesById(newRole.getRoleId());
 		
 		if(checkData.isPresent()) {
 			repo.updateRoleByRoleTies(newRole);
@@ -31,6 +31,7 @@ public class UpdateRoleByRoleTiesCommandHandler extends CommandHandler<RoleByRol
 		} else {
 			repo.insertRoleByRoleTies(newRole);;
 		}
+*/
 		
 	}
 }

@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.FixedConditionWorkRecord;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.FixedConditionWorkRecordRepository;
@@ -99,7 +101,7 @@ public class JpaFixedConWorkRecordRepository extends JpaRepository implements  F
 	public List<FixedConditionWorkRecord> getFixConWorkRecordByIdUse (String dailyAlarmConID, int use) {
 		List<FixedConditionWorkRecord> data = this.queryProxy().query(SELECT_FIXED_CON_BY_ALARM_ID_USE, KrcmtFixedConditionWorkRecord.class)
 				.setParameter("dailyAlarmConID", dailyAlarmConID)
-				.setParameter("useAtr", use)
+				.setParameter("useAtr", BooleanUtils.toBoolean(use))
 				.getList(c->c.toDomain());
 		return data;
 	}

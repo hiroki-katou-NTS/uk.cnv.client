@@ -12,9 +12,6 @@ import nts.uk.shr.com.context.AppContexts;
 
 import javax.ejb.Stateless;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -77,11 +74,14 @@ public class CreateAlarmDataTopPageService {
 
         // if　$エラーがなくなった職場IDList.isPrensent()　//削除
         if (!CollectionUtil.isEmpty(wkplIdListNotErrors)) {
-            List<String> allEmpErrorsRemoved = new ArrayList<>();
-            wkplIdListNotErrors.forEach(x -> {
-                List<String> preEmpIds = require.getListEmployeeId(x, GeneralDate.today());
-                allEmpErrorsRemoved.addAll(preEmpIds);
-            });
+            // 職場IDから、アラームメールの受信を許可されている管理者を取得する
+            // $全てエラーが解除済み社員　 =　require. 職場IDから、アラームメールの受信を許可されている管理者を取得する($エラーがなくなった職場IDList, 年月日#今日())
+            // map　$.value()		//List<社員ID>
+            Map<String, List<String>> adminReceiveAlarmMailMap = require.getAdminReceiveAlarmMailByWorkplaceIds(wkplIdListNotErrors);
+            List<String> allEmpErrorsRemoved = adminReceiveAlarmMailMap.isEmpty() ? Collections.emptyList():
+                    adminReceiveAlarmMailMap.values().stream()
+                            .flatMap(Collection::stream)
+                            .collect(Collectors.toList());
 
             //$削除の情報　＝　削除の情報Param#作成する(アラームリスト、 $全てエラーが解除済み社員、 上長、 $パターンコード )
             delInfo = Optional.of(DeleteInfoAlarmImport.builder()
@@ -101,10 +101,15 @@ public class CreateAlarmDataTopPageService {
 
         //$パターン名称　＝　アラームリストの情報.get(0).パターン名
         Optional<String> patternName = alarmListInfo.get(0).getPatternName();
+
+        // 職場IDから、アラームメールの受信を許可されている管理者を取得する（OUTPUT：Map＜職場ID、List＜社員ID＞＞）
+        // $上長の社員IDMap　 =　require. 職場IDから、アラームメールの受信を許可されている管理者を取得する($エラーがある職場IDList, 年月日#今日())
+        Map<String, List<String>> superiorEmployeeMap = require.getAdminReceiveAlarmMailByWorkplaceIds(wkplIdListErrors);
+
         //$エラーがある職場IDList：for
         for (String wkpl : wkplIdListErrors) {//職場、基準日からアラーム通知先の社員を取得する
-            //$上長の社員IDList　 =　require. 職場、基準日からアラーム通知先の社員を取得する($, 年月日#今日())
-            List<String> superiorEmpIDList = require.getListEmployeeId(wkpl, GeneralDate.today());
+            // $上長の社員IDList　 =　$上長の社員IDMap.get($)
+            List<String> superiorEmpIDList = superiorEmployeeMap.getOrDefault(wkpl, Collections.emptyList());
 
             //$発生日時　＝　$職場Map.get($)　：　sort $.発生日時 DESC first $.発生日時
             val topAlarmParamList = workplaceMap.getOrDefault(wkpl, new ArrayList<>());
@@ -157,11 +162,6 @@ public class CreateAlarmDataTopPageService {
         return topAlarmParamList.stream().filter(x -> x != null).map(i -> i.getDisplaySId()).collect(Collectors.toList());
     }
 
-    private static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
-        Map<Object, Boolean> map = new ConcurrentHashMap<>();
-        return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-    }
-
     public interface Require {
         /**
          * [R-1] 社員ID（List）と基準日から所属職場IDを取得 : using EmployeeWorkplaceAdapter
@@ -172,14 +172,14 @@ public class CreateAlarmDataTopPageService {
          */
         List<AffAtWorkplaceExport> getWorkplaceId(List<String> sIds, GeneralDate baseDate);
 
-        /**
-         * [R-2] 職場、基準日からアラーム通知先の社員を取得する : using EmployeeAlarmListAdapter
-         *
-         * @param workplaceId
-         * @param referenceDate
-         * @return
-         */
-        List<String> getListEmployeeId(String workplaceId, GeneralDate referenceDate);
+//        /**
+//         * [R-2] 職場、基準日からアラーム通知先の社員を取得する : using EmployeeAlarmListAdapter
+//         *
+//         * @param workplaceId
+//         * @param referenceDate
+//         * @return
+//         */
+//        List<String> getListEmployeeId(String workplaceId, GeneralDate referenceDate);
 
         /**
          * [R-3] トップページアラームデータを作成する : using TopPageAlarmAdapter
@@ -189,5 +189,10 @@ public class CreateAlarmDataTopPageService {
          * @param delInfoOpt 削除の情報
          */
         void create(String companyId, List<TopPageAlarmImport> alarmInfos, Optional<DeleteInfoAlarmImport> delInfoOpt);
+
+        /**
+         * 	[R-4]職場IDから、アラームメールの受信を許可されている管理者を取得する
+         */
+        Map<String, List<String>> getAdminReceiveAlarmMailByWorkplaceIds(List<String> workplaceIds);
     }
 }

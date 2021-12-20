@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
-import java.util.Arrays;
 
 import nts.arc.time.GeneralDateTime;
 
@@ -50,14 +49,6 @@ public class LogManager {
 	public static void err(Exception e) {
 		system_error(e.toString());
 		outputLog(e.toString());
-
-		if (e.getStackTrace() == null) return;
-
-		Arrays.stream(e.getStackTrace())
-			.forEach(st -> {
-				system_error(st.toString());
-				outputLog(st.toString());
-			});
 	}
 	
 	private static void system_out(String str) {

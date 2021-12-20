@@ -34,5 +34,5 @@ public class SspmtDataDeletionPatternSettingPK implements Serializable {
 	 * パターン区分
 	 */
 	@Column(name = "PATTERN_ATR")
-	public int patternClassification;
+	public boolean patternClassification;
 }

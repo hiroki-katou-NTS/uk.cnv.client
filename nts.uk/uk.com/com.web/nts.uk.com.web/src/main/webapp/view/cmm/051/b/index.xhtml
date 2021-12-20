@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+<ui:composition template="../../../../master/dialog.xhtml">
+    <ui:define name="htmlHead">
+        <script>
+            var dialogSize = {
+                width: 430,
+                height: 370
+            };
+        </script>
+        <com:scriptfile set="IGNITE"/>
+        <com:stylefile path="cmm051.b.main.css"/>
+        <com:scriptfile path="cmm051.b.vm.js"/>
+    </ui:define>
+
+    <!-- PAGE CONTENT -->
+    <ui:define name="content">
+        <div id="contents-area">
+            <!--B_1-->
+            <div>#{i18n.getText('CMM051_53')}</div>
+            <table class="table_content">
+                <colgroup>
+                    <col width="120px"/>
+                    <col width="250px"/>
+                </colgroup>
+                <tr>
+                    <td>
+                        <!--B2_1-->
+                        <div data-bind="ntsFormLabel: {required: true}">#{i18n.getText('CMM051_54')}</div>
+                    </td>
+                    <td>
+                        <!--B2_2-->
+                        <div id="daterangepicker" tabindex="1"
+                             data-bind="ntsDateRangePicker:
+                              { required: required,
+                               value: periodDate,
+                               maxRange: 'none'}"/>
+
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="functions-area-bottom">
+            <!--B3_1-->
+            <button tabindex="3" data-bind="click: execution,  enable: $root.errors.isEmpty()"
+                    class="x-large proceed">#{i18n.getText('CMM051_55')}</button>
+            <!--B3_2-->
+            <button tabindex="4" data-bind="click: cancel_Dialog" class="large" >#{i18n.getText('CMM051_56')}</button>
+        </div>
+    </ui:define>
+
+</ui:composition>
+</body>
+</html>

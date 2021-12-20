@@ -212,7 +212,7 @@ public class WorkInfoOfDailyAttendanceTest {
 	@Test
 	public void isAttendanceRate_False() {
 		val workInfo = new WorkInformation("01", "01");
-		val workInfoOfDailyAtt = WorkInfoOfDailyAttendanceHelper.getData(workInfo);
+		val workInfoOfDailyAtt = WorkInfoOfDailyAttendanceHelper.createByWorkInformation(workInfo);
 		new Expectations(workInfo) {
 			{
 				workInfo.isAttendanceRate(require);
@@ -232,7 +232,7 @@ public class WorkInfoOfDailyAttendanceTest {
 	@Test
 	public void isAttendanceRate_true() {
 		val workInfo = new WorkInformation("01", "01");
-		val workInfoOfDailyAtt = WorkInfoOfDailyAttendanceHelper.getData(workInfo);
+		val workInfoOfDailyAtt = WorkInfoOfDailyAttendanceHelper.createByWorkInformation(workInfo);
 		new Expectations(workInfo) {
 			{
 				workInfo.isAttendanceRate(require);

@@ -50,5 +50,7 @@ public class StartKSU001Dto {
 	public TargetShiftPalette targetShiftPalette; // 対象のシフトパレッ
 	public List<ShiftMasterMapWithWorkStyle> shiftMasterWithWorkStyleLst;
 	public List<ScheduleOfShiftDto> listWorkScheduleShift; // ・List<勤務予定（シフト）dto>
+	public AggregatePersonalMapDto aggreratePersonal; // 個人計集計結果　←集計内容によって情報が異なる (update ver5)
+	public AggregateWorkplaceMapDto aggrerateWorkplace; // ・職場計集計結果　←集計内容によって情報が異なる  (update ver5)
 	
 }

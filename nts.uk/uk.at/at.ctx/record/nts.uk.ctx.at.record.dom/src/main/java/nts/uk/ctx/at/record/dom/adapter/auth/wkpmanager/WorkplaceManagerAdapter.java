@@ -9,4 +9,9 @@ public interface WorkplaceManagerAdapter {
      * 管理者未登録を確認する
      */
     List<WorkplaceManagerImport> findByPeriodAndWkpIds(List<String> wkpIds, DatePeriod datePeriod);
+
+
+
+    // Get workplace manager list by workplace id
+    List<WorkplaceManagerImport> getWkpManagerListByWkpId(String workplaceId);
 }

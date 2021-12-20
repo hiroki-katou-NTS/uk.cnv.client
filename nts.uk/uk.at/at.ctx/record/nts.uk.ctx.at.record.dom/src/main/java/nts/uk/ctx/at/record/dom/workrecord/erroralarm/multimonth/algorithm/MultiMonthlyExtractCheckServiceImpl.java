@@ -2,18 +2,25 @@ package nts.uk.ctx.at.record.dom.workrecord.erroralarm.multimonth.algorithm;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import lombok.val;
+import nts.arc.task.parallel.ManagedParallelWithContext;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.YearMonthPeriod;
-import nts.uk.ctx.at.record.dom.monthly.TimeOfMonthlyRepository;
+import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.algorithm.DataCheckAlarmListService;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.condition.attendanceitem.CompareSingleValue;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.condition.attendanceitem.ErAlAttendanceItemCondition;
@@ -33,19 +40,16 @@ import nts.uk.ctx.at.shared.dom.alarmList.extractionResult.AlarmListCheckInfor;
 import nts.uk.ctx.at.shared.dom.alarmList.extractionResult.AlarmListCheckType;
 import nts.uk.ctx.at.shared.dom.alarmList.extractionResult.ExtractionAlarmPeriodDate;
 import nts.uk.ctx.at.shared.dom.alarmList.extractionResult.ResultOfEachCondition;
-import nts.uk.ctx.at.shared.dom.alarmList.persistenceextractresult.*;
+import nts.uk.ctx.at.shared.dom.alarmList.persistenceextractresult.AlarmCheckConditionCode;
+import nts.uk.ctx.at.shared.dom.alarmList.persistenceextractresult.AlarmEmployeeList;
+import nts.uk.ctx.at.shared.dom.alarmList.persistenceextractresult.AlarmExtractInfoResult;
+import nts.uk.ctx.at.shared.dom.alarmList.persistenceextractresult.AlarmExtractionCondition;
+import nts.uk.ctx.at.shared.dom.alarmList.persistenceextractresult.ExtractResultDetail;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.remainmerge.RemainMergeRepository;
 import nts.uk.shr.com.i18n.TextResource;
 @Stateless
 public class MultiMonthlyExtractCheckServiceImpl<V> implements MultiMonthlyExtractCheckService{
 	
-	
-	@Inject
-	private TimeOfMonthlyRepository timeRepo;
-	
-	@Inject
-	private RemainMergeRepository remainRepo;
 	@Inject
 	private AttendanceItemNameAdapter attendanceAdapter;
 	@Inject
@@ -54,12 +58,15 @@ public class MultiMonthlyExtractCheckServiceImpl<V> implements MultiMonthlyExtra
 	private ConvertCompareTypeToText convertComparaToText;
 	@Inject
 	private DataCheckAlarmListService dataCheckAlarm;
+	@Inject
+	private ManagedParallelWithContext parallelManager;
 	@Override
 	public void extractMultiMonthlyAlarm(String cid, List<String> lstSid, YearMonthPeriod mPeriod,
 			List<String> lstAnyConID, List<WorkPlaceHistImportAl> getWplByListSidAndPeriod,
 			List<ResultOfEachCondition> lstResultCondition, List<AlarmListCheckInfor> lstCheckType,
 			List<AlarmEmployeeList> alarmEmployeeList, List<AlarmExtractionCondition> alarmExtractConditions,
-			String alarmCheckConditionCode) {
+			String alarmCheckConditionCode,Consumer<Integer> counter,
+			  Supplier<Boolean> shouldStop) {
 		DataCheck data = new DataCheck(cid, lstSid, mPeriod, lstAnyConID);
 		if(data.lstAnyCondCheck.isEmpty()) return;
 		
@@ -85,7 +92,16 @@ public class MultiMonthlyExtractCheckServiceImpl<V> implements MultiMonthlyExtra
 			int compare = erCondition.getCompareSingleValue() == null ?
 					erCondition.getCompareRange().getCompareOperator().value :
 						erCondition.getCompareSingleValue().getCompareOpertor().value;
-			for(String sid : lstSid) {
+			
+			parallelManager.forEach(CollectionUtil.partitionBySize(lstSid, 100), emps -> {
+
+			synchronized (this) {
+					if (shouldStop.get()) {
+						return;
+					}
+			}
+						
+			for(String sid : emps) {
 				String startValue = erCondition.getCompareSingleValue() == null ?
 						erCondition.getCompareRange().getStartValue().toString() :
 						erCondition.getCompareSingleValue().getValue().toString();					
@@ -310,7 +326,7 @@ public class MultiMonthlyExtractCheckServiceImpl<V> implements MultiMonthlyExtra
 					}
 					
 					GeneralDate startDate = GeneralDate.ymd(mPeriod.start().year() , mPeriod.start().month(), 1);
-					GeneralDate enDate = GeneralDate.ymd(mPeriod.start().year() , mPeriod.start().month() + 1, 1).addDays(-1);
+					GeneralDate enDate = GeneralDate.ymd(mPeriod.end().year() , mPeriod.end().month() + 1, 1).addDays(-1);
 					ExtractionAlarmPeriodDate pDate = new ExtractionAlarmPeriodDate(Optional.ofNullable(startDate), Optional.ofNullable(enDate));
 					
 					String workplaceId = "";
@@ -321,6 +337,8 @@ public class MultiMonthlyExtractCheckServiceImpl<V> implements MultiMonthlyExtra
 										&& x.getDatePeriod().end().afterOrEquals(startDate)).findFirst();
 						if(optWorkPlaceIdAndPeriodImportAl.isPresent()) {
 							workplaceId = optWorkPlaceIdAndPeriodImportAl.get().getWorkplaceId();
+						} else {
+							workplaceId = optWorkPlaceHistImportAl.get().getLstWkpIdAndPeriod().get(0).getWorkplaceId();
 						}
 					}
 
@@ -362,24 +380,13 @@ public class MultiMonthlyExtractCheckServiceImpl<V> implements MultiMonthlyExtra
 						));
 						alarmEmployeeList.add(new AlarmEmployeeList(alarmExtractInfoResults, sid));
 					}
-
-//					List<ResultOfEachCondition> result = lstResultCondition.stream()
-//							.filter(x -> x.getCheckType() == AlarmListCheckType.FreeCheck && x.getNo().equals(String.valueOf(anyCond.getCondNo())))
-//							.collect(Collectors.toList());
-//					if(result.isEmpty()) {
-//						ResultOfEachCondition resultCon = new ResultOfEachCondition(AlarmListCheckType.FixCheck,
-//								String.valueOf(anyCond.getCondNo()),
-//								new ArrayList<>());
-//						resultCon.getLstResultDetail().add(detail);
-//						lstResultCondition.add(resultCon);
-//					} else {
-//						ResultOfEachCondition ex = result.get(0);
-//						lstResultCondition.remove(ex);
-//						ex.getLstResultDetail().add(detail);
-//						lstResultCondition.add(ex);
-//					}
 				}
 			}
+
+			synchronized (this) {
+				counter.accept(emps.size());
+			}
+		});
 		}
 		
 	}

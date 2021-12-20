@@ -1,0 +1,50 @@
+
+.panel.panel-frame {
+  width: 260px;
+  height: 400px;
+  float: left;
+  display: block;
+}
+
+.panel.panel-frame > * {
+  margin-top: 10px;
+}
+
+.panel.panel-gray-bg {
+  text-align: center;
+}
+
+.panel.panel-gray-bg > label {
+  font-size: 1.5em;
+}
+
+.btn-with-caret > .caret {
+  text-align: center;
+}
+
+.btn-with-caret > button {
+  width: 243px;
+  height: 38px;
+}
+
+.btn-with-caret > button:not(.caret-right) {
+  width: 260px !important;
+}
+
+.caret-bottom:after {
+	color: #92D050;
+	border-width: 18px 55px;
+	margin-top: 5px;
+}
+
+#A1 {
+  margin-left: 25px;
+  margin-right: 40px;
+}
+
+.setting_caret.caret-right:after {
+  color: #97D155;
+  border-width: 18px 18px;
+  margin-left: 1px;
+  top: 40%;
+}

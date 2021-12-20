@@ -4,22 +4,12 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.NoArgsConstructor;
-import nts.arc.time.YearMonth;
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.AnnualLeaveMaxHistoryData;
-import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.HalfdayAnnualLeaveMax;
-import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.MaxMinutes;
-import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.MaxTimes;
-import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.RemainingMinutes;
-import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.RemainingTimes;
-import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.TimeAnnualLeaveMax;
-import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.UsedMinutes;
-import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.maxdata.UsedTimes;
-import nts.uk.shr.com.time.calendar.date.ClosureDate;
-import nts.uk.shr.infra.data.entity.ContractCompanyUkJpaEntity;
 import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 
 /**
@@ -31,8 +21,6 @@ import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 @Entity
 @Table(name = "KRCDT_HDPAID_MAX_HIST")
 public class KrcdtAnnLeaMaxHist extends ContractUkJpaEntity {
-
-	private static final long serialVersionUID = 1L;
 
 	/** プライマリキー */
 	@EmbeddedId
@@ -83,7 +71,7 @@ public class KrcdtAnnLeaMaxHist extends ContractUkJpaEntity {
 		this.maxMinutes = maxMinutes;
 		this.usedMinutes = usedMinutes;
 		this.remainingMinutes = remainingMinutes;
-		this.PK = new KrcdtAnnLeaMaxHistPK(sid, yearMonth, closureId, closeDay, isLastDay);
+		this.PK = new KrcdtAnnLeaMaxHistPK(sid, yearMonth, closureId, closeDay, BooleanUtils.toBoolean(isLastDay));
 	}
 
 	public static KrcdtAnnLeaMaxHist fromDomain(AnnualLeaveMaxHistoryData domain) {

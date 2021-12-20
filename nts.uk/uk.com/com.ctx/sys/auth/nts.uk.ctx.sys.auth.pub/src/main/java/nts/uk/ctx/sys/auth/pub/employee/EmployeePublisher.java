@@ -27,6 +27,13 @@ public interface EmployeePublisher {
 	
 	/** [RQ.653]職場リスト、基準日から就業確定できる社員を取得する **/
 	Map<String, List<String>> getListEmpInfo(String companyID , GeneralDate referenceDate, List<String> workplaceID);
+
+	/**
+	 * Request list 727 ([No.727])
+	 * 職場IDから、アラームメールの受信を許可されている管理者を取得する
+	 * UKDesign.ドメインモデル.NittsuSystem.UniversalK.システム.権限管理.Export.[No.727]職場IDから、アラームメールの受信を許可されている管理者を取得する.[No.727]職場IDから、アラームメールの受信を許可されている管理者を取得する
+	 */
+	Map<String, List<String>> getManagersByWorkplaceIds(List<String> workplaceIds);
 	
 	
 	public static interface RequireRQ653 {

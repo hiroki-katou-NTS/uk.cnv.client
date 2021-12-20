@@ -243,7 +243,6 @@ public class GetAnnLeaRemNumWithinPeriodProc {
 
 		// 次回年休付与日を計算
 		List<NextAnnualLeaveGrant> nextAnnualLeaveGrantList = new ArrayList<>();
-
 		nextAnnualLeaveGrantList = CalcNextAnnualLeaveGrantDate.algorithm(
 				require, cacheCarrier,
 				companyId, employeeId, Optional.of(period.get()),

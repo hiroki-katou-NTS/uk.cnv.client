@@ -16,6 +16,8 @@ import nts.uk.ctx.at.schedule.dom.displaysetting.DisplaySettingByDateForOrganiza
 import nts.uk.ctx.at.schedule.dom.displaysetting.GetDisplaySettingByDateService;
 import nts.uk.ctx.at.schedule.dom.displaysetting.functioncontrol.ScheFunctionControl;
 import nts.uk.ctx.at.schedule.dom.displaysetting.functioncontrol.ScheFunctionControlRepository;
+import nts.uk.ctx.at.shared.app.query.task.GetTaskOperationSettingQuery;
+import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.operationsettings.TaskOperationSetting;
 import nts.uk.ctx.at.shared.dom.workmanagementmultiple.WorkManagementMultiple;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.TargetOrgIdenInfor;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.WorkplaceInfo;
@@ -30,21 +32,23 @@ import nts.uk.screen.at.app.ksu003.start.dto.ScheFunctionControlDto;
 import nts.uk.screen.at.app.ksu003.start.dto.WorkManageMultiDto;
 import nts.uk.screen.at.app.query.kcp013.GetAllWorkingHoursQuery;
 import nts.uk.shr.com.context.AppContexts;
+
 /**
  * 初期起動の情報取得
  * UKDesign.UniversalK.就業.KSU_スケジュール.KSU003_個人スケジュール修正(日付別).A：個人スケジュール修正(日付別).メニュー別OCD
+ * 
  * @author phongtq
  *
  */
 @Stateless
 public class GetInfoInitStartKsu003 {
-	
+
 	@Inject
 	private DisplaySettingByDateForOrgRepository orgRepository; // 組織別スケジュール修正日付別の表示設定Repository.get (対象組織識別情報)
-	
+
 	@Inject
-	private DisplaySettingByDateForCmpRepository cmpRepository; // 会社別スケジュール修正日付別の表示設定Repository.get (会社ID)	
-	
+	private DisplaySettingByDateForCmpRepository cmpRepository; // 会社別スケジュール修正日付別の表示設定Repository.get (会社ID)
+
 	@Inject
 	private WorkplaceGroupAdapter groupAdapter;
 
@@ -53,51 +57,59 @@ public class GetInfoInitStartKsu003 {
 
 	@Inject
 	private AffWorkplaceAdapter wplAdapter;
-	
+
 	@Inject
 	private GetAllWorkingHoursQuery hoursQuery;
-	
+
 	@Inject
 	private ScheFunctionControlRepository controlRepository;
-	
+
+	@Inject
+	private GetTaskOperationSettingQuery operaSetQuery;
+
 	public GetInfoInitStartKsu003Dto getData(TargetOrgIdenInfor targetOrg) {
-		
+
 		String cid = AppContexts.user().companyId();
-		
+
 		// 1 .取得する(Require, 対象組織識別情報) : スケジュール修正日付別の表示設定
 		GetDisplayRequireImpl requireImpl = new GetDisplayRequireImpl(orgRepository, cmpRepository);
-		DisplaySettingByDateDto byDateDto = DisplaySettingByDateDto.convert(GetDisplaySettingByDateService.get(requireImpl, targetOrg));
-		
+		DisplaySettingByDateDto byDateDto = DisplaySettingByDateDto
+				.convert(GetDisplaySettingByDateService.get(requireImpl, targetOrg));
+
 		// 2 .組織の表示情報を取得する(Require, 年月日) : 組織の表示情報
 		TargetOrgIdenInforImpl idenInforImpl = new TargetOrgIdenInforImpl(groupAdapter, serviceAdapter, wplAdapter);
-		DisplayInfoOrganizationDto organizationDto = DisplayInfoOrganizationDto.convert(targetOrg.getDisplayInfor(idenInforImpl, GeneralDate.today()));
-		
+		DisplayInfoOrganizationDto organizationDto = DisplayInfoOrganizationDto
+				.convert(targetOrg.getDisplayInfor(idenInforImpl, GeneralDate.today()));
+
 		// 3 .複数回勤務管理を取得する(会社ID) : 複数回勤務管理
 		Optional<WorkManagementMultiple> manageMulti = hoursQuery.getUseDistinction();
 		WorkManageMultiDto manageMultiDto = WorkManageMultiDto.convert(manageMulti);
-		
+
 		// 4 .時刻修正可能取得する(ログイン会社ID) : スケジュール修正の機能制御
 		Optional<ScheFunctionControl> scheFunc = controlRepository.get(cid);
 		ScheFunctionControlDto functionControlDto = ScheFunctionControlDto.convert(scheFunc);
-		
-		GetInfoInitStartKsu003Dto dto = new GetInfoInitStartKsu003Dto(byDateDto, organizationDto, manageMultiDto, functionControlDto);
-		
+
+		// 5 .取得する(会社ID) : Optional<作業運用設定>
+		Optional<TaskOperationSetting> operaSetting = operaSetQuery.getTasksOperationSetting(cid);
+		GetInfoInitStartKsu003Dto dto = new GetInfoInitStartKsu003Dto(byDateDto, organizationDto, manageMultiDto,
+				functionControlDto, operaSetting.isPresent() ? operaSetting.get().getTaskOperationMethod().value : null);
+
 		return dto;
 	}
-	
+
 	@AllArgsConstructor
-	private static class GetDisplayRequireImpl implements GetDisplaySettingByDateService.Require{
-		
+	private static class GetDisplayRequireImpl implements GetDisplaySettingByDateService.Require {
+
 		@Inject
 		private DisplaySettingByDateForOrgRepository orgRepository; // 組織別スケジュール修正日付別の表示設定Repository.get (対象組織識別情報)
-		
+
 		@Inject
-		private DisplaySettingByDateForCmpRepository cmpRepository; // 会社別スケジュール修正日付別の表示設定Repository.get (会社ID)	
-		
+		private DisplaySettingByDateForCmpRepository cmpRepository; // 会社別スケジュール修正日付別の表示設定Repository.get (会社ID)
+
 		@Override
 		public Optional<DisplaySettingByDateForOrganization> getOrg(TargetOrgIdenInfor targetOrg) {
 			String cid = AppContexts.user().companyId();
-			Optional<DisplaySettingByDateForOrganization> displaySet =  orgRepository.get(cid, targetOrg);
+			Optional<DisplaySettingByDateForOrganization> displaySet = orgRepository.get(cid, targetOrg);
 			return displaySet;
 		}
 
@@ -107,9 +119,9 @@ public class GetInfoInitStartKsu003 {
 			Optional<DisplaySettingByDateForCompany> displaySet = cmpRepository.get(cid);
 			return displaySet;
 		}
-		
+
 	}
-	
+
 	@AllArgsConstructor
 	private static class TargetOrgIdenInforImpl implements TargetOrgIdenInfor.Require {
 		@Inject
@@ -148,5 +160,5 @@ public class GetInfoInitStartKsu003 {
 			return wplAdapter.getWKPID(CID, WKPGRPID);
 		}
 	}
-	
+
 }

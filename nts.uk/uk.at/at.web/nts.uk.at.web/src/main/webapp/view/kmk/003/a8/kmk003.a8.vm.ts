@@ -199,6 +199,8 @@ module a8 {
         isEnable: KnockoutObservable<boolean>;
         
         listRoundingBreakTime: KnockoutObservableArray<any>;
+        listRoundingBreakTimeOvertime: KnockoutObservableArray<any>;
+        listRoundingBreakTimeHoliday: KnockoutObservableArray<any>;
         listRoundingTimeValue: KnockoutObservableArray<EnumConstantDto>;
         listRoundingValue: KnockoutObservableArray<EnumConstantDto>;
         
@@ -209,6 +211,14 @@ module a8 {
                 { value: 0, localizedName: nts.uk.resource.getText("KMK003_87") },
                 { value: 1, localizedName: nts.uk.resource.getText("KMK003_88") }
             ]);
+            _self.listRoundingBreakTimeOvertime = ko.observableArray([
+              { value: 0, localizedName: nts.uk.resource.getText("KMK003_330") },
+              { value: 1, localizedName: nts.uk.resource.getText("KMK003_88") }
+          ]);
+            _self.listRoundingBreakTimeHoliday = ko.observableArray([
+              { value: 0, localizedName: nts.uk.resource.getText("KMK003_331") },
+              { value: 1, localizedName: nts.uk.resource.getText("KMK003_88") }
+          ]);
             //_self.listRoundingBreakTime(settingEnum.roundingBreakTime);
             _self.listRoundingTimeValue = ko.observableArray(settingEnum.roundingTime);
             _self.listRoundingValue = ko.observableArray(settingEnum.roundingSimple);           

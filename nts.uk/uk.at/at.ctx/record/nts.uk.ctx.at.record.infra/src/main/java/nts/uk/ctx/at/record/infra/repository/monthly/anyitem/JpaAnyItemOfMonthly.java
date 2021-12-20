@@ -914,7 +914,7 @@ public class JpaAnyItemOfMonthly extends JpaRepository implements AnyItemOfMonth
 		for (AnyItemOfMonthly d : domain) {
 			entity.toEntityAnyItemOfMonthly(d);
 		}
-		this.getEntityManager().persist(entity);
+		this.getEntityManager().merge(entity);
 	}
 	
 	/** 削除 */

@@ -2,12 +2,17 @@ package nts.uk.screen.at.app.query.kdp.kdp003.a;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.sys.gateway.dom.outage.company.PlannedOutageByCompany;
+import nts.uk.ctx.sys.gateway.dom.outage.company.PlannedOutageByCompanyRepository;
+import nts.uk.ctx.sys.gateway.dom.outage.tenant.PlannedOutageByTenant;
+import nts.uk.ctx.sys.gateway.dom.outage.tenant.PlannedOutageByTenantRepository;
 import nts.uk.ctx.sys.portal.app.query.notice.MessageNoticeDto;
 import nts.uk.ctx.sys.portal.dom.notice.DestinationClassification;
 import nts.uk.ctx.sys.portal.dom.notice.MessageNotice;
@@ -25,6 +30,12 @@ public class GetStampInputSetting {
 
 	@Inject
 	private MessageNoticeRepository msgNoticeRepo;
+	
+	@Inject
+	private PlannedOutageByTenantRepository stopBySystemRepo;
+	
+	@Inject
+	private PlannedOutageByCompanyRepository stopByCompanyRepo;
 
 	/**
 	 * 
@@ -35,6 +46,7 @@ public class GetStampInputSetting {
 	public GetStampInputSettingDto get(DatePeriod period, List<String> wkpIds) {
 		List<MessageNoticeDto> messageNoticeDtos = new ArrayList<>();
 		String cid = AppContexts.user().companyId();
+		String contractCd = AppContexts.user().contractCode();
 
 		// 1. [※ノートに記述]: 職場IDListからメッセージを取得する(期間、<List>職場ID):お知らせメッセージ
 		List<MessageNotice> messageNotices = msgNoticeRepo.getMsgFromWpIdList(period, wkpIds, cid);
@@ -47,8 +59,34 @@ public class GetStampInputSetting {
 			messageNoticeDtos = messageNotices.stream().map(m -> MessageNoticeDto.toDto(m))
 					.collect(Collectors.toList());
 		}
+		
+		Optional<PlannedOutageByTenant> system = stopBySystemRepo.find(contractCd);
+		
+		StopBySystemDto systemDto = new StopBySystemDto();
+		
+		if (system.isPresent()) {
+			PlannedOutageByTenant tenant = system.get();
+			
+			systemDto.setContractCd(contractCd);
+			systemDto.setStopMessage(tenant.getState().getNoticeMessage().v());
+			systemDto.setStopMode(tenant.getState().getOutageMode().value);
+			systemDto.setSystemStatusType(tenant.getState().getSystemAvailability().value);
+			systemDto.setUsageStopMessage(tenant.getState().getOutageMessage().v());
+		}
+		
+		Optional<PlannedOutageByCompany> company = stopByCompanyRepo.find(cid);
+		
+		StopByCompanyDto companyDto = new StopByCompanyDto();
+		
+		if (company.isPresent()) {
+			PlannedOutageByCompany outageByCompany = company.get();
+			
+			companyDto.setStopMessage(outageByCompany.getState().getNoticeMessage().v());
+			companyDto.setStopMode(outageByCompany.getState().getOutageMode().value);
+			companyDto.setSystemStatus(outageByCompany.getState().getSystemAvailability().value);
+			companyDto.setUsageStopMessage(outageByCompany.getState().getOutageMessage().v());
+		}
 
-		return new GetStampInputSettingDto(messageNoticeDtos);
+		return new GetStampInputSettingDto(messageNoticeDtos, systemDto, companyDto);
 	}
-
 }

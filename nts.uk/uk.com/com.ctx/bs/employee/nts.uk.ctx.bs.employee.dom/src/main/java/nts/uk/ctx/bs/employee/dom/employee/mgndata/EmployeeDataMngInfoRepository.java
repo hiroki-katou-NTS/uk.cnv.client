@@ -191,5 +191,15 @@ public interface EmployeeDataMngInfoRepository {
 	Map<String, String> getAllSidAndScdBySids(List<String> sids);
 
 	Optional<EmployeeDataMngInfo> findByScdNotDel(String employeeCd, String companyId);
+
+	// Pub get all Sid
+	List<String> getAllSidByCid(String cid);
+	
+	/**
+	 * 個人IDリストから取得する
+	 * @param personIdList 個人IDリスト
+	 * @return List<社員データ管理情報>
+	 */
+	List<EmployeeDataMngInfo> getByPersonIdList(List<String> personIdList);
 	
 }

@@ -16,12 +16,17 @@ import nts.arc.layer.ws.WebService;
 import nts.uk.ctx.at.request.app.find.dialog.employmentsystem.AcquisitionNumberRestDayDto;
 import nts.uk.ctx.at.request.app.find.dialog.employmentsystem.EmployeeBasicInfoDto;
 import nts.uk.ctx.at.request.app.find.dialog.employmentsystem.EmploymentSystemFinder;
+import nts.uk.ctx.at.request.dom.application.common.adapter.bs.EmployeeRequestAdapter;
+import nts.uk.shr.com.context.AppContexts;
 
 @Path("at/request/dialog/employmentsystem")
 @Produces("application/json")
 public class EmploymentSystemService extends WebService {
 	@Inject
 	EmploymentSystemFinder employeeFinder;
+	
+	@Inject
+	private EmployeeRequestAdapter employeeRequestAdapter;
 	
 	// Code for KDL005
 	
@@ -77,6 +82,14 @@ public class EmploymentSystemService extends WebService {
 		// 振休残数情報の取得
 		return employeeFinder.getAcquisitionNumberRestDays(employeeId, baseDate);
 	}
+	
+	@POST
+	@Path("getSid")
+	public List<String> getEmployee() {		
+		List<String> result = employeeRequestAdapter.getAllSidByCid(AppContexts.user().companyId());
+		return result;
+	}
+	
 }
 
 @Value

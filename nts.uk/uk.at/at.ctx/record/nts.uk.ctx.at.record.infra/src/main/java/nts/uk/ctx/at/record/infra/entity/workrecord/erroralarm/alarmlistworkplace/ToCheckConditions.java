@@ -61,7 +61,7 @@ public class ToCheckConditions {
             if (checkMonthlyItemsType == CheckMonthlyItemsType.AVERAGE_TIME.value) {
                 return setCompareSingleValue((V) new AverageTime((int) singleFixed.get().fixedValue), compareSingle.get().compareAtr, compareSingle.get().conditionType);
             } else if (checkMonthlyItemsType == CheckMonthlyItemsType.AVERAGE_NUMBER_DAY.value ) {
-                return setCompareSingleValue((V) new AverageNumberDays(new BigDecimal(singleFixed.get().fixedValue)), compareSingle.get().compareAtr, compareSingle.get().conditionType);
+                return setCompareSingleValue((V) new AverageNumberDays(BigDecimal.valueOf(singleFixed.get().fixedValue)), compareSingle.get().compareAtr, compareSingle.get().conditionType);
             } else if (checkMonthlyItemsType == CheckMonthlyItemsType.AVERAGE_NUMBER_TIME.value ) {
                 return setCompareSingleValue((V) new AverageNumberTimes((int) singleFixed.get().fixedValue), compareSingle.get().compareAtr, compareSingle.get().conditionType);
             } else if (checkMonthlyItemsType == CheckMonthlyItemsType.AVERAGE_RATIO.value ) {
@@ -73,7 +73,7 @@ public class ToCheckConditions {
             if (checkMonthlyItemsType == CheckMonthlyItemsType.AVERAGE_TIME.value) {
                 return setCompareRange((V) new AverageTime((int) compareRange.get().startValue), (V) new AverageTime((int) compareRange.get().endValue), compareRange.get().compareAtr);
             } else if (checkMonthlyItemsType == CheckMonthlyItemsType.AVERAGE_NUMBER_DAY.value) {
-                return setCompareRange((V) new AverageNumberDays(new BigDecimal(compareRange.get().startValue)), (V) new AverageNumberDays(new BigDecimal(compareRange.get().endValue)), compareRange.get().compareAtr);
+                return setCompareRange((V) new AverageNumberDays(BigDecimal.valueOf(compareRange.get().startValue)), (V) new AverageNumberDays(BigDecimal.valueOf(compareRange.get().endValue)), compareRange.get().compareAtr);
             } else if (checkMonthlyItemsType == CheckMonthlyItemsType.AVERAGE_NUMBER_TIME.value ) {
                 return setCompareRange((V) new AverageNumberTimes((int) compareRange.get().startValue), (V) new AverageNumberTimes((int) compareRange.get().endValue), compareRange.get().compareAtr);
             } else if (checkMonthlyItemsType == CheckMonthlyItemsType.AVERAGE_RATIO.value) {

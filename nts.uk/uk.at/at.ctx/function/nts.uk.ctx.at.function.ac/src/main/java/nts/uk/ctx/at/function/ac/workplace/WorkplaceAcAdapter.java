@@ -36,6 +36,18 @@ public class WorkplaceAcAdapter implements WorkplaceAdapter {
 	}
 
 	@Override
+	public List<WorkplaceImport> findWkpByWkpIdList(String companyId, GeneralDate baseDate, List<String> wkpIds) {
+		// [No.560]職場IDから職場の情報をすべて取得する
+		List<WorkplaceInforExport> listWorkPlaceInfoExport = workplacePub.getWorkplaceInforByWkpIds(companyId, wkpIds, baseDate);
+		return listWorkPlaceInfoExport.stream().map(e ->{
+			return  WorkplaceImport.builder()
+					.workplaceCode(e.getWorkplaceCode())
+					.wkpDisplayName(e.getWorkplaceDisplayName())
+					.workplaceName(e.getWorkplaceName()).build();
+		} ).collect(Collectors.toList());
+	}
+
+	@Override
 	public List<WorkplaceIdName> findWkpByWkpId(String companyId, GeneralDate baseDate, List<String> wkpIds) {
 		// [No.560]職場IDから職場の情報をすべて取得する
 		List<WorkplaceInforExport> listWorkPlaceInfoExport = workplacePub.getWorkplaceInforByWkpIds(companyId, wkpIds, baseDate);

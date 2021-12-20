@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import nts.arc.time.GeneralDate;
+import nts.uk.ctx.bs.employee.dom.jobtitle.affiliate.AffWorkplaceHistoryItemWPeriod;
 import nts.uk.shr.com.history.DateHistoryItem;
 import nts.arc.time.calendar.period.DatePeriod;
 
@@ -111,5 +112,49 @@ public interface AffWorkplaceHistoryRepository {
 
 	// get data cps013
 	List<DateHistoryItem> getListByListSidsNoWithPeriod(String cid, List<String> sids);
+	
+	/**
+	 * [1] Get*
+	 * 指定社員リストと期間のすべての所属職場履歴を取得する
+	 * @param sids 社員リスト
+	 * @param period 期間
+	 * @return 職場履歴
+	 */
+	List<AffWorkplaceHistory> getAffWkpHists(List<String> sids, DatePeriod period);
+	
+	/**
+	 * [2] Get*
+	 * 履歴IDリストに該当する所属職場履歴項目を取得する
+	 * @param histIds 履歴IDリスト
+	 * @return 履歴項目リスト
+	 */
+	List<AffWorkplaceHistoryItem> getHistItems(List<String> histIds);
+	
+	/**
+	 * [3] 全ての職場履歴を取得する
+	 * 指定社員リストの期間内の所属職場履歴項目を取得する
+	 * @param sids 社員リスト
+	 * @param period 期間
+	 * @return 職場履歴リスト
+	 */
+	List<AffWorkplaceHistoryItemWPeriod> getAllWkpHist(List<String> sids, DatePeriod period);
 
+	/**
+	 * [4] 基準日時点に所属職場履歴変更している社員を取得する
+	 * 基準日時点に所属職場履歴変更している社員を取得する
+	 * @param sids 社員リスト
+	 * @param period 基準日
+	 * @return 社員リスト
+	 */
+	List<String> empHasChangedWkpWithPeriod(List<String> sids, GeneralDate generalDate);
+	
+	/**
+	 * [5] 期間内に履歴変更している社員を取得する
+	 * 開始日が期間内にが含む履歴がある社員を取得する
+	 * @param cid 会社ID
+	 * @param period 期間
+	 * @return 社員リスト
+	 */
+	List<String> empHasChangedWkpWithinPeriod(String cid, DatePeriod period);
+	
 }

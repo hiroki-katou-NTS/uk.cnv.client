@@ -6,8 +6,8 @@ import javax.inject.Inject;
 import lombok.val;
 import nts.arc.layer.app.command.CommandHandler;
 import nts.arc.layer.app.command.CommandHandlerContext;
+import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.employee.carryForwarddata.PublicHolidayCarryForwardDataRepository;
 import nts.uk.ctx.at.shared.dom.remainingnumber.excessleave.ExcessLeaveInfoRepository;
-import nts.uk.ctx.at.shared.dom.remainingnumber.publicholiday.PublicHolidayRemainRepository;
 import nts.uk.shr.pereg.app.command.PeregDeleteCommandHandler;
 
 @Stateless
@@ -15,7 +15,7 @@ public class DeleteOtherHolidayInfoCommandHandler extends CommandHandler<DeleteO
 implements PeregDeleteCommandHandler<DeleteOtherHolidayInfoCommand> {
 
 	@Inject
-	private PublicHolidayRemainRepository publicHolidayRemainRepository;
+	private PublicHolidayCarryForwardDataRepository publicHolidayCarryForwardDataRepository;
 	
 	@Inject 
 	private ExcessLeaveInfoRepository excessLeaveInfoRepository;
@@ -33,7 +33,7 @@ implements PeregDeleteCommandHandler<DeleteOtherHolidayInfoCommand> {
 	@Override
 	protected void handle(CommandHandlerContext<DeleteOtherHolidayInfoCommand> context) {
 		val command = context.getCommand();
-		publicHolidayRemainRepository.delete(command.getEmployeeId());
+		publicHolidayCarryForwardDataRepository.delete(command.getEmployeeId());
 		excessLeaveInfoRepository.delete(command.getEmployeeId());
 	}
 

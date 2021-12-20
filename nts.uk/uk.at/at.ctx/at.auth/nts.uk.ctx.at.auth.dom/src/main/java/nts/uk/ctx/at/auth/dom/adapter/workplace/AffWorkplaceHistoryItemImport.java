@@ -27,12 +27,12 @@ public class AffWorkplaceHistoryItemImport {
 	// 職場ID
 	private String  workplaceId;
 	
-	/** The normalWorkplaceCode. */
-	// 通常職場コード
-	private String  normalWorkplaceId;
+//	/** The normalWorkplaceCode. */
+//	// 通常職場コード
+//	private String  normalWorkplaceId;
 	
-	public static AffWorkplaceHistoryItemImport createFromJavaType(String histId, String employeeId, String workplaceId, String normalWorkplaceId){
-		return new AffWorkplaceHistoryItemImport(histId,employeeId, workplaceId, normalWorkplaceId);
+	public static AffWorkplaceHistoryItemImport createFromJavaType(String histId, String employeeId, String workplaceId){
+		return new AffWorkplaceHistoryItemImport(histId,employeeId, workplaceId);
 
 	}
 	

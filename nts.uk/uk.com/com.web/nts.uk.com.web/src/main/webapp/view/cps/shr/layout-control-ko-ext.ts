@@ -1375,7 +1375,8 @@ module nts.custombinding {
                             if (!byItemId) { // remove item by classification id (virtual id)
                                 items = _.filter(items, x => x.layoutID != data.layoutID);
                             } else if (data.listItemDf) { // remove item by item definition id
-                                items = _.filter(items, (x: IItemClassification) => x.listItemDf && x.listItemDf[0].id == data.listItemDf[0].id);
+                                items = _.filter(items, 
+                                    (x: IItemClassification) => x.layoutItemType == IT_CLA_TYPE.SPER || (x.listItemDf && x.listItemDf[0].id != data.listItemDf[0].id));
                             }
 
                             let maps: Array<number> = _(items).map((x: IItemClassification, i) => (x.layoutItemType == IT_CLA_TYPE.SPER) ? i : -1)
@@ -1432,7 +1433,12 @@ module nts.custombinding {
                                     .value();
 
                             let items1 = _(ko.toJS(opts.sortable.data))
-                                .map(x => _.omit(x, "items"))
+                                .map(x => {
+                                    if (x.listItemDf && !Array.isArray(x.listItemDf)) {
+                                        x.listItemDf = Object.keys(x.listItemDf).map(key => x.listItemDf[key]);
+                                    }
+                                    return _.omit(x, "items");
+                                })
                                 .value(),
                                 items2 = _(defs)
                                     .filter(def => {
@@ -1511,9 +1517,11 @@ module nts.custombinding {
                                 if (dups && dups.length) {
                                     // 情報メッセージ（#Msg_204#,既に配置されている項目名,選択したグループ名）を表示する
                                     // Show Msg_204 if itemdefinition is exist
+                                    let groupNames = _.uniqBy(defs, (x: IItemDefinition) => x.fieldGroupName).map((x: IItemDefinition) => x.fieldGroupName);
+                                    let itemNames = dups.map((x: IItemDefinition) => x.itemName);
                                     info({
                                         messageId: 'Msg_204',
-                                        messageParams: dups.map((x: IItemDefinition) => x.itemName)
+                                        messageParams: [itemNames.join("、"), groupNames.join("、")]
                                     })
                                         .then(() => {
                                             opts.sortable.removeItems(dups.map((x: IItemDefinition) => {
@@ -2752,7 +2760,7 @@ module nts.custombinding {
                                 let cats = _.filter(data.categoryList, (x: IItemCategory) => !x.isAbolition && !x.categoryParentCode);
 
                                 if (location.href.indexOf('/view/cps/007/a/') > -1) {
-                                    cats = _.filter(cats, (c: IItemCategory) => c.categoryCode != 'CS00069');
+                                    cats = _.filter(cats, (c: IItemCategory) => c.categoryCode != 'CS00069' && c.categoryCode != 'CS00100');
                                 }
 
                                 if (cats && cats.length) {
@@ -3174,6 +3182,8 @@ module nts.custombinding {
         systemRequired?: number;
         requireChangable?: number;
         itemTypeState: IItemTypeState;
+        personInfoItemGroupId?: string;
+        fieldGroupName?: string;
     }
 
     interface IItemTypeState extends ISetItem, ISingleItem {

@@ -6,7 +6,6 @@ package nts.uk.ctx.at.shared.infra.repository.vacation.setting.annualpaidleave;
 
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.AnnualNumberDay;
-import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.DisplaySetting;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.HalfDayManage;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.ManageAnnualSettingGetMemento;
 import nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.MaxDayReference;
@@ -66,20 +65,6 @@ public class JpaManageAnnualSettingGetMemento implements ManageAnnualSettingGetM
                 .roundProcesCla(RoundProcessingClassification.valueOf(this.entity.getHalfRoundProc()))
                 .build();
         return halfDay;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.
-     * ManageAnnualSettingGetMemento#getIsWorkDayCalculate()
-     */
-    @Override
-    public boolean getIsWorkDayCalculate() {
-    	if(this.entity.getIsWorkDayCal() == null)
-    		return true;
-    	
-        return this.entity.getIsWorkDayCal() == 1 ? true : false;
     }
 
     /*

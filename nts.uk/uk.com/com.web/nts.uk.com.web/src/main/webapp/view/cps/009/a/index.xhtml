@@ -23,25 +23,28 @@
 
 		<ui:define name="content">
 			<div id="functions-area">
+				<!-- A1_006: button 目次へ戻る -->
+				<a tabindex="1" class="goback" 
+					data-bind="ntsLinkButton: { jump: '/view/cps/018/a/index.xhtml' }, visible: $vm.isFromCPS018">#{i18n.getText('CPS009_47')}</a>
 				<!-- A1_001: button 新規 -->
-				<button id="A1_001" tabindex="1" data-bind="click: openDDialog, enable: $root.errors.isEmpty()">#{i18n.getText('CPS009_3')}</button>
+				<button id="A1_001" tabindex="2" data-bind="click: openDDialog, enable: $root.errors.isEmpty()">#{i18n.getText('CPS009_3')}</button>
 				<!-- A1_002: button 登録 -->
-				<button id="A1_002" class="proceed" data-bind="click: update, enable: $root.errors.isEmpty() &amp; initValSettingLst().length > 0"  tabindex="2">#{i18n.getText('CPS009_4')}</button>
+				<button id="A1_002" class="proceed" data-bind="click: update, enable: $root.errors.isEmpty() &amp; initValSettingLst().length > 0"  tabindex="3">#{i18n.getText('CPS009_4')}</button>
 				<!-- A1_003: button 複製 -->
-				<button id="A1_003" data-bind="click: openCDialog, enable: initValSettingLst().length > 0" tabindex="3">#{i18n.getText('CPS009_5')}</button>
+				<button id="A1_003" data-bind="click: openCDialog, enable: initValSettingLst().length > 0" tabindex="4">#{i18n.getText('CPS009_5')}</button>
 				<!-- A1_004: button 削除 -->
 				<button id="A1_004" class="danger"
-					data-bind="click: deleteInitValue, enable: initValSettingLst().length > 0" tabindex="4">#{i18n.getText('CPS009_6')}</button>
+					data-bind="click: deleteInitValue, enable: initValSettingLst().length > 0" tabindex="5">#{i18n.getText('CPS009_6')}</button>
 
 				<button id="closeBtn" style="visibility: hidden;"
 					data-bind="click: closeDialog" tabindex="3">#{i18n.getText('CPS016_4')}</button>
 				<!--Export Excel-->
 				<button tabindex="4"
-					data-bind="click : exportExcel">#{i18n.getText('CPS009_39')}</button>
+					data-bind="click : exportExcel,  enable: false">#{i18n.getText('CPS009_39')}</button>
 				<!-- A1_005: link label 個人情報定義へ -->
 				<a class='goout link-button'
-						data-bind="ntsLinkButton: {jump: '/view/cps/002/a/index.xhtml' }, style: { 'margin-left': _.size(currentCategory().itemList()) &lt; 15 ? '480px' : '498px'}"
-						tabindex="5">#{i18n.getText('CPS009_7')}</a>
+						data-bind="ntsLinkButton: {jump: '/view/cps/002/a/index.xhtml' }, style: { 'margin-left': _.size(currentCategory().itemList()) &lt; 15 ? ($vm.isFromCPS018() ? '358px' : '480px') : ($vm.isFromCPS018() ? '376px' : '498px')}"
+						tabindex="6">#{i18n.getText('CPS009_7')}</a>
 			</div>
 			<div id="contents-area" class="cf">
 				<div id="content" class="table">
@@ -60,7 +63,7 @@
 								columnResize: false,
 								value: initSettingId,
 								rows: 12 }"
-								tabindex="6">
+								tabindex="7">
 							</table>
 						</div>
 					</div>
@@ -80,7 +83,7 @@
 								constraint: 'ValueSettingCode',
 								enable: false,
 								immediate: false}"
-								tabindex="7"></input>
+								tabindex="8"></input>
 
 							<!-- A3_003: 名称 -->
 							<input id="ctgName"
@@ -91,14 +94,14 @@
 								enable: initValSettingLst().length > 0,
 								immediate: false,
 								required: true}"
-								tabindex="8"></input>
+								tabindex="9"></input>
 						</div>
 
 						<div id='sub-content-right' class="table">
 							<div id="search_his" class='flex valign-center'>
 								<!-- A3_004: カテゴリー検索
  -->
-								<div id="search" tabindex="9"
+								<div id="search" tabindex="10"
 									data-bind="ntsSearchBox: {
 									name: '#[CPS009_17]',
 									searchMode: 'highlight',
@@ -115,7 +118,7 @@
 									<!-- A3_13: button ヘルプボタン -->
 									<button id="A3_13" class="small"
 										data-bind="ntsHelpButton: {image: 'helpcps0091.png',position: 'bottom center',enable: true }"
-										tabindex="11">?</button>
+										tabindex="12">?</button>
 									<!-- A3_014: 履歴参照基準日(History reference date) -->
 									<div id="date1"
 										data-bind="ntsDatePicker: {
@@ -123,10 +126,10 @@
 											value: baseDate, 
 											required: true,
 											dateFormat: 'YYYY/MM/DD'}"
-										tabindex="12"></div>
+										tabindex="13"></div>
 									<!-- A3_15: button 適用 -->
 									<button id="A3_15" data-bind="click: historyFilter"
-										tabindex="13">#{i18n.getText('CPS009_20')}</button>
+										tabindex="14">#{i18n.getText('CPS009_20')}</button>
 								</div>
 							</div>
 							<div class="valign-top control-group">
@@ -141,7 +144,7 @@
 									columnResize: false,
 									value: currentItemId,
 									rows: 8 }"
-									tabindex="10">
+									tabindex="11">
 								</table>
 								<div style="margin-top: 10px;">
 									<!-- A3_011: label 済マーク説明 -->
@@ -152,7 +155,7 @@
 								<span class="caret-background caret-right direction-right"
 									style="margin-top: 135px;"></span>
 							</div>
-							<div id='sub-right' class="cell" tabindex="14">
+							<div id='sub-right' class="cell" tabindex="15">
 								<!-- A3_016: table 項目初期値設定表 -->
 								<table class="contents-header">
 									<thead>
@@ -162,17 +165,17 @@
 											<td id="COL_2">
 												<!-- A3_018: button 一括設定ボタン -->
 												<button id="A2_012" class="small"
-													data-bind=" click: openBDialog" tabindex="15">#{i18n.getText('CPS009_22')}
+													data-bind=" click: openBDialog" tabindex="16">#{i18n.getText('CPS009_22')}
 												</button> <!-- A3_019: help button -->
 												<button id="help" class="small"
 													data-bind="ntsHelpButton: {image: 'helpcps0092.png',position: 'right top', enable: true }"
-													tabindex="16">?</button>
+													tabindex="17">?</button>
 											</td>
 											<!-- A3_020: header 値 -->
 											<td id="COL_3">#{i18n.getText('CPS009_23')}</td>
 										</tr>
 									</thead>
-									<tbody data-bind="foreach: currentCategory().itemList(), style: { 'overflow-y': _.size(currentCategory().itemList()) &lt; 15 ? 'hidden' : 'scroll'}">
+									<tbody data-bind="foreach: currentCategory().itemList()">
 										<tr>
 											<td class="input-units-1" data-bind="css:{ requiredCell: isRequired(), notrequiredCell:!isRequired()}">
 											<span class="months-input limited-label" data-bind='text: itemName,attr: {

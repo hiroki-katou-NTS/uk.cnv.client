@@ -347,6 +347,15 @@ module nts.uk.at.view.kmk003.a {
                     }
                 });
 
+                $('#inp-worktimename').on("input", (event: any) => {
+                  const val = event.target.value;
+                  if (!nts.uk.text.isNullOrEmpty(val)) {
+                    $('.workTimeAbName-input').ntsError('clear');
+                    self.mainSettingModel.workTimeSetting.workTimeDisplayName.workTimeAbName(self.subString(val));
+                  } else {
+                    self.mainSettingModel.workTimeSetting.workTimeDisplayName.workTimeAbName("");
+                  }
+               });
             }
 
             /**
@@ -855,6 +864,8 @@ module nts.uk.at.view.kmk003.a {
                 // reset data
                 self.mainSettingModel.resetData();
                 self.settingEnum.workTimeMethodSet = _.filter(self.settingEnum.workTimeMethodSet, item => item.fieldName != 'DIFFTIME_WORK');
+                const predTimeSetting = self.mainSettingModel.predetemineTimeSetting;
+                self.mainSettingModel.updatePeriod(predTimeSetting.startDateClock(), predTimeSetting.rangeTimeDay());
                 // set screen mode
                 self.screenMode(ScreenMode.NEW);
 
@@ -1004,6 +1015,20 @@ module nts.uk.at.view.kmk003.a {
                 });
             }
             //end view model
+
+            private subString(value: string): string {
+              const length = __viewContext.primitiveValueConstraints.WorkTimeAbName.maxLength;
+              let maxCountHalfSizeCharacter = length;
+              let valueTemp = "";
+              const valueSplit = value.split("");
+              valueSplit.forEach((character: string) => {
+                  maxCountHalfSizeCharacter -= nts.uk.text.countHalf(character);
+                  if (maxCountHalfSizeCharacter >= 0) {
+                      valueTemp += character;
+                  }
+              });
+              return valueTemp;
+          }
             
         }
 
@@ -1823,6 +1848,30 @@ module nts.uk.at.view.kmk003.a {
                     }
                     return;
                 }               
+            }
+
+            updatePeriod(startDateClock: number, rangeTimeDay: number) {
+              const vm = this;
+              if (vm.addMode()) {
+                const model = vm.fixedWorkSetting.offdayWorkTimezone.lstWorkTimezone();
+                if (model.length > 1) return;
+                const timezone = model[0].timezone;
+                timezone.start(startDateClock);
+                timezone.end(startDateClock + rangeTimeDay);
+                const dtos = _.map(model, data => {
+                  return {
+                    workTimeNo: data.workTimeNo(),
+                    timezone: ko.toJS(data.timezone),
+                    isLegalHolidayConstraintTime: data.isLegalHolidayConstraintTime(),
+                    inLegalBreakFrameNo: data.inLegalBreakFrameNo(),
+                    isNonStatutoryDayoffConstraintTime: data.isNonStatutoryDayoffConstraintTime(),
+                    outLegalBreakFrameNo: data.outLegalBreakFrameNo(),
+                    isNonStatutoryHolidayConstraintTime: data.isNonStatutoryHolidayConstraintTime(),
+                    outLegalPubHDFrameNo: data.outLegalPubHDFrameNo()
+                  };
+                });
+                vm.fixedWorkSetting.offdayWorkTimezone.updateHDTimezone(dtos);
+              }
             }
         }
 

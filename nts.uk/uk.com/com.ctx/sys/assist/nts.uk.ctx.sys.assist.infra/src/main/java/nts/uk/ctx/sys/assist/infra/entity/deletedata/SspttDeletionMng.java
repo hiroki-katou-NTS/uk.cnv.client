@@ -29,7 +29,7 @@ public class SspttDeletionMng extends ContractUkJpaEntity implements Serializabl
 	/** 中断するしない */
 	@Basic(optional = false)
 	@Column(name = "IS_INTERRUPTED_FLG")
-	public int isInterruptedFlg;
+	public boolean isInterruptedFlg;
 	
 	/** The total category count. */
 	/** カテゴリトータルカウント */
@@ -62,16 +62,15 @@ public class SspttDeletionMng extends ContractUkJpaEntity implements Serializabl
 	}
 
 	public ManagementDeletion toDomain() {
-		boolean isInterruptedFlg = this.isInterruptedFlg == 1;
+		boolean isInterruptedFlg = this.isInterruptedFlg;
 		return ManagementDeletion.createFromJavatype(this.sspdtManagementDeletionPK.delId, 
 				isInterruptedFlg, this.totalCategoryCount, this.categoryCount, 
 				this.errorCount, this.operatingCondition);
 	}
 
 	public static SspttDeletionMng toEntity(ManagementDeletion managementDeletion) {
-		int isInterruptedFlg = managementDeletion.isInterruptedFlg ? 1 : 0;
 		
-		return new SspttDeletionMng(new SspdtManagementDeletionPK(managementDeletion.delId), isInterruptedFlg,
+		return new SspttDeletionMng(new SspdtManagementDeletionPK(managementDeletion.delId), managementDeletion.isInterruptedFlg,
 				managementDeletion.totalCategoryCount, managementDeletion.categoryCount, 
 				managementDeletion.errorCount, managementDeletion.operatingCondition.value);
 	}

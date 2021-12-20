@@ -40,22 +40,32 @@ public class OuenWorkTimeOfDailyRepoImpl extends JpaRepository implements OuenWo
 
 	@Override
 	public void update(List<OuenWorkTimeOfDaily> domain) {
-		domain.stream().map(c -> KrcdtDayOuenTime.convert(c)).forEach(e -> {
-			commandProxy().update(e);
+		domain.stream().map(c -> KrcdtDayOuenTime.convert(c)).forEach(lstE -> {
+			lstE.forEach(e -> {
+				this.queryProxy().find(e.pk, KrcdtDayOuenTime.class).ifPresent(entity -> {
+					entity.update(e);
+					commandProxy().update(entity);
+				});
+			});
+
 		});
 	}
 
 	@Override
 	public void insert(List<OuenWorkTimeOfDaily> domain) {
-		domain.stream().map(c -> KrcdtDayOuenTime.convert(c)).forEach(e -> {
-			commandProxy().insert(e);
+		domain.stream().map(c -> KrcdtDayOuenTime.convert(c)).forEach(lstE -> {
+			commandProxy().insertAll(lstE);
 		});
 	}
 
 	@Override
 	public void delete(List<OuenWorkTimeOfDaily> domain) {
-		domain.stream().map(c -> KrcdtDayOuenTime.convert(c)).forEach(e -> {
-			commandProxy().remove(e);
+		domain.stream().map(c -> KrcdtDayOuenTime.convert(c)).forEach(lstE -> {
+			lstE.forEach(entity -> {
+				this.queryProxy().find(entity.pk, KrcdtDayOuenTime.class).ifPresent(e -> {
+					this.commandProxy().remove(e);
+				});
+			});
 		});
 	}
 	

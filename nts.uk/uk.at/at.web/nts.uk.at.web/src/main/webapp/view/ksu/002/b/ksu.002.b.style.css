@@ -1,0 +1,21 @@
+.custom-table {
+    padding: 15px;
+    width: 95%;
+}
+
+.custom-cell {
+    padding-right: 25px;
+}
+
+.switchbox-wrappers.radio-wrappers label input + span {
+    width: 90px;
+    text-align: center;
+}
+
+.first-column {
+    width: 30%;
+}
+
+.contents-area, .contents-area {
+    padding-left: 40px;
+}

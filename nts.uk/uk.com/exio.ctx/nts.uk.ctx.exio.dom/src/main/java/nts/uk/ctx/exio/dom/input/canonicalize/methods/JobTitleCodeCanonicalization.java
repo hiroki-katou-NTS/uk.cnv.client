@@ -6,10 +6,11 @@ import lombok.Value;
 import lombok.val;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.bs.employee.dom.jobtitle.info.JobTitleInfo;
-import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalItem;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.ItemNoMap;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalItem;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.IntermediateResult;
 import nts.uk.ctx.exio.dom.input.errors.RecordError;
-import nts.uk.ctx.exio.dom.input.util.Either;
+import nts.gul.util.Either;
 /**
  * 職位コードを職位IDに正準化
  */
@@ -51,8 +52,7 @@ public class JobTitleCodeCanonicalization {
 
 	private IntermediateResult canonicalize(IntermediateResult canonicalizingData, String jobTitleId) {
 		return canonicalizingData.addCanonicalized(
-				CanonicalItem.of(itemNoJobTitleId, jobTitleId),
-				itemNoJobTitleCode);
+				CanonicalItem.of(itemNoJobTitleId, jobTitleId));
 	}
 
 	public static interface Require {

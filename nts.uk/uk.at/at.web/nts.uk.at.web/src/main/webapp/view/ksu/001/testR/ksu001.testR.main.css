@@ -1,0 +1,58 @@
+#setting-workplace {
+	float: right;
+	margin-right: 20px
+}
+
+#set-work-type, #set-work-time {
+	margin-bottom: 10px;
+	margin-left: 10px
+}
+
+#time-edit1, #time-edit2 {
+	text-align: center !important;
+	width: 43px !important;
+}
+
+#time-edit1 {
+	margin-left: 16px
+}
+
+.reserved, #table-worktime {
+	margin-left: 10px;
+}
+
+#switch-o1 {
+	margin-left: 27px
+}
+
+#combo-box1 {
+	vertical-align: middle;
+	margin-left: 30px
+}
+
+#paste {
+	background: url(../image/image102.png) no-repeat center;
+	min-width: 30px !important;
+	margin-left: 250px !important;
+}
+
+#copy {
+	background: url(../image/image104.png) no-repeat center;
+	min-width: 30px !important;
+	margin-left: 5px !important;
+}
+
+#undo {
+	background: url(../image/image030.png) no-repeat center;
+	min-width: 30px !important;
+	margin-left: 5px !important;
+}
+
+.size-image-button {
+	background-size: 25px 25px !important;
+	height: 30px;
+}
+
+#functions-area button:FIRST-CHILD {
+	vertical-align: top
+}

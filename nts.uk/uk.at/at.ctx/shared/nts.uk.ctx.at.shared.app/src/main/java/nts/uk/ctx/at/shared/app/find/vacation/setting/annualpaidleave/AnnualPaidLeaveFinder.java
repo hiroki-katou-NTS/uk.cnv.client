@@ -51,7 +51,6 @@ public class AnnualPaidLeaveFinder {
         dto.setAnnualPriority(setting.getAcquisitionSetting().annualPriority.value);
 
         // Manage Annual
-        dto.setAddAttendanceDay(setting.getManageAnnualSetting().isWorkDayCalculate() == true ? 1 : 0);
         //dto.setMaxManageSemiVacation(setting.getManageAnnualSetting().getHalfDayManage().manageType.value);
         if(setting.getManageAnnualSetting().getHalfDayManage().manageType == null){
         	dto.setMaxManageSemiVacation(1);

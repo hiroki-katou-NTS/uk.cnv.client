@@ -4,7 +4,8 @@ module nts.uk.pr.view.ccg007.g {
 
         // Service paths.
         var servicePath = {
-            submitSendMail: "ctx/sys/gateway/sendmail/submit2"
+            submitSendMail: "ctx/sys/gateway/sendmail/submit2",
+            submitSendMailCCG007D: "ctx/sys/gateway/sendmail/submitCCG007D"
         }
 
         /**
@@ -13,6 +14,13 @@ module nts.uk.pr.view.ccg007.g {
         export function submitSendMail(data : SendMailInfoFormGCommand): JQueryPromise<any> {
             return nts.uk.request.ajax(servicePath.submitSendMail, data);
         }
+
+        /**
+          * Function is used to check contract.
+          */
+         export function submitSendMailCCG007D(data : SendMailInfoFormGCommand): JQueryPromise<any> {
+            return nts.uk.request.ajax(servicePath.submitSendMailCCG007D, data);
+        }
         
         export interface CallerParameter {
             companyCode: string;
@@ -20,6 +28,7 @@ module nts.uk.pr.view.ccg007.g {
             contractCode: string;
             employeeCode : string;
             contractPassword: string;
+            isFromD: boolean;
         }
         
         export class SendMailInfoFormGCommand {

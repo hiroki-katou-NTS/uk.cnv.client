@@ -6,10 +6,9 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import nts.uk.ctx.at.auth.dom.employmentrole.EmploymentRole;
 import nts.uk.ctx.at.auth.pub.employmentrole.EmploymentRolePub;
+import nts.uk.ctx.at.record.dom.workrecord.emplrole.EmployeeRole;
 import nts.uk.ctx.at.record.dom.workrecord.emplrole.EmploymentRoleAdapter;
-
 @Stateless
 public class EmploymentRolesFinder implements EmploymentRoleAdapter {
 
@@ -17,9 +16,9 @@ public class EmploymentRolesFinder implements EmploymentRoleAdapter {
 	private EmploymentRolePub employmentRolePub;
 
 	@Override
-	public List<EmploymentRole> getEmploymentRoleByCompany(String companyId) {
+	public List<EmployeeRole> getEmploymentRoleByCompany(String companyId) {
 		return employmentRolePub.getAllByCompanyId(companyId).stream().map(item -> {
-			return new EmploymentRole(item.getCompanyId(), item.getRoleId());
+			return new EmployeeRole(item.getCompanyId(), item.getRoleId());
 		}).collect(Collectors.toList());
 	}
 

@@ -1,7 +1,6 @@
 package nts.uk.ctx.exio.dom.input.errors;
 
 import lombok.Value;
-import nts.uk.ctx.exio.dom.input.ExecutionContext;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomainId;
 import nts.uk.ctx.exio.dom.input.importableitem.ImportableItem;
 
@@ -15,6 +14,9 @@ public class ExternalImportError {
 
 	/** CSV行番号 */
 	Integer csvRowNo;
+
+	/** ドメインID */
+	ImportingDomainId domainId;
 	
 	/** 項目NO */
 	Integer itemNo;
@@ -23,19 +25,19 @@ public class ExternalImportError {
 	String message;
 	
 	public static ExternalImportError execution(String message) {
-		return new ExternalImportError(null, null, message);
+		return new ExternalImportError(null, null, null, message);
 	}
 	
-	public static ExternalImportError record(int csvRowNo, String message) {
-		return new ExternalImportError(csvRowNo, null, message);
+	public static ExternalImportError record(int csvRowNo, ImportingDomainId domainId, String message) {
+		return new ExternalImportError(csvRowNo, domainId, null, message);
 	}
 	
-	public static ExternalImportError of(int csvRowNo, ItemError error) {
-		return new ExternalImportError(csvRowNo, error.getItemNo(), error.getMessage());
+	public static ExternalImportError of(int csvRowNo, ImportingDomainId domainId, ItemError error) {
+		return new ExternalImportError(csvRowNo, domainId, error.getItemNo(), error.getMessage());
 	}
 	
-	public static ExternalImportError of(RecordError error) {
-		return new ExternalImportError(error.getCsvRowNo(), null, error.getMessage());
+	public static ExternalImportError of(ImportingDomainId domainId, RecordError error) {
+		return new ExternalImportError(error.getCsvRowNo(), domainId, null, error.getMessage());
 	}
 	
 	public boolean isExecution() {
@@ -50,7 +52,7 @@ public class ExternalImportError {
 		return !isExecution() && itemNo != null;
 	}
 	
-	public void toText(RequireToText require, ExecutionContext context, StringBuilder sb) {
+	public void toText(RequireToText require, StringBuilder sb) {
 		
 		if (isExecution()) {
 			sb.append("実行エラー");
@@ -61,7 +63,10 @@ public class ExternalImportError {
 		sb.append("\t");
 		
 		if (isItem()) {
-			String itemName = require.getImportableItem(context.getDomainId(), itemNo).getItemName();
+			String domainName = require.getDomainName(domainId);
+			sb.append(domainName);
+			sb.append("\t");
+			String itemName = require.getImportableItem(domainId, itemNo).getItemName();
 			sb.append(itemName);
 		}
 		
@@ -71,6 +76,8 @@ public class ExternalImportError {
 	}
 	
 	public static interface RequireToText {
+
+		String getDomainName(ImportingDomainId domainId);
 		
 		ImportableItem getImportableItem(ImportingDomainId domainId, int itemNo);
 	}

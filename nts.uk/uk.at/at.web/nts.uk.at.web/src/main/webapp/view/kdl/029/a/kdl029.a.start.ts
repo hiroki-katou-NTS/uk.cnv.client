@@ -1,8 +1,9 @@
-module nts.uk.at.view.kdl029.a.start {
-    let __viewContext: any = window['__viewContext'] || {};
-    __viewContext.ready(() => {
-
-        let vm =  __viewContext['viewModel'] = new nts.uk.at.view.kdl029.a.screenModel.ViewModel();
-            __viewContext.bind(__viewContext['viewModel']); 
+module nts.uk.at.view.kdl029.a {
+    __viewContext.ready(function() {
+        var screenModel = new nts.uk.at.view.kdl029.a.viewmodel.ScreenModel();
+        screenModel.startPage().done(function() {
+            __viewContext.bind(screenModel);
+		//$('#contents-all').css('display','');
+        });
     });
 }

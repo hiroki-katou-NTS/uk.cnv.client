@@ -10,6 +10,6 @@ public interface ReflectApplicationWorkSchedulePub {
 
 	//[RQ666]申請を勤務予定へ反映する
 	public Pair<SCReflectStatusResultExport, AtomTask> process(Object application, GeneralDate date, SCReflectStatusResultExport reflectStatus,
-			int preAppWorkScheReflectAttr);
+			int preAppWorkScheReflectAttr, String execId);
 	
 }

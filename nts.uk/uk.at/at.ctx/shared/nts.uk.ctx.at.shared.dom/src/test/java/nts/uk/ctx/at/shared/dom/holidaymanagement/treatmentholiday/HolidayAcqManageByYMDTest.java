@@ -3,15 +3,22 @@ package nts.uk.ctx.at.shared.dom.holidaymanagement.treatmentholiday;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.experimental.theories.DataPoints;
+import org.junit.experimental.theories.Theories;
+import org.junit.experimental.theories.Theory;
+import org.junit.runner.RunWith;
 
+import lombok.AllArgsConstructor;
+import lombok.val;
 import mockit.Injectable;
 import nts.arc.testing.assertion.NtsAssert;
 import nts.arc.time.GeneralDate;
-import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.shared.dom.common.days.FourWeekDays;
 
+@RunWith(Enclosed.class)
 public class HolidayAcqManageByYMDTest {
-
+	
 	@Injectable
 	private HolidayAcquisitionManagement.Require require;
 	
@@ -29,14 +36,6 @@ public class HolidayAcqManageByYMDTest {
 	}
 	
 	@Test
-	public void test_make4Weeks() {
-		HolidayAcqManageByYMD holidayAcqManageByYMD = new HolidayAcqManageByYMD(GeneralDate.today(), new FourWeekDays(4.0));
-		DatePeriod datePeriod = holidayAcqManageByYMD.make4Weeks(GeneralDate.ymd(2020, 11, 11), GeneralDate.ymd(2020, 11, 12));
-		assertThat(datePeriod).isEqualTo(new DatePeriod(GeneralDate.ymd(2020, 11, 11), GeneralDate.ymd(2020, 12, 8)));
-	}
-	
-	
-	@Test
 	public void test_getStartDateType() {
 		HolidayAcqManageByYMD holidayAcqManageByYMD = new HolidayAcqManageByYMD(GeneralDate.today(), new FourWeekDays(4.0));
 		StartDateClassification result = holidayAcqManageByYMD.getStartDateType();
@@ -44,51 +43,55 @@ public class HolidayAcqManageByYMDTest {
 		assertThat(result).isEqualTo(StartDateClassification.SPECIFY_YMD);
 	}
 	
-	@Test
-	public void test_getManagementPeriod() {
-		HolidayAcqManageByYMD holidayAcqManageByYMD = new HolidayAcqManageByYMD(GeneralDate.ymd(2020, 11, 12), new FourWeekDays(4.0));
-		HolidayAcqManaPeriod result = holidayAcqManageByYMD.getManagementPeriod(require, GeneralDate.ymd(2020, 11, 11));
+	@RunWith(Theories.class)
+	public static class TestGetMangementPeriod {
 		
-		assertThat(result.getHolidayDays().v()).isEqualTo(4.0);
-		assertThat(result.getPeriod())
-				.isEqualTo(new DatePeriod(GeneralDate.ymd(2020, 11, 12), GeneralDate.ymd(2020, 12, 9)));
+		@Injectable
+		private HolidayAcquisitionManagement.Require require;
+		
+		@DataPoints
+		public static Fixture[] cases = {
+			//基準日 < 起算日
+			new Fixture(GeneralDate.ymd(2020, 3, 31), GeneralDate.ymd(2021, 4, 1), GeneralDate.ymd(2021, 4, 28), 4.0),
+			
+			//基準日 >=  起算日
+			new Fixture(GeneralDate.ymd(2021, 4, 1), GeneralDate.ymd(2021, 4, 1), GeneralDate.ymd(2021, 4, 28), 4.0),
+			new Fixture(GeneralDate.ymd(2021, 4, 28), GeneralDate.ymd(2021, 4, 1), GeneralDate.ymd(2021, 4, 28), 4.0),
+			new Fixture(GeneralDate.ymd(2021, 4, 29), GeneralDate.ymd(2021, 4, 29), GeneralDate.ymd(2021, 5, 26), 4.0),
+			
+			new Fixture(GeneralDate.ymd(2021, 8, 19), GeneralDate.ymd(2021, 8, 19), GeneralDate.ymd(2021, 9, 15), 4.0),
+			new Fixture(GeneralDate.ymd(2021, 9, 15), GeneralDate.ymd(2021, 8, 19), GeneralDate.ymd(2021, 9, 15), 4.0),
+			
+			new Fixture(GeneralDate.ymd(2022, 3, 3), GeneralDate.ymd(2022, 3, 3), GeneralDate.ymd(2022, 3, 30), 4.0),
+			new Fixture(GeneralDate.ymd(2022, 3, 30), GeneralDate.ymd(2022, 3, 3), GeneralDate.ymd(2022, 3, 30), 4.0),
+			
+			new Fixture(GeneralDate.ymd(2022, 4, 1), GeneralDate.ymd(2022, 3, 31), GeneralDate.ymd(2022, 4, 27), 4.0),
+		};
+
+		@Theory
+		public void test(Fixture caseTest) {
+			
+			val holidayAcqManageByYMD = new HolidayAcqManageByYMD(	GeneralDate.ymd(2021, 4, 1)//起算日
+					,	new FourWeekDays(4.0)
+						);
+			
+			//Act
+			HolidayAcqManaPeriod result = holidayAcqManageByYMD.getManagementPeriod( require, caseTest.param );
+			
+			//Assert
+			assertThat( result.getPeriod().start()).isEqualTo( caseTest.expectStartDate );
+			assertThat( result.getPeriod().end()).isEqualTo( caseTest.expectEndDate );
+			assertThat( result.getHolidayDays().v() ).isEqualTo( caseTest.expectHolidayDays );
+		}
+		
 	}
-
-	/**
-	 * 起算月日 = 1/1
-	 */
-	@Test
-	public void test_get28days() {
-		HolidayAcqManageByYMD holidayAcqManageByYMD = new HolidayAcqManageByYMD(GeneralDate.ymd(2021, 1, 1), new FourWeekDays(4.0));
-		
-		/**
-		 * ケース1	基準日 = 2021/1/1		期待値：2021/1/1 - 2021/1/28
-		 */
-		DatePeriod result = holidayAcqManageByYMD.get28Days(require, GeneralDate.ymd(2021, 1, 1));
-		assertThat(result.start()).isEqualTo(GeneralDate.ymd(2021, 1, 1));
-		assertThat(result.end()).isEqualTo(GeneralDate.ymd(2021, 1, 28));
-
-		/**
-		 * ケース2	基準日 = 2021/1/28	期待値：2021/1/1 - 2021/1/28
-		 */
-		result = holidayAcqManageByYMD.get28Days(require, GeneralDate.ymd(2021, 1, 28));
-		assertThat(result.start()).isEqualTo(GeneralDate.ymd(2021, 1, 1));
-		assertThat(result.end()).isEqualTo(GeneralDate.ymd(2021, 1, 28));
-
-		/**
-		 * ケース3	基準日 = 2021/1/29	期待値：2021/1/29 - 2021/2/25
-		 */
-		result = holidayAcqManageByYMD.get28Days(require, GeneralDate.ymd(2021, 1, 29));
-		assertThat(result.start()).isEqualTo(GeneralDate.ymd(2021, 1, 29));
-		assertThat(result.end()).isEqualTo(GeneralDate.ymd(2021, 2, 25));
-
-		/**
-		 * ケース4	基準日 = 2022/1/1		期待値：2021/12/31 - 2022/1/27
-		 */
-		result = holidayAcqManageByYMD.get28Days(require, GeneralDate.ymd(2022, 1, 1));
-		assertThat(result.start()).isEqualTo(GeneralDate.ymd(2021, 12, 31));
-		assertThat(result.end()).isEqualTo(GeneralDate.ymd(2022, 1, 27));
-		
+	
+	@AllArgsConstructor
+	static class Fixture {
+		GeneralDate param;
+		GeneralDate expectStartDate;
+		GeneralDate expectEndDate;
+		Double expectHolidayDays;
 	}
 	
 }

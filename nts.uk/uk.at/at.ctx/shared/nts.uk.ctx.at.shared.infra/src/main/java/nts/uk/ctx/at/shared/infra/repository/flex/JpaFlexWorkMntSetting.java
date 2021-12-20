@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.at.shared.dom.workrule.workform.FlexWorkMntSetRepository;
 import nts.uk.ctx.at.shared.dom.workrule.workform.FlexWorkSet;
@@ -34,7 +36,7 @@ public class JpaFlexWorkMntSetting extends JpaRepository implements FlexWorkMntS
 	 * @return the flex work set
 	 */
 	public FlexWorkSet convertToDomain(KshmtFlexMng setting) {
-		return FlexWorkSet.createFromJavaType(setting.getId().getCid(), setting.getManageFlexWork());
+		return FlexWorkSet.createFromJavaType(setting.getId().getCid(), BooleanUtils.toInteger(setting.isManageFlexWork()));
 	}
 	
 	/**
@@ -48,7 +50,7 @@ public class JpaFlexWorkMntSetting extends JpaRepository implements FlexWorkMntS
 		KshstFlexWorkSettingPK primaryKey = new KshstFlexWorkSettingPK();
 		primaryKey.setCid(setting.getCompanyId().v());
 		entity.setId(primaryKey);
-		entity.setManageFlexWork(setting.getUseFlexWorkSetting().value);
+		entity.setManageFlexWork(BooleanUtils.toBoolean(setting.getUseFlexWorkSetting().value));
 		return entity;
 	}
 
@@ -71,7 +73,7 @@ public class JpaFlexWorkMntSetting extends JpaRepository implements FlexWorkMntS
 		KshmtFlexMng setting;
 		if (optEntity.isPresent()) {
 			setting = optEntity.get();
-			setting.setManageFlexWork(flexWorkSetting.getUseFlexWorkSetting().value);
+			setting.setManageFlexWork(BooleanUtils.toBoolean(flexWorkSetting.getUseFlexWorkSetting().value));
 		}
 		else {
 			setting = convertToDbType(flexWorkSetting);

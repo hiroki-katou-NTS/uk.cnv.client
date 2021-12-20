@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.at.record.dom.employmentinfoterminal.infoterminal.log.TopPageAlarmEmpInfoTer;
 import nts.uk.ctx.at.record.dom.employmentinfoterminal.infoterminal.log.TopPgAlTrRepository;
@@ -32,7 +34,7 @@ public class JpaTopPgAlTrRepository extends JpaRepository implements TopPgAlTrRe
 	private KrcdtTopPgAlTr toEntity(TopPageAlarmEmpInfoTer domain) {
 		return new KrcdtTopPgAlTr(
 				new KrcdtTopPgAlTrPK(domain.getCompanyId(), domain.getEmpInfoTerCode().v(), domain.getFinishDateTime()),
-				domain.getExistenceError().value, domain.getIsCancelled().value);
+				domain.getExistenceError().value, BooleanUtils.toBoolean(domain.getIsCancelled().value));
 	}
 
 	private List<KrcdtTopPgAlDetailTr> toDetailEntity(TopPageAlarmEmpInfoTer domain) {
@@ -47,9 +49,13 @@ public class JpaTopPgAlTrRepository extends JpaRepository implements TopPgAlTrRe
 
 	private List<KrcdtTopPgAlManagerTr> toEntityManagerTr(TopPageAlarmEmpInfoTer domain) {
 		return domain.getLstManagerTr().stream()
-				.map(x -> new KrcdtTopPgAlManagerTr(new KrcdtTopPgAlManagerTrPK(domain.getCompanyId(),
-						domain.getEmpInfoTerCode().v(), domain.getFinishDateTime(), x.getManagerId()),
-						x.getRogerFlag().value))
+				.map(x -> new KrcdtTopPgAlManagerTr(
+						new KrcdtTopPgAlManagerTrPK(
+								domain.getCompanyId(),
+								domain.getEmpInfoTerCode().v(), 
+								domain.getFinishDateTime(), 
+								x.getManagerId()),
+						BooleanUtils.toBoolean(x.getRogerFlag().value)))
 				.collect(Collectors.toList());
 	}
 

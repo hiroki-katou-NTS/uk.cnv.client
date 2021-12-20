@@ -26,7 +26,7 @@ public class KrcdtTopPgAlManagerTr extends ContractUkJpaEntity implements Serial
 	 * 了解フラグ
 	 */
 	@Column(name = "ROGER_FLAG")
-	public int rogerFlag;
+	public boolean rogerFlag;
 
 	@Override
 	protected Object getKey() {

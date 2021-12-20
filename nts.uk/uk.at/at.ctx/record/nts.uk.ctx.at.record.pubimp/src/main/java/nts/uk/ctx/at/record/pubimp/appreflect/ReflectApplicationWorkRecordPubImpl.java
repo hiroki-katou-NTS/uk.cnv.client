@@ -209,7 +209,7 @@ public class ReflectApplicationWorkRecordPubImpl implements ReflectApplicationWo
 	
 	@Override
 	public Pair<RCReflectStatusResultExport, Optional<AtomTask>> process(Object application, GeneralDate date,
-			RCReflectStatusResultExport reflectStatus, GeneralDateTime reflectTime) {
+			RCReflectStatusResultExport reflectStatus, GeneralDateTime reflectTime, String execId) {
 
 		RequireImpl impl = new RequireImpl(AppContexts.user().companyId(), AppContexts.user().contractCode(),
 				stampCardRepository, correctionAttendanceRule, workTypeRepo, workTimeSettingRepository,
@@ -222,7 +222,7 @@ public class ReflectApplicationWorkRecordPubImpl implements ReflectApplicationWo
 				timeLeaveAppReflectRepository, appReflectOtHdWorkRepository, vacationApplicationReflectRepository, timePriorityRepository,
 				compensLeaveComSetRepository, subLeaveAppReflectRepository, substituteWorkAppReflectRepository,
 				applicationReflectHistoryRepo, getMngInfoFromEmpIDListAdapter, createDailyResults);
-		val result = ReflectApplicationWorkRecord.process(impl , AppContexts.user().companyId(), (ApplicationShare) application, date, convertToDom(reflectStatus), reflectTime);
+		val result = ReflectApplicationWorkRecord.process(impl , AppContexts.user().companyId(), (ApplicationShare) application, date, convertToDom(reflectStatus), reflectTime, execId);
 		return Pair.of(convertToExport(result.getLeft()), result.getRight());
 	}
 

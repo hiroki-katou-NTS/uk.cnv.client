@@ -1,12 +1,12 @@
 package nts.uk.ctx.exio.dom.input.errors;
 
-import nts.uk.ctx.exio.dom.input.ExecutionContext;
-
 public interface ExternalImportErrorsRepository {
-	
-	void setup(ExecutionContext context);
 
-	void add(ExecutionContext context, ExternalImportError error);
+	void cleanOldTables(String companyId);
 	
-	ExternalImportErrors find(ExecutionContext context, int startErrorNo, int size);
+	void setup(String companyId);
+
+	void add(String companyId, ExternalImportError error);
+	
+	ExternalImportErrors find(String companyId, int startErrorNo, int size);
 }

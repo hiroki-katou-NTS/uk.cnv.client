@@ -36,4 +36,12 @@ public interface RecSpecificDateSettingAdapter {
 	 */
 	List<RecSpecificDateItemImport> getSpecifiDateItem(String companyId, List<Integer> specifiDateNos);
 	
+	/**
+	 * Find 職場の特定日設定を取得する, not get work place children
+	 * @param companyID company id
+	 * @param workPlaceID work place id
+	 * @param date date
+	 * @return 職場の特定日設定を取得
+	 */
+	RecSpecificDateSettingImport findSpecDateSetByWkpLst(String companyID, List<String> workPlaceID, GeneralDate date);
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import nts.uk.ctx.at.request.app.find.application.gobackdirectly.WorkInformationDto;
 
 @Data
 @AllArgsConstructor
@@ -22,4 +23,7 @@ public class WorkScheduleDto {
 	
 	// 勤務予定.出退勤
 	private List<AttendanceDto> listAttendaceDto;
+	
+	//	勤務情報
+	private WorkInformationDto workInfo;
 }

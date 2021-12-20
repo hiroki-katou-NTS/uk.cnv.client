@@ -4,11 +4,24 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.app.find.worktime.worktimeset;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+
 import lombok.val;
 import nts.arc.error.BusinessException;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.app.find.worktime.dto.WorkTimeDto;
 import nts.uk.ctx.at.shared.app.find.worktime.dto.WorkTimeSettingInfoDto;
+import nts.uk.ctx.at.shared.app.find.worktime.filtercriteria.WorkHoursFilterConditionDto;
 import nts.uk.ctx.at.shared.app.find.worktime.predset.PredetemineTimeSetFinder;
 import nts.uk.ctx.at.shared.app.find.worktime.worktimeset.dto.SimpleWorkTimeSettingDto;
 import nts.uk.ctx.at.shared.app.find.worktime.worktimeset.dto.WorkTimeResultDto;
@@ -18,6 +31,7 @@ import nts.uk.ctx.at.shared.dom.workmanagementmultiple.WorkManagementMultipleRep
 import nts.uk.ctx.at.shared.dom.workrule.shiftmaster.AffWorkplaceAdapter;
 import nts.uk.ctx.at.shared.dom.worktime.common.AbolishAtr;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
+import nts.uk.ctx.at.shared.dom.worktime.filtercriteria.WorkHoursFilterConditionRepository;
 import nts.uk.ctx.at.shared.dom.worktime.predset.PredetemineTimeSetting;
 import nts.uk.ctx.at.shared.dom.worktime.predset.PredetemineTimeSettingRepository;
 import nts.uk.ctx.at.shared.dom.worktime.predset.TimezoneUse;
@@ -32,12 +46,6 @@ import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.context.LoginUserContext;
 import nts.uk.shr.com.time.TimeWithDayAttr;
 import nts.uk.shr.infra.i18n.resource.I18NResourcesForUK;
-
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * The Class WorkTimeSettingFinder.
@@ -80,6 +88,9 @@ public class WorkTimeSettingFinder {
 
     @Inject
     public WorkTypeRepository workTypeRepository;
+    
+    @Inject
+    private WorkHoursFilterConditionRepository workHoursFilterConditionRepository;
 
     /**
      * Find all simple.
@@ -365,6 +376,11 @@ public class WorkTimeSettingFinder {
         List<WorkTimeDto> selectableWorkingHours = new ArrayList<>();
         String cid = null;
         Integer useATR = null;
+        // ドメインモデル「就業時間帯の絞り込み条件」を取得
+        List<WorkHoursFilterConditionDto> filterConditions = this.workHoursFilterConditionRepository
+        		.findByCid(companyID).stream().map(WorkHoursFilterConditionDto::fromDomain)
+        		.sorted(Comparator.comparing(WorkHoursFilterConditionDto::getNo))
+        		.collect(Collectors.toList());
         // ドメインモデル「複数回勤務管理」を取得する
         Optional<WorkManagementMultiple> optWorkMultiple = workMultipleRepo.findByCode(companyID);
         if (optWorkMultiple.isPresent()) {
@@ -431,6 +447,7 @@ public class WorkTimeSettingFinder {
                 , workingHoursByWorkplace
                 , cid
                 , useATR
+                , filterConditions
         );
 
     }

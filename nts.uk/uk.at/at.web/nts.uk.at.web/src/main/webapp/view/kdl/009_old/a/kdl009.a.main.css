@@ -1,0 +1,85 @@
+#contents-area {
+	padding: 25px;
+}
+
+.date-fixed-table {
+	padding-top: 10px;
+}
+.date-fixed-table .nts-fixed-body-container {
+	overflow-x: hidden;
+}
+.date-fixed-table .scroll-header.nts-fixed-header {
+	height: 30px;
+}
+
+table#date-fixed-table {
+	empty-cells: show;
+}
+
+table.fixed-table th {
+  padding: 3px !important;
+}
+
+table#date-fixed-table tr {
+  height: 25px;
+}
+
+table#date-fixed-table td {
+	padding: 6px 3px;
+	border-top: none;
+}
+table#date-fixed-table td.border-dotted {
+	padding: 6px 3px;
+	border-bottom: 1px dotted #CCC !important;
+}
+
+table.summary-table {
+	margin-top: 10px;
+}
+table.summary-table tr:first-child {
+	border-top: 1px solid #CCC;
+}
+table.summary-table tr:last-child {
+	border-top: double #CCC;
+	border-bottom: 1px solid #CCC;
+}
+table.summary-table td {
+	padding: 3px;
+	border-left: 1px solid #CCC;
+	border-right: 1px solid #CCC;
+	border-top: 1px #CCC dotted;
+	border-bottom: 1px #CCC dotted;
+}
+table.summary-table td:first-child {
+  background-color: #CFF1A5;
+}
+table.summary-table td:last-child {
+  border-left: none;
+}
+
+.margin-top-20 {
+	margin-top: 20px;
+}
+.margin-left-20 {
+	margin-left: 20px;
+}
+.margin-right-20 {
+	margin-right: 20px;
+}
+.margin-right-40 {
+	margin-right: 40px;
+}
+
+#description {
+	margin-top: 5px;
+}
+#expDate{
+	margin-top: 5px;
+}
+
+.big-text {
+	font-size: 2rem;
+}
+.float-right {
+	float: right;
+}

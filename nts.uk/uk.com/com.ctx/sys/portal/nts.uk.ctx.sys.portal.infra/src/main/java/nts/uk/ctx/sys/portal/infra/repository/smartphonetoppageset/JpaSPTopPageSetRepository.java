@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.sys.portal.dom.smartphonetoppageset.NotificationDetailSet;
 
@@ -41,8 +43,6 @@ public class JpaSPTopPageSetRepository extends JpaRepository implements SPTopPag
 	private final String SEL_ALL_DETAIL = SEL_DETAIL
 			+ "where d.pk.companyId = :companyId"
 			+ "order by d.pk.detailType asc"; 
-	private static final String DELETE_DETAIL_BY_PK = "DELETE FROM SptmtSPTopPageDetail d"
-			+ " WHERE d.pk.companyId = :companyId AND d.pk.type = :type AND d.pk.detailType IN :listDetailType";
 
 	@Override
 	public List<SPTopPageSet> getTopPageSet(String companyId, int system) {
@@ -72,7 +72,7 @@ public class JpaSPTopPageSetRepository extends JpaRepository implements SPTopPag
 			int type = Type.NOTIFICATION.value;
 			SptmtSPTopPageDetailPK pk = new SptmtSPTopPageDetailPK(domain.getCompanyId(), type,
 					x.getDetailType().value);
-			SptmtSPTopPageDetail entity = new SptmtSPTopPageDetail(pk, x.getDisplayAtr().value);
+			SptmtSPTopPageDetail entity = new SptmtSPTopPageDetail(pk, BooleanUtils.toBoolean(x.getDisplayAtr().value));
 			listEntity.add(entity);
 		});
 		this.commandProxy().updateAll(listEntity);
@@ -86,7 +86,7 @@ public class JpaSPTopPageSetRepository extends JpaRepository implements SPTopPag
 			int type = Type.TIME_STATUS.value;
 			SptmtSPTopPageDetailPK pk = new SptmtSPTopPageDetailPK(domain.getCompanyId(), type,
 					x.getDetailType().value);
-			SptmtSPTopPageDetail entity = new SptmtSPTopPageDetail(pk, x.getDisplayAtr().value);
+			SptmtSPTopPageDetail entity = new SptmtSPTopPageDetail(pk, BooleanUtils.toBoolean(x.getDisplayAtr().value));
 			listEntity.add(entity);
 		});
 		this.commandProxy().updateAll(listEntity);
@@ -102,7 +102,7 @@ public class JpaSPTopPageSetRepository extends JpaRepository implements SPTopPag
 		return lstEntity.isEmpty() ? Optional.empty()
 				: Optional.of(new TimeStatusDetailsSet(companyId,
 						lstEntity.stream()
-								.map(x -> TimeStatusDisplayItem.createFromJavaType(x.pk.detailType, x.dispAtr))
+								.map(x -> TimeStatusDisplayItem.createFromJavaType(x.pk.detailType, BooleanUtils.toInteger(x.dispAtr)))
 								.collect(Collectors.toList())));
 	}
 
@@ -115,14 +115,14 @@ public class JpaSPTopPageSetRepository extends JpaRepository implements SPTopPag
 		return lstEntity.isEmpty() ? Optional.empty()
 				: Optional.of(new NotificationDetailSet(companyId,
 						lstEntity.stream()
-								.map(x -> NotificationDisplayItem.createFromJavaType(x.pk.detailType, x.dispAtr))
+								.map(x -> NotificationDisplayItem.createFromJavaType(x.pk.detailType, BooleanUtils.toInteger(x.dispAtr)))
 								.collect(Collectors.toList())));
 	}
 
 	private SptmtSPTopPage toEntityTopPageSet(SPTopPageSet domain) {
 		return new SptmtSPTopPage(new SptmtSPTopPagePK(domain.getCompanyId(),
 				domain.getSmartPhoneTopPageType().getSystem().value, domain.getSmartPhoneTopPageType().getType().value),
-				domain.getDisplayAtr().value);
+				BooleanUtils.toBoolean(domain.getDisplayAtr().value));
 	}
 
 	private SPTopPageSet toDomainTopPageSet(SptmtSPTopPage entity) {
@@ -130,7 +130,7 @@ public class JpaSPTopPageSetRepository extends JpaRepository implements SPTopPag
 			return null;
 		}
 		return SPTopPageSet.createFromJavaType(entity.pk.companyId,
-				SPTopPageType.createFromJavaType(entity.pk.systemAtr, entity.pk.type), entity.dispAtr);
+				SPTopPageType.createFromJavaType(entity.pk.systemAtr, entity.pk.type), BooleanUtils.toInteger(entity.dispAtr));
 	}
 
 	/*
@@ -167,7 +167,7 @@ public class JpaSPTopPageSetRepository extends JpaRepository implements SPTopPag
 		return lstEntity.isEmpty() ? Optional.empty()
 				: Optional.of(new NotificationDetailSet(companyID,
 						lstEntity.stream()
-								.map(x -> NotificationDisplayItem.createFromJavaType(x.pk.detailType, x.dispAtr))
+								.map(x -> NotificationDisplayItem.createFromJavaType(x.pk.detailType, BooleanUtils.toInteger(x.dispAtr)))
 								.collect(Collectors.toList())));
 	}
 
@@ -200,7 +200,7 @@ public class JpaSPTopPageSetRepository extends JpaRepository implements SPTopPag
 		return lstEntity.isEmpty() ? Optional.empty()
 				: Optional.of(new TimeStatusDetailsSet(companyID,
 						lstEntity.stream()
-								.map(x -> TimeStatusDisplayItem.createFromJavaType(x.pk.detailType, x.dispAtr))
+								.map(x -> TimeStatusDisplayItem.createFromJavaType(x.pk.detailType, BooleanUtils.toInteger(x.dispAtr)))
 								.collect(Collectors.toList())));
 	}
 

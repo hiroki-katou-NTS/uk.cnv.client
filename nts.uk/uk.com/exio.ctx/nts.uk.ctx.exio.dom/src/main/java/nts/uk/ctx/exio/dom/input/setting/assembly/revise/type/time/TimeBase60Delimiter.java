@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.exio.dom.input.errors.ErrorMessage;
 import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.string.PaddingMethod;
-import nts.uk.ctx.exio.dom.input.util.Either;
+import nts.gul.util.Either;
 
 /**
  * 60進数表記時分データの区切り文字

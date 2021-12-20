@@ -94,8 +94,8 @@ public class Company extends AggregateRoot {
 				EnumAdaptor.valueOf(isAbolition, AbolitionAtr.class), 
 				!StringUtil.isNullOrEmpty(repname, true) ? Optional.of(new RepName(repname)) : Optional.of(new RepName("")), 
 				!StringUtil.isNullOrEmpty(repjob, true) ? Optional.of(new RepJob(repjob)) : Optional.of(new RepJob("")),
-				Optional.of(new KNName(comNameKana)), 
-				Optional.of(new ABName(shortComName)),
+				Optional.ofNullable(comNameKana).map(KNName::new),
+				Optional.ofNullable(shortComName).map(ABName::new),
 				new ContractCd(contractCd), 
 				taxNo != null ? Optional.of(new TaxNo(taxNo)) : Optional.empty(),
 				addInfor != null ? Optional.of(addInfor) : Optional.empty());

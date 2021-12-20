@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import lombok.val;
+import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.gul.collection.CollectionUtil;
@@ -29,6 +30,7 @@ import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.confirmationstatus.Ap
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.confirmationstatus.ConfirmStatusActualResult;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.confirmationstatus.change.approval.ApprovalStatusActualDayChange;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.confirmationstatus.change.confirm.ConfirmStatusActualDayChange;
+import nts.uk.ctx.at.record.dom.require.RecordDomRequireService;
 import nts.uk.ctx.at.record.dom.workinformation.WorkInfoOfDailyPerformance;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.EmployeeDailyPerErrorRepository;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.ErrorAlarmWorkRecord;
@@ -50,6 +52,7 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.flexshortage.Insu
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.flexshortage.InsufficientFlexHolidayMntRepository;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHoliday;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHolidayRepository;
+import nts.uk.ctx.at.shared.dom.workrule.closure.service.GetClosureStartForEmployee;
 import nts.uk.screen.at.app.dailymodify.query.DailyModifyResult;
 import nts.uk.screen.at.app.dailyperformance.correction.checkdata.dto.FlexShortageRCDto;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.ApprovalConfirmCache;
@@ -88,6 +91,7 @@ public class ValidatorDataDailyRes {
 	
 	@Inject
 	private ConfirmStatusActualDayChange confirmStatusActualDayChange;
+	
 
 	private static final Integer[] CHILD_CARE = { 759, 760, 761, 762, 580 };
 	private static final Integer[] CARE = { 763, 764, 765, 766, 586 };
@@ -474,9 +478,9 @@ public class ValidatorDataDailyRes {
 	 * 計算後エラーチェック
 	 */
 	public Map<Pair<String, GeneralDate>, ResultReturnDCUpdateData> errorCheckDivergence(List<IntegrationOfDaily> dailyResults,
-			List<IntegrationOfMonthly> monthlyResults) {
+			List<IntegrationOfMonthly> monthlyResults,Boolean checkUnLock) {
 		Map<Pair<String, GeneralDate>, ResultReturnDCUpdateData> resultError = new HashMap<>();
-
+		
 		// 乖離エラーのチェック
 		for (IntegrationOfDaily d : dailyResults) {
 			List<DPItemValue> divergenceErrors = new ArrayList<>();

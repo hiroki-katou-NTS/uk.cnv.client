@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.val;
 import nts.arc.time.GeneralDate;
@@ -28,8 +29,6 @@ import nts.uk.ctx.at.record.app.find.dailyperform.workrecord.dto.TimeLeavingOfDa
 import nts.uk.ctx.at.record.dom.actualworkinghours.daily.workrecord.AttendanceTimeByWorkOfDaily;
 import nts.uk.ctx.at.record.dom.attendanceitem.util.AttendanceItemConverterCommonService;
 import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDaily;
-import nts.uk.ctx.at.record.dom.breakorgoout.BreakTimeOfDailyPerformance;
-import nts.uk.ctx.at.record.dom.daily.remarks.RemarksOfDailyPerform;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.ItemConst;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.affiliationinfor.AffiliationInforOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TemporaryTimeOfDailyAttd;
@@ -154,7 +153,7 @@ public class DailyRecordToAttendanceItemConverterImpl extends AttendanceItemConv
 
 	public DailyRecordToAttendanceItemConverter withEmployeeErrors(List<EmployeeDailyPerError> domain) {
 
-		this.errors = domain;
+		this.errors = domain.stream().map(x -> x.clone()).collect(Collectors.toList());
 		return this;
 	}
 
@@ -235,8 +234,7 @@ public class DailyRecordToAttendanceItemConverterImpl extends AttendanceItemConv
 	}
 
 	public DailyRecordToAttendanceItemConverter withEditStates(List<EditStateOfDailyAttd> domain) {
-
-		this.editStates = new ArrayList<>(domain);
+		this.editStates = domain.stream().map(x -> x.clone()).collect(Collectors.toList());
 		return this;
 	}
 

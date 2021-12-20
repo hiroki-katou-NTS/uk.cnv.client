@@ -7,12 +7,14 @@ module nts.uk.at.view.kdp004.a {
 			startPage: 'at/record/stamp/finger/get-finger-stamp-setting',
 			stampInput: 'at/record/stamp/finger/register-finger-stamp',
 			confirmUseOfStampInput: 'at/record/stamp/employment_system/confirm_use_of_stamp_input',
-			loginAdminMode: 'ctx/sys/gateway/kdp/login/adminmode',
-			loginEmployeeMode: 'ctx/sys/gateway/kdp/login/employeemode',
+			loginAdminMode: 'ctx/sys/gateway/login/password' + location.search,
+			// loginEmployeeMode: 'ctx/sys/gateway/kdp/login/employeemode',
 			fingerAuth: '',
 			getError: 'at/record/stamp/employment_system/get_omission_contents',
 			getStampToSuppress: 'at/record/stamp/employment_system/get_stamp_to_suppress',
-			getLogginSetting: 'ctx/sys/gateway/kdp/login/getLogginSetting'
+			getLogginSetting: 'ctx/sys/gateway/kdp/login/getLogginSetting',
+			createDaily: 'at/record/stamp/craeteDaily',
+			getEmployeeWorkByStamping: 'at/record/stamp/employee_work_by_stamping'
 		}
 
 		export function startPage(): JQueryPromise<any> {
@@ -27,9 +29,8 @@ module nts.uk.at.view.kdp004.a {
 			return ajax("at", url.confirmUseOfStampInput, data);
 		}
 
-		export function login(isAdmin, data) {
-			data.runtimeEnvironmentCreate = true;
-			return ajax("at", isAdmin ? url.loginAdminMode : url.loginEmployeeMode, data);
+		export function login(data): JQueryPromise<any> {
+			return ajax("com", url.loginAdminMode, data);
 		}
 
 		export function fingerAuth(param) {
@@ -51,6 +52,15 @@ module nts.uk.at.view.kdp004.a {
 		export function getLogginSetting(param): JQueryPromise<any> {
 			return ajax("at", url.getLogginSetting, {contractCode: param});
 		}
+
+		export function createDaily(data): JQueryPromise<any> {
+			return ajax("at", url.createDaily, data);
+		}
+
+		export function getEmployeeWorkByStamping(param: any): JQueryPromise<any> {
+			return ajax("at", url.getEmployeeWorkByStamping, param);
+		}
+
 	}
 
 }

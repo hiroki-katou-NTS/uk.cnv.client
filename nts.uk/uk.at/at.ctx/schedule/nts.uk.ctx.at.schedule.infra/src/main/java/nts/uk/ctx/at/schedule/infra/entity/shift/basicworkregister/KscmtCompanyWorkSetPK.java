@@ -29,7 +29,7 @@ public class KscmtCompanyWorkSetPK implements Serializable {
 	private String cid;
 	
 	/** The workday division. */
-	@Column(name = "WORK_DAY_ATR")
+	@Column(name = "WORKING_DAY_ATR")
 	private Integer workdayDivision;
 	
 	

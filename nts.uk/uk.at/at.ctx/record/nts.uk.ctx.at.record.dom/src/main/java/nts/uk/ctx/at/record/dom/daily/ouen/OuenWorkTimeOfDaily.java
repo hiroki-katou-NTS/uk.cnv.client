@@ -32,4 +32,10 @@ public class OuenWorkTimeOfDaily extends AggregateRoot {
 
 		return new OuenWorkTimeOfDaily(empId, ymd, ouenTimes);
 	}
+	
+//■Public
+	/** [1] 変更する */
+	public void setOuenTime(List<OuenWorkTimeOfDailyAttendance> ouenTimes) {
+		this.ouenTimes = ouenTimes;
+	}
 }

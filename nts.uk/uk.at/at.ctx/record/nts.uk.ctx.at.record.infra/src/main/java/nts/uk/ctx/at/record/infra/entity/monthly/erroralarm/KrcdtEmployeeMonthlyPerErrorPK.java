@@ -41,6 +41,6 @@ public class KrcdtEmployeeMonthlyPerErrorPK implements Serializable {
 
 	// 締め日.末日とする
 	@Column(name = "IS_LAST_DAY")
-	public Integer isLastDay;
+	public boolean isLastDay;
 	
 }

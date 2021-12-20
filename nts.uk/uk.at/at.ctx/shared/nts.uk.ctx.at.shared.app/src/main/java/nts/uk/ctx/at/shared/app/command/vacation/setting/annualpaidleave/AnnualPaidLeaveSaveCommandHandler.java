@@ -178,8 +178,6 @@ public class AnnualPaidLeaveSaveCommandHandler extends CommandHandler<AnnualPaid
                 return;
             }
             // Manage Annual Setting
-            command.setAddAttendanceDay(
-                    setttingDB.getManageAnnualSetting().isWorkDayCalculate() == TRUE ? BIT_TRUE : BIT_FALSE);
 			if (setttingDB.getManageAnnualSetting().getHalfDayManage().manageType == null) {
 				command.setMaxManageSemiVacation(0);
 			} else {

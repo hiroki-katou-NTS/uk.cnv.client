@@ -143,7 +143,7 @@ module nts.uk.at.kal011.c {
                 } else {
                     vm.$dialog.info({messageId: "Msg_207"})
                         .then(() => {
-                            vm.closeDialog();
+                            //vm.closeDialog();
                         });
                 }
 

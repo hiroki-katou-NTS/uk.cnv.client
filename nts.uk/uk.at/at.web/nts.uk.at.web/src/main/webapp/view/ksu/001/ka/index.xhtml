@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>    
+    <ui:composition template="../../../../master/dialog.xhtml">
+        <ui:define name="htmlHead">	
+            <script>var dialogSize = { width: 1400, height: 850 };</script>
+            <com:ValidatorScript>
+                nts.uk.ctx.at.aggregation.dom.scheduletable.PersonalScheduleComments
+			</com:ValidatorScript>
+			<com:scriptfile set="IGNITE" />
+			<com:stylefile path="ksu001.k.a.style.css" />
+			<com:scriptfile path="ksu001.k.a.vm.js" />
+		</ui:define>
+
+        <!-- PAGE CONTENT -->
+        <ui:define name="content">
+            <div id="functions-area">
+                <!--A1-1-->
+                <button tabindex="1"
+                        id="exportExcel"
+                        data-bind="click: exportExcel, enable: !_.isEmpty(itemList()) &amp;&amp; $root.errors.isEmpty()">#{i18n.getText('KSU001_4079')}</button>
+                <!--A1-2-->
+                <button tabindex="2"
+                        id="A1_2"
+                        data-bind="click: exportPdf, enable: !_.isEmpty(itemList()) &amp;&amp; $root.errors.isEmpty()">#{i18n.getText('KSU001_4080')}</button>
+                <!--A1-3-->
+                <button tabindex="3" id="A1_3" data-bind="click: closeDialog">#{i18n.getText('KSU001_4081')}</button>
+            </div>
+        
+            <div id="contents-area">
+                <div class="control-group valign-top" style="padding-left: 10px;">
+                    <!--A2-1-->
+                    <div data-bind="ntsFormLabel:{required: true}">#{i18n.getText('KSU001_4082')} </div>
+                    <!--A2-2-->
+                    <div tabindex="4"
+                         style="margin-left: 5px;"
+                         id="combo-box"
+                         data-bind="ntsComboBox: {
+                                            name:'#[KSU001_4083]',
+                                            options: itemList,
+                                            width: 260,
+                                            optionsValue: 'code',
+                                            visibleItemsCount: 10,
+                                            value: selectedCode,
+                                            optionsText: 'name',
+                                            columns: [
+                                                { prop: 'code', length: 4 },
+                                                { prop: 'name', length: 10 },
+                                            ]}">
+                    </div>
+                    <!--A2-3-->
+                    <div style="display: inline-flex; flex-direction: column; align-items: center; margin: 0px 35px 0px 10px;">
+                        <button tabindex="5"
+                                id="A2_3"
+                                data-bind="click: openDialog, style: {visibility: enableSetting() ? 'initial' : 'hidden'}">#{i18n.getText('KSU001_4084')}</button>
+                        <button tabindex="5"
+                                id="A2_4"
+                                class="caret-bottom caret-inline"
+                                style="margin-top: 10px;"
+                                data-bind="click: previewOutput, enable: !_.isEmpty(itemList())">#{i18n.getText('KSU001_4085')}</button>
+                    </div>
+                    <!--A3-1-->
+                    <div id="A3_1" data-bind="ntsFormLabel:{required: false, constraint:['PersonalScheduleComments']}">
+                        #{i18n.getText('KSU001_4086')} </div>
+                    <!--A3-2-->
+                    <textarea tabindex="7"
+                              class="inputValue"
+                              rows="4" cols="75"
+                              data-bind="ntsMultilineEditor: {
+                                                name: '#[KSU001_4086]',
+                                                value: comments,
+                                                constraint:'PersonalScheduleComments',
+                                                required: false }" />
+                </div>
+                <div id="preview-frame" style="width: 100%; height: calc(100% - 110px); overflow: auto; border: 1px solid #cfd4da;"/>
+            </div>
+        </ui:define>
+        </ui:composition>
+</body>
+</html>

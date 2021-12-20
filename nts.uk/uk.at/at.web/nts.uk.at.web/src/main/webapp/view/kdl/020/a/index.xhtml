@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+	<ui:composition template="../../../../master/dialog.xhtml">
+		<ui:define name="htmlHead">
+			<!-- <script>var dialogSize = { width: 1040, height: 600 };</script> -->
+			<com:scriptfile set="IGNITE" />
+			<!-- KCP005 -->
+			<com:scriptfile path="/view/kcp/share/list.js" of="/nts.uk.com.web" />
+			<!-- KDL005 -->
+			<com:scriptfile path="kdl020.a.start.js" />
+			<com:scriptfile path="kdl020.a.vm.js" />
+			<com:scriptfile path="kdl020.a.service.js" />
+			<com:stylefile path="kdl020.a.style.css" />
+		</ui:define>
+
+		<ui:define name="content">
+			<div id="contents-area">
+					<!-- Search Box -->
+					<div tabindex="-1" id="area-right" style="float: left;">
+						<div>
+							<div class="input-wrapper">
+								<span class="nts-editor-wrapped ntsControl"> <input
+									id="input-search" data-bind="text:searchText"
+									class="ntsSearchBox nts-editor ntsSearchBox_Component"
+									type="text" placeholder="コード・名称で検索・・・" data-name="検索テキストボックス"
+									tabindex="-1" style="width: 187px;"></input>
+								</span> <i id="search-icon-new" class="img-icon"></i>
+							</div>
+							<button id="search-btn" data-bind=" click: findData"
+								class="caret-bottom " tabindex="-1">検索</button>
+						</div>
+						<!-- KCP005 -->
+						<div tabindex="-1" id="kcp005component"></div>
+					</div>
+					<div id="area-left" style="width: 620px;">
+						<!-- A2_1 -->
+						<div>
+							#{i18n.getText('Com_Person')}<label style="margin-left: 10px;"
+								id="emp-code-name" data-bind="text:employeeCodeName"></label>
+						</div>
+						 <!-- A5 -->
+						<div id="area-non-info">
+							<label id="A7" style="font-size: 23px;" data-bind="visible: changeMode ">#{i18n.getText('KDL020_43')}</label>
+						</div>
+						<div id="area-info" data-bind="visible: showGrid ">
+							<div>
+								<!-- A2_3 -->
+								<label id="A2_3">#{i18n.getText('KDL020_44')}</label>
+								<!-- A2_4 -->
+								<button tabindex="-1" id="btn-help-1"
+									data-bind="ntsHelpButton: {textId: 'KDL020_45', textParams:['{#KDL020_45}', '', '', ''], position: 'bottom left' }">？</button>
+								<!-- A2_5 -->
+								<label id="A2_5" style="margin-left: 36px; font-size: 18px;"
+									data-bind="text : currentRemainNum"></label>
+							</div>
+								<!-- A2_6 -->
+								<label id="description-label">#{i18n.getText('KDL020_46')}</label>
+							<div id="schedule-grant" style="margin-top: 10px; display: flex;">
+								<!-- A2_7 -->
+								<div style = "width: 250px;">
+								<label id="next-given">#{i18n.getText('KDL020_47')}</label> 
+								</div>
+								<!-- A2_8 -->
+								<label id="granted-next-time" data-bind="text : nextScheDate"></label>
+							</div>
+							<div id="annual-area" style="margin-top: 10px;">
+								<!-- A2_10 -->
+								<div style = "width: 250px; float: left;">
+								<label id="time-annual-leave">#{i18n.getText('KDL020_48')}</label>
+								</div>
+								<div>
+								<!-- A2_11 -->
+								<label id="maximum-time" data-bind="text : annMaxTime"></label>
+								<!-- A2_14 -->
+								<!-- <label id="available-label">#{i18n.getText('KDL020_50')}</label> -->
+								<!-- A2_15 -->
+								<label id="A2_15" data-bind="visible: checkEnable ">#{i18n.getText('KDL020_61')}</label>
+								<!-- A2_9 -->
+								<label id="start-annual" data-bind="text : annLimitStart, visible: checkEnable"></label>
+								<!-- A2_13 -->
+								<label id="A2_13" data-bind="visible: checkEnable ">#{i18n.getText('KDL020_49')}</label>
+								<!-- A2_12 -->
+								<label id="end-annual" data-bind="text : annLimitEnd, visible: checkEnable"></label>
+								<!-- A2_16 -->
+								<label id="A2_16" data-bind="visible: checkEnable ">#{i18n.getText('KDL020_62')}</label>
+								</div>
+							</div>
+							<!-- A3 -->
+							<div tabindex="-1" id="grid-data" style="margin-top: 10px;">
+								<table tabindex="-1" id="grid-grand"></table>
+									<!-- data-bind="ntsGridList: {
+							name : '#KDL020_7'	,							
+							height: 280,
+							options: holidayData,
+							columns: columns,
+							multiple: false,
+							virtualization: true,
+                    		virtualizationMode: 'continuous',
+							value: currentCode,
+							features: [{ name: 'Resizing', type: 'local' }],
+							rows : 5}">
+								</table> -->
+							</div>
+							<div style="margin-top: 10px;">
+								<!-- A4_1 -->
+								<label id="latest-annual-leave">#{i18n.getText('KDL020_57')}</label>
+							</div>
+							<div tabindex="-1" id="grid-data-2" style="margin-top: 10px;">
+								<table tabindex="-1" id="grid-grand-2"></table>
+									<!-- data-bind="ntsGridList: {
+							name : '#KDL020_58'	,							
+							height: 280,
+							options: holidayData2,
+							columns: columns2,
+							multiple: false,
+							value: currentCode2,
+							rows : 6}">
+								</table> -->
+							</div>
+						</div>
+
+					</div>
+			</div>
+			<div id="functions-area-bottom"
+				style="background-color: white">
+				<button tabindex="1" id="cancel-btn" data-bind="click: cancel"
+					class="large">#{i18n.getText('KDL005_17')}</button>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+
+</html>

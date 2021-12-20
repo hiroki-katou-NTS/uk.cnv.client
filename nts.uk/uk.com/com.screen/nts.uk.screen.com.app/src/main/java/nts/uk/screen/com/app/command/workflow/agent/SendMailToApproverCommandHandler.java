@@ -1,21 +1,24 @@
 package nts.uk.screen.com.app.command.workflow.agent;
 
+import java.util.Arrays;
+import java.util.Optional;
+
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+
+import org.apache.commons.lang3.StringUtils;
+
 import nts.arc.error.BusinessException;
 import nts.arc.layer.app.command.CommandHandler;
 import nts.arc.layer.app.command.CommandHandlerContext;
 import nts.gul.mail.send.MailContents;
 import nts.uk.ctx.sys.gateway.dom.loginold.adapter.MailDestinationAdapter;
-import nts.uk.ctx.sys.gateway.dom.loginold.dto.MailDestinationImport;
+import nts.uk.ctx.sys.gateway.dom.loginold.dto.MailDestiImport;
+import nts.uk.ctx.sys.gateway.dom.loginold.dto.SentMailListImport;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.i18n.TextResource;
 import nts.uk.shr.com.mail.MailSender;
-import org.apache.commons.lang3.StringUtils;
-
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.List;
 
 @Stateless
 @Transactional
@@ -29,14 +32,17 @@ public class SendMailToApproverCommandHandler extends CommandHandler<SendEmailCo
     @Override
     protected void handle(CommandHandlerContext<SendEmailCommand> commandHandlerContext) {
         String companyId = AppContexts.user().companyId();
+        SendEmailCommand command = commandHandlerContext.getCommand();
         //imported（申請承認）「社員メールアドレス」を取得する  - Rq225 (419)
-        MailDestinationImport lstApplicantMail = mailDestinationAdapter.getMailofEmployee(companyId, Arrays.asList(commandHandlerContext.getCommand().getApproverId()), 6);
-        if(lstApplicantMail.getOutGoingMails().isEmpty()
-                || lstApplicantMail.getOutGoingMails().stream().allMatch(StringUtils::isEmpty)){
+        MailDestiImport lstApplicantMail = mailDestinationAdapter.getMailDestiOfEmployee(companyId, Arrays.asList(command.getApproverId()), 6);
+        Optional<SentMailListImport> optMailList = lstApplicantMail.getSentMailLists().stream()
+        		.filter(data -> data.getSid().equals(command.getApproverId())).findFirst();
+        if(!optMailList.isPresent()
+                || optMailList.get().getMailAddresses().stream().allMatch(StringUtils::isEmpty)){
             throw new BusinessException("Msg_791");
         }
         //代行承認者へ代行依頼メールを送信する
-        lstApplicantMail.getOutGoingMails().stream().filter(email -> !StringUtils.isEmpty(email))
+        optMailList.get().getMailAddresses().stream().filter(email -> !StringUtils.isEmpty(email))
                 .findFirst().ifPresent(email -> {
             mailSender.sendFromAdmin(
                     email,

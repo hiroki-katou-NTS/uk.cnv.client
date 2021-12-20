@@ -7,15 +7,12 @@ package nts.uk.ctx.at.shared.infra.entity.vacation.setting.compensatoryleave;
 import java.io.Serializable;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.apache.commons.lang3.BooleanUtils;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -45,7 +42,7 @@ public class KclmtCompensLeaveEmp extends ContractUkJpaEntity implements Seriali
     /** The manage atr. */
     @Basic(optional = false)
     @Column(name = "MANAGE_ATR")
-    private int manageAtr;
+    private boolean manageAtr;
     
  
     
@@ -98,7 +95,7 @@ public class KclmtCompensLeaveEmp extends ContractUkJpaEntity implements Seriali
 	public KclmtCompensLeaveEmp(KclmtCompensLeaveEmpPK kclmtCompensLeaveEmpPK, int manageAtr) {
 		super();
 		this.kclmtCompensLeaveEmpPK = kclmtCompensLeaveEmpPK;
-		this.manageAtr = manageAtr;
+		this.manageAtr = BooleanUtils.toBoolean(manageAtr);
 	}
     
     public static KclmtCompensLeaveEmp toEntity(CompensatoryLeaveEmSetting domain){
@@ -110,6 +107,6 @@ public class KclmtCompensLeaveEmp extends ContractUkJpaEntity implements Seriali
     	return new CompensatoryLeaveEmSetting(
     			kclmtCompensLeaveEmpPK.getCid(),
     			new EmploymentCode(kclmtCompensLeaveEmpPK.getEmpcd()) ,
-    			EnumAdaptor.valueOf(this.getManageAtr(), ManageDistinct.class));
+    			EnumAdaptor.valueOf(BooleanUtils.toInteger(this.isManageAtr()), ManageDistinct.class));
     }
 }

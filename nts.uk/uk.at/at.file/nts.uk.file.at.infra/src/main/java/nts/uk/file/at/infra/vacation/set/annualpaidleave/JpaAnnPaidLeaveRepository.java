@@ -3,24 +3,29 @@ package nts.uk.file.at.infra.vacation.set.annualpaidleave;
 import nts.arc.i18n.I18NText;
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.arc.layer.infra.data.jdbc.NtsResultSet;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.vtotalmethod.WorkDaysNumberOnLeaveCount;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.vtotalmethod.WorkDaysNumberOnLeaveCountRepository;
 import nts.uk.file.at.app.export.vacation.set.EmployeeSystemImpl;
 import nts.uk.file.at.app.export.vacation.set.annualpaidleave.AnnPaidLeaveRepository;
 import nts.uk.file.at.infra.vacation.set.CommonTempHolidays;
 import nts.uk.file.at.infra.vacation.set.DataEachBox;
+import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.infra.file.report.masterlist.data.ColumnTextAlign;
 import nts.uk.shr.infra.file.report.masterlist.data.MasterCellData;
 import nts.uk.shr.infra.file.report.masterlist.data.MasterCellStyle;
 import nts.uk.shr.infra.file.report.masterlist.data.MasterData;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
+
 import java.sql.PreparedStatement;
 import java.util.*;
 
 @Stateless
 public class JpaAnnPaidLeaveRepository extends JpaRepository implements AnnPaidLeaveRepository {
 
+	private static final int LEAVE_TYPE = 1;
 	private static final String GET_PAID_LEA_EXPORT = "SELECT  pl.MANAGE_ATR, " +
-			" mas.IS_WORK_DAY_CAL, " +
 			" mas.RETENTION_YEAR, " +
 			" mas.SCHEDULD_WORKING_DAYS, " +
 			" mas.HALF_MANAGE_ATR, " +
@@ -41,6 +46,9 @@ public class JpaAnnPaidLeaveRepository extends JpaRepository implements AnnPaidL
 			"INNER JOIN KSHMT_HDPAID_SET_MNG mas on pl.CID = mas.CID " +
 			"INNER JOIN KSHMT_HDPAID_TIME_SET tas on mas.CID = tas.CID ";
 	private static final int NOT_MANAGER = 0;
+	
+	@Inject
+	private WorkDaysNumberOnLeaveCountRepository workDaysNumberOnLeaveCountRepository;
 
 	@Override
 	public List<MasterData> getAnPaidLea(String cid) {
@@ -64,6 +72,11 @@ public class JpaAnnPaidLeaveRepository extends JpaRepository implements AnnPaidL
 
 	private List<MasterData> buildMasterListData(NtsResultSet.NtsResultRecord rs) {
 		List<MasterData> datas = new ArrayList<>();
+		WorkDaysNumberOnLeaveCount leave = this.workDaysNumberOnLeaveCountRepository
+				.findByCid(AppContexts.user().companyId());
+		String isCounting = leave.getCountedLeaveList().stream()
+				.map(data -> data.value).filter(data -> data == LEAVE_TYPE).findFirst().isPresent()
+				? "管理する" : "管理しない";
 		if (rs == null) {
 			return buildMasterListData();
 		}
@@ -89,7 +102,7 @@ public class JpaAnnPaidLeaveRepository extends JpaRepository implements AnnPaidL
 					, new DataEachBox(I18NText.getText("KMF001_177"), ColumnTextAlign.LEFT)
 					, new DataEachBox(I18NText.getText("KMF001_178"), ColumnTextAlign.LEFT)
 					, new DataEachBox(null, ColumnTextAlign.LEFT)
-					, new DataEachBox(CommonTempHolidays.getTextEnumManageDistinct(Integer.valueOf(rs.getString("IS_WORK_DAY_CAL"))), ColumnTextAlign.LEFT)));
+					, new DataEachBox(isCounting, ColumnTextAlign.LEFT)));
 //			// Row 3
 //			datas.add(buildARow(new DataEachBox(null, ColumnTextAlign.LEFT)
 //					, new DataEachBox(null, ColumnTextAlign.LEFT)

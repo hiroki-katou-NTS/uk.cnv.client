@@ -50,7 +50,7 @@ public class LeaveNumberInfo implements Cloneable {
 		remainingNumber = new LeaveRemainingNumber();
 		usedPercent = new LeaveUsedPercent(new BigDecimal(0.0));
 	}
-
+	
 	public LeaveNumberInfo(LeaveNumberInfo info) {
 		this.grantNumber = info.getGrantNumber();
 		this.usedNumber = info.getUsedNumber();

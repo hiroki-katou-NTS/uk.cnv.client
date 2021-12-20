@@ -45,6 +45,10 @@ module nts.uk.at.view.kmf001.a.viewmodel {
         public openKMF001L(): void {
             nts.uk.request.jump("/view/kmf/001/l/index.xhtml", {});
         }
+        // 特別休暇の設定
+        public openKMF001N(): void {
+          nts.uk.ui.windows.sub.modal("/view/kmf/001/n/index.xhtml", {});
+        }
         
        public openKMK007B(): void {
            var self = this;

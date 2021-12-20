@@ -19,7 +19,7 @@ import java.util.List;
 public class JpaScheModifyFuncCommonRepository extends JpaRepository implements ScheModifyFuncCommonRepository {
     @Override
     public List<ScheModifyFuncCommon> getAll() {
-        String sql = "SELECT * FROM KSCMT_FUNC_COMMON ORDER BY FUNCTION_NO ASC";
+        String sql = "SELECT * FROM KSCCT_FUNC_COMMON ORDER BY FUNCTION_NO ASC";
 
         return new NtsStatement(sql, this.jdbcProxy())
                 .getList(x -> KscmtFuncCommon.MAPPER.toEntity(x).toDomain());

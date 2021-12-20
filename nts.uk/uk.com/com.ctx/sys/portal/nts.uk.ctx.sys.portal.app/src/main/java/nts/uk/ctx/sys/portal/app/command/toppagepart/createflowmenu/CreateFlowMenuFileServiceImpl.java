@@ -23,13 +23,13 @@ import nts.uk.shr.com.context.AppContexts;
 @Stateless
 public class CreateFlowMenuFileServiceImpl implements CreateFlowMenuFileService {
 
-	public static final String DATA_STORE_PATH = ServerSystemProperties.fileStoragePath();
-
 	@Inject
 	private StoredFileInfoRepository storedFileInfoRepository;
 
 	@Inject
 	private FileStorage fileStorage;
+	
+	public static final String DATA_STORE_PATH = ServerSystemProperties.fileStoragePath();
 
 	@Override
 	public String copyFile(String fileId) {

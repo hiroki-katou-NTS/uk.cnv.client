@@ -5,7 +5,6 @@
 package nts.uk.ctx.sys.auth.infra.entity.otreferset;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,7 +35,7 @@ public class SacmtOtRefer extends ContractUkJpaEntity implements Serializable {
 
 	/** The refer wkp admin. */
 	@Column(name="REFER_WKP_ADMIN")
-	private BigDecimal referWkpAdmin;
+	private boolean referWkpAdmin;
 
 
 	/* (non-Javadoc)

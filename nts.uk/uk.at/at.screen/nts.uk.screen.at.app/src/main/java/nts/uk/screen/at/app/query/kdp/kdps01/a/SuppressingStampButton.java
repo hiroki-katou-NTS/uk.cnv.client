@@ -14,8 +14,6 @@ import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampDakokuRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.GetStampTypeToSuppressService;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.StampToSuppress;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.PortalStampSettings;
@@ -52,9 +50,6 @@ public class SuppressingStampButton {
 	private PortalStampSettingsRepository portalStampSettingsrepo;
 
 	@Inject
-	private StampRecordRepository stampRecordRepo;
-
-	@Inject
 	private StampDakokuRepository stampRepo;
 
 	@Inject
@@ -73,7 +68,7 @@ public class SuppressingStampButton {
 		// 1.取得する(Require, 社員ID, 打刻手段)
 
 		GetStampTypeToSuppressServiceImpl require = new GetStampTypeToSuppressServiceImpl(stampSetPerRepo,
-				settingsSmartphoneStampRepo, portalStampSettingsrepo, stampRecordRepo, stampRepo, stampCardRepo,
+				settingsSmartphoneStampRepo, portalStampSettingsrepo, stampRepo, stampCardRepo,
 				preRepo,workingConditionRepository ,workingConditionItemRepository);
 
 		return GetStampTypeToSuppressService.get(require, AppContexts.user().employeeId(), StampMeans.SMART_PHONE);
@@ -93,9 +88,6 @@ public class SuppressingStampButton {
 		private PortalStampSettingsRepository portalStampSettingsrepo;
 
 		@Inject
-		private StampRecordRepository stampRecordRepo;
-
-		@Inject
 		private StampDakokuRepository stampRepo;
 
 		@Inject
@@ -113,11 +105,6 @@ public class SuppressingStampButton {
 		@Override
 		public List<StampCard> getListStampCard(String sid) {
 			return this.stampCardRepo.getListStampCard(sid);
-		}
-
-		@Override
-		public List<StampRecord> getStampRecord(List<StampNumber> stampNumbers, GeneralDate date) {
-			return this.stampRecordRepo.get(AppContexts.user().contractCode(), stampNumbers, date);
 		}
 
 		@Override

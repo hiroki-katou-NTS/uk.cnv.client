@@ -4,15 +4,13 @@
  *****************************************************************/
 package nts.uk.ctx.sys.gateway.app.command.sendmail;
 
-import java.util.List;
-
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import nts.arc.layer.app.command.CommandHandlerContext;
 import nts.arc.layer.app.command.CommandHandlerWithResult;
-import nts.uk.ctx.sys.gateway.app.command.sendmail.dto.SendMailReturnDto;
+import nts.uk.ctx.sys.gateway.app.command.sendmail.dto.SendMailCCG007DReturnDto;
 import nts.uk.ctx.sys.gateway.app.service.login.LoginService;
 
 /**
@@ -21,7 +19,7 @@ import nts.uk.ctx.sys.gateway.app.service.login.LoginService;
 @Stateless
 @Transactional
 public class SendMailForgetPassMobileCommandHandler
-		extends CommandHandlerWithResult<SendMailInfoFormGCommand, List<SendMailReturnDto>> {
+		extends CommandHandlerWithResult<SendMailInfoFormGCommand, SendMailCCG007DReturnDto> {
 	
 	/** The login Service. */
 	@Inject
@@ -34,7 +32,7 @@ public class SendMailForgetPassMobileCommandHandler
 	 * .CommandHandlerContext)
 	 */
 	@Override
-	protected List<SendMailReturnDto> handle(CommandHandlerContext<SendMailInfoFormGCommand> context) {
+	protected SendMailCCG007DReturnDto handle(CommandHandlerContext<SendMailInfoFormGCommand> context) {
 		// get command
 		SendMailInfoFormGCommand command = context.getCommand();
 
@@ -42,6 +40,6 @@ public class SendMailForgetPassMobileCommandHandler
 		
 		String employeeCode = loginService.employeeCodeEdit(command.getEmployeeCode(), companyId);
 		
-		return loginService.sendMail(companyId, employeeCode, command.getContractCode());
+		return loginService.sendMailCCG007D(companyId, employeeCode, command.getContractCode());
 	}
 }

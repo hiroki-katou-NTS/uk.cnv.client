@@ -24,6 +24,8 @@ import nts.uk.ctx.at.schedule.pub.appreflectprocess.export.SCReasonNotReflectDai
 import nts.uk.ctx.at.schedule.pub.appreflectprocess.export.SCReasonNotReflectExport;
 import nts.uk.ctx.at.schedule.pub.appreflectprocess.export.SCReflectStatusResultExport;
 import nts.uk.ctx.at.schedule.pub.appreflectprocess.export.SCReflectedStateExport;
+import nts.uk.ctx.at.shared.dom.scherec.adapter.log.schedulework.CorrectRecordDailyResultImport;
+import nts.uk.ctx.at.shared.dom.scherec.adapter.log.schedulework.schedule.GetWorkScheduleLogAdapter;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.ApplicationShare;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.ApplicationReflectHistory;
@@ -59,12 +61,16 @@ public class RecoverSCBeforeAppReflectPubImpl implements RecoverSCBeforeAppRefle
 	
 	@Inject
 	private ApplicationReflectHistoryRepo applicationReflectHistoryRepo;
+	
+	@Inject
+	private GetWorkScheduleLogAdapter getWorkScheduleLogAdapter;
 
 	@Override
 	public SCRecoverAppReflectExport process(Object application, GeneralDate date,
 			SCReflectStatusResultExport reflectStatus, NotUseAtr dbRegisterClassfi) {
 		RequireImpl impl = new RequireImpl(dailyRecordConverter, correctionAfterTimeChange,
-				calculateDailyRecordServiceCenter, workScheduleRepository, applicationReflectHistoryRepo);
+				calculateDailyRecordServiceCenter, workScheduleRepository, applicationReflectHistoryRepo,
+				getWorkScheduleLogAdapter);
 		val result = RecoverWorkScheduleBeforeAppReflect.process(impl, (ApplicationShare) application, date,
 				convertToShare(reflectStatus), dbRegisterClassfi);
 		return new SCRecoverAppReflectExport(convertToExport(result.getReflectStatus()), result.getSchedule().map(x -> (Object)x),
@@ -107,7 +113,9 @@ public class RecoverSCBeforeAppReflectPubImpl implements RecoverSCBeforeAppRefle
 		private final WorkScheduleRepository workScheduleRepository;
 
 		private final ApplicationReflectHistoryRepo applicationReflectHistoryRepo;
-
+		
+		private final GetWorkScheduleLogAdapter getWorkScheduleLogAdapter ;
+		
 		@Override
 		public List<ApplicationReflectHistory> findAppReflectHistAfterMaxTime(String sid, GeneralDate baseDate,
 				ScheduleRecordClassifi classification, boolean flgRemove, GeneralDateTime reflectionTime) {
@@ -158,6 +166,24 @@ public class RecoverSCBeforeAppReflectPubImpl implements RecoverSCBeforeAppRefle
 		@Override
 		public IntegrationOfDaily correct(IntegrationOfDaily domainDaily, ChangeDailyAttendance changeAtt) {
 			return correctionAfterTimeChange.process(domainDaily, changeAtt);
+		}
+
+		@Override
+		public List<ApplicationReflectHistory> getCancelHistOtherId(String sid, GeneralDate date, String appId,
+				GeneralDateTime createTime, ScheduleRecordClassifi classification) {
+			return applicationReflectHistoryRepo.getCancelHistOtherId(sid, date, appId, createTime, classification);
+		}
+
+		@Override
+		public List<CorrectRecordDailyResultImport> getBySpecifyItemId(String sid, GeneralDate targetDate,
+				Integer itemId) {
+			return getWorkScheduleLogAdapter.getBySpecifyItemId(sid, targetDate, itemId);
+		}
+
+		@Override
+		public List<ApplicationReflectHistory> getHistWithSidDate(String sid, GeneralDate date,
+				ScheduleRecordClassifi classification) {
+			return applicationReflectHistoryRepo.getHistWithSidDate(sid, date, classification);
 		}
 
 	}

@@ -7,12 +7,11 @@ import java.util.List;
 import lombok.val;
 import nts.gul.text.IdentifierUtil;
 import nts.uk.ctx.exio.dom.input.ExecutionContext;
-import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalItemList;
-import nts.uk.ctx.exio.dom.input.canonicalize.domaindata.DomainDataColumn;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.DomainCanonicalization;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.ItemNoMap;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.generic.EmployeeHistoryCanonicalization;
 import nts.uk.ctx.exio.dom.input.canonicalize.history.HistoryType;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalItemList;
 import nts.uk.ctx.exio.dom.input.meta.ImportingDataMeta;
 
 /**
@@ -78,14 +77,6 @@ public class TempAbsenceHistoryCanonicalization extends EmployeeHistoryCanonical
 	@Override
 	protected List<String> getChildTableNames() {
 		return Arrays.asList("BSYMT_TEMP_ABS_HIST_ITEM");
-	}
-	
-	@Override
-	protected List<DomainDataColumn> getDomainDataKeys() {
-		return Arrays.asList(
-				DomainDataColumn.SID,
-				DomainDataColumn.HIST_ID
-		);
 	}
 	
 	@Override

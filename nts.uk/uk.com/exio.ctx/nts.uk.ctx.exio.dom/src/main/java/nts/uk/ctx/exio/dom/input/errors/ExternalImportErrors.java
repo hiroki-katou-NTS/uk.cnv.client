@@ -31,12 +31,12 @@ public class ExternalImportErrors {
 				.size() > 0;
 	}
 	
-	public String toText(RequireToText require, ExecutionContext context) {
+	public String toText(RequireToText require) {
 		
 		val sb = new StringBuilder();
 		
 		errors.forEach(e -> {
-			e.toText(require, context, sb);
+			e.toText(require, sb);
 			sb.append("\r\n");
 		});
 		

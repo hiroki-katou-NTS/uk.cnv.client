@@ -33,4 +33,14 @@ public interface ApplicationReflectHistoryRepo {
 	 */
 	public List<ApplicationReflectHistory> findAppReflectHistDateCond(String sid, GeneralDate baseDate,
 			ScheduleRecordClassifi classification, boolean flgRemove, GeneralDateTime reflectionTime);
+	
+	/**
+	 * [1] 指定した時刻以前の申請IDが異なる取り消し済み履歴を取得する
+	 */
+	public List<ApplicationReflectHistory> getCancelHistOtherId(String sid,  GeneralDate date, String appId, GeneralDateTime createTime,
+			ScheduleRecordClassifi classification);
+	
+	//[2] 申請反映履歴を取得する
+	public List<ApplicationReflectHistory> getHistWithSidDate(String sid, GeneralDate date,
+			ScheduleRecordClassifi classification);
 }

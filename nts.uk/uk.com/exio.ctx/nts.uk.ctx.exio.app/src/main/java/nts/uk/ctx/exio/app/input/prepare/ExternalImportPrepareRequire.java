@@ -26,8 +26,6 @@ import nts.uk.ctx.bs.employee.dom.workplace.master.WorkplaceInformation;
 import nts.uk.ctx.bs.employee.dom.workplace.master.WorkplaceInformationRepository;
 import nts.uk.ctx.exio.dom.input.ExecutionContext;
 import nts.uk.ctx.exio.dom.input.PrepareImporting;
-import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalizedDataRecord;
-import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalizedDataRecordRepository;
 import nts.uk.ctx.exio.dom.input.canonicalize.domaindata.DomainDataId;
 import nts.uk.ctx.exio.dom.input.canonicalize.domaindata.DomainDataRepository;
 import nts.uk.ctx.exio.dom.input.canonicalize.existing.AnyRecordToChange;
@@ -36,6 +34,8 @@ import nts.uk.ctx.exio.dom.input.canonicalize.existing.ExternalImportExistingRep
 import nts.uk.ctx.exio.dom.input.canonicalize.history.ExternalImportHistory;
 import nts.uk.ctx.exio.dom.input.canonicalize.history.HistoryKeyColumnNames;
 import nts.uk.ctx.exio.dom.input.canonicalize.history.HistoryType;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalizedDataRecord;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalizedDataRecordRepository;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomain;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomainId;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomainRepository;
@@ -77,9 +77,9 @@ public class ExternalImportPrepareRequire {
 			PrepareImporting.Require,
 			ExternalImportWorkspaceRepository.Require {
 		
-		ExternalImportSetting getExternalImportSetting(String companyId, ExternalImportCode settingCode);
+		ExternalImportSetting getExternalImportSetting(ExternalImportCode settingCode);
 		
-		ExternalImportCurrentState getExternalImportCurrentState(String companyId);
+		ExternalImportCurrentState getExternalImportCurrentState();
 	}
 	
 	@Inject
@@ -162,12 +162,12 @@ public class ExternalImportPrepareRequire {
 		/***** 外部受入関連 *****/
 		
 		@Override
-		public void add(ExecutionContext context, ExternalImportError error) {
-			errorsRepo.add(context, error);
+		public void add(ExternalImportError error) {
+			errorsRepo.add(companyId, error);
 		}
 
 		@Override
-		public ExternalImportCurrentState getExternalImportCurrentState(String companyId) {
+		public ExternalImportCurrentState getExternalImportCurrentState() {
 			return currentStateRepo.find(companyId);
 		}
 
@@ -177,14 +177,9 @@ public class ExternalImportPrepareRequire {
 		}
 		
 		@Override
-		public ExternalImportSetting getExternalImportSetting(String companyId, ExternalImportCode settingCode) {
-			return settingRepo.get(companyId, settingCode)
+		public ExternalImportSetting getExternalImportSetting(ExternalImportCode settingCode) {
+			return settingRepo.get(null, companyId, settingCode)
 						.orElseThrow(() -> new RuntimeException("not found: " + companyId + ", " + settingCode));
-		}
-
-		@Override
-		public List<ImportingDomain> getAllImportingDomains() {
-			return importingDomainRepo.findAll();
 		}
 		
 		@Override
@@ -198,8 +193,8 @@ public class ExternalImportPrepareRequire {
 		}
 		
 		@Override
-		public Optional<ReviseItem> getReviseItem(String companyId, ExternalImportCode importCode, int importItemNumber) {
-			return reviseItemRepo.get(companyId, importCode, importItemNumber);
+		public Optional<ReviseItem> getReviseItem(ExternalImportCode importCode, ImportingDomainId domainId, int importItemNumber) {
+			return reviseItemRepo.get(companyId, importCode, domainId, importItemNumber);
 		}
 		
 		@Override
@@ -216,13 +211,23 @@ public class ExternalImportPrepareRequire {
 		
 		
 		/***** Workspace *****/
+				
+		@Override
+		public void setupWorkspace() {
+			errorsRepo.cleanOldTables(companyId);
+			
+			errorsRepo.setup(companyId);
+		}
 		
 		@Override
-		public void setupWorkspace(ExecutionContext context) {
+		public void setupWorkspaceForEachDomain(ExecutionContext context) {
+			workspaceRepo.cleanOldTables(this, context);
+			existingRepo.cleanOldTables(context);
+			metaRepo.cleanOldTables(context);
+			
 			workspaceRepo.setup(this, context);
 			existingRepo.setup(context);
 			metaRepo.setup(context);
-			errorsRepo.setup(context);
 		}
 		
 		@Override

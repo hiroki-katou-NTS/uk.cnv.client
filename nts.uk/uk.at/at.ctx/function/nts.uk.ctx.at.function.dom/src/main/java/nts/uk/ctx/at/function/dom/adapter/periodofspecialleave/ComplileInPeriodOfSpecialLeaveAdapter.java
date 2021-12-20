@@ -5,6 +5,8 @@ import java.util.List;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.function.dom.adapter.holidaysremaining.AggrResultOfAnnualLeaveEachMonthKdr;
+import nts.uk.ctx.at.function.dom.adapter.holidaysremaining.AggrResultOfAnnualLeaveKdr;
 
 public interface ComplileInPeriodOfSpecialLeaveAdapter {
 
@@ -51,4 +53,19 @@ public interface ComplileInPeriodOfSpecialLeaveAdapter {
 	 * @return
 	 */
 	public List<SpecialHolidayImported> getSpeHdOfConfMonVer2(String sid, YearMonth startMonth, YearMonth endMonth);
+
+
+	/**
+	 * 273 new
+	 * @param cid
+	 * @param sid
+	 * @param complileDate
+	 * @param mode
+	 * @param baseDate
+	 * @param specialLeaveCode
+	 * @param mngAtr
+	 * @return
+	 */
+	public SpecialVacationImportedKdr get273New(String cid, String sid, DatePeriod complileDate,
+												boolean mode, GeneralDate baseDate, int specialLeaveCode, boolean mngAtr);
 }

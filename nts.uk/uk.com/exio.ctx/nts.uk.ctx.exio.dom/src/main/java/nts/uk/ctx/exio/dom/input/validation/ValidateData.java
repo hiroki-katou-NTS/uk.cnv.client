@@ -12,7 +12,7 @@ import nts.uk.ctx.exio.dom.input.errors.ErrorMessage;
 import nts.uk.ctx.exio.dom.input.errors.ItemError;
 import nts.uk.ctx.exio.dom.input.importableitem.ImportableItem;
 import nts.uk.ctx.exio.dom.input.setting.assembly.RevisedDataRecord;
-import nts.uk.ctx.exio.dom.input.util.Either;
+import nts.gul.util.Either;
 import nts.uk.ctx.exio.dom.input.validation.user.ImportingUserCondition;
 
 /**

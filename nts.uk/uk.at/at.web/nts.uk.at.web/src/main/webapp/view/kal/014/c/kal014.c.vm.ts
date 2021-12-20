@@ -28,19 +28,19 @@ module nts.uk.at.kal014.c {
             let enumBeforeAfter = _.map(__viewContext.enums.FontRearSection, i=> new ItemModel(i.value, vm.$i18n(i.name)));
             vm.workPalceCategory = common.WORKPLACE_CATAGORY;
 
-            vm.strComboMonth = ko.observableArray(__viewContext.enums.SpecifiedMonth);
-            vm.endComboMonth = ko.observableArray(__viewContext.enums.SpecifiedMonth);
+            vm.strComboMonth = ko.observableArray(__viewContext.enums.DailyClosingDateSpecifiedMonth);
+            vm.endComboMonth = ko.observableArray(__viewContext.enums.DailyClosingDateSpecifiedMonth);
 
             vm.strComboDay = ko.observableArray(enumBeforeAfter);
             vm.endComboDay = ko.observableArray(enumBeforeAfter);
 
             vm.dateSpecify = ko.observableArray([
                 {value: StartSpecify.DAYS, name: vm.$i18n("KAL014_44")},
-                {value: StartSpecify.MONTH, name: ""}
+                {value: StartSpecify.MONTH, name: "  "}
             ]);
             vm.monthSpecify = ko.observableArray([
                 {value: EndSpecify.DAYS, name: vm.$i18n("KAL014_49")},
-                {value: EndSpecify.MONTH, name: ""}
+                {value: EndSpecify.MONTH, name: "  "}
             ]);
 
 
@@ -211,7 +211,7 @@ module nts.uk.at.kal014.c {
              AND　開始の月数　＞　終了の月数
              */
             else if ((vm.strSelected() === StartSpecify.MONTH && vm.endSelected() === StartSpecify.MONTH)
-                && vm.modalDTO.startMonth() < vm.modalDTO.endMonth()) {
+                && vm.modalDTO.startMonth() > vm.modalDTO.endMonth()) {
                 return "Msg_812";
             }
 

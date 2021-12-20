@@ -16,6 +16,9 @@ import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHolidayCode;
 import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 
 import javax.persistence.*;
+
+import org.apache.commons.lang3.BooleanUtils;
+
 import java.util.Optional;
 
 /**
@@ -31,7 +34,7 @@ public class KscdtScheAnyCondMonth extends ContractUkJpaEntity {
 
     /* 使用区分 */
     @Column(name = "USE_ATR")
-    public boolean useAtr;
+    public int useAtr;
 
     /* 名称 */
     @Column(name = "COND_NAME")
@@ -95,7 +98,7 @@ public class KscdtScheAnyCondMonth extends ContractUkJpaEntity {
         		checkedCondition, 
         		EnumAdaptor.valueOf(condType, MonCheckItemType.class),
         		pk.sortBy,
-        		useAtr,
+        		BooleanUtils.toBoolean(useAtr),
         		new NameAlarmExtractCond(condName), 
         		Optional.ofNullable(condMsg == null ? null : new ErrorAlarmMessage(condMsg)));
     }

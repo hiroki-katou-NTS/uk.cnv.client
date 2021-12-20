@@ -29,5 +29,5 @@ public class Ksrmt36AgrMgtCmpPk implements Serializable {
      * 会社３６協定時間
      */
     @Column(name = "LABOR_SYSTEM_ATR")
-    public int laborSystemAtr;
+    public boolean laborSystemAtr;
 }

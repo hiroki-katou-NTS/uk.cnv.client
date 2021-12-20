@@ -148,6 +148,10 @@ public class JpaTempAbsHist extends JpaRepository implements TempAbsHistReposito
 
 	@Override
 	public Optional<DateHistoryItem> getItemByEmpIdAndStandardDate(String employeeId, GeneralDate standardDate) {
+		if (standardDate == null) {
+			return Optional.empty();
+		}
+
 		Optional<BsymtTempAbsHist> optionData = this.queryProxy().query(GET_BY_SID_DATE, BsymtTempAbsHist.class)
 				.setParameter("sid", employeeId).setParameter("standardDate", standardDate).getSingle();
 		if (optionData.isPresent()) {

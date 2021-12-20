@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="../../../../master/dialog.xhtml">
+		<ui:define name="htmlHead">
+			<com:ValidatorScript>
+				nts.uk.ctx.at.aggregation.dom.schedulecounter.budget.laborcost.LaborCostBudgetAmount
+			</com:ValidatorScript>
+			<script type='text/javascript'>
+				var dialogSize = {
+					width : 443,
+				    height : 445
+				};
+			</script>
+			<com:scriptfile set="IGNITE" />
+			<com:stylefile path="ksu001.r.main.css" />
+			<com:scriptfile path="ksu001.r.service.js" />
+			<com:scriptfile path="ksu001.r.vm.js" />
+			<com:scriptfile path="ksu001.r.start.js" />
+
+		</ui:define>
+		<ui:define name="content">
+			<div id="functions-area">
+				<button class="proceed" tabindex="1"
+					data-bind="click: register, enable: $root.errors.isEmpty">#{i18n.getText('KSU001_3801')}</button>
+				<button id="close" tabindex="3"
+					data-bind="click: closeDialog">#{i18n.getText('KSU001_3802')}</button>
+			</div>
+			<div id="content-area" style="width: 430px">
+				<div id="left-content">
+					<div>
+						<div data-bind=""></div>
+					</div>
+					<div>
+						<div>
+							<div class="label"
+								style="margin-left: 30px; margin-top: 10px; width: 60%;">
+								<span data-bind="text: organizationName"></span>
+							</div>
+						</div>
+						<hr />
+						<div style="display: flex;">
+							<div style="margin-left: 40px; margin-top: 10px"
+								data-bind="ntsFormLabel: {}">#{i18n.getText('KSU001_3803')}</div>
+							<div style="margin-left: 20px; margin-top: 15px">
+								
+								<table style="border-bottom: 1px solid #A9A9A9 !important;">
+									<thead>
+										<tr>
+											<th style="font-weight: bold;"><pre>#{i18n.getText('KSU001_3706')}</pre></th>
+											<th style="font-weight: bold;" data-bind="text: labelQ32"></th>
+										</tr>
+									</thead>
+									<tbody data-bind="foreach: listperiods" >
+										<tr data-bind="if: date() != ''">
+											<td style="background-color: #d9d9d9;" data-bind="text: date"></td>
+																				
+											<td 
+												data-bind="visible: $parent.check1, with: $parent.currencyeditor"><input id = "extBudgetMoney"
+												style="text-align: right; border: 0px solid #999999; width: 121px; height: 24px; border-radius: 0px;"
+												data-bind="ntsNumberEditor: {
+													name: '#[KSU001_3804]',
+													value: $parent.value,
+													constraint: 'LaborCostBudgetAmount',
+													option: option,
+													required: false,
+													enable: true,
+													readonly: $parent.date() == '' }" /></td>													
+
+										</tr>
+										
+										<tr data-bind="if: date() == ''" >
+											<td style="border: 1.2px solid; border-color: #F1F1F1 #F1F1F1 #F1F1F1 #A9A9A9;  background-color: #F1F1F1 !important;" colspan="2"></td>
+											<!-- <td style="border: none; background-color: #F1F1F1;"></td> -->
+										</tr>
+									</tbody>								
+								</table>
+							</div>
+						</div>						
+					</div>
+				</div>
+
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+
+</html>

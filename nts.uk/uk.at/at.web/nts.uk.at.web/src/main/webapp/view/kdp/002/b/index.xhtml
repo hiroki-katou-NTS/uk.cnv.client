@@ -29,7 +29,7 @@
 					<div id="right-area">
 						<div style="text-align: center;" class="title">
 							<div class="date" data-bind="date: $vm.time.now, format: 'YYYY/MM/DD(ddd)'"></div>
-							<div class="time" data-bind="date: $vm.time.now, format: 'HH:mm'"></div>
+							<div class="time" data-bind="text: $vm.stampTime"></div>
 							<div class="commuting" data-bind="text: currentStampData().stampArtName"></div>
 						</div>
 					</div>
@@ -68,8 +68,10 @@
 								<span id="text-b20-2" data-bind="i18n: 'KDP002_97'"></span>
 							</div>
 							<div data-bind="ifnot: $vm.modeNikoNiko">
-								<span id="text-b20-1" data-bind="i18n: resultDisplayTime"></span>
-								<span id="text-b20-2" data-bind="i18n: 'KDP002_48'"></span>
+								<div data-bind="if: $vm.modeZeroTime">
+									<span id="text-b20-1" data-bind="i18n: resultDisplayTime"></span>
+									<span id="text-b20-2" data-bind="i18n: 'KDP002_48'"></span>
+								</div>
 							</div>
 						</div>
 					</div>

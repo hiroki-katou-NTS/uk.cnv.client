@@ -3,6 +3,7 @@ package nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.vtotalmethod;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import nts.arc.enums.EnumAdaptor;
+import nts.uk.ctx.at.shared.dom.worktype.WorkTypeClassification;
 
 /**
  * 月別実績集計の特定日カウント条件

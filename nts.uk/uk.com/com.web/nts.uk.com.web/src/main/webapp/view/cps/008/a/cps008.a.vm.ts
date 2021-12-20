@@ -18,11 +18,17 @@ module cps008.a.viewmodel {
         enaBtnSave : KnockoutObservable<boolean> = ko.observable(true);
         enaBtnCoppy : KnockoutObservable<boolean> = ko.observable(true);
         enaBtnDel : KnockoutObservable<boolean> = ko.observable(true);
+
+        isFromCPS018: KnockoutObservable<boolean> = ko.observable(false);   
+
         constructor() {
             let self = this,
                 layout: Layout = self.layout(),
                 layouts = self.layouts;
 
+            let params = getShared("CPS008A_PARAMS") || { isFromCPS018: false };
+            self.isFromCPS018(params.isFromCPS018);
+            nts.uk.sessionStorage.removeItem(nts.uk.request.STORAGE_KEY_TRANSFER_DATA);
 
             self.start();
 

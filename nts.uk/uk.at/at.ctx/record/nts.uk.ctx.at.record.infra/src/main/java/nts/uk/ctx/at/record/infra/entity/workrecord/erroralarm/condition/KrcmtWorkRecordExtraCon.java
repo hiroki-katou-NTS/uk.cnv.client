@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.NoArgsConstructor;
 import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.condition.DisplayMessages;
@@ -33,7 +35,7 @@ public class KrcmtWorkRecordExtraCon  extends ContractUkJpaEntity implements Ser
 	@Column(name = "CHECK_ITEM")
 	public int checkItem;
 	@Column(name = "MESSAGE_BOLD")
-	public int messageBold;
+	public boolean messageBold;
 	
 	@Column(name = "MESSAGE_COLOR")
 	public String messageColor;
@@ -42,7 +44,7 @@ public class KrcmtWorkRecordExtraCon  extends ContractUkJpaEntity implements Ser
 	public int sortOrderBy;
 	
 	@Column(name = "USE_ATR")
-	public int useAtr;
+	public boolean useAtr;
 	
 	@Column(name = "NAME")
 	public String nameWKRecord;
@@ -57,10 +59,10 @@ public class KrcmtWorkRecordExtraCon  extends ContractUkJpaEntity implements Ser
 		super();
 		this.errorAlarmCheckID = errorAlarmCheckID;
 		this.checkItem = checkItem;
-		this.messageBold = messageBold;
+		this.messageBold = BooleanUtils.toBoolean(messageBold);
 		this.messageColor = messageColor;
 		this.sortOrderBy = sortOrderBy;
-		this.useAtr = useAtr;
+		this.useAtr = BooleanUtils.toBoolean(useAtr);
 		this.nameWKRecord = nameWKRecord;
 	}
 	
@@ -81,10 +83,10 @@ public class KrcmtWorkRecordExtraCon  extends ContractUkJpaEntity implements Ser
 				this.errorAlarmCheckID,
 				EnumAdaptor.valueOf(this.checkItem, TypeCheckWorkRecord.class),
 				new DisplayMessages(
-					this.messageBold == 1?true:false,
+					this.messageBold,
 					new ColorCode(this.messageColor)),
 				this.sortOrderBy,
-				this.useAtr == 1?true:false,
+				this.useAtr,
 				new NameWKRecord(this.nameWKRecord)
 				);
 	}

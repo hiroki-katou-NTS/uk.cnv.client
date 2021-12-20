@@ -7,7 +7,8 @@ module nts.uk.at.view.kal004.a.service {
             addAlarmPattern: "at/function/alarm/addPatternAlarm",
             updateAlarmPattern: "at/function/alarm/updatePatternAlarm",
             removeAlarmPattern: "at/function/alarm/removePatternSetting",
-            getEnumAlarmCategory : "at/function/alarm/getEnumAlarmCategory" 
+            getEnumAlarmCategory : "at/function/alarm/getEnumAlarmCategory",
+            processingYm: "at/function/alarm/kal/001/processingym"
         }
         
         
@@ -39,7 +40,9 @@ module nts.uk.at.view.kal004.a.service {
             return nts.uk.request.ajax(paths.getEnumAlarmCategory);
         }
     
+        /** Get processing year month */
+        export function getProcessingYm(): JQueryPromise<number> {
+            return nts.uk.request.ajax(paths.processingYm);
+        }
 
-    
-    
 }

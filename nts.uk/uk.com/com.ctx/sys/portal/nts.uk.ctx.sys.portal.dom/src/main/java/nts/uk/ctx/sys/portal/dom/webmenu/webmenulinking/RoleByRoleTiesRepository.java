@@ -3,8 +3,6 @@ package nts.uk.ctx.sys.portal.dom.webmenu.webmenulinking;
 import java.util.Optional;
 
 public interface RoleByRoleTiesRepository {
-
-	Optional<RoleByRoleTies> getRoleByRoleTiesById(String roleId);
 	
 	Optional<RoleByRoleTies> getByRoleIdAndCompanyId(String roleId, String companyId);
 	
@@ -12,7 +10,7 @@ public interface RoleByRoleTiesRepository {
 
 	void updateRoleByRoleTies(RoleByRoleTies roleByRoleTies);
 
-	void deleteRoleByRoleTies(String roleId);
+	void deleteRoleByRoleTies(String roleId, String companyId);
 
 }
 

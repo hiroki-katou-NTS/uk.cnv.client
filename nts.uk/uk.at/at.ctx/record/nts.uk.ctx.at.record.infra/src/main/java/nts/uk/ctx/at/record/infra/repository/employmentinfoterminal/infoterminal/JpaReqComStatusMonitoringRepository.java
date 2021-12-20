@@ -27,7 +27,7 @@ public class JpaReqComStatusMonitoringRepository extends JpaRepository implement
 	public void update(ReqComStatusMonitoring reqComStatusMonitoring) {
 		KrcdtTrRqStMonitorPK key = new KrcdtTrRqStMonitorPK(reqComStatusMonitoring.getContractCode().v(), reqComStatusMonitoring.getTerminalCode().v());
 		KrcdtTrRqStMonitor entity = this.queryProxy().find(key, KrcdtTrRqStMonitor.class).get();
-		entity.connecting = reqComStatusMonitoring.isConnecting() ? 1 : 0;
+		entity.connecting = reqComStatusMonitoring.isConnecting();
 		this.commandProxy().update(entity);
 	}
 

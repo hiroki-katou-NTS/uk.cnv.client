@@ -15,13 +15,13 @@ import nts.uk.ctx.at.record.app.command.monthly.attendancetime.AttendanceTimeOfM
 import nts.uk.ctx.at.record.app.command.monthly.care.MonthCareRemainCommandHandler;
 import nts.uk.ctx.at.record.app.command.monthly.childcare.MonthChildCareRemainCommandHandler;
 import nts.uk.ctx.at.record.app.command.monthly.dayoff.DayOffRemainMonthlyCommandHandler;
+import nts.uk.ctx.at.record.app.command.monthly.publicholiday.MonthPublicHolidayRemainCommandHandler;
 import nts.uk.ctx.at.record.app.command.monthly.remarks.MonthlyRemarksCommandHandler;
 import nts.uk.ctx.at.record.app.command.monthly.reserveleave.RsvLeaRemNumEachMonthCommandHandler;
 import nts.uk.ctx.at.record.app.command.monthly.specialholiday.SpecialHolidayRemainMonthlyCommandHandler;
 import nts.uk.ctx.at.shared.app.util.attendanceitem.CommandFacade;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.RecordHandler;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.anno.AttendanceItemLayout;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
 
 @Stateless
 public class MonthlyRecordWorkCommandHandler extends RecordHandler {
@@ -91,6 +91,12 @@ public class MonthlyRecordWorkCommandHandler extends RecordHandler {
 	@AttendanceItemLayout(layout = MONTHLY_CHILD_CARE_HD_REMAIN_CODE, 
 		jpPropertyName = MONTHLY_CHILD_CARE_HD_REMAIN_NAME, index = 11)
 	private MonthChildCareRemainCommandHandler childCare;
+	
+	/** 公休月別残数データ **/
+	@Inject
+	@AttendanceItemLayout(layout = MONTHLY_PUBLIC_HOLIDAYREMAIN_CODE,
+		jpPropertyName = MONTHLY_PUBLIC_HOLIDAYREMAIN_NAME, index = 12)
+	private MonthPublicHolidayRemainCommandHandler publicHoliday;
 
 	public void handleAdd(MonthlyRecordWorkCommand command) {
 		handler(command, false);
@@ -155,6 +161,9 @@ public class MonthlyRecordWorkCommandHandler extends RecordHandler {
 			break;
 		case MONTHLY_CHILD_CARE_HD_REMAIN_NAME:
 			handler = this.childCare;
+			break;
+		case MONTHLY_PUBLIC_HOLIDAYREMAIN_NAME:
+			handler = this.publicHoliday;
 			break;
 		default:
 			break;

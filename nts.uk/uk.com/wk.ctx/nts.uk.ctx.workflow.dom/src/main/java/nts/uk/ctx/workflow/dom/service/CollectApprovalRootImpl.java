@@ -27,8 +27,6 @@ import nts.uk.ctx.workflow.dom.adapter.bs.dto.StatusOfEmployment;
 import nts.uk.ctx.workflow.dom.adapter.workplace.WorkplaceApproverAdapter;
 import nts.uk.ctx.workflow.dom.approvermanagement.setting.ApprovalSettingRepository;
 import nts.uk.ctx.workflow.dom.approvermanagement.setting.ApproverRegisterSet;
-import nts.uk.ctx.workflow.dom.approvermanagement.setting.JobAssignSetting;
-import nts.uk.ctx.workflow.dom.approvermanagement.setting.JobAssignSettingRepository;
 import nts.uk.ctx.workflow.dom.approvermanagement.setting.PrincipalApprovalFlg;
 import nts.uk.ctx.workflow.dom.approvermanagement.setting.UseClassification;
 import nts.uk.ctx.workflow.dom.approvermanagement.workroot.ApprovalAtr;
@@ -71,9 +69,6 @@ public class CollectApprovalRootImpl implements CollectApprovalRootService {
 	
 	@Inject
 	private EmployeeAdapter employeeAdapter;
-	
-	@Inject
-	private JobAssignSettingRepository jobAssignSetRepository;
 	
 	@Inject
 	private WorkplaceApproverAdapter wkApproverAdapter;
@@ -303,12 +298,6 @@ public class CollectApprovalRootImpl implements CollectApprovalRootService {
 		List<ConcurrentEmployeeImport> employeeList = employeeAdapter.getConcurrentEmployee(cid, jobTitleId, baseDate);
 		if(CollectionUtil.isEmpty(employeeList)) {
 			return Collections.emptyList();
-		}
-		// ドメインモデル「職位指定の設定」を取得する
-		Optional<JobAssignSetting> assignSet = jobAssignSetRepository.findById();
-		if (assignSet.get().getIsConcurrently()) {
-			// 取得した職位対象者から兼務役職者を除く
-			employeeList.removeIf(x -> x.isConcurrent());
 		}
 		
 		List<String> approvers = new ArrayList<>();

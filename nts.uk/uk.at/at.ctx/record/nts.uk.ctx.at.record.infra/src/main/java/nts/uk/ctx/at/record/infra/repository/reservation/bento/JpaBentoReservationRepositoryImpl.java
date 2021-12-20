@@ -1,24 +1,5 @@
 package nts.uk.ctx.at.record.infra.repository.reservation.bento;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.SneakyThrows;
-import nts.arc.layer.infra.data.JpaRepository;
-import nts.arc.time.GeneralDate;
-import nts.arc.time.GeneralDateTime;
-import nts.arc.time.calendar.period.DatePeriod;
-import nts.gul.collection.CollectionUtil;
-import nts.uk.ctx.at.record.dom.reservation.bento.*;
-import nts.uk.ctx.at.record.dom.reservation.bentomenu.closingtime.ReservationClosingTimeFrame;
-import nts.uk.ctx.at.record.infra.entity.reservation.bento.KrcdtReservation;
-import nts.uk.ctx.at.record.infra.entity.reservation.bento.KrcdtReservationDetail;
-import nts.uk.ctx.at.record.infra.entity.reservation.bento.KrcdtReservationDetailPK;
-import nts.uk.ctx.at.record.infra.entity.reservation.bento.KrcdtReservationPK;
-import nts.uk.shr.com.context.AppContexts;
-
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,13 +9,36 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import nts.arc.layer.infra.data.JpaRepository;
+import nts.arc.layer.infra.data.database.DatabaseProduct;
+import nts.arc.time.GeneralDate;
+import nts.arc.time.GeneralDateTime;
+import nts.arc.time.calendar.period.DatePeriod;
+import nts.gul.collection.CollectionUtil;
+import nts.uk.ctx.at.record.dom.reservation.bento.BentoReservation;
+import nts.uk.ctx.at.record.dom.reservation.bento.BentoReservationRepository;
+import nts.uk.ctx.at.record.dom.reservation.bento.ReservationDate;
+import nts.uk.ctx.at.record.dom.reservation.bento.ReservationRegisterInfo;
+import nts.uk.ctx.at.record.dom.reservation.bento.WorkLocationCode;
+import nts.uk.ctx.at.record.dom.reservation.bentomenu.closingtime.ReservationClosingTimeFrame;
+import nts.uk.ctx.at.record.infra.entity.reservation.bento.KrcdtReservation;
+import nts.uk.ctx.at.record.infra.entity.reservation.bento.KrcdtReservationDetail;
+import nts.uk.ctx.at.record.infra.entity.reservation.bento.KrcdtReservationDetailPK;
+import nts.uk.ctx.at.record.infra.entity.reservation.bento.KrcdtReservationPK;
+import nts.uk.shr.com.context.AppContexts;
+
 @Stateless
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class JpaBentoReservationRepositoryImpl extends JpaRepository implements BentoReservationRepository {
 	
 	private static final String DATE_FORMAT = "yyyy-MM-dd";
-	
-	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	
 	private static final String SELECT;
 	
@@ -159,7 +163,6 @@ public class JpaBentoReservationRepositoryImpl extends JpaRepository implements 
 					KrcdtReservationPK pk = new KrcdtReservationPK(
 							first.getCompanyID(), 
 							first.getReservationID());
-					String contractCD = first.getContractCD();
 					GeneralDate date = first.getDate();
 					int frameAtr = first.getFrameAtr();
 					String cardNo = first.getCardNo();
@@ -176,9 +179,9 @@ public class JpaBentoReservationRepositoryImpl extends JpaRepository implements 
 										y.getValue().get(0).getRegisterDate());
 								int quantity = y.getValue().get(0).getQuantity();
 								boolean autoReservation = y.getValue().get(0).getAutoReservation();
-								return new KrcdtReservationDetail(detailPk, quantity, autoReservation ? 1 : 0, null);
+								return new KrcdtReservationDetail(detailPk, quantity, autoReservation, null);
 							}).collect(Collectors.toList());
-					return new KrcdtReservation(pk, date, frameAtr, cardNo, ordered ? 1 : 0,workLocationCode, reservationDetails);
+					return new KrcdtReservation(pk, date, frameAtr, cardNo, ordered, workLocationCode, reservationDetails);
 				}).collect(Collectors.toList());
 	}
 	
@@ -247,9 +250,17 @@ public class JpaBentoReservationRepositoryImpl extends JpaRepository implements 
                 }
             }
         }
+        
+        boolean isSQL = this.database().is(DatabaseProduct.MSSQLSERVER);
+        
         String orderedParam;
-        if(ordered) orderedParam = "1";
-        else orderedParam = "0,1";
+        if (isSQL) {
+        	if(ordered) orderedParam = "1";
+        	else orderedParam = "0,1";     
+        } else {
+        	if(ordered) orderedParam = "true";
+        	else orderedParam = "false,true";        	
+        }
         query = query.replaceFirst("cardLst", cardLstStr);
         query = query.replaceFirst("startDate", period.start().toString());
         query = query.replaceFirst("endDate", period.end().toString());

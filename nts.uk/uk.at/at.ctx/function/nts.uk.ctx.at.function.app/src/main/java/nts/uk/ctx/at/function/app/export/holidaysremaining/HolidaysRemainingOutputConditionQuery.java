@@ -6,7 +6,7 @@ import lombok.Value;
 public class HolidaysRemainingOutputConditionQuery {
 	private String startMonth;
 	private String endMonth;
-	private String outputItemSettingCode;
+	private String layOutId;
 	private int pageBreak;
 	private String baseDate;
 	private int closureId;

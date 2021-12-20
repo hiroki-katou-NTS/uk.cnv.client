@@ -12,7 +12,6 @@ import javax.persistence.Table;
 
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeOfDaily;
-import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.premiumtime.PremiumTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.MedicalCareTimeEachTimeSheet;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.MedicalCareTimeEachTimeSheet.FullTimeNightShiftAttr;
@@ -237,5 +236,42 @@ public class KrcdtDayOuenTime extends ContractUkJpaEntity implements Serializabl
 		
 		return times.stream().filter(c -> c.getPremiumTimeNo() == no)
 				.findFirst().map(c -> c.getPremitumTime().v()).orElse(0);
+	}
+
+	public void update(KrcdtDayOuenTime entity) {
+		this.amount = entity.amount;
+		this.priceUnit = entity.priceUnit;
+		this.totalTime = entity.totalTime;
+		this.breakTime = entity.breakTime;
+		this.withinTime = entity.withinTime;
+		this.premiumTime1 = entity.premiumTime1;
+		this.premiumTime2 = entity.premiumTime2;
+		this.premiumTime3 = entity.premiumTime3;
+		this.premiumTime4 = entity.premiumTime4;
+		this.premiumTime5 = entity.premiumTime5;
+		this.premiumTime6 = entity.premiumTime6;
+		this.premiumTime7 = entity.premiumTime7;
+		this.premiumTime8 = entity.premiumTime8;
+		this.premiumTime9 = entity.premiumTime9;
+		this.premiumTime10 = entity.premiumTime10;
+		this.moveTotalTime = entity.moveTotalTime;
+		this.moveBreakTime = entity.moveBreakTime;
+		this.moveWithinTime = entity.moveWithinTime;
+		this.movePremiumTime1 = entity.movePremiumTime1;
+		this.movePremiumTime2 = entity.movePremiumTime2;
+		this.movePremiumTime3 = entity.movePremiumTime3;
+		this.movePremiumTime4 = entity.movePremiumTime4;
+		this.movePremiumTime5 = entity.movePremiumTime5;
+		this.movePremiumTime6 = entity.movePremiumTime6;
+		this.movePremiumTime7 = entity.movePremiumTime7;
+		this.movePremiumTime8 = entity.movePremiumTime8;
+		this.movePremiumTime9 = entity.movePremiumTime9;
+		this.movePremiumTime10 = entity.movePremiumTime10;
+		this.normalWorkTime = entity.normalWorkTime;
+		this.normalBreakTime = entity.normalBreakTime;
+		this.normalDeductionTime = entity.normalDeductionTime;
+		this.nightWorkTime = entity.nightWorkTime;
+		this.nightBreakTime = entity.nightBreakTime;
+		this.nightDeductionTime = entity.nightDeductionTime;
 	}
 }

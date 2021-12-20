@@ -474,12 +474,14 @@ module nts.uk.at.view {
             workTimezoneCommonSet: commonKmk003.WorkTimezoneCommonSetDto; //就業時間帯の共通設定
             breakTime: BreakTimeKdl045Dto;//<Optional>休憩時間
             workTimeForm: number;//勤務タイプ : 就業時間帯の勤務形態 WorkTimeForm
+            coreTimeFlexSetting: any;
             constructor(workTimezoneCommonSet: commonKmk003.WorkTimezoneCommonSetDto,
                 breakTime: BreakTimeKdl045Dto,
-                workTimeForm: number) {
+                workTimeForm: number,coreTimeFlexSetting: any) {
                 this.workTimezoneCommonSet = workTimezoneCommonSet;
                 this.breakTime = breakTime;
                 this.workTimeForm = workTimeForm;
+                this.coreTimeFlexSetting = coreTimeFlexSetting;
             }
         }
         

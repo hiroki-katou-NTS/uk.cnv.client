@@ -7,6 +7,15 @@ import nts.arc.time.GeneralDate;
  *
  */
 public interface AnnLeaveRemainNumberAdapter {
+    
+    /**
+     * RequestList198
+     * 基準日時点の年休残数を取得する
+     * @param employeeID
+     * @param date
+     * @return ReNumAnnLeaveImport
+     */
+    ReNumAnnLeaveImport getReferDateAnnualLeaveRemain(String employeeID, GeneralDate date);
 
 	/**
 	 * RequestList198

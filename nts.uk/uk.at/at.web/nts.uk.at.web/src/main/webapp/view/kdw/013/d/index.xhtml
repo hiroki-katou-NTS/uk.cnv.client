@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+	<ui:composition template="/master/dialog.xhtml">
+		<ui:define name="htmlHead">
+			<script>var dialogSize = { width: 635, height: 310 };</script>
+			<com:scriptfile set="IGNITE" />
+
+			<com:scriptfile path="../share/functional.js" />
+			<com:stylefile path="./kdw013.d.css" />
+			<com:scriptfile path="./kdw013.d.vm.js" />
+		</ui:define>
+		<ui:define name="content">
+			<div id="contents-area" class="kdw-013-d">
+				<table id="kdw-013-ddata" data-bind="
+						ntsGridList: {								
+							height: 200,
+							dataSource: $vm.dataSource,
+							primaryKey: 'overtimeLeaveAtr',
+							columns: [{
+								headerText: '',
+								key: 'overtimeLeaveAtr',
+								hidden: true
+							}, {
+								headerText: $vm.$i18n('KDW013_32'),
+								key: 'date',
+								width: '100px'
+							}, {
+								headerText: $vm.$i18n('KDW013_33'),
+								key: 'description',
+								width: '300px'
+							}, {
+								headerText: $vm.$i18n('KDW013_34'),
+								key: 'link',
+								width: '200px'
+							}],
+							value: ko.observable()
+						}
+					">
+				</table>
+			</div>
+			<div id="functions-area-bottom" class="kdw-013-d">
+				<button data-bind="i18n: 'KDW013_37', click: $vm.close"></button>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+
+</html>

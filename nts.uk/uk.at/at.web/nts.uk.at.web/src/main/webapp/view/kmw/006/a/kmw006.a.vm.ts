@@ -268,7 +268,8 @@ module nts.uk.at.view.kmw006.a.viewmodel {
             if (localStorage.getItem("MonthlyClosureListEmpId") != null) {
                 listEmpId = localStorage.getItem("MonthlyClosureListEmpId").split(',');
             }
-            confirmProceed({ messageId: "Msg_1355" }).ifYes(() => {
+            confirmProceed({ messageId: "Msg_2296" }).ifYes(() => {
+              confirmProceed({ messageId: "Msg_1355" }).ifYes(() => {
                 block.invisible();
                 var screenParams = {
                     monthlyClosureUpdateLogId: localStorage.getItem("MonthlyClosureUpdateLogId"),
@@ -301,7 +302,8 @@ module nts.uk.at.view.kmw006.a.viewmodel {
                 }).always(() => {
                     block.clear();
                 });
-            })
+              });
+            });
         }
 
         private openKmw006fDialog(params: any) {

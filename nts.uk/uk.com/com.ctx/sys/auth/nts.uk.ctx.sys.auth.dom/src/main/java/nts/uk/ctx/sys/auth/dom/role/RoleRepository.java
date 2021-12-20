@@ -28,16 +28,6 @@ public interface RoleRepository {
 	Optional<Role> findByRoleId(String roleId);
 
 	/**
-	 * Find role by role code and role type
-	 * 
-	 * @param roleCode
-	 * @param RoleType
-	 * @return
-	 */
-	Optional<Role> findRoleByRoleCode(String companyId,String roleCode, int roleType);
-	
-
-	/**
 	 * Find by list role id.
 	 *
 	 * @param companyId
@@ -134,4 +124,37 @@ public interface RoleRepository {
 	 * @return
 	 */
 	Map<String, String> findRoleIdAndNameByListRoleId(String cid, List<String> roleIds);
+
+	/**
+	 * exists(会社ID, ロール種類, 担当区分毎に, ロールコード)
+	 * @param cid 会社ID
+	 * @param roleType ロール種類
+	 * @param assignAtr 担当区分
+	 * @param roleCode ロールコード
+	 * @return
+	 */
+	boolean exists(String cid, RoleType roleType, RoleAtr assignAtr, RoleCode roleCode);
+	
+	/**
+	 * [2] 承認権限がある就業ロールを取得する
+	 * @param cid
+	 * @return ロールList
+	 */
+	List<Role> obtainRoleWorks(String cid);
+	
+	/**
+	 * [3] 就業ロールIDから承認権限がある就業ロールを取得する
+	 * @param cid
+	 * @param eplRoleId 就業ロールID
+	 * @return ロール
+	 */
+	Optional<Role> getRoleWorks(String cid, String eplRoleId);
+
+	/**
+	 * find by company
+	 *
+	 * @param companyId
+	 * @return Role
+	 */
+	List<Role> findByCompanyId(String companyId);
 }

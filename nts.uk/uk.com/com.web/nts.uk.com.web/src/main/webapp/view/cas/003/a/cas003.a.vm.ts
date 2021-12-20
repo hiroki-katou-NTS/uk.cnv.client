@@ -84,14 +84,12 @@ module nts.uk.com.view.cas003.a {
 
 
             exportExcel(): void {
-                var self = this;
-                nts.uk.ui.block.grayout();
-                let langId = "ja";
-                service.saveAsExcel(langId).done(function() {
-                }).fail(function(error) {
-                    nts.uk.ui.dialog.alertError({ messageId: error.messageId });
-                }).always(function() {
-                    nts.uk.ui.block.clear();
+                service.saveAsExcel().done(function(data) {
+
+                }).fail(function(res: any) {
+                    nts.uk.ui.dialog.alertError(res).then(function() { nts.uk.ui.block.clear(); });
+                }).always(()=>{
+                    block.clear();
                 });
              }
             

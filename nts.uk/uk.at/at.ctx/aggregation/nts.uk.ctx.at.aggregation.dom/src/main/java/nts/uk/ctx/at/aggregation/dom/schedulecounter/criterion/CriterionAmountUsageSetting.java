@@ -20,5 +20,9 @@ public class CriterionAmountUsageSetting implements DomainAggregate {
 
 	/** 雇用利用区分 */
 	private NotUseAtr employmentUse;
+	
+	public void update(NotUseAtr employmentUse) {
+		this.employmentUse = employmentUse;
+	}
 
 }

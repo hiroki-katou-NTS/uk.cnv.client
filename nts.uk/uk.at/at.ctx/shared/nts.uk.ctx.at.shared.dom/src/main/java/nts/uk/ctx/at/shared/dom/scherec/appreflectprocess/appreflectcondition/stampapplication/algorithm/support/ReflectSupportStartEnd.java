@@ -92,7 +92,7 @@ public class ReflectSupportStartEnd {
 
 	}
 
-	private static Pair<OuenWorkTimeSheetOfDailyAttendance, List<Integer>> update(Require require, 
+	private static Pair<OuenWorkTimeSheetOfDailyAttendance, List<Integer>> update(Require require,
 			OuenWorkTimeSheetOfDailyAttendance old,
 			TimeStampAppShare data) {
 		List<Integer> lstItemId = new ArrayList<>();

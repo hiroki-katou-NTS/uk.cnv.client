@@ -50,7 +50,7 @@ public class KscmtNurseLicense extends ContractUkJpaEntity implements Serializab
 	@Basic(optional = false)
 	@NotNull
 	@Column(name = "IS_OFFICE_WORK")
-	private int officeWork;
+	private boolean officeWork;
 
 	@Override
 	protected Object getKey() {

@@ -1,5 +1,6 @@
 package nts.uk.ctx.at.aggregation.infra.entity.scheduletable.outputsetting;
 
+import javax.persistence.Column;
 import javax.persistence.Table;
 
 import java.io.Serializable;
@@ -27,6 +28,9 @@ public class KagmtRptScheduleTallyByWkp extends ContractUkJpaEntity implements S
 	
 	@EmbeddedId
 	public KagmtRptScheduleTallyByWkpPk pk;
+
+	@Column(name = "DISPORDER")
+	public Integer displayOrder;
 
 	@Override
 	protected Object getKey() {

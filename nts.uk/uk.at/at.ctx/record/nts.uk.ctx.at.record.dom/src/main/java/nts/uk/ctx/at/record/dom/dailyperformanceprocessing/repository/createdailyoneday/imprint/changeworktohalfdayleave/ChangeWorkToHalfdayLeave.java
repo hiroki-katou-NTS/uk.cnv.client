@@ -12,7 +12,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
 import nts.uk.ctx.at.shared.dom.dailyperformanceprocessing.ErrMessageResource;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.editstate.EditStateOfDailyAttd;
@@ -56,12 +56,12 @@ public class ChangeWorkToHalfdayLeave {
 				.collect(Collectors.toList());
 		Optional<WorkType> workType = Optional.empty();
 		// 「打刻。時刻変更区分」を確認する
-		if (stamp.getType().getChangeClockArt() == ChangeClockArt.WORKING_OUT) {
+		if (stamp.getType().getChangeClockArt() == ChangeClockAtr.WORKING_OUT) {
 			workType = listWorkType.stream()
 					.filter(c -> c.getDailyWork().getMorning() == WorkTypeClassification.Attendance
 							&& c.getDailyWork().getAfternoon() == WorkTypeClassification.AnnualHoliday)
 					.findFirst();
-		} else if (stamp.getType().getChangeClockArt() == ChangeClockArt.GOING_TO_WORK) {
+		} else if (stamp.getType().getChangeClockArt() == ChangeClockAtr.GOING_TO_WORK) {
 			workType = listWorkType.stream()
 					.filter(c -> c.getDailyWork().getMorning() == WorkTypeClassification.AnnualHoliday
 							&& c.getDailyWork().getAfternoon() == WorkTypeClassification.Attendance)

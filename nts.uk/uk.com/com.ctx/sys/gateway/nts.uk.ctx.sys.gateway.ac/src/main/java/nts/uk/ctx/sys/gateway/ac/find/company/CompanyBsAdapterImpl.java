@@ -44,4 +44,21 @@ public class CompanyBsAdapterImpl implements CompanyBsAdapter{
 					f.getIsAbolition());
 		}).collect(Collectors.toList());
 	}
+
+	/**
+	 * Gets the all company by contract cd.
+	 *
+	 * @param contractCd the contract cd
+	 * @return the all company by contract cd
+	 */
+	@Override
+	public List<CompanyBsImport> getAllCompanyByContractCd(String contractCd) {
+		return this.companyPub.getAllCompanyByContract(contractCd).stream().map(f -> {
+			return new CompanyBsImport(
+					f.getCompanyCode(), 
+					f.getCompanyName(), 
+					f.getCompanyId(), 
+					f.getIsAbolition());
+		}).collect(Collectors.toList());
+	}
 }

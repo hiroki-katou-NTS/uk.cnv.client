@@ -10,11 +10,19 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonObject;
 
+import lombok.val;
 import nts.arc.layer.app.cache.DateHistoryCache;
 import nts.arc.layer.app.cache.KeyDateHistoryCache;
 import nts.arc.layer.app.cache.MapCache;
+import nts.arc.layer.app.command.AsyncCommandHandler;
+import nts.arc.layer.app.command.CommandHandlerContext;
+import nts.arc.task.data.TaskDataSetter;
 import nts.arc.task.parallel.ManagedParallelWithContext;
 import nts.arc.task.tran.AtomTask;
 import nts.arc.time.GeneralDate;
@@ -67,7 +75,8 @@ import nts.uk.shr.com.context.AppContexts;
  *
  */
 @Stateless
-public class ScheduleRegisterCommandHandler {
+@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+public class ScheduleRegisterCommandHandler extends AsyncCommandHandler<ScheduleRegisterCommand> {
 
     @Inject
     private WorkTypeRepository workTypeRepo;
@@ -126,72 +135,149 @@ public class ScheduleRegisterCommandHandler {
     @Inject
     private ManagedParallelWithContext parallel;
 
-    public List<RegisterWorkScheduleOutput> register(ScheduleRegisterCommand command) {
-        List<RegisterWorkScheduleOutput> outputs = new ArrayList<RegisterWorkScheduleOutput>();
+//    public List<RegisterWorkScheduleOutput> register(ScheduleRegisterCommand command) {
+//        List<RegisterWorkScheduleOutput> outputs = new ArrayList<RegisterWorkScheduleOutput>();
+//        List<String> importCodes = command.getTargets().stream().map(x -> x.getImportCode()).distinct().collect(Collectors.toList());
+//        List<String> employeeList = command.getTargets().stream().map(x -> x.getEmployeeId()).distinct().collect(Collectors.toList());
+//        List<GeneralDate> dates = command.getTargets().stream()
+//                .map(x -> GeneralDate.fromString(x.getDate(), "yyyy/MM/dd"))
+//                .distinct().sorted().collect(Collectors.toList());
+//        DatePeriod period = dates.size() > 0 ? new DatePeriod(dates.get(0), dates.get(dates.size() - 1)) : null;
+//        RequireImp requireImp = new RequireImp(importCodes, employeeList, period);
+//        ScheduleRegister sr =  command.toDomain();
+//        
+//        Map<String, List<ScheduleRegisterTarget>> mapTargetBySid = sr.getTargets().stream().
+//                collect(Collectors.groupingBy(target -> target.getEmployeeId()));
+//        List<List<ScheduleRegisterTarget>> listTargetBySid = mapTargetBySid.entrySet().stream().map(x -> x.getValue())
+//                .collect(Collectors.toList());
+//        List<String> employeeIds = new ArrayList<String>();
+//        this.parallel.forEach(listTargetBySid, targets -> {
+//            // 1.1: 作る(Require, 社員ID, 年月日, シフトマスタ取り込みコード, boolean)
+//            List<ResultOfRegisteringWorkSchedule> resultOfRegisteringWorkSchedule = 
+//                    targets
+//                    .stream()
+//                    .map(x -> CreateWorkScheduleByImportCode.create(
+//                            requireImp, 
+//                            x.getEmployeeId(), 
+//                            x.getDate(), 
+//                            x.getImportCode(), 
+//                            sr.isOverWrite())
+//                            ).collect(Collectors.toList());
+//            
+//            // 1.2: <call>
+////            if (outputs.size() > 0) {
+////                return;
+////            }
+//            resultOfRegisteringWorkSchedule.stream().filter(result -> !result.isHasError()).collect(Collectors.toList())
+//            .forEach(result -> {
+//                Optional<AtomTask> atomTaskOpt = result.getAtomTask();
+//                
+//                if (atomTaskOpt.isPresent()) {
+//                    atomTaskOpt.get().run();
+//                }
+//            });
+//            
+//            // 2: List<勤務予定の登録処理結果> : anyMatch $.エラーがあるか == true 社員IDを指定して社員を取得する(List<社員ID>)
+//            resultOfRegisteringWorkSchedule.stream().forEach(x -> {
+//                if (x.isHasError()) {
+//                    employeeIds.add(x.getErrorInformation().get(0).getEmployeeId());
+//                }
+//            });
+//            List<EmployeeImport> employeeImports = empEmployeeAdapter.findByEmpId(employeeIds);
+//            employeeImports.stream().forEach(x -> {
+//                List<ResultOfRegisteringWorkSchedule> results = resultOfRegisteringWorkSchedule.stream()
+//                        .filter(y -> y.isHasError() ? y.getErrorInformation().get(0).getEmployeeId().equals(x.getEmployeeId()) : y.isHasError()).collect(Collectors.toList());
+//                results.forEach(result -> {
+//                    outputs.add(new RegisterWorkScheduleOutput(
+//                            x.getEmployeeCode(),
+//                            x.getEmployeeName(), 
+//                            result.getErrorInformation().get(0).getDate().toString("yyyy/MM/dd"),
+//                            result.getErrorInformation().get(0).getAttendanceItemId().isPresent() ? result.getErrorInformation().get(0).getAttendanceItemId().get() : 0,
+//                                    result.getErrorInformation().get(0).getErrorMessage()));
+//                });
+//            });
+//        });
+//        
+//
+//
+//        return outputs;
+//    }
+    
+
+
+    @Override
+    protected void handle(CommandHandlerContext<ScheduleRegisterCommand> context) {
+        ScheduleRegisterCommand command = context.getCommand();
+        val asyncTask = context.asAsync();
+        TaskDataSetter setter = asyncTask.getDataSetter();
+        
         List<String> importCodes = command.getTargets().stream().map(x -> x.getImportCode()).distinct().collect(Collectors.toList());
+        // loop:社員ID in 社員IDリスト
         List<String> employeeList = command.getTargets().stream().map(x -> x.getEmployeeId()).distinct().collect(Collectors.toList());
+        // loop:年月日 in 年月日リスト
         List<GeneralDate> dates = command.getTargets().stream()
                 .map(x -> GeneralDate.fromString(x.getDate(), "yyyy/MM/dd"))
                 .distinct().sorted().collect(Collectors.toList());
         DatePeriod period = dates.size() > 0 ? new DatePeriod(dates.get(0), dates.get(dates.size() - 1)) : null;
         RequireImp requireImp = new RequireImp(importCodes, employeeList, period);
-        ScheduleRegister sr =  command.toDomain();
         
-        Map<String, List<ScheduleRegisterTarget>> mapTargetBySid = sr.getTargets().stream().
-                collect(Collectors.groupingBy(target -> target.getEmployeeId()));
-        List<List<ScheduleRegisterTarget>> listTargetBySid = mapTargetBySid.entrySet().stream().map(x -> x.getValue())
-                .collect(Collectors.toList());
-        List<String> employeeIds = new ArrayList<String>();
-        this.parallel.forEach(listTargetBySid, targets -> {
-            // 1.1: 作る(Require, 社員ID, 年月日, シフトマスタ取り込みコード, boolean)
-            List<ResultOfRegisteringWorkSchedule> resultOfRegisteringWorkSchedule = 
-                    targets
-                    .stream()
-                    .map(x -> CreateWorkScheduleByImportCode.create(
-                            requireImp, 
+        // 1.1: 作る(Require, 社員ID, 年月日, シフトマスタ取り込みコード, boolean)
+        ScheduleRegisterDto sr =  command.toDomain();
+        List<ResultOfRegisteringWorkSchedule> resultOfRegisteringWorkSchedule = 
+                sr.getTargets()
+                  .stream()
+                  .map(x -> CreateWorkScheduleByImportCode.create(
+                           requireImp, 
                             x.getEmployeeId(), 
                             x.getDate(), 
                             x.getImportCode(), 
                             sr.isOverWrite())
-                            ).collect(Collectors.toList());
+                  ).collect(Collectors.toList());
+        
+        // 1.2: call()
+        boolean isRegister = false;
+        for (ResultOfRegisteringWorkSchedule result : resultOfRegisteringWorkSchedule) {
+            Optional<AtomTask> atomTaskOpt = result.getAtomTask();
             
-            // 1.2: <call>
-            if (outputs.size() > 0) {
-                return;
+            if (atomTaskOpt.isPresent()) {
+                isRegister = true;
+                atomTaskOpt.get().run();
             }
-            resultOfRegisteringWorkSchedule.stream().filter(result -> !result.isHasError()).collect(Collectors.toList())
-            .forEach(result -> {
-                Optional<AtomTask> atomTaskOpt = result.getAtomTask();
-                
-                if (atomTaskOpt.isPresent()) {
-                    atomTaskOpt.get().run();
-                }
-            });
-            
-            // 2: List<勤務予定の登録処理結果> : anyMatch $.エラーがあるか == true 社員IDを指定して社員を取得する(List<社員ID>)
-            resultOfRegisteringWorkSchedule.stream().forEach(x -> {
-                if (x.isHasError()) {
-                    employeeIds.add(x.getErrorInformation().get(0).getEmployeeId());
-                }
-            });
-            List<EmployeeImport> employeeImports = empEmployeeAdapter.findByEmpId(employeeIds);
-            employeeImports.stream().forEach(x -> {
-                List<ResultOfRegisteringWorkSchedule> results = resultOfRegisteringWorkSchedule.stream()
-                        .filter(y -> y.isHasError() ? y.getErrorInformation().get(0).getEmployeeId().equals(x.getEmployeeId()) : y.isHasError()).collect(Collectors.toList());
-                results.forEach(result -> {
-                    outputs.add(new RegisterWorkScheduleOutput(
-                            x.getEmployeeCode(),
-                            x.getEmployeeName(), 
-                            result.getErrorInformation().get(0).getDate().toString("yyyy/MM/dd"),
-                            result.getErrorInformation().get(0).getAttendanceItemId().isPresent() ? result.getErrorInformation().get(0).getAttendanceItemId().get() : 0,
-                                    result.getErrorInformation().get(0).getErrorMessage()));
-                });
-            });
+        }
+        
+        // 2: List<勤務予定の登録処理結果> : anyMatch $.エラーがあるか == true 社員IDを指定して社員を取得する(List<社員ID>)
+        List<String> employeeIds = new ArrayList<String>();
+        resultOfRegisteringWorkSchedule.stream().forEach(x -> {
+            if (x.isHasError()) {
+                employeeIds.add(x.getErrorInformation().get(0).getEmployeeId());
+            }
         });
         
-
-
-        return outputs;
+        boolean isError = false;
+        if (employeeIds.size() > 0) {
+            isError = true;
+        }
+        List<EmployeeImport> employeeImports = empEmployeeAdapter.findByEmpId(employeeIds);
+        for (int i = 0; i < employeeImports.size(); i++) {
+            EmployeeImport employeeImport = employeeImports.get(i);
+            List<ResultOfRegisteringWorkSchedule> results = resultOfRegisteringWorkSchedule.stream()
+                    .filter(y -> y.isHasError() ? 
+                            y.getErrorInformation().get(0).getEmployeeId()
+                            .equals(employeeImport.getEmployeeId()) : y.isHasError())
+                    .collect(Collectors.toList());
+            for (int j = 0; j < results.size(); j++) {
+                JsonObject value = Json.createObjectBuilder()
+                        .add("employeeCode", employeeImport.getEmployeeCode())
+                        .add("employeename", employeeImport.getEmployeeName())
+                        .add("date", results.get(j).getErrorInformation().get(0).getDate().toString("yyyy/MM/dd"))
+                        .add("errorItemId", results.get(j).getErrorInformation().get(0).getAttendanceItemId().isPresent() ? results.get(j).getErrorInformation().get(0).getAttendanceItemId().get() : 0)
+                        .add("errorMessage", results.get(j).getErrorInformation().get(0).getErrorMessage())
+                        .build();
+                setter.setData("ERROR" + employeeImport.getEmployeeCode() + j, value);
+            }
+        }
+        setter.setData("STATUS_REGISTER", isRegister);
+        setter.setData("STATUS_ERROR", isError);
     }
     
     private class RequireImp implements CreateWorkScheduleByImportCode.Require {

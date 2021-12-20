@@ -12,6 +12,7 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.absencel
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.annualleave.AnnLeaRemNumEachMonth;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.care.CareRemNumEachMonth;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.childcare.ChildcareRemNumEachMonth;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.publicholiday.PublicHolidayRemNumEachMonth;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.reserveleave.RsvLeaRemNumEachMonth;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.specialholiday.SpecialHolidayRemainData;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureId;
@@ -77,6 +78,8 @@ public interface RemainMergeRepository {
 	
 	void persistAndUpdate(RsvLeaRemNumEachMonth domain);
 	
+	void persistAndUpdate(PublicHolidayRemNumEachMonth domain);
+	
 	/**
 	 * 削除
 	 * @param key 月別実績プライマリキー
@@ -108,6 +111,8 @@ public interface RemainMergeRepository {
 	void removeSpecHoliday(String employeeId, YearMonth yearMonth, ClosureId closureId, ClosureDate closureDate);
 	
 	void removeSpecHoliday(String employeeId, YearMonth yearMonth, ClosureId closureId, ClosureDate closureDate, int no);
+	
+	void removeMonpublicHoliday(String employeeId, YearMonth yearMonth);
 	
 	/**
 	 * @author hoatt

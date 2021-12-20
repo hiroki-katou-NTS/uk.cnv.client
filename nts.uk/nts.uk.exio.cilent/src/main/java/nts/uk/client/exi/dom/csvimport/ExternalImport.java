@@ -23,6 +23,7 @@ public class ExternalImport {
     private static final String SERVICE_URL_PREPARE = "/nts.uk.com.web/webapi/exio/input/prepare";
     private static final String SERVICE_URL_EXECUTE = "/nts.uk.com.web/webapi/exio/input/execute";
     private static final String SERVICE_URL_ASYNC = "/nts.uk.com.web/webapi/ntscommons/arc/task/async/info/";
+	private static final String SERVICE_URL_CHECKERROR =  "/nts.uk.com.web/webapi/exio/input/errors/";
 
 	private String serverUrl;
     private String constractCode;
@@ -90,6 +91,8 @@ public class ExternalImport {
 			awaitComplated(cookieList, taskId);
 		}
 
+		checkErrorMessage("受入準備",cookieList);
+		
 		LogManager.out("外部受入 事前チェック -- 終了 --");
 	}
 
@@ -108,6 +111,8 @@ public class ExternalImport {
 		if ((boolean) result.jsonAsyncTaskInfo.get("running")) {
 			awaitComplated(cookieList, taskId);
 		}
+
+		checkErrorMessage("受入実行", cookieList);
 		
 		LogManager.out("外部受入 実行 -- 終了 --");
 	}
@@ -192,6 +197,24 @@ public class ExternalImport {
 		public CallWebServiceResult(List<String> setCookies, Map<String, Object> jsonAsyncTaskInfo) {
 			this.setCookies = setCookies;
 			this.jsonAsyncTaskInfo = jsonAsyncTaskInfo;
+		}
+	}
+
+	private void checkErrorMessage(String processName, List<String> cookieList) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		int errorsCount = 1;
+		for (int requestCount = 1;; requestCount++) {
+			URL checkErrorsUrl = new URL(serverUrl + SERVICE_URL_CHECKERROR + this.settingCode + "/" + requestCount);
+			CallWebServiceResult errorCheckResult = callWebService(checkErrorsUrl, "", cookieList);
+			sb.append(errorCheckResult.jsonAsyncTaskInfo.get("text"));
+			errorsCount = (int) errorCheckResult.jsonAsyncTaskInfo.get("errorsCount");
+			
+			if(errorsCount == 0) break;
+		}
+		
+		if(sb.length()>0) {
+			String errorMessage = processName + "が完了しましたが、以下のエラーが発生しています。\r\n" + sb.toString();
+			LogManager.err(errorMessage);
 		}
 	}
 }

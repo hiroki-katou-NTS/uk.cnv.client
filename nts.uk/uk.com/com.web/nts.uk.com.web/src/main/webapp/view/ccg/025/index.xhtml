@@ -8,29 +8,125 @@
 	<ui:composition template="../../../master/base.xhtml">
 		<ui:define name="htmlHead">
 			<com:scriptfile set="IGNITE" />
-			<com:stylefile path="/view/sample/catalog/catalog.css" />
-			<com:scriptfile path="/view/sample/catalog/catalog.js" />
-			<com:scriptfile path="ccg025.a.start.js" />
 
 			<com:stylefile path="component/component.css" />
 			<com:scriptfile path="component/component.service.js" />
 			<com:scriptfile path="component/component.vm.js" />
+
+			<com:stylefile path="/view/sample/catalog/catalog.css" />
+			<com:scriptfile path="/view/sample/catalog/catalog.js" />
+			<com:scriptfile path="ccg025.a.start.js" />
 		</ui:define>
 		<ui:define name="content">
 			<div id="contents-area">
 				<div id="side-menu" class="cf"></div>
 				<div id="content" class="cf">
 					<h2>CCG025 Testing page</h2>
-					<h3>roleType: 1, multiple: false</h3>
+					<div class="valign-center control-group">
+						<div data-bind="ntsFormLabel: {required: false, text: 'roleType'}"/>
+						<div data-bind="ntsComboBox: {
+											options: [
+												{value: 0, name: '0 - SYSTEM_MANAGER'},
+												{value: 1, name: '1 - COMPANY_MANAGER'},
+												{value: 2, name: '2 - GROUP_COMAPNY_MANAGER'},
+												{value: 3, name: '3 - EMPLOYMENT'},
+												{value: 4, name: '4 - SALARY'},
+												{value: 5, name: '5 - HUMAN_RESOURCE'},
+												{value: 6, name: '6 - OFFICE_HELPER'},
+												{value: 7, name: '7 - MY_NUMBER'},
+												{value: 8, name: '8 - PERSONAL_INFO'}
+											],
+											optionsValue: 'value',
+											visibleItemsCount: 5,
+											value: roleType,
+											optionsText: 'name',
+								}">
+						</div>
+					</div>
+					<div class="valign-center control-group">
+						<div data-bind="ntsFormLabel: {required: false, text: 'roleAtr'}"/>
+						<div data-bind="ntsComboBox: {
+											options: [
+												{value: -1, name: 'UNDIFINED'},
+												{value: 0, name: 'INCHARGE'},
+												{value: 1, name: 'GENERAL'}
+											],
+											optionsValue: 'value',
+											visibleItemsCount: 5,
+											value: roleAtr,
+											optionsText: 'name',
+								}">
+						</div>
+					</div>
+					<div class="valign-center control-group">
+						<div data-bind="ntsFormLabel: {required: false, text: 'onDialog'}"/>
+						<div data-bind="ntsCheckBox: { checked: onDialog }"> </div>
+					</div>
+					<div class="valign-center control-group">
+						<div data-bind="ntsFormLabel: {required: false, text: 'multiple'}"/>
+						<div data-bind="ntsCheckBox: { checked: multiple }"> </div>
+					</div>
+					<div class="valign-center control-group">
+						<div data-bind="ntsFormLabel: {required: false, text: 'isAlreadySetting'}"/>
+						<div data-bind="ntsCheckBox: { checked: isAlreadySetting }"> </div>
+						<button data-bind="visible: isAlreadySetting(), click: setConfigured">Set</button>
+						<button data-bind="visible: isAlreadySetting(), click: unSetConfigured">Unset</button>
+					</div>
+					<div class="control-group valign-center" data-bind="if: isAlreadySetting">
+						<div style="margin-left: 110px" data-bind="ntsFormLabel: {required: false, text: 'alreadySetList'}"/>
+						<div style="width: 420px" data-bind="ntsComboBox: {
+											options: listRole,
+											optionsValue: 'roleId',
+											visibleItemsCount: 5,
+											value: selectedSetId,
+											optionsText: 'roleCode',
+											selectFirstIfNull: false,
+											columns: [
+                                                { prop: 'roleCode', length: 10 },
+                                                { prop: 'roleId', length: 10 },
+                                            ]
+								}">
+						</div>
+					</div>
+					<div class="valign-center control-group">
+						<div data-bind="ntsFormLabel: {required: false, text: 'showEmptyItem'}"/>
+						<div data-bind="ntsCheckBox: { checked: showEmptyItem }"> </div>
+					</div>
+					<div class="control-group valign-center">
+						<div data-bind="ntsFormLabel: {}">Select Type:</div>
+						<div data-bind="ntsRadioBoxGroup: {
+                                    options: selectTypes,
+                                    optionsValue: 'value',
+                                    optionsText: 'name',
+                                    value: selectType,
+                                    enable: true}"/>
+					</div>
+					<div class="control-group valign-center" data-bind="if: selectType() == 1">
+						<div style="margin-left: 110px" data-bind="ntsFormLabel: {required: false, text: 'selectedId'}"/>
+						<div style="width: 420px" data-bind="ntsComboBox: {
+											options: listRole,
+											optionsValue: 'roleId',
+											visibleItemsCount: 5,
+											value: selectedId,
+											optionsText: 'roleCode',
+											selectFirstIfNull: false,
+											columns: [
+                                                { prop: 'roleCode', length: 10 },
+                                                { prop: 'roleId', length: 10 },
+                                            ]
+								}">
+						</div>
+					</div>
+					<div class="valign-center control-group">
+						<div data-bind="ntsFormLabel: {required: false, text: 'rows'}"/>
+						<input data-bind="ntsNumberEditor: {value: rows}" />
+					</div>
 					<br />
 					<div data-bind="with: componentViewmodel">
-						<div id="pannel-top"
-							data-bind="ntsPanel:{width: '350px', height: '320px', direction: '', showIcon: true, visible: true}">
-							<ui:include src="component/index.xhtml" />
-						</div>
+						<ui:include src="component/index.xhtml" />
 						<div>
-							<b>CurrentCode:</b> <span
-								data-bind="text: ko.toJSON(currentCode)"></span>
+							<b>Current Selected Item:</b> <span
+								data-bind="text: $parent.displaySelected"></span>
 						</div>
 					</div>
 					<article class="cf">
@@ -112,7 +208,7 @@
 												Multiple or Single mode</td>
 										</tr>
 										<tr>
-											<td>currentCode<br />
+											<td>selectedId<br />
 											<i>(optional)</i></td>
 											<td><b>Type:</b> KnockoutObservable&lt;string&gt; |
 												KnockoutObservableArray&lt;string&gt;<br /> <b>Default:</b>
@@ -125,6 +221,54 @@
 											<td><b>Type:</b> number<br /> <b>Default:</b> 0<br />
 												Set tabindex for component</td>
 										</tr>
+                                        <tr>
+                                            <td>showEmptyItem<br />
+                                                <i>(optional)</i></td>
+                                            <td><b>Type:</b> boolean<br /> <b>Default:</b> false<br />
+                                                Show/Hide empty item row</td>
+                                        </tr>
+                                        <tr>
+                                            <td>roleAtr<br />
+                                                <i>(optional)</i></td>
+                                            <td><b>Type:</b> number<br /> <b>Default:</b> undefined<br />
+                                                undefined: show switch button, 0: 担当 (hide switch), 1: 一般 (hide switch)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>isResize<br />
+                                                <i>(optional)</i></td>
+                                            <td><b>Type:</b> boolean<br /> <b>Default:</b> false<br />
+                                                enable/disable resizable columns</td>
+                                        </tr>
+                                        <tr>
+                                            <td>rows<br />
+                                                <i>(optional)</i></td>
+                                            <td><b>Type:</b> number<br /> <b>Default:</b> 15<br />
+                                                max row display</td>
+                                        </tr>
+                                        <tr>
+                                            <td>isAlreadySetting<br />
+                                                <i>(optional)</i></td>
+                                            <td><b>Type:</b> boolean<br /> <b>Default:</b> false<br />
+                                                show/hide already set column</td>
+                                        </tr>
+                                        <tr>
+                                            <td>alreadySetList<br />
+                                                <i>(optional)</i></td>
+                                            <td><b>Type:</b> Array&lt;string&gt; | KnockoutObservableArray&lt;string&gt;<br />
+                                                list of already set role ID</td>
+                                        </tr>
+                                        <tr>
+                                            <td>selectType<br />
+                                                <i>(optional)</i></td>
+                                            <td><b>Type:</b> number<br /> <b>Default:</b> 3<br />
+                                                1: select by list ID, 2: select all (multiple), 3: select first item, 4: select none</td>
+                                        </tr>
+                                        <tr>
+                                            <td>onDialog<br />
+                                                <i>(optional)</i></td>
+                                            <td><b>Type:</b> boolean<br /> <b>Default:</b> false<br />
+                                                hide background panel when onDialog == true</td>
+                                        </tr>
 									</tbody>
 								</table>
 								<pre>
@@ -153,17 +297,17 @@ self.component = new ccg.component.viewmodel.ComponentModel({
 												find by roleType</td>
 										</tr>
 										<tr>
-											<td>currentCode</td>
+											<td>currentRoleId</td>
 											<td><b>Type:</b> KnockoutObservable&lt;string&gt; |
 												KnockoutObservableArray&lt;string&gt;<br /> Current selected
-												code or list current selected code</td>
+												role ID or list current selected role ID</td>
 										</tr>
 									</tbody>
 								</table>
 								<pre>
 									<![CDATA[// Demo
 self.component.listRole(); // Get list Role
-self.component.currentCode(); // Get single/list selected Role]]>
+self.component.currentRoleId(); // Get single/list selected Role]]>
 								</pre>
 							</div>
 						</div>

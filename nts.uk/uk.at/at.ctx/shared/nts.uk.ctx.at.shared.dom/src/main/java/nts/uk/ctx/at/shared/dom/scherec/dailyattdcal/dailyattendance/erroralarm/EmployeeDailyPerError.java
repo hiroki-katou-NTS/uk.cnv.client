@@ -3,6 +3,7 @@ package nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.erroralarm
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,7 @@ import nts.arc.time.GeneralDate;
  */
 @Getter
 @NoArgsConstructor
-public class EmployeeDailyPerError extends AggregateRoot {
+public class EmployeeDailyPerError extends AggregateRoot implements Cloneable {
 	private String id;
 	/** 会社ID: 会社ID */
 	private String companyID;
@@ -119,5 +120,11 @@ public class EmployeeDailyPerError extends AggregateRoot {
 		this.errorAlarmMessage = Optional.empty();
 	}
 	
+	@Override
+	public EmployeeDailyPerError clone() {
+		return new EmployeeDailyPerError(id, companyID, employeeID, date, new ErrorAlarmWorkRecordCode(errorAlarmWorkRecordCode.v()), 
+				attendanceItemList.stream().map(x -> x.intValue()).collect(Collectors.toList()),
+				errorCancelAble, errorAlarmMessage.map(x -> x.v()).orElse(null));
+	}
 	
 }

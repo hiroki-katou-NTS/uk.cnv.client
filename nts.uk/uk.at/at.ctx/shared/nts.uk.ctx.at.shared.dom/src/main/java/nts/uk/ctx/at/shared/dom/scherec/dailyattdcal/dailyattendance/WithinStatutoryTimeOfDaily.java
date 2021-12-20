@@ -41,6 +41,7 @@ import nts.uk.shr.com.enumcommon.NotUseAtr;
 
 /**
  * 日別実績の所定内時間
+ * 日別勤怠の所定内時間(new)
  * @author keisuke_hoshina
  */
 @Getter
@@ -59,8 +60,8 @@ public class WithinStatutoryTimeOfDaily {
 	@Setter
 	private WithinStatutoryMidNightTime withinStatutoryMidNightTime = new WithinStatutoryMidNightTime(TimeDivergenceWithCalculation.sameTime(new AttendanceTime(0)));
 
-
-	/** 就業時間金額 **/
+	/** 所定内労働時間金額   -  就業時間金額 ? **/
+	@Setter
 	private AttendanceAmountDaily withinWorkTimeAmount = new AttendanceAmountDaily(0);
 
 

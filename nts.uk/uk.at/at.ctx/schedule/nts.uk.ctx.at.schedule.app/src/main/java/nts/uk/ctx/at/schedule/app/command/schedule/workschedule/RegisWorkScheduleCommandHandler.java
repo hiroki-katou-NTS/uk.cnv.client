@@ -13,12 +13,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
+import javax.json.Json;
+import javax.json.JsonObject;
 
 import lombok.AllArgsConstructor;
+import lombok.val;
+import nts.arc.layer.app.command.AsyncCommandHandler;
 import nts.arc.layer.app.command.CommandHandlerContext;
-import nts.arc.layer.app.command.CommandHandlerWithResult;
+import nts.arc.task.data.TaskDataSetter;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.schedule.dom.adapter.classification.SClsHistImported;
@@ -69,8 +74,8 @@ import nts.uk.shr.com.context.AppContexts;
  */
 
 @Stateless
-@Transactional
-public class RegisWorkScheduleCommandHandler<T> extends CommandHandlerWithResult<List<WorkScheduleSaveCommand<T>>, ResultRegisWorkSchedule>{
+@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+public class RegisWorkScheduleCommandHandler<T> extends AsyncCommandHandler<List<WorkScheduleSaveCommand<T>>>{
 	
 	@Inject
 	private BasicScheduleService basicScheduleService;
@@ -112,10 +117,17 @@ public class RegisWorkScheduleCommandHandler<T> extends CommandHandlerWithResult
 	@Inject
 	private EmpEmployeeAdapter empAdapter;
 	
+	private final String STATUS_REGISTER = "STATUS_REGISTER";
+	private final String STATUS_ERROR = "STATUS_ERROR";
+	
 	@Override
-	protected ResultRegisWorkSchedule handle(CommandHandlerContext<List<WorkScheduleSaveCommand<T>>> context) {
+	protected void handle(CommandHandlerContext<List<WorkScheduleSaveCommand<T>>> context) {
 
 		List<WorkScheduleSaveCommand<T>> commands = context.getCommand();
+		
+		val asyncTask = context.asAsync();
+		
+        TaskDataSetter setter = asyncTask.getDataSetter();
 
 		Map<String, List<WorkScheduleSaveCommand<T>>> mapBySid = commands.stream().collect(Collectors.groupingBy(item -> item.getSid()));
 		
@@ -160,10 +172,7 @@ public class RegisWorkScheduleCommandHandler<T> extends CommandHandlerWithResult
 		
 		// step3
 		List<ResultOfRegisteringWorkSchedule> lstRsHasErrors = lstRsOfRegisWorkSchedule.stream().filter(i -> i.isHasError() == true).collect(Collectors.toList());
-		ResultRegisWorkSchedule rs = new ResultRegisWorkSchedule();
-		rs.setRegistered(isRegistered);
 		boolean isError = false;
-		List<ErrorInfomation> listErrorInfo = new ArrayList<>();
 		List<ErrorInfoOfWorkSchedule> errorInformations = new ArrayList<>();
 		
 		if (lstRsHasErrors.size() > 0) {
@@ -180,21 +189,20 @@ public class RegisWorkScheduleCommandHandler<T> extends CommandHandlerWithResult
 			for (int k = 0; k < lstEmpInfo.size(); k++) {
 				EmployeeImport empImport = lstEmpInfo.get(k);
 				List<ErrorInfoOfWorkSchedule> errorInforOfEmp = errorInformations.stream().filter(i -> i.getEmployeeId().equals(empImport.getEmployeeId())).collect(Collectors.toList());
-				for (int h = 0; h < errorInforOfEmp.size(); h++) {
-					ErrorInfomation errorInfomation = new ErrorInfomation(
-							empImport.getEmployeeId(),
-							empImport.getEmployeeCode(), 
-							empImport.getEmployeeName(), 
-							errorInforOfEmp.get(h).getDate(), 
-							errorInforOfEmp.get(h).getAttendanceItemId().orElse(null),
-							errorInforOfEmp.get(h).getErrorMessage());
-					listErrorInfo.add(errorInfomation);
+				for (int x = 0; x < errorInforOfEmp.size(); x++) {
+					JsonObject value = Json.createObjectBuilder()
+							.add("sid", empImport.getEmployeeId())
+							.add("scd", empImport.getEmployeeCode())
+							.add("empName", empImport.getEmployeeName())
+							.add("date", errorInforOfEmp.get(x).getDate().toString())
+							.add("attendanceItemId", errorInforOfEmp.get(x).getAttendanceItemId().isPresent() ? errorInforOfEmp.get(x).getAttendanceItemId().get().toString() : "" )
+							.add("errorMessage", errorInforOfEmp.get(x).getErrorMessage()).build();
+					setter.setData("ERROR"+k+""+x, value);
 				}
 			}
 		}
-		rs.setHasError(isError);
-		rs.setListErrorInfo(listErrorInfo);
-		return rs;
+		setter.setData(STATUS_REGISTER, isRegistered);
+		setter.setData(STATUS_ERROR, isError);
 	}
 	
 	@AllArgsConstructor

@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import nts.uk.ctx.exio.dom.input.ExecutionContext;
 import nts.uk.ctx.exio.dom.input.canonicalize.methods.CanonicalizationMethodRequire;
 import nts.uk.ctx.exio.dom.input.canonicalize.methods.EmployeeCodeCanonicalization;
-import nts.uk.ctx.exio.dom.input.canonicalize.methods.IntermediateResult;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.IntermediateResult;
 import nts.uk.ctx.exio.dom.input.errors.ExternalImportError;
 import nts.uk.ctx.exio.dom.input.setting.assembly.RevisedDataRecord;
 
@@ -42,7 +42,7 @@ public class CanonicalizeUtil {
 				.map(stream -> stream.collect(toList()))
 				.ifRight(process)
 				.ifLeft(errors -> errors.forEach(error -> {
-					require.add(context, ExternalImportError.of(error));
+					require.add(ExternalImportError.of(context.getDomainId(), error));
 				}));
 		}
 	}

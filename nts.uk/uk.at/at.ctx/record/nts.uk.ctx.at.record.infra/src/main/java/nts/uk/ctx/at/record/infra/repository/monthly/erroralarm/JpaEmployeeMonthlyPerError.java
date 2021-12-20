@@ -7,8 +7,11 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.val;
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.arc.layer.infra.data.database.DatabaseProduct;
 import nts.arc.time.YearMonth;
 import nts.uk.ctx.at.record.infra.entity.monthly.erroralarm.KrcdtEmployeeMonthlyPerError;
 import nts.uk.ctx.at.record.infra.entity.monthly.erroralarm.KrcdtEmployeeMonthlyPerErrorPK;
@@ -57,7 +60,7 @@ public class JpaEmployeeMonthlyPerError extends JpaRepository implements Employe
 				domain.getEmployeeID(),
 				domain.getClosureId().value,
 				domain.getClosureDate().getClosureDay().v(),
-				domain.getClosureDate().getLastDayOfMonth() ? 1 : 0);
+				domain.getClosureDate().getLastDayOfMonth());
 		
 		// 登録・更新
 		KrcdtEmployeeMonthlyPerError entity = this.getEntityManager().find(KrcdtEmployeeMonthlyPerError.class, key);
@@ -73,11 +76,11 @@ public class JpaEmployeeMonthlyPerError extends JpaRepository implements Employe
 
 	@Override
 	public void removeAll(String employeeID, YearMonth yearMonth, ClosureId closureId, ClosureDate closureDate) {
-		
+				
 		this.getEntityManager().createQuery(REMOVE_EMP).setParameter("employeeID", employeeID)
 				.setParameter("yearMonth", yearMonth.v()).setParameter("closureId", closureId.value)
 				.setParameter("closeDay", closureDate.getClosureDay().v())
-				.setParameter("isLastDay", closureDate.getLastDayOfMonth() ? 1 : 0).executeUpdate();
+				.setParameter("isLastDay", closureDate.getLastDayOfMonth()).executeUpdate();
 		
 //		this.getEntityManager().flush();
 	}
@@ -88,7 +91,7 @@ public class JpaEmployeeMonthlyPerError extends JpaRepository implements Employe
 		return this.getEntityManager().createQuery(FIND_ERROR, KrcdtEmployeeMonthlyPerError.class)
 				.setParameter("employeeIds", employeeID).setParameter("yearMonth", yearMonth.v())
 				.setParameter("closureId", closureId.value).setParameter("closeDay", closureDate.getClosureDay().v())
-				.setParameter("isLastDay", closureDate.getLastDayOfMonth() ? 1 : 0).getResultList().stream()
+				.setParameter("isLastDay", closureDate.getLastDayOfMonth()).getResultList().stream()
 				.map(x -> x.convertToDomain()).collect(Collectors.toList());
 	}
 

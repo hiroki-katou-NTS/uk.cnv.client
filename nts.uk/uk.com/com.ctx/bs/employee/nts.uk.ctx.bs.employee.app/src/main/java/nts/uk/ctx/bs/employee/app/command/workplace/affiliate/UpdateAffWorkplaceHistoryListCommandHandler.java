@@ -90,7 +90,7 @@ implements PeregUpdateListCommandHandler<UpdateAffWorkplaceHistoryCommand> {
 					}
 				}
 				AffWorkplaceHistoryItem histItem = AffWorkplaceHistoryItem.createFromJavaType(c.getHistoryId(),
-						c.getEmployeeId(), c.getWorkplaceId(), c.getNormalWorkplaceId());
+						c.getEmployeeId(), c.getWorkplaceId());
 				histItems.add(histItem);
 			} catch (BusinessException e) {
 				MyCustomizeException ex = new MyCustomizeException(e.getMessageId(), Arrays.asList(c.getEmployeeId()), "期間");

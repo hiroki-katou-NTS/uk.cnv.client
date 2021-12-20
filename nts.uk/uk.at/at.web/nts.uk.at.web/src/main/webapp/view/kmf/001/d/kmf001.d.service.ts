@@ -10,7 +10,9 @@ module nts.uk.pr.view.kmf001.d {
             saveByEmployment: 'ctx/at/shared/vacation/setting/employmentsetting/save',
             deleteByEmployment: 'ctx/at/shared/vacation/setting/employmentsetting/delete',
             findIsManaged: 'ctx/at/share/vacation/setting/annualpaidleave/find/setting',
-            findAllByEmployment: 'ctx/at/shared/vacation/setting/employmentsetting/findAll'
+            findAllByEmployment: 'ctx/at/shared/vacation/setting/employmentsetting/findAll',
+            findLeaveCount: "at/shared/scherec/leaveCount/get",
+            registerLeaveCount: "at/shared/scherec/leaveCount/register"
         };
 
         
@@ -44,6 +46,13 @@ module nts.uk.pr.view.kmf001.d {
             return nts.uk.request.ajax(paths.findAllByEmployment);
         }
         
+        export function findLeaveCount(): JQueryPromise<any> {
+          return nts.uk.request.ajax(paths.findLeaveCount);
+        }
+
+        export function registerLeaveCount(param: any): JQueryPromise<any> {
+          return nts.uk.request.ajax(paths.registerLeaveCount, param);
+        }
 
         /**
         * Model namespace.

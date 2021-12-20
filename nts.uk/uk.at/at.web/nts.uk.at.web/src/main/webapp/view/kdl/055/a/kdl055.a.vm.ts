@@ -57,6 +57,18 @@ module nts.uk.at.view.kdl055.a.viewmodel {
                 }
             });
 
+            vm.scheduleImport.captureCheckSheet.subscribe((value) => {
+                if (!value) {
+                    vm.$errors('clear', ['#captureSheet']);
+                }
+            })
+
+            vm.scheduleImport.captureCheckCell.subscribe((value) => {
+                if (!value) {
+                    vm.$errors('clear', ['#captureCell']);
+                }
+            })
+
         }
 
         intakeInput() {
@@ -66,39 +78,43 @@ module nts.uk.at.view.kdl055.a.viewmodel {
                 vm.$dialog.error({ messageId: "Msg_722" });  
                 return; 
             }
-            vm.$blockui('show');
             // call api upload file
-            $('#file-upload').ntsFileUpload({ stereoType: "excelFile" }).done((res: any) => {
-                console.log(res);
-                vm.fileID(res[0].id);
-                vm.filename(res[0].originalName);
-                // save to cache
-                characteristics.save('ScheduleImport', ko.toJS(vm.scheduleImport));
-            }).then((res: any) => {
-                if (res) {
-                    let param = {
-                        fileID: vm.fileID(),
-                        captureSheet: vm.scheduleImport.captureSheet(),
-                        captureCheckSheet: vm.scheduleImport.captureCheckSheet(),
-                        captureCell: vm.scheduleImport.captureCell(),
-                        captureCheckCell: vm.scheduleImport.captureCheckCell(),
-                        overwrite: vm.scheduleImport.overwrite()
-                    };
-    
-                    return vm.$ajax(paths.checkFileUpload, param);
+            vm.$validate().then((valid) => {
+                if (valid) {
+                    vm.$blockui('show');
+                    $('#file-upload').ntsFileUpload({ stereoType: "excelFile" }).done((res: any) => {
+                        console.log(res);
+                        vm.fileID(res[0].id);
+                        vm.filename(res[0].originalName);
+                        // save to cache
+                        characteristics.save('ScheduleImport', ko.toJS(vm.scheduleImport));
+                    }).then((res: any) => {
+                        if (res) {
+                            let param = {
+                                fileID: vm.fileID(),
+                                captureSheet: vm.scheduleImport.captureSheet(),
+                                captureCheckSheet: vm.scheduleImport.captureCheckSheet(),
+                                captureCell: vm.scheduleImport.captureCell(),
+                                captureCheckCell: vm.scheduleImport.captureCheckCell(),
+                                overwrite: vm.scheduleImport.overwrite()
+                            };
+            
+                            return vm.$ajax(paths.checkFileUpload, param);
+                        }
+                    }).done((res: any) => {
+                        if (res) {
+                            vm.paramB = res;
+                            vm.paramB.startDate = vm.startDate;
+                            vm.paramB.endDate = vm.endDate;
+                            vm.close();
+                        }
+                    }).fail((err: any) => {
+                        if (err) {
+                            vm.$dialog.error({ messageId: err.messageId, messageParams: err.parameterIds });
+                        }
+                    }).always(() => vm.$blockui('hide'));
                 }
-            }).done((res: any) => {
-                if (res) {
-                    vm.paramB = res;
-                    vm.paramB.startDate = vm.startDate;
-                    vm.paramB.endDate = vm.endDate;
-                    vm.close();
-                }
-            }).fail((err: any) => {
-                if (err) {
-                    vm.$dialog.error({ messageId: err.messageId, messageParams: err.parameterIds });
-                }
-            }).always(() => vm.$blockui('hide'));
+            })
         }
 
         outputExcel() {

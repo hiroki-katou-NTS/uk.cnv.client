@@ -45,6 +45,9 @@ public class SacmtRole extends ContractUkJpaEntity implements Serializable {
 	@Column(name = "ASSIGN_ATR")
 	private int assignAtr;
 
+	@Column(name = "APPROVAL_AUTHORITY")
+	private Integer approvalAuthority;
+
 	public SacmtRole() {
 	}
 

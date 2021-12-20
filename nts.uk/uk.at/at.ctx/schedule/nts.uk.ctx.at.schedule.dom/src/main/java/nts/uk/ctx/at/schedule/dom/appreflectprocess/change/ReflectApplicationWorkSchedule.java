@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.tuple.Pair;
 
 import lombok.val;
+import nts.arc.enums.EnumAdaptor;
 import nts.arc.task.tran.AtomTask;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
@@ -19,6 +20,7 @@ import nts.uk.ctx.at.schedule.dom.schedule.workschedule.WorkSchedule;
 import nts.uk.ctx.at.schedule.dom.schedule.workschedule.snapshot.DailySnapshotWork;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.ApplicationShare;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.ApplicationTypeShare;
+import nts.uk.ctx.at.shared.dom.scherec.application.common.ReflectedStateShare;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.DailyRecordOfApplication;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.CreateApplicationReflectionHist;
@@ -42,7 +44,7 @@ import nts.uk.ctx.at.shared.dom.workrecord.workperfor.dailymonthlyprocessing.enu
 public class ReflectApplicationWorkSchedule {
 
 	public static Pair<SCReflectStatusResult, AtomTask> process(Require require, String companyId,  ApplicationShare application,
-			GeneralDate date, SCReflectStatusResult reflectStatus, int preAppWorkScheReflectAttr) {
+			GeneralDate date, SCReflectStatusResult reflectStatus, int preAppWorkScheReflectAttr, String execId) {
 		// 勤務予定から日別実績(work）を取得する
 		WorkSchedule workSchedule = require.get(application.getEmployeeID(), date).orElse(null);
 		if (workSchedule == null)
@@ -103,6 +105,7 @@ public class ReflectApplicationWorkSchedule {
 			dailyRecordApp.setDomain(lstAfterCalc.get(0));
 		}
 		
+		ReflectedStateShare before = EnumAdaptor.valueOf(reflectStatus.getReflectStatus().value, ReflectedStateShare.class);
 		AtomTask atomTask = AtomTask.of(() -> {
 			// 勤務予定の更新 --- co update , thuoc tinh ConfirmedATR
 			WorkSchedule workScheduleReflect = new WorkSchedule(dailyRecordApp.getEmployeeId(), dailyRecordApp.getYmd(),
@@ -114,7 +117,7 @@ public class ReflectApplicationWorkSchedule {
 
 			// 申請反映履歴を作成する
 			CreateApplicationReflectionHist.create(require, application.getAppID(), ScheduleRecordClassifi.SCHEDULE,
-					dailyRecordApp, domainBeforeReflect, GeneralDateTime.now());
+					dailyRecordApp, domainBeforeReflect, GeneralDateTime.now(), execId, before);
 		});
 
 		reflectStatus.setReflectStatus(SCReflectedState.REFLECTED);

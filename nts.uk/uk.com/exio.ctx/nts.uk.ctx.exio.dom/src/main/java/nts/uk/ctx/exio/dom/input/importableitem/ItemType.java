@@ -7,7 +7,7 @@ import nts.arc.i18n.I18NText;
 import nts.arc.time.GeneralDate;
 import nts.gul.text.StringUtil;
 import nts.uk.ctx.exio.dom.input.errors.ErrorMessage;
-import nts.uk.ctx.exio.dom.input.util.Either;
+import nts.gul.util.Either;
 
 /**
  * 

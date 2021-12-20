@@ -146,8 +146,9 @@ public class TemporarilyReflectStampDailyAttd {
 		case END_OF_SUPPORT:
 			// 応援開始 OR 応援終了 OR 応援出勤 OR 臨時+応援出勤
 			reflectStampSupport.reflect(companyId, stamp, integrationOfDaily, stampReflectRangeOutput);
-
+			
 			return listErrorMessageInfo;
+			
 		default:
 			return listErrorMessageInfo;
 		}

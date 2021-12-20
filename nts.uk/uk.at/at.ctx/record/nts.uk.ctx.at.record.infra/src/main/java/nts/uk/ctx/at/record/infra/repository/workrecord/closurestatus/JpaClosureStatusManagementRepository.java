@@ -39,7 +39,7 @@ public class JpaClosureStatusManagementRepository extends JpaRepository implemen
 	public Optional<ClosureStatusManagement> getById(String employeeId, YearMonth ym, int closureId,
 			ClosureDate closureDate) {
 		Optional<KrcdtClosureSts> opt = this.queryProxy().find(new KrcdtClosureSttMngPk(ym.v(), employeeId,
-				closureId, closureDate.getClosureDay().v(), closureDate.getLastDayOfMonth() ? 1 : 0),
+				closureId, closureDate.getClosureDay().v(), closureDate.getLastDayOfMonth()),
 				KrcdtClosureSts.class);
 		if (opt.isPresent())
 			return Optional.of(opt.get().toDomain());

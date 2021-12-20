@@ -1,3 +1,0 @@
-INS_DATE,INS_CCD,INS_SCD,INS_PG,UPD_DATE,UPD_CCD,UPD_SCD,UPD_PG,EXCLUS_VER,FUNCTION_NO,NAME,DESCRIPTION,DEISPLAY_ORDER,INITIAL_VALUE
-,,,,,,,,0,1,"休暇状況参照","スケジュールの修正画面で社員の休暇の情報を確認できます。",1,0
-,,,,,,,,0,2,"修正履歴参照","スケジュールの修正履歴を参照できます。",2,0

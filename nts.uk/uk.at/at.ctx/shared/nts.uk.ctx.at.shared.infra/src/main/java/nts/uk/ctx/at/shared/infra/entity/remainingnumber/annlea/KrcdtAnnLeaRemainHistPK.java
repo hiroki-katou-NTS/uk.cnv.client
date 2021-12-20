@@ -41,7 +41,7 @@ public class KrcdtAnnLeaRemainHistPK implements Serializable{
 	/** 締め日.末日とする */
 	@Column(name = "IS_LAST_DAY")
 	@Basic(optional = false)
-	public Integer isLastDay;
+	public boolean isLastDay;
 	
 	/** 付与日 */
 	@Column(name = "GRANT_DATE")

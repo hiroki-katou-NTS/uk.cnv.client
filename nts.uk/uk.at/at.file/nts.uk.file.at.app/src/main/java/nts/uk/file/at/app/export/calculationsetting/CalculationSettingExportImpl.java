@@ -1,13 +1,22 @@
 package nts.uk.file.at.app.export.calculationsetting;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import nts.arc.enums.EnumAdaptor;
+import nts.gul.text.StringUtil;
 import nts.uk.ctx.at.record.app.find.divergence.time.DivergenceAttendanceItemFinder;
 import nts.uk.ctx.at.record.dom.actualworkinghours.daily.midnight.MidnightTimeSheetRepo;
+import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.CreatingDailyResultsCondition;
+import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.CreatingDailyResultsConditionRepository;
 import nts.uk.ctx.at.record.dom.divergence.time.service.attendance.AttendanceNameDivergenceDto;
 import nts.uk.ctx.at.record.dom.workrecord.goout.OutManage;
 import nts.uk.ctx.at.record.dom.workrecord.goout.OutManageRepository;
@@ -15,21 +24,38 @@ import nts.uk.ctx.at.record.dom.workrecord.temporarywork.ManageWorkTemporary;
 import nts.uk.ctx.at.record.dom.workrecord.temporarywork.ManageWorkTemporaryRepository;
 import nts.uk.ctx.at.shared.dom.calculationsetting.StampReflectionManagement;
 import nts.uk.ctx.at.shared.dom.calculationsetting.repository.StampReflectionManagementRepository;
-import nts.uk.ctx.at.shared.dom.entranceexit.ManageEntryExit;
-import nts.uk.ctx.at.shared.dom.entranceexit.ManageEntryExitRepository;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.configuration.DayOfWeek;
-import nts.uk.ctx.at.shared.dom.monthlyattditem.MonthlyAttendanceItem;
 import nts.uk.ctx.at.shared.dom.ot.frame.OvertimeWorkFrame;
 import nts.uk.ctx.at.shared.dom.ot.frame.OvertimeWorkFrameRepository;
 import nts.uk.ctx.at.shared.dom.personallaborcondition.UseAtr;
-import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.*;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.AddSetManageWorkHour;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.AddSetManageWorkHourRepository;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.CalcurationByActualTimeAtr;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.HolidayAddtionRepository;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.HolidayAddtionSet;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.HourlyPaymentAdditionSet;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.HourlyPaymentAdditionSetRepository;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.TimeHolidayAddingMethod;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.TimeHolidayAdditionSet;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.VacationAdditionTimeRef;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.WorkClassOfTimeHolidaySet;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.WorkDeformedLaborAdditionSet;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.WorkDeformedLaborAdditionSetRepository;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.WorkFlexAdditionSet;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.WorkFlexAdditionSetRepository;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.WorkRegularAdditionSet;
+import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.WorkRegularAdditionSetRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.calculationsettings.totalrestrainttime.CalculateOfTotalConstraintTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worklabor.defor.DeformLaborOT;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worklabor.defor.DeformLaborOTRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worklabor.flex.FlexSet;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worklabor.flex.FlexSetRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.midnighttimezone.MidNightTimeSheet;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.zerotime.*;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.zerotime.HdFromHd;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.zerotime.HdFromWeekday;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.zerotime.WeekdayHoliday;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.zerotime.ZeroTime;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.zerotime.ZeroTimeRepository;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.roundingset.RoundingSetOfMonthly;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.roundingset.RoundingSetOfMonthlyRepository;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.vtotalmethod.AggregateMethodOfMonthly;
@@ -38,10 +64,9 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.flexshortage.Insu
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.flexshortage.InsufficientFlexHolidayMntRepository;
 import nts.uk.ctx.at.shared.dom.workdayoff.frame.WorkdayoffFrame;
 import nts.uk.ctx.at.shared.dom.workdayoff.frame.WorkdayoffFrameRepository;
-import nts.uk.ctx.at.shared.dom.workmanagementmultiple.WorkManagementMultiple;
-import nts.uk.ctx.at.shared.dom.workmanagementmultiple.WorkManagementMultipleRepository;
 import nts.uk.ctx.at.shared.dom.workrule.deformed.AggDeformedLaborSetting;
 import nts.uk.ctx.at.shared.dom.workrule.deformed.AggDeformedLaborSettingRepository;
+import nts.uk.ctx.at.shared.dom.workrule.goingout.GoingOutReason;
 import nts.uk.ctx.at.shared.dom.workrule.specific.SpecificWorkRuleRepository;
 import nts.uk.ctx.at.shared.dom.workrule.specific.TimeOffVacationPriorityOrder;
 import nts.uk.ctx.at.shared.dom.workrule.specific.UpperLimitTotalWorkingHour;
@@ -76,9 +101,6 @@ public class CalculationSettingExportImpl implements MasterListData {
 	private AggDeformedLaborSettingRepository aggSettingRepo;
 
 	@Inject
-	private WorkManagementMultipleRepository multipleWorkRepo;
-
-	@Inject
 	private TemporaryWorkUseManageRepository tempWorkRepo;
 
 	@Inject
@@ -92,9 +114,6 @@ public class CalculationSettingExportImpl implements MasterListData {
 
 	@Inject
     private OutManageRepository outManageRepository;
-
-	@Inject
-	private ManageEntryExitRepository entryExitRepo;
 
 	@Inject
 	private OvertimeWorkFrameRepository overtimeWorkFrameRepo;
@@ -146,6 +165,9 @@ public class CalculationSettingExportImpl implements MasterListData {
 
 	@Inject
     private ZeroTimeRepository zeroTimeRepo;
+	
+	@Inject
+	private CreatingDailyResultsConditionRepository creatingDailyResultsConditionRepository;
 
 	@Override
 	public List<SheetData> extraSheets(MasterListExportQuery query) {
@@ -218,82 +240,24 @@ public class CalculationSettingExportImpl implements MasterListData {
 	@Override
 	public List<MasterData> getMasterDatas(MasterListExportQuery query) {
 		String companyId = AppContexts.user().companyId();
-		Optional<FlexWorkSet> optFlexWorkSet = flexWorkRepo.find(companyId);
-		Optional<AggDeformedLaborSetting> optAggSetting = aggSettingRepo.findByCid(companyId);
-		Optional<WorkManagementMultiple> optWorkMultiple = multipleWorkRepo.findByCode(companyId);
-		Optional<TemporaryWorkUseManage> optTempWorkUse = tempWorkRepo.findByCid(companyId);
-		Optional<ManageWorkTemporary> optTempWorkManage = tempWorkManageRepo.findByCID(companyId);
 		Optional<MidNightTimeSheet> midNightTimeSheet = midnightTimeSheetRepo.findByCId(companyId);
 		Optional<WeekRuleManagement> weekRuleManagement = weekRuleManagementRepo.find(companyId);
-		Optional<OutManage> outManage = outManageRepository.findByID(companyId);
-		Optional<ManageEntryExit> entryExit = entryExitRepo.findByID(companyId);
 		List<MasterData> data = new ArrayList<>();
-		for (int row = 0; row < 13; row++) {
+		for (int row = 0; row < 3; row++) {
 			Map<String, MasterCellData> rowData = new HashMap<>();
 			for (int col = 0; col < 4; col++) {
 				String value = "";
 				if (row == 0) {
-					if (col == 0) value = TextResource.localize("KMK013_206");
-					else if (col == 1) value = TextResource.localize("KMK013_486");
-					else if (col == 3 && optFlexWorkSet.isPresent())
-						value = optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
-								? TextResource.localize("KMK013_209")
-								: TextResource.localize("KMK013_210");
-				} else if (row == 1) {
-					if (col == 1) value = TextResource.localize("KMK013_211");
-					else if (col == 3 && optAggSetting.isPresent())
-						value = optAggSetting.get().getUseDeformedLabor() == UseAtr.USE
-								? TextResource.localize("KMK013_209")
-								: TextResource.localize("KMK013_210");
-				} else if (row == 2) {
-					if (col == 1) value = TextResource.localize("KMK013_216");
-					else if (col == 3 && optWorkMultiple.isPresent())
-						value = optWorkMultiple.get().getUseATR().value == UseAtr.USE.value
-								? TextResource.localize("KMK013_209")
-								: TextResource.localize("KMK013_210");
-				} else if (row == 3) {
-					if (col == 1) value = TextResource.localize("KMK013_220");
-					else if (col == 3 && optTempWorkUse.isPresent())
-						value = optTempWorkUse.get().getUseClassification() == UseAtr.USE
-								? TextResource.localize("KMK013_209")
-								: TextResource.localize("KMK013_210");
-				} else if (row == 4) {
-					if (col == 2) value = TextResource.localize("KMK013_348");
-					else if (col == 3 && optTempWorkUse.isPresent() && optTempWorkUse.get().getUseClassification() == UseAtr.USE) {
-						if (optTempWorkManage.isPresent()) value = optTempWorkManage.get().getMaxUsage().v() + TextResource.localize("KMK013_471");
-					}
-				} else if (row == 5) {
-					if (col == 2) value = TextResource.localize("KMK013_349");
-					else if (col == 3 && optTempWorkUse.isPresent() && optTempWorkUse.get().getUseClassification() == UseAtr.USE) {
-						if (optTempWorkManage.isPresent()) value = new TimeWithDayAttr(optTempWorkManage.get().getTimeTreatTemporarySame().v()).getRawTimeWithFormat();
-					}
-				} else if (row == 6) {
 					if (col == 0) value = TextResource.localize("KMK013_487");
 					else if (col == 1) value = TextResource.localize("KMK013_364");
 					else if (col == 3 && midNightTimeSheet.isPresent()) value = midNightTimeSheet.get().getStart().getFullText();
-				} else if (row == 7) {
+				} else if (row == 1) {
 					if (col == 1) value = TextResource.localize("KMK013_366");
 					else if (col == 3 && midNightTimeSheet.isPresent()) value = midNightTimeSheet.get().getEnd().getFullText();
-				} else if (row == 8) {
+				} else {
 					if (col == 0) value = TextResource.localize("KMK013_488");
 					else if (col == 3 && weekRuleManagement.isPresent())
 					    value = TextResource.localize(EnumAdaptor.valueOf(weekRuleManagement.get().getWeekStart().value, DayOfWeek.class).nameId);
-				} else if (row == 9) {
-					if (col == 0) value = TextResource.localize("KMK013_489");
-					else if (col == 1) value = TextResource.localize("KMK013_289");
-					else if (col == 3) value = TextResource.localize("ENUM_APPLYATR_USE");
-				} else if (row == 10) {
-					if (col == 2) value = TextResource.localize("KMK013_290");
-					else if (col == 3 && outManage.isPresent()) value = outManage.get().getMaxUsage().v() + TextResource.localize("KMK013_471");
-				} else if (row == 11) {
-					if (col == 2) value = TextResource.localize("KMK013_292");
-					else if (col == 3 && outManage.isPresent()) value = TextResource.localize(outManage.get().getInitValueReasonGoOut().nameId);
-				} else {
-					if (col == 1) value = TextResource.localize("KMK013_227");
-					else if (col == 3 && entryExit.isPresent())
-						value = entryExit.get().getUseClassification().value == 1
-								? TextResource.localize("ENUM_APPLYATR_USE")
-								: TextResource.localize("ENUM_APPLYATR_NOT_USE");
 				}
 				rowData.put(
 						col + "",
@@ -400,7 +364,7 @@ public class CalculationSettingExportImpl implements MasterListData {
 		Optional<FlexWorkSet> optFlexWorkSet = flexWorkRepo.find(companyId);
         Optional<AggDeformedLaborSetting> optAggSetting = aggSettingRepo.findByCid(companyId);
 		List<MasterData> data = new ArrayList<>();
-        for (int row = 0; row < 71; row++) {
+        for (int row = 0; row < 68; row++) {
             Map<String, MasterCellData> rowData = new HashMap<>();
             for (int col = 0; col < 5; col++) {
                 String value = "";
@@ -530,129 +494,109 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getAddition() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 20) {
-                    if (col == 3) value = TextResource.localize("KMK013_531");
-                    else if (col == 4 && workRegularAdditionSet.isPresent()
-                            && workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
-                            && workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent()
-                            && workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getAddition() == NotUseAtr.USE
-                            && workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getDeformationExceedsPredeterminedValue().isPresent())
-                        value = workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getDeformationExceedsPredeterminedValue().get() == CalculationMethodForNormalWorkAndDeformedLaborOverTime.CALCULATE_AS_OVERTIME_HOURS
-                                ? TextResource.localize("KMK013_37")
-                                : TextResource.localize("KMK013_36");
-                } else if (row == 21) {
+				} else if (row == 20) {
                     if (col == 2) value = TextResource.localize("KMK013_524");
                     else if (col == 4 && workRegularAdditionSet.isPresent()
                             && workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getCalculateIncludCareTime() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 22) {
+                } else if (row == 21) {
                     if (col == 2) value = TextResource.localize("KMK013_525");
                     else if (col == 4 && workRegularAdditionSet.isPresent()
                             && workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getCalculateIncludIntervalExemptionTime() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 23) {
+                } else if (row == 22) {
                     if (col == 2) value = TextResource.localize("KMK013_526");
                     else if (col == 4 && workRegularAdditionSet.isPresent()
                             && workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getNotDeductLateLeaveEarly().getDeduct().isDeduct() ? "○" : "-";
-                } else if (row == 24) {
+                } else if (row == 23) {
                     if (col == 3) value = TextResource.localize("KMK013_527");
                     else if (col == 4 && workRegularAdditionSet.isPresent()
                             && workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = workRegularAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getNotDeductLateLeaveEarly().isEnableSetPerWorkHour() ? "○" : "-";
-                } else if (row == 25) {
+                } else if (row == 24) {
                     if (col == 0) value = TextResource.localize("KMK013_422");
                     else if (col == 1) value = TextResource.localize("KMK013_519");
                     else if (col == 4 && hourlyPaymentAdditionSet.isPresent())
                         value = hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                                 ? TextResource.localize("KMK013_42")
                                 : TextResource.localize("KMK013_43");
-                } else if (row == 26) {
+                } else if (row == 25) {
                     if (col == 2) value = TextResource.localize("KMK013_523");
                     else if (col == 4 && hourlyPaymentAdditionSet.isPresent()
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent())
                         value = hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getIncludeVacationSet().getAddition() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 27) {
+                } else if (row == 26) {
                     if (col == 2) value = TextResource.localize("KMK013_524");
                     else if (col == 4 && hourlyPaymentAdditionSet.isPresent()
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent())
                     value = hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getCalculateIncludCareTime() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 28) {
+                } else if (row == 27) {
                     if (col == 2) value = TextResource.localize("KMK013_525");
                     else if (col == 4 && hourlyPaymentAdditionSet.isPresent()
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent())
                         value = hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getCalculateIncludIntervalExemptionTime() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 29) {
+                } else if (row == 28) {
                     if (col == 2) value = TextResource.localize("KMK013_526");
                     else if (col == 4 && hourlyPaymentAdditionSet.isPresent()
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent())
                         value = hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getNotDeductLateLeaveEarly().getDeduct().isDeduct() ? "○" : "-";
-                } else if (row == 30) {
+                } else if (row == 29) {
                     if (col == 3) value = TextResource.localize("KMK013_527");
                     else if (col == 4 && hourlyPaymentAdditionSet.isPresent()
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent()
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getNotDeductLateLeaveEarly().getDeduct().isDeduct())
                         value = hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getNotDeductLateLeaveEarly().isEnableSetPerWorkHour() ? "○" : "-";
-                } else if (row == 31) {
+                } else if (row == 30) {
                     if (col == 1) value = TextResource.localize("KMK013_528");
                     else if (col == 4 && hourlyPaymentAdditionSet.isPresent())
                         value = hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getUseAtr() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 32) {
+                } else if (row == 31) {
                     if (col == 1) value = TextResource.localize("KMK013_529");
                     else if (col == 4 && hourlyPaymentAdditionSet.isPresent())
                         value = hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                                 ? TextResource.localize("KMK013_42")
                                 : TextResource.localize("KMK013_43");
-                } else if (row == 33) {
+                } else if (row == 32) {
                     if (col == 2) value = TextResource.localize("KMK013_523");
                     else if (col == 4 && hourlyPaymentAdditionSet.isPresent()
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getAddition() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 34) {
-                    if (col == 3) value = TextResource.localize("KMK013_531");
-                    else if (col == 4 && hourlyPaymentAdditionSet.isPresent()
-                            && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
-                            && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent()
-                            && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getAddition() == NotUseAtr.USE
-                            && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getDeformationExceedsPredeterminedValue().isPresent())
-                        value = hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getDeformationExceedsPredeterminedValue().get() == CalculationMethodForNormalWorkAndDeformedLaborOverTime.CALCULATE_AS_OVERTIME_HOURS
-                                ? TextResource.localize("KMK013_37")
-                                : TextResource.localize("KMK013_36");
-                } else if (row == 35) {
+                } else if (row == 33) {
                     if (col == 2) value = TextResource.localize("KMK013_524");
                     else if (col == 4 && hourlyPaymentAdditionSet.isPresent()
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getCalculateIncludCareTime() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 36) {
+                } else if (row == 34) {
                     if (col == 2) value = TextResource.localize("KMK013_525");
                     else if (col == 4 && hourlyPaymentAdditionSet.isPresent()
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getCalculateIncludIntervalExemptionTime() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 37) {
+                } else if (row == 35) {
                     if (col == 2) value = TextResource.localize("KMK013_526");
                     else if (col == 4 && hourlyPaymentAdditionSet.isPresent()
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getNotDeductLateLeaveEarly().getDeduct().isDeduct() ? "○" : "-";
-                } else if (row == 38) {
+                } else if (row == 366) {
                     if (col == 3) value = TextResource.localize("KMK013_527");
                     else if (col == 4 && hourlyPaymentAdditionSet.isPresent()
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = hourlyPaymentAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getNotDeductLateLeaveEarly().isEnableSetPerWorkHour() ? "○" : "-";
-                } else if (row == 39) {
+                } else if (row == 37) {
                     if (col == 0) value = TextResource.localize("KMK013_26");
                     else if (col == 1) value = TextResource.localize("KMK013_534");
                     else if (col == 4 && optFlexWorkSet.isPresent()
@@ -661,7 +605,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                                 ? TextResource.localize("KMK013_42")
                                 : TextResource.localize("KMK013_43");
-                } else if (row == 40) {
+                } else if (row == 38) {
                     if (col == 2) value = TextResource.localize("KMK013_523");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -669,7 +613,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent())
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getIncludeVacationSet().getAddition() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 41) {
+                } else if (row == 39) {
                     if (col == 3) value = TextResource.localize("KMK013_536");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -678,7 +622,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent()
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getIncludeVacationSet().getPredeterminedDeficiencyOfFlex().isPresent())
                         value = TextResource.localize(workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getIncludeVacationSet().getPredeterminedDeficiencyOfFlex().get().nameId);
-                } else if (row == 42) {
+                } else if (row == 40) {
                     if (col == 3) value = TextResource.localize("KMK013_258");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -687,7 +631,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent()
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getIncludeVacationSet().getAdditionWithinMonthlyStatutory().isPresent())
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getIncludeVacationSet().getAdditionWithinMonthlyStatutory().get() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 43) {
+                } else if (row == 41) {
                     if (col == 2) value = TextResource.localize("KMK013_524");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -695,7 +639,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent())
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getCalculateIncludCareTime() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 44) {
+                } else if (row == 42) {
                     if (col == 2) value = TextResource.localize("KMK013_525");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -703,7 +647,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent())
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getCalculateIncludIntervalExemptionTime() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 45) {
+                } else if (row == 43) {
                     if (col == 2) value = TextResource.localize("KMK013_537");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -712,7 +656,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent()
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getMinusAbsenceTime().isPresent())
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getMinusAbsenceTime().get() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 46) {
+                } else if (row == 44) {
                     if (col == 2) value = TextResource.localize("KMK013_526");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -720,7 +664,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent())
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getNotDeductLateLeaveEarly().getDeduct().isDeduct() ? "○" : "-";
-                } else if (row == 47) {
+                } else if (row == 45) {
                     if (col == 3) value = TextResource.localize("KMK013_527");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -729,13 +673,13 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent()
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getNotDeductLateLeaveEarly().getDeduct().isDeduct())
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getNotDeductLateLeaveEarly().isEnableSetPerWorkHour() ? "○" : "-";
-                } else if (row == 48) {
+                } else if (row == 46) {
                     if (col == 1) value = TextResource.localize("KMK013_528");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
                             && workFlexAdditionSet.isPresent())
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getUseAtr() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 49) {
+                } else if (row == 47) {
                     if (col == 1) value = TextResource.localize("KMK013_538");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -743,7 +687,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                                 ? TextResource.localize("KMK013_42")
                                 : TextResource.localize("KMK013_43");
-                } else if (row == 50) {
+                } else if (row == 48) {
                     if (col == 2) value = TextResource.localize("KMK013_523");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -751,7 +695,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getAddition() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 51) {
+                } else if (row == 49) {
                     if (col == 3) value = TextResource.localize("KMK013_531");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -760,7 +704,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent()
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getPredeterminedExcessTimeOfFlex().isPresent())
                         value = TextResource.localize(workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getPredeterminedExcessTimeOfFlex().get().nameId);
-                } else if (row == 52) {
+                } else if (row == 50) {
                     if (col == 2) value = TextResource.localize("KMK013_524");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -768,7 +712,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getCalculateIncludCareTime() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 53) {
+                } else if (row == 51) {
                     if (col == 2) value = TextResource.localize("KMK013_525");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -776,7 +720,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getCalculateIncludIntervalExemptionTime() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 54) {
+                } else if (row == 52) {
                     if (col == 2) value = TextResource.localize("KMK013_526");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -784,7 +728,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getNotDeductLateLeaveEarly().getDeduct().isDeduct() ? "○" : "-";
-                } else if (row == 55) {
+                } else if (row == 53) {
                     if (col == 3) value = TextResource.localize("KMK013_527");
                     else if (col == 4 && optFlexWorkSet.isPresent()
                             && optFlexWorkSet.get().getUseFlexWorkSetting() == UseAtr.USE
@@ -793,7 +737,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent()
                             && workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getNotDeductLateLeaveEarly().getDeduct().isDeduct())
                         value = workFlexAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getNotDeductLateLeaveEarly().isEnableSetPerWorkHour() ? "○" : "-";
-                } else if (row == 56) {
+                } else if (row == 54) {
                     if (col == 0) value = TextResource.localize("KMK013_27");
                     else if (col == 1) value = TextResource.localize("KMK013_541");
                     else if (col == 4 && optAggSetting.isPresent()
@@ -802,7 +746,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                         value = workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                                 ? TextResource.localize("KMK013_42")
                                 : TextResource.localize("KMK013_43");
-                } else if (row == 57) {
+                } else if (row == 55) {
                     if (col == 2) value = TextResource.localize("KMK013_523");
                     else if (col == 4 && optAggSetting.isPresent()
                             && optAggSetting.get().getUseDeformedLabor() == UseAtr.USE
@@ -810,7 +754,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent())
                         value = workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getIncludeVacationSet().getAddition() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 58) {
+                } else if (row == 56) {
                     if (col == 2) value = TextResource.localize("KMK013_524");
                     else if (col == 4 && optAggSetting.isPresent()
                             && optAggSetting.get().getUseDeformedLabor() == UseAtr.USE
@@ -818,7 +762,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent())
                         value = workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getCalculateIncludCareTime() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 59) {
+                } else if (row == 57) {
                     if (col == 2) value = TextResource.localize("KMK013_525");
                     else if (col == 4 && optAggSetting.isPresent()
                             && optAggSetting.get().getUseDeformedLabor() == UseAtr.USE
@@ -826,8 +770,8 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent())
                         value = workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getCalculateIncludIntervalExemptionTime() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 60) {
-                    if (col == 2) value = TextResource.localize("KMK013_537");
+                } else if (row == 58) {
+                    if (col == 2) value = TextResource.localize("KMK013_568");
                     else if (col == 4 && optAggSetting.isPresent()
                             && optAggSetting.get().getUseDeformedLabor() == UseAtr.USE
                             && workDeformedLaborAdditionSet.isPresent()
@@ -835,7 +779,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent()
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getMinusAbsenceTime().isPresent())
                         value = workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getMinusAbsenceTime().get() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 61) {
+                } else if (row == 59) {
                     if (col == 2) value = TextResource.localize("KMK013_526");
                     else if (col == 4 && optAggSetting.isPresent()
                             && optAggSetting.get().getUseDeformedLabor() == UseAtr.USE
@@ -843,7 +787,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent())
                         value = workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getNotDeductLateLeaveEarly().getDeduct().isDeduct() ? "○" : "-";
-                } else if (row == 62) {
+                } else if (row == 60) {
                     if (col == 3) value = TextResource.localize("KMK013_527");
                     else if (col == 4 && optAggSetting.isPresent()
                             && optAggSetting.get().getUseDeformedLabor() == UseAtr.USE
@@ -852,13 +796,13 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().isPresent()
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getNotDeductLateLeaveEarly().getDeduct().isDeduct())
                         value = workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getWorkTimeCalcMethodOfHoliday().getAdvancedSet().get().getNotDeductLateLeaveEarly().isEnableSetPerWorkHour() ? "○" : "-";
-                } else if (row == 63) {
+                } else if (row == 61) {
                     if (col == 1) value = TextResource.localize("KMK013_528");
                     else if (col == 4 && optAggSetting.isPresent()
                             && optAggSetting.get().getUseDeformedLabor() == UseAtr.USE
                             && workDeformedLaborAdditionSet.isPresent())
                         value = workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getUseAtr() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 64) {
+                } else if (row == 62) {
                     if (col == 1) value = TextResource.localize("KMK013_543");
                     else if (col == 4 && optAggSetting.isPresent()
                             && optAggSetting.get().getUseDeformedLabor() == UseAtr.USE
@@ -866,7 +810,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                         value = workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                                 ? TextResource.localize("KMK013_42")
                                 : TextResource.localize("KMK013_43");
-                } else if (row == 65) {
+                } else if (row == 63) {
                     if (col == 2) value = TextResource.localize("KMK013_523");
                     else if (col == 4 && optAggSetting.isPresent()
                             && optAggSetting.get().getUseDeformedLabor() == UseAtr.USE
@@ -874,19 +818,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getAddition() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 66) {
-                    if (col == 3) value = TextResource.localize("KMK013_540");
-                    else if (col == 4 && optAggSetting.isPresent()
-                            && optAggSetting.get().getUseDeformedLabor() == UseAtr.USE
-                            && workDeformedLaborAdditionSet.isPresent()
-                            && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
-                            && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent()
-                            && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getAddition() == NotUseAtr.USE
-                            && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getDeformationExceedsPredeterminedValue().isPresent())
-                        value = workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getIncludeVacationSet().getDeformationExceedsPredeterminedValue().get() == CalculationMethodForNormalWorkAndDeformedLaborOverTime.CALCULATE_AS_OVERTIME_HOURS
-                                ? TextResource.localize("KMK013_37")
-                                : TextResource.localize("KMK013_36");
-                } else if (row == 67) {
+                } else if (row == 64) {
                     if (col == 2) value = TextResource.localize("KMK013_524");
                     else if (col == 4 && optAggSetting.isPresent()
                             && optAggSetting.get().getUseDeformedLabor() == UseAtr.USE
@@ -894,7 +826,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getCalculateIncludCareTime() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 68) {
+                } else if (row == 65) {
                     if (col == 2) value = TextResource.localize("KMK013_525");
                     else if (col == 4 && optAggSetting.isPresent()
                             && optAggSetting.get().getUseDeformedLabor() == UseAtr.USE
@@ -902,7 +834,7 @@ public class CalculationSettingExportImpl implements MasterListData {
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getCalculateActualOperation() == CalcurationByActualTimeAtr.CALCULATION_OTHER_THAN_ACTUAL_TIME
                             && workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().isPresent())
                         value = workDeformedLaborAdditionSet.get().getVacationCalcMethodSet().getPremiumCalcMethodOfHoliday().getAdvanceSet().get().getCalculateIncludIntervalExemptionTime() == NotUseAtr.USE ? "○" : "-";
-                } else if (row == 69) {
+                } else if (row == 66) {
                     if (col == 2) value = TextResource.localize("KMK013_526");
                     else if (col == 4 && optAggSetting.isPresent()
                             && optAggSetting.get().getUseDeformedLabor() == UseAtr.USE
@@ -1279,11 +1211,17 @@ public class CalculationSettingExportImpl implements MasterListData {
     private List<MasterData> getSheet8MasterDatas() {
         String companyId = AppContexts.user().companyId();
         Optional<StampReflectionManagement> stampReflectionMng = stampReflectionManagementRepo.findByCid(companyId);
+        Optional<TemporaryWorkUseManage> optTempWorkUse = tempWorkRepo.findByCid(companyId);
+		Optional<ManageWorkTemporary> optTempWorkManage = tempWorkManageRepo.findByCID(companyId);
+		Optional<OutManage> optOutManage = outManageRepository.findByID(companyId);
+		Optional<CreatingDailyResultsCondition> optCreatingDailyResultsCondition = 
+				this.creatingDailyResultsConditionRepository.findByCid(companyId);
         List<MasterData> data = new ArrayList<>();
-        for (int row = 0; row < 6; row++) {
+        for (int row = 0; row < 11; row++) {
             Map<String, MasterCellData> rowData = new HashMap<>();
             for (int col = 0; col < 3; col++) {
                 String value = "";
+                ColumnTextAlign align = ColumnTextAlign.LEFT;
                 if (row == 0){
                     if (col == 0) value = TextResource.localize("KMK013_277");
                     else if (col == 2 && stampReflectionMng.isPresent())
@@ -1296,39 +1234,91 @@ public class CalculationSettingExportImpl implements MasterListData {
                         value = stampReflectionMng.get().getActualStampOfPriorityClass().value == 1
                                 ? TextResource.localize("KMK013_301")
                                 : TextResource.localize("KMK013_300");
-                } else if (row == 2){
+                } else if (row == 2) {
+                	if (col == 0) {
+                		value = TextResource.localize("KMK013_575");
+                	} else if (col == 2) {
+                		value = optCreatingDailyResultsCondition
+                				.map(val -> val.getIsCreatingFutureDay().isUse()).orElse(false)
+                					? TextResource.localize("KMK013_577")
+                							: TextResource.localize("KMK013_576");
+                	}
+                } else if (row == 3){
                     if (col == 0) value = TextResource.localize("KMK013_281");
                     else if (col == 2 && stampReflectionMng.isPresent())
                         value = stampReflectionMng.get().getAutoStampForFutureDayClass().value == 1
                                 ? TextResource.localize("KMK013_283")
                                 : TextResource.localize("KMK013_284");
-                } else if (row == 3){
+                } else if (row == 4){
                     if (col == 0) value = TextResource.localize("KMK013_294");
                     else if (col == 1) value = TextResource.localize("KMK013_507");
                     else if (stampReflectionMng.isPresent())
                         value = stampReflectionMng.get().getGoBackOutCorrectionClass().value == 1
                                 ? TextResource.localize("KMK013_209")
                                 : TextResource.localize("KMK013_210");
-                } else if (row == 4){
+                } else if (row == 5){
                     if (col == 0) value = TextResource.localize("KMK013_508");
                     else if (col == 1) value = TextResource.localize("KMK013_509");
                     else if (stampReflectionMng.isPresent())
                         value = stampReflectionMng.get().getReflectWorkingTimeClass().value == 1
                                 ? TextResource.localize("KMK013_209")
                                 : TextResource.localize("KMK013_210");
-                } else {
+                } else if (row == 6) {
                     if (col == 0) value = TextResource.localize("KMK013_302");
                     else if (col == 2 && stampReflectionMng.isPresent())
                         value = stampReflectionMng.get().getBreakSwitchClass().value == 1
                                 ? TextResource.localize("KMK013_305")
                                 : TextResource.localize("KMK013_304");
+                } else if (row == 7) {
+                	if (col == 0) {
+                		value = TextResource.localize("KMK013_289");
+                	} else if (col == 1) {
+                		value = TextResource.localize("KMK013_290");
+                	} else if (col == 2) {
+                		value = optOutManage.map(val -> val.getMaxUsage().v()).orElse(3)
+                				+ TextResource.localize("KMK013_471");
+                		align = ColumnTextAlign.RIGHT;
+                	}
+                } else if (row == 8) {
+                	if (col == 1) {
+                		value = TextResource.localize("KMK013_292");
+                	} else if (col == 2) {
+                		value = optOutManage.map(val -> val.getInitValueReasonGoOut().nameId)
+                				.orElse(GoingOutReason.PRIVATE.nameId);
+                	}
+                } else if (row == 9) {
+                	if (col == 0) {
+                		value = TextResource.localize("KMK013_220");
+                	} else if (col == 1) {
+                		value = TextResource.localize("KMK013_348");
+                	} else if (col == 2) {
+                		if (optTempWorkUse.isPresent() && optTempWorkUse.get().getUseClassification().isUse()) {
+                			value = optTempWorkManage.map(val -> val.getMaxUsage().v()).orElse(0)
+                    				+ TextResource.localize("KMK013_471");
+                			align = ColumnTextAlign.RIGHT;
+                		} else {
+                			value = "";
+                		}
+                	}
+                } else {
+                	if (col == 1) {
+                		value = TextResource.localize("KMK013_349");
+                	} else if (col == 2) {
+                		if (optTempWorkUse.isPresent() && optTempWorkUse.get().getUseClassification().isUse()) {
+                			value = optTempWorkManage.map(val -> this.formatTime(val.getTimeTreatTemporarySame().v()))
+                					.orElse("00:00");
+                			align = ColumnTextAlign.RIGHT;
+                		} else {
+                			value = "";
+                		}
+                	}
                 }
                 rowData.put(
                         col + "",
                         MasterCellData.builder()
                                 .columnId(col + "")
                                 .value(value)
-                                .style(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT))
+                                .style(MasterCellStyle.build().horizontalAlign(align))
                                 .build());
             }
             data.add(MasterData.builder().rowData(rowData).build());
@@ -1404,6 +1394,18 @@ public class CalculationSettingExportImpl implements MasterListData {
                                 ? TextResource.localize("KMK013_312")
                                 : TextResource.localize("KMK013_311");
                 } else if (row == 7){
+                    if (col == 1) value = TextResource.localize("KMK013_319");
+                    else if (col == 2 && aggregateMethodOfMonthly.isPresent())
+                        value = aggregateMethodOfMonthly.get().getSpecTotalCountMonthly().isContinuousCount()
+                                ? TextResource.localize("KMK013_209")
+                                : TextResource.localize("KMK013_210");
+                } else if (row == 8) {
+                    if (col == 1) value = TextResource.localize("KMK013_321");
+                    else if (col == 2 && aggregateMethodOfMonthly.isPresent())
+                        value = aggregateMethodOfMonthly.get().getSpecTotalCountMonthly().isNotWorkCount()
+                                ? TextResource.localize("KMK013_209")
+                                : TextResource.localize("KMK013_210");
+                } else {
                     if (col == 0) value = TextResource.localize("KMK013_313");
                     else if (col == 1) value = TextResource.localize("KMK013_314");
                     else if (aggregateMethodOfMonthly.isPresent())
@@ -1412,18 +1414,6 @@ public class CalculationSettingExportImpl implements MasterListData {
                                 : (aggregateMethodOfMonthly.get().getSpecTotalCountMonthly().getSpecCount().value == 1
                                 ? TextResource.localize("無条件にカウントしない")
                                 : TextResource.localize("無条件にカウントする"));
-                } else if (row == 8){
-                    if (col == 1) value = TextResource.localize("KMK013_319");
-                    else if (col == 2 && aggregateMethodOfMonthly.isPresent())
-                        value = aggregateMethodOfMonthly.get().getSpecTotalCountMonthly().isContinuousCount()
-                                ? TextResource.localize("KMK013_209")
-                                : TextResource.localize("KMK013_210");
-                } else {
-                    if (col == 1) value = TextResource.localize("KMK013_321");
-                    else if (col == 2 && aggregateMethodOfMonthly.isPresent())
-                        value = aggregateMethodOfMonthly.get().getSpecTotalCountMonthly().isNotWorkCount()
-                                ? TextResource.localize("KMK013_209")
-                                : TextResource.localize("KMK013_210");
                 }
                 rowData.put(
                         col + "",
@@ -1438,4 +1428,14 @@ public class CalculationSettingExportImpl implements MasterListData {
         return data;
     }
 
+    /**
+     * Format Clock_Short_HM
+     * @param value
+     * @return
+     */
+    private String formatTime(int value) {
+    	final String hour = String.valueOf(value / 60);
+    	final String minute = String.valueOf(value % 60);
+    	return hour + ":" + StringUtil.padLeft(minute, 2, '0');
+    }
 }

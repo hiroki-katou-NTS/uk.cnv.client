@@ -33,11 +33,14 @@ public class LayoutAnyRecordToDelete {
 	private String tableName() {
 		return TemporaryTable.createTableName(context, TABLE_NAME);
 	}
+
+	public void dropTable() {
+		TemporaryTable.dropTable(jdbcProxy, tableName());
+	}
 	
 	public void createTable() {
 		
 		String tableName = tableName();
-		TemporaryTable.dropTable(jdbcProxy, tableName);
 		jdbcProxy.query(Entity.sqlCreateTable(tableName)).execute();
 	}
 	

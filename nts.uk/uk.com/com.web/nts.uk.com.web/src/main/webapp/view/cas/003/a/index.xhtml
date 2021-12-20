@@ -27,8 +27,9 @@
 
 		<ui:define name="content">
 			<div id="functions-area">
+				<a class="goback" id="A1_000" data-bind="ntsLinkButton: { jump: '/view/cmm/052/a/index.xhtml' }">#{i18n.getText('CAS003_62')}</a>
 				<button tabindex="1" class="proceed" data-bind="click: submitData">#{i18n.getText('CAS003_2')}</button>
-				<button tabindex="2" id="print-button"  data-bind="click: exportExcel">#{i18n.getText('CAS003_38')}</button>
+				<button tabindex="2" id="print-button"  data-bind="click: exportExcel" hidden = "false">#{i18n.getText('CAS003_38')}</button>
 			</div>
 			<div id="contents-area">
 				<div class="container">

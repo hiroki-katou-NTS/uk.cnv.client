@@ -8,6 +8,8 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.NoArgsConstructor;
 import lombok.val;
 import nts.arc.enums.EnumAdaptor;
@@ -18,7 +20,6 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.reserveleave.empinfo.grantremain
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureId;
 import nts.uk.shr.com.time.calendar.date.ClosureDate;
 import nts.uk.shr.infra.data.entity.ContractCompanyUkJpaEntity;
-import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 
 /**
  *
@@ -80,7 +81,7 @@ public class KrcdtReserveLeaveRemainHist extends ContractCompanyUkJpaEntity impl
 		
 		return new ReserveLeaveGrantRemainHistoryData(data, new YearMonth(this.krcdtReserveLeaveRemainHistPK.yearMonth),
 				EnumAdaptor.valueOf(this.krcdtReserveLeaveRemainHistPK.closureId, ClosureId.class),
-				new ClosureDate(this.krcdtReserveLeaveRemainHistPK.closeDay, this.krcdtReserveLeaveRemainHistPK.isLastDay == 1));
+				new ClosureDate(this.krcdtReserveLeaveRemainHistPK.closeDay, this.krcdtReserveLeaveRemainHistPK.isLastDay));
 	}
 
 	public KrcdtReserveLeaveRemainHist(String sid, Integer yearMonth, Integer closureId, Integer closeDay,
@@ -88,7 +89,7 @@ public class KrcdtReserveLeaveRemainHist extends ContractCompanyUkJpaEntity impl
 			GeneralDate deadline, int expStatus, int registerType, double grantDays, double usedDays,
 			Double overLimitDays, double remainingDays) {
 		super();
-		this.krcdtReserveLeaveRemainHistPK = new KrcdtReserveLeaveRemainHistPK(sid, yearMonth, closureId, closeDay, isLastDay, grantDate);
+		this.krcdtReserveLeaveRemainHistPK = new KrcdtReserveLeaveRemainHistPK(sid, yearMonth, closureId, closeDay, BooleanUtils.toBoolean(isLastDay), grantDate);
 		this.deadline = deadline;
 		this.expStatus = expStatus;
 		this.registerType = registerType;

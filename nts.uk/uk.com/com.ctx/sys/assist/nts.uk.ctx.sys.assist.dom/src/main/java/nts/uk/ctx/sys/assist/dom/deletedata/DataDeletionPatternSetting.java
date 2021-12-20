@@ -3,6 +3,8 @@ package nts.uk.ctx.sys.assist.dom.deletedata;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.Getter;
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.layer.dom.AggregateRoot;
@@ -101,11 +103,11 @@ public class DataDeletionPatternSetting extends AggregateRoot {
 		memento.setPatternCompressionPwd(patternCompressionPwd.map(FileCompressionPassword::v).orElse(""));
 		memento.setMonthlyReferMonth(monthlyReferMonth.map(data -> data.value).orElse(null));
 		memento.setMonthlyReferYear(monthlyReferYear.map(data -> data.value).orElse(null));
-		memento.setPatternClassification(patternClassification.value);
+		memento.setPatternClassification(BooleanUtils.toBoolean(patternClassification.value));
 		memento.setPatternCode(patternCode.v());
 		memento.setPatternName(patternName.v());
 		memento.setPatternSuppleExplanation(patternSuppleExplanation.map(Explanation::v).orElse(""));
-		memento.setWithoutPassword(withoutPassword.value);
+		memento.setWithoutPassword(BooleanUtils.toBoolean(withoutPassword.value));
 		memento.setCategories(categories);
 	}
 	
@@ -158,9 +160,9 @@ public class DataDeletionPatternSetting extends AggregateRoot {
 	public static interface MementoSetter {
 		void setPatternCode(String patternCode);
 		void setPatternName(String patternName);
-		void setPatternClassification(int patternClassification);
+		void setPatternClassification(boolean patternClassification);
 		void setContractCode(String contractCode);
-		void setWithoutPassword(int withoutPassword);
+		void setWithoutPassword(boolean withoutPassword);
 		void setPatternCompressionPwd(String fileCompressionPassword);
 		void setDailyReferYear(Integer dailyReferYear);
 		void setDailyReferMonth(Integer dailyReferMonth);

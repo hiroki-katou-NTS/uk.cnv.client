@@ -42,4 +42,6 @@ public class PrepareData {
 	private List<WorkTimeSetting> listWorktime;
 	//List<勤怠項目>
 	private List<MonthlyAttendanceItemNameDto> lstItemDay;
+
+	private List<ErrorAlarmCondition> errorMessageAlarmList;
 }

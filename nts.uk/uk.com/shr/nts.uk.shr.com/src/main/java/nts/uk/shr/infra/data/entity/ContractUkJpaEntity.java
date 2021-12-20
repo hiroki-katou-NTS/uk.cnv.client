@@ -22,7 +22,9 @@ public abstract class ContractUkJpaEntity extends UkJpaEntity {
 	
 	@PrePersist
     private void setInsertingContractInfo() {
-		this.contractCd = AppContexts.user().contractCode();
+		if (this.contractCd == null) {
+			this.contractCd = AppContexts.user().contractCode();
+		}
 	}
 	
 	@PreUpdate

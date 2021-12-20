@@ -1,0 +1,58 @@
+#A2_3 {
+	font-size: 18px !important;
+	margin-top: 10px;
+}
+
+#btn-help-1 {
+	margin-top: 10px;
+	margin-left: 32px;
+}
+
+#area-left {
+	float: left;
+	margin-left: 50px;
+}
+
+#description-label {
+	margin-top: 10px;
+	margin-left: 250px;
+}
+
+#search-btn {
+	min-width: 80px;
+	margin-top: -32px;
+	float: right;
+	margin-right: 20px;
+}
+
+.nts-help-button-image{
+	top: 63px !important;
+    left: 27px !important;
+    margin-top: 0px !important;
+}
+
+.caret-top, .caret-helpbutton{
+	left: 5px !important; 
+}
+
+#area-non-info {
+	margin-left: 45px;
+    margin-top: 10px;
+}
+
+.img-icon {
+	margin-left: -28px;
+	margin-top: 3px;
+	background-color: #30cc40;
+    position: absolute;
+    border-radius: 2px;
+    background-size: contain;
+    width: 25px;
+    height: 25px;
+	background-image:
+		url("../../../../../nts.uk.com.js.web/lib/nittsu/ui/style/stylesheets/images/icons/numbered/1.png");
+}
+#input-search{
+	margin-left: 20px;
+}
+

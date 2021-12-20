@@ -61,17 +61,6 @@ public class JpaManageAnnualSettingSetMemento implements ManageAnnualSettingSetM
      * (non-Javadoc)
      *
      * @see nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.
-     * ManageAnnualSettingSetMemento#setWorkDayCalculate(boolean)
-     */
-    @Override
-    public void setWorkDayCalculate(boolean isWorkDayCalculate) {
-        this.entity.setIsWorkDayCal(isWorkDayCalculate == true ? 1 : 0);
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.
      * ManageAnnualSettingSetMemento#setRemainingNumberSetting(nts.uk.ctx.at.
      * shared.dom.vacation.setting.annualpaidleave.RemainingNumberSetting)
      */

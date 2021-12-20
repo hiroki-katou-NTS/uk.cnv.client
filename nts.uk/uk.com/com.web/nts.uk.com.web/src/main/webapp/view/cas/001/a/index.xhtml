@@ -29,14 +29,16 @@
 		<ui:define name="content">
 			<div id="functions-area">
 				<div class="container">
+					<a tabindex="1" class="goback" id="A1_001"
+						data-bind="ntsLinkButton: { jump: '/view/cps/018/a/index.xhtml' }, visible: $vm.isFromCPS018">#{i18n.getText('CAS001_100')}</a>
 					<!-- <button id="A1_001">#{i18n.getText('CAS001_2')}</button> -->
-					<button tabindex="1" id="A1_002" class="proceed" data-bind="click:saveData">#{i18n.getText('CAS001_3')}</button>
-					<button tabindex="2" id="A1_003"
+					<button tabindex="2" id="A1_002" class="proceed" data-bind="click:saveData">#{i18n.getText('CAS001_3')}</button>
+					<button tabindex="3" id="A1_003"
 						data-bind="click:openCModal,enable:(personRoleList().length > 1)">#{i18n.getText('CAS001_4')}</button>
 					<!-- 	<button id="A1_004" class="danger">#{i18n.getText('CAS001_5')}</button> -->
 					<button id="print-button" tabindex="2" data-bind="click: exportExcel, visible:hasPermission()" style="width: 130px;">#{i18n.getText('KMK007_4')}</button>
 					
-					<div tabindex="3" class="float-right">
+					<div tabindex="4" class="float-right">
 						<a  id="A1_005" class="goout "
 							data-bind="ntsLinkButton: { jump: '/view/cps/001/a/index.xhtml' }">#{i18n.getText('CAS001_6')}</a>
 					</div>
@@ -55,7 +57,7 @@
 
 						<span id="A2_001Caret" class="caret-bottom outline"></span>
 						<div id="left-bottom">
-							<div style="width: 270px" id="A2_007" tabindex="5" data-bind="ntsSearchBox: {
+							<div style="width: 270px" id="A2_007" tabindex="6" data-bind="ntsSearchBox: {
 								searchMode: 'highlight',
 								targetKey: 'categoryId',
 							 	comId: 'A2_008',
@@ -65,7 +67,7 @@
 							 	fields: ['categoryName'],
 							 	mode: 'igGrid',
 							 	placeHolder: '#{i18n.getText('CAS001_76')}'}" />
-							<table  tabindex="6" id="A2_008" data-bind="ntsGridList: {	
+							<table  tabindex="7" id="A2_008" data-bind="ntsGridList: {	
 								dataSource: roleCategoryList ,
 								primaryKey: 'categoryId' ,
 								columns: ctgColumns ,
@@ -89,7 +91,7 @@
 									</div>
 								</div>
 								<div class="line_col_2" data-bind="with:$parent">
-									<button  tabindex="7"  id="A3_004" data-bind="click:openDModal">#{i18n.getText('CAS001_13')}</button>
+									<button  tabindex="8"  id="A3_004" data-bind="click:openDModal">#{i18n.getText('CAS001_13')}</button>
 								</div>
 							</div>
 							<!-- 	category area -->

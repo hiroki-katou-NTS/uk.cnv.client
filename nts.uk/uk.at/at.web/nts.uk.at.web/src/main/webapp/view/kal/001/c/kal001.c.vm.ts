@@ -80,6 +80,7 @@ module nts.uk.at.view.kal001.c {
                  
                  if(isHaveChecked){
                      let listEmployeeSendTaget = [], listManagerSendTaget = [];
+                     let listManager : Array<modeldto.ManagerTagetDto> = [];
                      _.forEach(self.listEmployee, function(item: modeldto.EmployeeSendEmail) {
                         if (item.isSendToMe == true ) {
                              //set to employeee list taget
@@ -88,12 +89,14 @@ module nts.uk.at.view.kal001.c {
                          if (item.isSendToManager == true) {
                              //set to Manager list taget
                              listManagerSendTaget.push(item.employeeId);
+                             listManager.push(new modeldto.ManagerTagetDto(item.employeeId, item.workplaceId));
                          }
                      });
                      let params ={
                        listEmployeeSendTaget: listEmployeeSendTaget,
                        listManagerSendTaget: listManagerSendTaget,
-                       processId: self.processId
+                       processId: self.processId,
+                         listManagerSelected : listManager
                      };
                      // call service send mail
                      service.alarmListSendEmail(params).done(function(data: string) {
@@ -155,6 +158,16 @@ module nts.uk.at.view.kal001.c {
                 this.employeeName = e.employeeName;
             }
 
+        }
+
+        export class ManagerTagetDto {
+            employeeID: string;
+            workplaceID: string;
+
+            constructor(employeeID: string, workplaceID: string) {
+                this.employeeID = employeeID;
+                this.workplaceID = workplaceID;
+            }
         }
         
         export interface EmployeeDto{

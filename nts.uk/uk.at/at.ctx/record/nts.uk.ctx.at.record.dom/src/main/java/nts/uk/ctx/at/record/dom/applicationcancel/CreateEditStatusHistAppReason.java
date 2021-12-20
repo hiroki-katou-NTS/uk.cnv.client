@@ -8,8 +8,10 @@ import java.util.Optional;
 
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
+import nts.uk.ctx.at.record.dom.adapter.request.application.state.RCReflectedState;
 import nts.uk.ctx.at.record.dom.editstate.EditStateOfDailyPerformance;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
+import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.AppReflectExecInfo;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.ApplicationReflectHistory;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.AttendanceBeforeApplicationReflect;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.editstate.EditStateSetting;
@@ -22,7 +24,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.editstate.E
 public class CreateEditStatusHistAppReason {
 
 	public static List<AttendanceBeforeApplicationReflect> process(Require require, String employeeId, GeneralDate date, String appId,
-			ScheduleRecordClassifi classification, Map<Integer, String> mapValue, GeneralDateTime reflectTime) {
+			ScheduleRecordClassifi classification, Map<Integer, String> mapValue, GeneralDateTime reflectTime, String execId, RCReflectedState state) {
 		List<AttendanceBeforeApplicationReflect> lstAttBeforeReflect = new ArrayList<>();
 		// 日別実績から、該当する編集状態を取得する
 		List<EditStateOfDailyPerformance> lstEditState = require.findByKey(employeeId, date);
@@ -50,8 +52,8 @@ public class CreateEditStatusHistAppReason {
 		});
 
 		// 申請反映履歴を作成する
-		require.insertAppReflectHist(new ApplicationReflectHistory(employeeId, date, appId, reflectTime,
-				classification, false, lstAttBeforeReflect));
+		require.insertAppReflectHist(new ApplicationReflectHistory(employeeId, date, appId, classification, false,
+				lstAttBeforeReflect, new AppReflectExecInfo(state == RCReflectedState.REFLECTED, execId, reflectTime)));
 
 		return lstAttBeforeReflect;
 	}

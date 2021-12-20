@@ -85,10 +85,12 @@ export class KSUS01AComponent extends Vue {
     public memo: string = '';
     public workDesireInputMode: number = WorkDesireInputMode.SHIFT;
 
-    @Watch('yearMonth')
-    public subcribeYearMonth(value: string) {
+    public watchYearMonth(data?: number) {
         let self = this;
 
+        if (data) {
+            self.yearMonth = data.toString();
+        }
         let diffMonth = moment(self.yearMonth, 'YYYY/MM/DD').diff(moment(self.yearMonthOldVal, 'YYYY/MM/DD'), 'months');
 
         // self.startDate = moment(self.startDate, 'YYYY/MM/DD').add(diffMonth, 'months').format('YYYY/MM/DD');
@@ -169,7 +171,7 @@ export class KSUS01AComponent extends Vue {
             self.getInforOnTargetPeriod();
         }).catch((error: any) => {
             self.errorHandler(error);
-        }).then(() => self.$mask('hide'));
+        }).then(() => {});
 
         self.createDateHeaderList();
         self.createDateCellList();
@@ -456,6 +458,7 @@ export class KSUS01AComponent extends Vue {
     public changeYearMonth(isNext: boolean) {
         let self = this;
         self.yearMonth = isNext ? moment(self.yearMonth, 'YYYYMM').add(1, 'months').format('YYYYMM') : moment(self.yearMonth, 'YYYYMM').add(-1, 'months').format('YYYYMM');
+        self.watchYearMonth();
     }
 
     //3: 年月を変更する方法
@@ -463,6 +466,7 @@ export class KSUS01AComponent extends Vue {
     public backCurrentMonth() {
         let self = this;
         self.yearMonth = moment().format('YYYYMM');
+        self.watchYearMonth();
     }
 
     public showDetail(isShow: boolean, dateCell?: DateCell) {
@@ -551,9 +555,17 @@ export class KSUS01AComponent extends Vue {
 
     public openKSUS01B() {
         let self = this;
+        let params: ParamB = {
+            // listWorkSchedule: self.listWorkSchedule,
+            baseYM: self.yearMonth,
+            targetPeriod: {
+                start: self.startDate,
+                end: self.endDate,
+            },
+        };
         self.$modal(
             'ksus01b',
-            {},
+            params,
             { type: 'dropback' }
         ).then((v) => {
             console.log('close ksus01b and return ', v);
@@ -655,6 +667,12 @@ export interface PeriodCommand {
     end: string;
 }
 
+export interface ParamB {
+    // listWorkSchedule: Array<WorkScheduleDto>;
+    baseYM: string;
+    targetPeriod: PeriodCommand;
+}
+
 // api dto
 export interface InitInformation {
     publicOpAtr: boolean;
@@ -681,6 +699,12 @@ export interface WorkScheduleDto {
     shiftMaster: ShiftMasterDto;
     workAtr: number;
     listAttendaceDto: Array<AttendanceDto>;
+    workInfo: WorkInformationDto;
+}
+
+export interface WorkInformationDto {
+    workType: string;
+    workTime: string;
 }
 
 export interface ShiftMasterDto {
@@ -717,6 +741,5 @@ export interface AttendanceDto {
     attendanceStamp: string;
     leaveStamp: string;
 }
-
 
 

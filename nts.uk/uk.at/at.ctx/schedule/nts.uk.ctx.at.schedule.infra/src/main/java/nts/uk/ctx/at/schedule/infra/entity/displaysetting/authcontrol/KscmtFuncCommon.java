@@ -21,7 +21,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "KSCMT_FUNC_COMMON")
+@Table(name = "KSCCT_FUNC_COMMON")
 public class KscmtFuncCommon extends UkJpaEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     public static final JpaEntityMapper<KscmtFuncCommon> MAPPER = new JpaEntityMapper<>(KscmtFuncCommon.class);
@@ -48,7 +48,7 @@ public class KscmtFuncCommon extends UkJpaEntity implements Serializable {
     /**
      * 表示順
      */
-    @Column(name = "DEISPLAY_ORDER")
+    @Column(name = "DISPLAY_ORDER")
     public int deisplayOrder;
 
     /**

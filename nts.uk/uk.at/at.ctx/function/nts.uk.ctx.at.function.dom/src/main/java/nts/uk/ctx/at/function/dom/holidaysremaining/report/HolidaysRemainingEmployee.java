@@ -17,12 +17,17 @@ public class HolidaysRemainingEmployee {
 	private String workplaceCode;
 	private String workplaceName;
 	private String employmentName;
-	private String jobTitle;
+	// Update export KDR001-Ver 15 D2_6
+	private String employmentCode;
+	private String positionName;
+	// Update export KDR001-Ver 15-D2-7
+	private String positionCode;
 	private Optional<YearMonth> currentMonth;
 	private HolidayRemainingInfor holidayRemainingInfor;
 
 	public HolidaysRemainingEmployee(String employeeId, String employeeCode, String employeeName, String workplaceId,
-			String workplaceCode, String workplaceName, String employmentName, String jobTitle,
+			String workplaceCode, String workplaceName, String employmentName, String employmentCode,
+									 String positionName,String positionCode,
 			Optional<YearMonth> currentMonth, HolidayRemainingInfor holidayRemainingInfor) {
 		super();
 		this.employeeId = employeeId;
@@ -32,8 +37,10 @@ public class HolidaysRemainingEmployee {
 		this.workplaceCode = workplaceCode;
 		this.workplaceName = workplaceName;
 		this.employmentName = employmentName;
-		this.jobTitle = jobTitle;
+		this.positionName = positionName;
+		this.positionCode = positionCode;
 		this.currentMonth = currentMonth;
 		this.holidayRemainingInfor = holidayRemainingInfor;
+		this.employmentCode = employmentCode;
 	}
 }

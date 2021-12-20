@@ -23,10 +23,12 @@ import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Relieve;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeCalArt;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.SetPreClockArt;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampType;
 import nts.uk.ctx.at.shared.dom.scherec.application.stamp.AppRecordImageShare;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.work.WorkCode;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.work.WorkGroup;
 import nts.uk.ctx.at.shared.dom.workrule.goingout.GoingOutReason;
 
 @RunWith(JMockit.class)
@@ -48,6 +50,7 @@ public class GetTargetDateRecordApplicationTest {
 	@Test
 	public void test() {
 		AppRecordImageShare appShare = ReflectApplicationHelper.createAppRecord();
+		WorkGroup group = new WorkGroup(new WorkCode("DUMMY"), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()); //dummy
 
 		new Expectations() {
 			{
@@ -69,10 +72,9 @@ public class GetTargetDateRecordApplicationTest {
 				new StampType(false, 
 						GoingOutReason.valueOf(1), //外出理由
 						SetPreClockArt.NONE, // 所定時刻セット区分
-						ChangeClockArt.GOING_TO_WORK,//時刻変更区分
+						ChangeClockAtr.GOING_TO_WORK,//時刻変更区分
 						ChangeCalArt.NONE),//計算区分変更対象
-				new RefectActualResult(null, null, null), 
-				Optional.empty(), "DUMMY");
+				new RefectActualResult(null, null, null, group), Optional.empty());
 
 		assertStamp(actualResult.getRight().get(), expectedResult);
 

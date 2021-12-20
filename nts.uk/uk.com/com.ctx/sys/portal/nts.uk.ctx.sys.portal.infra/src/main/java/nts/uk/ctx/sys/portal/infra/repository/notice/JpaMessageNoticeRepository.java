@@ -212,7 +212,7 @@ public class JpaMessageNoticeRepository extends JpaRepository implements Message
 											.setParameter("CID", cid)
 											.setParameter("SID", sid)
 											.setParameter("WKPID", wpId.orElse(null))
-											.setParameter("CURRENTDATE", GeneralDate.today().toString())
+											.setParameter("CURRENTDATE", GeneralDate.today().date())
 										. getResultList();
 		List<MessageNotice> list = resultList.stream()
 				.map(item -> {

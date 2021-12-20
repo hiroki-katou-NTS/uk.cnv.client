@@ -27,7 +27,7 @@ public class JpaAnnualLeaveRemainHistRepository extends JpaRepository implements
 	@Override
 	public void addOrUpdate(AnnualLeaveRemainingHistory domain) {
 		KrcdtAnnLeaRemainHistPK krcdtAnnLeaRemainHistPK = new KrcdtAnnLeaRemainHistPK(domain.getEmployeeId(), domain.getYearMonth().v(),
-				domain.getClosureId().value, domain.getClosureDate().getClosureDay().v(), domain.getClosureDate().getLastDayOfMonth() ? 1 : 0, domain.getGrantDate());
+				domain.getClosureId().value, domain.getClosureDate().getClosureDay().v(), domain.getClosureDate().getLastDayOfMonth(), domain.getGrantDate());
 		Optional<KrcdtAnnLeaRemainHist> opt = this.queryProxy().find(krcdtAnnLeaRemainHistPK,
 				KrcdtAnnLeaRemainHist.class);
 		if (opt.isPresent()) {

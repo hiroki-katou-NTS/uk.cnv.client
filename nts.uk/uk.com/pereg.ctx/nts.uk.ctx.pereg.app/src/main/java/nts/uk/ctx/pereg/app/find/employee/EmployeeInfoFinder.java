@@ -1,6 +1,7 @@
 package nts.uk.ctx.pereg.app.find.employee;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import javax.ejb.Stateless;
@@ -8,6 +9,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 
+import nts.arc.error.BundledBusinessException;
 import nts.arc.error.BusinessException;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.record.dom.stamp.card.stamcardedit.StampCardEditing;
@@ -20,6 +22,10 @@ import nts.uk.ctx.bs.employee.dom.setting.code.EmployeeCESetting;
 import nts.uk.ctx.bs.employee.dom.setting.code.IEmployeeCESettingRepository;
 import nts.uk.ctx.pereg.dom.usesetting.UserSetting;
 import nts.uk.ctx.pereg.dom.usesetting.UserSettingRepository;
+import nts.uk.ctx.sys.gateway.dom.loginold.ContractCode;
+import nts.uk.ctx.sys.gateway.dom.securitypolicy.password.PasswordPolicy;
+import nts.uk.ctx.sys.gateway.dom.securitypolicy.password.PasswordPolicyRepository;
+import nts.uk.ctx.sys.gateway.dom.securitypolicy.password.ViolationInfo;
 import nts.uk.ctx.sys.shared.dom.user.UserRepository;
 import nts.uk.shr.com.context.AppContexts;
 
@@ -47,6 +53,9 @@ public class EmployeeInfoFinder {
 	@Inject
 	private IEmployeeCESettingRepository empCESettingRepo;
 
+	@Inject
+	private PasswordPolicyRepository passwordPolicyRepository;
+	
 	private static final String JP_SPACE = "　";
 
 	public String generateEmplCode(String startLetters) {
@@ -170,7 +179,20 @@ public class EmployeeInfoFinder {
 		if (employeeName.startsWith(JP_SPACE) || employeeName.endsWith(JP_SPACE) || !employeeName.contains(JP_SPACE)) {
 			throw new BusinessException("Msg_924");
 		}
-
+		
+		String password = empInfo.getPassword();
+		PasswordPolicy policy = passwordPolicyRepository.getPasswordPolicy(new ContractCode(AppContexts.user().contractCode()));
+		List<ViolationInfo> violations = policy.getComplexityRequirement().validatePassword(password);
+		if (!violations.isEmpty()) {
+			if (violations.size() > 1) {
+				BundledBusinessException ex = BundledBusinessException.newInstance();
+				violations.forEach(v -> ex.addMessage(v.toBusinessException()));
+				throw ex;
+			} else if (violations.size() > 0) {
+				throw violations.get(0).toBusinessException();
+			}
+		}
+		
 	}
 
 	private String generateCode(String value) {

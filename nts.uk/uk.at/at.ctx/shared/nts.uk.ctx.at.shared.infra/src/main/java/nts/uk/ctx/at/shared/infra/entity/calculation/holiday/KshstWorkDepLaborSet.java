@@ -76,19 +76,19 @@ public class KshstWorkDepLaborSet  extends ContractUkJpaEntity implements Serial
 	
 	/*就業時間帯毎の設定を可能とする*/
 	@Column(name = "ENABLE_SET_PER_WORK_HOUR1")
-	public int enableSetPerWorkHour1;
+	public boolean enableSetPerWorkHour1;
 	
 	/*就業時間帯毎の設定を可能とする*/
 	@Column(name = "ENABLE_SET_PER_WORK_HOUR2")
-	public int enableSetPerWorkHour2;
+	public boolean enableSetPerWorkHour2;
 
 	// // 申請により取り消した場合も控除する
 	@Column(name = "DEDUCT_BY_APPLICATION")
-	public int deductByApplication;
+	public boolean deductByApplication;
 
 	// 割増計算方法を設定する
 	@Column(name = "SET_PREMIUM_CALC_METHOD")
-	public int setPreCalcMethod;
+	public boolean setPreCalcMethod;
 	
 	@OneToOne(optional = false)
 		@JoinColumn(name = "CID", referencedColumnName="CID", insertable = false, updatable = false)

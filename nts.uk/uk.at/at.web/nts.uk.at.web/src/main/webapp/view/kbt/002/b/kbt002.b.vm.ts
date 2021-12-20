@@ -57,8 +57,8 @@ module nts.uk.at.view.kbt002.b {
     tabs: KnockoutObservableArray<any> = ko.observableArray([
       { id: TabPanelId.TAB_1, title: getTextResource('KBT002_279'), content: '.tab-content-1', enable: ko.observable(true), visible: ko.observable(true) },
       { id: TabPanelId.TAB_2, title: getTextResource('KBT002_40'), content: '.tab-content-2', enable: ko.observable(true), visible: ko.observable(true) },
-      { id: TabPanelId.TAB_3, title: getTextResource('KBT002_293'), content: '.tab-content-3', enable: ko.observable(true), visible: ko.observable(true) },
-      { id: TabPanelId.TAB_4, title: getTextResource('KBT002_280'), content: '.tab-content-4', enable: ko.observable(true), visible: ko.observable(true) }
+      { id: TabPanelId.TAB_3, title: getTextResource('KBT002_293'), content: '.tab-content-3', enable: ko.observable(true), visible: ko.observable(false) },
+      { id: TabPanelId.TAB_4, title: getTextResource('KBT002_280'), content: '.tab-content-4', enable: ko.observable(true), visible: ko.observable(false) }
     ]);
     selectedTab: KnockoutObservable<string> = ko.observable('');
 

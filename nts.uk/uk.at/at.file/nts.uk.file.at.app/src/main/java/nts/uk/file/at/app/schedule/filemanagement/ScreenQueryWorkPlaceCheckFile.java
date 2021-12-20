@@ -50,6 +50,8 @@ import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.employeeinfor.em
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.employeeinfor.employmenthistory.imported.EmploymentPeriodImported;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.EmployeeSearchCallSystemType;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.RegulationInfoEmpQuery;
+import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.EmpAffiliationInforAdapter;
+import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.EmpOrganizationImport;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.WorkplaceGroupAdapter;
 import nts.uk.ctx.at.shared.dom.workrule.shiftmaster.ShiftMaster;
 import nts.uk.ctx.at.shared.dom.workrule.shiftmaster.ShiftMasterImportCode;
@@ -147,9 +149,12 @@ public class ScreenQueryWorkPlaceCheckFile {
 
     @Inject
     private GetHolidaysByPeriod getHolidaysByPeriod;
-    
+
     @Inject
     private EmpLeaveHistoryAdapter empHisAdapter;
+    
+    @Inject
+	private EmpAffiliationInforAdapter empAffiliationInforAdapter;
 
     public CapturedRawDataDto processingFile(WorkPlaceScheCheckFileParam param) throws Exception {
         try {
@@ -261,7 +266,7 @@ public class ScreenQueryWorkPlaceCheckFile {
 
         // 6: 曜日()
         // Use List<GeneralDate> importableDates step 3
-        
+
         //7: 取得する(期間)
         long startGetHolidays = System.currentTimeMillis();
         List<PublicHoliday> holidays = new ArrayList<PublicHoliday>();
@@ -273,80 +278,80 @@ public class ScreenQueryWorkPlaceCheckFile {
 
         return new CaptureDataOutput(listPersonEmp, importableDates, holidays, importResult, mappingErrorList);
     }
-    
+
     private class RequireImp implements WorkScheduleImportService.Require {
         private final MapCache<String, ScheAuthModifyDeadline> scheAuthModifyDeadlineCache;
-        
+
         private final MapCache<GetEmpCanReferByWorkplaceGroupParam, List<String>> workplaceGroupCache;
-        
+
         private final MapCache<GetAllEmpCanReferByWorkplaceGroupParam, List<String>> workplaceGroupAllCache;
-        
+
         private KeyDateHistoryCache<String, WorkingConditionItemWithPeriod> workCondItemWithPeriodCache;
-        
+
         private final KeyDateHistoryCache<String, EmployeeLeaveJobPeriodImport> empHisCache;
-        
+
         private final MapCache<String, SetupType> basicScheduleCache;
 
         private final MapCache<WorkTimeCode, FixedWorkSetting> fixedWorkSettingCache;
-        
+
         private final MapCache<WorkTimeCode, FlowWorkSetting> flowWorkSettingCache;
 
         private final MapCache<WorkTimeCode, FlexWorkSetting> flexWorkSettingCache;
-        
+
         private final MapCache<WorkTimeCode, PredetemineTimeSetting> predetemineTimeSettingCache;
-        
+
         private final List<ShiftMaster> shiftMasterCache;
-        
+
         private final MapCache<String, WorkType> workTypeCache;
-        
+
         private final MapCache<String, WorkTimeSetting> workTimeSettingCache;
-        
+
         private final Map<String, String> empEmployeeCache;
-        
+
         private final KeyDateHistoryCache<String, EmpEnrollPeriodImport> affCompanyHistByEmployeeCache;
-        
+
         private final KeyDateHistoryCache<String, EmploymentPeriodImported> employmentPeriodCache;
-        
+
         private final KeyDateHistoryCache<String, EmpLeaveWorkPeriodImport> empLeaveWorkPeriodCache;
-        
+
         private final Map<EmployeeAndYmd, Boolean> workScheExistedCache;
-        
+
         private final Map<EmployeeAndYmd, ConfirmedATR> workScheConfirmAtrMap;
-        
+
         public RequireImp(CapturedRawData rawData) {
 
             List<String> employeeCodes = rawData.getEmployeeCodes();
             List<String> importCodes = rawData.getContents().stream().map( e -> e.getImportCode().v() ).distinct().collect(Collectors.toList());
-            
+
             shiftMasterCache = shiftMasterRepository.getByListImportCodes(AppContexts.user().companyId(), importCodes);
-            
+
             workTypeCache = MapCache.incremental(item -> workTypeRepo.findByPK(AppContexts.user().companyId(), item));
-            
+
             workTimeSettingCache = MapCache.incremental(item -> workTimeSettingRepository.findByCode(AppContexts.user().companyId(), item));
-            
+
             empEmployeeCache = empEmployeeAdapter.getEmployeeIDListByCode(AppContexts.user().companyId(), employeeCodes);
-            
+
             List<String> employeeIds = employeeCodes.stream().map(x -> empEmployeeCache.get(x)).collect(Collectors.toList());
-            
+
             scheAuthModifyDeadlineCache = MapCache.incremental(role -> scheAuthModifyDeadlineRepository.get(AppContexts.user().companyId(), role));
-            
+
             workplaceGroupCache = MapCache.
-                    incremental(item -> Optional.ofNullable(workplaceGroupAdapter.getReferableEmp(item.getDate(), item.getEmpId(), item.getWorkplaceGroupID())));
-            
+                    incremental(item -> Optional.ofNullable(workplaceGroupAdapter.getReferableEmp(item.getEmpId(), item.getDate(), DatePeriod.oneDay(item.getDate()), item.getWorkplaceGroupID())));
+
             workplaceGroupAllCache = MapCache.
-                    incremental(item -> Optional.ofNullable(workplaceGroupAdapter.getAllReferableEmp(item.getDate(), item.getEmpId())));
-            
+                    incremental(item -> Optional.ofNullable(workplaceGroupAdapter.getAllReferableEmp(item.getEmpId(), item.getDate(), DatePeriod.oneDay(item.getDate()))));
+
             basicScheduleCache = MapCache.incremental(item -> Optional.ofNullable(basicScheduleService.checkNeededOfWorkTimeSetting(item)));
-            
+
             fixedWorkSettingCache = MapCache.incremental(item -> fixedWorkSettingRepository.findByKey(AppContexts.user().companyId(), item.v()));
-            
+
             flowWorkSettingCache = MapCache.incremental(item -> flowWorkSettingRepository.find(AppContexts.user().companyId(), item.v()));
-            
+
             flexWorkSettingCache = MapCache.incremental(item -> flexWorkSettingRepository.find(AppContexts.user().companyId(), item.v()));
-            
+
             predetemineTimeSettingCache = MapCache.incremental(item -> predetemineTimeSettingRepository.findByWorkTimeCode(AppContexts.user().companyId(), item.v()));
-            
-            
+
+
             List<GeneralDate> ymdList = rawData.getYmdList();
             if ( ymdList.isEmpty() ) {
                 affCompanyHistByEmployeeCache = null;
@@ -360,32 +365,32 @@ public class ScreenQueryWorkPlaceCheckFile {
             }
 
             DatePeriod period = new DatePeriod( ymdList.get(0), ymdList.get( ymdList.size() - 1 ) );
-            
+
             List<EmpEnrollPeriodImport> affCompanyHists =  comHisAdapter.getEnrollmentPeriod(employeeIds, period);
             Map<String, List<EmpEnrollPeriodImport>> data2 = affCompanyHists.stream().collect(Collectors.groupingBy(item ->item.getEmpID()));
             affCompanyHistByEmployeeCache = KeyDateHistoryCache.loaded(createEntries1(data2));
-            
+
             List<EmploymentPeriodImported> listEmploymentPeriodImported = scheAdapter.getEmploymentPeriod(employeeIds, period);
             Map<String, List<EmploymentPeriodImported>> data3 = listEmploymentPeriodImported.stream().collect(Collectors.groupingBy(item ->item.getEmpID()));
             employmentPeriodCache = KeyDateHistoryCache.loaded(createEntries2(data3));
-            
+
             List<WorkingConditionItemWithPeriod> listData = workingConditionRepo.getWorkingConditionItemWithPeriod(AppContexts.user().companyId(), employeeIds, period);
             Map<String, List<WorkingConditionItemWithPeriod>> data6 = listData.stream().collect(Collectors.groupingBy(item ->item.getWorkingConditionItem().getEmployeeId()));
             workCondItemWithPeriodCache = KeyDateHistoryCache.loaded(createEntries5(data6));
-            
+
             List<EmployeeLeaveJobPeriodImport> listEmpPeriod = empHisAdapter.getLeaveBySpecifyingPeriod(employeeIds, period);
             Map<String, List<EmployeeLeaveJobPeriodImport>> data7 = listEmpPeriod.stream().collect(Collectors.groupingBy(item -> item.getEmpID()));
             empHisCache = KeyDateHistoryCache.loaded(createEntries7(data7));
-            
+
             List<EmpLeaveWorkPeriodImport> empLeaveWorkPeriods =  leaHisAdapter.getHolidayPeriod(employeeIds, period);
             Map<String, List<EmpLeaveWorkPeriodImport>> data5 = empLeaveWorkPeriods.stream().collect(Collectors.groupingBy(item ->item.getEmpID()));
             empLeaveWorkPeriodCache = KeyDateHistoryCache.loaded(createEntries4(data5));
-            
+
             workScheExistedCache = workScheduleRepository.checkExists(employeeIds, period);
-            
+
             workScheConfirmAtrMap = workScheduleRepository.getConfirmedStatus(employeeIds, period);
         }
-        
+
         private Map<String, List<DateHistoryCache.Entry<EmpEnrollPeriodImport>>>  createEntries1(Map<String, List<EmpEnrollPeriodImport>> data) {
             Map<String, List<DateHistoryCache.Entry<EmpEnrollPeriodImport>>> rs = new HashMap<>();
             data.forEach( (k,v) -> {
@@ -394,7 +399,7 @@ public class ScreenQueryWorkPlaceCheckFile {
             });
             return rs;
         }
-        
+
         private Map<String, List<DateHistoryCache.Entry<EmploymentPeriodImported>>>  createEntries2(Map<String, List<EmploymentPeriodImported>> data) {
             Map<String, List<DateHistoryCache.Entry<EmploymentPeriodImported>>> rs = new HashMap<>();
             data.forEach( (k,v) -> {
@@ -403,7 +408,7 @@ public class ScreenQueryWorkPlaceCheckFile {
             });
             return rs;
         }
-        
+
         private Map<String, List<DateHistoryCache.Entry<WorkingConditionItemWithPeriod>>>  createEntries5(Map<String, List<WorkingConditionItemWithPeriod>> data) {
             Map<String, List<DateHistoryCache.Entry<WorkingConditionItemWithPeriod>>> rs = new HashMap<>();
             data.forEach( (k,v) -> {
@@ -412,7 +417,7 @@ public class ScreenQueryWorkPlaceCheckFile {
             });
             return rs;
         }
-        
+
         private Map<String, List<DateHistoryCache.Entry<EmployeeLeaveJobPeriodImport>>> createEntries7(Map<String, List<EmployeeLeaveJobPeriodImport>> data) {
             Map<String, List<DateHistoryCache.Entry<EmployeeLeaveJobPeriodImport>>> rs = new HashMap<>();
             data.forEach( (k, v) -> {
@@ -421,7 +426,7 @@ public class ScreenQueryWorkPlaceCheckFile {
             });
             return rs;
         }
-        
+
         private Map<String, List<DateHistoryCache.Entry<EmpLeaveWorkPeriodImport>>>  createEntries4(Map<String, List<EmpLeaveWorkPeriodImport>> data) {
             Map<String, List<DateHistoryCache.Entry<EmpLeaveWorkPeriodImport>>> rs = new HashMap<>();
             data.forEach( (k,v) -> {
@@ -437,22 +442,22 @@ public class ScreenQueryWorkPlaceCheckFile {
         }
 
 //        @Override
-//        public List<String> getEmpCanReferByWorkplaceGroup(GeneralDate date, String empId, String workplaceGroupID) {
-//            return workplaceGroupAdapter.getReferableEmp(date, empId, workplaceGroupID);
+//        public List<String> getEmpCanReferByWorkplaceGroup(String empId, GeneralDate date, DatePeriod period, String workplaceGroupID) {
+//            return workplaceGroupAdapter.getReferableEmp(empId, date, period, workplaceGroupID);
 //        }
-        
+
         @Override
-        public List<String> getEmpCanReferByWorkplaceGroup(GeneralDate date, String empId, String workplaceGroupID) {
+        public List<String> getEmpCanReferByWorkplaceGroup(String empId, GeneralDate date, DatePeriod period, String workplaceGroupID) {
             return workplaceGroupCache.get(new GetEmpCanReferByWorkplaceGroupParam(date, empId, workplaceGroupID)).orElse(new ArrayList<String>());
         }
 
 //        @Override
-//        public List<String> getAllEmpCanReferByWorkplaceGroup(GeneralDate date, String empId) {
-//            return workplaceGroupAdapter.getAllReferableEmp(date, empId);
+//        public List<String> getAllEmpCanReferByWorkplaceGroup(String empId, GeneralDate date, DatePeriod period) {
+//            return workplaceGroupAdapter.getAllReferableEmp(empId, date, period);
 //        }
-        
+
         @Override
-        public List<String> getAllEmpCanReferByWorkplaceGroup(GeneralDate date, String empId) {
+        public List<String> getAllEmpCanReferByWorkplaceGroup(String empId, GeneralDate date, DatePeriod period) {
             return workplaceGroupAllCache.get(new GetAllEmpCanReferByWorkplaceGroupParam(date, empId)).orElse(new ArrayList<String>());
         }
 
@@ -493,8 +498,8 @@ public class ScreenQueryWorkPlaceCheckFile {
                     .worktypeCodes(new ArrayList<String>())
                     .filterByClosure(false)
                     .closureIds(new ArrayList<Integer>())
-                    .periodStart(GeneralDateTime.now())
-                    .periodEnd(GeneralDateTime.now())
+                    .periodStart( GeneralDateTime.fromString(regulationInfoEmpQuery.getPeriodStart() + " 00:00", "yyyy/MM/dd HH:mm") )
+                    .periodEnd( GeneralDateTime.fromString(regulationInfoEmpQuery.getPeriodEnd() + " 00:00", "yyyy/MM/dd HH:mm") )
                     .includeIncumbents(true)
                     .includeWorkersOnLeave(true)
                     .includeOccupancy(true)
@@ -612,8 +617,13 @@ public class ScreenQueryWorkPlaceCheckFile {
         public boolean isWorkScheduleComfirmed(EmployeeId employeeId, GeneralDate ymd) {
         	return workScheConfirmAtrMap.get(new EmployeeAndYmd(employeeId.v(), ymd)).equals(ConfirmedATR.CONFIRMED) ? true : false;
         }
+
+		@Override
+		public List<EmpOrganizationImport> getEmpOrganization(GeneralDate baseDate, List<String> lstEmpId) {
+			return empAffiliationInforAdapter.getEmpOrganization(baseDate, lstEmpId);
+		}
     }
-    
+
     @AllArgsConstructor
     @Getter
     public static class GetEmpCanReferByWorkplaceGroupParam {
@@ -621,7 +631,7 @@ public class ScreenQueryWorkPlaceCheckFile {
         String empId;
         String workplaceGroupID;
     }
-    
+
     @AllArgsConstructor
     @Getter
     public static class GetAllEmpCanReferByWorkplaceGroupParam {

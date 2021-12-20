@@ -1,0 +1,21 @@
+#left-content {
+	float: left;
+	width: 340px;
+    height: 410px;
+    
+	border-radius: 7px;
+    box-sizing: border-box;
+}
+#right-content {
+	margin-left: 10px;
+	float: left;
+	margin-top: 0px;
+}
+#search-box {   
+    display: flex;
+    margin-left: 20px;
+}
+.container-custom {	
+    display: flex;	
+    margin:10px 20px ;
+}

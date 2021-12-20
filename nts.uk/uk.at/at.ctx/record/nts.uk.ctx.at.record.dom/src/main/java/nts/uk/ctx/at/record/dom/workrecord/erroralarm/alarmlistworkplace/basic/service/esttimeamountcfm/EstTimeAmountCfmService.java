@@ -10,6 +10,8 @@ import nts.uk.ctx.at.record.dom.workrecord.erroralarm.primitivevalue.DisplayMess
 import nts.uk.ctx.at.shared.dom.scherec.alarm.alarmlistactractionresult.AlarmValueDate;
 import nts.uk.ctx.at.shared.dom.scherec.alarm.alarmlistactractionresult.AlarmValueMessage;
 import nts.uk.ctx.at.shared.dom.scherec.alarm.alarmlistactractionresult.MessageDisplay;
+import nts.uk.shr.com.company.CompanyAdapter;
+import nts.uk.shr.com.company.CompanyInfor;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.i18n.TextResource;
 
@@ -29,7 +31,8 @@ public class EstTimeAmountCfmService {
 
     @Inject
     private CompanyEstablishmentAdaptor companyEstablishmentAdaptor;
-
+    @Inject
+    private CompanyAdapter companyAdapter;
     /**
      * 目安時間・金額確認
      *
@@ -43,6 +46,8 @@ public class EstTimeAmountCfmService {
         // 空欄のリスト「抽出結果」を作成する
         List<ExtractResultDto> results = new ArrayList<>();
 
+        Optional<CompanyInfor> companyInfor = companyAdapter.getCurrentCompany();
+
         // 「Input．期間．開始日．年」から「Input．期間．終了日．年」までループする。
         int startYear = ymPeriod.start().year();
         int endYear = ymPeriod.end().year();
@@ -51,7 +56,7 @@ public class EstTimeAmountCfmService {
             Optional<CompanyEstablishmentImport> comEstOpt = companyEstablishmentAdaptor.findById2(cid, startYear);
             if (!comEstOpt.isPresent()) {
                 // 「アラーム値メッセージ」を作成します。
-                String message = TextResource.localize("KAL020_8", String.valueOf(startYear), AppContexts.user().companyCode());
+                String message = TextResource.localize("KAL020_8", String.valueOf(startYear), AppContexts.user().companyCode() + "　" + companyInfor.map(CompanyInfor::getCompanyName).orElse(""));
 
                 // ドメインオブジェクト「抽出結果」を作成してリスト「抽出結果」に追加
                 ExtractResultDto result = new ExtractResultDto(new AlarmValueMessage(message),

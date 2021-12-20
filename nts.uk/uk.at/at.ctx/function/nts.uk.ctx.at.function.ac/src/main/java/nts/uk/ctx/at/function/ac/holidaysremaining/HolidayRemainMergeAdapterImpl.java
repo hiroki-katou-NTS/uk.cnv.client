@@ -1,9 +1,6 @@
 package nts.uk.ctx.at.function.ac.holidaysremaining;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -12,14 +9,7 @@ import javax.inject.Inject;
 import lombok.val;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.YearMonth;
-import nts.uk.ctx.at.function.dom.adapter.holidaysremaining.AnnLeaveOfThisMonthImported;
-import nts.uk.ctx.at.function.dom.adapter.holidaysremaining.AnnLeaveUsageStatusOfThisMonthImported;
-import nts.uk.ctx.at.function.dom.adapter.holidaysremaining.AnnualLeaveUsageImported;
-import nts.uk.ctx.at.function.dom.adapter.holidaysremaining.CheckCallRequest;
-import nts.uk.ctx.at.function.dom.adapter.holidaysremaining.HdRemainDetailMerEx;
-import nts.uk.ctx.at.function.dom.adapter.holidaysremaining.HolidayRemainMerEx;
-import nts.uk.ctx.at.function.dom.adapter.holidaysremaining.HolidayRemainMergeAdapter;
-import nts.uk.ctx.at.function.dom.adapter.holidaysremaining.StatusOfHolidayImported;
+import nts.uk.ctx.at.function.dom.adapter.holidaysremaining.*;
 import nts.uk.ctx.at.function.dom.adapter.periodofspecialleave.SpecialHolidayImported;
 import nts.uk.ctx.at.function.dom.adapter.reserveleave.ReserveHolidayImported;
 import nts.uk.ctx.at.function.dom.adapter.reserveleave.ReservedYearHolidayImported;
@@ -56,7 +46,7 @@ public class HolidayRemainMergeAdapterImpl implements HolidayRemainMergeAdapter{
 	private RemainMergeRepository repoRemainMer;
 	@Inject
 	private GetConfirmedAnnualLeave a;
-	@Inject 
+	@Inject
 	private GetConfirmedReserveLeave b;
 	@Inject
 	private MonthlyDayoffRemainExport c;
@@ -64,24 +54,30 @@ public class HolidayRemainMergeAdapterImpl implements HolidayRemainMergeAdapter{
 	private MonthlyAbsenceleaveRemainExport d;
 	@Inject
 	private SpecialHolidayRemainDataSevice e;
-	
-	@Inject 
+
+	@Inject
 	private HdRemainDetailMerPub hdMerPub;
-	
+
 	@Override
 	public HolidayRemainMerEx getRemainMer(String employeeId, YearMonthPeriod period) {
 		val lstYrMon = ConvertHelper.yearMonthsBetween(period);
 		Map<YearMonth, List<RemainMerge>> mapRemainMer = repoRemainMer.findBySidsAndYrMons(employeeId, lstYrMon);
 		//255
-		List<AnnualLeaveUsageExport> lstAnn = a.getYearHdMonthlyVer2(employeeId, period, mapRemainMer);
+		List<AnnualLeaveUsageExport> lstAnn = a.getYearHdMonthlyVer4(employeeId, period, mapRemainMer);
 		List<AnnualLeaveUsageImported> result255 = new ArrayList<>();
 		for (AnnualLeaveUsageExport ann : lstAnn) {
-			AnnualLeaveUsageImported HolidayRemainData = new AnnualLeaveUsageImported(ann.getYearMonth(),
-					ann.getUsedDays().v(), ann.getUsedTime().map(i -> i.v()).orElse(null), ann.getRemainingDays().v(),
-					ann.getRemainingTime().map(i -> i.v()).orElse(null));
+			AnnualLeaveUsageImported HolidayRemainData = new AnnualLeaveUsageImported(
+					ann.getYearMonth(),
+					ann.getUsedDays().v(),
+					ann.getUsedTime().map(i -> i.v()).orElse(null),
+					ann.getRemainingDays().v(),
+					ann.getRemainingTime().map(i -> i.v()).orElse(null),
+					ann.getNumOfuses().isPresent()?ann.getNumOfuses().get().v():null,
+					ann.getNumOfRemain().isPresent()?ann.getNumOfRemain().get().v():null,
+					ann.getMonthlyRemainTime().isPresent()?ann.getMonthlyRemainTime().get().v():null
+			);
 			result255.add(HolidayRemainData);
 		}
-		
 		//258
 		List<ReserveLeaveUsageExport> lstRsv = b.getYearRsvMonthlyVer2(employeeId, period, mapRemainMer);
 		List<ReservedYearHolidayImported> result258 = new ArrayList<>();
@@ -89,7 +85,7 @@ public class HolidayRemainMergeAdapterImpl implements HolidayRemainMergeAdapter{
 			result258.add(new ReservedYearHolidayImported(rsv.getYearMonth(),
 					rsv.getUsedDays().v(), rsv.getRemainingDays().v()));
 		}
-		
+
 		//259
 		List<DayoffCurrentMonthOfEmployee> lstDayCur = c.lstDayoffCurrentMonthOfEmpVer2(employeeId, period, mapRemainMer);
 		List<StatusHolidayImported> result259 = new ArrayList<>();
@@ -99,7 +95,7 @@ public class HolidayRemainMergeAdapterImpl implements HolidayRemainMergeAdapter{
 						day.getUnUsedTimes(), day.getRemainingDays(), day.getRemainingTimes());
 				result259.add(statusHoliday);
 		}
-		
+
 		//260
 		List<AbsenceleaveCurrentMonthOfEmployee> lstAbs = d.getDataCurrMonOfEmpVer2(employeeId, period, mapRemainMer);
 		List<StatusOfHolidayImported> result260 = new ArrayList<>();
@@ -108,7 +104,7 @@ public class HolidayRemainMergeAdapterImpl implements HolidayRemainMergeAdapter{
 					abs.getUsedDays(), abs.getUnUsedDays(), abs.getRemainingDays());
 			result260.add(sttOfHd);
 		}
-		
+
 		//263
 		List<SpecialHolidayRemainDataOutput> lstSpeHd = e.getSpeHdOfConfMonVer2(employeeId, period, mapRemainMer);
 		List<SpecialHolidayImported> result263 = new ArrayList<>();
@@ -117,7 +113,7 @@ public class HolidayRemainMergeAdapterImpl implements HolidayRemainMergeAdapter{
 					speHd.getUseTimes(), speHd.getRemainDays(), speHd.getRemainTimes());
 			result263.add(specialHoliday);
 		}
-		
+
 		return new HolidayRemainMerEx(result255, result258, result259, result260, result263);
 	}
 
@@ -133,7 +129,7 @@ public class HolidayRemainMergeAdapterImpl implements HolidayRemainMergeAdapter{
 				annLeave.getUsedMinutes(), annLeave.getRemainDays().v(), annLeave.getRemainMinutes());
 		//268
 		ReserveLeaveNowExport reserveLeave = data.getResult268();
-		ReserveHolidayImported result268 = reserveLeave == null ? null : new ReserveHolidayImported(reserveLeave.getStartMonthRemain().v(), 
+		ReserveHolidayImported result268 = reserveLeave == null ? null : new ReserveHolidayImported(reserveLeave.getStartMonthRemain().v(),
 				reserveLeave.getGrantNumber().v(), reserveLeave.getUsedNumber().v(), reserveLeave.getRemainNumber().v(),
 				reserveLeave.getUndigestNumber().v());
 		//269
@@ -165,10 +161,114 @@ public class HolidayRemainMergeAdapterImpl implements HolidayRemainMergeAdapter{
 		List<RsvLeaUsedCurrentMonImported> result364 = lst364.stream().map(c -> new RsvLeaUsedCurrentMonImported(
 				c.getYearMonth(), c.getUsedNumber().v(), c.getRemainNumber().v())).collect(Collectors.toList());
 		//369
-		Optional<GeneralDate> result369 = data.getResult369() == null ? Optional.empty() : 
+		Optional<GeneralDate> result369 = data.getResult369() == null ? Optional.empty() :
 					Optional.of(data.getResult369().getGrantDate());
-		
 		return new HdRemainDetailMerEx(result265, result268, result269, result363, result364, result369);
 	}
 
+	@Override
+	public List<AggrResultOfAnnualLeaveEachMonthKdr> getRs363(String employeeId, YearMonth currentMonth, GeneralDate baseDate, DatePeriod period,
+															  boolean checkCall363) {
+		CheckCallRQ check = new CheckCallRQ(false, false, false, checkCall363, false, false);
+		HdRemainDetailMer data = hdMerPub.getHdRemainDetailMer(employeeId, currentMonth, baseDate, period, check);
+		List<AggrResultOfAnnualLeaveEachMonth> lst363 = data.getResult363();
+		List<AggrResultOfAnnualLeaveEachMonthKdr> lsRs = lst363.stream().map(e->
+        {
+            val aggrResultOfAnnualLeaveAsOfStart =  e.getAggrResultOfAnnualLeave().getAsOfGrant();
+            val aggrResultOfAnnualLeaveAsLased =  e.getAggrResultOfAnnualLeave().getLapsed();
+            List<AnnualLeaveInfoKdr> asOfGrant = Collections.emptyList();
+            List<AnnualLeaveInfoKdr> lapsed = Collections.emptyList();
+            if(aggrResultOfAnnualLeaveAsOfStart.isPresent()){
+                asOfGrant=   e.getAggrResultOfAnnualLeave().getAsOfGrant().get().stream().map(
+                        i -> new AnnualLeaveInfoKdr(
+                                i.getYmd(),
+                                new AnnualLeaveRemainingKdr(
+                                        i.getRemainingNumber().getAnnualLeaveNoMinus(),
+                                        i.getRemainingNumber().getAnnualLeaveWithMinus(),
+                                        i.getRemainingNumber().getHalfDayAnnualLeaveNoMinus(),
+                                        i.getRemainingNumber().getHalfDayAnnualLeaveWithMinus(),
+                                        i.getRemainingNumber().getTimeAnnualLeaveNoMinus(),
+                                        i.getRemainingNumber().getTimeAnnualLeaveWithMinus(),
+                                        i.getRemainingNumber().getAnnualLeaveUndigestNumber()
+                                ),
+                                i.getGrantRemainingDataList(),
+                                i.getMaxData(),
+                                i.getGrantInfo(),
+                                i.getUsedDays(),
+                                i.getUsedTime(),
+                                i.getAnnualPaidLeaveSet()
+                        )
+                ).collect(Collectors.toList());
+            }
+            if(aggrResultOfAnnualLeaveAsLased.isPresent()){
+                lapsed =  aggrResultOfAnnualLeaveAsLased.get().stream().map(
+                        i -> new AnnualLeaveInfoKdr(
+                                i.getYmd(),
+                                new AnnualLeaveRemainingKdr(
+                                        i.getRemainingNumber().getAnnualLeaveNoMinus(),
+                                        i.getRemainingNumber().getAnnualLeaveWithMinus(),
+                                        i.getRemainingNumber().getHalfDayAnnualLeaveNoMinus(),
+                                        i.getRemainingNumber().getHalfDayAnnualLeaveWithMinus(),
+                                        i.getRemainingNumber().getTimeAnnualLeaveNoMinus(),
+                                        i.getRemainingNumber().getTimeAnnualLeaveWithMinus(),
+                                        i.getRemainingNumber().getAnnualLeaveUndigestNumber()
+                                ),
+                                i.getGrantRemainingDataList(),
+                                i.getMaxData(),
+                                i.getGrantInfo(),
+                                i.getUsedDays(),
+                                i.getUsedTime(),
+                                i.getAnnualPaidLeaveSet()
+                        )
+                ).collect(Collectors.toList());
+            }
+            return new AggrResultOfAnnualLeaveEachMonthKdr(
+                    e.getYearMonth(),
+                    new AggrResultOfAnnualLeaveKdr(
+                            new AnnualLeaveInfoKdr(
+                                    e.getAggrResultOfAnnualLeave().getAsOfPeriodEnd().getYmd(),
+                                    new AnnualLeaveRemainingKdr(
+                                            e.getAggrResultOfAnnualLeave().getAsOfPeriodEnd().getRemainingNumber().getAnnualLeaveNoMinus(),
+                                            e.getAggrResultOfAnnualLeave().getAsOfPeriodEnd().getRemainingNumber().getAnnualLeaveWithMinus(),
+                                            e.getAggrResultOfAnnualLeave().getAsOfPeriodEnd().getRemainingNumber().getHalfDayAnnualLeaveNoMinus(),
+                                            e.getAggrResultOfAnnualLeave().getAsOfPeriodEnd().getRemainingNumber().getHalfDayAnnualLeaveWithMinus(),
+                                            e.getAggrResultOfAnnualLeave().getAsOfPeriodEnd().getRemainingNumber().getTimeAnnualLeaveNoMinus(),
+                                            e.getAggrResultOfAnnualLeave().getAsOfPeriodEnd().getRemainingNumber().getTimeAnnualLeaveWithMinus(),
+                                            e.getAggrResultOfAnnualLeave().getAsOfPeriodEnd().getRemainingNumber().getAnnualLeaveUndigestNumber()
+                                    ),
+                                    e.getAggrResultOfAnnualLeave().getAsOfPeriodEnd().getGrantRemainingDataList(),
+                                    e.getAggrResultOfAnnualLeave().getAsOfPeriodEnd().getMaxData(),
+                                    e.getAggrResultOfAnnualLeave().getAsOfPeriodEnd().getGrantInfo(),
+                                    e.getAggrResultOfAnnualLeave().getAsOfPeriodEnd().getUsedDays(),
+                                    e.getAggrResultOfAnnualLeave().getAsOfPeriodEnd().getUsedTime(),
+                                    e.getAggrResultOfAnnualLeave().getAsOfPeriodEnd().getAnnualPaidLeaveSet()
+                            ),
+                            new AnnualLeaveInfoKdr(
+                                    e.getAggrResultOfAnnualLeave().getAsOfStartNextDayOfPeriodEnd().getYmd(),
+                                    new AnnualLeaveRemainingKdr(
+                                            e.getAggrResultOfAnnualLeave().getAsOfStartNextDayOfPeriodEnd().getRemainingNumber().getAnnualLeaveNoMinus(),
+                                            e.getAggrResultOfAnnualLeave().getAsOfStartNextDayOfPeriodEnd().getRemainingNumber().getAnnualLeaveWithMinus(),
+                                            e.getAggrResultOfAnnualLeave().getAsOfStartNextDayOfPeriodEnd().getRemainingNumber().getHalfDayAnnualLeaveNoMinus(),
+                                            e.getAggrResultOfAnnualLeave().getAsOfStartNextDayOfPeriodEnd().getRemainingNumber().getHalfDayAnnualLeaveWithMinus(),
+                                            e.getAggrResultOfAnnualLeave().getAsOfStartNextDayOfPeriodEnd().getRemainingNumber().getTimeAnnualLeaveNoMinus(),
+                                            e.getAggrResultOfAnnualLeave().getAsOfStartNextDayOfPeriodEnd().getRemainingNumber().getTimeAnnualLeaveWithMinus(),
+                                            e.getAggrResultOfAnnualLeave().getAsOfStartNextDayOfPeriodEnd().getRemainingNumber().getAnnualLeaveUndigestNumber()
+                                    ),
+                                    e.getAggrResultOfAnnualLeave().getAsOfStartNextDayOfPeriodEnd().getGrantRemainingDataList(),
+                                    e.getAggrResultOfAnnualLeave().getAsOfStartNextDayOfPeriodEnd().getMaxData(),
+                                    e.getAggrResultOfAnnualLeave().getAsOfStartNextDayOfPeriodEnd().getGrantInfo(),
+                                    e.getAggrResultOfAnnualLeave().getAsOfStartNextDayOfPeriodEnd().getUsedDays(),
+                                    e.getAggrResultOfAnnualLeave().getAsOfStartNextDayOfPeriodEnd().getUsedTime(),
+                                    e.getAggrResultOfAnnualLeave().getAsOfStartNextDayOfPeriodEnd().getAnnualPaidLeaveSet()
+
+
+                            ),
+                            asOfGrant,
+                            lapsed
+                    )
+            );
+        })
+				.collect(Collectors.toList());
+		return lsRs;
+	}
 }

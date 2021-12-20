@@ -132,11 +132,13 @@ public class JpaAttendanceItemLinkingRepository extends JpaRepository implements
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@Override
 	public List<AttendanceItemLinking> getFullDataByAttdIdAndType(List<Integer> attendanceItemIds, TypeOfItem type) {
-		if(attendanceItemIds.isEmpty()) {
-			return Collections.emptyList();
-		}
+    	List<Integer> ids = attendanceItemIds.stream().filter(x -> x != null).collect(Collectors.toList());
+    	if (ids.isEmpty()) return Collections.emptyList();
+//		if(attendanceItemIds.isEmpty()) {
+//			return Collections.emptyList();
+//		}
 		List<KfnmtAttendanceLink> results  = new ArrayList<>();
-		CollectionUtil.split(attendanceItemIds, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subList -> {
+		CollectionUtil.split(ids, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subList -> {
 			results.addAll(this.queryProxy().query(FIND_BY_ITEM_ID_AND_TYPE, KfnmtAttendanceLink.class)
 					.setParameter("attendanceItemIds", subList)
 					.setParameter("typeOfItem", type.value).getList());

@@ -42,14 +42,19 @@ public class SpecialHolidayDto {
 		if(specialHoliday == null) {
 			return null;
 		}
-
-		GrantRegularDto grantRegular = GrantRegularDto.fromDomain(specialHoliday.getGrantRegular() != null ? specialHoliday.getGrantRegular() : null);
-
-		SpecialLeaveRestrictionDto specialLeaveRestriction = SpecialLeaveRestrictionDto
-				.fromDomain(specialHoliday.getSpecialLeaveRestriction() != null ? specialHoliday.getSpecialLeaveRestriction() : null);
-
-		TargetItemDto targetItem = TargetItemDto.fromDomain(specialHoliday.getTargetItem() != null ? specialHoliday.getTargetItem() : null);
-
+		GrantRegularDto grantRegular = null;
+		if(specialHoliday.getGrantRegular()!=null) {
+			grantRegular= GrantRegularDto.fromDomain(specialHoliday.getGrantRegular());
+		}
+		SpecialLeaveRestrictionDto specialLeaveRestriction = null;
+		if(specialHoliday.getSpecialLeaveRestriction() != null){
+			 specialLeaveRestriction = SpecialLeaveRestrictionDto
+					.fromDomain(specialHoliday.getSpecialLeaveRestriction());
+		}
+		TargetItemDto targetItem = null;
+		if(specialHoliday.getTargetItem()!=null){
+			targetItem	= TargetItemDto.fromDomain(specialHoliday.getTargetItem());
+		}
 		return new SpecialHolidayDto(
 				specialHoliday.getCompanyId(),
 				specialHoliday.getSpecialHolidayCode().v(),

@@ -59,4 +59,11 @@ public class RecSpecificDateSettingAdapterImpl implements RecSpecificDateSetting
 				.collect(Collectors.toList());
 	}
 
+	@Override
+	public RecSpecificDateSettingImport findSpecDateSetByWkpLst(String companyID, List<String> workPlaceIds,
+			GeneralDate date) {
+		WpSpecificDateSettingExport wpSpecificDateSettingExport = wpSpecificDateSettingPub.findSpecDateSetByWkpLst(companyID, workPlaceIds, date);
+		return new RecSpecificDateSettingImport(wpSpecificDateSettingExport.getDate(), wpSpecificDateSettingExport.getNumberList());
+	}
+
 }

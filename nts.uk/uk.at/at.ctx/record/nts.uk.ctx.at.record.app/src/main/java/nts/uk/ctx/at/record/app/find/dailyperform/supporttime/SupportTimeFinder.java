@@ -16,9 +16,7 @@ import javax.inject.Inject;
 import lombok.val;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
-import nts.uk.ctx.at.record.app.find.dailyattendance.timesheet.ouen.dto.OuenWorkTimeSheetOfDailyAttendanceDto;
 import nts.uk.ctx.at.record.app.find.dailyattendance.timesheet.ouen.dto.OuenWorkTimeSheetOfDailyDto;
-import nts.uk.ctx.at.record.app.find.dailyperform.remark.dto.RemarksOfDailyDto;
 import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDaily;
 import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDailyRepo;
 import nts.uk.ctx.at.shared.app.util.attendanceitem.FinderFacade;
@@ -63,9 +61,7 @@ public class SupportTimeFinder extends FinderFacade{
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends ConvertibleAttendanceItem> List<T> find(List<String> employeeIds, DatePeriod period) {
-		List<OuenWorkTimeSheetOfDaily> domainDailys = employeeIds.stream().map(c -> this.repo.find(c, period))
-				.flatMap(List::stream)
-				.collect(Collectors.toList());
+		List<OuenWorkTimeSheetOfDaily> domainDailys = this.repo.find(employeeIds, period);
 		
 		List<OuenWorkTimeSheetOfDailyDto> dtos = group(domainDailys);
 		return (List<T>) dtos;

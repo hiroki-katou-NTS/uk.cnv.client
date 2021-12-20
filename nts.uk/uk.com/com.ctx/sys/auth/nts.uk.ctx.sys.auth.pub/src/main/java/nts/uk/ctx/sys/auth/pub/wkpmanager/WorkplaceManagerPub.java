@@ -19,5 +19,12 @@ public interface WorkplaceManagerPub {
 	 * ドメインモデル「職場管理者」を取得する
 	 */
 	List<WorkplaceManagerExport> findByPeriodAndBaseDate(String wkpId, GeneralDate baseDate);
+
+	// Get workplace manager list by workplace id
+	List<WorkplaceManagerExport> getWkpManagerListByWkpId(String workplaceId);
+
+	List<WorkplaceManagerExport> findListWkpManagerByWkpIdsAndBaseDate(List<String> wkpIDLst, GeneralDate baseDate);
 }
+
+
 

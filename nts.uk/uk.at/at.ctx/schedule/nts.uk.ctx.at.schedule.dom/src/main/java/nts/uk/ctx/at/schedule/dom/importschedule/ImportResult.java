@@ -95,6 +95,14 @@ public class ImportResult {
 
 
 	/**
+	 * 未チェックの取り込み結果が存在するか
+	 * @return true: 存在する / false: 存在しない
+	 */
+	public boolean existsUncheckedResults() {
+		return !this.getUncheckedResults().isEmpty();
+	}
+
+	/**
 	 * 未チェックの取り込み結果を取得する
 	 * @return 取り込み結果リスト(状態＝未チェック)
 	 */

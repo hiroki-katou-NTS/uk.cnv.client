@@ -30,7 +30,7 @@ public class KsrmtCalcShortTimeWork extends ContractUkJpaEntity implements Seria
 	
 	/** 計算方法 */
 	@Column(name = "CALC_METHOD")
-	public int calcMethod;
+	public boolean calcMethod;
 	
 	@Override
 	protected Object getKey() {

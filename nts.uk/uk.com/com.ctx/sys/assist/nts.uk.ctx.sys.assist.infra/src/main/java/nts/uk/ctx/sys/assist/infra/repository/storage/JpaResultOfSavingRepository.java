@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import nts.arc.layer.infra.data.JpaRepository;
@@ -73,7 +74,7 @@ public class JpaResultOfSavingRepository extends JpaRepository implements Result
 			data.targetNumberPeople = targetNumberPeople;
 			data.saveStatus = saveStatus.value;
 			data.fileId = fileId;
-			data.deletedFiles = deletedFiles.value;
+			data.deletedFiles = BooleanUtils.toBoolean(deletedFiles.value);
 			data.saveFileName = compressedFileName;
 			data.saveEndDatetime = GeneralDateTime.now();
 			this.commandProxy().update(data);
@@ -121,7 +122,7 @@ public class JpaResultOfSavingRepository extends JpaRepository implements Result
 												.setParameter("fileId", fileId)
 												.getSingle();
 		op.ifPresent(data -> {
-			data.deletedFiles = NotUseAtr.USE.value;
+			data.deletedFiles = BooleanUtils.toBoolean(NotUseAtr.USE.value);
 			this.commandProxy().update(data);
 		});
 								

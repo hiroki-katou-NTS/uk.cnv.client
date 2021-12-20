@@ -20,6 +20,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.WithinStatu
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.WithinStatutoryTimeOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.affiliationinfor.AffiliationInforOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.affiliationinfor.ClassificationCode;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.WorkTimes;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakgoout.BreakTimeOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.breaking.BreakTimeOfDailyAttd;
@@ -129,6 +130,44 @@ public class IntegrationOfDailyHelperInAggregation {
 					, Optional.empty()	// スナップショット
 				);
 
+	}
+	
+
+	/**
+	 * 日別勤怠の勤務情報、日別勤怠の出退勤、日別勤怠の勤怠時間を使って日別勤怠（work)を作成する
+	 * @param employeeId 社員ID
+	 * @param ymd 年月日
+	 * @param workInfo 日別勤怠の勤務情報
+	 * @param attendanceLeave 日別勤怠の出退勤
+	 * @param attendanceTime 日別勤怠の勤怠時間
+	 * @return 日別勤怠(Work)
+	 */
+	public static IntegrationOfDaily create(
+			String employeeId, 
+			GeneralDate ymd, 
+			WorkInfoOfDailyAttendance workInfo,
+			Optional<TimeLeavingOfDailyAttd> attendanceLeave,
+			Optional<AttendanceTimeOfDailyAttendance> attendanceTime
+			) {
+		return new IntegrationOfDaily( employeeId, ymd
+				, workInfo			// 勤務情報
+				, CalAttrOfDailyAttd.defaultData()
+				, AffInfoHelper.createDummuy()	// 所属情報
+				, Optional.empty()	// PCログオン情報
+				, new ArrayList<>()	// エラーアラーム
+				, Optional.empty()	// 外出時間帯
+				, breakTime			// 休憩時間帯
+				, attendanceTime	// 勤怠時間
+				, attendanceLeave	// 出退勤
+				, Optional.empty()	// 短時間勤務時間帯
+				, Optional.empty()	// 特定日区分
+				, Optional.empty()	// 入退門
+				, Optional.empty()	// 任意項目
+				, new ArrayList<>()	// 編集状態
+				, Optional.empty()	// 臨時出退勤
+				, new ArrayList<>()	// 備考
+				, Optional.empty()	// スナップショット
+			);
 	}
 
 	/**

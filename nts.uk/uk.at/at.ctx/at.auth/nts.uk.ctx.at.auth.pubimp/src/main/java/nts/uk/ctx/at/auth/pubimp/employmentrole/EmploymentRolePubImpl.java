@@ -18,7 +18,7 @@ public class EmploymentRolePubImpl implements EmploymentRolePub {
 	@Override
 	public List<EmploymentRolePubDto> getAllByCompanyId(String companyId) {
 		return repository.getAllByCompanyId(companyId).stream().map(item -> {
-			return new EmploymentRolePubDto(item.getCompanyId(), item.getRoleId(),item.getScheduleEmployeeRef().value,item.getBookEmployeeRef().value,item.getEmployeeRefSpecAgent().value,item.getPresentInqEmployeeRef().value,item.getFutureDateRefPermit().value);
+			return new EmploymentRolePubDto(item.getCompanyId(), item.getRoleId(), item.getFutureDateRefPermit().value);
 		}).collect(Collectors.toList());
 	}
 }

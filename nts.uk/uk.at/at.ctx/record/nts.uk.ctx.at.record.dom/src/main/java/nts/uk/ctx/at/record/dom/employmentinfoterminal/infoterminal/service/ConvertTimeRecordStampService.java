@@ -5,13 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import lombok.val;
 import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.task.tran.AtomTask;
 import nts.arc.time.GeneralDate;
-import nts.arc.time.GeneralDateTime;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.record.dom.adapter.employmentinfoterminal.infoterminal.EmpDataImport;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.reflectstamp.ReflectStampInDailyRecord;
@@ -22,7 +19,6 @@ import nts.uk.ctx.at.record.dom.stamp.card.stampcard.ContractCode;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampCard;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.InfoReflectDestStamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.ReflectDataStampDailyService;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.RegisterStampData;
@@ -55,13 +51,13 @@ public class ConvertTimeRecordStampService {
 		}
 		
 		Optional<AtomTask> stampReflectResult = RegisterStampData.registerStamp(require,
-				stamp.get().getRight(), Optional.of(stamp.get().getLeft()));
+				stamp.get());
 		if(!stampReflectResult.isPresent()) {
 			return Optional.empty();
 		}
 		
 		//	$社員データ 
-		Optional<EmpDataImport> employeeData = getEmployeeData(require, contractCode, stamp.get().getKey().getCardNumber());
+		Optional<EmpDataImport> employeeData = getEmployeeData(require, contractCode, stamp.get().getCardNumber());
 		
 		if (!employeeData.isPresent())
 			return Optional
@@ -72,14 +68,14 @@ public class ConvertTimeRecordStampService {
 			return Optional
 					.of(new StampDataReflectResult(Optional.empty(), stampReflectResult.orElse(AtomTask.none())));
 		
-		return createDailyData(require, stamp.get().getKey(), stampReflectResult.get());
+		return createDailyData(require, stamp.get(), stampReflectResult.get());
 	}
 
 	//打刻を作成する
-	private static Optional<Pair<Stamp, StampRecord>> createStamp(EmpInfoTerminal empInfoTer,
+	private static Optional<Stamp> createStamp(EmpInfoTerminal empInfoTer,
 			ContractCode contractCode, StampReceptionData stampReceptData){
 		//＄打刻
-		Optional<Pair<Stamp, StampRecord>> stamp = empInfoTer.getCreateStampInfo().createStamp(contractCode, stampReceptData, empInfoTer.getEmpInfoTerCode());
+		Optional<Stamp> stamp = empInfoTer.getCreateStampInfo().createStamp(contractCode, stampReceptData, empInfoTer.getEmpInfoTerCode());
 		return stamp;
 	}
 
@@ -148,6 +144,10 @@ public class ConvertTimeRecordStampService {
 		Optional<EmpDataImport> empData = employeeId
 				.flatMap(sid -> require.getEmpData(Arrays.asList(sid)).stream().findFirst());
 		
+		if (!employeeId.isPresent() || !empData.isPresent()) {
+			return Optional.empty();
+		}
+		
 		return empData;
 		
 	}
@@ -160,8 +160,8 @@ public class ConvertTimeRecordStampService {
 				ContractCode contractCode);
 
 		// [R-2]打刻記録を取得する
-		public Optional<StampRecord> getStampRecord(ContractCode contractCode, StampNumber stampNumber,
-				GeneralDateTime dateTime);
+//		public Optional<StampRecord> getStampRecord(ContractCode contractCode, StampNumber stampNumber,
+//				GeneralDateTime dateTime);
 
 		// [R-3]打刻カードを取得する
 		public Optional<StampCard> getByCardNoAndContractCode(ContractCode contractCode, StampNumber stampNumber);

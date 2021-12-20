@@ -46,7 +46,7 @@ public class SyWorkplaceAcFinder implements SyWorkplaceAdapter {
 						.collect(Collectors.toMap(
 								Entry::getKey, 
 								item -> new AffWorkplaceHistoryItemImport(item.getValue().getHistoryId(), 
-										item.getValue().getWorkplaceId(), item.getValue().getNormalWorkplaceId())))))
+										item.getValue().getWorkplaceId())))))
 				.collect(Collectors.toList());
 	}
 

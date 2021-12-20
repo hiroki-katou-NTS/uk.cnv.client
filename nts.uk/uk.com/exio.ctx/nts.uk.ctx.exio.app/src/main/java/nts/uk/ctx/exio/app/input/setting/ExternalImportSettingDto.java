@@ -1,7 +1,6 @@
 package nts.uk.ctx.exio.app.input.setting;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.Value;
@@ -11,9 +10,11 @@ import nts.uk.ctx.exio.dom.input.csvimport.ExternalImportCsvFileInfo;
 import nts.uk.ctx.exio.dom.input.csvimport.ExternalImportRowNumber;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomainId;
 import nts.uk.ctx.exio.dom.input.importableitem.ImportableItem;
+import nts.uk.ctx.exio.dom.input.setting.DomainImportSetting;
 import nts.uk.ctx.exio.dom.input.setting.ExternalImportCode;
 import nts.uk.ctx.exio.dom.input.setting.ExternalImportName;
 import nts.uk.ctx.exio.dom.input.setting.ExternalImportSetting;
+import nts.uk.ctx.exio.dom.input.setting.ImportSettingBaseType;
 import nts.uk.ctx.exio.dom.input.setting.assembly.ExternalImportAssemblyMethod;
 import nts.uk.ctx.exio.dom.input.setting.assembly.mapping.ImportingItemMapping;
 import nts.uk.ctx.exio.dom.input.setting.assembly.mapping.ImportingMapping;
@@ -43,49 +44,59 @@ public class ExternalImportSettingDto {
 	/** CSVの取込開始行 */
 	private int importStartRow;
 	
+	private String baseFileId;
+	
 	/** レイアウト */
 	private List<ExternalImportLayoutDto> layouts;
 	
-	public static ExternalImportSettingDto fromDomain(Require require, ExternalImportSetting domain) {
-		
+	public static ExternalImportSettingDto fromDomain(Require require, ExternalImportSetting domain, DomainImportSetting domainSetting) {
 		return new ExternalImportSettingDto(
 				domain.getCompanyId(), 
 				domain.getCode().toString(), 
 				domain.getName().toString(), 
-				domain.getExternalImportDomainId().value, 
-				domain.getImportingMode().value, 
-				domain.getAssembly().getCsvFileInfo().getItemNameRowNumber().hashCode(), 
-				domain.getAssembly().getCsvFileInfo().getImportStartRowNumber().hashCode(), 
-				domain.getAssembly().getMapping().getMappings().stream()
-					.map(m -> ExternalImportLayoutDto.fromDomain(require, domain.getExternalImportDomainId(), m))
-				.collect(Collectors.toList()));
+				domainSetting.getDomainId().value, 
+				domainSetting.getImportingMode().value, 
+				domain.getCsvFileInfo().getItemNameRowNumber().hashCode(), 
+				domain.getCsvFileInfo().getImportStartRowNumber().hashCode(),
+				domain.getCsvFileInfo().getBaseCsvFileId().orElse(""),
+				domainSetting.getAssembly().getMapping().getMappings().stream()
+					.map(m -> ExternalImportLayoutDto.fromDomain(require, domainSetting.getDomainId(), m))
+					.sorted(Comparator.comparing(ExternalImportLayoutDto::getItemNo))
+					.collect(Collectors.toList()));
 	}
 
 	
 	public ExternalImportSetting toDomain(Require require) {
-		return new ExternalImportSetting(
-				companyId, 
-				new ExternalImportCode(code), 
-				new ExternalImportName(name), 
+		DomainImportSetting domainSetting = new DomainImportSetting (
 				ImportingDomainId.valueOf(domain), 
 				ImportingMode.valueOf(mode), 
 				new ExternalImportAssemblyMethod(
-						new ExternalImportCsvFileInfo(
-								new ExternalImportRowNumber(itemNameRow), 
-								new ExternalImportRowNumber(importStartRow)), 
 						new ImportingMapping(createMappings(require))));
+		Map<ImportingDomainId, DomainImportSetting> domainSettings = new HashMap<>();
+		domainSettings.put(ImportingDomainId.valueOf(domain), domainSetting);
+
+		return new ExternalImportSetting(
+				ImportSettingBaseType.DOMAIN_BASE,
+				companyId, 
+				new ExternalImportCode(code), 
+				new ExternalImportName(name), 
+				new ExternalImportCsvFileInfo(
+						new ExternalImportRowNumber(itemNameRow), 
+						new ExternalImportRowNumber(importStartRow),
+						Optional.empty()),
+				domainSettings);
 	}
-	
+
 	private List<ImportingItemMapping> createMappings(Require require){
 		val optRegisteredSetting = require.getSetting(AppContexts.user().companyId(), new ExternalImportCode(code));
 		if(optRegisteredSetting.isPresent()) {
-			val mappings = optRegisteredSetting.get().getAssembly().getMapping().getMappings();
+			val mappings = optRegisteredSetting.get().getDomainSettings().get(0).getAssembly().getMapping().getMappings();
 			if(mappings.size() > 0) {
 				return mappings;
 			}
 		}
 		return layouts.stream()
-				.map(l -> new ImportingItemMapping(l.itemNo, null, null))
+				.map(l -> new ImportingItemMapping(l.itemNo, true, Optional.empty(), Optional.empty()))
 				.collect(Collectors.toList());
 	}
 	
@@ -126,12 +137,11 @@ public class ExternalImportSettingDto {
 	
 	private static String checkImportSource(ImportingItemMapping mapping) {
 		val optCsvColumnNo = mapping.getCsvColumnNo();
-		val optFixedValue = mapping.getFixedValue();
-		if(optCsvColumnNo.isPresent()){
-			return "CSV";
-		}
-		else if(optFixedValue.isPresent()){
+		if(mapping.isFixedValue()){
 			return "固定値";
+		}
+		else if(optCsvColumnNo.isPresent()){
+			return "CSV";
 		}
 		else {
 			return "未設定";

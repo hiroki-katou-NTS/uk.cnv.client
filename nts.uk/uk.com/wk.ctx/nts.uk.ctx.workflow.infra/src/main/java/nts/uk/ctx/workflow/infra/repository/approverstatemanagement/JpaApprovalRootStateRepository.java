@@ -3,12 +3,7 @@ package nts.uk.ctx.workflow.infra.repository.approverstatemanagement;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -518,6 +513,7 @@ public class JpaApprovalRootStateRepository extends JpaRepository implements App
 	@Override
 	public List<ApprovalRootState> findAppByListEmployeeIDRecordDate(GeneralDate startDate, GeneralDate endDate,
 			List<String> employeeIDs, Integer rootType) {
+		if (CollectionUtil.isEmpty(employeeIDs)) return Collections.emptyList();
 		switch (rootType) {
 			case 1:
 				return this.queryProxy().query(SELECT_DAY_BY_LIST_EMP_DATE, WwfdtApprovalRootDay.class)
@@ -713,9 +709,6 @@ public class JpaApprovalRootStateRepository extends JpaRepository implements App
 		}
 
 		String query = "";
-		String lstPhase = NtsStatement.In.createParamsString(lstPhaseStt);
-		String lstFrame = NtsStatement.In.createParamsString(lstFrameStt);
-		String lstIds = NtsStatement.In.createParamsString(lstApproverID);
 
 		query = "SELECT root.ROOT_STATE_ID, root.EMPLOYEE_ID, root.APPROVAL_RECORD_DATE, "
 				+ 	"phase.PHASE_ORDER, phase.APPROVAL_FORM, phase.APP_PHASE_ATR, approver.APPROVER_ORDER, "
@@ -727,36 +720,38 @@ public class JpaApprovalRootStateRepository extends JpaRepository implements App
 				+ "WHERE root.ROOT_STATE_ID IN "
 				+ 	"(SELECT DISTINCT a.ROOT_STATE_ID " + "FROM WWFDT_APP_INST_APPROVER a "
 				+ 		"inner join WWFDT_APP_INST_PHASE c on a.ROOT_STATE_ID = c.ROOT_STATE_ID and a.PHASE_ORDER = c.PHASE_ORDER "
-				+ 		"and a.APP_DATE >= ?  and a.APP_DATE <= ? " 
-				+ 		"and c.APP_PHASE_ATR IN (" + lstPhase + ") " 
-				+ 		"and a.APPROVAL_ATR IN (" + lstFrame + ") " 
-				+ 		"and (a.APPROVER_ID IN (" + lstIds + ") or (a.AGENT_ID = ?)) "
+				+ 		"and a.APP_DATE >= @startDate  and a.APP_DATE <= @endDate " 
+				+ 		"and c.APP_PHASE_ATR IN @lstPhaseStt " 
+				+ 		"and a.APPROVAL_ATR IN @lstFrameStt " 
+				+ 		"and (a.APPROVER_ID IN @lstApproverID or (a.AGENT_ID = @approverID)) "
 				+ 	")";
+		
+		NtsStatement ntsStatement = new NtsStatement(query, this.jdbcProxy())
+				.paramDate("startDate", period.start())
+				.paramDate("endDate", period.end())
+				.paramInt("lstPhaseStt", lstPhaseStt)
+				.paramInt("lstFrameStt", lstFrameStt)
+				.paramString("lstApproverID", lstApproverID)
+				.paramString("approverID", approverID);
 
-		List<WwfdtFullJoinState> listFullData = new ArrayList<>();
-
-		try (val pstatement = this.connection().prepareStatement(query)) {
-			pstatement.setString(1, period.start().toString("yyyy-MM-dd"));
-			pstatement.setString(2, period.end().toString("yyyy-MM-dd"));
-
-			for (int i = 0; i < lstPhaseStt.size(); i++) {
-				pstatement.setInt(i + 3, lstPhaseStt.get(i));
-			}
-
-			for (int i = 0; i < lstFrameStt.size(); i++) {
-				pstatement.setInt(i + 3 + lstPhaseStt.size(), lstFrameStt.get(i));
-			}
-
-			for (int i = 0; i < lstApproverID.size(); i++) {
-				pstatement.setString(i + 3 + lstPhaseStt.size() + lstFrameStt.size(), lstApproverID.get(i));
-			}
-			
-			pstatement.setString(3 + lstPhaseStt.size() + lstFrameStt.size() + lstApproverID.size(), approverID);
-
-			listFullData.addAll(WwfdtFullJoinState.fromResultSet(new NtsResultSet(pstatement.executeQuery())));
-		}
-
-		// List<ApprovalRootState> entityRoot = WwfdtFullJoinState.toDomain(listFullData);
+		List<WwfdtFullJoinState> listFullData = ntsStatement.getList(rec -> {
+			return new WwfdtFullJoinState(
+					rec.getString("ROOT_STATE_ID"), 
+					rec.getString("EMPLOYEE_ID"), 
+					rec.getGeneralDate("APPROVAL_RECORD_DATE"), 
+					rec.getInt("PHASE_ORDER"), 
+					rec.getInt("APPROVAL_FORM"), 
+					rec.getInt("APP_PHASE_ATR"), 
+					rec.getInt("APPROVER_ORDER"), 
+					rec.getString("APPROVER_ID"), 
+					rec.getInt("APPROVAL_ATR"), 
+					rec.getInt("CONFIRM_ATR"), 
+					rec.getString("AGENT_ID"), 
+					rec.getGeneralDateTime("APPROVAL_DATE"), 
+					rec.getString("APPROVAL_REASON"), 
+					rec.getGeneralDate("APP_DATE"), 
+					rec.getInt("APPROVER_LIST_ORDER"));
+		});
 		
 		if(unapprovalStatus) {
 			List<String> unapprovalStatusStrLst = listFullData.stream().filter(x -> {

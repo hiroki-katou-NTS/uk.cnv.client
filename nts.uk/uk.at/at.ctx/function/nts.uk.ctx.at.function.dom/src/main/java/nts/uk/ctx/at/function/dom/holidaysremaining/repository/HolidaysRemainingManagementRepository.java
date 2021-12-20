@@ -9,6 +9,8 @@ public interface HolidaysRemainingManagementRepository {
 
 	List<HolidaysRemainingManagement> getHolidayManagerLogByCompanyId(String companyId);
 
+	Optional<HolidaysRemainingManagement> getHolidayManagerByLayOutId(String layOutId);
+
 	Optional<HolidaysRemainingManagement> getHolidayManagerByCidAndExecCd(String companyID, String code);
 
 	void insert(HolidaysRemainingManagement domain);
@@ -16,4 +18,6 @@ public interface HolidaysRemainingManagementRepository {
 	void update(HolidaysRemainingManagement domain);
 
 	void remove(String companyId, String code);
+
+	void remove(String layoutId);
 }

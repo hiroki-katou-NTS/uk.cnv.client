@@ -1,10 +1,14 @@
 package nts.uk.ctx.at.record.dom.monthlyclosureupdateprocess.remainnumberprocess;
 
+
+import java.util.Optional;
+
 import lombok.val;
 import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.task.tran.AtomTask;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.record.dom.monthly.holidaymanagement.publicholiday.GetAggregationPeriodForPublicHoliday;
 import nts.uk.ctx.at.record.dom.monthlyclosureupdateprocess.remainnumberprocess.annualleave.AnnualLeaveProcess;
 import nts.uk.ctx.at.record.dom.monthlyclosureupdateprocess.remainnumberprocess.care.CareProcess;
 import nts.uk.ctx.at.record.dom.monthlyclosureupdateprocess.remainnumberprocess.childcare.ChildCareProcess;
@@ -42,6 +46,18 @@ public class MonthlyClosureRemainNumProcess {
 		val interimRemainMng = require.monthInterimRemainData(cacheCarrier, companyId, empId, period.getPeriod(),
 												attTimeMonthly.getYearMonth(), period.getClosureId(), period.getClosureDate());
 		
+		Optional<DatePeriod> aggregationPeriodForPublicHoliday = 
+				GetAggregationPeriodForPublicHoliday.getAggregationPeriodForPublicHoliday(require,
+				cacheCarrier, companyId, empId,period.getYearMonth(), period.getPeriod());
+
+		// Workを考慮した月次処理用の暫定残数管理データを作成する
+		FixedRemainDataForMonthlyAgg interimDatasForPublicHoliday = new FixedRemainDataForMonthlyAgg();
+		if (aggregationPeriodForPublicHoliday.isPresent())
+			interimDatasForPublicHoliday = require.monthInterimRemainData(cacheCarrier, companyId, empId, 
+					aggregationPeriodForPublicHoliday.get(),
+					attTimeMonthly.getYearMonth(), period.getClosureId(), period.getClosureDate());
+
+		
 		/** 年休処理 */
 		return AnnualLeaveProcess.annualHolidayProcess(require, cacheCarrier, cid, period, empId, interimRemainMng.getDaily())
 				/** 振休処理 */
@@ -51,7 +67,8 @@ public class MonthlyClosureRemainNumProcess {
 				/** 特別休暇処理 */
 				.then(SpecialHolidayProcess.specialHolidayProcess(require, cacheCarrier, period, empId, interimRemainMng.getDaily()))
 				/** 公休処理 */
-				.then(PublicHolidayProcess.process(require, cacheCarrier, period, empId, interimRemainMng.getDaily()))
+				.then(PublicHolidayProcess.process(require, cacheCarrier, period, aggregationPeriodForPublicHoliday, empId, interimDatasForPublicHoliday.getDaily()))
+
 				/** TODO: 60H超休処理 */
 				
 				/** 子の看護休暇処理 */

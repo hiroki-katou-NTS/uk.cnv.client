@@ -57,7 +57,7 @@ public class GetWorkplacesServiceTest {
 		new Expectations() { 
 			{
 				require.getAffiliatedEmployees(workplaceIds.get(0), baseDate);
-				result = Arrays.asList(new AffWorkplaceHistoryItemImport("historyId","employeeId","workplaceId","normalWorkplaceId"));
+				result = Arrays.asList(new AffWorkplaceHistoryItemImport("historyId","employeeId","workplaceId"));
 				
 				require.getProcessCloseCorrespondToEmps((List<String>) any, baseDate);
 				
@@ -108,7 +108,7 @@ public class GetWorkplacesServiceTest {
 		new Expectations() {
 			{
 				require.getAffiliatedEmployees(workplaceIds.get(0), baseDate);
-				result = Arrays.asList(new AffWorkplaceHistoryItemImport("historyId","employeeId","workplaceId","normalWorkplaceId"));
+				result = Arrays.asList(new AffWorkplaceHistoryItemImport("historyId","employeeId","workplaceId"));
 				
 				require.getProcessCloseCorrespondToEmps((List<String>) any, (GeneralDate) any);
 				result = Arrays.asList(new ClosureInformation("employeeID", 1));
@@ -133,7 +133,7 @@ public class GetWorkplacesServiceTest {
 		new Expectations() {
 			{
 				require.getAffiliatedEmployees(workplaceIds.get(0), baseDate);
-				result = Arrays.asList(new AffWorkplaceHistoryItemImport("historyId","employeeId","workplaceId","normalWorkplaceId"));
+				result = Arrays.asList(new AffWorkplaceHistoryItemImport("historyId","employeeId","workplaceId"));
 				
 				require.getProcessCloseCorrespondToEmps((List<String>) any, (GeneralDate) any);
 				result = Arrays.asList(new ClosureInformation("employeeID", 2));

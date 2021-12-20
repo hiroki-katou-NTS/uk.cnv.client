@@ -23,7 +23,7 @@ import nts.uk.ctx.at.function.dom.alarm.checkcondition.AlarmCheckConditionByCate
 import nts.uk.ctx.at.function.dom.alarm.checkcondition.CheckCondition;
 import nts.uk.ctx.at.function.dom.alarm.extractionrange.ExtractionRangeBase;
 import nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.ExtractionPeriodDaily;
-import nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.SpecifiedMonth;
+import nts.uk.ctx.at.function.dom.alarm.extractionrange.daily.DailyClosingDateSpecifiedMonth;
 import nts.uk.ctx.at.function.dom.alarm.extractionrange.month.ExtractionPeriodMonth;
 import nts.uk.ctx.at.function.dom.alarm.extractionrange.month.mutilmonth.AverageMonth;
 import nts.uk.ctx.at.function.dom.alarm.extractionrange.periodunit.ExtractionPeriodUnit;
@@ -75,7 +75,7 @@ public class AlarmPatternSettingFinder {
 
 	public List<SpecifiedMonthDto> getSpecifiedMonth() {
 		List<SpecifiedMonthDto> monthDtos = new ArrayList<SpecifiedMonthDto>();
-		for (SpecifiedMonth r : SpecifiedMonth.values()) {
+		for (DailyClosingDateSpecifiedMonth r : DailyClosingDateSpecifiedMonth.values()) {
 			monthDtos.add(new SpecifiedMonthDto(r.value, r.nameId));
 		}
 		return monthDtos;

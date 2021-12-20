@@ -7,9 +7,9 @@ package nts.uk.ctx.at.shared.dom.vacation.setting.subst;
  */
 public enum ManageDeadline {
 	//締めで管理する
-	MANAGE_BY_TIGHTENING( 0 , "締めで管理する", "締めで管理する"),
+	MANAGE_BY_TIGHTENING( 0 , "KMF001_328", "KMF001_328"),
 	//発生日を基準にして管理する
-	MANAGE_BY_BASE_DATE(1, "発生日を基準にして管理する" ,"発生日を基準にして管理する") ;
+	MANAGE_BY_BASE_DATE(1, "KMF001_329" ,"KMF001_329") ;
 	
 	/** The value. */
 	public int value;

@@ -2,14 +2,15 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
     import setShared = nts.uk.ui.windows.setShared;
     import getShared = nts.uk.ui.windows.getShared;
     import getText = nts.uk.resource.getText;
+    import characteristics = nts.uk.characteristics;
 
     export class ScreenModel {
 
         modeCompany: KnockoutObservable<boolean> = ko.observable(true);
-        workplaceModeName : KnockoutObservable<String > = ko.observable(getText("Com_Workplace"));
-        
+        workplaceModeName: KnockoutObservable<String> = ko.observable(getText("Com_Workplace"));
+
         palletUnit: KnockoutObservableArray<any> = ko.observableArray([]);
-        selectedpalletUnit: KnockoutObservable<number> ;
+        selectedpalletUnit: KnockoutObservable<number>;
         enableSwitchBtn: KnockoutObservable<boolean> = ko.observable(true);
         overwrite: KnockoutObservable<boolean> = ko.observable(true);
         enableCheckBoxOverwrite: KnockoutObservable<boolean> = ko.observable(true);
@@ -25,11 +26,11 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
         textName: KnockoutObservable<string> = ko.observable(null);
         tooltip: KnockoutObservable<string> = ko.observable(null);
         selectedLinkButtonCom: KnockoutObservable<number> = ko.observable(0);
-        KEY = 'nts.uk.characteristics.ksu001Data';
+        KEY = 'ksu001Data';
         selectedLinkButtonWkp: KnockoutObservable<number> = ko.observable(0);
         flag: boolean = true;
         dataToStick: any = null;
-        listPageInfo : any;
+        listPageInfo: any;
         isFirstCom: boolean = true;
         isFirstOrg: boolean = true;
 
@@ -42,28 +43,27 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
         listShiftWork: any[] = ko.observableArray([]);
         listPageComIsEmpty: boolean = false;
         listPageWkpIsEmpty: boolean = false;
-        
-        constructor() {
+
+        constructor(data) {
             let self = this;
-            
+
             self.contextMenu = [
                 { id: "openDialog", text: getText("KSU001_1705"), action: self.openDialogJB.bind(self) },
                 { id: "openPopup", text: getText("KSU001_1706"), action: self.openPopup.bind(self) },
                 { id: "delete", text: getText("KSU001_1707"), action: self.remove.bind(self) }
             ];
-            
+
             self.palletUnit = ko.observableArray([
                 { code: 1, name: getText("Com_Company") },
                 { code: 2, name: self.workplaceModeName() }
             ]);
-            
-            uk.localStorage.getItem(self.KEY).ifPresent((data) => {
-                let userInfor: IUserInfor = JSON.parse(data);
-                self.selectedpalletUnit = ko.observable(userInfor.shiftPalletUnit);
-            }).ifEmpty((data) => {
+
+            if (!_.isNil(data)) {
+                self.selectedpalletUnit = ko.observable(data.shiftPalletUnit);
+            } else {
                 self.selectedpalletUnit = ko.observable(1);
-            });
-            
+            }
+
             self.overwrite.subscribe((newValue) => {
                 if (newValue) {
                     $("#extable").exTable("stickOverWrite", true);
@@ -71,18 +71,15 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
                     $("#extable").exTable("stickOverWrite", false);
                 }
             });
-            
+
             self.selectedpalletUnit.subscribe((newValue) => {
                 if (self.flag == false)
                     return;
                 if (newValue) {
                     $("#extable").exTable("stickData", []);
-                    uk.localStorage.getItem(self.KEY).ifPresent((data) => {
-                        let userInfor = JSON.parse(data);
-                        userInfor.shiftPalletUnit = newValue;
-                        uk.localStorage.setItemAsJson(self.KEY, userInfor);
-                    });
-
+                    __viewContext.viewModel.viewA.userInfor.shiftPalletUnit = newValue;
+                    characteristics.save(self.KEY, __viewContext.viewModel.viewA.userInfor);
+                    
                     self.changeMode();
                 }
             });
@@ -94,8 +91,7 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
                 let arrDataToStick = [];
 
                 // get listShiftMaster luu trong localStorage
-                let itemLocal = uk.localStorage.getItem(self.KEY);
-                let userInfor = JSON.parse(itemLocal.get());
+                let userInfor = __viewContext.viewModel.viewA.userInfor;
                 let listShiftMasterSaveLocal = userInfor.shiftMasterWithWorkStyleLst;
 
                 if (value.column == -1 || value.row == -1) {
@@ -116,60 +112,60 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
                         if (shiftMasterName == mami || workInfo.length == 0) {
                             isMasterNotReg = true;
                         } else {
-                            arrDataToStick.push(new ExCell(workInfo[0].workTypeCode, '', workInfo[0].workTimeCode, '', '', '', workInfo[0].shiftMasterName, workInfo[0].shiftMasterCode)); 
+                            arrDataToStick.push(new ExCell(workInfo[0].workTypeCode, '', workInfo[0].workTimeCode, '', '', '', workInfo[0].shiftMasterName, workInfo[0].shiftMasterCode));
                         }
                     }
                     if (isMasterNotReg == true) {
                         arrDataToStick = [];
                     }
-                    
+
                     $("#extable").exTable("stickData", arrDataToStick);
-                    
+
                     // set color for cell
                     $("#extable").exTable("stickStyler", function(rowIdx, key, innerIdx, data, stickOrigData) {
                         let modeBackGround = __viewContext.viewModel.viewA.backgroundColorSelected(); // 0||1
                         let shiftCode;
-                        if(_.isNil(stickOrigData)){
+                        if (_.isNil(stickOrigData)) {
                             shiftCode = data.shiftCode;
-                        }else{
+                        } else {
                             shiftCode = stickOrigData.shiftCode == "" ? data.shiftCode : stickOrigData.shiftCode;
                         }
                         let workInfo = _.filter(listShiftMasterSaveLocal, function(o) { return o.shiftMasterCode === shiftCode; });
                         if (workInfo.length > 0) {
                             let workStyle = workInfo[0].workStyle;
                             if (workStyle == AttendanceHolidayAttr.FULL_TIME + '') {
-                                if(modeBackGround == 1){
-                                    return { textColor: "#0000ff", background : "#" + workInfo[0].color }; // color-attendance
-                                }else{
-                                    return { textColor: "#0000ff"}; // color-attendance
+                                if (modeBackGround == 1) {
+                                    return { textColor: "#0000ff", background: "#" + workInfo[0].color }; // color-attendance
+                                } else {
+                                    return { textColor: "#0000ff" }; // color-attendance
                                 }
                             }
                             if (workStyle == AttendanceHolidayAttr.MORNING + '') {
-                                if(modeBackGround == 1){
-                                    return { textColor: "#FF7F27", background : "#" + workInfo[0].color };// color-half-day-work
-                                }else{
+                                if (modeBackGround == 1) {
+                                    return { textColor: "#FF7F27", background: "#" + workInfo[0].color };// color-half-day-work
+                                } else {
                                     return { textColor: "#FF7F27" };// color-half-day-work
                                 }
                             }
                             if (workStyle == AttendanceHolidayAttr.AFTERNOON + '') {
-                                if(modeBackGround == 1){
-                                    return { textColor: "#FF7F27", background : "#" + workInfo[0].color };// color-half-day-work
-                                }else{
-                                    return { textColor: "#FF7F27"};// color-half-day-work
+                                if (modeBackGround == 1) {
+                                    return { textColor: "#FF7F27", background: "#" + workInfo[0].color };// color-half-day-work
+                                } else {
+                                    return { textColor: "#FF7F27" };// color-half-day-work
                                 }
                             }
                             if (workStyle == AttendanceHolidayAttr.HOLIDAY + '') {
-                                if(modeBackGround == 1){
-                                    return { textColor: "#ff0000", background : "#" + workInfo[0].color };// color-holiday
-                                }else{
+                                if (modeBackGround == 1) {
+                                    return { textColor: "#ff0000", background: "#" + workInfo[0].color };// color-holiday
+                                } else {
                                     return { textColor: "#ff0000" };// color-holiday
                                 }
-                                
+
                             }
                             if (nts.uk.util.isNullOrUndefined(workStyle) || nts.uk.util.isNullOrEmpty(workStyle)) {
-                                if(modeBackGround == 1){
-                                    return { textColor: "#000000", background : "#ffffff" } // デフォルト（黒）  Default (black)
-                                }else{
+                                if (modeBackGround == 1) {
+                                    return { textColor: "#000000", background: "#ffffff" } // デフォルト（黒）  Default (black)
+                                } else {
                                     return { textColor: "#000000" }
                                 }
                             }
@@ -184,11 +180,8 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
                 }
 
                 if (value.column !== -1 && value.row !== -1) {
-                    uk.localStorage.getItem(self.KEY).ifPresent((data) => {
-                        let userInfor: any = JSON.parse(data);
-                        userInfor.shiftPalletPositionNumberCom = { column: self.selectedButtonTableCompany().column, row: self.selectedButtonTableCompany().row, data : value.data  };
-                        uk.localStorage.setItemAsJson(self.KEY, userInfor);
-                    });
+                    __viewContext.viewModel.viewA.userInfor.shiftPalletPositionNumberCom = { column: self.selectedButtonTableCompany().column, row: self.selectedButtonTableCompany().row, data: value.data };
+                    characteristics.save(self.KEY, __viewContext.viewModel.viewA.userInfor);
                 }
             });
 
@@ -198,8 +191,7 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
                 let indexBtnSelected = value.column + value.row * 10;
                 let arrDataToStickWkp = [];
                 // get listShiftMaster luu trong localStorage
-                let itemLocal = uk.localStorage.getItem(self.KEY);
-                let userInfor = JSON.parse(itemLocal.get());
+                let userInfor = __viewContext.viewModel.viewA.userInfor;
                 let listShiftMasterSaveLocal = userInfor.shiftMasterWithWorkStyleLst;
                 let mami = nts.uk.resource.getText('KSU001_94');
 
@@ -220,15 +212,15 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
                         if (shiftMasterName == mami || workInfo.length == 0) {
                             isMasterNotReg = true;
                         } else {
-                            arrDataToStickWkp.push(new ExCell(workInfo[0].workTypeCode, '', workInfo[0].workTimeCode, '', '', '', workInfo[0].shiftMasterName,workInfo[0].shiftMasterCode)); 
+                            arrDataToStickWkp.push(new ExCell(workInfo[0].workTypeCode, '', workInfo[0].workTimeCode, '', '', '', workInfo[0].shiftMasterName, workInfo[0].shiftMasterCode));
                         }
                     }
                     if (isMasterNotReg == true) {
                         arrDataToStickWkp = [];
                     }
-                    
+
                     $("#extable").exTable("stickData", arrDataToStickWkp);
-                    
+
                     // set color for cell
                     $("#extable").exTable("stickStyler", function(rowIdx, key, innerIdx, data, stickOrigData) {
                         let modeBackGround = __viewContext.viewModel.viewA.backgroundColorSelected(); // 0||1
@@ -287,11 +279,8 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
                 }
 
                 if (value.column !== -1 && value.row !== -1) {
-                    uk.localStorage.getItem(self.KEY).ifPresent((data) => {
-                        let userInfor: IUserInfor = JSON.parse(data);
-                        userInfor.shiftPalletPositionNumberOrg = { column: self.selectedButtonTableWorkplace().column, row: self.selectedButtonTableWorkplace().row, data : value.data };
-                        uk.localStorage.setItemAsJson(self.KEY, userInfor);
-                    });
+                    __viewContext.viewModel.viewA.userInfor.shiftPalletPositionNumberOrg = { column: self.selectedButtonTableWorkplace().column, row: self.selectedButtonTableWorkplace().row, data: value.data };
+                    characteristics.save(self.KEY, __viewContext.viewModel.viewA.userInfor);
                 }
             });
 
@@ -306,32 +295,28 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
             });
 
         }
-        
+
         /**
          */
         changeMode(): void {
             let self = this;
             if (self.selectedpalletUnit() === 1) {
                 self.modeCompany(true);
-                uk.localStorage.getItem(self.KEY).ifPresent((data) => {
-                    let userInfor : IUserInfor = JSON.parse(data);
-                    self.getDataComPattern(userInfor.shiftPalettePageNumberCom);
-                }).ifEmpty((data) => {
-                    let userInfor : IUserInfor = JSON.parse(data);
+                if (!_.isNil(__viewContext.viewModel.viewA.userInfor)) {
+                    self.getDataComPattern(__viewContext.viewModel.viewA.userInfor.shiftPalettePageNumberCom);
+                } else {
                     self.getDataComPattern(1);
-                });
+                }
             } else {
                 self.modeCompany(false);
-                uk.localStorage.getItem(self.KEY).ifPresent((data) => {
-                    let userInfor: IUserInfor = JSON.parse(data);
-                    self.getDataWkpPattern(userInfor.shiftPalettePageNumberOrg);
-                }).ifEmpty((data) => {
-                    let userInfor: IUserInfor = JSON.parse(data);
+                if (!_.isNil(__viewContext.viewModel.viewA.userInfor)) {
+                    self.getDataWkpPattern(__viewContext.viewModel.viewA.userInfor.shiftPalettePageNumberOrg);
+                } else {
                     self.getDataWkpPattern(1);
-                });
+                }
             }
         }
-        
+
         /**
          * handle init
          * change text of linkbutton
@@ -341,7 +326,7 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
             let self = this;
             self.modeCompany(true);
             self.listPageInfo = listPageInfo;
-            
+
             // truowng hop khong co page nao duoc dang ky
             if (listPageInfo.length == 0) {
                 self.listPageComIsEmpty = true;
@@ -360,22 +345,21 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
             }
             self.textButtonArrComPattern(arr);
             self.textButtonArrComPattern.valueHasMutated();
-            
+
             // get listShiftMaster luu torng localStorage
-            let itemLocal = uk.localStorage.getItem(self.KEY);
-            let userInfor = JSON.parse(itemLocal.get());
+            let userInfor = __viewContext.viewModel.viewA.userInfor;
             let listShiftMasterSaveLocal = userInfor.shiftMasterWithWorkStyleLst;
-            
-            self.updateDataSourceCompany(listPattern , listShiftMasterSaveLocal);
-            
-            let indexLinkBtnCom = self.indexOfPageSelected(listPageInfo , pageNumber);
+
+            self.updateDataSourceCompany(listPattern, listShiftMasterSaveLocal);
+
+            let indexLinkBtnCom = self.indexOfPageSelected(listPageInfo, pageNumber);
             self.selectedLinkButtonCom(indexLinkBtnCom);
             self.clickLinkButton(null, ko.observable(indexLinkBtnCom));
         }
-        
+
         updateDataSourceCompany(listShiftPalletCom, listShiftMasterSaveLocal) {
             let self = this;
-            if(listShiftPalletCom.length == 0) {
+            if (listShiftPalletCom.length == 0) {
                 let source: any[] = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
                 self.sourceCompany(source);
             }
@@ -391,11 +375,11 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
                         let matchShiftWork = _.find(listShiftMasterSaveLocal, ["shiftMasterCode", wPSet.shiftCode != null ? wPSet.shiftCode : wPSet.workTypeCode]);
                         let value = "";
                         if (self.selectedpalletUnit() === 1) {
-                            let shortName = (matchShiftWork != null) ?  matchShiftWork.shiftMasterName : mami;
+                            let shortName = (matchShiftWork != null) ? matchShiftWork.shiftMasterName : mami;
                             value = shortName;
                             arrPairShortName.push(shortName);
                         } else {
-                            let shortName = (matchShiftWork != null) ? matchShiftWork.shiftMasterName  : mami;
+                            let shortName = (matchShiftWork != null) ? matchShiftWork.shiftMasterName : mami;
                             value = shortName;
                             arrPairShortName.push(shortName);
                         }
@@ -426,16 +410,16 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
             }
         }
 
-        private indexOfPageSelected(listPageInfo : any, shiftPalettePageNumber : any) {
+        private indexOfPageSelected(listPageInfo: any, shiftPalettePageNumber: any) {
             let index = _.findIndex(listPageInfo, function(o) { return o.pageNumber == shiftPalettePageNumber; });
             return index != -1 ? index : 0;
         }
-        
+
         handleInitWkp(listPageInfo: any, listPattern: any, pageNumber: any): any {
             let self = this;
             self.modeCompany(false);
             self.listPageInfo = listPageInfo;
-            
+
             // truowng hop khong co page nao duoc dang ky
             if (listPageInfo.length == 0) {
                 self.listPageWkpIsEmpty = true;
@@ -443,12 +427,12 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
             } else {
                 self.listPageWkpIsEmpty = false;
             }
-            
+
             //set default for listTextButton and dataSource
             self.dataSourceWorkplace([null, null, null, null, null, null, null, null, null, null]);
             self.textButtonArrComPattern([]);
             self.textButtonArrComPattern.valueHasMutated();
-            
+
             self.textButtonArrWkpPattern([]);
             self.textButtonArrWkpPattern.valueHasMutated();
             let arr = [];
@@ -457,24 +441,23 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
             }
             self.textButtonArrWkpPattern(arr);
             self.textButtonArrWkpPattern.valueHasMutated();
-            
+
             // get listShiftMaster luu torng localStorage
-            let itemLocal = uk.localStorage.getItem(self.KEY);
-            let userInfor = JSON.parse(itemLocal.get());
+            let userInfor = __viewContext.viewModel.viewA.userInfor;
             let listShiftMasterSaveLocal = userInfor.shiftMasterWithWorkStyleLst;
 
             self.updateDataSourceWorkplace(listPattern, listShiftMasterSaveLocal);
-            
-            let indexLinkBtnOrg = self.indexOfPageSelected(listPageInfo , pageNumber);
+
+            let indexLinkBtnOrg = self.indexOfPageSelected(listPageInfo, pageNumber);
             self.selectedLinkButtonWkp(indexLinkBtnOrg);
             self.clickLinkButton(null, ko.observable(indexLinkBtnOrg));
         }
-        
+
         updateDataSourceWorkplace(listShiftPalletWorkPlace, listShiftMasterSaveLocal) {
             let self = this;
-            if(listShiftPalletWorkPlace.length == 0){
+            if (listShiftPalletWorkPlace.length == 0) {
                 let source: any[] = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-                self.sourceWorkplace(source);    
+                self.sourceWorkplace(source);
             }
             for (let i = 0; i < listShiftPalletWorkPlace.length; i++) {
                 let source: any[] = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
@@ -488,11 +471,11 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
                         let matchShiftWork = _.find(listShiftMasterSaveLocal, ["shiftMasterCode", wPSet.shiftCode != null ? wPSet.shiftCode : wPSet.workTypeCode]);
                         let value = "";
                         if (self.selectedpalletUnit() === 1) {
-                            let shortName = (matchShiftWork != null) ? matchShiftWork.shiftMasterName  :  mami;
+                            let shortName = (matchShiftWork != null) ? matchShiftWork.shiftMasterName : mami;
                             value = shortName;
                             arrPairShortName.push(shortName);
                         } else {
-                            let shortName = (matchShiftWork != null) ? matchShiftWork.shiftMasterName  : mami;
+                            let shortName = (matchShiftWork != null) ? matchShiftWork.shiftMasterName : mami;
                             value = shortName;
                             arrPairShortName.push(shortName);
                         }
@@ -536,17 +519,16 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
                 return;
             nts.uk.ui.block.grayout();
             let pageNumberSelected = self.listPageInfo[indexBtn].pageNumber;
-            let dataLocal = uk.localStorage.getItem(self.KEY);
-            let userInfor = JSON.parse(dataLocal.get());
+            let userInfor = __viewContext.viewModel.viewA.userInfor;
 
             let param = {
                 listShiftMasterNotNeedGetNew: userInfor.shiftMasterWithWorkStyleLst,
                 shiftPalletUnit: self.selectedpalletUnit(),
                 pageNumberCom: pageNumberSelected,
                 pageNumberOrg: pageNumberSelected,
-                unit            : userInfor.unit,
-                workplaceId     : self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 0 ? userInfor.workplaceId : null ),
-                workplaceGroupId: self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 1 ? userInfor.workplaceGroupId : null )
+                unit: userInfor.unit,
+                workplaceId: self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 0 ? userInfor.workplaceId : null),
+                workplaceGroupId: self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 1 ? userInfor.workplaceGroupId : null)
             }
 
             service.getShiftPalletWhenChangePage(param).done((data) => {
@@ -555,20 +537,17 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
                     self.setLinkSelected(indexBtn);
 
                     let shiftPalletPositionNumberCom = {};
-                    uk.localStorage.getItem(self.KEY).ifPresent((dataLocal) => {
-                        let userInfor = JSON.parse(dataLocal);
-                        userInfor.shiftPalettePageNumberCom = pageNumberSelected;
-                        userInfor.shiftMasterWithWorkStyleLst = data.listShiftMaster;
-                        shiftPalletPositionNumberCom = userInfor.shiftPalletPositionNumberCom;
-                        uk.localStorage.setItemAsJson(self.KEY, userInfor);
-                    });
-                    
+                    __viewContext.viewModel.viewA.userInfor.shiftPalettePageNumberCom = pageNumberSelected;
+                    __viewContext.viewModel.viewA.userInfor.shiftMasterWithWorkStyleLst = data.listShiftMaster;
+                    shiftPalletPositionNumberCom = __viewContext.viewModel.viewA.userInfor.shiftPalletPositionNumberCom;
+                    characteristics.save(self.KEY, __viewContext.viewModel.viewA.userInfor);
+
                     //set sourceCompa  
                     let listPattern = data.targetShiftPalette.shiftPalletCom;
-                    self.updateDataSourceCompany(listPattern , data.listShiftMaster);
+                    self.updateDataSourceCompany(listPattern, data.listShiftMaster);
                     self.sourceCompany(self.dataSourceCompany()[pageNumberSelected - 1] || source);
                     self.selectedLinkButtonCom(indexBtn);
-                    
+
                     // select button Table
                     if (self.isFirstCom) {
                         let indexBtnSelected = shiftPalletPositionNumberCom.column + shiftPalletPositionNumberCom.row * 10;
@@ -616,13 +595,11 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
                     self.setLinkSelected(indexBtn);
 
                     let shiftPalletPositionNumberOrg = {};
-                    uk.localStorage.getItem(self.KEY).ifPresent((dataLocal) => {
-                        let userInfor = JSON.parse(dataLocal);
-                        userInfor.shiftPalettePageNumberOrg = pageNumberSelected;
-                        userInfor.shiftMasterWithWorkStyleLst = data.listShiftMaster;
-                        shiftPalletPositionNumberOrg = userInfor.shiftPalletPositionNumberOrg;
-                        uk.localStorage.setItemAsJson(self.KEY, userInfor);
-                    });
+                    __viewContext.viewModel.viewA.userInfor.shiftPalettePageNumberOrg = pageNumberSelected;
+                    __viewContext.viewModel.viewA.userInfor.shiftMasterWithWorkStyleLst = data.listShiftMaster;
+                    shiftPalletPositionNumberOrg = __viewContext.viewModel.viewA.userInfor.shiftPalletPositionNumberOrg;
+                    characteristics.save(self.KEY, __viewContext.viewModel.viewA.userInfor);
+
                     //set sourceWorkplace
                     let listPattern = data.targetShiftPalette.shiftPalletWorkPlace;
                     self.updateDataSourceWorkplace(listPattern, data.listShiftMaster);
@@ -707,31 +684,28 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
             });
         }
         
-        
-        
         getRowColumnIndex(indexBtnSelected: number) {
             if (indexBtnSelected < 10) {
-                let obj = {row : 0 , column : indexBtnSelected};
+                let obj = { row: 0, column: indexBtnSelected };
                 return obj;
             } else {
-                let obj = {row : 1 , column : indexBtnSelected - 10};
+                let obj = { row: 1, column: indexBtnSelected - 10 };
                 return obj;
             }
         }
-        
+
         getShiftPalletWhenChangePage(pageNumber: number): JQueryPromise<any> {
             let self = this, dfd = $.Deferred();
-            let dataLocal = uk.localStorage.getItem(self.KEY);
-            let userInfor = JSON.parse(dataLocal.get());
+            let userInfor = __viewContext.viewModel.viewA.userInfor;
 
             let param = {
                 listShiftMasterNotNeedGetNew: userInfor.shiftMasterWithWorkStyleLst,
                 shiftPalletUnit: self.selectedpalletUnit(),
                 pageNumberCom: pageNumber,
                 pageNumberOrg: pageNumber,
-                unit            : userInfor.unit,
-                workplaceId     : self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 0 ? userInfor.workplaceId : null ),
-                workplaceGroupId: self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 1 ? userInfor.workplaceGroupId : null )
+                unit: userInfor.unit,
+                workplaceId: self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 0 ? userInfor.workplaceId : null),
+                workplaceGroupId: self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 1 ? userInfor.workplaceGroupId : null)
             }
 
             service.getShiftPalletWhenChangePage(param).done((data) => {
@@ -746,7 +720,7 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
         /**
          * Open popup to change name button
          */
-        openPopup(button) {}
+        openPopup(button) { }
 
         /**
          * decision change name button
@@ -769,30 +743,29 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
 
         getDataComPattern(pageNumber): JQueryPromise<any> {
             let self = this, dfd = $.Deferred();
-            let dataLocal = uk.localStorage.getItem(self.KEY);
-            let userInfor = JSON.parse(dataLocal.get());
+            let userInfor = __viewContext.viewModel.viewA.userInfor;
             let param = {
                 listShiftMasterNotNeedGetNew: userInfor.shiftMasterWithWorkStyleLst,
                 shiftPaletteWantGet: {
                     shiftPalletUnit: self.selectedpalletUnit(),
                     pageNumberCom: pageNumber,
                 },
-                workplaceId: self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 0 ? userInfor.workplaceId : userInfor.workplaceGroupId ),
+                workplaceId: self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 0 ? userInfor.workplaceId : userInfor.workplaceGroupId),
                 workplaceGroupId: ''
             }
             nts.uk.ui.block.grayout();
             service.getShiftPallets(param).done((data) => {
                 self.handleInitCom(
-                    data.listPageInfo, 
+                    data.listPageInfo,
                     data.targetShiftPalette.shiftPalletCom,
                     pageNumber);
-                
+
                 // truowng hop khong co page nao duoc dang ky
                 if (data.listPageInfo.length == 0) {
                     // set css table button
                     self.setStyleBtn();
                 }
-                
+
                 nts.uk.ui.block.clear();
                 dfd.resolve();
             }).fail(function() {
@@ -807,17 +780,16 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
          */
         getDataWkpPattern(pageNumber): JQueryPromise<any> {
             let self = this, dfd = $.Deferred();
-            let dataLocal = uk.localStorage.getItem(self.KEY);
-            let userInfor = JSON.parse(dataLocal.get());
+            let userInfor = __viewContext.viewModel.viewA.userInfor;
             let param = {
                 listShiftMasterNotNeedGetNew: userInfor.shiftMasterWithWorkStyleLst,
                 shiftPaletteWantGet: {
                     shiftPalletUnit: self.selectedpalletUnit(),
                     pageNumberOrg: pageNumber,
                 },
-                unit            : userInfor.unit,
-                workplaceId     : self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 0 ? userInfor.workplaceId : null ),
-                workplaceGroupId: self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 1 ? userInfor.workplaceGroupId : null )
+                unit: userInfor.unit,
+                workplaceId: self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 0 ? userInfor.workplaceId : null),
+                workplaceGroupId: self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 1 ? userInfor.workplaceGroupId : null)
             }
             nts.uk.ui.block.grayout();
             service.getShiftPallets(param).done((data) => {
@@ -825,13 +797,13 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
                     data.listPageInfo,
                     data.targetShiftPalette.shiftPalletWorkPlace,
                     pageNumber);
-                
+
                 // truowng hop khong co page nao duoc dang ky
                 if (data.listPageInfo.length == 0) {
                     // set css table button
                     self.setStyleBtn();
                 }
-                
+
                 nts.uk.ui.block.clear();
                 dfd.resolve();
             }).fail(function() {
@@ -846,20 +818,19 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
          */
         openDialogJB1(): JQueryPromise<any> {
             let self = this, dfd = $.Deferred();
-            let dataLocal = uk.localStorage.getItem(self.KEY);
-            let userInfor : IUserInfor = JSON.parse(dataLocal.get());
-            
+            let userInfor: IUserInfor = __viewContext.viewModel.viewA.userInfor;
+
             setShared('dataForJB', {
                 selectedTab: self.selectedpalletUnit() == 1 ? 'company' : userInfor.unit == 0 ? 'workplace' : 'workplaceGroup',
                 workplaceName: self.workplaceModeName(),
                 workplaceCode: userInfor.code,
-                workplaceId: self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 0 ? userInfor.workplaceId : userInfor.workplaceGroupId ),
+                workplaceId: self.selectedpalletUnit() === 1 ? null : (userInfor.unit == 0 ? userInfor.workplaceId : userInfor.workplaceGroupId),
                 listWorkType: __viewContext.viewModel.viewAB.listWorkType(),
                 listWorkTime: __viewContext.viewModel.viewAB.listWorkTime(),
                 selectedLinkButton: self.selectedpalletUnit() === 1 ? userInfor.shiftPalettePageNumberCom - 1 : userInfor.shiftPalettePageNumberOrg - 1,
                 // listCheckNeededOfWorkTime for JA to JA send to JB
                 listCheckNeededOfWorkTime: __viewContext.viewModel.viewA.listCheckNeededOfWorkTime(),
-                overwrite : self.overwrite()
+                overwrite: self.overwrite()
             });
             nts.uk.ui.windows.sub.modal("/view/ksu/001/jb/index.xhtml").onClosed(() => {
                 let pageNumber: any = getShared("dataFromJA").selectedLinkButton + 1;
@@ -938,7 +909,7 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
             }
         }
     }
-    
+
     class ExCell {
         workTypeCode: string;
         workTypeName: string;
@@ -961,7 +932,7 @@ module nts.uk.at.view.ksu001.ac.viewmodel {
             this.shiftCode = shiftCode !== null ? shiftCode : '';
         }
     }
-    
+
     interface IUserInfor {
         disPlayFormat: string;
         backgroundColor: number; // 背景色

@@ -8,17 +8,24 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum LicenseClassification {
 
-	NURSE(0, "看護師"),
+	/**
+	 * 看護師
+	 */
+	NURSE(0, "Enum_LicenseClassification_NURSE"),
 
-	//Associate nurse
-	NURSE_ASSOCIATE(1, "准看護師"),
+	/**
+	 * 准看護師
+	 */
+	NURSE_ASSOCIATE(1, "Enum_LicenseClassification_NURSE_ASSOCIATE"),
 
-	//Nursing assistant
-	NURSE_ASSIST(2, "看護補助者");
+	/**
+	 * 看護補助者
+	 */
+	NURSE_ASSIST(2, "Enum_LicenseClassification_NURSE_ASSIST");
 
 	public final int value;
 
-	public final String name;
+	public final String nameId;
 
 	private final static LicenseClassification[] values = LicenseClassification.values();
 
@@ -35,4 +42,5 @@ public enum LicenseClassification {
 
 		return null;
 	}
+	
 }

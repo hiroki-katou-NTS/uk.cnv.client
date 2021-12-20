@@ -4,7 +4,7 @@ import nts.uk.ctx.exio.dom.input.ExecutionContext;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.DomainCanonicalization;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.ItemNoMap;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.employee.holiday.occurence.OccurenceHolidayCanonicalizationBase;
-import nts.uk.ctx.exio.dom.input.canonicalize.methods.IntermediateResult;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.IntermediateResult;
 
 /**
  * 代休管理データの正準化

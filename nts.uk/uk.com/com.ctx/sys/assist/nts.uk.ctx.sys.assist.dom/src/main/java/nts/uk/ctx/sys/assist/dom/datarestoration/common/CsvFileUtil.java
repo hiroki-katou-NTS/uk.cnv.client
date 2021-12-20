@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import nts.uk.shr.infra.file.storage.stream.FileStoragePath;
 import org.apache.commons.csv.CSVFormat;
 
 import nts.arc.system.ServerSystemProperties;
@@ -26,7 +27,6 @@ import nts.gul.csv.NtsCsvRecord;
 public class CsvFileUtil {
 
 	private static final String NEW_LINE_CHAR = "\r\n";
-	private static final String DATA_STORE_PATH = ServerSystemProperties.fileStoragePath();
 
 	static List<List<String>> getAllRecord(InputStream inputStream) {
 		// get csv reader
@@ -163,6 +163,6 @@ public class CsvFileUtil {
 	}
 
 	public static String getExtractDataStoragePath(String fileId) {
-		return DATA_STORE_PATH + "//packs//" + fileId;
+		return new FileStoragePath().getPathOfCurrentTenant().toString() + "//packs//" + fileId;
 	}
 }

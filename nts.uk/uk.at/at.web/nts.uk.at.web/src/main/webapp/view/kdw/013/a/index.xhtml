@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="/master/base.xhtml">
+		<ui:define name="htmlHead">
+			<com:scriptfile set="IGNITE" />
+			<com:ValidatorScript>
+				nts.uk.ctx.at.shared.dom.scherec.taskmanagement.taskmaster.TaskNote
+			</com:ValidatorScript>
+			
+			<com:stylefile set="FULLCALENDAR" />
+			<com:scriptfile set="FULLCALENDAR" />
+
+			<com:scriptfile path="../share/functional.js" />
+			<com:scriptfile path="../share/dropdown.js" />
+			<com:scriptfile path="../share/input-time.js" />
+			<com:scriptfile path="../share/description.js" />
+			<com:scriptfile path="./cores/fullcalendar.js" />
+
+			<com:stylefile path="./kdw013.a.css" />
+			<com:scriptfile path="./kdw013.a.vm.js" />
+
+			<com:scriptfile path="../b/kdw013.b.vm.js" />
+			<com:scriptfile path="../c/kdw013.c.vm.js" />
+		</ui:define>
+		<ui:define name="content">
+			<div id="functions-area">
+				<button id='btn_register' data-bind="i18n: 'KDW013_1', click: $vm.saveData, mutable: $vm.$toggle.save, hasFocus: true" class="proceed"></button>
+				<button data-bind="i18n: 'KDW013_2', click: $vm.confirm, kdw-toggle: $vm.$toggle.confirm"></button>
+				<button data-bind="i18n: 'KDW013_3', click: $vm.removeConfirm, kdw-toggle: $vm.$toggle.remove"></button>
+			</div>
+			<div id="contents-area">
+				<div data-bind="
+					fullcalendar: $vm.events,
+					employee: $vm.employee,
+					confirmers: $vm.confirmers,
+					editable: $vm.editable,
+					firstDay: $vm.firstDay,
+					scrollTime: $vm.scrollTime,
+					slotDuration: $vm.slotDuration,
+					initialDate: $vm.initialDate,
+					initialView: $vm.initialView,
+					availableView: $vm.availableView,
+					breakTime: $vm.breakTime,
+					businessHours: $vm.businessHours,
+					attendanceTimes: $vm.attendanceTimes,
+					validRange: $vm.validRange,
+					event: {
+						datesSet: $vm.datesSet
+					},
+					components: {
+						view: 'kdp013b',
+						editor: 'kdp013c'
+					},
+					$datas: $vm.$datas,
+					$settings: $vm.$settings
+				"></div>
+			</div>
+        </ui:define>
+    </ui:composition>
+</body>
+</html>

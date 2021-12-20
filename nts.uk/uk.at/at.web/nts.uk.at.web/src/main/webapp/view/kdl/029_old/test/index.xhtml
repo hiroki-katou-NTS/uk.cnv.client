@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="/master/base.xhtml">
+		<ui:define name="htmlHead">
+			<com:scriptfile set="IGNITE" />
+
+			<com:scriptfile path="kdl029.test.start.js" />
+			<com:scriptfile path="kdl029.test.service.js" />
+			<com:scriptfile path="kdl029.test.vm.js" />
+		</ui:define>
+
+		<ui:define name="content">
+			<div id="functions-area"></div>
+			<div id="contents-area" class="cf">
+				<div>Nhap SID theo dinh dang: sid1,sid2</div>
+				<input data-bind="value: lstSID"></input>
+				<div>Vi du:</div>
+				<div data-bind = "text: demo"></div>
+				<button data-bind="click: openkdl029Dialog">Open KDL 029</button>
+
+			</div>
+
+
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

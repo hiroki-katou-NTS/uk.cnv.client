@@ -1,21 +1,30 @@
 package nts.uk.ctx.at.schedule.app.find.schedule.workplace;
 
-import java.util.List;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.inject.Inject;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import nts.arc.task.AsyncTaskInfo;
+import nts.gul.text.IdentifierUtil;
+import nts.uk.ctx.at.schedule.app.command.budget.external.actualresult.dto.ExecutionInfor;
+import nts.uk.ctx.at.schedule.app.command.schedule.workplace.ScheduleRegisterCommand;
 
 /**
  * @author anhnm
  *
  */
-@Getter
-@Setter
-@AllArgsConstructor
+@Stateless
+@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class ScheduleRegister {
-
-    private List<ScheduleRegisterTarget> targets;
     
-    private boolean overWrite;
+    @Inject
+    private ScheduleRegisterCommandHandler scheduleRegisterCommandHandler;
+
+    public ExecutionInfor handle(ScheduleRegisterCommand command) {
+        String executeId = IdentifierUtil.randomUniqueId();
+        
+        AsyncTaskInfo taskInfor = scheduleRegisterCommandHandler.handle(command);
+        return ExecutionInfor.builder().taskInfor(taskInfor).executeId(executeId).build();
+    }
 }

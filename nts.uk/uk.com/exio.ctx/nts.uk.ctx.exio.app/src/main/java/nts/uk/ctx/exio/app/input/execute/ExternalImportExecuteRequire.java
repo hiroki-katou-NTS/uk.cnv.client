@@ -1,6 +1,7 @@
 package nts.uk.ctx.exio.app.input.execute;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -26,12 +27,12 @@ import nts.uk.ctx.bs.employee.dom.workplace.master.WorkplaceInformationRepositor
 import nts.uk.ctx.bs.person.dom.person.info.PersonRepository;
 import nts.uk.ctx.exio.dom.input.ExecuteImporting;
 import nts.uk.ctx.exio.dom.input.ExecutionContext;
-import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalizedDataRecordRepository;
 import nts.uk.ctx.exio.dom.input.canonicalize.domaindata.DomainDataId;
 import nts.uk.ctx.exio.dom.input.canonicalize.domaindata.DomainDataRepository;
 import nts.uk.ctx.exio.dom.input.canonicalize.existing.AnyRecordToChange;
 import nts.uk.ctx.exio.dom.input.canonicalize.existing.AnyRecordToDelete;
 import nts.uk.ctx.exio.dom.input.canonicalize.existing.ExternalImportExistingRepository;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalizedDataRecordRepository;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomain;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomainId;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomainRepository;
@@ -66,9 +67,9 @@ public class ExternalImportExecuteRequire {
 			ExecuteImporting.Require,
 			ExternalImportWorkspaceRepository.Require {
 		
-		ExternalImportSetting getExternalImportSetting(String companyId, ExternalImportCode settingCode);
+		ExternalImportSetting getExternalImportSetting(ExternalImportCode settingCode);
 		
-		ExternalImportCurrentState getExternalImportCurrentState(String companyId);
+		ExternalImportCurrentState getExternalImportCurrentState();
 	}
 	
 	@Inject
@@ -145,7 +146,7 @@ public class ExternalImportExecuteRequire {
 		private final String companyId;
 
 		@Override
-		public ExternalImportCurrentState getExternalImportCurrentState(String companyId) {
+		public ExternalImportCurrentState getExternalImportCurrentState() {
 			return currentStateRepo.find(companyId);
 		}
 
@@ -155,19 +156,14 @@ public class ExternalImportExecuteRequire {
 		}
 
 		@Override
-		public void add(ExecutionContext context, ExternalImportError error) {
-			errorsRepo.add(context, error);
+		public void add(ExternalImportError error) {
+			errorsRepo.add(companyId, error);
 		}
 		
 		@Override
-		public ExternalImportSetting getExternalImportSetting(String companyId, ExternalImportCode settingCode) {
-			return settingRepo.get(companyId, settingCode)
+		public ExternalImportSetting getExternalImportSetting(ExternalImportCode settingCode) {
+			return settingRepo.get(Optional.empty(), companyId, settingCode)
 					.orElseThrow(() -> new RuntimeException("not found: " + companyId + ", " + settingCode));
-		}
-
-		@Override
-		public List<ImportingDomain> getAllImportingDomains() {
-			return importingDomainRepo.findAll();
 		}
 
 		@Override

@@ -53,15 +53,8 @@ public class WorkScheduleWorkInforDto {
 	public EditStateOfDailyAttdDto endTimeEditState;
 	// 出勤休日区分
 	public Integer workHolidayCls;
-	
-	//để check điều kiện ※Abc1 dùng cho màn ksu001
-	public boolean isEdit;
-	
-	//để check điều kiện ※Abc2 dùng cho màn ksu001
-	public boolean isActive;
-	
 	// dùng cho màn ksu001
-	public boolean workTypeIsNotExit; 
+	public boolean workTypeIsNotExit;
 	// dùng cho màn ksu001
 	public boolean workTimeIsNotExit;
 	
@@ -70,4 +63,16 @@ public class WorkScheduleWorkInforDto {
 	
 	// dùng cho màn ksu002
 	public String workTimeNameKsu002;
+	
+	// chưa bao gồm điều kiện 対象の日 < A画面パラメータ. 修正可能開始日　の場合 => check dưới UI
+	public boolean conditionAbc1; 
+	public boolean conditionAbc2;
+	
+	/**固定勤務
+	FIXED(0, "固定勤務"),
+	FLEX(1, "フレックス勤務"),
+	FLOW(2,"流動勤務"), */
+	
+	//就業時間帯の勤務形態 
+	public Integer workTimeForm;
 }

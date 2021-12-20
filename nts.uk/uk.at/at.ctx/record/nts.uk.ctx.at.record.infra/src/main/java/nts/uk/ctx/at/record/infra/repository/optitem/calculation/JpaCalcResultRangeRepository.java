@@ -4,8 +4,9 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.layer.infra.data.JpaRepository;
-import nts.arc.layer.infra.data.jdbc.NtsStatement;
 import nts.uk.ctx.at.record.infra.entity.optitem.KrcmtAnyfResultRange;
 import nts.uk.ctx.at.record.infra.entity.optitem.KrcmtCalcResultRangePK;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcRangeCheck;
@@ -18,7 +19,6 @@ import nts.uk.ctx.at.shared.dom.scherec.optitem.calculation.CalcResultRangeRepos
  */
 @Stateless
 public class JpaCalcResultRangeRepository extends JpaRepository implements CalcResultRangeRepository {
-    private final String QUERY = "SELECT * FROM KrcmtAnyfResultRange WHERE CID = @companyID AND OPTIONAL_ITEM_NO = @optNo";
 
     @Override
     public void update(String companyID, int optionalItemNo, CalcResultRange domain) {
@@ -26,8 +26,8 @@ public class JpaCalcResultRangeRepository extends JpaRepository implements CalcR
         if (entityOpt.isPresent()) {
             KrcmtAnyfResultRange entity = entityOpt.get();
             
-            entity.setUpperLimitAtr(domain.getUpperLimit().value);
-            entity.setLowerLimitAtr(domain.getLowerLimit().value);
+            entity.setUpperLimitAtr(BooleanUtils.toBoolean(domain.getUpperLimit().value));
+            entity.setLowerLimitAtr(BooleanUtils.toBoolean(domain.getLowerLimit().value));
             
             if (domain.getUpperLimit().equals(CalcRangeCheck.SET)) {
                 

@@ -6,10 +6,9 @@ import nts.uk.ctx.at.function.dom.alarmworkplace.extractresult.AlarmListExtractI
 import nts.uk.ctx.at.function.infra.entity.alarmworkplace.extractresult.KfndtAlarmExtractWpl;
 
 import javax.ejb.Stateless;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Stateless
 public class JpaAlarmListExtractInfoWorkplaceRepository extends JpaRepository implements AlarmListExtractInfoWorkplaceRepository {
@@ -27,6 +26,7 @@ public class JpaAlarmListExtractInfoWorkplaceRepository extends JpaRepository im
         builderString = new StringBuilder();
         builderString.append(SELECT);
         builderString.append(" WHERE a.processId = :processId ");
+        builderString.append(" ORDER BY a.workplaceCode, a.category, a.alarmValueMessage ");
         FIND_BY_ID = builderString.toString();
     }
 
@@ -40,7 +40,10 @@ public class JpaAlarmListExtractInfoWorkplaceRepository extends JpaRepository im
         List<KfndtAlarmExtractWpl> result = this.queryProxy().query(FIND_BY_ID, KfndtAlarmExtractWpl.class)
                 .setParameter("processId", processId)
                 .getList();
-        result.sort(Comparator.comparing(i -> i.workplaceCode));
+        if (result.isEmpty()) {
+            return Collections.emptyList();
+        }
+        result.sort(Comparator.comparing(i -> i.workplaceCode != null ? i.workplaceCode : ""));
         return KfndtAlarmExtractWpl.toDomain(result);
     }
 }

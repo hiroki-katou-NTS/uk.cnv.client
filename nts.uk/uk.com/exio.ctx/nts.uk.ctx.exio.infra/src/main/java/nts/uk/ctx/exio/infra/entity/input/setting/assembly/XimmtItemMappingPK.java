@@ -24,6 +24,10 @@ public class XimmtItemMappingPK implements Serializable{
 	/* 受入設定コード */
 	@Column(name = "SETTING_CODE")
 	private String code;
+
+	/* 受入グループID */
+	@Column(name = "DOMAIN_ID")
+	private int domainId;
 	
 	/* 受入項目NO */
 	@Column(name = "ITEM_NO")

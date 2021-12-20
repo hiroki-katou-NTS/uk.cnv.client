@@ -6,7 +6,7 @@ import nts.arc.error.BusinessException;
 import nts.gul.text.StringUtil;
 import nts.uk.ctx.exio.dom.input.errors.ErrorMessage;
 import nts.uk.ctx.exio.dom.input.setting.assembly.revise.ReviseValue;
-import nts.uk.ctx.exio.dom.input.util.Either;
+import nts.gul.util.Either;
 
 /**
  * 日付型編集

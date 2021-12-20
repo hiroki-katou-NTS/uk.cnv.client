@@ -138,4 +138,23 @@ public class AnnLeaveRemainingFinder implements AnnLeaveRemainingAdapter {
 //		});
 		return lstHdRemainData;
 	}
+
+	@Override
+	public List<AnnLeaGrantNumberImported> getAnnLeaGrantNumberImporteds(String employeeId) {
+		List<AnnualLeaveGrantRemainDataExport> listAnnualLeave = annLeaGrantRemDataPub
+				.getAnnualLeaveGrantRemainingData(employeeId);
+		if (listAnnualLeave == null) {
+			return new ArrayList<AnnLeaGrantNumberImported>();
+		}
+		// requestList281
+		return listAnnualLeave.stream().map(item -> {
+			return new AnnLeaGrantNumberImported(
+					item.getGrantDate(),
+					item.getGrantNumberDays(),
+					item.getRemainDay(),
+					item.getRemainTime(),
+					item.getGrantTime()
+			);
+		}).collect(Collectors.toList());
+	}
 }

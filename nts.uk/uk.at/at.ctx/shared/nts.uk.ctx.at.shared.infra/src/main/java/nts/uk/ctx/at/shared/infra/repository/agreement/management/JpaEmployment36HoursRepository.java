@@ -1,6 +1,13 @@
 package nts.uk.ctx.at.shared.infra.repository.agreement.management;
 
 
+import java.util.List;
+import java.util.Optional;
+
+import javax.ejb.Stateless;
+
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.val;
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.management.AgreementTimeOfEmployment;
@@ -8,11 +15,6 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.management.Empl
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.management.enums.LaborSystemtAtr;
 import nts.uk.ctx.at.shared.infra.entity.agreement.management.Ksrmt36AgrMgtEmp;
 import nts.uk.ctx.at.shared.infra.entity.agreement.management.Ksrmt36AgrMgtEmpPk;
-
-import javax.ejb.Stateless;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * 	Repository: 雇用３６協定時間
@@ -89,10 +91,10 @@ public class JpaEmployment36HoursRepository extends JpaRepository implements Emp
     public void delete(AgreementTimeOfEmployment domain) {
 
         val entity = this.queryProxy().find(new Ksrmt36AgrMgtEmpPk(domain.getCompanyId(),domain.getEmploymentCategoryCode().v()
-                ,domain.getLaborSystemAtr().value),Ksrmt36AgrMgtEmp.class);
+                ,BooleanUtils.toBoolean(domain.getLaborSystemAtr().value)),Ksrmt36AgrMgtEmp.class);
         if(entity.isPresent()){
             this.commandProxy().remove(Ksrmt36AgrMgtEmp.class,new Ksrmt36AgrMgtEmpPk(domain.getCompanyId(),domain.getEmploymentCategoryCode().v()
-                    ,domain.getLaborSystemAtr().value));
+                    ,BooleanUtils.toBoolean(domain.getLaborSystemAtr().value)));
 			this.getEntityManager().flush();
         }
     }
@@ -137,7 +139,7 @@ public class JpaEmployment36HoursRepository extends JpaRepository implements Emp
     public List<String> findEmploymentSetting(String companyId, LaborSystemtAtr laborSystemAtr) {
 
         return this.queryProxy().query(FIND_EMPLOYMENT_SETTING, Ksrmt36AgrMgtEmp.class)
-                .setParameter("companyId", companyId).setParameter("laborSystemAtr", laborSystemAtr.value)
+                .setParameter("companyId", companyId).setParameter("laborSystemAtr", laborSystemAtr.value == 1)
                 .getList(f -> f.ksrmt36AgrMgtEmpPk.employmentCode);
     }
 
@@ -147,7 +149,7 @@ public class JpaEmployment36HoursRepository extends JpaRepository implements Emp
         return this.queryProxy().query(FIND_BY_CID_AND_CD_LABOR, Ksrmt36AgrMgtEmp.class)
                 .setParameter("cid", cid)
                 .setParameter("cd", employCode)
-                .setParameter("laborSystemAtr", laborSystemAtr.value)
+                .setParameter("laborSystemAtr", laborSystemAtr.value == 1)
                 .getSingle(Ksrmt36AgrMgtEmp::toDomain);
     }
 

@@ -1,7 +1,20 @@
-#contents-area > .label{padding:70px 0 40px 70px;}
+#contents-area > .label{padding:0px 0 40px 70px;}
 .setMail{margin:0 0 30px 70px;}
 .setMail .left{float:left; width: 400px;}
 .setMail .right{float:left;}
 .setMail .option{margin-bottom:20px;}
 .setMail .option span{width:70px; display:inline-block;}
 .setMail .option button{padding:3px 18px;}
+
+.mail-dest-setting {
+  margin: 20px 0px 50px 70px;
+}
+.mail-dest-setting > * {
+  margin-bottom: 30px;
+}
+#B5_2 {
+  width: 465px;
+}
+#B5_3 {
+  padding: 3px 18px;
+}

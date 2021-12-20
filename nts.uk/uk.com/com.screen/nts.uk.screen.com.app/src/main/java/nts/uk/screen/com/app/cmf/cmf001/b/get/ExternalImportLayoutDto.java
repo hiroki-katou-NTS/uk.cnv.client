@@ -29,44 +29,14 @@ public class ExternalImportLayoutDto {
 	private String source;
 
 
-	public static ExternalImportLayoutDto fromDomain(Require require,
-			ExternalImportCode settingCode,
-			ImportingDomainId domainId,
-			ImportingItemMapping domain) {
+	public static ExternalImportLayoutDto fromDomain(ImportableItem itemDomain, ImportingItemMapping mappingDomain) {
 
 		return new ExternalImportLayoutDto(
-				domain.getItemNo(),
-				getItemName(require, domainId, domain),
-				checkRequired(require, domainId, domain),
-				getItemType(require, domainId, domain),
-				checkImportSource(domain));
-	}
-
-	private static String getItemName(Require require, ImportingDomainId domainId, ImportingItemMapping mapping) {
-		val importableItems = require.getImportableItems(domainId);
-		return importableItems.stream()
-				.filter(i -> i.getItemNo() == mapping.getItemNo()).collect(Collectors.toList()).get(0).getItemName();
-	}
-
-	private static String getItemType(Require require, ImportingDomainId domainId, ImportingItemMapping mapping) {
-		val importableItems = require.getImportableItems(domainId);
-		return importableItems.stream()
-				.filter(i -> i.getItemNo() == mapping.getItemNo()).collect(Collectors.toList()).get(0).getItemType().getResourceText();
-	}
-
-	private static boolean checkRequired(Require require, ImportingDomainId domainId, ImportingItemMapping mapping) {
-		val importableItems = require.getImportableItems(domainId);
-
-		boolean required = importableItems.stream()
-								.filter(i -> i.getItemNo() == mapping.getItemNo())
-								.collect(Collectors.toList()).get(0).isRequired();
-
-		boolean primary = importableItems.stream()
-								.filter(i -> i.getItemNo() == mapping.getItemNo())
-								.collect(Collectors.toList()).get(0).isPrimaryKey();
-
-
-		return required || primary;
+				itemDomain.getItemNo(),
+				itemDomain.getItemName(),
+				itemDomain.isRequired() || itemDomain.isPrimaryKey(),
+				itemDomain.getItemType().getResourceText(),
+				checkImportSource(mappingDomain));
 	}
 
 	private static String checkImportSource(ImportingItemMapping mapping) {
@@ -82,7 +52,6 @@ public class ExternalImportLayoutDto {
 			return "未設定";
 		}
 	}
-
 
 	public static interface Require {
 		List<ImportableItem> getImportableItems(ImportingDomainId domainId);

@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html	xmlns="http://www.w3.org/1999/xhtml"
+			xmlns:ui="http://java.sun.com/jsf/facelets"
+			xmlns:com="http://xmlns.jcp.org/jsf/component"
+			xmlns:h="http://xmlns.jcp.org/jsf/html">
+	<body>
+		<ui:composition template="../../../../master/base.xhtml">
+			<ui:define name="htmlHead">
+				<com:scriptfile set="IGNITE" />
+				<com:stylefile path="cmf001.f.css" />
+				<com:scriptfile path="cmf001.f.vm.js" />
+				<com:EnumScript>
+					nts.uk.ctx.exio.dom.input.domain.ImportingDomainId
+				</com:EnumScript>
+			</ui:define>
+
+			<ui:define name="content">
+				<div id="functions-area">
+					<a
+						class="goback"
+						tabindex="1"
+						data-bind="ntsLinkButton: { jump: '/view/cmf/001/e/index.xhtml' }, text: '戻る'"
+					></a>
+					<button
+						class="proceed"
+						tabindex="3"
+						data-bind="enable: canSave, click: save, text: '登録'"
+					></button>
+				</div>
+
+				<div id="contents-area" class="fixed-flex-layout">
+					<div class="fixed-flex-layout-left" style="padding-top: 20px; padding-left: 20px">
+						<div id="importDomain" data-bind="ntsComboBox: {
+							name: '受入ドメイン', 
+							options: $root.content.importDomainOption,
+							optionsValue: 'value',
+							visibleItemsCount: 10,
+							optionsText: 'name',
+							selectFirstIfNull: false,
+							value: importDomain,
+							required: false}"></div>
+						<button class="normal" id="bntAddImportDomain" data-bind="click: addImportDomain, text: '追加'"></button>
+						<button class="normal" id="bntDelImportDomain" data-bind="click: deleteImportDomain, text: '削除'"></button>
+						<table id="domain-list" data-bind="ntsGridList: {
+							height: '300px',
+							dataSource: domainList,
+							primaryKey: 'domainId',
+							columns: domainListColumns,
+							value: selectedDomainId
+							}">
+						</table>
+					</div>
+					<div class="fixed-flex-layout-right" style="padding-top: 20px;">									
+						<div class="layout">
+							<button class="normal" data-bind="click: selectLayout, text: '項目を追加する', enable: canEditDetail" ></button>
+							<button class="normal" data-bind="text: '受入項目の詳細設定', click: gotoDetailSetting, enable: canEditDetail" ></button>
+						<table id="grid"></table>
+						</div>
+					</div>
+				</div>
+			</ui:define>
+		</ui:composition>
+	</body>
+</html>

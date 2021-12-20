@@ -14,6 +14,7 @@ module a6 {
         fixTableOptionFixed: any;
         fixTableOptionDiffTime: any;
         selectedTab: KnockoutObservable<string>;
+        isNewMode: KnockoutComputed<boolean>;
         isFlowMode: KnockoutComputed<boolean>;
         isFlexMode: KnockoutComputed<boolean>;
         isFixedMode: KnockoutComputed<boolean>;
@@ -311,9 +312,9 @@ module a6 {
         }
 
         /**
-         * Init.
+         * Update.
          */
-        init(element: any, valueAccessor: () => any): void {
+        update(element: any, valueAccessor: () => any): void {
             var webserviceLocator = nts.uk.request.location.siteRoot
                 .mergeRelativePath(nts.uk.request.WEB_APP_NAME["at"] + '/')
                 .mergeRelativePath('/view/kmk/003/a6/index.xhtml').serialize();
@@ -321,8 +322,10 @@ module a6 {
             let input = valueAccessor();
             var settingEnum: WorkTimeSettingEnumDto = input.enum;
             var mainSettingModel: MainSettingModel = input.mainModel;
+            var isNewMode: KnockoutComputed<boolean> = input.isNewMode;
             nts.uk.at.view.kmk003.a6.service.findAllUsedWorkDayoffFrame().done(function(data) {
                 let screenModel = new ScreenModel(settingEnum, mainSettingModel);
+                screenModel.isNewMode = isNewMode;
                 screenModel.lstWorkDayOffFrame = data;
                 screenModel.initDataModel();
                 _.defer(() => {

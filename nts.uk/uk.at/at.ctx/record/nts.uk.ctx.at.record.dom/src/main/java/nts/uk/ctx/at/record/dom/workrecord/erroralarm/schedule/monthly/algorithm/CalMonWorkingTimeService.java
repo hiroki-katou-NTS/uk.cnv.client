@@ -39,6 +39,11 @@ public class CalMonWorkingTimeService {
 		// 当月より前の月かチェック
 		boolean isBeforeThisMonth = monthIsBeforeThisMonthChecking.checkMonthIsBeforeThisMonth(ym, closurePeriod.getCurrentClosingPeriod().getProcessingYm());
 		if (isBeforeThisMonth) {
+			// Input．月別実績　＝＝　Emptyの場合　＃117183
+			if (attendanceTimeOfMonthly == null) {
+				return 0.0;
+			}
+			
 			// 合計就業時間　を計算
 			MonthlyCalculation monthlyCalculation = attendanceTimeOfMonthly.getMonthlyCalculation();
 			// Input．月別実績．勤怠時間．月の計算．集計時間．就業時間．就業時間

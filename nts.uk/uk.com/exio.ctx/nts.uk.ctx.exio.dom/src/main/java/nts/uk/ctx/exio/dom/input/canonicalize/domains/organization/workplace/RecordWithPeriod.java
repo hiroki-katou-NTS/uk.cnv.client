@@ -5,11 +5,12 @@ import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import nts.arc.time.calendar.period.DatePeriod;
-import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalItem;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.organization.workplace.WorkplaceCanonicalization.Items;
-import nts.uk.ctx.exio.dom.input.canonicalize.methods.IntermediateResult;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalItem;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.IntermediateResult;
 import nts.uk.ctx.exio.dom.input.errors.ExternalImportError;
-import nts.uk.ctx.exio.dom.input.util.Either;
+import nts.uk.ctx.exio.dom.input.errors.RecordError;
+import nts.gul.util.Either;
 
 @AllArgsConstructor()
 class RecordWithPeriod {
@@ -18,12 +19,12 @@ class RecordWithPeriod {
 	
 	final IntermediateResult interm;
 	
-	public static Either<ExternalImportError, RecordWithPeriod> build(IntermediateResult interm) {
+	public static Either<RecordError, RecordWithPeriod> build(IntermediateResult interm) {
 		
 		val period = PeriodUtil.getPeriod(interm);
 		
 		if (period.isReversed()) {
-			return Either.left(ExternalImportError.record(interm.getRowNo(), "開始日と終了日が逆転しています。"));
+			return Either.left(RecordError.record(interm.getRowNo(), "開始日と終了日が逆転しています。"));
 		}
 		
 		return Either.right(new RecordWithPeriod(period, interm));

@@ -28,6 +28,7 @@ module nts.uk.at.view.ksp001.b.viewmodel {
             roleType: 3, // 就業 
             multiple: false,
             isAlreadySetting: true,
+            alreadySetList: this.listRoleId
         });
         isCallGetDataByRoleId: boolean = true;
         listMenuCdNoData: KnockoutObservableArray<string> = ko.observableArray([]);
@@ -41,7 +42,7 @@ module nts.uk.at.view.ksp001.b.viewmodel {
             });
 
             _.extend(role, {
-                roleId: self.component025.currentCode
+                roleId: self.component025.currentRoleId
             });
 
             // khi roleId thay đổi, get lại data cho table bên phải
@@ -112,7 +113,7 @@ module nts.uk.at.view.ksp001.b.viewmodel {
             let self = this, dfd = $.Deferred();
             // set isCallGetDataByRoleId = false để không gọi vào hàm getDataByRoleId() 2 lần liên tiếp
             self.isCallGetDataByRoleId = false;
-            self.component025.startPage(self.listRoleId(), self.selectedRole.roleId()).done(() => {
+            self.component025.startPage(self.selectedRole.roleId()).done(() => {
                 self.isEnable(self.listRole().length ? true : false);
                 self.isCallGetDataByRoleId = true;
                 self.getDataByRoleId();

@@ -46,7 +46,7 @@ public class JpaComFlexMonthActCalSetRepository extends JpaRepository implements
 		// Transfer data
 		entity.transfer(domain);
 		entity.setCid(domain.getComId());
-		entity.setWithinTimeUse(domain.isWithinTimeUsageAttr() ? 1 : 0);
+		entity.setWithinTimeUse(domain.isWithinTimeUsageAttr());
 
 		// Insert into DB
 		this.commandProxy().insert(entity);
@@ -65,7 +65,7 @@ public class JpaComFlexMonthActCalSetRepository extends JpaRepository implements
 		this.queryProxy().find(domain.getComId(), KrcmtCalcMSetFleCom.class).ifPresent(e -> {
 			
 			e.transfer(domain);
-			e.setWithinTimeUse(domain.isWithinTimeUsageAttr() ? 1 : 0);
+			e.setWithinTimeUse(domain.isWithinTimeUsageAttr());
 			
 			this.commandProxy().update(e);
 		});
@@ -89,7 +89,7 @@ public class JpaComFlexMonthActCalSetRepository extends JpaRepository implements
 										e.shortageFlexSetting(), 
 										e.aggregateTimeSetting(), 
 										e.flexTimeHandle(),
-										e.getWithinTimeUse() == 1);
+										e.isWithinTimeUse());
 	}
 
 }

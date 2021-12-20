@@ -50,7 +50,7 @@ public class KfnmtExtractPeriodMonth extends ContractUkJpaEntity implements Seri
 	public int strMonth;
 	
 	@Column(name = "STR_CURRENT_MONTH")
-	public int strCurrentMonth;
+	public boolean strCurrentMonth;
 	
 	@Column(name = "STR_PREVIOUS_ATR")
 	public int strPreviousAtr;
@@ -65,7 +65,7 @@ public class KfnmtExtractPeriodMonth extends ContractUkJpaEntity implements Seri
 	public int endMonth;
 	
 	@Column(name = "END_CURRENT_MONTH")
-	public int endCurrentMonth;
+	public boolean endCurrentMonth;
 	
 	@Column(name = "END_PREVIOUS_ATR")
 	public int endPreviousAtr;
@@ -99,13 +99,13 @@ public class KfnmtExtractPeriodMonth extends ContractUkJpaEntity implements Seri
 		StartMonth startMonth = new StartMonth(strSpecify);
 		
 		if(this.strSpecify==SpecifyStartMonth.DESIGNATE_CLOSE_START_MONTH.value) {
-			startMonth.setStartMonth(EnumAdaptor.valueOf(strPreviousAtr, PreviousClassification.class), strMonth, strCurrentMonth ==1);
+			startMonth.setStartMonth(EnumAdaptor.valueOf(strPreviousAtr, PreviousClassification.class), strMonth, strCurrentMonth);
 		}else {
 			startMonth.setFixedMonth(EnumAdaptor.valueOf(yearType, YearSpecifiedType.class), specifyMonth);
 		}
 		
 		EndMonth endMonth = new EndMonth(endSpecify, extractPeriod);
-		endMonth.setEndMonthNo(EnumAdaptor.valueOf(endPreviousAtr, PreviousClassification.class), this.endMonth, endCurrentMonth==1);
+		endMonth.setEndMonthNo(EnumAdaptor.valueOf(endPreviousAtr, PreviousClassification.class), this.endMonth, endCurrentMonth);
 		
 		return new ExtractionPeriodMonth(extractionId, extractionRange, startMonth, endMonth, EnumAdaptor.valueOf(pk.unit, NumberOfMonth.class));
 	}
@@ -116,12 +116,12 @@ public class KfnmtExtractPeriodMonth extends ContractUkJpaEntity implements Seri
 		this.yearType = domain.getStartMonth().getFixedMonthly().isPresent() ? domain.getStartMonth().getFixedMonthly().get().getYearSpecifiedType().value: YearSpecifiedType.CURRENT_YEAR.value;
 		this.specifyMonth = domain.getStartMonth().getFixedMonthly().isPresent()? domain.getStartMonth().getFixedMonthly().get().getDesignatedMonth(): 0;
 		this.strMonth = domain.getStartMonth().getStrMonthNo().isPresent() ? domain.getStartMonth().getStrMonthNo().get().getMonthNo(): 0;
-		this.strCurrentMonth = domain.getStartMonth().getStrMonthNo().isPresent() ? (domain.getStartMonth().getStrMonthNo().get().isCurentMonth()? 1: 0 ) : 1;
+		this.strCurrentMonth = domain.getStartMonth().getStrMonthNo().isPresent() ? (domain.getStartMonth().getStrMonthNo().get().isCurentMonth()) : true;
 		this.strPreviousAtr = PreviousClassification.BEFORE.value;
 		this.endSpecify = domain.getEndMonth().getSpecifyEndMonth().value;
 		this.extractPeriod = domain.getEndMonth().getExtractFromStartMonth().value;
 		this.endMonth = domain.getEndMonth().getEndMonthNo() != null && domain.getEndMonth().getEndMonthNo().isPresent()  ? domain.getEndMonth().getEndMonthNo().get().getMonthNo() : 0;
-		this.endCurrentMonth = domain.getEndMonth().getEndMonthNo() != null && domain.getEndMonth().getEndMonthNo().isPresent() && domain.getEndMonth().getEndMonthNo().get().isCurentMonth()? 1: 0;
+		this.endCurrentMonth = domain.getEndMonth().getEndMonthNo() != null && domain.getEndMonth().getEndMonthNo().isPresent() && domain.getEndMonth().getEndMonthNo().get().isCurentMonth();
 		this.endPreviousAtr = domain.getEndMonth().getEndMonthNo() != null && domain.getEndMonth().getEndMonthNo().isPresent() ? domain.getEndMonth().getEndMonthNo().get().getMonthPrevious().value : 0;
 	}
 	

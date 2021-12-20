@@ -10,10 +10,10 @@ import javax.inject.Inject;
 
 import nts.arc.layer.app.command.CommandHandlerContext;
 import nts.arc.layer.app.command.CommandHandlerWithResult;
+import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.employee.carryForwarddata.PublicHolidayCarryForwardData;
 import nts.uk.ctx.at.shared.dom.remainingnumber.excessleave.ExcessLeaveInfo;
 import nts.uk.ctx.at.shared.dom.remainingnumber.otherholiday.OtherHolidayInfoInter;
 import nts.uk.ctx.at.shared.dom.remainingnumber.otherholiday.OtherHolidayInfoService;
-import nts.uk.ctx.at.shared.dom.remainingnumber.publicholiday.PublicHolidayRemain;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.pereg.app.command.MyCustomizeException;
 import nts.uk.shr.pereg.app.command.PeregAddCommandResult;
@@ -41,13 +41,13 @@ implements PeregUpdateListCommandHandler<UpdateOtherHolidayInfoCommand>{
 		List<PeregAddCommandResult> result = new ArrayList<>();
 		
 		cmd.stream().forEach(c ->{
-			//公休付与残数データ
-			PublicHolidayRemain pubHD = new PublicHolidayRemain(cid, c.getEmployeeId(),
-					c.getPubHdremainNumber());
+			//公休繰越データ
+			PublicHolidayCarryForwardData pubCFD = PublicHolidayCarryForwardData.createFromJavaType(c.getEmployeeId(),
+					c.getPubHdremainNumber(),0);
 			//超過有休基本情報
 			ExcessLeaveInfo exLeav = ExcessLeaveInfo.createDomain(cid, c.getEmployeeId(), c.getUseAtr(),
 					c.getOccurrenceUnit(), c.getPaymentMethod());
-			otherHolidayInfos.put(c.getEmployeeId(), new OtherHolidayInfoInter(cid, pubHD, exLeav, c.getRemainNumber(), c.getRemainsLeft()));
+			otherHolidayInfos.put(c.getEmployeeId(), new OtherHolidayInfoInter(cid, pubCFD, exLeav, c.getRemainNumber(), c.getRemainsLeft()));
 			result.add(new PeregAddCommandResult(c.getEmployeeId()));
 		});
 		

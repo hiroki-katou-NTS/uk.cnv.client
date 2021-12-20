@@ -15,7 +15,7 @@ public class JpaSystemConfigurationRepository extends JpaRepository
 		return this.forDefaultDataSource(em -> {
 			
 			String sql = "select * from CISCT_SYSTEM_CONFIG where CONFIG_NAME = @name";
-			return this.jdbcProxy().query(sql)
+			return this.jdbcProxy(em).query(sql)
 					.paramString("name", key)
 					.getSingle(rec -> new SystemConfigurationValue(rec.getString("CONFIG_VALUE")))
 					.orElse(SystemConfigurationValue.none());

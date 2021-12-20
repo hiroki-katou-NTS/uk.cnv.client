@@ -17,6 +17,9 @@ import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 
 import javax.ejb.Stateless;
+
+import org.apache.commons.lang3.BooleanUtils;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -76,7 +79,7 @@ public class JpaStdAcceptCondSetRepository extends JpaRepository implements StdA
 				Optional.ofNullable(entity.getCsvDataStartLine() == null ? null : new AcceptanceLineNumber(entity.getCsvDataStartLine())),
 				Optional.ofNullable(entity.getCharacterCode() == null ? null :  EnumAdaptor.valueOf(entity.getCharacterCode(), ExiCharset.class)),
 				EnumAdaptor.valueOf(entity.getCheckCompleted(), NotUseAtr.class),
-				Optional.ofNullable(entity.getDeleteExtDataMethod() == null ? null : EnumAdaptor.valueOf(entity.getDeleteExtDataMethod(), DeleteExistDataMethod.class)),
+				Optional.ofNullable(entity.getDeleteExtDataMethod() == null ? null : EnumAdaptor.valueOf(entity.getDeleteExtDataMethod() ? 1 : 0, DeleteExistDataMethod.class)),
 				Optional.ofNullable(entity.getAcceptMode() == null ? null : EnumAdaptor.valueOf(entity.getAcceptMode(), AcceptMode.class)));
 		return domain;
 	}
@@ -135,7 +138,7 @@ public class JpaStdAcceptCondSetRepository extends JpaRepository implements StdA
 				domain.getCharacterCode().isPresent() ? domain.getCharacterCode().get().value : null,
 				domain.getAcceptMode().isPresent() ? domain.getAcceptMode().get().value : null,
 				domain.getConditionSetName().v(), domain.getCheckCompleted().value,
-				domain.getDeleteExistDataMethod().isPresent() ? domain.getDeleteExistDataMethod().get().value : null);
+				domain.getDeleteExistDataMethod().isPresent() ? domain.getDeleteExistDataMethod().get().value == 1 : null);
 		return entity;
 	}
 

@@ -105,63 +105,6 @@ public class AgreementTimeBreakdown {
 	}
 	
 	/**
-	 * 36協定時間の対象項目を取得
-	 * @param aggregateAtr 集計区分
-	 * @param monthlyCalculation 月別実績の月の計算
-	 */
-//	public void getTargetItemOfAgreement(
-//			MonthlyAggregateAtr aggregateAtr,
-//			MonthlyCalculation monthlyCalculation){
-//		
-//		// 集計結果　初期化
-//		init();
-//		
-//		// 丸め設定取得
-//		RoundingSetOfMonthly roundingSet = monthlyCalculation.getCompanySets().getRoundingSet();
-//		
-//		// 「時間外超過設定」を取得
-//		OutsideOTSetting outsideOTSet = monthlyCalculation.getCompanySets().getOutsideOverTimeSet();
-//		for (val attendanceItemId : outsideOTSet.getAllAttendanceItemIds()){
-//			
-//			// 対象項目の時間を取得　と　丸め処理
-//			val targetItemTime = monthlyCalculation.getTimeOfAttendanceItemId(attendanceItemId, roundingSet, true);
-//			
-//			// 勤怠項目IDに対応する時間を加算する
-//			this.addTimeByAttendanceItemId(attendanceItemId, targetItemTime);
-//		}
-//	}
-	
-	/**
-	 * 36協定時間の対象項目を取得　（週用）
-	 * @param aggregateAtr 集計区分
-	 * @param weeklyCalculation 月別実績の月の計算
-	 * @param companySets 月別集計で必要な会社別設定
-	 */
-//	public void getTargetItemOfAgreementForWeek(
-//			MonthlyAggregateAtr aggregateAtr,
-//			WeeklyCalculation weeklyCalculation,
-//			MonAggrCompanySettings companySets){
-//		
-//		// 集計結果　初期化
-//		init();
-//		
-//		// 丸め設定取得
-//		RoundingSetOfMonthly roundingSet = companySets.getRoundingSet();
-//		
-//		// 「時間帯超過設定」を取得
-//		val outsideOTSet = companySets.getOutsideOverTimeSet();
-//		if (outsideOTSet == null) return;
-//		for (val attendanceItemId : outsideOTSet.getAllAttendanceItemIds()){
-//			
-//			// 対象項目の時間を取得　と　丸め処理
-//			val targetItemTime = weeklyCalculation.getTimeOfAttendanceItemId(attendanceItemId, roundingSet, true);
-//			
-//			// 勤怠項目IDに対応する時間を加算する
-//			this.addTimeByAttendanceItemId(attendanceItemId, targetItemTime);
-//		}
-//	}
-	
-	/**
 	 * 勤怠項目IDに対応する時間を加算する
 	 * @param attendanceItemId 勤怠項目ID
 	 * @param targetItemTime 対象項目の時間
@@ -174,21 +117,9 @@ public class AgreementTimeBreakdown {
 			this.overTime = this.overTime.addMinutes(targetItemTime.v());
 		}
 		
-		// 計算残業時間
-		if (attendanceItemId >= AttendanceItemOfMonthly.CALC_OVER_TIME_01.value &&
-			attendanceItemId <= AttendanceItemOfMonthly.CALC_OVER_TIME_10.value){
-			this.overTime = this.overTime.addMinutes(targetItemTime.v());
-		}
-		
 		// 振替残業時間
 		if (attendanceItemId >= AttendanceItemOfMonthly.TRANSFER_OVER_TIME_01.value &&
 			attendanceItemId <= AttendanceItemOfMonthly.TRANSFER_OVER_TIME_10.value){
-			this.transferOverTime = this.transferOverTime.addMinutes(targetItemTime.v());
-		}
-		
-		// 計算振替残業時間
-		if (attendanceItemId >= AttendanceItemOfMonthly.CALC_TRANSFER_OVER_TIME_01.value &&
-			attendanceItemId <= AttendanceItemOfMonthly.CALC_TRANSFER_OVER_TIME_10.value){
 			this.transferOverTime = this.transferOverTime.addMinutes(targetItemTime.v());
 		}
 		
@@ -198,21 +129,9 @@ public class AgreementTimeBreakdown {
 			this.illegalHolidayWorkTime = this.illegalHolidayWorkTime.addMinutes(targetItemTime.v());
 		}
 		
-		// 計算休出時間
-		if (attendanceItemId >= AttendanceItemOfMonthly.CALC_HOLIDAY_WORK_TIME_01.value &&
-			attendanceItemId <= AttendanceItemOfMonthly.CALC_HOLIDAY_WORK_TIME_10.value){
-			this.illegalHolidayWorkTime = this.illegalHolidayWorkTime.addMinutes(targetItemTime.v());
-		}
-		
 		// 振替時間
 		if (attendanceItemId >= AttendanceItemOfMonthly.TRANSFER_TIME_01.value &&
 			attendanceItemId <= AttendanceItemOfMonthly.TRANSFER_TIME_10.value){
-			this.illegaltransferTime = this.illegaltransferTime.addMinutes(targetItemTime.v());
-		}
-		
-		// 計算振替時間
-		if (attendanceItemId >= AttendanceItemOfMonthly.CALC_TRANSFER_TIME_01.value &&
-			attendanceItemId <= AttendanceItemOfMonthly.CALC_TRANSFER_TIME_10.value){
 			this.illegaltransferTime = this.illegaltransferTime.addMinutes(targetItemTime.v());
 		}
 		

@@ -9,7 +9,7 @@ import nts.arc.primitive.constraint.IntegerMinValue;
  * 小数桁数
  */
 @IntegerMaxValue(10)
-@IntegerMinValue(0)
+@IntegerMinValue(1)
 public class DecimalDigitNumber extends IntegerPrimitiveValue<PrimitiveValue<Integer>>{
 	
 	private static final long serialVersionUID = 1L;

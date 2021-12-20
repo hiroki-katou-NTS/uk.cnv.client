@@ -22,8 +22,9 @@ import nts.uk.ctx.at.shared.dom.worktime.predset.WorkNo;
  */
 public class OuenWorkTimeSheetOfDailyHelper {
 	
+	public static List<OuenWorkTimeSheetOfDailyAttendance> ouenTimeSheets = new ArrayList<>();
+	
 	public static OuenWorkTimeSheetOfDaily getOuenWorkTimeSheetOfDailyDefault() {
-		List<OuenWorkTimeSheetOfDailyAttendance> ouenTimeSheets = new ArrayList<>();
 		OuenWorkTimeSheetOfDailyAttendance ouenTimeSheet = OuenWorkTimeSheetOfDailyAttendance.create(
 				1, 
 				WorkContent.create( 
@@ -35,5 +36,19 @@ public class OuenWorkTimeSheetOfDailyHelper {
 				"empId", 
 				GeneralDate.today(), 
 				ouenTimeSheets);
+	}
+	
+	public static List<OuenWorkTimeSheetOfDailyAttendance> getListOuenWorkTime() {
+		
+		OuenWorkTimeSheetOfDailyAttendance attendance = OuenWorkTimeSheetOfDailyAttendance.create(1,
+				WorkContent.create(
+						WorkplaceOfWorkEachOuen.create(new WorkplaceId("DUMMY"),new WorkLocationCD("1")),
+						Optional.empty(), Optional.empty()),
+				null);
+		
+		ouenTimeSheets.add(attendance);
+		ouenTimeSheets.add(attendance);
+		
+		return ouenTimeSheets;
 	}
 }

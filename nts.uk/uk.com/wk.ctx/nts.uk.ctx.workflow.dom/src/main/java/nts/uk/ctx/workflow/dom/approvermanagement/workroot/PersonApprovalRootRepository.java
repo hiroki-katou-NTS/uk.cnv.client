@@ -12,6 +12,24 @@ import nts.arc.time.calendar.period.DatePeriod;
  *
  */
 public interface PersonApprovalRootRepository {
+	
+	/**
+	 * [1] 承認者として登録されている対象社員リストを取得する
+	 * 
+	 * @param sid 社員ID
+	 * @param baseDate 年月日
+	 * @return List<社員ID> 承認対象社員リスト
+	 */
+	List<String> getListSidRegistered(String sid, GeneralDate baseDate);
+	
+	/**
+	 * [2] 承認者を取得する
+	 * 
+	 * @param sid 社員ID
+	 * @param baseDate 年月日
+	 * @return List<社員ID> 承認者リスト
+	 */
+	List<String> getListAppover(String sid, GeneralDate baseDate);
 
 	/**
 	 * get all Person Approval Root

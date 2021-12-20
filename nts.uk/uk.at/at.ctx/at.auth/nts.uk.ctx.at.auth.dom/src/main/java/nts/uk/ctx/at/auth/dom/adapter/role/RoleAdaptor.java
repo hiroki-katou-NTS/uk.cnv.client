@@ -26,4 +26,7 @@ public interface RoleAdaptor {
 	 * 社員参照範囲を取得する
 	 */
 	OptionalInt findEmpRangeByRoleID(String roleID);
+	
+	//社員参照範囲を取得する(ユーザID,ロール種類 .就業,基準日)	
+	Integer getEmployeeReferenceRange(String userId, int roleType, GeneralDate baseDate);
 }

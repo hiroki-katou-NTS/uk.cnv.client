@@ -26,13 +26,6 @@ public interface RetentionYearlySettingGetMemento {
 	UpperLimitSetting getUpperLimitSetting();
 	
 	/**
-	 * Gets the leave as work days.
-	 *
-	 * @return the leave as work days
-	 */
-	Boolean getLeaveAsWorkDays();
-	
-	/**
 	 * Gets the management category.
 	 *
 	 * @return the management category

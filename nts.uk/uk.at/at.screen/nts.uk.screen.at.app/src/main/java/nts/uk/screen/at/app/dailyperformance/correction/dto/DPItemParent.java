@@ -66,4 +66,6 @@ public class DPItemParent {
 	private Optional<MonthlyRecordWorkDto> domainMonthOpt = Optional.empty();
 	
 	private ParamCommonAsync paramCommonAsync;
+	
+	private Boolean checkUnLock;
 }
