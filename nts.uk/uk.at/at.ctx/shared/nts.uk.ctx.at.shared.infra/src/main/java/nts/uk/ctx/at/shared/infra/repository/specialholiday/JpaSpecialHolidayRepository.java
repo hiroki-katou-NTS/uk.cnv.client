@@ -31,6 +31,7 @@ import nts.uk.ctx.at.shared.dom.specialholiday.grantcondition.AgeStandard;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantcondition.SpecialLeaveRestriction;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.FixGrantDate;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.GrantDate;
+import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.GrantDateTblReferenceGrant;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.GrantRegular;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.GrantedDays;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.PeriodGrantDate;
@@ -209,7 +210,7 @@ public class JpaSpecialHolidayRepository extends JpaRepository implements Specia
 		int gender = c.getInt("GENDER") != null ? c.getInt("GENDER") : 1;
 		int continuousAcquisition = c.getInt("CONTINUOUS_ACQUISITION");
 
-		Optional<GrantDeadline> grantPeriodic = Optional.empty();
+		Optional<GrantDateTblReferenceGrant> grantPeriodic = Optional.empty();
 		Optional<FixGrantDate> fixGrantDate = Optional.empty();
 		Optional<PeriodGrantDate> periodGrantDate = Optional.empty();
 
@@ -219,7 +220,7 @@ public class JpaSpecialHolidayRepository extends JpaRepository implements Specia
 			 * 期限 = KSHMT_HDSP_GRANT_DEADLINE
 			 */
 			grantPeriodic = Optional
-					.of(createGrantDeadline(timeMethod, deadlineMonths, deadlineYears, limitCarryoverDays));
+					.of(new GrantDateTblReferenceGrant(createGrantDeadline(timeMethod, deadlineMonths, deadlineYears, limitCarryoverDays)));
 			break;
 		case 2:// 指定日に付与する
 			/*
@@ -388,7 +389,7 @@ public class JpaSpecialHolidayRepository extends JpaRepository implements Specia
 
 		if (isAutoGrant) {
 			if (domain.getGrantRegular().getGrantPeriodic().isPresent()) {
-				timeSpecifyMethod = domain.getGrantRegular().getGrantPeriodic().get().getTimeSpecifyMethod().value;
+				timeSpecifyMethod = domain.getGrantRegular().getGrantPeriodic().get().getGrantDeadline().getTimeSpecifyMethod().value;
 			}
 			limitCarryoverDays = 0;
 
@@ -436,17 +437,17 @@ public class JpaSpecialHolidayRepository extends JpaRepository implements Specia
 		}
 		// ver 33: typeTime == 1
 		if (domain.getGrantRegular().getGrantPeriodic().isPresent()) {
-			timeSpecifyMethod = domain.getGrantRegular().getGrantPeriodic().get().getTimeSpecifyMethod().value;
-			if (domain.getGrantRegular().getGrantPeriodic().get().getLimitAccumulationDays().isPresent()
-					&& domain.getGrantRegular().getGrantPeriodic().get().getLimitAccumulationDays().get()
+			timeSpecifyMethod = domain.getGrantRegular().getGrantPeriodic().get().getGrantDeadline().getTimeSpecifyMethod().value;
+			if (domain.getGrantRegular().getGrantPeriodic().get().getGrantDeadline().getLimitAccumulationDays().isPresent()
+					&& domain.getGrantRegular().getGrantPeriodic().get().getGrantDeadline().getLimitAccumulationDays().get()
 							.getLimitCarryoverDays().isPresent()) {
-				limitCarryoverDays = domain.getGrantRegular().getGrantPeriodic().get().getLimitAccumulationDays().get()
+				limitCarryoverDays = domain.getGrantRegular().getGrantPeriodic().get().getGrantDeadline().getLimitAccumulationDays().get()
 						.getLimitCarryoverDays().get().v();
 			}
-			if (domain.getGrantRegular().getGrantPeriodic().get().getExpirationDate().isPresent()) {
-				entity.deadlineMonths = domain.getGrantRegular().getGrantPeriodic().get().getExpirationDate().get()
+			if (domain.getGrantRegular().getGrantPeriodic().get().getGrantDeadline().getExpirationDate().isPresent()) {
+				entity.deadlineMonths = domain.getGrantRegular().getGrantPeriodic().get().getGrantDeadline().getExpirationDate().get()
 						.getMonths().v();
-				entity.deadlineYears = domain.getGrantRegular().getGrantPeriodic().get().getExpirationDate().get()
+				entity.deadlineYears = domain.getGrantRegular().getGrantPeriodic().get().getGrantDeadline().getExpirationDate().get()
 						.getYears().v();
 			}
 		}
@@ -583,7 +584,7 @@ public class JpaSpecialHolidayRepository extends JpaRepository implements Specia
 				specialHoliday.getCompanyId(),
 				specialHoliday.getSpecialHolidayCode().v());
 		
-		GrantDeadline grantPeriodic = null;
+		GrantDateTblReferenceGrant grantPeriodic = null;
 		/** #118010s */
 		// reset [KSHMT_HDSP_GRANT]
 		KshmtHdspGrantPK oldHDSPGrantPK = new KshmtHdspGrantPK(specialHoliday.getCompanyId(), specialHoliday.getSpecialHolidayCode().v());
@@ -603,13 +604,13 @@ public class JpaSpecialHolidayRepository extends JpaRepository implements Specia
 				} else if(specialHoliday.getGrantRegular().getGrantPeriodic().isPresent()) {
 					val oldGrantPeriodic1 = oldGrantPeriodicOpt1.get();
 					grantPeriodic = specialHoliday.getGrantRegular().getGrantPeriodic().get();
-					grantPeriodic.getExpirationDate().ifPresent(d -> {
+					grantPeriodic.getGrantDeadline().getExpirationDate().ifPresent(d -> {
 						oldGrantPeriodic1.deadlineMonths = d.getMonths().v();
 						oldGrantPeriodic1.deadlineYears = d.getYears().v();
 					});
 					
 					AtomicBoolean isLimitCarryoverDaysPresent = new AtomicBoolean(false);
-					grantPeriodic.getLimitAccumulationDays().ifPresent(d -> {
+					grantPeriodic.getGrantDeadline().getLimitAccumulationDays().ifPresent(d -> {
 						d.getLimitCarryoverDays().ifPresent(c -> {
 							oldGrantPeriodic1.limitCarryoverDays = c.v();
 							isLimitCarryoverDaysPresent.set(true);
@@ -619,7 +620,7 @@ public class JpaSpecialHolidayRepository extends JpaRepository implements Specia
 						oldGrantPeriodic1.limitCarryoverDays = null;
 					}
 					
-					oldGrantPeriodic1.timeMethod = grantPeriodic.getTimeSpecifyMethod().value;
+					oldGrantPeriodic1.timeMethod = grantPeriodic.getGrantDeadline().getTimeSpecifyMethod().value;
 					this.commandProxy().update(oldGrantPeriodic1);
 				}
 				

@@ -29,8 +29,5 @@ public class InforSpecialLeaveOfEmployee {
 	 * 特別休暇情報一覧
 	 */
 	private List<SpecialHolidayInfor> speHolidayInfor;
-	/**
-	 * ・端数消滅：ドメインモデル「特別休暇．付与情報．取得できなかった端数は消滅する」
-	 */
-	private boolean chkDisappear;
+
 }

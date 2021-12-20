@@ -40,7 +40,7 @@ public class CreateSpecialHolidayCommandHandler extends CommandHandlerWithResult
 
 		SpecialHoliday domain = command.toDomain(companyId);
 		if ( domain.getGrantRegular().getGrantPeriodic().isPresent() ) {
-			errList.addAll(domain.getGrantRegular().getGrantPeriodic().get().validateInput());
+			errList.addAll(domain.getGrantRegular().getGrantPeriodic().get().getGrantDeadline().validateInput());
 		}
 
 		errList.addAll(domain.getSpecialLeaveRestriction().validateInput());

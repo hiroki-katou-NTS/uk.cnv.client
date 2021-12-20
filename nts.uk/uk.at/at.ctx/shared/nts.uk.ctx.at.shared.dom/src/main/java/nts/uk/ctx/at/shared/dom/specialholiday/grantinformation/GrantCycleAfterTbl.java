@@ -1,9 +1,11 @@
 package nts.uk.ctx.at.shared.dom.specialholiday.grantinformation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.SpecialVacationMonths;
 
 /**
  * テーブル以降の付与周期
@@ -29,6 +31,27 @@ public class GrantCycleAfterTbl {
 	
 	public static GrantCycleAfterTbl createFromJavaType(int year, int month){
 		return new GrantCycleAfterTbl(ElapseYearMonth.createFromJavaType(year, month) );
+	}
+	
+	/**
+	 * 指定した付与回数までの経過年数テーブルを取得する
+	 * @param beforeElapseYearMonthTbl
+	 * @param grantcnt
+	 * @return
+	 */
+	public List<ElapseYearMonthTbl> getElapseYearMonthTbltheGrantCnt(
+			ElapseYearMonthTbl beforeElapseYearMonthTbl,
+			int grantcnt){
+		
+		List<ElapseYearMonthTbl> elapseYearMonthTbl = new ArrayList<>();
+		
+		ElapseYearMonth elapseYearMonth = beforeElapseYearMonthTbl.getElapseYearMonth();
+		
+		for(int i = beforeElapseYearMonthTbl.getGrantCnt()+1; i <= grantcnt; i++){
+			elapseYearMonth = elapseYearMonth.addElapseYearMonth(this.getElapseYearMonth());
+			elapseYearMonthTbl.add(new ElapseYearMonthTbl(i, elapseYearMonth));
+		}
+		return elapseYearMonthTbl;
 	}
 	
 }

@@ -3,6 +3,7 @@ package nts.uk.ctx.at.shared.dom.specialholiday.export;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import nts.arc.time.GeneralDate;
@@ -23,6 +24,7 @@ import nts.uk.ctx.at.shared.dom.yearholidaygrant.GrantNum;
  */
 @Getter
 @Setter
+@AllArgsConstructor
 public class NextSpecialLeaveGrant {
 
 	/** 付与年月日 */
@@ -47,6 +49,15 @@ public class NextSpecialLeaveGrant {
 		this.grantDays = new LeaveGrantDayNumber(0.0);
 		this.times = new GrantNum(0);
 		this.deadLine = GeneralDate.max();
+		this.errorFlg = Optional.empty();
+	}
+	
+	public NextSpecialLeaveGrant(GeneralDate grantDate, LeaveGrantDayNumber grantDays, GrantNum times,
+			GeneralDate deadLine) {
+		this.grantDate = grantDate;
+		this.grantDays = grantDays;
+		this.times = times;
+		this.deadLine = deadLine;
 		this.errorFlg = Optional.empty();
 	}
 	

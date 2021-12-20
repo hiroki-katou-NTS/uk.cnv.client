@@ -19,7 +19,7 @@ public class SpecialLeaveGrantSetting {
 	// 付与日数
 	private Optional<GrantNumber> grantDays;
 	
-	// 26.4.2018 - EA 修正履歴　履歴＃1475 勤続年数付与テーブル
+	// 付与テーブルコード
 	private Optional<PerServiceLengthTableCD> grantTable;
 	
 	public SpecialLeaveGrantSetting(GeneralDate grantDate, Integer grantDays, String grantTbl){

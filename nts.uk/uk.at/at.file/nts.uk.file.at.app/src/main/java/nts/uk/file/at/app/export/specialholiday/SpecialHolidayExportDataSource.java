@@ -222,11 +222,11 @@ public class SpecialHolidayExportDataSource implements Comparable<SpecialHoliday
 			}
 			if(typeTime == TypeTime.REFER_GRANT_DATE_TBL) {
 				data.setExpirationDate(SpecialHolidayUtils.getTimeMethod(
-						specialHoliday.getGrantRegular().getGrantPeriodic().get().getTimeSpecifyMethod().value));
+						specialHoliday.getGrantRegular().getGrantPeriodic().get().getGrantDeadline().getTimeSpecifyMethod().value));
 				if(specialHoliday.getGrantRegular().getGrantPeriodic().get()
-						.getLimitAccumulationDays().isPresent()) {
+						.getGrantDeadline().getLimitAccumulationDays().isPresent()) {
 					data.setMaxAccumulationDays(specialHoliday.getGrantRegular().getGrantPeriodic().get()
-							.getLimitAccumulationDays().get().getLimitCarryoverDays().get().v() 
+							.getGrantDeadline().getLimitAccumulationDays().get().getLimitCarryoverDays().get().v() 
 							+ TextResource.localize("KMF004_157"));
 				}
 			}
@@ -243,10 +243,10 @@ public class SpecialHolidayExportDataSource implements Comparable<SpecialHoliday
 			}
 			if(typeTime == TypeTime.REFER_GRANT_DATE_TBL) {
 				data.setExpirationYear(specialHoliday.getGrantRegular().getGrantPeriodic().get()
-						.getExpirationDate().get().getYears().v() 
+						.getGrantDeadline().getExpirationDate().get().getYears().v() 
 						+ TextResource.localize("KMF004_156"));
 				data.setExpirationMonth(specialHoliday.getGrantRegular().getGrantPeriodic().get()
-						.getExpirationDate().get().getMonths().v() 
+						.getGrantDeadline().getExpirationDate().get().getMonths().v() 
 						+ TextResource.localize("KMF004_158"));
 			}
 		}
@@ -469,7 +469,7 @@ public class SpecialHolidayExportDataSource implements Comparable<SpecialHoliday
 				}
 			case "6.2":
 				if(specialHoliday.getGrantRegular().getGrantPeriodic().isPresent()) {
-					GrantDeadline grantDeadline = specialHoliday.getGrantRegular().getGrantPeriodic().get();
+					GrantDeadline grantDeadline = specialHoliday.getGrantRegular().getGrantPeriodic().get().getGrantDeadline();
 					if(grantDeadline.getTimeSpecifyMethod() == TimeLimitSpecification.AVAILABLE_GRANT_DATE_DESIGNATE) {
 						return true;
 					} else {

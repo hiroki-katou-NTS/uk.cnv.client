@@ -10,7 +10,6 @@ import java.util.Optional;
 
 import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
-import nts.arc.time.YearMonthDayHolder.Difference;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.shared.dom.adapter.employee.AffComHistItemShareImport;
 import nts.uk.ctx.at.shared.dom.adapter.employee.AffCompanyHistSharedImport;
@@ -22,13 +21,11 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.basicinfo.An
 import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.empinfo.basicinfo.SpecialLeaveBasicInfo;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.enums.UseAtr;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHoliday;
-import nts.uk.ctx.at.shared.dom.specialholiday.grantcondition.AgeBaseYear;
-import nts.uk.ctx.at.shared.dom.specialholiday.grantcondition.SpecialLeaveRestriction;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.ElapseYear;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.GrantDate;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.GrantDateTbl;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.TypeTime;
-import nts.uk.shr.com.time.calendar.MonthDay;
+import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.LimitCarryoverDays;
 
 public class InforSpecialLeaveOfEmployeeSevice {
 
@@ -44,7 +41,7 @@ public class InforSpecialLeaveOfEmployeeSevice {
 			String cid, String sid, int specialLeaveCode,DatePeriod complileDate,SpecialHoliday specialHoliday) {
 
 		InforSpecialLeaveOfEmployee outputData = new InforSpecialLeaveOfEmployee(
-				InforStatus.NOTUSE, Optional.empty(), new ArrayList<>(), false);
+				InforStatus.NOTUSE, Optional.empty(), new ArrayList<>());
 
 		//ドメインモデル「特別休暇基本情報」を取得する
 		Optional<SpecialLeaveBasicInfo> optBasicInfor = require.specialLeaveBasicInfo(sid, specialLeaveCode, UseAtr.USE);
@@ -65,18 +62,20 @@ public class InforSpecialLeaveOfEmployeeSevice {
 		GrantDaysInforByDates grantDayInfors = getGrantDays(require, cacheCarrier, cid, sid,
 				complileDate, specialHoliday, leaverBasicInfo);
 		// 「付与日数一覧」の件数をチェックする
-		int upLimiDays = specialHoliday.getGrantRegular().getLimitCarryoverDays();
+		Optional<LimitCarryoverDays> upLimiDays = specialHoliday.getGrantRegular().getLimitCarryoverDays();
 
 		if(grantDayInfors == null || grantDayInfors.getNextSpecialLeaveGrant().isEmpty()) {
 			// 状態：「付与なし」を返す
-			return new InforSpecialLeaveOfEmployee(InforStatus.NOTGRANT, Optional.of(upLimiDays),
-					new ArrayList<>(), false);
+			return new InforSpecialLeaveOfEmployee(InforStatus.NOTGRANT, 
+					upLimiDays.isPresent() ? Optional.of(upLimiDays.get().v()) : Optional.empty(),
+					new ArrayList<>());
 		} else {
 			// 期限を取得する
 			List<SpecialHolidayInfor> getDeadlineInfo = getDeadlineInfo(grantDayInfors, specialHoliday);
 
-			return new InforSpecialLeaveOfEmployee(InforStatus.GRANTED, Optional.of(upLimiDays),
-					getDeadlineInfo, false);
+			return new InforSpecialLeaveOfEmployee(InforStatus.GRANTED, 
+					upLimiDays.isPresent() ? Optional.of(upLimiDays.get().v()) : Optional.empty(),
+					getDeadlineInfo);
 		}
 			//return new InforSpecialLeaveOfEmployee();
 	}
@@ -197,105 +196,7 @@ public class InforSpecialLeaveOfEmployeeSevice {
 		return outputData;
 	}
 
-	/**
-	 * 利用条件をチェックする
-	 * @param require
-	 * @param cacheCarrier
-	 * @param cid
-	 * @param sid
-	 * @param baseDate
-	 * @param speHoliday
-	 * @return
-	 */
-	public static ErrorFlg checkUse(RequireM2 require, CacheCarrier cacheCarrier, String cid, String sid,
-			GeneralDate baseDate, SpecialHoliday speHoliday) {
 
-		ErrorFlg outData = new ErrorFlg(false, false, false, false);
-		SpecialLeaveRestriction specialLeaveRestric = speHoliday.getSpecialLeaveRestriction();
-		//Imported(就業)「社員」を取得する
-		EmployeeRecordImport empInfor = require.employeeFullInfo(cacheCarrier, sid);
-		//取得しているドメインモデル「定期付与．特別休暇利用条件．性別条件」をチェックする
-		if(specialLeaveRestric.isGenderRest()) {
-			//性別が一致するかチェックする
-			if(empInfor.getGender() != specialLeaveRestric.getGender().value) {
-				//パラメータ「エラーフラグ．性別条件に一致しない」にTRUEをセットする
-				outData.setGenderError(true);
-			}
-		}
-		//取得しているドメインモデル「定期付与．特別休暇利用条件．雇用条件」をチェックする
-		if(specialLeaveRestric.isRestEmp()) {
-			//アルゴリズム「社員所属雇用履歴を取得」を実行する
-			Optional<BsEmploymentHistoryImport> findEmploymentHistory = require.employmentHistory(cacheCarrier, cid, sid, baseDate);
-			if(!findEmploymentHistory.isPresent()) {
-				outData.setEmploymentError(true);
-			} else {
-				BsEmploymentHistoryImport lstEmployment = findEmploymentHistory.get();
-
-				List<String> listEmp = speHoliday.getSpecialLeaveRestriction().getListEmp();
-				if(listEmp != null && !listEmp.isEmpty()) {
-					boolean isExit = false;
-					if(listEmp.contains(lstEmployment.getEmploymentCode())) {
-						isExit = true;
-					}
-					if(!isExit) {
-						outData.setEmploymentError(true);
-					}
-				}
-			}
-		}
-		//ドメインモデル「特別休暇利用条件」．分類条件をチェックする
-		if(specialLeaveRestric.isRestrictionCls()) {
-			//アルゴリズム「社員所属分類履歴を取得」を実行する
-			List<String> lstSids = new ArrayList<>();
-			lstSids.add(sid);
-			List<SClsHistImport> lstClass = require.employeeClassificationHistoires(cacheCarrier, cid, lstSids, new DatePeriod(baseDate, baseDate));
-			if(lstClass.isEmpty()) {
-				outData.setClassError(true);
-			}
-			//取得した分類コードが取得しているドメインモデル「定期付与．特別休暇利用条件．分類一覧」に存在するかチェックする
-			List<String> listClassSpe = speHoliday.getSpecialLeaveRestriction().getListCls();
-			if(listClassSpe != null && !listClassSpe.isEmpty()) {
-				boolean isExit = false;
-				for (SClsHistImport classData : lstClass) {
-					if(listClassSpe.contains(classData.getClassificationCode())) {
-						isExit = true;
-						break;
-					}
-				}
-				if(!isExit) {
-					outData.setClassError(true);
-				}
-			}
-		}
-		//ドメインモデル「特別休暇利用条件」．年齢条件をチェックする
-		if(specialLeaveRestric.isAgeLimit()) {
-			GeneralDate ageBase = baseDate;
-			//年齢基準日を求める
-			MonthDay ageBaseDate = specialLeaveRestric.getAgeStandard().getAgeBaseDate();
-			int year = 0;
-			if(specialLeaveRestric.getAgeStandard().getAgeCriteriaCls() == AgeBaseYear.THIS_YEAR) {
-				//年齢基準日 = パラメータ「基準日．年」 + ドメインモデル「定期付与．特別休暇利用条件．年齢基準．年齢基準日」
-				year = ageBaseDate != null ? ageBase.year() : 0;
-			} else {
-				//年齢基準日 = パラメータ「基準日．年」 の翌年 + ドメインモデル「定期付与．特別休暇利用条件．年齢基準．年齢基準日」
-				year = ageBaseDate != null ? ageBase.year() + 1 : 0;
-			}
-			if(year != 0
-					&& ageBaseDate.getMonth() != 0
-					&& ageBaseDate.getDay() != 0) {
-				ageBase = GeneralDate.ymd(year, ageBaseDate.getMonth(), ageBaseDate.getDay());
-			}
-			//求めた「年齢基準日」時点の年齢を求める
-			Difference difYMD = ageBase.differenceFrom(empInfor.getBirthDay());
-			//求めた「年齢」が年齢条件に一致するかチェックする
-			if(specialLeaveRestric.getAgeRange().getAgeLowerLimit().v() > difYMD.years()
-					|| specialLeaveRestric.getAgeRange().getAgeHigherLimit().v() < difYMD.years()) {
-				outData.setAgeError(true);
-			}
-		}
-
-		return outData;
-	}
 
 //	/**
 //	 * テーブルに基づいた付与日数一覧を求める

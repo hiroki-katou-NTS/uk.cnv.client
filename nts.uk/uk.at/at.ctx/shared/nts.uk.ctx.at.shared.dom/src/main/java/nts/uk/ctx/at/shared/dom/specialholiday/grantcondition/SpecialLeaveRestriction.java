@@ -2,6 +2,7 @@ package nts.uk.ctx.at.shared.dom.specialholiday.grantcondition;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 //import lombok.Data;
@@ -9,8 +10,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nts.arc.enums.EnumAdaptor;
+import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.layer.dom.DomainObject;
+import nts.arc.time.GeneralDate;
+import nts.arc.time.YearMonthDayHolder.Difference;
+import nts.arc.time.calendar.period.DatePeriod;
 import nts.gul.collection.CollectionUtil;
+import nts.uk.ctx.at.shared.dom.adapter.employee.EmployeeRecordImport;
+import nts.uk.ctx.at.shared.dom.adapter.employee.SClsHistImport;
+import nts.uk.ctx.at.shared.dom.adapter.employment.BsEmploymentHistoryImport;
+import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.service.ErrorFlg;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHolidayCode;
 
 /**
@@ -150,5 +159,206 @@ public class SpecialLeaveRestriction extends DomainObject {
 		this.ageStandard = ageStandard;
 		this.ageRange = ageRange;
 		this.gender = gender;
+	}
+	
+	
+	/**
+	 * 利用条件をチェックする
+	 * @param companyId 会社ID
+	 * @param employeeId 社員ID
+	 * @param spLeaveCD 特別休暇コード
+	 * @param 基準日
+	 * @return true：利用可能、false：利用不可
+	 */
+	public boolean checkUseCondition(
+			Require require,
+			CacheCarrier cacheCarrier,
+			String companyId,
+			String employeeId,
+			int spLeaveCD,
+			GeneralDate ymd) {
+
+		// Imported(就業)「社員」を取得する
+		EmployeeRecordImport empInfor = require.employeeFullInfo(cacheCarrier, employeeId);
+
+		boolean genderError = false;
+		
+		// 取得しているドメインモデル「定期付与．特別休暇利用条件．性別条件」をチェックする
+		if(this.isGenderRest()){ // 利用するとき
+			genderError = isGenderSetting(empInfor);
+		}
+
+		boolean EmploymentError = false;
+		
+		// 取得しているドメインモデル「定期付与．特別休暇利用条件．雇用条件」をチェックする
+		if(this.isRestEmp()){ // 利用するとき
+			EmploymentError = isRestEmp(require, cacheCarrier,companyId, employeeId, ymd);
+		}
+		
+		boolean classError = false;
+
+		// ドメインモデル「特別休暇利用条件」．分類条件をチェックする
+		if(this.isRestrictionCls()){ // 利用するとき
+			classError = isRestrictionCls(require, cacheCarrier,companyId, employeeId, ymd);
+		}
+
+		boolean AgeError = false;
+		
+		// ドメインモデル「特別休暇利用条件」．年齢条件をチェックする
+		if(this.isAgeLimit()){ // 利用するとき
+
+			AgeError = isageLimit(empInfor,ymd);
+		}
+		return new ErrorFlg(EmploymentError, genderError, AgeError, classError).canUse();
+	}
+
+	/**
+	 * 性別条件設定と一致するかチェックする
+	 * @param empInfor
+	 * @return
+	 */
+	private boolean isGenderSetting(EmployeeRecordImport empInfor){
+		// 性別設定と一致するかチェックする
+		if(empInfor.getGender() == this.getGender().value) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	
+	/**
+	 * 雇用条件設定と一致するかチェックする
+	 * @param require
+	 * @param cacheCarrier
+	 * @param companyId
+	 * @param employeeId
+	 * @param ymd
+	 * @return
+	 */
+	private boolean isRestEmp(Require require, CacheCarrier cacheCarrier, String companyId, String employeeId,
+			GeneralDate ymd) {
+		// アルゴリズム「社員所属雇用履歴を取得」を実行する
+		Optional<BsEmploymentHistoryImport> employmentHistory = require.employmentHistory(cacheCarrier, companyId,
+				employeeId, ymd);
+
+		if (!employmentHistory.isPresent()) {
+			// パラメータ「エラーフラグ．雇用条件に一致しない」にTRUEをセットする
+			return true;
+		} else {
+			if (this.getListEmp() == null && this.getListEmp().isEmpty()) {
+				return true;
+			}
+			
+			// 取得した雇用コードが取得しているドメインモデル「定期付与．特別休暇利用条件．雇用一覧」に存在するかチェックする
+			if (this.getListEmp().contains(employmentHistory.get().getEmploymentCode())) {
+				// パラメータ「エラーフラグ．雇用条件に一致しない」にFALSEをセットする
+				return false;
+			} else {
+				// パラメータ「エラーフラグ．雇用条件に一致しない」にTRUEをセットする
+				return true;
+			}
+		}
+	}
+	
+	/**
+	 * 分類条件設定と一致するかチェックする
+	 * @param require
+	 * @param cacheCarrier
+	 * @param companyId
+	 * @param employeeId
+	 * @param ymd
+	 * @return
+	 */
+	private boolean isRestrictionCls(Require require, CacheCarrier cacheCarrier, String companyId, String employeeId,
+			GeneralDate ymd){
+		
+		// アルゴリズム「社員所属分類履歴を取得」を実行する
+		List<String> emploeeIdList = new ArrayList<>();
+		emploeeIdList.add(employeeId);
+		List<SClsHistImport> clsHistList = require.employeeClassificationHistoires(
+				cacheCarrier, companyId, emploeeIdList, new DatePeriod(ymd, ymd));
+		
+		if(clsHistList.isEmpty()) {
+			return true;
+		}
+		
+		// 取得した分類コードが取得しているドメインモデル「定期付与．特別休暇利用条件．分類一覧」に存在するかチェックする
+		if(this.getListCls() == null && this.getListCls().isEmpty()) {
+			return true;
+		}
+		
+		boolean isExit = false;
+		for (SClsHistImport classData : clsHistList) {
+			if(this.getListCls().contains(classData.getClassificationCode())) {
+				isExit = true;
+				break;
+			}
+		}
+		if(isExit) { // 存在するとき
+			// パラメータ「エラーフラグ．分類条件に一致しない」にFALSEをセットする
+			return false;
+		} else {
+			// パラメータ「エラーフラグ．分類条件に一致しない」にTRUEをセットする
+			return true;
+		}
+
+	}
+	
+	/**
+	 * 年齢条件設定と一致するかチェックする
+	 * @param empInfor
+	 * @param ymd
+	 * @return
+	 */
+	private boolean isageLimit(EmployeeRecordImport empInfor, GeneralDate ymd){
+		GeneralDate ageBase = ymd;
+
+		// 年齢基準日を求める
+		nts.uk.shr.com.time.calendar.MonthDay ageBaseDate
+			= this.getAgeStandard().getAgeBaseDate();
+
+		int year = 0;
+
+		// 取得しているドメインモデル「定期付与．特別休暇利用条件．年齢基準．年齢基準年区分」＝　「当年」の場合
+		if(this.getAgeStandard().getAgeCriteriaCls() == AgeBaseYear.THIS_YEAR) {
+			// 年齢基準日 = パラメータ「基準日．年」 + ドメインモデル「定期付与．特別休暇利用条件．年齢基準．年齢基準日」
+			year = ageBaseDate != null ? ageBase.year() : 0;
+		} else
+		// 取得しているドメインモデル「定期付与．特別休暇利用条件．年齢基準．年齢基準年区分」＝　「翌年」の場合
+		if(this.getAgeStandard().getAgeCriteriaCls() == AgeBaseYear.NEXT_YEAR) {
+			// 年齢基準日 = パラメータ「基準日．年」 の翌年 + ドメインモデル「定期付与．特別休暇利用条件．年齢基準．年齢基準日」
+			year = ageBaseDate != null ? ageBase.year() + 1 : 0;
+		}
+
+		if(year != 0
+			&& ageBaseDate.getMonth() != 0
+			&& ageBaseDate.getDay() != 0) {
+			ageBase = GeneralDate.ymd(year, ageBaseDate.getMonth(), ageBaseDate.getDay());
+		}
+
+		// 求めた「年齢基準日」時点の年齢を求める
+		Difference difYMD = ageBase.differenceFrom(empInfor.getBirthDay());
+
+		//求めた「年齢」が年齢条件に一致するかチェックする
+		if(this.getAgeRange().getAgeLowerLimit().v() > difYMD.years()
+				|| this.getAgeRange().getAgeHigherLimit().v() < difYMD.years()) {
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	
+	
+	public static interface Require {
+
+		EmployeeRecordImport employeeFullInfo(CacheCarrier cacheCarrier, String empId);
+		Optional<BsEmploymentHistoryImport> employmentHistory(CacheCarrier cacheCarrier, String companyId,
+				String employeeId, GeneralDate baseDate);
+		List<SClsHistImport> employeeClassificationHistoires(CacheCarrier cacheCarrier, String companyId,
+				List<String> employeeIds, DatePeriod datePeriod);
 	}
 }

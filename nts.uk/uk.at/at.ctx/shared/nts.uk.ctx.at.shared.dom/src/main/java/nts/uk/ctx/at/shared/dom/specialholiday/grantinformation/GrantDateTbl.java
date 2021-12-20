@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nts.arc.layer.dom.AggregateRoot;
-import nts.arc.time.YearMonth;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHolidayCode;
 
 /**
@@ -22,7 +21,6 @@ import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHolidayCode;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 public class GrantDateTbl extends AggregateRoot {
 
 	/** 会社ID */
@@ -35,15 +33,19 @@ public class GrantDateTbl extends AggregateRoot {
 	private GrantDateCode grantDateCode;
 
 	/** 名称 */
+	@Setter
 	private GrantDateName grantDateName;
 
 	/** 付与日数  */
+	@Setter
 	private List<GrantElapseYearMonth> elapseYear;
 
 	/** 規定のテーブルとする */
+	@Setter
 	private boolean isSpecified;
 
 	/** テーブル以降の付与日数 */
+	@Setter
 	private Optional<GrantedDays> grantedDays;
 
 	@Override
@@ -67,73 +69,6 @@ public class GrantDateTbl extends AggregateRoot {
 	}
 	
 	
-	/**
-	 * Validate input data
-	 */
-	public List<String> validateInput() {
-		List<String> errors = new ArrayList<>();
-		List<YearMonth> yearMonth = new ArrayList<>();
-
-//		for (int i = 0; i < this.elapseYear.size(); i++) {
-//			GrantElapseYearMonth currentElapseYear = this.elapseYear.get(i);
-//
-//			// 同じ経過年数の場合は登録不可
-//			YearMonth currentYearMonth = new YearMonth();
-//			currentYearMonth.setMonth(currentElapseYear.getMonths().v());
-//			currentYearMonth.setYear(currentElapseYear.getYears().v());
-//
-//			if (currentYearMonth.getMonth()==0 && currentYearMonth.getYear()==0) {
-//				throw new BusinessException("Msg_95");
-//			}
-//
-//			if (yearMonth.stream().anyMatch(x -> x.equals(currentYearMonth))) {
-//				throw new BusinessException("Msg_96");
-//			}
-//
-//			yearMonth.add(currentYearMonth);
-//
-//			// 付与日数が入力されていても、年数、月数ともに未入力の場合登録不可
-//			if ((currentElapseYear.getMonths() == null && currentElapseYear.getYears() == null)
-//					&& (currentElapseYear.getGrantedDays() != null || currentElapseYear.getGrantedDays().v() != 0)) {
-//				errors.add("Msg_100");
-//			}
-//
-//			// 経過年数が入力されており、付与日数が未入力の場合登録不可
-//			if ((currentElapseYear.getGrantedDays() == null)
-//					&& ((currentElapseYear.getYears() != null && currentElapseYear.getMonths() != null)
-//							|| (currentElapseYear.getYears().v() != 0 && currentElapseYear.getMonths().v() != 0))) {
-//				errors.add("Msg_101");
-//			}
-//		}
-
-		return errors;
-	}
-
-//	public GrantDateTbl(
-//			GrantDateCode grantDateCode,
-//			GrantDateName grantDateName,
-//			boolean isSpecified,
-//			boolean fixedAssign,
-//			Integer numberOfDays) {
-//		this.grantDateCode = grantDateCode;
-//		this.grantDateName = grantDateName;
-//		this.isSpecified = isSpecified;
-//		this.fixedAssign = fixedAssign;
-//		this.numberOfDays = numberOfDays;
-//	}
-
-//	public static GrantDateTbl createFromJavaType(
-//			String grantDateCode,
-//			String grantDateName,
-//			boolean isSpecified,
-//			Integer numberOfDays) {
-//		return new GrantDateTbl(
-//				new GrantDateCode(grantDateCode),
-//				new GrantDateName(grantDateName),
-//				isSpecified,
-////				fixedAssign,
-//				numberOfDays);
-//	}
 
 	/**
 	 * Create from Java Type
@@ -161,6 +96,27 @@ public class GrantDateTbl extends AggregateRoot {
 				Optional.ofNullable(numberOfDays == null ? 
 						null : new GrantedDays(numberOfDays))
 				);
+	}
+	
+	/**
+	 * 付与日数を取得する
+	 * @param elapseNo
+	 * @return
+	 */
+	public Optional<GrantedDays> getGrantDays(int elapseNo){
+		
+		Optional<GrantedDays> grantDays = elapseYear.stream().filter(c -> c.getElapseNo() == elapseNo)
+				.map(x -> x.getGrantedDays()).findFirst();
+
+		if(grantDays.isPresent()){
+			return grantDays;
+		}
+		
+		if(!this.getGrantedDays().isPresent()){
+			return Optional.empty();
+		}
+		
+		return this.getGrantedDays();
 	}
 
 }

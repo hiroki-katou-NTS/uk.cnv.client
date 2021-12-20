@@ -3,6 +3,7 @@ package nts.uk.ctx.at.shared.dom.specialholiday.periodinformation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import nts.arc.time.GeneralDate;
 
 /**
  * 特別休暇の有効期限
@@ -22,5 +23,14 @@ public class SpecialVacationDeadline {
 
 	public static SpecialVacationDeadline createFromJavaType(int months, int years) {
 		return new SpecialVacationDeadline(new SpecialVacationMonths(months), new SpecialVacationYears(years));
+	}
+	
+	/**
+	 * 期限日を計算する
+	 * @param grantDate
+	 * @return
+	 */
+	public GeneralDate calcDeadline(GeneralDate grantDate){
+		return grantDate.addYears(this.getYears().v()).addMonths(this.getMonths().v()).addDays(-1);
 	}
 }
