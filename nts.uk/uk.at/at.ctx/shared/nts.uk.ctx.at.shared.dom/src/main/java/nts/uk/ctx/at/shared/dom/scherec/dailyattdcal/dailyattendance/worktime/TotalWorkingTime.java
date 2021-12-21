@@ -408,7 +408,7 @@ public class TotalWorkingTime {
 		
 		//実働時間
 		val actualTime = new AttendanceTime(withinStatutoryTimeOfDaily.getActualWorkTime().valueAsMinutes()
-											+ withinStatutoryTimeOfDaily.getWithinPrescribedPremiumTime().valueAsMinutes() 
+											+ withinStatutoryTimeOfDaily.getActualWithinPremiumTime().valueAsMinutes() 
 											+ excesstime.calcOverTime().valueAsMinutes()
 											+ excesstime.calcWorkHolidayTime().valueAsMinutes()
 											+ tempTime.totalTemporaryFrameTime()

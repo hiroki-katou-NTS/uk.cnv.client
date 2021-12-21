@@ -495,8 +495,26 @@ public class WithinWorkTimeSheet implements LateLeaveEarlyManagementTimeSheet{
 					predetermineTimeSetByPersonInfo).valueAsMinutes();
 		workTime = workTime.addMinutes(holidayAddMinutes);
 		
+		//実働就業時間の計算
+		AttendanceTime actualWorkTime = this.calcWorkTimeBeforeDeductPremium(
+				integrationOfDaily,
+				integrationOfWorkTime,
+				PremiumAtr.RegularWork,
+				vacationClass,
+				workType,
+				predetermineTimeSet,
+				AutoCalcOfLeaveEarlySetting.createAllTrue(),	//遅刻早退の自動計算設定を全て「する」で渡す
+				addSetting.createCalculationByActualTime(),	//休暇加算はすべて「しない」で渡す,
+				holidayAddtionSet,
+				Optional.empty(),
+				dailyUnit,
+				commonSetting,
+				conditionItem,
+				predetermineTimeSetByPersonInfo,
+				NotUseAtr.USE); //遅刻早退は常に控除する
+		
 		//所定内割増時間の計算
-		AttendanceTime withinpremiumTime = calcPredeterminePremiumTime(workType, dailyUnit, predetermineTimeSet, workTime);
+		AttendanceTime withinpremiumTime = calcPredeterminePremiumTime(workType, dailyUnit, predetermineTimeSet, actualWorkTime);
 		//所定内割増時間を減算
 		workTime = workTime.minusMinutes(withinpremiumTime.valueAsMinutes());
 		

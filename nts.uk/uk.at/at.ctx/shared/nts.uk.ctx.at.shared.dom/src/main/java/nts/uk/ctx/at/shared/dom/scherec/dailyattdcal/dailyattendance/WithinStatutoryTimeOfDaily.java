@@ -51,7 +51,7 @@ public class WithinStatutoryTimeOfDaily {
 	//実働就業時間
 	@Setter
 	private AttendanceTime actualWorkTime = new AttendanceTime(0);
-	//所定内割増時間
+	/** 所定内割増時間 ※実働所定内割増時間と同じ時間が入る */
 	private AttendanceTime withinPrescribedPremiumTime = new AttendanceTime(0);
 	/** 実働所定内割増時間 */
 	private AttendanceTime actualWithinPremiumTime = new AttendanceTime(0);
@@ -136,7 +136,7 @@ public class WithinStatutoryTimeOfDaily {
 		
 		//ここに計算できる状態でやってきているかチェックをする
 		if(recordReget.getCalculationRangeOfOneDay().getWithinWorkingTimeSheet().isPresent() && recordReget.getCalculationRangeOfOneDay().getPredetermineTimeSetForCalc() != null) {
-			//所定内割増時間の計算
+			//所定内割増時間の計算 ※実働所定内割増と同じ時間が入る。
 			withinpremiumTime = calcWithinPremiumTime(
 					recordReget,
 					vacationClass,
@@ -490,6 +490,9 @@ public class WithinStatutoryTimeOfDaily {
 
 	/**
 	 * 所定内割増時間を計算する
+	 * 	※今はcalcWorkTime()内で所定内割増を実働で求めるようになっている。
+	 *		ただし、E版と動作が違うケースがあり復活させる可能性がある為、この処理を残している。
+	 *		Ex)所定8.5hの日に半日年休を使用した場合、E版は0.5hが所定内割増になる。UKは0h。
 	 * @param recordReget 時間帯作成、時間計算で再取得が必要になっているクラスたちの管理クラス
 	 * @param vacationClass 休暇クラス
 	 * @param workType 勤務種類
