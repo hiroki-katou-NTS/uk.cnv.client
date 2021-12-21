@@ -253,13 +253,13 @@ public class WithinWorkTimeFrame extends ActualWorkingTimeSheet {
 		HolidayCalcMethodSet holidayCalcMethodSet = addSetting.getVacationCalcMethodSet();
 		// 日別勤怠の出退勤を確認する
 		Optional<TimeLeavingWork> timeLeavingWork = integrationOfDaily.getAttendanceLeave()
-				.flatMap(a -> a.getAttendanceLeavingWork(this.workingHoursTimeNo.v()));
+				.flatMap(a -> a.getAttendanceLeavingWork(this.workNo.v()));
 		// 遅刻判断時刻を取得する
 		Optional<LateDecisionClock> lateDecisionClock =
-				parentSheet.getLateDecisionClock(this.workingHoursTimeNo.v());
+				parentSheet.getLateDecisionClock(this.workNo.v());
 		// 早退判断時刻を取得する
 		Optional<LeaveEarlyDecisionClock> leaveEarlyDecisionClock =
-				parentSheet.getLeaveEarlyDecisionClock(this.workingHoursTimeNo.v());
+				parentSheet.getLeaveEarlyDecisionClock(this.workNo.v());
 		// 就業時間の計算
 		AttendanceTime actualTime = calcActualTime(holidayCalcMethodSet,premiumAtr);
 		// 実働時間を就業時間に入れる
@@ -280,7 +280,8 @@ public class WithinWorkTimeFrame extends ActualWorkingTimeSheet {
 		AttendanceTime timeVacationOffsetTime = this.getTimeVacationOffsetTimeForAddWorkTime(
 				integrationOfDaily, integrationOfWorkTime, addSetting, holidayAddtionSet);
 		workTime = new AttendanceTime(workTime.valueAsMinutes() + timeVacationOffsetTime.valueAsMinutes());
-		if(this.leaveEarlyTimeSheet.isPresent() && this.leaveEarlyTimeSheet.get().getForDeducationTimeSheet().isPresent()) {
+		if(integrationOfWorkTime.map(i -> i.getWorkTimeSetting().getWorkTimeDivision().isFlow()).orElse(false)
+				&& this.leaveEarlyTimeSheet.isPresent() && this.leaveEarlyTimeSheet.get().getForDeducationTimeSheet().isPresent()) {
 			//休暇加算によって、就業時間から溢れて残業になる時間帯
 			TimeSpanForDailyCalc overTimebyTimeVacation = new TimeSpanForDailyCalc(
 					this.timeSheet.getEnd(),
