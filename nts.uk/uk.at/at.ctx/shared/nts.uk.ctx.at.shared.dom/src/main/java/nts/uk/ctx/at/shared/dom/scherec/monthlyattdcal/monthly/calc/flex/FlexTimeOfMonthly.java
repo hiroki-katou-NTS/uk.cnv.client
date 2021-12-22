@@ -2207,6 +2207,15 @@ public class FlexTimeOfMonthly implements SerializableWithOptional{
 	 */
 	public AttendanceTimeMonth getTotalWorkingTargetTime(){
 		
+		/** ○「集計方法」を確認する */
+		if (this.flexAggrSet.getAggrMethod() == FlexAggregateMethod.FOR_CONVENIENCE) { /** 便宜上集計 */
+			
+			/** フレックス時間（プラス分）を取得する（日の縦計） */
+			return this.flexTime.getPlusFlexTime();
+		}
+		
+		/** 原則集計 */
+		/** 総労働対象時間を計算する  */
 		return new AttendanceTimeMonth(this.flexExcessTime.v() +
 				this.flexCarryforwardTime.getFlexCarryforwardWorkTime().v());
 	}
