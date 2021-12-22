@@ -221,10 +221,6 @@ module nts.uk.com.view.oew001.share.model {
       $.extend(this, init);
     }
   }
-
-  export function setReadOnly(itemId: string) {
-    $(itemId).attr("readonly", "readonly");
-  }
 }
 
 module nts.uk.com.view.oew001.share.model.constants {

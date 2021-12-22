@@ -14,6 +14,7 @@
 				};
 			</script>
 			<com:ValidatorScript>
+				nts.uk.ctx.at.shared.dom.common.anyitem.AnyTimeMonth
 				nts.uk.ctx.at.shared.dom.scherec.optitem.calculation.InputValue
 			</com:ValidatorScript>
 			<com:scriptfile set="IGNITE" />
@@ -27,10 +28,11 @@
 			<div id="contents-area" style="display: none" data-bind="visible: true">
 			<com:ko tag="with" bind="formulaSetting">
 				<div data-bind="ntsFormLabel: {required: false}">#{i18n.getText('KMK002_24')}</div>
-				<div data-bind="ntsFormLabel: {text: formulaAtr}" style="margin-right: 100px"></div>
+				<div data-bind="ntsFormLabel: {text: formulaAtr}" style="margin-right: 100px">
+				</div>
 				<div data-bind="ntsFormLabel: {required: false}">#{i18n.getText('KMK002_34')}</div>
-				<div data-bind="ntsFormLabel: {text: formulaName}"></div>
-
+				<div data-bind="ntsFormLabel: {text: formulaName}">
+				</div>
 				<hr/>
 				<table id="tbl-formulaSetting">
 					<tbody>
@@ -52,7 +54,8 @@
 										name: 'KMK002_63',
 										checkedValue: 0,
 										checked: leftItem.settingMethod,
-										optionText: 'KMK002_64'}"></label>
+										optionText: 'KMK002_64'}">
+										</label>
 									<div tabindex="2" id="cbb-left-item" class="inline-table"
 										data-bind="ntsComboBox: {
 										name: '#[KMK002_66]',
@@ -90,7 +93,8 @@
 										name: 'KMK002_121',
 										checkedValue: 0,
 										checked: rightItem.settingMethod,
-										optionText: 'KMK002_64'}"></label>
+										optionText: 'KMK002_64'}">
+									</label>
 								<div tabindex="6" id="cbb-right-item" class="inline-table"
 									data-bind="ntsComboBox: {
 									name: '#[KMK002_66]',
@@ -101,7 +105,7 @@
 									editable: false,
 									enable: isRightCbbEnable,
 									columns: [
-										{ prop: 'symbolValue', length: 1 },
+										{ prop: 'symbolValue', length: 6 },
 										{ prop: 'formulaName', length: 6 },
 									]}">
 								</div>
@@ -110,15 +114,37 @@
 						</tr>
 						<tr>
 							<td>
-								<div>
+								<div data-bind="if: isD29()">
 									<label data-bind="ntsRadioButton: {
 										name: 'KMK002_63',
 										checkedValue: 1,
 										checked: leftItem.settingMethod,
-										optionText: 'KMK002_65'}"></label>
-									<input tabindex="3" class="inputNumberic"
+										optionText: 'KMK002_65'}">
+									</label>
+									<input tabindex="3" class=""
 										id="inp-left-item"
-										data-bind="ntsNumberEditor: {
+										data-bind="ntsTimeEditor: {
+										name: '#[KMK002_172]',
+	                                    value: leftItem.inputValue,
+	                                    constraint: 'AnyTimeMonth',
+	                                    inputFormat: 'time',
+                                        mode: 'time',
+	                                    readonly: false,
+	                                    enable: leftItem.isInputValue(), 
+	                                    required: true,
+	                                    }"/>
+		                         </div>
+								<!--D2_8-->
+								<div data-bind="if: !isD29()">
+									<label data-bind="ntsRadioButton: {
+										name: 'KMK002_63',
+										checkedValue: 1,
+										checked: leftItem.settingMethod,
+										optionText: 'KMK002_65'}">
+									</label>
+									<input tabindex="3" class="inputNumberic"
+										   id="inp-left-item_1"
+										   data-bind="ntsNumberEditor: {
 										name: '#[KMK002_67]',
 	                                    value: leftItem.inputValue,
 	                                    constraint: 'InputValue',
@@ -126,20 +152,39 @@
 		                                    grouplength: 3,
 		                                    decimallength: 2
 	                                    },
-	                                    enable: leftItem.isInputValue(), 
+	                                    enable: leftItem.isInputValue(),
 	                                    required: true,
 	                                    }"/>
-		                         </div>
+								</div>
 							</td>
 							<td>
-								<div>
+								<div data-bind="if: isD49()" >
 										<label data-bind="ntsRadioButton: {
 										name: 'KMK002_121',
 										checkedValue: 1,
 										checked: rightItem.settingMethod,
-										optionText: 'KMK002_65'}"></label>
+										optionText: 'KMK002_65'}">
+										</label>
 									<input tabindex="7" id="inp-right-item" class="inputNumberic"
-										data-bind="ntsNumberEditor: {
+										data-bind="ntsTimeEditor: {
+									  	name: '#[KMK002_172]',
+	                                    value: rightItem.inputValue,
+	                                    constraint: 'AnyTimeMonth',
+	                                    inputFormat: 'time',
+                                         mode: 'time',
+	                                    readonly: false,
+	                                    enable: rightItem.isInputValue(), 
+	                                    required: true}"/>
+                               </div>
+								<div data-bind="if: !isD49()" >
+									<label data-bind="ntsRadioButton: {
+										name: 'KMK002_121',
+										checkedValue: 1,
+										checked: rightItem.settingMethod,
+										optionText: 'KMK002_65'}">
+									</label>
+									<input tabindex="7" id="inp-right-item2" class="inputNumberic"
+										   data-bind="ntsNumberEditor: {
 									  	name: '#[KMK002_67]',
 	                                    value: rightItem.inputValue,
 	                                    constraint: 'InputValue',
@@ -147,9 +192,10 @@
 		                                    grouplength: 3,
 		                                    decimallength: 2
 	                                    },
-	                                    enable: rightItem.isInputValue(), 
+	                                    enable: rightItem.isInputValue(),
 	                                    required: true}"/>
-                               </div>
+								</div>
+
 							</td>
 						</tr>
 						<tr>
@@ -159,7 +205,8 @@
 									data-bind="ntsCheckBox: {
 									checked: minusSegment,
 									enable: true,
-									text: nts.uk.resource.getText('KMK002_59') }"></div>
+									text: nts.uk.resource.getText('KMK002_59') }">
+								</div>
 							</td>
 						</tr>
 					</tbody>

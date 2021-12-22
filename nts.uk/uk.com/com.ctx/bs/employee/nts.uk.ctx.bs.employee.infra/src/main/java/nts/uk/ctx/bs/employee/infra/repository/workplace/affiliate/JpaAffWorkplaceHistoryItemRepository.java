@@ -436,22 +436,22 @@ public class JpaAffWorkplaceHistoryItemRepository extends JpaRepository implemen
 		return sids;
 	}
 
-	@Override
-	public List<String> getSIDByListWklocationId(List<String> workLocationCDS) {
-		if (CollectionUtil.isEmpty(workLocationCDS)) {
-			return new ArrayList<>();
-		}
-		List<String> listHistItem = new ArrayList<>();
-		CollectionUtil.split(workLocationCDS, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subList -> {
-			listHistItem.addAll(this.queryProxy().query(GET_LIST_SID_BY_LIST_WKPID_DATEPERIOD, String.class)
-					.setParameter("wkLCds", subList)
-					.getList());
-		});
-		if (listHistItem.isEmpty()) {
-			return Collections.EMPTY_LIST;
-		}
-		return listHistItem;
-	}
+//	@Override
+//	public List<String> getSIDByListWklocationId(List<String> workLocationCDS) {
+//		if (CollectionUtil.isEmpty(workLocationCDS)) {
+//			return new ArrayList<>();
+//		}
+//		List<String> listHistItem = new ArrayList<>();
+//		CollectionUtil.split(workLocationCDS, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subList -> {
+//			listHistItem.addAll(this.queryProxy().query(GET_LIST_SID_BY_LIST_WKPID_DATEPERIOD, String.class)
+//					.setParameter("wkLCds", subList)
+//					.getList());
+//		});
+//		if (listHistItem.isEmpty()) {
+//			return Collections.EMPTY_LIST;
+//		}
+//		return listHistItem;
+//	}
 
 	@Override
 	public List<String> getSIDByListWklocationCode(List<String> workLocationCode) {

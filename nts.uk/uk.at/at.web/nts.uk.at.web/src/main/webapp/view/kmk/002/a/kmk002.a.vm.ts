@@ -14,6 +14,8 @@ module nts.uk.at.view.kmk002.a {
 
     export module viewmodel {
 
+        import isNullOrUndefined = nts.uk.util.isNullOrUndefined;
+
         export class ScreenModel {
             optionalItemHeader: OptionalItemHeader;
             langId: KnockoutObservable<string> = ko.observable('ja');
@@ -27,6 +29,7 @@ module nts.uk.at.view.kmk002.a {
                     self.changeLanguage();
                     self.langJP((value == "ja") ? true : false);
                 });
+
 
             }
 
@@ -2355,6 +2358,19 @@ module nts.uk.at.view.kmk002.a {
                 let self = this;
                 return self.formulaAtr() == EnumAdaptor.valueOf('TIME', Enums.ENUM_OPT_ITEM.formulaAtr);
             }
+            public formatTime(numbeMminutes:number):string {
+                if(numbeMminutes == 0){
+                    return "0:00";
+                }
+                let time = Math.abs(numbeMminutes);
+                let hours : number =Math.floor( time/ 60);
+                let minutes :number  = time % 60;
+                if(numbeMminutes < 0){
+                    return   "(-" + hours.toString()+ ":" + (minutes == 0 ? "00" : minutes.toString()) +")";
+                }else {
+                    return hours.toString()+ ":" + (minutes == 0 ? "00" : minutes.toString());
+                }
+            }
 
             /**
              * Check whether number atr is selected
@@ -2371,7 +2387,6 @@ module nts.uk.at.view.kmk002.a {
                 let self = this;
                 return self.formulaAtr() == EnumAdaptor.valueOf('AMOUNT', Enums.ENUM_OPT_ITEM.formulaAtr);
             }
-
             /**
             * Open dialog C: Item selection
             */
@@ -2414,10 +2429,12 @@ module nts.uk.at.view.kmk002.a {
                 let param = <ParamToD>{};
                 param.formulaId = dto.formulaId;
                 param.formulaAtr = EnumAdaptor.localizedNameOf(dto.formulaAtr, Enums.ENUM_OPT_ITEM.formulaAtr);
+                param.formulaNumber = dto.formulaAtr;
                 param.formulaName = dto.formulaName;
                 param.formulaSetting = dto.formulaSetting;
                 param.selectableFormulas = self.getSelectableFormulas(self.orderNo());
                 param.operatorDatasource = Enums.ENUM_OPT_ITEM.operatorAtr;
+                param.enums =  Enums.ENUM_OPT_ITEM;
 
                 nts.uk.ui.windows.setShared('paramToD', param);
 
@@ -2438,19 +2455,47 @@ module nts.uk.at.view.kmk002.a {
              * Display the setting of formula setting
              */
             public setFormulaSettingResult(dto: FormulaSettingDto): void {
+
+
                 let self = this;
                 let result;
                 let leftItem;
+                let right;
+                let left;
                 let rightItem;
+                let item = self.toDto();
+                let fomularAtr =  item.formulaAtr;
+                let isTimeSelected = fomularAtr == EnumAdaptor.valueOf('TIME', Enums.ENUM_OPT_ITEM.formulaAtr);
+                let isNumberSelected = fomularAtr == EnumAdaptor.valueOf('NUMBER', Enums.ENUM_OPT_ITEM.formulaAtr);
 
                 // get item selection enum value.
                 let operator: string = EnumAdaptor.localizedNameOf(dto.operator, Enums.ENUM_OPT_ITEM.operatorAtr);
+                let selectableFormulas = self.getSelectableFormulas(self.orderNo());
+                left = _.find(selectableFormulas, item => item.formulaId == dto.leftItem.formulaItemId);
+                right = _.find(selectableFormulas, item => item.formulaId == dto.rightItem.formulaItemId);
 
+                let isTimeLeft = false;
+                let isNumberLeft = false;
+                let isTimeRight = false;
+                let isNumberRight = false;
+                if(!isNullOrUndefined(left)){
+                    isTimeLeft = left.formulaAtr == EnumAdaptor.valueOf('TIME', Enums.ENUM_OPT_ITEM.formulaAtr);
+                    isNumberLeft = left.formulaAtr == EnumAdaptor.valueOf('NUMBER', Enums.ENUM_OPT_ITEM.formulaAtr);
+                }
+                if(!isNullOrUndefined(right)) {
+                    isTimeRight =  right.formulaAtr == EnumAdaptor.valueOf('TIME', Enums.ENUM_OPT_ITEM.formulaAtr);
+                    isNumberRight =   right.formulaAtr == EnumAdaptor.valueOf('NUMBER', Enums.ENUM_OPT_ITEM.formulaAtr);
+                }
                 // set left item
                 if (self.isSettingMethodOfItemSelection(dto.leftItem)) {
                     leftItem = self.getSymbolById(dto.leftItem.formulaItemId);
                 } else {
                     leftItem = dto.leftItem.inputValue;
+                    if((isTimeSelected && isTimeRight && (dto.operator == 0 ||dto.operator ==1))
+                        ||(isTimeSelected && isNumberRight && (dto.operator == 2 ))
+                        ||(isNumberSelected && isTimeRight && (dto.operator == 3))){
+                        leftItem  = this.formatTime(dto.leftItem.inputValue)
+                    }
                 }
 
                 // set right item
@@ -2458,15 +2503,25 @@ module nts.uk.at.view.kmk002.a {
                     rightItem = self.getSymbolById(dto.rightItem.formulaItemId);
                 } else {
                     rightItem = dto.rightItem.inputValue;
-                }
+                    if((isTimeSelected && isTimeLeft && (dto.operator == 0 ||dto.operator ==1))
+                        ||(isTimeSelected && isNumberLeft && (dto.operator == 2 ))
+                        ||(isNumberSelected && isTimeLeft&& (dto.operator == 3))){
+                        rightItem  = this.formatTime(dto.rightItem.inputValue)
+                    }
 
+                }
                 // set result
                 result = leftItem + ' ' + operator + ' ' + rightItem;
                 self.settingResult(result);
 
                 // clear error
                 $('#settingResult' + self.orderNo()).ntsEditor('validate');
+
+
+
+
             }
+
 
             /**
              * Display the setting of formula setting
@@ -2660,11 +2715,13 @@ module nts.uk.at.view.kmk002.a {
         }
         export interface ParamToD {
             formulaId: string;
+            formulaNumber:number;
             formulaName: string;
             formulaAtr: string;
             formulaSetting: FormulaSettingDto;
             operatorDatasource: Array<EnumConstantDto>;
             selectableFormulas: Array<FormulaDto>;
+            enums: any;
         }
     }
 }

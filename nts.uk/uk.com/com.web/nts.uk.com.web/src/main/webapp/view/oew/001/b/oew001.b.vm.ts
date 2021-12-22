@@ -52,7 +52,6 @@ module nts.uk.com.view.oew001.b {
         } else {
           $(".B2_2_1")[0].focus();
         }
-        vm.$nextTick(() => model.setReadOnly("#B2_2"));
         vm.$blockui("clear");
       });
     }

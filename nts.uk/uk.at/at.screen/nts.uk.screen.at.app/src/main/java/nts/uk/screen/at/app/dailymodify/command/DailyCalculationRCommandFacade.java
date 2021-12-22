@@ -177,12 +177,13 @@ public class DailyCalculationRCommandFacade {
 		Map<Integer, List<DPItemValue>> resultErrorMonth = new HashMap<>();
 		// 日別実績が修正されているかチェック
 		if (dataParent.isCheckDailyChange()) {
+			ExecutionType executionType = dataParent.isFlagCalculation()? ExecutionType.RERUN:ExecutionType.NORMAL_EXECUTION;
 			// 日別実績の計算
 			DailyCalcResult dailyCalcResult = processDailyCalc.processDailyCalc(
 					new DailyCalcParam(mapSidDate, dataParent.getLstNotFoundWorkType(), resultOlds,
 							dataParent.getDateRange(), dataParent.getDailyEdits(), dataParent.getItemValues()),
 					editedDtos, domainOld, dailyItems, querys, monthParam, dataParent.getShowDialogError(),
-					ExecutionType.RERUN);
+					executionType);
 			if (dailyCalcResult.getResultUI() == null) {
 				return new DailyPerformanceCalculationDto(editedKeep, new ArrayList<>(),
 						new DataResultAfterIU(dailyCalcResult.getDataResultAfterIU().getErrorMap(), flexShortage, false,

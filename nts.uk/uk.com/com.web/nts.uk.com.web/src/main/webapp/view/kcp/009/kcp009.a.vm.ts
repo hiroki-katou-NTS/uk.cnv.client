@@ -59,7 +59,7 @@ module kcp009.a.viewmodel {
 //                }
 //            });
 
-            self.isDisplayNumberOfEmployee = ko.observable(false);
+            self.isDisplayNumberOfEmployee = ko.observable(true);
             self.isDisplayNumberOfEmployee.subscribe(() => self.reloadComponent());
             
             self.targetBtnText = nts.uk.resource.getText("KCP009_3");

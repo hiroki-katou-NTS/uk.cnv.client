@@ -9,6 +9,7 @@ module nts.uk.at.view.kaf000.d.viewmodel {
 		isAgentMode: boolean;
 		approvalRootDisp: KnockoutObservable<boolean>;
 		indexApprover: number = 0;
+		approvalRootStateConvert: KnockoutObservableArray<any> = ko.observableArray([]);
 		
         created(params: KAF000DParam) {
 			const vm = this;
@@ -20,6 +21,47 @@ module nts.uk.at.view.kaf000.d.viewmodel {
 	        } else {
 	            vm.approvalRootState([]);
 	        }
+			let approvalRootStateConvert: Array<any> = [];
+			if(!_.isEmpty(vm.approvalRootState())) {
+				for(let phase of vm.approvalRootState()) {
+					if(_.isEmpty(_.flatMap(phase.listApprovalFrame(), frame => frame.listApprover()))) {
+						let approverConvert = {
+							agentID: '',
+							agentMail: '',
+							agentName: '',
+							approvalAtrName: '',
+							approvalAtrValue: '',
+							approvalDate: '',
+							approvalReason: '',
+							approverID: '',
+							approverInListOrder: '',
+							approverMail: '',
+							approverName: '',
+							representerID: '',
+							representerMail: '',
+							representerName: ''
+						}
+						let frame: any = _.first(phase.listApprovalFrame());
+						let frameConvert = {
+							appDate: frame ? frame.appDate() : '',
+							confirmAtr: frame ? frame.confirmAtr() : '',
+							frameOrder: frame ? frame.frameOrder() : '',
+							listApprover: [ko.mapping.fromJS(approverConvert)]
+						}
+						let phaseConvert = {
+							approvalAtrName: phase.approvalAtrName(),
+							approvalAtrValue: phase.approvalAtrValue(),
+							approvalFormValue: phase.approvalFormValue(),
+							listApprovalFrame: [ko.mapping.fromJS(frameConvert)],
+							phaseOrder: phase.phaseOrder()
+						}
+						approvalRootStateConvert.push(ko.mapping.fromJS(phaseConvert));
+					} else {
+						approvalRootStateConvert.push(phase);
+					}
+				}	
+			}
+			vm.approvalRootStateConvert(ko.mapping.fromJS(approvalRootStateConvert)());
 			vm.approvalRootDisp = ko.observable(!vm.isAgentMode || _.size(vm.appDispInfoStartupOutput.appDispInfoNoDateOutput.employeeInfoLst)<=1);
         }
 
@@ -40,13 +82,6 @@ module nts.uk.at.view.kaf000.d.viewmodel {
             return false;
         }
 
-        getFrameIndex(loopPhase, loopFrame, loopApprover) {
-            if(_.size(loopFrame.listApprover()) > 1) {
-                return _.findIndex(loopFrame.listApprover(), o => o == loopApprover) + 1;
-            }
-            return _.findIndex(loopPhase.listApprovalFrame(), o => o == loopFrame) + 1;
-        }
-
         frameCount(listFrame) {
             const vm = this;
             let listExist = _.filter(listFrame, x => _.size(x.listApprover()) > 0);
@@ -61,6 +96,9 @@ module nts.uk.at.view.kaf000.d.viewmodel {
         }
 
         getApproverAtr(approver) {
+			if(_.isEmpty(approver.approvalAtrName())) {
+				return '';	
+			}
             if(approver.approvalAtrName() !='未承認'){
                 if(approver.agentName().length > 0){
                     if(approver.agentMail().length > 0){
@@ -102,17 +140,6 @@ module nts.uk.at.view.kaf000.d.viewmodel {
                 case 5: return vm.$i18n("KAF000_8");
                 default: return "";
             }
-        }
-
-        getApproverLabel(loopPhase, loopFrame, loopApprover) {
-            const vm = this;
-			let indexBefore = _.chain(vm.approvalRootState()).filter(o => o.phaseOrder() < loopPhase.phaseOrder()).map(o => vm.frameCount(o.listApprovalFrame())).sum().value(),
-           		index = indexBefore + vm.getFrameIndex(loopPhase, loopFrame, loopApprover);
-            // case group approver
-            if(_.size(loopFrame.listApprover()) > 1) {
-                index++;
-            }
-           	return vm.$i18n("KAF000_9",[index+'']);
         }
 
 		getApproverLabelByIndex() {

@@ -48,9 +48,13 @@ module nts.uk.at.view.kaf000.a.component6.viewmodel {
 				let approvalRootStateShort = [],
 					listPhase: any = value.appDispInfoWithDateOutput.opListApprovalPhaseState;
 				for(let phase of listPhase) {
-					for(let frame of phase.listApprovalFrame) {
-						for(let approver of frame.listApprover) {
-							approvalRootStateShort.push(new ApproverInforShort(approver.approverName, approver.representerName));
+					if(_.isEmpty(_.flatMap(phase.listApprovalFrame, frame => frame.listApprover))) {
+						approvalRootStateShort.push(new ApproverInforShort('', ''));	
+					} else {
+						for(let frame of phase.listApprovalFrame) {
+							for(let approver of frame.listApprover) {
+								approvalRootStateShort.push(new ApproverInforShort(approver.approverName, approver.representerName));
+							}
 						}
 					}
 				}

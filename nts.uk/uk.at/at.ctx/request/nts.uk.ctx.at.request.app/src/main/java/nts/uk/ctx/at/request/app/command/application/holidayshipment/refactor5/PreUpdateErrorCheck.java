@@ -10,6 +10,12 @@ import javax.inject.Inject;
 
 import nts.arc.error.BusinessException;
 import nts.arc.time.GeneralDate;
+import nts.uk.ctx.at.request.app.command.application.kdl035.HolidayWorkAssociationStart;
+import nts.uk.ctx.at.request.app.command.application.kdl035.Kdl035InputData;
+import nts.uk.ctx.at.request.app.command.application.kdl035.Kdl035OutputData;
+import nts.uk.ctx.at.request.app.command.application.kdl036.HolidayAssociationStart;
+import nts.uk.ctx.at.request.app.command.application.kdl036.Kdl036InputData;
+import nts.uk.ctx.at.request.app.command.application.kdl036.Kdl036OutputData;
 import nts.uk.ctx.at.request.app.find.application.holidayshipment.refactor5.dto.DisplayInforWhenStarting;
 import nts.uk.ctx.at.request.dom.application.EmploymentRootAtr;
 import nts.uk.ctx.at.request.dom.application.common.service.detailscreen.before.DetailBeforeUpdate;
@@ -17,8 +23,14 @@ import nts.uk.ctx.at.request.dom.application.common.service.other.output.ActualC
 import nts.uk.ctx.at.request.dom.application.common.service.setting.CommonAlgorithm;
 import nts.uk.ctx.at.request.dom.application.holidayshipment.absenceleaveapp.AbsenceLeaveApp;
 import nts.uk.ctx.at.request.dom.application.holidayshipment.recruitmentapp.RecruitmentApp;
+import nts.uk.ctx.at.shared.app.find.remainingnumber.paymana.PayoutSubofHDManagementDto;
+import nts.uk.ctx.at.shared.app.find.remainingnumber.subhdmana.dto.LeaveComDayOffManaDto;
 import nts.uk.ctx.at.shared.dom.remainingnumber.paymana.PayoutSubofHDManagement;
+import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveComDayOffManagement;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
+import nts.uk.ctx.at.shared.dom.worktype.WorkType;
+import nts.uk.ctx.at.shared.dom.worktype.WorkTypeClassification;
+import nts.uk.ctx.at.shared.dom.worktype.WorkTypeUnit;
 
 /**
  * @author thanhpv
@@ -40,6 +52,12 @@ public class PreUpdateErrorCheck {
 	@Inject
 	private DetailBeforeUpdate detailBeforeUpdate;
 	
+	@Inject
+    private HolidayAssociationStart holidayAssociationStart;
+	
+	@Inject
+    private HolidayWorkAssociationStart holidayWorkAssociationStart;
+	
 	/**
 	 * 振休振出申請（詳細）登録前のチェック
 	 * @param companyId 申請者会社ID
@@ -48,7 +66,8 @@ public class PreUpdateErrorCheck {
 	 * @param displayInforWhenStarting 振休振出申請起動時の表示情報
 	 */
 	public void errorCheck(String companyId, Optional<AbsenceLeaveApp> abs, Optional<RecruitmentApp> rec, DisplayInforWhenStarting displayInforWhenStarting, 
-	        List<PayoutSubofHDManagement> payoutSubofHDManagements, boolean checkFlag) {
+	        List<PayoutSubofHDManagement> payoutSubofHDManagements, List<LeaveComDayOffManagement> leaveComDayOffManagements, 
+	        boolean checkFlag, List<WorkType> listWorkTypes) {
 		//アルゴリズム「登録前エラーチェック（更新）」を実行する
 		this.preRegistrationErrorCheck.preconditionCheck(abs, rec, 
 		        Optional.ofNullable(displayInforWhenStarting.getApplicationForHoliday() == null ? null : displayInforWhenStarting.getApplicationForHoliday().getWorkInformationForApplication()), 
@@ -121,9 +140,60 @@ public class PreUpdateErrorCheck {
 					 existFlag, 
 					 Optional.of(abs.get().getWorkInformation().getWorkTypeCode().v()), 
 					 abs.get().getWorkInformation().getWorkTimeCodeNotNull().map(WorkTimeCode::v));
+			 
+			 Optional<WorkType> workType = listWorkTypes.stream().filter(x -> x.getWorkTypeCode().v().equals(abs.get().getWorkInformation().getWorkTypeCode().v())).findFirst();
+			 if (workType.isPresent() && isHolidayWorkType(workType.get()) && !rec.isPresent()) {
+                 // 休出代休関連付けダイアログ起動
+                 Kdl036OutputData output = holidayAssociationStart.init(new Kdl036InputData(
+                         abs.get().getEmployeeID(), 
+                         abs.get().getAppDate().getApplicationDate(), 
+                         abs.get().getAppDate().getApplicationDate(), 
+                         workType.get().getDailyWork().getWorkTypeUnit().equals(WorkTypeUnit.OneDay) ? 1 : 0, 
+                         1,
+                         displayInforWhenStarting.getAppDispInfoStartup().getAppDispInfoWithDateOutput().getOpActualContentDisplayLst(), 
+                         new ArrayList<LeaveComDayOffManaDto>()));
+                 
+                 // データがある　AND　INPUT.振休申請.休出代休紐付け管理がEmpty 
+                 if (!output.getHolidayWorkInfoList().isEmpty() && leaveComDayOffManagements.isEmpty()) {
+                     throw new BusinessException("Msg_3255");
+                 }
+             }
+			 
+			 if (workType.isPresent() && isPauseWorkType(workType.get()) && !rec.isPresent()) {
+			     // 振休振休関連付けダイアログ起動
+			     Kdl035OutputData kdl035output = holidayWorkAssociationStart.init(new Kdl035InputData(
+			             abs.get().getEmployeeID(), 
+			             abs.get().getAppDate().getApplicationDate(), 
+			             abs.get().getAppDate().getApplicationDate(), 
+			             workType.get().getDailyWork().getWorkTypeUnit().equals(WorkTypeUnit.OneDay) ? 1 : 0, 
+			                     1,
+			                     displayInforWhenStarting.getAppDispInfoStartup().getAppDispInfoWithDateOutput().getOpActualContentDisplayLst(), 
+			                     new ArrayList<PayoutSubofHDManagementDto>()));
+			     
+			     if (!kdl035output.getSubstituteWorkInfoList().isEmpty() && payoutSubofHDManagements.isEmpty()) {
+			         throw new BusinessException("Msg_2223");
+			     }
+			 }
 		 }
 		
 	}
+	
+	public boolean isHolidayWorkType(WorkType workType) {
+        WorkTypeUnit workTypeUnit = workType.getDailyWork().getWorkTypeUnit();
+        if (workTypeUnit.equals(WorkTypeUnit.MonringAndAfternoon)) {
+            return workType.getDailyWork().getMorning().equals(WorkTypeClassification.SubstituteHoliday) || workType.getDailyWork().getAfternoon().equals(WorkTypeClassification.SubstituteHoliday);
+        }
+        return false;
+    }
+	
+	public boolean isPauseWorkType(WorkType workType) {
+        WorkTypeUnit workTypeUnit = workType.getDailyWork().getWorkTypeUnit();
+        if (workTypeUnit.equals(WorkTypeUnit.OneDay)) {
+            return workType.getDailyWork().getOneDay().equals(WorkTypeClassification.Pause);
+        } else {
+            return workType.getDailyWork().getMorning().equals(WorkTypeClassification.Pause) || workType.getDailyWork().getAfternoon().equals(WorkTypeClassification.Pause);
+        }
+    }
 	
 }
 

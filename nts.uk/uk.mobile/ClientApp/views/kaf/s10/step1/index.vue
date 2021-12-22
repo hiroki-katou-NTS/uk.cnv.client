@@ -71,8 +71,6 @@
             workInfo.workTime.code
           }}</span>
           <span>{{ workInfo.workTime.name }}</span>
-          <!--A1_4_6-->
-          <span class="d-block mt-1">{{ workInfo.workTime.time }}</span>
         </button>
       </div>
     </div>

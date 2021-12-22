@@ -1,7 +1,6 @@
 package nts.uk.ctx.at.request.app.command.application.holidayshipment.refactor5;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -100,7 +99,9 @@ public class UpdateHolidayShipmentCommandHandlerRef5 {
 		        rec, 
 		        command.displayInforWhenStarting, 
 		        command.existAbs() ? command.abs.payoutSubofHDManagements.stream().map(c->c.toDomain()).collect(Collectors.toList()) : new ArrayList<>(), 
-		        command.isCheckFlag());
+		        command.existAbs() ? command.abs.leaveComDayOffMana.stream().map(c->c.toDomain()).collect(Collectors.toList()) : new ArrayList<>(), 
+		        command.isCheckFlag(), 
+		        command.getDisplayInforWhenStarting().getApplicationForHoliday().getWorkTypeList().stream().map(x -> x.toDomain()).collect(Collectors.toList()));
 		
 		//アルゴリズム「振休振出申請の更新登録」を実行する
 		return this.updateApplicationProcess(

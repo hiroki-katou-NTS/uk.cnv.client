@@ -46,7 +46,7 @@ public class EmploymentRoleDataFinder {
 					x.getEmployeeReferenceRange())).orElse(null));
 			return result;
 		}
-		return null;
+		return new EmploymentRoleDataDto();
 	}
 	
 }

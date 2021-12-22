@@ -81,7 +81,7 @@ public class CoreTimeSetting extends WorkTimeDomainObject implements Cloneable{
 	public void validate() {
 		// コアタイム時間帯.開始時刻 >= コアタイム時間帯.終了時刻 => Msg_770
 		if (this.isUseTimeSheet()
-				&& this.coreTimeSheet.getStartTime().greaterThanOrEqualTo(this.coreTimeSheet.getEndTime())) {
+				&& this.coreTimeSheet.getStartTime().greaterThan(this.coreTimeSheet.getEndTime())) {
 			this.bundledBusinessExceptions.addMessage("Msg_770", "KMK003_157");
 		}
 

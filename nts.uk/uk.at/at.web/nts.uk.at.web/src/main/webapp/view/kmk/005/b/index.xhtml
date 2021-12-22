@@ -36,7 +36,7 @@
 									</th>
 								</tr>
 							</thead>
-							<tbody data-bind="foreach: timeItemList">
+							<!-- <tbody data-bind="foreach: timeItemList">
 								 
 								<tr style="height: 10px; ">
 									<td data-bind="text: timeItemNo"></td>
@@ -59,13 +59,274 @@
 										value: timeItemName, 
 										constraint: 'TimeItemName',
 										option: { width: '220px' }, 
-										required: true, 
+										required: required, 
 										enable: Boolean(useAtr()==1) }" />
 										 <input type="hidden" data-bind="value: timeItemId" />
-									</td>
-									 
+									</td>									 
 								</tr> 
 
+							</tbody> -->
+							<tbody data-bind="">								 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_22')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useAtr1,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemName1" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_140]', 
+										value: timeItemName1, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isRequired1, 
+										enable: Boolean(useAtr1()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemId1" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_23')}</td>
+									<td>
+										<div class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useAtr2,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemName2" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_141]', 
+										value: timeItemName2, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isRequired2, 
+										enable: Boolean(useAtr2()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemId2" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_24')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useAtr3,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemName3" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_142]', 
+										value: timeItemName3, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isRequired3, 
+										enable: Boolean(useAtr3()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemId3" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_25')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useAtr4,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemName4" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_143]', 
+										value: timeItemName4, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isRequired4, 
+										enable: Boolean(useAtr4()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemId4" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_26')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useAtr5,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemName5" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_144]', 
+										value: timeItemName5, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isRequired5, 
+										enable: Boolean(useAtr5()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemId5" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_27')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useAtr6,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemName6" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_145]', 
+										value: timeItemName6, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isRequired6, 
+										enable: Boolean(useAtr6()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemId6" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_28')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useAtr7,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemName7" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_146]', 
+										value: timeItemName7, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isRequired7, 
+										enable: Boolean(useAtr7()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemId7" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_29')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useAtr8,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemName8" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_147]', 
+										value: timeItemName8, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isRequired8, 
+										enable: Boolean(useAtr8()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemId8" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_30')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useAtr9,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemName9" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_148]', 
+										value: timeItemName9, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isRequired9, 
+										enable: Boolean(useAtr9()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemId9" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_31')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useAtr10,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemName10" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_149]', 
+										value: timeItemName10, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isRequired10, 
+										enable: Boolean(useAtr10()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemId10" />
+									</td>									 
+								</tr> 
 							</tbody>
 						</table>
 
@@ -82,7 +343,7 @@
 									</th>
 								</tr>
 							</thead>
-							<tbody data-bind="foreach: timeItemSpecList">
+							<!-- <tbody data-bind="foreach: timeItemSpecList">
 								 
 								<tr style="height:10px;">
 									<td data-bind="text: timeItemNo"></td>
@@ -105,13 +366,275 @@
 										value: timeItemName, 
 										constraint: 'TimeItemName',
 										option: { width: '220px' }, 
-										required: true, 
+										required: required, 
 										enable: Boolean(useAtr()==1) }" />
 										 <input type="hidden" data-bind="value: timeItemId" />
 									</td>
 									 
 								</tr> 
 
+							</tbody> -->
+							<tbody data-bind="">								 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_22')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useSpecAtr1,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemSpecName1" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_140]', 
+										value: timeItemSpecName1, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isSpecRequired1, 
+										enable: Boolean(useSpecAtr1()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemSpecId1" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_23')}</td>
+									<td>
+										<div class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useSpecAtr2,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemSpecName2" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_141]', 
+										value: timeItemSpecName2, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isSpecRequired2, 
+										enable: Boolean(useSpecAtr2()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemSpecId2" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_24')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useSpecAtr3,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemSpecName3" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_142]', 
+										value: timeItemSpecName3, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isSpecRequired3, 
+										enable: Boolean(useSpecAtr3()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemSpecId3" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_25')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useSpecAtr4,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemSpecName4" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_143]', 
+										value: timeItemSpecName4, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isSpecRequired4, 
+										enable: Boolean(useSpecAtr4()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemSpecId4" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_26')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useSpecAtr5,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemSpecName5" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_144]', 
+										value: timeItemSpecName5, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isSpecRequired5, 
+										enable: Boolean(useSpecAtr5()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemSpecId5" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_27')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useSpecAtr6,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemSpecName6" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_145]', 
+										value: timeItemSpecName6, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isSpecRequired6, 
+										enable: Boolean(useSpecAtr6()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemSpecId6" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_28')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useSpecAtr7,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemSpecName7" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_146]', 
+										value: timeItemSpecName7, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isSpecRequired7, 
+										enable: Boolean(useSpecAtr7()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemSpecId7" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_29')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useSpecAtr8,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemSpecName8" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_147]', 
+										value: timeItemSpecName8, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isSpecRequired8, 
+										enable: Boolean(useSpecAtr8()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemSpecId8" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_30')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useSpecAtr9,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemSpecName9" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_148]', 
+										value: timeItemSpecName9, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isSpecRequired9, 
+										enable: Boolean(useSpecAtr9()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemSpecId9" />
+									</td>									 
+								</tr> 
+								<tr style="height: 10px; ">
+									<td > #{i18n.getText('KMK005_31')}</td>
+									<td>
+										<div id="" class="cf"
+											data-bind="ntsSwitchButton: {
+										name: '#[KMK005_20]',
+										options:ko.observableArray([
+											{ code: 1, name: '#{i18n.getText('Enum_UseAtr_Use')}' },
+								            { code: 0, name: '#{i18n.getText('Enum_UseAtr_NotUse')}' }
+								        ]),
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: $vm.useSpecAtr10,
+										enable: true }"></div>
+									</td>
+									<td><input id="itemSpecName10" class="premiumName itemName"
+										data-bind="ntsTextEditor: {
+										name: '#[KMK005_149]', 
+										value: timeItemSpecName10, 
+										constraint: 'TimeItemName',
+										option: { width: '220px' }, 
+										required: $vm.isSpecRequired10, 
+										enable: Boolean(useSpecAtr10()==1) }" />
+										 <input type="hidden" data-bind="value: timeItemSpecId10" />
+									</td>									 
+								</tr> 
 							</tbody>
 						</table>
 					</div>

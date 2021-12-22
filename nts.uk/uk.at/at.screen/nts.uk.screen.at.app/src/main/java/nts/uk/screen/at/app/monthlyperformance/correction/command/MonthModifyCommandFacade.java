@@ -2,6 +2,7 @@ package nts.uk.screen.at.app.monthlyperformance.correction.command;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,8 +18,11 @@ import nts.uk.ctx.at.record.app.find.monthly.finder.MonthlyRecordWorkFinder;
 import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyRecordWorkDto;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.AttendanceItemUtil;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.AttendanceItemUtil.AttendanceItemType;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItem;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemRepository;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureId;
 import nts.uk.screen.at.app.monthlyperformance.correction.query.MonthlyModifyQuery;
+import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.time.calendar.date.ClosureDate;
 
 
@@ -31,6 +35,9 @@ public class MonthModifyCommandFacade {
 	
 	@Inject
 	private MonthlyRecordWorkFinder finder;
+	
+	@Inject
+	private OptionalItemRepository optionalItemRepo;
 	
 	public void handleUpdate(MonthlyModifyQuery query) {
 		MonthlyRecordWorkDto dto = toDto(query);
@@ -80,6 +87,9 @@ public class MonthModifyCommandFacade {
 //			IntegrationOfMonthly domain = v.toDomain(v.employeeId(), v.yearMonth(), v.getClosureID(), v.getClosureDate());
 //			MonthlyRecordWorkDto dtoNew = MonthlyRecordWorkDto.fromOnlyAttTime(domain);
 			MonthlyRecordWorkDto dto = AttendanceItemUtil.fromItemValues(v, q.getItems(), AttendanceItemType.MONTHLY_ITEM);
+			Map<Integer, OptionalItem> master = optionalItemRepo.findAll(AppContexts.user().companyId())
+																.stream().collect(Collectors.toMap(c -> c.getOptionalItemNo().v(), c -> c));
+			dto.getAnyItem().correctItems(master);
 
 			if(dto.getAffiliation() != null){
 				dto.getAffiliation().setVersion(q.getVersion());
@@ -100,5 +110,4 @@ public class MonthModifyCommandFacade {
 		command.forEmployee(query.getEmployeeId());
 		return command;
 	}
-
 }

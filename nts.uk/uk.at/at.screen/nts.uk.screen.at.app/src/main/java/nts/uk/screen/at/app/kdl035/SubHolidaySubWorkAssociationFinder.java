@@ -2,14 +2,15 @@ package nts.uk.screen.at.app.kdl035;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import lombok.experimental.var;
 import nts.arc.error.BusinessException;
 import nts.arc.error.RawErrorMessage;
 import nts.arc.layer.app.cache.CacheCarrier;
@@ -109,7 +110,10 @@ public class SubHolidaySubWorkAssociationFinder {
         result.addAll(getProvisionalDrawingData(employeeId, closurePeriod, managementData));
 
         // 確定振出データを取得する
-        result.addAll(getFixedDrawingData(employeeId, closurePeriod, managementData));
+        List<SubstituteWorkData> lstDrawingData = getFixedDrawingData(employeeId, closurePeriod, managementData);
+        
+        // 確定振出データを整理する
+        result.addAll(this.organizeFixedData(employeeId, lstDrawingData));
 
         // 紐付け中の振出データを取得する
         result.addAll(getDrawingDataDuringLinking(employeeId, closurePeriod, managementData));
@@ -304,5 +308,46 @@ public class SubHolidaySubWorkAssociationFinder {
             }
         }
         return result;
+    }
+    
+    /**
+     * 確定振出データを整理する
+     */
+    public List<SubstituteWorkData> organizeFixedData(String employeeId, List<SubstituteWorkData> lstDrawingData) {
+        if (lstDrawingData.isEmpty()) {
+            return lstDrawingData;
+        }
+        // ドメイン「振出振休紐付け管理」を取得する
+        List<PayoutSubofHDManagement> listPayoutSubofHDManagements = payoutSubofHDManaRepository.getByListOccDate(
+                employeeId, 
+                lstDrawingData.stream().map(x -> x.getSubstituteWorkDate()).collect(Collectors.toList()));
+        
+        Map<GeneralDate, Double> remainingByDate = new HashMap<GeneralDate, Double>();
+        if (listPayoutSubofHDManagements.isEmpty()) {
+            return lstDrawingData;
+        }
+        
+        // 休出代休紐付け管理ListをLoopする
+        listPayoutSubofHDManagements.forEach(x -> {
+            if (remainingByDate.containsKey(x.getAssocialInfo().getOutbreakDay())) {
+                remainingByDate.put(x.getAssocialInfo().getOutbreakDay(), 
+                        remainingByDate.get(x.getAssocialInfo().getOutbreakDay()) + x.getAssocialInfo().getDayNumberUsed().v());
+            } else {
+                remainingByDate.put(x.getAssocialInfo().getOutbreakDay(), x.getAssocialInfo().getDayNumberUsed().v());
+            }
+        });
+        
+        // 整理した「確定振出データ」を渡す
+        return lstDrawingData.stream().filter(x -> {
+            return !remainingByDate.containsKey(x.getSubstituteWorkDate()) || (remainingByDate.containsKey(x.getSubstituteWorkDate()) && remainingByDate.get(x.getSubstituteWorkDate()) != x.getRemainingNumber());
+        }).map(x -> {
+            if (!remainingByDate.containsKey(x.getSubstituteWorkDate())) {
+                return x;
+            } else {
+                Double remainingNumber = x.getRemainingNumber() - remainingByDate.get(x.getSubstituteWorkDate());
+                x.setRemainingNumber(remainingNumber);
+                return x;
+            }
+        }).collect(Collectors.toList());
     }
 }

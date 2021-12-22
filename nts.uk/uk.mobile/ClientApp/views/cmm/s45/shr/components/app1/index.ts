@@ -393,7 +393,7 @@ export class CmmS45ShrComponentsApp1Component extends Vue {
     public get c22() {
         const self = this;
 
-        return self.c22_1 && self.c22_2;
+        return self.c22_2;
     }
     // 休暇申請起動時の表示情報. 休暇残数情報．振休管理．紐づけ管理区分」= 管理する
     public get c22_1() {
@@ -416,7 +416,8 @@ export class CmmS45ShrComponentsApp1Component extends Vue {
         let workAtr = workTypeInfo.workAtr;
         if (workAtr == WorkTypeUnit.OneDay) {
 
-            return workTypeInfo.oneDayCls == WorkTypeClassification.Pause;
+            return false;
+            // return workTypeInfo.oneDayCls == WorkTypeClassification.Pause;
         } else {
 
             return (workTypeInfo.morningCls == WorkTypeClassification.Pause || workTypeInfo.afternoonCls == WorkTypeClassification.Pause);

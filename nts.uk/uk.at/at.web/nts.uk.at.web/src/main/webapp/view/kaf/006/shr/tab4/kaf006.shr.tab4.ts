@@ -38,7 +38,7 @@ module nts.uk.at.view.kaf006.shr.tab4.viewmodel {
                                     timeWithDay: true,
                                     width: '120',
                                     textalign: 'center'
-                                })), enable: $parent.isChangeWorkHour() && $parent.condition30() && $parent.updateMode()
+                                })), enable: $parent.isChangeWorkHour() && $parent.condition30() && $parent.updateMode() && $parent.flowWorkFlag()
                             }" />
                             <span data-bind="text: $i18n('KAF006_47')"></span>
                             <input style="width: 120px;" data-bind="ntsTimeWithDayEditor: {
@@ -49,7 +49,7 @@ module nts.uk.at.view.kaf006.shr.tab4.viewmodel {
                                     timeWithDay: true,
                                     width: '120',
                                     textalign: 'center'
-                                })), enable: $parent.isChangeWorkHour() && $parent.condition30() && $parent.updateMode()
+                                })), enable: $parent.isChangeWorkHour() && $parent.condition30() && $parent.updateMode() && $parent.flowWorkFlag()
                             }" />
                         </div>
                     </div>
@@ -66,7 +66,7 @@ module nts.uk.at.view.kaf006.shr.tab4.viewmodel {
                                     timeWithDay: true,
                                     width: '120',
                                     textalign: 'center'
-                                })), enable: $parent.isChangeWorkHour() && $parent.condition30() && $parent.updateMode()
+                                })), enable: $parent.isChangeWorkHour() && $parent.condition30() && $parent.updateMode() && $parent.flowWorkFlag()
                             }" />
                             <span data-bind="text: $i18n('KAF006_47')"></span>
                             <input style="width: 120px;" data-bind="ntsTimeWithDayEditor: {
@@ -77,7 +77,7 @@ module nts.uk.at.view.kaf006.shr.tab4.viewmodel {
                                     timeWithDay: true,
                                     width: '120',
                                     textalign: 'center'
-                                })), enable: $parent.isChangeWorkHour() && $parent.condition30() && $parent.updateMode()
+                                })), enable: $parent.isChangeWorkHour() && $parent.condition30() && $parent.updateMode() && $parent.flowWorkFlag()
                             }" />
                         </div>
                     </div>

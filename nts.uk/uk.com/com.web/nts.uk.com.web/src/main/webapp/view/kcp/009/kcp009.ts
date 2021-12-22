@@ -87,7 +87,7 @@ module kcp009.viewmodel {
                 else {//input.初期選択社員IDに値がある場合
                     self.selectedItem = data.selectedItem;
                 }
-              self.isDisplayNumberOfEmployee = data.isDisplayNumberOfEmployee || false;
+              self.isDisplayNumberOfEmployee = data.isDisplayNumberOfEmployee ?? true;
             } else {
                 // message 184
                 nts.uk.ui.dialog.info({ messageId: "Msg_184" });

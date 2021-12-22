@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.shared.dom.remainingnumber.paymana;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,9 +18,10 @@ import nts.uk.ctx.at.shared.dom.adapter.employee.EmpEmployeeAdapter;
 import nts.uk.ctx.at.shared.dom.adapter.employee.PersonEmpBasicInfoImport;
 import nts.uk.ctx.at.shared.dom.adapter.employment.EmploymentHistShareImport;
 import nts.uk.ctx.at.shared.dom.adapter.employment.ShareEmploymentAdapter;
+import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.interim.InterimAbsMng;
+import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.interim.InterimRecAbasMngRepository;
 import nts.uk.ctx.at.shared.dom.remainingnumber.base.DigestionAtr;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.interim.InterimBreakDayOffMngRepository;
-import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.interim.InterimDayOffMng;
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.subst.ComSubstVacation;
 import nts.uk.ctx.at.shared.dom.vacation.setting.subst.ComSubstVacationRepository;
@@ -54,7 +56,7 @@ public class FurikyuMngDataExtractionService {
 	private ClosureEmploymentRepository closureEmploymentRepository;
 	
 	@Inject
-	private InterimBreakDayOffMngRepository interimBreakDayOffMngRepository;
+	private InterimRecAbasMngRepository interimRecAbasMngRepository;
 	
 	@Inject
 	private ShareEmploymentAdapter shareEmploymentAdapter;
@@ -321,7 +323,7 @@ public class FurikyuMngDataExtractionService {
 						.filter(item -> item.getHolidayDate().getDayoffDate()
 								.map(date -> date.equals(useDate)).orElse(false))
 						.findFirst();
-				Optional<InterimDayOffMng> optInterimDayOff = Optional.empty();
+				Optional<InterimAbsMng> optInterimDayOff = Optional.empty();
 				if (!optSubstitution.isPresent()) {
 					// Step ドメインモデル「振休管理データ」を取得
 					optSubstitution = this.substitutionOfHDManaDataRepository
@@ -329,7 +331,8 @@ public class FurikyuMngDataExtractionService {
 					// 取得した振休管理データをチェック
 					if (!optSubstitution.isPresent()) {
 						// ドメイン「暫定振休管理データ」を取得
-						optInterimDayOff = this.interimBreakDayOffMngRepository.getDayOffByDate(empId, useDate);
+						optInterimDayOff = this.interimRecAbasMngRepository.getAbsBySidDateList(empId, Arrays.asList(useDate))
+								.stream().findFirst();
 					}
 				}
 				if (optSubstitution.isPresent() || optInterimDayOff.isPresent()) {

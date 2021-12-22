@@ -1,10 +1,10 @@
 package nts.uk.screen.at.app.kdl036;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -21,16 +21,14 @@ import nts.uk.ctx.at.shared.app.find.remainingnumber.subhdmana.dto.LeaveComDayOf
 import nts.uk.ctx.at.shared.dom.adapter.employment.ShareEmploymentAdapter;
 import nts.uk.ctx.at.shared.dom.remainingnumber.base.DigestionAtr;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.interim.InterimBreakDayOffMngRepository;
-import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.interim.InterimBreakMng;
 import nts.uk.ctx.at.shared.dom.remainingnumber.interimremain.primitive.CreateAtr;
+import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveComDayOffManaRepository;
 import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveComDayOffManagement;
 import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveManaDataRepository;
-import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveManagementData;
 import nts.uk.ctx.at.shared.dom.vacation.setting.ApplyPermission;
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensLeaveComSetRepository;
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensatoryLeaveComSetting;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureEmploymentRepository;
-import nts.uk.ctx.at.shared.dom.workrule.closure.ClosurePeriod;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureRepository;
 import nts.uk.ctx.at.shared.dom.workrule.closure.service.ClosureService;
 import nts.uk.screen.at.app.dailyperformance.correction.closure.FindClosureDateService;
@@ -61,6 +59,9 @@ public class HolidayWorkSubHolidayAssociationFinder {
 
     @Inject
     private ShareEmploymentAdapter shareEmploymentAdapter;
+    
+    @Inject
+    private LeaveComDayOffManaRepository leaveComDayOffManaRepo;
 
     /**
      * 休出代休関連付けダイアログ起動
@@ -112,7 +113,10 @@ public class HolidayWorkSubHolidayAssociationFinder {
         result.addAll(getProvisionalDrawingData(employeeId, closurePeriod, managementData));
 
         // 確定休出データを取得する
-        result.addAll(getFixedDrawingData(employeeId, closurePeriod, managementData));
+        List<HolidayWorkData> lstDrawingData = getFixedDrawingData(employeeId, closurePeriod, managementData);
+        
+        // 確定休出データを整理する
+        result.addAll(this.organizeLeaveData(employeeId, lstDrawingData));
 
         // 紐付け中の休出データを取得する
         result.addAll(getDrawingDataDuringLinking(employeeId, closurePeriod, managementData));
@@ -280,5 +284,47 @@ public class HolidayWorkSubHolidayAssociationFinder {
             }
         }
         return result;
+    }
+    
+    /**
+     * 確定休出データを整理する
+     */
+    public List<HolidayWorkData> organizeLeaveData(String employeeId, List<HolidayWorkData> lstDrawingData) {
+        if (lstDrawingData.isEmpty()) {
+            return lstDrawingData;
+        }
+        // ドメイン「休出代休紐付け管理」を取得する 
+        List<LeaveComDayOffManagement> listLeaveComDayOffManagements = 
+                leaveComDayOffManaRepo.getLeavByListOccDate(
+                        employeeId, 
+                        lstDrawingData.stream().map(x -> x.getHolidayWorkDate()).collect(Collectors.toList()));
+        
+        Map<GeneralDate, Double> remainingByDate = new HashMap<GeneralDate, Double>();
+        if (listLeaveComDayOffManagements.isEmpty()) {
+            return lstDrawingData;
+        }
+        
+        // 休出代休紐付け管理の発生日ListをLoopする
+        listLeaveComDayOffManagements.forEach(x -> {
+            if (remainingByDate.containsKey(x.getAssocialInfo().getOutbreakDay())) {
+                remainingByDate.put(x.getAssocialInfo().getOutbreakDay(), 
+                        remainingByDate.get(x.getAssocialInfo().getOutbreakDay()) + x.getAssocialInfo().getDayNumberUsed().v());
+            } else {
+                remainingByDate.put(x.getAssocialInfo().getOutbreakDay(), x.getAssocialInfo().getDayNumberUsed().v());
+            }
+        });
+        
+        // 紐付けした確定休出を整理する
+        return lstDrawingData.stream().filter(x -> {
+            return !remainingByDate.containsKey(x.getHolidayWorkDate()) || (remainingByDate.containsKey(x.getHolidayWorkDate()) && remainingByDate.get(x.getHolidayWorkDate()) != x.getRemainingNumber());
+        }).map(x -> {
+            if (!remainingByDate.containsKey(x.getHolidayWorkDate())) {
+                return x;
+            } else {
+                Double remainingNumber = x.getRemainingNumber() - remainingByDate.get(x.getHolidayWorkDate());
+                x.setRemainingNumber(remainingNumber);
+                return x;
+            }
+        }).collect(Collectors.toList());
     }
 }

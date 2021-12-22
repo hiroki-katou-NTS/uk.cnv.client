@@ -899,7 +899,7 @@ module nts.uk.at.view.kmk006.a {
                 
                 self.clearAllError();
                 let isError: boolean = false;
-                $('.nts-input').ntsEditor('validate');
+                //$('.nts-input').ntsEditor('validate');
                 if ($('.nts-input').ntsError('hasError')) {
                     isError = true;
                     nts.uk.ui.block.clear();

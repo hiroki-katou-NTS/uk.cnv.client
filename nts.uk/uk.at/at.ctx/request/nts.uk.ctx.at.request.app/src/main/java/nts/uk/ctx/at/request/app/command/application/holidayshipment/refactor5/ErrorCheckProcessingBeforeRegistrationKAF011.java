@@ -9,32 +9,26 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import nts.arc.enums.EnumAdaptor;
-import nts.arc.error.BusinessException;
 import nts.arc.time.GeneralDate;
-import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.request.dom.application.ApplicationDate;
 import nts.uk.ctx.at.request.dom.application.EmploymentRootAtr;
 import nts.uk.ctx.at.request.dom.application.common.service.newscreen.before.NewBeforeRegister;
 import nts.uk.ctx.at.request.dom.application.common.service.other.OtherCommonAlgorithm;
 import nts.uk.ctx.at.request.dom.application.common.service.other.output.ActualContentDisplay;
-import nts.uk.ctx.at.request.dom.application.common.service.other.output.PeriodCurrentMonth;
 import nts.uk.ctx.at.request.dom.application.common.service.setting.output.AppDispInfoStartupOutput;
 import nts.uk.ctx.at.request.dom.application.common.service.setting.output.MsgErrorOutput;
 import nts.uk.ctx.at.request.dom.application.holidayshipment.absenceleaveapp.AbsenceLeaveApp;
 import nts.uk.ctx.at.request.dom.application.holidayshipment.recruitmentapp.RecruitmentApp;
-import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.vacationapplicationsetting.HolidayApplicationSetting;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.vacationapplicationsetting.HolidayApplicationSettingRepository;
 import nts.uk.ctx.at.request.dom.workrecord.remainmanagement.InterimRemainDataMngCheckRegisterRequest;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.AppRemainCreateInfor;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.ApplicationType;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.EarchInterimRemainCheck;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.InterimRemainCheckInputParam;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.PrePostAtr;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.RecordRemainCreateInfor;
-import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.ScheRemainCreateInfor;
 import nts.uk.ctx.at.shared.dom.remainingnumber.paymana.PayoutSubofHDManagement;
+import nts.uk.ctx.at.shared.dom.remainingnumber.subhdmana.LeaveComDayOffManagement;
 import nts.uk.ctx.at.shared.dom.remainingnumber.work.VacationTimeUseInfor;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
+import nts.uk.ctx.at.shared.dom.worktype.WorkType;
 
 /**
  * @author thanhpv
@@ -72,7 +66,8 @@ public class ErrorCheckProcessingBeforeRegistrationKAF011 {
 	public void processing(String companyId, Optional<AbsenceLeaveApp> abs, Optional<RecruitmentApp> rec, boolean represent, 
 	        List<MsgErrorOutput> msgErrorLst, List<ActualContentDisplay> opActualContentDisplayLst, 
 	        AppDispInfoStartupOutput appDispInfoStartup, List<PayoutSubofHDManagement> payoutSubofHDManagements, 
-	        boolean checkFlag, boolean existFlag) {
+	        List<LeaveComDayOffManagement> leaveComDayOffManagements, 
+	        boolean checkFlag, boolean existFlag, List<WorkType> listWorkTypes) {
 		
 		//登録前エラーチェック（新規）(Check error trước khi đăng ký (New)
 		this.PreRegistrationErrorCheck.errorCheck(companyId, abs, rec, 
@@ -82,7 +77,9 @@ public class ErrorCheckProcessingBeforeRegistrationKAF011 {
 												Optional.empty(), 
 												Optional.empty(),
 												payoutSubofHDManagements, 
-												checkFlag);
+												leaveComDayOffManagements, 
+												checkFlag, 
+												listWorkTypes);
 		//振休残数不足チェック (Check số nghỉ bù thiếu)
 //		this.checkForInsufficientNumberOfHolidays(companyId, appDispInfoStartup.getAppDispInfoNoDateOutput().getEmployeeInfoLst().get(0).getSid(), abs, rec);
 		

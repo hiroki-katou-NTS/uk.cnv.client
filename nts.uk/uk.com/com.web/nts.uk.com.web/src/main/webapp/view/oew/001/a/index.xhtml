@@ -14,7 +14,7 @@
 
     <ui:define name="content">
       <div id="functions-area">
-        <button id="A1_1" data-bind="click: openDialogC" tabindex="1">#{i18n.getText('OEW001_10')}</button>
+        <button id="A1_1" data-bind="click: openDialogC, disable: isErr3251" tabindex="1">#{i18n.getText('OEW001_10')}</button>
       </div>
       <div id="contents-area">
         <div class="setting-zone">
@@ -47,13 +47,14 @@
               valueFormat: 'YYYYMM',
               showJumpButtons: true
             }" tabindex="4"></div>
-            <button id="A4_3" class="large ml-50" data-bind="click: performSearchData" tabindex="5">#{i18n.getText('OEW001_17')}</button>
+            <button id="A4_3" class="large ml-50" data-bind="click: performSearchData, disable: isErr3251" tabindex="5">#{i18n.getText('OEW001_17')}</button>
           </div>
         </div>
         <div class="result-zone">
           <div class="div-line flex valign-center">
             <button id="A5_1" data-bind="click: openDialogB.bind($vm, null),
-              enable: ko.computed(function() { return !!selectedEquipmentClsCode() &amp;&amp; !!selectedEquipmentInfoCode() })" tabindex="6">
+              enable: ko.computed(function() { return !!selectedEquipmentClsCode() &amp;&amp; !!selectedEquipmentInfoCode() &amp;&amp; !isErr3251() })" 
+              tabindex="6">
               #{i18n.getText('OEW001_18')}
             </button>
           </div>

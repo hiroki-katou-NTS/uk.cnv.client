@@ -1,5 +1,7 @@
 package nts.uk.file.at.infra.schedule.daily;
 
+import nts.uk.shr.com.i18n.TextResource;
+
 /**
  * The Class WorkScheOutputConstants.
  * @author HoangNDH
@@ -92,6 +94,9 @@ public class WorkScheOutputConstants {
 	/** The Constant PREDETERMINED. */
 	public static final String PREDETERMINED = "所定日数";
 	
+	// 出勤日数
+	public static final String WORK_DAY_COUNT = TextResource.localize("KWR001_166");
+	
 	/** The Constant HOLIDAY. */
 	public static final String HOLIDAY = "休日日数";
 	
@@ -119,7 +124,7 @@ public class WorkScheOutputConstants {
 	/** The Constant DAY_COUNT_TITLES. */
 	public static final String[] DAY_COUNT_TITLES =
 		{
-			PREDETERMINED, HOLIDAY, OFF, YEAR_OFF,
+			PREDETERMINED, WORK_DAY_COUNT, HOLIDAY, OFF, YEAR_OFF,
 			HEAVY, SPECIAL, ABSENCE, LATE_COME, EARLY_LEAVE
 		};
 	

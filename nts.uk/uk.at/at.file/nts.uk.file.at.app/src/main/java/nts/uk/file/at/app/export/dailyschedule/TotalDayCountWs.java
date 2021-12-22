@@ -1,6 +1,7 @@
 package nts.uk.file.at.app.export.dailyschedule;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -8,20 +9,23 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
-
 import nts.arc.time.GeneralDate;
+import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.function.dom.adapter.dailyattendanceitem.AttendanceResultImport;
 import nts.uk.ctx.at.record.dom.workinformation.WorkInfoOfDailyPerformance;
 import nts.uk.ctx.at.record.dom.workinformation.repository.WorkInformationRepository;
+import nts.uk.ctx.at.schedule.dom.schedule.workschedule.snapshot.DailySnapshotWork;
+import nts.uk.ctx.at.schedule.dom.schedule.workschedule.snapshot.DailySnapshotWorkRepository;
+import nts.uk.ctx.at.shared.dom.worktype.DailyWork;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
+import nts.uk.ctx.at.shared.dom.worktype.WorkTypeClassification;
+import nts.uk.ctx.at.shared.dom.worktype.WorkTypeCode;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeRepository;
 import nts.uk.file.at.app.export.dailyschedule.totalsum.DayType;
 import nts.uk.file.at.app.export.dailyschedule.totalsum.NumberOfItem;
 import nts.uk.file.at.app.export.dailyschedule.totalsum.TotalCountDay;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.DateRange;
 import nts.uk.shr.com.context.AppContexts;
-import nts.arc.time.calendar.period.DatePeriod;
 
 /**
  * Total day count class
@@ -37,101 +41,105 @@ public class TotalDayCountWs {
 	private WorkTypeRepository workTypeRepository;
 	
 	@Inject
-	private WorkInformationRepository workInformationRepo;
+	private WorkInformationRepository workInformationRepository;
+	
+	@Inject
+	private DailySnapshotWorkRepository dailySnapshotWorkRepository;
 	
 	/**
-	 * 所定日数を計算す�
+	 * 所定日数を計算する
 	 * @param employeeId
 	 * @param lstDate
 	 */
 	private TotalCountDay calculatePredeterminedDay(String employeeId, DateRange dateRange, TotalCountDay totalCountDay) {
 		// ドメインモッ�「勤務種類」を取得す�
-		List<WorkType> lstWorkType = workTypeRepository.findByCompanyId(AppContexts.user().companyId()).stream().filter(x -> 
-			x.getDailyWork().getOneDay().isAttendance() || x.getDailyWork().getMorning().isAttendance() || x.getDailyWork().getAfternoon().isAttendance() 
-		).collect(Collectors.toList());
+		List<WorkType> lstWorkType = workTypeRepository.findByCompanyId(AppContexts.user().companyId()).stream()
+			.filter(data -> this.checkWorkType(data.getDailyWork())).collect(Collectors.toList());
 		if (lstWorkType.size() > 0) {
-			// ドメインモッ�「日別実績の勤務情報」を取得す�
-			List<String> empList = new ArrayList<>();
-			empList.add(employeeId);
-			// 予定勤務種類コードを取得す�
-			List<WorkInfoOfDailyPerformance> dailyPerformanceList = workInformationRepo.findByPeriodOrderByYmdAndEmps(empList, new DatePeriod(dateRange.getStartDate(), dateRange.getEndDate()));
-			
-			int dayCount = 0;
-			for (WorkType workType: lstWorkType) {
-//				dayCount += dailyPerformanceList.stream().filter(x -> x.getWorkInformation().getScheduleInfo().getWorkTypeCode().v().equals(workType.getWorkTypeCode().v())).collect(Collectors.toList()).size();
-			}
-			//dayCount = lstWorkType.size();
-			
-			// 所定日数をカウントす�
-			totalCountDay.setPredeterminedDay(dayCount);
+			// ドメインモデル「日別勤怠のスナップショット.勤務情報」を取得する
+			List<DailySnapshotWork> dailySnapshotWorks = this.dailySnapshotWorkRepository
+					.find(Arrays.asList(employeeId), new DatePeriod(dateRange.getStartDate(), dateRange.getEndDate()));
+			// 日別勤怠のスナップショット.勤務情報の勤務種類コードを取得する
+			List<WorkTypeCode> snapshotWorkTypeCds = dailySnapshotWorks.stream()
+					.map(data -> data.getSnapshot().getWorkInfo().getWorkTypeCode())
+					.collect(Collectors.toList());
+			// 日別勤怠のスナップショット.勤務情報の勤務種類コードの値と合致するか
+			List<WorkTypeCode> workTypeCds = lstWorkType.stream().map(WorkType::getWorkTypeCode)
+					.collect(Collectors.toList());
+			double count = snapshotWorkTypeCds.stream()
+					.filter(data -> workTypeCds.contains(data))
+					.mapToDouble(data -> this.getDayCount(lstWorkType, data, true)).sum();
+			totalCountDay.setPredeterminedDay(count);
 		}
 		else {
-			totalCountDay.setPredeterminedDay(0);
+			totalCountDay.setPredeterminedDay(0d);
 		}
 		return totalCountDay;
 	}
 	
 	/**
-	 * 所定外�日数を計算す�
+	 * 所定以外の日数を計算する
 	 * @param employeeId
 	 * @param dateRange
 	 * @param dayType
 	 * @return
 	 */
 	private TotalCountDay calculateNonPredeterminedDay(String employeeId, DateRange dateRange, TotalCountDay totalCountDay) {
-		// ドメインモッ�「日別実績の勤務情報」を取得す�
-		List<String> empList = new ArrayList<>();
-		empList.add(employeeId);
-		// 予定勤務種類コードを取得す�
-		//List<WorkInfoOfDailyPerformanceDetailDto> dailyPerformanceList = dailyPerformanceRepo.find(empList, dateRange);
-		
-		List<WorkInfoOfDailyPerformance> dailyPerformanceList = workInformationRepo.findByPeriodOrderByYmdAndEmps(empList, new DatePeriod(dateRange.getStartDate(), dateRange.getEndDate()));
-		
 		String companyId = AppContexts.user().companyId();
 		
+		List<WorkInfoOfDailyPerformance> workInformationList = this.workInformationRepository
+				.findByPeriodOrderByYmd(employeeId, new DatePeriod(dateRange.getStartDate(), dateRange.getEndDate()));
+		
 		for (DayType dayType : DayType.values()) {
-			// ドメインモッ�「勤務種類」を取得す�
-			List<WorkType> lstWorkType = workTypeRepository.findByCompanyId(companyId).stream().filter(x -> 
-				x.getDailyWork().getOneDay().value == dayType.value || 
-				x.getDailyWork().getMorning().value == dayType.value || 
-				x.getDailyWork().getAfternoon().value == dayType.value).collect(Collectors.toList());
+			// ドメインモデル「勤務種類」を取得する 
+			List<WorkType> lstWorkType = workTypeRepository.findByCompanyId(companyId).stream()
+					.filter(data -> this.checkWorkType(data.getDailyWork(), dayType)).collect(Collectors.toList());
 			
-			if (lstWorkType.size() > 0) {
-				
-				for (WorkType workType: lstWorkType) {
-					// 日数をカウントす�
-					int dayCount = 0;//dailyPerformanceList.stream().filter(x -> StringUtils.equals(x.getWorkInformation().getScheduleInfo().getWorkTypeCode().v(),workType.getWorkTypeCode().v())
-							//|| StringUtils.equals(x.getWorkInformation().getRecordInfo().getWorkTypeCode().v(),workType.getWorkTypeCode().v())).collect(Collectors.toList()).size();
-					//int dayCount = lstWorkType.size();
-					switch (dayType) {
-					case HOLIDAY:
-						totalCountDay.setHolidayDay(totalCountDay.getHolidayDay() + dayCount);
-						break;
-					case ABSENCE:
-						totalCountDay.setAbsenceDay(totalCountDay.getAbsenceDay() + dayCount);
-						break;
-					case ANNUAL_HOLIDAY:
-						totalCountDay.setYearOffUsage(totalCountDay.getYearOffUsage() + dayCount);
-						break;
-					case OFF_WORK:
-						totalCountDay.setOffDay(totalCountDay.getOffDay() + dayCount);
-						break;
-					case SPECIAL:
-						totalCountDay.setSpecialHoliday(totalCountDay.getSpecialHoliday() + dayCount);
-						break;
-					case YEARLY_RESERVED:
-						totalCountDay.setHeavyHolDay(totalCountDay.getHeavyHolDay() + dayCount);
-						break;
+			dateRange.toListDate().forEach(date -> {
+				// ドメインモデル「日別実績の勤務情報」を取得する
+				Optional<WorkInfoOfDailyPerformance> optWorkInfo = workInformationList.stream()
+						.filter(data -> data.getYmd().equals(date)).findFirst();
+				// 勤務種類コードを取得する 
+				optWorkInfo.ifPresent(workInfo -> {
+					Optional<WorkType> optWorkType = lstWorkType.stream()
+							.filter(data -> data.getWorkTypeCode().equals(workInfo.getWorkInformation().getRecordInfo().getWorkTypeCode()))
+							.findFirst();
+					// 日別勤務表の勤務種類コードの値と合致するか
+					if (optWorkType.isPresent()) {
+						// 日数をカウントする 
+						double dayCount = this.getDayCount(lstWorkType, workInfo.getWorkInformation().getRecordInfo().getWorkTypeCode(), false);
+						switch (dayType) {
+						case ATTENDANCE:
+							totalCountDay.setWorkingDay(totalCountDay.getWorkingDay() + dayCount);
+							break;
+						case HOLIDAY:
+							totalCountDay.setHolidayDay(totalCountDay.getHolidayDay() + dayCount);
+							break;
+						case ABSENCE:
+							totalCountDay.setAbsenceDay(totalCountDay.getAbsenceDay() + dayCount);
+							break;
+						case ANNUAL_HOLIDAY:
+							totalCountDay.setYearOffUsage(totalCountDay.getYearOffUsage() + dayCount);
+							break;
+						case OFF_WORK:
+							totalCountDay.setOffDay(totalCountDay.getOffDay() + dayCount);
+							break;
+						case SPECIAL:
+							totalCountDay.setSpecialHoliday(totalCountDay.getSpecialHoliday() + dayCount);
+							break;
+						case YEARLY_RESERVED:
+							totalCountDay.setHeavyHolDay(totalCountDay.getHeavyHolDay() + dayCount);
+							break;
+						}
 					}
-				}
-				
-			}
+				});
+			});
 		}
 		return totalCountDay;
 	}
 	
 	/**
-	 * 回数を計算す�
+	 * 回数を計算する
 	 * @param employeeId
 	 * @param dateRange
 	 * @param totalCountDay
@@ -193,5 +201,65 @@ public class TotalDayCountWs {
 		totalCountDay = calculateNonPredeterminedDay(employeeId, dateRange, totalCountDay);
 		totalCountDay = calculateDayCount(employeeId, dateRange, totalCountDay);
 		return totalCountDay;
+	}
+	
+	private boolean checkWorkType(DailyWork dailyWork) {
+		switch (dailyWork.getWorkTypeUnit()) {
+		case OneDay:
+			return this.isPredetermineWorkType(dailyWork.getOneDay());
+		case MonringAndAfternoon:
+			return this.isPredetermineWorkType(dailyWork.getMorning()) || this.isPredetermineWorkType(dailyWork.getAfternoon());
+		}
+		return false;
+	}
+	
+	private boolean checkWorkType(DailyWork dailyWork, DayType dayType) {
+		switch (dailyWork.getWorkTypeUnit()) {
+		case OneDay:
+			return dayType.compareToWorkTypeCls(dailyWork.getOneDay());
+		case MonringAndAfternoon:
+			return dayType.compareToWorkTypeCls(dailyWork.getMorning())
+					|| dayType.compareToWorkTypeCls(dailyWork.getAfternoon());
+		}
+		return false;
+	}
+	
+	/**
+	 * 勤務種類　＝　0：出勤、2：年休、3：積立年休、
+　　　　　　　　 　4：特別休暇、5：欠勤、6：代休、
+　　　　　　　　　 7：振出、9：時間消化休暇
+	 */
+	private boolean isPredetermineWorkType(WorkTypeClassification workTypeClassification) {
+		return Arrays.asList(WorkTypeClassification.Attendance, WorkTypeClassification.AnnualHoliday,
+				WorkTypeClassification.YearlyReserved, WorkTypeClassification.SpecialHoliday, WorkTypeClassification.SpecialHoliday,
+				WorkTypeClassification.Absence, WorkTypeClassification.SubstituteHoliday, WorkTypeClassification.Shooting,
+				WorkTypeClassification.TimeDigestVacation).contains(workTypeClassification);
+	}
+	
+	/**
+	 * Calculate day used for worktype (0/0.5/1)
+	 * @param workTypes
+	 * @param code
+	 * @param isPredetermined	所定日数?
+	 * @return
+	 */
+	private double getDayCount(List<WorkType> workTypes, WorkTypeCode code, boolean isPredetermined) {
+		Optional<WorkType> optWorkType = workTypes.stream()
+				.filter(data -> data.getWorkTypeCode().equals(code)).findFirst();
+		if (optWorkType.isPresent()) {
+			DailyWork dailyWork = optWorkType.get().getDailyWork();
+			switch (dailyWork.getWorkTypeUnit()) {
+			case OneDay:
+				return 1.0d;
+			case MonringAndAfternoon:
+				// Calculate sum if 所定日数
+				if (isPredetermined) {
+					return (this.isPredetermineWorkType(dailyWork.getMorning()) ? 0.5d : 0d)
+							+ (this.isPredetermineWorkType(dailyWork.getAfternoon()) ? 0.5d : 0d);
+				}
+				return 0.5d;
+			}
+		}
+		return 0d;
 	}
 }

@@ -5,7 +5,8 @@ module nts.uk.at.view.kmk003.a10 {
          *  Service paths
          */
         let servicePath: any = {
-            getAllBonusPaySetting: "at/share/bonusPaySetting/getAllBonusPaySetting"
+            getAllBonusPaySetting: "at/share/bonusPaySetting/getAllBonusPaySetting",
+			getWTBPSetting: "at/share/wtBonusPaySetting/getWTBPSetting"
         };
 
         /**
@@ -13,6 +14,10 @@ module nts.uk.at.view.kmk003.a10 {
          */
         export function findAllBonusPaySetting(): JQueryPromise<model.BonusPaySettingFindDto[]> {
             return nts.uk.request.ajax(servicePath.getAllBonusPaySetting);
+        }
+
+		export function getWTBPSetting(workTimeCode: string): JQueryPromise<any> {
+            return nts.uk.request.ajax("at", servicePath.getWTBPSetting + '/' + workTimeCode);
         }
 
         /**

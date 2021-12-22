@@ -31,4 +31,9 @@ public class LockOutDataUserDto {
 	/** The user id. */
 	private String userId;
 	
+	/** The CompanyCode. 会社コード */
+	private String companyCode;
+	
+	/** The EmployeeCode. 社員コード */
+	private String employeeCode;	
 }

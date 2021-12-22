@@ -150,6 +150,7 @@ export class KafS10Component extends KafS00ShrComponent {
                 }
                 let step1 = vm.$refs.step1 as KafS10Step1Component;
                 step1.loadData(vm.model.appHdWorkDispInfo);
+                step1.createHoursWorkTime();
             }
         }).catch((error: any) => {
             vm.handleErrorCustom(error).then((result) => {

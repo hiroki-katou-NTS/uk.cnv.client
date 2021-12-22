@@ -2,9 +2,6 @@ package nts.uk.ctx.bs.employee.pub.workplace.affiliate;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-import java.util.Optional;
 
 /**
  * 所属職場履歴項目Exported
@@ -29,6 +26,6 @@ public class AffWorkplaceHistoryItemExport {
 	// 通常職場コード
 	private String  normalWorkplaceId;
 
-	private Optional<String> workLocationCode;
+//	private Optional<String> workLocationCode;
 
 }

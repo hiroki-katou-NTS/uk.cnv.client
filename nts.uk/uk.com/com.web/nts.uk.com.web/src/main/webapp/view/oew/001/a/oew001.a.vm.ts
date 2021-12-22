@@ -18,6 +18,7 @@ module nts.uk.com.view.oew001.a {
     yearMonth: KnockoutObservable<string> = ko.observable("");
     hasExtractData: KnockoutObservable<boolean> = ko.observable(false);
     isInitComplete: boolean = false;
+    isErr3251: KnockoutObservable<boolean> = ko.observable(false);
 
     // dto
     equipmentClassification: KnockoutObservable<model.EquipmentClassificationDto> = ko.observable(null);
@@ -68,7 +69,6 @@ module nts.uk.com.view.oew001.a {
       .always(() => {
         vm.isInitComplete = true;
         $("#A5_1").focus();
-        vm.$nextTick(() => model.setReadOnly("#A4_2"));
         vm.$blockui("clear");
       });
     }
@@ -94,7 +94,10 @@ module nts.uk.com.view.oew001.a {
           vm.itemSettings(result.itemSettings);
           vm.formatSetting(result.formatSetting);
         }
-      }, err => vm.$dialog.error({ messageId: err.messageId }));
+      }, err => {
+        vm.$dialog.error({ messageId: err.messageId });
+        vm.isErr3251(err.messageId === "Msg_3251");
+      });
     }
 
     // Ａ3：「実績の抽出処理」を実行する

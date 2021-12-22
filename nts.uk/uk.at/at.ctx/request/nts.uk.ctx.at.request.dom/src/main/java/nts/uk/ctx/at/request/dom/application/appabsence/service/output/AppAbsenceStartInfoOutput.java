@@ -92,6 +92,11 @@ public class AppAbsenceStartInfoOutput {
 	private boolean workTimeChange;
 	
 	/**
+	 * 流動勤務Flg
+	 */
+	private boolean flowWorkFlag;
+	
+	/**
 	 * 特別休暇表示情報
 	 */
 	private Optional<SpecAbsenceDispInfo> specAbsenceDispInfo = Optional.empty();

@@ -16,6 +16,8 @@ module cli001.b.viewmodel {
             this.columns = ko.observableArray([
                 { key: 'userID', hidden: true },
                 { headerText: getText('CLI001_21'), key: 'loginID', width: 140 },
+                { headerText: getText('CLI001_27'), key: 'companyCD', width: 50 },
+                { headerText: getText('CLI001_28'), key: 'empCD', width: 160 },
                 { headerText: getText('CLI001_22'), key: 'userName', width: 220 },
             ]);
             this.searchText = ko.observable();
@@ -67,10 +69,14 @@ module cli001.b.viewmodel {
     class ItemModel {
         userID: string;
         loginID: string;
+        companyCD: string;
+        empCD: string;
         userName: string;
-        constructor(userID: string, loginID: string, userName: string) {
+        constructor(userID: string, loginID: string, companyId: string, employeeId:string,  userName: string) {
             this.userID = userID;
             this.loginID = loginID;
+            this.companyCD = companyId;
+            this.empCD = employeeId;
             this.userName = userName;
         }
     }

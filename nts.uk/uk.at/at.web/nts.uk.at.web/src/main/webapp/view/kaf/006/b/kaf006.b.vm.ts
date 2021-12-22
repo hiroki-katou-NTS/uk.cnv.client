@@ -112,6 +112,7 @@ module nts.uk.at.view.kaf006_ref.b.viewmodel {
 		condition9: KnockoutObservable<boolean> = ko.observable(true);
 		condition31: KnockoutObservable<boolean> = ko.observable(true);
 		condition32: KnockoutObservable<boolean> = ko.observable(false);
+		flowWorkFlag: KnockoutObservable<boolean> = ko.observable(false);
         
         created(params: {
             appType: any,
@@ -445,6 +446,19 @@ module nts.uk.at.view.kaf006_ref.b.viewmodel {
                         workTimeCd: value ? vm.selectedWorkTimeCD() : null, 
                         appAbsenceStartInfo: vm.data
                     };
+
+					command.appAbsenceStartInfo.leaveComDayOffManas = _.map(command.appAbsenceStartInfo.leaveComDayOffManas, (x: any) => {
+						x.dateOfUse = new Date(x.dateOfUse).toISOString();
+						x.outbreakDay = new Date(x.outbreakDay).toISOString();
+			
+						return x;
+					});
+					command.appAbsenceStartInfo.payoutSubofHDManas = _.map(command.appAbsenceStartInfo.payoutSubofHDManas, (x: any) => {
+						x.dateOfUse = new Date(x.dateOfUse).toISOString();
+						x.outbreakDay = new Date(x.outbreakDay).toISOString();
+						
+						return x;
+					});
     
                     vm.$ajax(API.changeUseingWorkTime, command).then((res) => {
                         if (res) {
@@ -720,6 +734,7 @@ module nts.uk.at.view.kaf006_ref.b.viewmodel {
             vm.$ajax(API.initPageB, command)
                 .done((success) => {
 					vm.data = success.appAbsenceStartInfo;
+					vm.flowWorkFlag(success.flowWorkFlag);
 					let hdAppSetInput: any[] = vm.data.hdAppSet.dispNames;
 					vm.workTypeOrigin = success.appAbsenceStartInfo.selectedWorkTypeCD;
 					vm.workTimeOrigin = success.appAbsenceStartInfo.selectedWorkTimeCD;
@@ -854,6 +869,7 @@ module nts.uk.at.view.kaf006_ref.b.viewmodel {
         private fetchData(data: any) {
 			const vm = this;
 			let workTypeLstOutput = data.workTypeLst;
+			vm.flowWorkFlag(data.flowWorkFlag);
 			
 			// Get value workType before change workType List
 			let workTypesBefore = _.filter(vm.data.workTypeLst, {'workTypeCode': vm.selectedWorkTypeCD()});
@@ -1385,16 +1401,44 @@ module nts.uk.at.view.kaf006_ref.b.viewmodel {
             return false;
         }
 
-		checkCondition30(data: any) {
-			const vm = this;
+		// checkCondition30(data: any) {
+		// 	const vm = this;
 
-			if (vm.data && vm.data.vacationApplicationReflect && vm.data.vacationApplicationReflect.workAttendanceReflect.reflectAttendance === 1) {
+		// 	if (vm.data && vm.data.vacationApplicationReflect && vm.data.vacationApplicationReflect.workAttendanceReflect.reflectAttendance === 1) {
+		// 		vm.condition30(true);
+		// 		return true;
+		// 	}
+		// 	vm.condition30(false);
+		// 	return false;
+		// }
+		checkCondition30(data: any) {
+            const vm = this;
+
+            let listAbs = [1, 2, 3, 4, 5, 6, 8, 9, 12, 13];
+            let workTypeList = vm.data.workTypeLst;
+            let workTypeFilter = _.filter(workTypeList, (x: any) => x.workTypeCode === vm.selectedWorkTypeCD());
+            if (workTypeFilter.length > 0) {
+                let workType = workTypeFilter[0];
+                // 選択している勤務種類.1日の勤務.勤務区分　＝　1日
+                if (workType.workAtr == 0) {
+					vm.condition30(false);
+                    return false;
+                } else {
+                    // 午前の勤務種類　AND　午後の勤務種類が休み（休日、年休、積立年休、特別休暇、欠勤、代休、振休、時間消化休暇、休職、休業）
+                    if (_.includes(listAbs, workType.morningCls) && _.includes(listAbs, workType.afternoonCls)) {
+                        vm.condition30(false);
+						return false;
+                    }
+                }
+
+                // 上記以外
 				vm.condition30(true);
-				return true;
-			}
+                return true;
+            }
+
 			vm.condition30(false);
-			return false;
-		}
+            return false;
+        }
 
 		checkCondition19(data: any) {
 			const vm = this;

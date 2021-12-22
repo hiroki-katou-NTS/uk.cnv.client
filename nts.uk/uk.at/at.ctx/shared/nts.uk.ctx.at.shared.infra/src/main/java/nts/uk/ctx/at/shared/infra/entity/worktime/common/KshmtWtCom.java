@@ -49,8 +49,8 @@ public class KshmtWtCom extends ContractUkJpaEntity implements Serializable {
 	private int overDayCalcSet;
 
 	/** The raising salary set. */
-	@Column(name = "RAISING_SALARY_SET")
-	private String raisingSalarySet;
+//	@Column(name = "RAISING_SALARY_SET")
+//	private String raisingSalarySet;
 
 	/** The nur timezone work use. */
 	@Column(name = "NUR_TIMEZONE_WORK_USE")

@@ -81,7 +81,7 @@ public class JpaUserRepositoryAuth extends JpaRepository implements UserReposito
 	
 	
 	
-	private static final String SELECT_BY_ID_OR_NAME = "SELECT c.sacmtUserPK.userID, c.loginID, c.userName, p.businessName FROM SacmtUser c"
+	private static final String SELECT_BY_ID_OR_NAME = "SELECT c.sacmtUserPK.userID, c.loginID, c.userName, p.businessName, p.bpsmtPersonPk.pId FROM SacmtUser c"
 			+ " LEFT JOIN BpsmtPerson p ON c.associatedPersonID = p.bpsmtPersonPk.pId"
 			+ " WHERE (LOWER(c.loginID) LIKE LOWER(CONCAT('%', :userIDName, '%')) ESCAPE '/'"
 			+ " OR LOWER(c.userName) LIKE LOWER(CONCAT('%', :userIDName, '%')) ESCAPE '/'"
@@ -102,12 +102,13 @@ public class JpaUserRepositoryAuth extends JpaRepository implements UserReposito
 			String userID = object[0].toString();
 			String loginID = object[1].toString();
 			String personName = object[3] == null ? object[2].toString() : object[3].toString();
+			String personId = object[4].toString();
 			/*
 			 * String perSon = ""; if (object[3] == null){ perSon = object[2].toString(); }
 			 * else perSon = object[3].toString(); result.add(new SearchUser(userID,
 			 * loginID, perSon));
 			 */
-			result.add(new SearchUser(userID, loginID, personName));
+			result.add(new SearchUser(userID, loginID, personName, personId));
 		}
 		return result;
 	}

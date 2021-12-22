@@ -2565,7 +2565,9 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
 					dayCountTag.setValue(WorkScheOutputConstants.DAY_COUNT);
 					
 					// A7_2 -> A7_10
-					for (int i = 0; i < 9; i++) {
+					TotalCountDay totalCountDay = employeeReportData.getTotalCountDay();
+					totalCountDay.initAllDayCount();
+					for (int i = 0; i < totalCountDay.getAllDayCount().size(); i++) {
 						Cell dayTypeTag = cells.get(currentRow, i*2 + 3);
 						dayTypeTag.setValue(WorkScheOutputConstants.DAY_COUNT_TITLES[i]);
 					}
@@ -2573,13 +2575,11 @@ public class AsposeWorkScheduleOutputConditionGenerator extends AsposeCellsRepor
 					currentRow++;
 				
 					// A7_11 -> A7_19
-					TotalCountDay totalCountDay = employeeReportData.getTotalCountDay();
-					totalCountDay.initAllDayCount();
 					
-					for (int i = 0; i < 9; i++) {
+					for (int i = 0; i < totalCountDay.getAllDayCount().size(); i++) {
 						Cell dayTypeTag = cells.get(currentRow, i*2 + 3);
 						String value = totalCountDay.getAllDayCount().get(i);
-						boolean isZeroValue = Integer.valueOf(value.substring(0, value.length() - 1)) == 0;
+						boolean isZeroValue = Double.valueOf(value.substring(0, value.length() - 1)) == 0d;
 						dayTypeTag.setValue((isZeroValue && condition.getZeroDisplayType() == ZeroDisplayType.NON_DISPLAY) 
 								? "" : totalCountDay.getAllDayCount().get(i));
 					}

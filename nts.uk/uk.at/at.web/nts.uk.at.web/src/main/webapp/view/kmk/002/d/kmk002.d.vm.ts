@@ -6,14 +6,17 @@ module nts.uk.at.view.kmk002.d {
         import EnumConstantDto = nts.uk.at.view.kmk002.a.service.model.EnumConstantDto;
         import FormulaDto = nts.uk.at.view.kmk002.a.service.model.FormulaDto;
         import ParamToD = nts.uk.at.view.kmk002.a.viewmodel.ParamToD;
+        import EnumAdaptor = nts.uk.at.view.kmk002.a.service.model.EnumAdaptor;
+        import OptItemEnumDto = nts.uk.at.view.kmk002.a.service.model.OptItemEnumDto;
+        import isNullOrUndefined = nts.uk.util.isNullOrUndefined;
+        import isNullOrEmpty = nts.uk.util.isNullOrEmpty;
 
         export class ScreenModel {
             formulaSetting: FormulaSetting;
-
             constructor() {
+                let self = this;
                 this.formulaSetting = new FormulaSetting();
             }
-
             /**
              * Start page.
              */
@@ -25,6 +28,78 @@ module nts.uk.at.view.kmk002.d {
                 let dto = nts.uk.ui.windows.getShared('paramToD');
 
                 // Set params to view model
+
+
+                self.formulaSetting.rightItem.formulaItemId.subscribe((rightId)=>{
+                    if(!isNullOrUndefined(rightId)) {
+                        let leftId =  self.formulaSetting.leftItem.formulaItemId();
+                        let operator =  self.formulaSetting.operator();
+                        let isTimeD29 = self.formulaSetting.checkD2_9(leftId,operator,rightId);
+                        let isTimeD49 = self.formulaSetting.checkD4_9(leftId,operator,rightId);
+                        if(!isNullOrUndefined(isTimeD29)){
+                            if(self.formulaSetting.isD29() == !isTimeD29){
+                                self.formulaSetting.leftItem.inputValue(null);
+                            }
+                            self.formulaSetting.isD29(isTimeD29);
+                        }
+
+                        if(!isNullOrUndefined(isTimeD49)){
+                            if(self.formulaSetting.isD49()  == !isTimeD49){
+                                self.formulaSetting.rightItem.inputValue(null);
+                            }
+                            self.formulaSetting.isD49(isTimeD49);
+                        }
+
+                    }
+                });
+
+                self.formulaSetting.leftItem.formulaItemId.subscribe((leftId)=>{
+                    if(!isNullOrUndefined(leftId)) {
+                        let rightId =  self.formulaSetting.rightItem.formulaItemId();
+                        let operator =  self.formulaSetting.operator();
+                        let isTimeD29 = self.formulaSetting.checkD2_9(leftId,operator,rightId);
+                        let isTimeD49 = self.formulaSetting.checkD4_9(leftId,operator,rightId);
+                        if(!isNullOrUndefined(isTimeD29)){
+                            if(self.formulaSetting.isD29() == !isTimeD29){
+                                self.formulaSetting.leftItem.inputValue(null);
+                            }
+                            self.formulaSetting.isD29(isTimeD29);
+                        }
+
+                        if(!isNullOrUndefined(isTimeD49)){
+                            if(self.formulaSetting.isD49() == !isTimeD49){
+                                self.formulaSetting.rightItem.inputValue(null);
+                            }
+                            self.formulaSetting.isD49(isTimeD49);
+                        }
+
+                    }
+                });
+                self.formulaSetting.operator.subscribe((operator)=>{
+                    if(!isNullOrUndefined(operator)) {
+                        let rightId =  self.formulaSetting.rightItem.formulaItemId();
+                        let leftId =  self.formulaSetting.leftItem.formulaItemId();
+                        let operator =  self.formulaSetting.operator();
+                        let isTimeD29 = self.formulaSetting.checkD2_9(leftId,operator,rightId);
+                        let isTimeD49 = self.formulaSetting.checkD4_9(leftId,operator,rightId);
+
+                        if(!isNullOrUndefined(isTimeD29)){
+                            if(self.formulaSetting.isD29()  == !isTimeD29){
+                                self.formulaSetting.leftItem.inputValue(null);
+                            }
+                            self.formulaSetting.isD29(isTimeD29);
+                        }
+
+                        if(!isNullOrUndefined(isTimeD49)){
+                            if(self.formulaSetting.isD49() ==!isTimeD49){
+                                self.formulaSetting.rightItem.inputValue(null);
+                            }
+                            self.formulaSetting.isD49(isTimeD49);
+                        }
+
+                    }
+                });
+
                 self.formulaSetting.fromDto(dto);
 
                 dfd.resolve();
@@ -42,6 +117,7 @@ module nts.uk.at.view.kmk002.d {
                 }
             }
 
+
             /**
              * Close dialog
              */
@@ -53,6 +129,7 @@ module nts.uk.at.view.kmk002.d {
             formulaId: string;
             formulaName: string;
             formulaAtr: string;
+            formulaNumber: number;
             selectableFormulas: KnockoutObservableArray<FormulaDto>;
 
             minusSegment: KnockoutObservable<boolean>;
@@ -67,6 +144,10 @@ module nts.uk.at.view.kmk002.d {
 
             // datasource
             operatorDatasource: KnockoutObservableArray<EnumConstantDto>;
+            isTime : KnockoutObservable<boolean> = ko.observable(false);
+            isD49 : KnockoutObservable<boolean> = ko.observable(false);
+            isD29 : KnockoutObservable<boolean> = ko.observable(false);
+            enums: any;
 
             constructor() {
                 this.minusSegment = ko.observable(false);
@@ -106,6 +187,9 @@ module nts.uk.at.view.kmk002.d {
                 // default value
                 this.formulaName = '';
                 this.formulaAtr = '';
+                this.formulaNumber = 1;
+                this.enums = null;
+
 
             }
 
@@ -128,12 +212,20 @@ module nts.uk.at.view.kmk002.d {
                 }
 
                 // Check required input of right item
-                if (self.rightItem.settingMethod() == SettingMethod.NUMBER_INPUT) {
+                if (self.rightItem.settingMethod() == SettingMethod.NUMBER_INPUT ) {
+                    // if(self.rightItem.inputValue() == null){
+                    //     $('#inp-right-item2').trigger("validate");
+                    // }
+                    $('#inp-right-item2').ntsEditor('validate');
                     $('#inp-right-item').ntsEditor('validate');
                 }
 
                 // Check required input of left item
                 if (self.leftItem.settingMethod() == SettingMethod.NUMBER_INPUT) {
+                    // if(self.leftItem.inputValue() == null){
+                    //     $('#inp-left-item_1').trigger("validate");
+                    // }
+                    $('#inp-left-item_1').ntsEditor('validate');
                     $('#inp-left-item').ntsEditor('validate');
                 }
 
@@ -153,6 +245,76 @@ module nts.uk.at.view.kmk002.d {
                 }
 
                 return true;
+
+            }
+            // Check item time atr;
+            public isTimeSelected(formulaNumber: number): boolean {
+                let seft = this;
+                if(!isNullOrUndefined(seft.enums))
+                return formulaNumber == EnumAdaptor.valueOf('TIME', seft.enums.formulaAtr);
+            }
+
+            /**
+             * Check whether number atr is selected
+             */
+            public isNumberSelected(formulaNumber: number): boolean {
+                let seft = this;
+                if(!isNullOrUndefined(seft.enums))
+                return formulaNumber == EnumAdaptor.valueOf('NUMBER', seft.enums.formulaAtr);
+            }
+
+            /**
+             * Check whether amount atr is selected
+             */
+            public isAmountSelected(formulaNumber: number): boolean {
+                let seft = this;
+                if(!isNullOrUndefined(seft.enums))
+                return formulaNumber == EnumAdaptor.valueOf('AMOUNT', seft.enums.formulaAtr);
+            }
+            public checkD2_9(leftId : string,operator:number,rightId:string):boolean {
+                let seft = this;
+                // let leftItem: FormulaDto = seft.formulaSetting.findFormulaById(
+                //     seft.formulaSetting.leftItem.formulaItemId());
+                let rightItem: FormulaDto = seft.findFormulaById(rightId);
+                let formulaNumber = seft.formulaNumber;
+                //0 : +
+                //1 : -
+                //2 : *
+                //3 : /
+                if(!isNullOrUndefined(rightItem) &&!isNullOrUndefined(formulaNumber)&&!isNullOrUndefined(operator)){
+                    if((seft.isTimeSelected(formulaNumber) && seft.isTimeSelected(rightItem.formulaAtr) && (operator == 0 ||operator==1))
+                        ||(seft.isTimeSelected(formulaNumber) && seft.isNumberSelected(rightItem.formulaAtr) && (operator == 2 ))
+                        ||(seft.isNumberSelected(formulaNumber) && seft.isTimeSelected(rightItem.formulaAtr) && (operator == 3))){
+                        return true
+                    }else {
+                        return false;
+                    }
+                }else {
+                    return false;
+                }
+
+            }
+            public checkD4_9(leftId : string,operator:number,rightId:string):boolean {
+                let seft = this;
+                 let leftItem: FormulaDto = seft.findFormulaById(leftId);
+                //      seft.formulaSetting.leftItem.formulaItemId());
+                //      let rightItem: FormulaDto = seft.findFormulaById(rightId);
+                let formulaNumber = seft.formulaNumber;
+                //0 : +
+                //1 : -
+                //2 : *
+                //3 : /
+                if(!isNullOrUndefined(leftItem) &&!isNullOrUndefined(formulaNumber)&&!isNullOrUndefined(operator)){
+                    if((seft.isTimeSelected(formulaNumber) && seft.isTimeSelected(leftItem.formulaAtr) && (operator == 0 ||operator==1))
+                        ||(seft.isTimeSelected(formulaNumber) && seft.isNumberSelected(leftItem.formulaAtr) && (operator == 2 ))
+                        ||(seft.isNumberSelected(formulaNumber) && seft.isTimeSelected(leftItem.formulaAtr) && (operator == 3))){
+                        return true
+                    }else {
+                        return false;
+                    }
+                }else {
+                    return false;
+                }
 
             }
 
@@ -198,7 +360,7 @@ module nts.uk.at.view.kmk002.d {
             /**
              * find formula by id.
              */
-            private findFormulaById(id: string): any {
+            public findFormulaById(id: string): any {
                 let self = this;
                 let f = _.find(self.selectableFormulas(), item => item.formulaId == id);
                 return f;
@@ -209,6 +371,14 @@ module nts.uk.at.view.kmk002.d {
              */
             public fromDto(dto: ParamToD): void {
                 let self = this;
+                if(!isNullOrEmpty(dto.selectableFormulas)){
+                    for (let i = 0; i < dto.selectableFormulas.length;i++){
+                        let item :FormulaDto = dto.selectableFormulas[i];
+                        let type  = EnumAdaptor.localizedNameOf(item.formulaAtr, dto.enums.formulaAtr);
+                        let name = item.symbolValue + " " + type;
+                        item.symbolValue = name;
+                    }
+                }
                 self.formulaId = dto.formulaId;
                 self.formulaName = dto.formulaName;
                 self.formulaAtr = dto.formulaAtr;
@@ -218,6 +388,13 @@ module nts.uk.at.view.kmk002.d {
                 self.rightItem.fromDto(dto.formulaSetting.rightItem);
                 self.selectableFormulas(dto.selectableFormulas);
                 self.operatorDatasource(dto.operatorDatasource);
+                self.enums = dto.enums;
+                self.formulaNumber = dto.formulaNumber;
+                if(!isNullOrEmpty(dto.selectableFormulas)){
+                    self.isD29(self.checkD2_9(self.leftItem.formulaItemId(),self.operator(),self.rightItem.formulaItemId()));
+                    self.isD49(self.checkD4_9(self.leftItem.formulaItemId(),self.operator(),self.rightItem.formulaItemId()));
+                }
+
             }
 
             /**
@@ -303,6 +480,9 @@ module nts.uk.at.view.kmk002.d {
         enum SettingMethod {
             ITEM_SELECTION = 0,
             NUMBER_INPUT = 1
+        }
+        class Enums {
+            static ENUM_OPT_ITEM: OptItemEnumDto;
         }
     }
 }

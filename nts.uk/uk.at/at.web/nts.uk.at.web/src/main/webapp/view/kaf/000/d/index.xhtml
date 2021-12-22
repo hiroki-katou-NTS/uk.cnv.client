@@ -35,7 +35,7 @@
 	                	</table>
 	                	<div style="margin-top: -1px; overflow: auto; height: 131px; width: 838px;">
 				            <table class="table-phase">
-				                <tbody data-bind="foreach: { data: approvalRootState, as: 'loopPhase' }">
+				                <tbody data-bind="foreach: { data: approvalRootStateConvert, as: 'loopPhase' }">
 				                    <com:ko-foreach bind="{data: loopPhase.listApprovalFrame, as: 'loopFrame'}">
 				                        <com:ko-foreach bind="{data: loopFrame.listApprover, as: 'loopApprover'}">
 				                        <tr>

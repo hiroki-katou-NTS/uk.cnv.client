@@ -181,13 +181,11 @@ module nts.uk.com.view.cmf005.c {
     disableMoveButton: KnockoutObservable<boolean> = ko.observable(false);
     usePasswordChecked: KnockoutObservable<boolean> = ko.observable(false);
     targetYearDD: KnockoutObservableArray<ItemModel> = ko.observableArray([
-      new ItemModel(0, '参照年'),
       new ItemModel(1, getText('CMF003_405')),
       new ItemModel(2, getText('CMF003_406')),
       new ItemModel(3, getText('CMF003_407'))
     ]);
     targetMonthDD: KnockoutObservableArray<ItemModel> = ko.observableArray([
-      new ItemModel(0, '参照月'),
       new ItemModel(1, getText('CMF003_408')),
       new ItemModel(2, getText('CMF003_409')),
       new ItemModel(3, getText('CMF003_410')),
@@ -201,11 +199,11 @@ module nts.uk.com.view.cmf005.c {
       new ItemModel(11, getText('CMF003_418')),
       new ItemModel(12, getText('CMF003_419'))
     ]);
-    selectedDailyTargetYear: KnockoutObservable<string> = ko.observable('');
-    selectedDailyTargetMonth: KnockoutObservable<string> = ko.observable('');
-    selectedMonthlyTargetYear: KnockoutObservable<string> = ko.observable('');
-    selectedMonthlyTargetMonth: KnockoutObservable<string> = ko.observable('');
-    selectedAnnualTargetYear: KnockoutObservable<string> = ko.observable('');
+    selectedDailyTargetYear: KnockoutObservable<number> = ko.observable(1);
+    selectedDailyTargetMonth: KnockoutObservable<number> = ko.observable(1);
+    selectedMonthlyTargetYear: KnockoutObservable<number> = ko.observable(1);
+    selectedMonthlyTargetMonth: KnockoutObservable<number> = ko.observable(1);
+    selectedAnnualTargetYear: KnockoutObservable<number> = ko.observable(1);
     password: KnockoutObservable<string> = ko.observable('');
     confirmPassword: KnockoutObservable<string> = ko.observable('');
     isCheckboxActive: KnockoutObservable<boolean> = ko.observable(false);
@@ -489,11 +487,8 @@ module nts.uk.com.view.cmf005.c {
       return arr[0];
     }
 
-    private getReferValue(value: any): string {
-      if (value) {
-        return String(value);
-      }
-      return '0';
+    private getReferValue(value: any): number {
+      return value ?? 1;
     }
 
     private getSystemText(type: number): string {
@@ -595,11 +590,11 @@ module nts.uk.com.view.cmf005.c {
   }
 
   export class ItemModel {
-    code: string;
+    code: number;
     name: string;
 
     constructor(code: number, name: string) {
-      this.code = code.toString();
+      this.code = code;
       this.name = name;
     }
   }

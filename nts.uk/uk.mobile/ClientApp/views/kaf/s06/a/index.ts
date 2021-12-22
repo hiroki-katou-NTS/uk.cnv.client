@@ -430,10 +430,36 @@ export class KafS06AComponent extends KafS00ShrComponent {
     public get c11() {
         const self = this;
         let model = self.model as Model;
-        let c11 = _.get(model, 'appAbsenceStartInfoDto.vacationApplicationReflect.workAttendanceReflect.reflectAttendance') == NotUseAtr.USE;
+        let c11 = _.get(model, 'appAbsenceStartInfoDto.flowWorkFlag');
         
-        return self.c7 && c11;
+        return self.c7 && c11 && self.c11_1;
     }
+
+    public get c11_1() {
+        const self = this;
+        let model = self.model as Model;
+        let listAbs = [1, 2, 3, 4, 5, 6, 8, 9, 12, 13];
+        let workTypeList = _.get(model, 'appAbsenceStartInfoDto.workTypeLst');
+        let workTypeFilter = _.filter(workTypeList, (x: any) => x.workTypeCode === self.workType.code);
+        if (workTypeFilter.length > 0) {
+            let workType = workTypeFilter[0];
+            // 選択している勤務種類.1日の勤務.勤務区分　＝　1日
+            if (workType.workAtr == 0) {
+                return false;
+            } else {
+                // 午前の勤務種類　AND　午後の勤務種類が休み（休日、年休、積立年休、特別休暇、欠勤、代休、振休、時間消化休暇、休職、休業）
+                if (_.includes(listAbs, workType.morningCls) && _.includes(listAbs, workType.afternoonCls)) {
+                    return false;
+                }
+            }
+
+            // 上記以外
+            return true;
+        }
+
+        return false;
+    }
+
     // 「A4_3」が「時間消化」を選択している
     public get c12() {
         const self = this;
@@ -927,6 +953,12 @@ export class KafS06AComponent extends KafS00ShrComponent {
         commandCheck.appAbsenceStartInfoDto = vm.cloneappAbsenceStartInfoDto(vm.model.appAbsenceStartInfoDto);
         commandCheck.applyForLeave = vm.model.applyForLeaveDto;
         commandCheck.mode = vm.modeNew;
+        let linkWithVacation = _.clone(vm.linkWithVacation);
+        vm.changeDateFromList(linkWithVacation);
+        let linkWithDraw = _.clone(vm.linkWithDraw);
+        vm.changeDateFromList(linkWithDraw);
+        commandCheck.appAbsenceStartInfoDto.leaveComDayOffManas = linkWithVacation;
+        commandCheck.appAbsenceStartInfoDto.payoutSubofHDManas = linkWithDraw;
         if (vm.modeNew) {
             commandCheck.application = vm.toApplication();
         } else {
@@ -1784,6 +1816,19 @@ export class KafS06AComponent extends KafS00ShrComponent {
             appAbsenceStartInfo: self.model.appAbsenceStartInfoDto
         };
 
+        command.appAbsenceStartInfo.leaveComDayOffManas = _.map(command.appAbsenceStartInfo.leaveComDayOffManas, (x: any) => {
+            x.dateOfUse = new Date(x.dateOfUse).toISOString();
+            x.outbreakDay = new Date(x.outbreakDay).toISOString();
+
+            return x;
+        });
+        command.appAbsenceStartInfo.payoutSubofHDManas = _.map(command.appAbsenceStartInfo.payoutSubofHDManas, (x: any) => {
+            x.dateOfUse = new Date(x.dateOfUse).toISOString();
+            x.outbreakDay = new Date(x.outbreakDay).toISOString();
+            
+            return x;
+        });
+        
         self.$http.post('at', API.changeUseingWorkTime, command)
             .then((res: any) => {
                 if (res) {

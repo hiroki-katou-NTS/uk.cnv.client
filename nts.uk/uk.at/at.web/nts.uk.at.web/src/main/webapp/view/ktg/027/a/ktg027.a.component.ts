@@ -30,6 +30,10 @@ module nts.uk.at.view.ktg027.a {
             return 'special-exceeding-limit';
         }
 
+        if (state === 8) {
+            return 'bg-exceed-special-upperlimit color-exceed-special-upperlimit';
+        }
+
         return '';
     }
 
@@ -446,16 +450,25 @@ module nts.uk.at.view.ktg027.a {
             const vm = this;
             const { $user } = vm;
             let paramKDW003 = {
-                lstEmployeeShare: item.employeeId,
-                errorRefStartAtr: false,
-                changePeriodAtr: true,
-                screenMode: "Normal",
-                displayFormat: "individual",
-                initClock: "",
+                initParam: {
+                    errorRefStartAtr: false,
+                    changePeriodAtr: true,
+                    screenMode: 0, //normal
+                    lstEmployee: [item.employeeId],
+                    transitionDesScreen: '',
+                    yearMonth: vm.targetYear(),
+                },
+                extractionParam: {
+                    displayFormat: 0, //individual
+                    startDate: vm.targetYear(),
+                    endDate: vm.targetYear(),
+                    dateTarget: vm.targetYear(),
+                    lstExtractedEmployee: [item.employeeId],
+                    individualTarget: item.employeeId,
+
+                },
             };
-            vm.$window
-                .shared('KDW003_PARAM', paramKDW003)
-                .then(() => vm.$jump('at', "/view/kdw/003/a/index.xhtml"));
+            vm.$jump('at', "/view/kdw/003/a/index.xhtml", paramKDW003);
         }
 
         destroyed() {

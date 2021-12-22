@@ -66,7 +66,7 @@ public class TimeZone extends WorkTimeDomainObject implements Cloneable{
 	 * @see nts.arc.layer.dom.DomainObject#validate()
 	 */
 	public void validateRange(String param) {
-		if (this.start.greaterThanOrEqualTo(this.end)) {
+		if (this.start.greaterThan(this.end)) {
 			this.bundledBusinessExceptions.addMessage("Msg_770", param);
 		}
 	}

@@ -15,9 +15,11 @@ module nts.uk.com.view.cli001.a {
                 this.columns = ko.observableArray([
                     { headerText: nts.uk.resource.getText(""), key: "userId", dataType: "string", hidden: true },
                     { headerText: nts.uk.resource.getText("CLI001_12"), key: "loginId", dataType: "string", width: 120 },
+                    { headerText: nts.uk.resource.getText('CLI001_27'), key: 'companyCode', width: 80 },
+                    { headerText: nts.uk.resource.getText('CLI001_28'), key: 'employeeCode', width: 180 },
                     { headerText: nts.uk.resource.getText("CLI001_13"), key: "userName", dataType: "string", width: 170 },
                     { headerText: nts.uk.resource.getText("CLI001_14"), key: "lockOutDateTime", dataType: "string", width: 200 },
-                    { headerText: nts.uk.resource.getText("CLI001_15"), key: "logType", dataType: "string", width: 300,
+                    { headerText: nts.uk.resource.getText("CLI001_15"), key: "logType", dataType: "string", width: 250,
                         formatter: v => v == 1 ? '強制ロック' : '自動ロック'
                     },
                 ]);
@@ -57,14 +59,16 @@ module nts.uk.com.view.cli001.a {
                     if (!_.isNil(data)) {
                         $('#tableGrid').focus();
                         let userId = { userId: data.userID };
-                        service.findByUserId(data.userID).done((dto: LockOutDataDto) => {
-                            _self.items.push({ logType: dto.lockType, loginId: data.loginID, userId: dto.userId, userName: data.userName, lockOutDateTime: moment.utc(dto.logoutDateTime).format('YYYY/MM/DD HH:mm:ss')});
+                        service.findByUserId(data.userID).done((dto: LockOutDataUserDto) => {
+                            dto.lockOutDateTime = moment.utc(dto.lockOutDateTime).format('YYYY/MM/DD HH:mm:ss');
+                            // _self.items.push({ logType: dto.lockType, loginId: data.loginID, userId: dto.userId, userName: data.userName, lockOutDateTime: moment.utc(dto.logoutDateTime).format('YYYY/MM/DD HH:mm:ss')});
+                            _self.items.push(dto);
                             _self.items(_.sortBy(_self.items(), item => item.loginId));
                             if (!_.isEmpty($('.ntsSearchBox ')[0].value)) {
                                 $('.search-btn').click();
                             }
                         });
-                    }
+                    }                   
                     nts.uk.ui.block.clear();
                 });
             }

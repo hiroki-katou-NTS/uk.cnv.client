@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import nts.arc.time.GeneralDate;
-import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.appabsence.ApplyForLeave;
 import nts.uk.ctx.at.request.dom.application.appabsence.HolidayAppType;
 import nts.uk.ctx.at.request.dom.application.appabsence.apptimedigest.TimeDigestApplication;
@@ -180,7 +179,7 @@ public interface AbsenceServiceProcess {
 	 * @return
 	 */
 	public AbsenceCheckRegisterOutput checkBeforeRegister(String companyID, AppAbsenceStartInfoOutput appAbsenceStartInfoOutput,
-			ApplyForLeave appAbsence, boolean agentAtr);
+			ApplyForLeave appAbsence, boolean agentAtr, boolean isEmptyLeaveList, boolean isEmptyPayoutList);
 
 	/**
 	 * 申請日の矛盾チェック
@@ -383,7 +382,7 @@ public interface AbsenceServiceProcess {
 	 * @return
 	 */
 	public AbsenceCheckRegisterOutput checkBeforeUpdate(String companyID, AppAbsenceStartInfoOutput appAbsenceStartInfoOutput,
-            ApplyForLeave appAbsence, boolean agentAtr);
+            ApplyForLeave appAbsence, boolean agentAtr, boolean isEmptyLeaveList, boolean isEmptyPayoutList);
 
 
     /**

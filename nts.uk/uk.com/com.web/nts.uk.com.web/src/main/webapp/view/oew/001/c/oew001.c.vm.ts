@@ -50,7 +50,6 @@ module nts.uk.com.view.oew001.c {
     mounted() {
       const vm = this;
       $("#C4_1").focus();
-      vm.$nextTick(() => model.setReadOnly("#C3_2"));
     }
 
     private getEquipmentInfoList(equipmentInfoCode?: string): JQueryPromise<any> {

@@ -72,6 +72,8 @@ export class KafS10Step1Component extends Vue {
 
     public isFirstModeUpdate: boolean = true;
 
+    public worktimeTimeLabel: string = null;
+
     public get isAddFrameBreakTime() {
         const self = this;
 
@@ -216,8 +218,8 @@ export class KafS10Step1Component extends Vue {
             workHours2.end = workHoursOp2 ? workHoursOp2.endTime : null;
 
         }
-        self.workHours1 = _.isNumber(workHours1.start) ?  workHours1 : null;
-        self.workHours2 = _.isNumber(workHours1.start) ?  workHours2 : null;
+        self.workHours1 = (_.isNumber(workHours1.start) || _.isNumber(workHours1.end)) ?  workHours1 : null;
+        self.workHours2 = (_.isNumber(workHours2.start) || _.isNumber(workHours2.end)) ?  workHours2 : null;
 
     }
 
@@ -286,6 +288,16 @@ export class KafS10Step1Component extends Vue {
         if (!_.isNil(self.workHours1)) {
             self.workInfo.workTime.time = self.handleTimeWithDay(self.workHours1.start) + '～' + self.handleTimeWithDay(self.workHours1.end);
         }
+
+        let wkTimeCodes = [self.getWorkTime()];
+        self.$http.post('at', API.getWorkTimeByCDLst, { wkTimeCodes }).then((data: any) => {
+            let workTimeInfo = _.find(data.data, (o: any) => o.code == self.getWorkTime());
+            if (workTimeInfo) {
+                self.worktimeTimeLabel = workTimeInfo.workTime1;
+            } else {
+                self.worktimeTimeLabel = '';
+            }
+        });
     }
 
     public handleTimeWithDay(time: number) {
@@ -327,6 +339,12 @@ export class KafS10Step1Component extends Vue {
         const self = this;
 
         return self.breakTimes;
+    }
+
+    public getWorktimeTimeLabel() {
+        const self = this;
+
+        return self.worktimeTimeLabel;
     }
 
     public setWorkType(
@@ -401,3 +419,7 @@ interface ValueTime {
     start: number;
     end: number;
 }
+
+const API = {
+    getWorkTimeByCDLst: 'at/shared/worktimesetting/get_worktime_by_codes'
+};

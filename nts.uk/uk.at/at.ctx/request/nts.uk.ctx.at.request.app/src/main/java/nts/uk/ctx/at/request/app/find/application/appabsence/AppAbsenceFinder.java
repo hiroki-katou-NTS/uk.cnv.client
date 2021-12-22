@@ -1,5 +1,6 @@
 package nts.uk.ctx.at.request.app.find.application.appabsence;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +16,12 @@ import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
 import nts.uk.ctx.at.request.app.command.application.appabsence.ApplyForLeaveDto;
 import nts.uk.ctx.at.request.app.command.application.appabsence.CreatAppAbsenceCommand;
+import nts.uk.ctx.at.request.app.command.application.kdl035.HolidayWorkAssociationStart;
+import nts.uk.ctx.at.request.app.command.application.kdl035.Kdl035InputData;
+import nts.uk.ctx.at.request.app.command.application.kdl035.Kdl035OutputData;
+import nts.uk.ctx.at.request.app.command.application.kdl036.HolidayAssociationStart;
+import nts.uk.ctx.at.request.app.command.application.kdl036.Kdl036InputData;
+import nts.uk.ctx.at.request.app.command.application.kdl036.Kdl036OutputData;
 import nts.uk.ctx.at.request.app.find.application.ApplicationDto;
 import nts.uk.ctx.at.request.app.find.application.appabsence.dto.AbsenceCheckRegisterDto;
 import nts.uk.ctx.at.request.app.find.application.appabsence.dto.AbsenceStartScreenBOutput;
@@ -48,9 +55,7 @@ import nts.uk.ctx.at.request.dom.application.appabsence.service.output.AppForLea
 import nts.uk.ctx.at.request.dom.application.appabsence.service.output.VacationCheckOutput;
 import nts.uk.ctx.at.request.dom.application.common.service.other.OtherCommonAlgorithm;
 import nts.uk.ctx.at.request.dom.application.stamp.StampRequestMode;
-import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.RecordDate;
 import nts.uk.ctx.at.request.dom.setting.company.appreasonstandard.AppStandardReasonCode;
-import nts.uk.ctx.at.request.dom.setting.employment.appemploymentsetting.WorkTypeObjAppHoliday;
 import nts.uk.ctx.at.shared.app.find.remainingnumber.paymana.PayoutSubofHDManagementDto;
 import nts.uk.ctx.at.shared.app.find.remainingnumber.subhdmana.dto.LeaveComDayOffManaDto;
 import nts.uk.ctx.at.shared.app.find.worktype.WorkTypeDto;
@@ -99,6 +104,12 @@ public class AppAbsenceFinder {
 	
 	@Inject
 	private SpecialHolidayEventAlgorithm specHdEventAlg;
+	
+	@Inject
+    private HolidayAssociationStart holidayAssociationStart;
+	
+	@Inject
+    private HolidayWorkAssociationStart holidayWorkAssociationStart;
 	
 
 	/**
@@ -439,11 +450,38 @@ public class AppAbsenceFinder {
 	    
 		AppAbsenceStartInfoOutput appAbsenceStartInfoOutput = param.getAppAbsenceStartInfoDto().toDomain(companyID);
 		
+		// 休出代休関連付けダイアログ起動
+        Kdl036OutputData kdl036output = holidayAssociationStart.init(new Kdl036InputData(
+                application.getEmployeeID(), 
+                GeneralDate.fromString(param.getApplication().getAppDate(), "yyyy/MM/dd"), 
+                GeneralDate.fromString(param.getApplication().getAppDate(), "yyyy/MM/dd"), 
+                param.getAppAbsenceStartInfoDto().getWorkTypeLst().stream()
+                    .filter(x -> x.getWorkTypeCode()
+                    .equals(param.getApplyForLeave().getReflectFreeTimeApp().getWorkInfo().getWorkType())).findFirst().get().getWorkAtr() == 0 ? 1 : 0, 
+                1,
+                param.getAppAbsenceStartInfoDto().getAppDispInfoStartupOutput().getAppDispInfoWithDateOutput().getOpActualContentDisplayLst(), 
+                new ArrayList<LeaveComDayOffManaDto>()));
+        
+        
+        // 振休振休関連付けダイアログ起動
+        Kdl035OutputData kdl035output = holidayWorkAssociationStart.init(new Kdl035InputData(
+                application.getEmployeeID(), 
+                GeneralDate.fromString(param.getApplication().getAppDate(), "yyyy/MM/dd"), 
+                GeneralDate.fromString(param.getApplication().getAppDate(), "yyyy/MM/dd"), 
+                param.getAppAbsenceStartInfoDto().getWorkTypeLst().stream()
+                    .filter(x -> x.getWorkTypeCode()
+                    .equals(param.getApplyForLeave().getReflectFreeTimeApp().getWorkInfo().getWorkType())).findFirst().get().getWorkAtr() == 0 ? 1 : 0, 
+                1,
+                param.getAppAbsenceStartInfoDto().getAppDispInfoStartupOutput().getAppDispInfoWithDateOutput().getOpActualContentDisplayLst(), 
+                new ArrayList<PayoutSubofHDManagementDto>()));
+		
 		AbsenceCheckRegisterOutput result = absenseProcess.checkBeforeRegister(
 				companyID, 
 				appAbsenceStartInfoOutput, 
 				applyForLeave,
-				param.isAgentAtr());
+				param.isAgentAtr(), 
+                kdl036output.getHolidayWorkInfoList().isEmpty(), 
+                kdl035output.getSubstituteWorkInfoList().isEmpty());
 		return AbsenceCheckRegisterDto.fromDomain(result);
 	}
 	
@@ -457,7 +495,38 @@ public class AppAbsenceFinder {
         applyForLeave.setApplication(application);
         AppAbsenceStartInfoOutput appAbsenceStartInfoOutput = param.getAppAbsenceStartInfoDto().toDomain(companyID);
         
-		return AbsenceCheckRegisterDto.fromDomain(absenseProcess.checkBeforeUpdate(companyID, appAbsenceStartInfoOutput, applyForLeave, param.isAgentAtr()));
+        // 休出代休関連付けダイアログ起動
+        Kdl036OutputData kdl036output = holidayAssociationStart.init(new Kdl036InputData(
+                application.getEmployeeID(), 
+                GeneralDate.fromString(param.getApplication().getAppDate(), "yyyy/MM/dd"), 
+                GeneralDate.fromString(param.getApplication().getAppDate(), "yyyy/MM/dd"), 
+                param.getAppAbsenceStartInfoDto().getWorkTypeLst().stream()
+                    .filter(x -> x.getWorkTypeCode()
+                    .equals(param.getApplyForLeave().getReflectFreeTimeApp().getWorkInfo().getWorkType())).findFirst().get().getWorkAtr() == 0 ? 1 : 0, 
+                1,
+                param.getAppAbsenceStartInfoDto().getAppDispInfoStartupOutput().getAppDispInfoWithDateOutput().getOpActualContentDisplayLst(), 
+                new ArrayList<LeaveComDayOffManaDto>()));
+        
+        
+        // 振休振休関連付けダイアログ起動
+        Kdl035OutputData kdl035output = holidayWorkAssociationStart.init(new Kdl035InputData(
+                application.getEmployeeID(), 
+                GeneralDate.fromString(param.getApplication().getAppDate(), "yyyy/MM/dd"), 
+                GeneralDate.fromString(param.getApplication().getAppDate(), "yyyy/MM/dd"), 
+                param.getAppAbsenceStartInfoDto().getWorkTypeLst().stream()
+                    .filter(x -> x.getWorkTypeCode()
+                    .equals(param.getApplyForLeave().getReflectFreeTimeApp().getWorkInfo().getWorkType())).findFirst().get().getWorkAtr() == 0 ? 1 : 0, 
+                1,
+                param.getAppAbsenceStartInfoDto().getAppDispInfoStartupOutput().getAppDispInfoWithDateOutput().getOpActualContentDisplayLst(), 
+                new ArrayList<PayoutSubofHDManagementDto>()));
+        
+		return AbsenceCheckRegisterDto.fromDomain(absenseProcess.checkBeforeUpdate(
+		        companyID, 
+		        appAbsenceStartInfoOutput, 
+		        applyForLeave, 
+		        param.isAgentAtr(), 
+		        kdl036output.getHolidayWorkInfoList().isEmpty(), 
+		        kdl035output.getSubstituteWorkInfoList().isEmpty()));
 	}
 
 	public VacationCheckOutput checkVacationTyingManage(WorkTypeDto wtBefore, WorkTypeDto wtAfter,

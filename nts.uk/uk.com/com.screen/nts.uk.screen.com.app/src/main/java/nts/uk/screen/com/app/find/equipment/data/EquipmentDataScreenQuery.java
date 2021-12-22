@@ -86,7 +86,11 @@ public class EquipmentDataScreenQuery {
 		String cid = AppContexts.user().companyId();
 		// 1.get(ログイン会社ID)
 		List<EquipmentUsageRecordItemSetting> itemSettings = this.equipmentRecordItemSettingRepository.findByCid(cid);
-		// 2.get(ログイン会社ID)
+		// 2.[設備利用実績の項目設定＝NULL]
+		if (itemSettings.isEmpty()) {
+			throw new BusinessException("Msg_3251");
+		}
+		// 3.get(ログイン会社ID)
 		Optional<EquipmentPerformInputFormatSetting> formatSetting = this.equipmentFormatSettingRepository.get(cid);
 		return new EquipmentInitSettingDto(
 				itemSettings.stream().map(EquipmentUsageRecordItemSettingDto::fromDomain).collect(Collectors.toList()),

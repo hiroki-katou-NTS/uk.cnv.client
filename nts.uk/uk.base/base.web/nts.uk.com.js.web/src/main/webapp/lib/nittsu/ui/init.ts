@@ -120,9 +120,11 @@ module nts.uk.ui {
                     if (kiban.header() === null) {
                         kiban.header(!__viewContext.noHeader || (kiban.mode() === 'view'));
                     }
-
+                    
                     // update notification
-                    kiban.notification(__viewContext.program.operationSetting.message);
+                    if (__viewContext.program.operationSetting != undefined) {
+                        kiban.notification(__viewContext.program.operationSetting.message);
+                    }
 
                     // off event reset for class reset-not-apply
                     $(".reset-not-apply").find(".reset-element").off("reset");

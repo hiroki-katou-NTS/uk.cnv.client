@@ -670,26 +670,23 @@ module nts.uk.com.view.ccg.share.ccg {
                 let self = this;
                 // set advanced search tab flag
                 self.showAdvancedSearchTab = self.systemType == ConfigEnumSystemType.ADMINISTRATOR ? true :
-                    self.showAdvancedSearchTab && (self.referenceRange != EmployeeReferenceRange.ONLY_MYSELF);
+                    self.showAdvancedSearchTab;
                 // always show quick search if advanced search is hidden
                 self.showQuickSearchTab = self.showAdvancedSearchTab ? self.showQuickSearchTab : true;
 
                 self.showAllReferableEmployee = self.systemType == ConfigEnumSystemType.ADMINISTRATOR ? true :
-                    self.referenceRange != EmployeeReferenceRange.ONLY_MYSELF
-                    && self.showAllReferableEmployee;
+                    self.showAllReferableEmployee;
 
                 // 部門対応 #106786
                 self.showSameDepartment = self.systemType == ConfigEnumSystemType.ADMINISTRATOR ? true :
-                    self.referenceRange != EmployeeReferenceRange.ONLY_MYSELF
-                    && self.showSameDepartment;
+                    self.showSameDepartment;
                 self.showSameDepartmentAndChild = self.systemType == ConfigEnumSystemType.ADMINISTRATOR ? true :
                     (self.referenceRange == EmployeeReferenceRange.ALL_REFERENCE_RANGE
                         || self.referenceRange == EmployeeReferenceRange.AFFILIATION_AND_ALL_SUBORDINATES)
                     && self.showSameDepartmentAndChild;
 
                 self.showSameWorkplace = self.systemType == ConfigEnumSystemType.ADMINISTRATOR ? true :
-                    self.referenceRange != EmployeeReferenceRange.ONLY_MYSELF
-                    && self.showSameWorkplace;
+                    self.showSameWorkplace;
                 self.showSameWorkplaceAndChild = self.systemType == ConfigEnumSystemType.ADMINISTRATOR ? true :
                     (self.referenceRange == EmployeeReferenceRange.ALL_REFERENCE_RANGE
                         || self.referenceRange == EmployeeReferenceRange.AFFILIATION_AND_ALL_SUBORDINATES)
@@ -703,13 +700,68 @@ module nts.uk.com.view.ccg.share.ccg {
                 let dfd = $.Deferred<void>();
                 let self = this;
                 $.when(service.getRefRangeBySysType(self.systemType),
-                    self.loadClosure()
-                ).done((refRange, noValue) => {
+                    self.loadClosure()).done((refRange, noValue,) => {
                     self.referenceRange = refRange;
-                    dfd.resolve();
+                    self.loadWkpManagedByLoginnedUser().done(() => {
+                        dfd.resolve();
+                    }).fail(err => nts.uk.ui.dialog.alertError(err));
                 }).fail(err => nts.uk.ui.dialog.alertError(err));
 
                 return dfd.promise();
+            }
+
+			private loadWkpManagedByLoginnedUser(): JQueryPromise<any> {
+                let dfd = $.Deferred<void>();
+                let self = this,
+                    isCheckForAdvancedSearch = self.showAdvancedSearchTab && self.systemType === ConfigEnumSystemType.EMPLOYMENT && self.referenceRange === EmployeeReferenceRange.ONLY_MYSELF,
+                    isCheckForAllReferable = self.showAllReferableEmployee && self.systemType === ConfigEnumSystemType.EMPLOYMENT && self.referenceRange === EmployeeReferenceRange.ONLY_MYSELF;
+                  
+                if (isCheckForAdvancedSearch || isCheckForAllReferable) {
+                    service.getCanManageWpkForLoginUser().done(manageWkp => {
+                        self.checkForAdvancedSearch(manageWkp);
+                        self.checkForAllReferable(manageWkp);
+                        
+                        dfd.resolve();
+                    }).fail(err => dfd.reject(err));    
+                } else {
+                    self.checkForAdvancedSearch([]);
+                    self.checkForAllReferable([]);
+                    
+                    dfd.resolve(); 
+                }
+
+                return dfd.promise();
+            }
+            
+            private checkForAdvancedSearch (manageWkp: Array<any>) {
+                let self = this;
+                if (self.showAdvancedSearchTab) {
+                    if (self.systemType === ConfigEnumSystemType.EMPLOYMENT) {
+                        if (self.referenceRange === EmployeeReferenceRange.ONLY_MYSELF && _.isEmpty(manageWkp)) {
+                            self.showAdvancedSearchTab = false;
+                        }
+                    } else {
+                        self.showAdvancedSearchTab = false;    
+                    }
+                }
+            }
+            
+            private checkForAllReferable (manageWkp: Array<any>) {
+                let self = this;
+                if (self.systemType === ConfigEnumSystemType.ADMINISTRATOR) {
+                    self.showAllReferableEmployee = true;
+                } else {
+                    if (self.showAllReferableEmployee) {
+                        if (self.systemType === ConfigEnumSystemType.EMPLOYMENT 
+                            && self.referenceRange === EmployeeReferenceRange.ONLY_MYSELF 
+                            && _.isEmpty(manageWkp)) {
+                            self.showAdvancedSearchTab = false;
+							self.showAllReferableEmployee = false;
+							self.showSameDepartment = false;
+							self.showSameWorkplace = false;
+                        }
+                    }    
+                }
             }
 
             /**

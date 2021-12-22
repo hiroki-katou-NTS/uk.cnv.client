@@ -21,7 +21,8 @@ module nts.uk.at.view.kmk003.a {
             findAllUsedOvertimeWorkFrame: "at/shared/overtimeworkframe/findall/used",
             saveAsExcel: "at/file/worktime/report/export",
             insertWorkTimeLang: "at/share/worktime/language/insert",
-            findByLangId: "at/shared/worktimesetting/findWTLanguageByCidAndLangId"
+            findByLangId: "at/shared/worktimesetting/findWTLanguageByCidAndLangId",
+			saveBonusPaySetting: "at/share/wtBonusPaySetting/saveSetting"
         };
 
         /**
@@ -128,6 +129,10 @@ module nts.uk.at.view.kmk003.a {
         
         export function findByLangId(langId: string): JQueryPromise<any> {
             return nts.uk.request.ajax("at", servicePath.findByLangId + '/' + langId);
+        }
+
+		export function saveBonusPaySetting(command: any): JQueryPromise<any> {
+            return nts.uk.request.ajax("at", servicePath.saveBonusPaySetting, command);
         }
         
         export function saveAsExcel(langId: string): JQueryPromise<any> {

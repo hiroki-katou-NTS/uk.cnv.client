@@ -1,8 +1,12 @@
 package nts.uk.ctx.sys.auth.app.find.user;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
+@NoArgsConstructor
 public class UserAuthDto {
 	/** ユーザID */
 	private String userID;
@@ -22,13 +26,14 @@ public class UserAuthDto {
 	/** 社員名 */
 	private String empName;
 	
-	public UserAuthDto ( String userID, String userName, String loginID, String empID, String empCD,String empName){
+	private String companyCD;
+	
+	public UserAuthDto ( String userID, String userName, String loginID, String empID, String empCD,String empName ){
 		this.userID = userID;
 		this.userName = userName;
 		this.loginID = loginID;
 		this.empID = empID;
 		this.empCD = empCD;
-		this.empName = empName;
-		
+		this.empName = empName;		
 	}
 }

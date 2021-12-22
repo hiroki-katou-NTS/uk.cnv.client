@@ -433,16 +433,11 @@ public class LogBasicInformationAllFinder {
 				List<CategoryCorrectionLog> rsListCategoryCorrectionLog = personInfoCorrectionLog
 						.getCategoryCorrections();
 				rsListCategoryCorrectionLog.forEach(categoryCorrectionLog -> {
-					List<ItemInfo> rsItemInfo = categoryCorrectionLog.getItemInfos();
-					if (!CollectionUtil.isEmpty(rsItemInfo)) {
-						rsItemInfo.stream().forEach(itemInfo -> {
-							returnList.addAll(
-								setPersonCategoryLog(personInfoCorrectionLog, categoryCorrectionLog,
-									mapLogBasicInfo, mapEmployeeCodePersons, mapEmployeeCodes,
-									roleNameByRoleIds, mapProgramNames, logParams, logSettingEditProgramId)
-							);
-						});
-					}
+					returnList.addAll(
+							setPersonCategoryLog(personInfoCorrectionLog, categoryCorrectionLog,
+								mapLogBasicInfo, mapEmployeeCodePersons, mapEmployeeCodes,
+								roleNameByRoleIds, mapProgramNames, logParams, logSettingEditProgramId)
+					);
 				});
 			});
 		}

@@ -190,7 +190,7 @@ public class DailyCorrectCalcTimeService {
 				: resultBaseDto.getEditStates().stream().map(c -> c.getAttendanceItemId()).collect(Collectors.toList());
 		beforeEditState.removeIf(c -> remainEditState.contains(c.getAttendanceItemId()));
 		
-		calcTime.setCellEdits(items.stream().map(x -> new DCCellEdit(itemEditCalc.getRowId(), "A" + x.getItemId(),
+		calcTime.setCellEdits(items.stream().map(x -> new DCCellEdit(itemEditCalc.getRowId(), (itemEditCalc.getValueType().equals("CODE") ? "Code" : "A" ) + x.getItemId(),
 				convertData(x.getValueType().value, x.getValue()))).collect(Collectors.toList()));
 		calcTime.setDailyEdits(dailyEditsResult);
 		calcTime.setClearStates(beforeEditState.stream().map(e -> {

@@ -219,7 +219,7 @@ module nts.uk.com.view.oem002.a {
     name: KnockoutObservable<string> = ko.observable(null);
     validPeriod: KnockoutObservable<any> = ko.observable({
       startDate: null,
-      endDate: null
+      endDate: moment.utc("9999/12/31", "YYYY/MM/DD")
     });
     equipmentClsCode: KnockoutObservable<string> = ko.observable(null);
     equipmentClsName: KnockoutObservable<string> = ko.observable(null);
@@ -231,8 +231,8 @@ module nts.uk.com.view.oem002.a {
       info.name(data.name);
       info.validPeriod({
         startDate: moment.utc(data.effectiveStartDate, "YYYY/MM/DD"),
-        endDate: moment.utc(data.effectiveEndDate, "YYYY/MM/DD")
-      })
+        endDate: moment.utc(data.effectiveEndDate ?? "9999/12/31", "YYYY/MM/DD")
+      });
       info.equipmentClsCode(data.equipmentClsCode);
       info.equipmentClsName(_.find(clsList, { "code" : data.equipmentClsCode }).name);
       info.remark(data.remark);

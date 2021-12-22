@@ -3,8 +3,6 @@ package nts.uk.ctx.at.shared.dom.adapter.workplace.affiliate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.Optional;
-
 /**
  * 所属職場履歴項目Imported
  */
@@ -28,6 +26,6 @@ public class AffWorkplaceHistoryItemImport {
 	// 通常職場コード
 	private String  normalWorkplaceId;
 
-	private Optional<String> workLocationCode;
+//	private Optional<String> workLocationCode;
 
 }

@@ -40,7 +40,6 @@ import nts.uk.ctx.at.request.dom.application.holidayshipment.absenceleaveapp.Abs
 import nts.uk.ctx.at.request.dom.application.holidayshipment.recruitmentapp.RecruitmentApp;
 import nts.uk.ctx.at.shared.app.find.common.TimeZoneWithWorkNoDto;
 import nts.uk.ctx.at.shared.app.find.worktime.predset.dto.TimeZone_NewDto;
-import nts.uk.ctx.at.shared.dom.remainingnumber.paymana.PayoutSubofHDManagement;
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.worktime.common.TimeZone;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
@@ -127,7 +126,9 @@ public class HolidayShipmentMobileWS extends WebService {
 				Optional.ofNullable(displayInforWhenStarting.getApplicationForHoliday() == null ? null : displayInforWhenStarting.getApplicationForHoliday().getWorkInformationForApplication()), 
 				Optional.ofNullable(displayInforWhenStarting.getApplicationForWorkingDay() == null ? null : displayInforWhenStarting.getApplicationForWorkingDay().getWorkInformationForApplication()), 
 				command.getAbsWorkMngLst().stream().map(x -> x.toDomain()).collect(Collectors.toList()), 
-				command.isCheckFlag());
+				command.getAbsHolidayMngLst().stream().map(x -> x.toDomain()).collect(Collectors.toList()), 
+				command.isCheckFlag(), 
+				command.getDisplayInforWhenStarting().getApplicationForHoliday().getWorkTypeList().stream().map(x -> x.toDomain()).collect(Collectors.toList()));
 		//振休残数不足チェック (Check số nghỉ bù thiếu)
 //		errorCheckProcessingBeforeRegistrationKAF011.checkForInsufficientNumberOfHolidays(
 //				companyId, 
@@ -191,8 +192,10 @@ public class HolidayShipmentMobileWS extends WebService {
 		        abs, 
 		        rec, 
 		        displayInforWhenStarting, 
-		        abs.isPresent() ? command.abs.payoutSubofHDManagements.stream().map(c->c.toDomain()).collect(Collectors.toList()) : new ArrayList<>(), 
-		        command.isCheckFlag());
+		        abs.isPresent() ? command.getAbsWorkMngLst().stream().map(x -> x.toDomain()).collect(Collectors.toList()) : new ArrayList<>(), 
+		        abs.isPresent() ? command.getAbsHolidayMngLst().stream().map(x -> x.toDomain()).collect(Collectors.toList()) : new ArrayList<>(), 
+		        command.isCheckFlag(), 
+		        command.getDisplayInforWhenStarting().getApplicationForHoliday().getWorkTypeList().stream().map(x -> x.toDomain()).collect(Collectors.toList()));
 		return Collections.emptyList();
 	}
 	

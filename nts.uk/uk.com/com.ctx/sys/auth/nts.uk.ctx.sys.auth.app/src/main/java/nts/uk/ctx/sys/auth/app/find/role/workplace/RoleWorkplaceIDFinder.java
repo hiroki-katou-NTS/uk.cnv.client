@@ -20,6 +20,7 @@ import nts.uk.ctx.sys.auth.dom.adapter.workplace.WorkplaceInfoImport;
 import nts.uk.ctx.sys.auth.dom.role.EmployeeReferenceRange;
 import nts.uk.ctx.sys.auth.dom.role.Role;
 import nts.uk.ctx.sys.auth.dom.role.RoleRepository;
+import nts.uk.ctx.sys.auth.dom.wkpmanager.WorkplaceManagerRepository;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.context.loginuser.role.LoginUserRoles;
 
@@ -42,8 +43,8 @@ public class RoleWorkplaceIDFinder {
 	
 	
 	/** The workplace manager repository. */
-//	@Inject
-//	private WorkplaceManagerRepository workplaceManagerRepository;
+	@Inject
+	private WorkplaceManagerRepository workplaceManagerRepository;
 
 	/**
 	 * ロールIDから参照可能な職場リストを取得する
@@ -109,8 +110,8 @@ public class RoleWorkplaceIDFinder {
 			return workplaceAdapter.findListWkpIdByBaseDate(referenceDate);
 		}else {
 			if(isWkplManager.isPresent() && isWkplManager.get()) {
-				//[RQ613]指定社員の職場管理者の職場リストを取得する（配下含む）
-				listWkpId.addAll(workplaceAdapter.getWorkplaceId(referenceDate, employeeId));
+				//ドメインモデル「職場管理者」を取得する
+				listWkpId.addAll(workplaceManagerRepository.findListWkpManagerByEmpIdAndBaseDate(employeeId, referenceDate).stream().map(c->c.getWorkplaceId()).collect(Collectors.toList()));
 			}
 					
 			// requestList #30 NEW

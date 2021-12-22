@@ -1,20 +1,33 @@
 package nts.uk.ctx.at.schedule.app.command.executionlog;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.val;
-import nts.arc.enums.EnumAdaptor;
-import nts.arc.time.GeneralDate;
-import nts.arc.time.GeneralDateTime;
-import nts.arc.time.calendar.period.DatePeriod;
-import nts.uk.ctx.at.schedule.dom.executionlog.*;
-import nts.uk.ctx.at.schedule.dom.shift.pattern.monthly.MonthlyPatternCode;
-import nts.uk.ctx.at.shared.dom.common.CompanyId;
-import nts.uk.ctx.at.shared.dom.employmentrules.organizationmanagement.ConditionEmployee;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.val;
+import nts.arc.time.GeneralDate;
+import nts.arc.time.GeneralDateTime;
+import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.schedule.dom.executionlog.CompletionStatus;
+import nts.uk.ctx.at.schedule.dom.executionlog.CreationMethod;
+import nts.uk.ctx.at.schedule.dom.executionlog.ExecutionAtr;
+import nts.uk.ctx.at.schedule.dom.executionlog.ExecutionDateTime;
+import nts.uk.ctx.at.schedule.dom.executionlog.ExecutionStatus;
+import nts.uk.ctx.at.schedule.dom.executionlog.ImplementAtr;
+import nts.uk.ctx.at.schedule.dom.executionlog.RecreateCondition;
+import nts.uk.ctx.at.schedule.dom.executionlog.ReferenceMaster;
+import nts.uk.ctx.at.schedule.dom.executionlog.ScheduleCreateContent;
+import nts.uk.ctx.at.schedule.dom.executionlog.ScheduleCreateContentGetMemento;
+import nts.uk.ctx.at.schedule.dom.executionlog.ScheduleCreator;
+import nts.uk.ctx.at.schedule.dom.executionlog.ScheduleCreatorGetMemento;
+import nts.uk.ctx.at.schedule.dom.executionlog.ScheduleExecutionLog;
+import nts.uk.ctx.at.schedule.dom.executionlog.ScheduleExecutionLogGetMemento;
+import nts.uk.ctx.at.schedule.dom.executionlog.SpecifyCreation;
+import nts.uk.ctx.at.schedule.dom.shift.pattern.monthly.MonthlyPatternCode;
+import nts.uk.ctx.at.shared.dom.common.CompanyId;
+import nts.uk.ctx.at.shared.dom.employmentrules.organizationmanagement.ConditionEmployee;
 
 /**
  * command clone ScheduleExecutionLogAddCommand update 28/8/2020
