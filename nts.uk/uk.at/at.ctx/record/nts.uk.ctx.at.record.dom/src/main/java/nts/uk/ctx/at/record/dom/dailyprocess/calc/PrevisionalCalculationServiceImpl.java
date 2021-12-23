@@ -1,10 +1,12 @@
 package nts.uk.ctx.at.record.dom.dailyprocess.calc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -13,16 +15,17 @@ import javax.inject.Inject;
 
 import lombok.val;
 import nts.arc.time.GeneralDate;
-import nts.uk.ctx.at.record.dom.actualworkinghours.repository.AttendanceTimeRepository;
-import nts.uk.ctx.at.record.dom.breakorgoout.repository.BreakTimeOfDailyPerformanceRepository;
-import nts.uk.ctx.at.record.dom.breakorgoout.repository.OutingTimeOfDailyPerformanceRepository;
 import nts.uk.ctx.at.record.dom.calculationattribute.CalAttrOfDailyPerformance;
 import nts.uk.ctx.at.record.dom.dailyprocess.calc.requestlist.PrevisionalForImp;
 import nts.uk.ctx.at.record.dom.workinformation.WorkInfoOfDailyPerformance;
 import nts.uk.ctx.at.record.dom.worktime.TimeLeavingOfDailyPerformance;
 import nts.uk.ctx.at.shared.dom.WorkInformation;
 import nts.uk.ctx.at.shared.dom.calculationattribute.enums.DivergenceTimeAttr;
+import nts.uk.ctx.at.shared.dom.dailyattdcal.converter.DailyRecordShareFinder;
+import nts.uk.ctx.at.shared.dom.dailyperformanceprocessing.AffiliationInforState;
 import nts.uk.ctx.at.shared.dom.dailyperformanceprocessing.ReflectWorkInforDomainService;
+import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
+import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.AttendanceItemIdContainer;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalAtrOvertime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalFlexOvertimeSetting;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalOvertimeSetting;
@@ -31,6 +34,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalSetti
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalcOfLeaveEarlySetting;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.TimeLimitUpperLimitSetting;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.deviationtime.AutoCalcSetOfDivergenceTime;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingWork;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.WorkTimes;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.OutingTimeOfDailyAttd;
@@ -41,11 +45,17 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.Time
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.TimeChangeMeans;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkLocationCD;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkStamp;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.enu.DailyDomainGroup;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.editstate.EditStateOfDailyAttd;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.editstate.EditStateSetting;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.function.algorithm.ChangeDailyAttendance;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.function.algorithm.ICorrectionAttendanceRule;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.shortworktime.ShortTimeOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.shortworktime.ShortWorkingTimeSheet;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.CalculationState;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.NotUseAttribute;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.WorkInfoOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.ManagePerCompanySet;
 import nts.uk.ctx.at.shared.dom.scherec.dailyprocess.calc.CalculateOption;
 import nts.uk.ctx.at.shared.dom.workrule.outsideworktime.AutoCalRaisingSalarySetting;
@@ -69,16 +79,13 @@ public class PrevisionalCalculationServiceImpl implements ProvisionalCalculation
 	private CalculateDailyRecordServiceCenter calculateDailyRecordServiceCenter;
 
 	@Inject
-	private AttendanceTimeRepository attendanceTimeRepository;
-
-	@Inject
-	private BreakTimeOfDailyPerformanceRepository breakTimeOfDailyPerformanceRepository;
-
-	@Inject
-	private OutingTimeOfDailyPerformanceRepository outingTimeOfDailyPerformanceRepository;
-
-	@Inject
 	private ReflectWorkInforDomainService reflectWorkInforDomainServiceImpl;
+	
+	@Inject
+	private ICorrectionAttendanceRule ICorrectionAttendanceRule;
+	
+	@Inject
+	private DailyRecordShareFinder dailyRecordShareFinder;
 
 	@Override
 	public List<IntegrationOfDaily> calculation(List<PrevisionalForImp> impList) {
@@ -112,20 +119,19 @@ public class PrevisionalCalculationServiceImpl implements ProvisionalCalculation
 	 */
 	private Optional<IntegrationOfDaily> createProvisionalDailyRecord(String employeeId, GeneralDate ymd,
 			WorkTypeCode workTypeCode, WorkTimeCode workTimeCode, Map<Integer, TimeZone> timeSheets) {
+		
 		// 日別実績の勤務情報
 		//Optional<WorkInfoOfDailyPerformance> preworkInformation = workInformationRepository.find(employeeId, ymd);
 		String setWorkTimeCode = null;
 		if (workTimeCode != null)
 			setWorkTimeCode = workTimeCode.v();
+		
+		Optional<IntegrationOfDaily> domainDaily = dailyRecordShareFinder.find(employeeId, ymd);
+		
 		WorkInfoOfDailyPerformance workInformation = new WorkInfoOfDailyPerformance(employeeId,
 				new WorkInformation(workTypeCode.v(), setWorkTimeCode), CalculationState.No_Calculated,
-				NotUseAttribute.Not_use, NotUseAttribute.Not_use, ymd, Collections.emptyList(), Optional.empty());
-		// 勤怠時間取得
-		val attendanceTime = attendanceTimeRepository.find(employeeId, ymd);
-		// 日別実績の休憩時間帯
-		val breakTimeSheet = breakTimeOfDailyPerformanceRepository.findByKey(employeeId, ymd);
-		// 日別実績の外出時間帯
-		val goOutTimeSheet = outingTimeOfDailyPerformanceRepository.findByEmployeeIdAndDate(employeeId, ymd);
+				NotUseAttribute.Not_use, NotUseAttribute.Not_use, ymd, new ArrayList<>(), Optional.empty());
+		
 		// 日別実績の短時間勤務時間帯
 		//Optional<ShortTimeOfDailyPerformance> ShortTimeOfDailyPerformance = Optional.empty();
 		// 日別実績の臨時出退勤
@@ -185,29 +191,91 @@ public class PrevisionalCalculationServiceImpl implements ProvisionalCalculation
 			return Optional.empty();		
 		}
 		
-		IntegrationOfDaily data = new IntegrationOfDaily(
+		return Optional.of(correctAttendanceRule(domainDaily, employeeId, ymd, calAttrOfDailyPerformance, employeeState,
+				timeAttendance.getAttendance(), workInformation.getWorkInformation(),
+				Optional.empty(), Optional.empty(),
+				Optional.empty()));
+	}
+
+	//擬似的な勤怠ルールを補正する
+	private IntegrationOfDaily correctAttendanceRule(Optional<IntegrationOfDaily> data,
+			String employeeId, GeneralDate ymd, 
+			CalAttrOfDailyPerformance calAttrOfDailyPerformance, AffiliationInforState employeeState,
+			TimeLeavingOfDailyAttd timeAttendance, WorkInfoOfDailyAttendance workInformation,
+			Optional<BreakTimeOfDailyAttd> breakTime, Optional<OutingTimeOfDailyAttd> outingTime,
+			Optional<ShortTimeOfDailyAttd> shortTime) {
+		
+		IntegrationOfDaily domainDaily = data.orElse(createNewDomain(employeeId, ymd, workInformation,
+				calAttrOfDailyPerformance, employeeState, timeAttendance));
+		boolean changeWork = setDataIntoDomain(domainDaily, timeAttendance, workInformation, calAttrOfDailyPerformance,
+				employeeState, breakTime, outingTime, shortTime);
+		setEditState(domainDaily);
+		domainDaily = ICorrectionAttendanceRule.process(domainDaily, new ChangeDailyAttendance(
+				data.map(x -> changeWork).orElse(true), false, false, true, ScheduleRecordClassifi.RECORD, false));
+		return domainDaily;
+
+	}
+	
+	private IntegrationOfDaily createNewDomain(String employeeId, GeneralDate ymd, WorkInfoOfDailyAttendance workInformation,
+			CalAttrOfDailyPerformance calAttrOfDailyPerformance, AffiliationInforState employeeState, TimeLeavingOfDailyAttd attendance) {
+		return new IntegrationOfDaily(
 				employeeId,
 				ymd,
-				workInformation.getWorkInformation(), //workInformation
+				workInformation, //workInformation
 				calAttrOfDailyPerformance.getCalcategory(),//calAttr
 				employeeState.getAffiliationInforOfDailyPerfor().get(), //affiliationInfor
 				Optional.empty(), //pcLogOnInfo
-				Collections.emptyList(), //employeeError
-				goOutTimeSheet.map(c -> c.getOutingTime()), //outingTime
-				breakTimeSheet.map(c -> c.getTimeZone()).orElse(new BreakTimeOfDailyAttd()), //breakTime
-				attendanceTime.map(c -> c.getTime()), //attendanceTimeOfDailyPerformance
-				Optional.of(timeAttendance.getAttendance()),// attendanceLeave
+				new ArrayList<>(), //employeeError
+				Optional.empty(), //outingTime
+				new BreakTimeOfDailyAttd(), //breakTime
+				Optional.empty(), //attendanceTimeOfDailyPerformance
+				Optional.of(attendance),// attendanceLeave
 				Optional.empty(), //shortTime
 				Optional.empty(), //specDateAttr
 				Optional.empty(), //attendanceLeavingGate
 				Optional.empty(), //anyItemValue
-				Collections.emptyList(), //editState
+				new ArrayList<>(), //editState
 				Optional.empty(), //tempTime
 				new ArrayList<>(),//remarks
 				Optional.empty());
-		return Optional.of(data);
 	}
 
+	//日別勤怠（Work）に作成したデータを入れる
+	private boolean setDataIntoDomain(IntegrationOfDaily data,
+			TimeLeavingOfDailyAttd timeAttendance, WorkInfoOfDailyAttendance workInformation,
+			CalAttrOfDailyPerformance calAttrOfDailyPerformance, AffiliationInforState employeeState,
+			Optional<BreakTimeOfDailyAttd> breakTime, Optional<OutingTimeOfDailyAttd> outingTime,
+			Optional<ShortTimeOfDailyAttd> shortTime) {
+		
+		if(breakTime.isPresent()) {
+			data.setBreakTime(breakTime.get());
+		}
+		data.setOutingTime(outingTime);
+		data.setShortTime(shortTime);
+		data.setAttendanceLeave(Optional.of(timeAttendance));
+		data.setCalAttr(calAttrOfDailyPerformance.getCalcategory());
+		data.setAffiliationInfor(employeeState.getAffiliationInforOfDailyPerfor().get());
+		if(workInformation.getRecordInfo().isSame(data.getWorkInformation().getRecordInfo())) {
+			val scheduleTimeSheet = workInformation.getScheduleTimeSheets();
+			workInformation.setScheduleTimeSheets(scheduleTimeSheet);
+			return false;
+		}else {
+			data.setWorkInformation(workInformation);
+			return true;
+		}
+	}
+	
+	//固定で編集状態を作る
+	private void setEditState(IntegrationOfDaily domain) {
+		List<Integer> ITEM = AttendanceItemIdContainer.getItemIdByDailyDomains(DailyDomainGroup.ATTENDACE_LEAVE,
+				DailyDomainGroup.BREAK_TIME, DailyDomainGroup.OUTING_TIME, DailyDomainGroup.SHORT_TIME);
+		ITEM.addAll(Arrays.asList(28,29));
+		List<EditStateOfDailyAttd> editState = ITEM.stream()
+				.map(x -> new EditStateOfDailyAttd(x, EditStateSetting.HAND_CORRECTION_MYSELF))
+				.collect(Collectors.toList());
+		domain.setEditState(editState);
+	}
+	
 	private IntegrationOfDaily replaceDeductionTimeSheet(IntegrationOfDaily provisionalRecord,
 			List<BreakTimeSheet> breakTimeSheets, List<OutingTimeSheet> outingTimeSheets,
 			List<ShortWorkingTimeSheet> shortWorkingTimeSheets, String employeeId, GeneralDate ymd) {
@@ -219,4 +287,5 @@ public class PrevisionalCalculationServiceImpl implements ProvisionalCalculation
 		return provisionalRecord;
 	}
 
+	//擬似的な勤怠ルールを補正する
 }
