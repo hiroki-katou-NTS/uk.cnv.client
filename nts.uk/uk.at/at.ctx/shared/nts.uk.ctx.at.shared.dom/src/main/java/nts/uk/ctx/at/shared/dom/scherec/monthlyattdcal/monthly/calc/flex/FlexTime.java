@@ -207,4 +207,13 @@ public class FlexTime implements Serializable{
 		this.illegalFlexTime = this.illegalFlexTime.addMinutes(target.illegalFlexTime.v());
 		this.flexTimeCurrentMonth.sum(target.flexTimeCurrentMonth);
 	}
+	
+	/** 日単位のフレックス超過時間を合計する */
+	public AttendanceTimeMonth getPlusFlexTime () {
+		
+		return new AttendanceTimeMonth(this.timeSeriesWorks.entrySet()
+						.stream().map(c -> c.getValue())
+						.mapToInt(c -> c.getFlexTime().getFlexOverTime().v())
+						.sum());
+	}
 }
