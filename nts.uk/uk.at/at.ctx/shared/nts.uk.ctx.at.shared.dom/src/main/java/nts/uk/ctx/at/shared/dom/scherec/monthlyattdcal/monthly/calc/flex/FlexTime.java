@@ -208,7 +208,7 @@ public class FlexTime implements Serializable{
 		this.flexTimeCurrentMonth.sum(target.flexTimeCurrentMonth);
 	}
 	
-	/** フレックス時間（プラス分）を取得する（日の縦計） */
+	/** 日単位のフレックス超過時間を合計する */
 	public AttendanceTimeMonth getPlusFlexTime () {
 		
 		return new AttendanceTimeMonth(this.timeSeriesWorks.entrySet()

@@ -2210,7 +2210,7 @@ public class FlexTimeOfMonthly implements SerializableWithOptional{
 		/** ○「集計方法」を確認する */
 		if (this.flexAggrSet.getAggrMethod() == FlexAggregateMethod.FOR_CONVENIENCE) { /** 便宜上集計 */
 			
-			/** フレックス時間（プラス分）を取得する（日の縦計） */
+			/** 日単位のフレックス超過時間を合計する */
 			return this.flexTime.getPlusFlexTime();
 		}
 		
