@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import nts.arc.time.GeneralDate;
 import nts.gul.util.value.Finally;
 import nts.uk.ctx.at.shared.dom.WorkInformation;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
@@ -59,6 +60,8 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.timezone.withinworkinghours.LateTimeSheet;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.timezone.withinworkinghours.WithinWorkTimeFrame;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.timezone.withinworkinghours.WithinWorkTimeSheet;
+import nts.uk.ctx.at.shared.dom.workingcondition.TimeZone;
+import nts.uk.ctx.at.shared.dom.workingcondition.WorkingConditionItem;
 import nts.uk.ctx.at.shared.dom.workrule.goingout.GoingOutReason;
 import nts.uk.ctx.at.shared.dom.workrule.outsideworktime.StatutoryAtr;
 import nts.uk.ctx.at.shared.dom.worktime.IntegrationOfWorkTime;
@@ -636,6 +639,9 @@ public class CalculationRangeOfOneDay {
 				integrationOfDaily.getWorkInformation(),
 				integrationOfWorkTime.getFlowWorkSetting().get().getFlowSetting().getCalculateSetting());
 		
+		//所定時間帯を取得する
+		this.predetermineTimeSetForCalc = this.getPredetermineTimeSheetForFlow(integrationOfDaily.getYmd(), personDailySetting.getPersonInfo());
+		
 		//空の就業時間内時間帯を作成。これを遅刻早退と就内の処理で編集していく。
 		WithinWorkTimeSheet creatingWithinWorkTimeSheet = new WithinWorkTimeSheet(new ArrayList<>(), new ArrayList<>(), Optional.empty(), Optional.empty());
 		
@@ -838,6 +844,9 @@ public class CalculationRangeOfOneDay {
 				integrationOfDaily.getWorkInformation(),
 				integrationOfWorkTime.getFlowWorkSetting().get().getFlowSetting().getCalculateSetting());
 		
+		//所定時間帯を取得する
+		this.predetermineTimeSetForCalc = this.getPredetermineTimeSheetForFlow(integrationOfDaily.getYmd(), personDailySetting.getPersonInfo());
+		
 		//パラメータを受け取る
 		//補正用出退勤としてクローンする
 		TimeLeavingOfDailyAttd timeLeavingForCorrect = new TimeLeavingOfDailyAttd(
@@ -962,13 +971,9 @@ public class CalculationRangeOfOneDay {
 			HolidayCalcMethodSet holidayCalcMethodSet,
 			TimeLeavingWork timeLeavingWork,
 			WithinWorkTimeSheet creatingWithinWorkTimeSheet){
-		
-		//所定時間帯を取得する
-		PredetermineTimeSetForCalc predetermineTimeSet = this.getPredetermineTimeSheetForFlow(timeLeavingWork.getWorkNo(), todayWorkType);
-		
 		//計算範囲を判断する
 		creatingWithinWorkTimeSheet.getWithinWorkTimeFrame().add(this.createWithinWorkTimeFrameIncludingCalculationRange(
-				todayWorkType, integrationOfWorkTime, timeLeavingWork, predetermineTimeSet));
+				todayWorkType, integrationOfWorkTime, timeLeavingWork, this.predetermineTimeSetForCalc));
 
 		//遅刻時間帯を計算
 		return creatingWithinWorkTimeSheet.calcLateTimeDeduction(
@@ -978,7 +983,7 @@ public class CalculationRangeOfOneDay {
 				deductionTimeSheet,
 				holidayCalcMethodSet,
 				timeLeavingWork,
-				predetermineTimeSet);
+				this.predetermineTimeSetForCalc);
 	}
 	
 	/**
@@ -1000,10 +1005,6 @@ public class CalculationRangeOfOneDay {
 			HolidayCalcMethodSet holidayCalcMethodSet,
 			TimeLeavingWork timeLeavingWork,
 			WithinWorkTimeSheet creatingWithinWorkTimeSheet){
-		
-		//所定時間帯を取得する
-		PredetermineTimeSetForCalc predetermineTimeSet = getPredetermineTimeSheetForFlow(timeLeavingWork.getWorkNo(), todayWorkType);
-		
 		//早退時間帯を計算
 		return creatingWithinWorkTimeSheet.calcLeaveEarlyTimeDeduction(
 				todayWorkType,
@@ -1012,37 +1013,24 @@ public class CalculationRangeOfOneDay {
 				deductionTimeSheet,
 				holidayCalcMethodSet,
 				timeLeavingWork,
-				predetermineTimeSet);
+				this.predetermineTimeSetForCalc);
 	}
 	
 	/**
-	* 所定時間帯を取得する(流動)_自身の計算用所定時間設定を補正した新しいインスタンスを作成して返す
-	* @param workNo 勤務NO
-	* @param workType 勤務種類
-	* @return PredetermineTimeSetForCalc 所定時間設定(計算用クラス)
+	* 所定時間帯を取得する(流動)
+	* @param date 年月日
+	* @param workingCondition 労働条件項目
+	* @return 所定時間設定(計算用クラス)
 	*/
-	private PredetermineTimeSetForCalc getPredetermineTimeSheetForFlow(
-			WorkNo workNo,
-			WorkType workType){
-		
-		PredetermineTimeSetForCalc copiedPredetermineTimeSetForCalc = this.predetermineTimeSetForCalc.clone();
-			
-		//始業/終業時刻から参照
-		Optional<ScheduleTimeSheet> scheduleTimeSheet = this.workInformationOfDaily.getScheduleTimeSheet(workNo);
-		
-		if(scheduleTimeSheet.isPresent()) {
-			copiedPredetermineTimeSetForCalc.getTimeSheets().stream().filter(c -> c.getWorkNo() == workNo.v())
-				.findFirst().ifPresent(c -> {
-					c.updateStartTime(scheduleTimeSheet.get().getAttendance());
-					c.updateEndTime(scheduleTimeSheet.get().getLeaveWork());
-				});
-//			copiedPredetermineTimeSetForCalc.getTimeSheets().get(workNo.v()).updateStartTime(scheduleTimeSheet.get().getAttendance());
-//			copiedPredetermineTimeSetForCalc.getTimeSheets().get(workNo.v()).updateEndTime(scheduleTimeSheet.get().getLeaveWork());
+	private PredetermineTimeSetForCalc getPredetermineTimeSheetForFlow(GeneralDate date, WorkingConditionItem workingCondition) {
+		List<TimeZone> schedules = this.workInformationOfDaily.getScheduleTimeSheets().stream()
+				.map(s -> new TimeZone(s.getWorkNo().v(), s.getAttendance(), s.getLeaveWork()))
+				.collect(Collectors.toList());
+		if(schedules.isEmpty()) {
+			//労働条件項目から勤務時間帯を取得する
+			return this.predetermineTimeSetForCalc.reCreate(workingCondition.getWorkCategory().getWorkTime().getWorkingHours(date));
 		}
-		
-		//午前勤務、午後勤務の場合に時間帯を補正する
-		copiedPredetermineTimeSetForCalc.correctPredetermineTimeSheet(workType.getDailyWork(),workNo.v());
-		return copiedPredetermineTimeSetForCalc;
+		return this.predetermineTimeSetForCalc.reCreate(schedules);
 	}
 	
 	/**

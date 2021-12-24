@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.val;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingWork;
+import nts.uk.ctx.at.shared.dom.workingcondition.TimeZone;
 import nts.uk.ctx.at.shared.dom.worktime.common.AmPmAtr;
 import nts.uk.ctx.at.shared.dom.worktime.predset.PredetemineTimeSetting;
 import nts.uk.ctx.at.shared.dom.worktime.predset.PredetermineTime;
@@ -18,6 +19,7 @@ import nts.uk.ctx.at.shared.dom.worktype.AttendanceHolidayAttr;
 import nts.uk.ctx.at.shared.dom.worktype.DailyWork;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
 import nts.uk.shr.com.time.TimeWithDayAttr;
+
 
 /**
  * 所定時間設定(計算用クラス)
@@ -325,5 +327,24 @@ public class PredetermineTimeSetForCalc implements Cloneable{
 				this.timeSheets.get(i).updateStartTime(timeLeavingWorks.get(i).getLeaveTime().get());
 			}
 		}
+	}
+	
+	/**
+	 * 作り直す
+	 * @param timeZones 時間帯
+	 * @return 時間帯を入れ替えた所定時間設定
+	 */
+	public PredetermineTimeSetForCalc reCreate(List<TimeZone> timeZones) {
+		List<TimezoneUse> newTimes = timeZones.stream()
+				.filter(t -> this.getTimeSheet(t.getCnt()).isPresent())
+				.map(t -> new TimezoneUse(t.getStart(), t.getEnd(), this.getTimeSheet(t.getCnt()).get().getUseAtr(), t.getCnt()))
+				.collect(Collectors.toList());
+		return new PredetermineTimeSetForCalc(
+				newTimes,
+				new TimeWithDayAttr(this.AMEndTime.getDayTime()),
+				new TimeWithDayAttr(this.PMStartTime.getDayTime()),
+				this.additionSet.clone(),
+				new AttendanceTime(this.oneDayRange.valueAsMinutes()),
+				new TimeWithDayAttr(this.startOneDayTime.getDayTime()));
 	}
 }
