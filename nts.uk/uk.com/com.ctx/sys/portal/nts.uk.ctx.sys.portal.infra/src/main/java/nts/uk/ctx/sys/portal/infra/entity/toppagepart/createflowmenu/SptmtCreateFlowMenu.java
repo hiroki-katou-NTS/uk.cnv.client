@@ -24,12 +24,12 @@ import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.CreateFlowMenu;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.DisplayName;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.FileAttachmentSetting;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.FileName;
-import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.FixedClassification;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.FontSetting;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.FontSize;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.HorizontalAndVerticalPosition;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.HorizontalAndVerticalSize;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.HorizontalPosition;
+import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.ImageInformation;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.ImageSetting;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.LabelContent;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.LabelSetting;
@@ -158,7 +158,14 @@ public class SptmtCreateFlowMenu extends UkJpaEntity
 								domain.getSizeAndPosition().getColumn().v(), domain.getSizeAndPosition().getRow().v()))
 						.systemType(domain.getSystemType().value)
 						.verticalPosition(domain.getFontSetting().getPosition().getVerticalPosition().value)
-						.width(domain.getSizeAndPosition().getWidth().v()).build())
+						.width(domain.getSizeAndPosition().getWidth().v())
+						.textColor(domain.getFontSetting().getSizeAndColor().getFontColor().map(ColorCode::v).orElse(""))
+						.defaultAtr(domain.getImageInformation().map(data -> data.getIsFixed().value).orElse(null))
+						.ratio(domain.getImageInformation().map(ImageInformation::getRatio).orElse(null))
+						.imgFileId(domain.getImageInformation().map(data -> data.getFileId().orElse("")).orElse(""))
+						.imgFileName(domain.getImageInformation()
+								.map(data -> data.getFileName().map(FileName::v).orElse("")).orElse(""))
+						.build())
 				.collect(Collectors.toList());
 	}
 
@@ -191,12 +198,14 @@ public class SptmtCreateFlowMenu extends UkJpaEntity
 	public void setImageSettings(List<ImageSetting> imageSettings, String contractCode) {
 		this.imageSettings = imageSettings.stream()
 				.map(domain -> SptmtFlowLayoutImage.builder().contractCode(contractCode)
-						.fileId(domain.getFileId().orElse(null))
-						.fileName(domain.getFileName().map(FileName::v).orElse(null))
-						.height(domain.getSizeAndPosition().getHeight().v()).isFixed(domain.getIsFixed().value)
+						.fileId(domain.getImageInformation().getFileId().orElse(null))
+						.fileName(domain.getImageInformation().getFileName().map(FileName::v).orElse(null))
+						.height(domain.getSizeAndPosition().getHeight().v())
+						.isFixed(domain.getImageInformation().getIsFixed().value)
 						.pk(new SptmtFlowLayoutImagePk(this.getCid(), this.getFlowMenuCode(),
 								domain.getSizeAndPosition().getColumn().v(), domain.getSizeAndPosition().getRow().v()))
-						.ratio(domain.getRatio()).width(domain.getSizeAndPosition().getWidth().v()).build())
+						.ratio(domain.getImageInformation().getRatio())
+						.width(domain.getSizeAndPosition().getWidth().v()).build())
 				.collect(Collectors.toList());
 	}
 
@@ -240,7 +249,7 @@ public class SptmtCreateFlowMenu extends UkJpaEntity
 				.map(entity -> MenuSetting.builder()
 						.fontSetting(new FontSetting(
 								new SizeAndColor(entity.getBold() == SizeAndColor.BOLD, Optional.empty(),
-										Optional.empty(), new FontSize(entity.getFontSize())),
+										Optional.ofNullable(entity.getTextColor()).map(ColorCode::new), new FontSize(entity.getFontSize())),
 								new HorizontalAndVerticalPosition(
 										EnumAdaptor.valueOf(entity.getHorizontalPosition(), HorizontalPosition.class),
 										EnumAdaptor.valueOf(entity.getVerticalPosition(), VerticalPosition.class))))
@@ -251,7 +260,11 @@ public class SptmtCreateFlowMenu extends UkJpaEntity
 								new HorizontalAndVerticalSize(entity.getPk().row),
 								new HorizontalAndVerticalSize(entity.getHeight()),
 								new HorizontalAndVerticalSize(entity.getWidth())))
-						.systemType(EnumAdaptor.valueOf(entity.getSystemType(), System.class)).build())
+						.systemType(EnumAdaptor.valueOf(entity.getSystemType(), System.class))
+						.imageInformation(
+								Optional.ofNullable(ImageInformation.createFromJavatype(entity.getDefaultAtr(),
+										entity.getRatio(), entity.getImgFileId(), entity.getImgFileName())))
+						.build())
 				.collect(Collectors.toList());
 	}
 
@@ -289,15 +302,13 @@ public class SptmtCreateFlowMenu extends UkJpaEntity
 	@Override
 	public List<ImageSetting> getImageSettings() {
 		return this.imageSettings.stream()
-				.map(entity -> ImageSetting.builder().fileId(Optional.ofNullable(entity.getFileId()))
-						.fileName(entity.getFileName() != null ? Optional.of(new FileName(entity.getFileName()))
-								: Optional.empty())
-						.isFixed(EnumAdaptor.valueOf(entity.getIsFixed(), FixedClassification.class))
-						.ratio(entity.getRatio())
+				.map(entity -> ImageSetting.builder()
 						.sizeAndPosition(new SizeAndPosition(new HorizontalAndVerticalSize(entity.getPk().column),
 								new HorizontalAndVerticalSize(entity.getPk().row),
 								new HorizontalAndVerticalSize(entity.getHeight()),
 								new HorizontalAndVerticalSize(entity.getWidth())))
+						.imageInformation(ImageInformation.createFromJavatype(entity.getIsFixed(), entity.getRatio(),
+								entity.getFileId(), entity.getFileName()))
 						.build())
 				.collect(Collectors.toList());
 	}

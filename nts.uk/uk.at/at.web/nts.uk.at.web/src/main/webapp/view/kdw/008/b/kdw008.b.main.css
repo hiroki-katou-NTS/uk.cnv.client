@@ -29,7 +29,7 @@
 	margin-left: 20px;
 } */
 #messageSwaplist {
-	margin-left: 412px;
+	margin-left: 413px;
 	width: 48%;
 	margin-bottom: -10px;
 }
@@ -101,9 +101,13 @@
 }
 
 .ntsSwapSearchRight {
-	right: -90px !important;
+	right: -94px !important;
 }
 
 .ntsMoveDataArea  {
 	padding: 0 10px; 
+}
+
+.tabs-list {
+	padding: 7px !important;
 }

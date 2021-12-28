@@ -1,0 +1,159 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+    <ui:composition template="/master/base.xhtml">
+        <ui:define name="htmlHead">
+
+            <com:ValidatorScript>
+                nts.uk.ctx.at.record.dom.jobmanagement.displayformat.RecordColumnDispName
+            </com:ValidatorScript>
+
+            <com:scriptfile set="IGNITE" />
+            <com:stylefile path="./kdw006.main.css" />
+            <com:scriptfile path="./kdw006.vm.js" />
+
+        </ui:define>
+
+        <ui:define name="content">
+            <div id="functions-area">
+                <a class="goback"
+                    data-bind="ntsLinkButton: { jump: '/view/kdw/006/a/index.xhtml' },text: $i18n('KDW006_25')"></a>
+                <button class="proceed" data-bind="text: $i18n('KDW006_26'), click: addOrUpdate"></button>
+            </div>
+            <div id="content-area" class="view-kdw">
+                <div id="tab-panel" data-bind="ntsTabPanel: { dataSource: tabs, active: selectedTab}">
+                    <div class="tab-content-1">
+                        <div class="title">
+                            <pre data-bind="i18n: 'KDW006_311'"></pre>
+                        </div>
+                        <div class="content">
+                            <div class="row-1">
+                                <div data-bind="ntsFormLabel: { enable: false}, text: $i18n('KDW006_312')"></div>
+                                <input class="ip-nameItem1" data-bind="ntsTextEditor: {
+                                        name:'#[KDW006_312]',
+                                        value: textInput1,
+                                        enabled: true,
+                                        option: {
+                                            width: '31px'},
+                                       constraint: 'RecordColumnDispName'
+                                }" />
+                                <button data-bind="text: $i18n('KDW006_55'), click: openDialogKDLDL1"></button>
+                                <span style="margin-left: 25px;" data-bind="text: $vm.nameAttendent1"></span>
+                            </div>
+                            <div class="row-2">
+                                <div data-bind="ntsFormLabel: { enable: false}, text: $i18n('KDW006_313')"></div>
+                                <input class="ip-nameItem2" data-bind="ntsTextEditor: {
+                                        name:'#[KDW006_313]',
+                                        value: textInput2,
+                                        enabled: true,
+                                        option: {
+                                            width: '31px'},
+                                        constraint: 'RecordColumnDispName'
+                                }" />
+                                <button data-bind="text: $i18n('KDW006_55'), click: openDialogKDLDL2"></button>
+                                <span style="margin-left: 25px;" data-bind="text: $vm.nameAttendent2"></span>
+                            </div>
+                            <div class="row-3">
+                                <div data-bind="ntsFormLabel: { enable: false}, text: $i18n('KDW006_314')"></div>
+                                <input class="ip-nameItem3" data-bind="ntsTextEditor: {
+                                        name:'#[KDW006_314]',
+                                        value: textInput3,
+                                        enabled: true,
+                                        option: {
+                                            width: '31px'},
+                                        constraint: 'RecordColumnDispName'
+                                }" />
+                                <button data-bind="text: $i18n('KDW006_55'), click: openDialogKDLDL3"></button>
+                                <span style="margin-left: 25px;" data-bind="text: $vm.nameAttendent3"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-content-2">
+                        <div class="title">
+                            <pre data-bind="i18n: 'KDW006_316'"></pre>
+                        </div>
+                        <div class="content">
+                            <div class="child-title">
+                                <div class="title-left" data-bind="i18n: 'KDW006_317'"></div>
+                                <div class="title-right" data-bind="i18n: 'KDW006_318'"></div>
+                            </div>
+                            <div>
+                                <div style="display: inline-block;">
+                                    <div style="margin-top: 10px" id="swap-list" data-bind="ntsSwapList: {
+                                            showSearchBox: { showLeft : true, showRight: true},
+                                            height: 373,
+                                            dataSource: $vm.itemsLeft,
+                                            primaryKey: 'id',
+                                            columns: columns2,
+                                            value: $vm.currentCodeListLeft,
+                                            searchMode: 'filter',
+                                            searchCriterion: ['id','name'],
+                                            draggable: true,
+                                            enableRowNumbering: false,
+                                            multipleDrag: { left: true, right: false },
+                                            innerDrag: { left: false, right: true },
+                                            outerDrag: { left: true, right: true },
+                                            itemsLimit: { right: 99}
+                                        }">
+                                    </div>
+                                    <div id="up-down" data-bind="ntsUpDown: {
+                                                targetSource: $vm.currentCodeListLeft,
+                                                primaryKey: 'code',
+                                                comId: '#swap-list',
+                                                type: 'swap',
+                                                swapTarget: 'right'}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-content-3">
+                        <div class="title">
+                            <pre data-bind="i18n: 'KDW006_319'"></pre>
+                        </div>
+                        <div class="content">
+                            <div class="child-title">
+                                <div class="title-left" data-bind="i18n: 'KDW006_320'"></div>
+                                <div class="title-right" data-bind="i18n: 'KDW006_321'"></div>
+                            </div>
+                            <div>
+                                <div style="display: inline-block;">
+                                    <div style="margin-top: 10px; float: left" id="swap-list-att" data-bind="ntsSwapList: {
+                                            showSearchBox: { showLeft : true, showRight: true},
+                                            height: 373,
+                                            dataSource: $vm.itemsRight,
+                                            primaryKey: 'id',
+                                            columns: columns2,
+                                            value: $vm.currentCodeListRight,
+                                            searchMode: 'filter',
+                                            searchCriterion: ['id','name'],
+                                            draggable: true,
+                                            enableRowNumbering: false,
+                                            multipleDrag: { left: true, right: false },
+                                            innerDrag: { left: false, right: true },
+                                            outerDrag: { left: true, right: true },
+                                            itemsLimit: { right: 99}
+                                        }">
+                                    </div>
+                                    <div id="up-down-att" data-bind="ntsUpDown: {
+                                                targetSource: $vm.currentCodeListRight,
+                                                primaryKey: 'code',
+                                                comId: '#swap-list-att',
+                                                type: 'swap',
+                                                swapTarget: 'right'}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ui:define>
+
+    </ui:composition>
+</body>
+
+</html>

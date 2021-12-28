@@ -91,7 +91,7 @@ public class ScheduleInformationByDateFileQuery {
             Optional<WorkTimeSetting> workTimeSetOpt = workTimeCode != null ? workTimeSettingList.stream().filter(wt -> wt.getWorktimeCode().equals(workTimeCode)).findFirst() : Optional.empty();
 
             // 4.1. 勤務形態を取得する() : return 就業時間帯の勤務形態
-            val workTimeForm = workTimeSetOpt.isPresent() ? workTimeSetOpt.get().getWorkTimeDivision().getWorkTimeForm() : null;
+            WorkTimeForm workTimeForm = workTimeSetOpt.isPresent() ? workTimeSetOpt.get().getWorkTimeDivision().getWorkTimeForm() : null;
 
             // 4.2. 就業時間帯の勤務形態 == フレックス勤務用: コアタイム時間帯を取得する
             Optional<TimeSpanForCalc> coreTimeOpt = Optional.empty();
@@ -175,7 +175,7 @@ public class ScheduleInformationByDateFileQuery {
             String workTimeName = workTimeSetOpt.isPresent() ? workTimeSetOpt.get().getWorkTimeDisplayName().getWorkTimeAbName().v() : null;
 
             // 勤務タイプ = 就業時間帯の設定.勤務区分.勤務形態を取得する()
-            Integer workType = workTimeForm.value;
+            Integer workType = workTimeForm != null ? workTimeForm.value : null;
 
             // コア開始時刻 = Optional<計算時間帯>．開始時刻 : ※4.2で取得したもの。
             Integer coreStartTime = coreTimeOpt.map(TimeSpanForCalc::start).orElse(null);

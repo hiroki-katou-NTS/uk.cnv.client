@@ -260,11 +260,12 @@ module nts.uk.com.view.ccg015.d {
         const ifr = document.getElementById('frameF1');
         const iframedoc = (ifr as any).contentDocument || (ifr as any).contentWindow.document;
         iframedoc.body.innerHTML = htmlSrc;
-        const width = iframedoc.activeElement.scrollWidth;
-        const height = iframedoc.activeElement.scrollHeight;
+        const width = iframedoc.activeElement.scrollWidth + 20;
+        const height = iframedoc.activeElement.scrollHeight + 20;
         (ifr as any).width = `${width.toString()}px`;
         (ifr as any).height = `${height.toString()}px`;
       }
+      nts.uk.com.view.ccg034.share.model.customload.loadLimitedLabelForIframe();
     }
 
     checkSaveLayout() {

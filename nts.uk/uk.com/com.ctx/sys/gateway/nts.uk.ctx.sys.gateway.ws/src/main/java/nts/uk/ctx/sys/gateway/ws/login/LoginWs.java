@@ -190,12 +190,8 @@ public class LoginWs extends WebService {
 	@POST
 	@Path("build_info_time")
 	public VerDto getBuildTime(@Context ServletContext context) {
-		File file = new File(context.getRealPath("/view/ccg/007/a/ccg007.a.start.js"));
-		if (!file.exists()) {
-			return VerDto.builder().ver("Please build js file!").build();
-		}
-		return VerDto.builder().ver(GeneralDateTime.legacyDateTime(new Date(file.lastModified()))
-				.toString("yyyy/MM/dd HH:mm")).build();
+		// リリースまで時間が無いのでとりあえずハードコーディング
+		return VerDto.builder().ver("Ver.1.1.1-1").build();
 	}
 	
 	/**

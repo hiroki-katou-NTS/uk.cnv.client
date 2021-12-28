@@ -312,14 +312,14 @@ public class JpaEmpInfoItemDataRepository extends JpaRepository implements EmpIn
 	
 	@Override
 	public void addAll(List<EmpInfoItemData> domains) {
-		String INS_SQL = "INSERT PPEMT_SYA_DATA_ITEM ( INS_DATE, INS_CCD, INS_SCD, INS_PG, "
+		String INS_SQL = "INSERT INTO PPEMT_SYA_DATA_ITEM ( INS_DATE, INS_CCD, INS_SCD, INS_PG, "
 				+ "  UPD_DATE,  UPD_CCD,  UPD_SCD, UPD_PG, "
 				+ "  EXCLUS_VER, CONTRACT_CD, "
 				+ "  RECORD_ID, PER_INFO_DEF_ID, SAVE_DATA_ATR, STRING_VAL , INT_VAL , DATE_VAL)"
 				+ "  VALUES (INS_DATE_VAL, INS_CCD_VAL, INS_SCD_VAL, INS_PG_VAL,"
 				+ "  UPD_DATE_VAL, UPD_CCD_VAL, UPD_SCD_VAL, UPD_PG_VAL, "
 				+ "  EXCLUS_VER_VAL, CONTRACT_CD_VAL, "
-				+ "  RECORD_ID_VAL, PER_INFO_DEF_ID_VAL, SAVE_DATA_ATR_VAL, STRING_VAL_VAL, INT_VAL_VAL, DATE_VAL_VAL)";
+				+ "  RECORD_ID_VAL, PER_INFO_DEF_ID_VAL, SAVE_DATA_ATR_VAL, STRING_VAL_VAL, INT_VAL_VAL, DATE_VAL_VAL);";
     	GeneralDateTime insertTime = GeneralDateTime.now();
     	String insCcd = AppContexts.user().companyCode();
     	String insScd = AppContexts.user().employeeCode();
@@ -344,7 +344,7 @@ public class JpaEmpInfoItemDataRepository extends JpaRepository implements EmpIn
 			sql = sql.replace("EXCLUS_VER_VAL", "0");
 			sql = sql.replace("CONTRACT_CD_VAL", "'" + contractCd + "'");
 			
-			sql = sql.replace("RECORD_ID_VAL", "'" + c.getRecordId() +"'");
+			sql = sql.replace("RECORD_ID_VAL", "'" + c.getRecordId() +"'").replace("_noData", "");
 			sql = sql.replace("PER_INFO_DEF_ID_VAL", "'" + c.getPerInfoDefId() +"'");
 			
 			sql = sql.replace("SAVE_DATA_ATR_VAL", ""+c.getDataState().getDataStateType().value +"");

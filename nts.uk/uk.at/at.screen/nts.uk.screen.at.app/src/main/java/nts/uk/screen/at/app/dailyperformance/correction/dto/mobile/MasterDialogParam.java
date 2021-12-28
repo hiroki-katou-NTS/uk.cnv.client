@@ -19,4 +19,6 @@ public class MasterDialogParam {
 	private String employeeID;
 	
 	private String workTypeCD;
+	
+	private List<Integer> itemIds;
 }

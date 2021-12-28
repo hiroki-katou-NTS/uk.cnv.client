@@ -66,7 +66,13 @@ public class DailyAttendanceTimePubImpl implements DailyAttendanceTimePub{
 			return notPresentValueForAttendanceTime();
 		}
 	}
-	
+
+	@Override
+	public IntegrationOfDaily calcOneDayAttendance(DailyAttendanceTimePubImport imp) {
+		List<IntegrationOfDaily> result = calcDailyAttendanceTime(imp);
+		return result.isEmpty() ? null : result.get(0);
+	}
+
 	/**
 	 * RequestList No.13
 	 */

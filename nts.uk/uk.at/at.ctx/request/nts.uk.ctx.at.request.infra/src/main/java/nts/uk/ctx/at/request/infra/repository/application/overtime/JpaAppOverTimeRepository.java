@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 
+import nts.uk.ctx.at.request.infra.entity.application.overtime.*;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -46,10 +47,6 @@ import nts.uk.ctx.at.request.dom.application.overtime.time36.Time36AgreeUpperLim
 import nts.uk.ctx.at.request.dom.application.overtime.time36.Time36AgreeUpperLimitPerMonth;
 import nts.uk.ctx.at.request.dom.application.stamp.StampRequestMode;
 import nts.uk.ctx.at.request.dom.setting.company.appreasonstandard.AppStandardReasonCode;
-import nts.uk.ctx.at.request.infra.entity.application.overtime.KrqdtAppOverTime;
-import nts.uk.ctx.at.request.infra.entity.application.overtime.KrqdtAppOvertimeInput;
-import nts.uk.ctx.at.request.infra.entity.application.overtime.KrqdtAppOvertimePK;
-import nts.uk.ctx.at.request.infra.entity.application.overtime.KrqdtOvertimeInputPK;
 import nts.uk.ctx.at.shared.dom.WorkInformation;
 import nts.uk.ctx.at.shared.dom.common.TimeZoneWithWorkNo;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
@@ -81,6 +78,20 @@ public class JpaAppOverTimeRepository extends JpaRepository implements AppOverTi
 				   .getSingle(x -> x.toDomain());
 		
 	}
+
+	@Override
+	public Optional<AppOverTime> findLatestMultipleOvertimeApp(String employeeId, GeneralDate appDate, PrePostAtr prePostAtr) {
+		return this.queryProxy().query("SELECT o FROM KrqdtAppOverTime o, KrqdtApplication a " +
+				"WHERE a.pk.companyID = o.krqdtAppOvertimePK.cid AND a.pk.appID = o.krqdtAppOvertimePK.appId " +
+				"AND o.overtimeAtr = 3 AND a.employeeID = :empId AND a.appDate = :appDate AND a.prePostAtr = :prePost " +
+				"ORDER BY a.inputDate DESC", KrqdtAppOverTime.class)
+				.setParameter("empId", employeeId)
+				.setParameter("appDate", appDate)
+				.setParameter("prePost", prePostAtr.value)
+				.getList(KrqdtAppOverTime::toDomain)
+				.stream().findFirst();
+	}
+
 	// KrqdtAppOverTime
 	@Override
 	public void add(AppOverTime appOverTime) {
@@ -211,6 +222,14 @@ public class JpaAppOverTimeRepository extends JpaRepository implements AppOverTi
 				
 									
 		}
+
+		if (appOverTime.getMultipleTimesOp().isPresent()) {
+			krqdtAppOverTime.multipleOvertimes = KrqdtAppOvertimeMultiTimes.fromDomain(
+					AppContexts.user().companyId(),
+					appOverTime.getAppID(),
+					appOverTime.getMultipleTimesOp().get()
+			);
+		}
 		
 		return krqdtAppOverTime;
 	}
@@ -299,394 +318,398 @@ public class JpaAppOverTimeRepository extends JpaRepository implements AppOverTi
 		});
 		updateAppOverTime.get().overtimeInputs = overtimeInputs;
 		
-		// updateAppOverTime.get().appOvertimeDetail = krqdtAppOverTime.appOvertimeDetail;
+		if (updateAppOverTime.get().multipleOvertimes != null) updateAppOverTime.get().multipleOvertimes.clear();
 		
 		this.commandProxy().update(updateAppOverTime.get());
 		this.getEntityManager().flush();
-	}
-	public AppOverTime toDomain(NtsResultRecord res) {
-		String pattern = "yyyy/MM/dd HH:mm:ss";
-		String pattern2 = "yyyy/MM/dd";
-		DateFormat df = new SimpleDateFormat(pattern);
-		DateFormat df2 = new SimpleDateFormat(pattern2);
-		String appID = res.getString("APP_ID");
-		Integer version = res.getInt("EXCLUS_VER");
-		PrePostAtr prePostAtr = EnumAdaptor.valueOf(res.getInt("PRE_POST_ATR"), PrePostAtr.class);
-		String enteredPerson = res.getString("ENTERED_PERSON_SID");
-		GeneralDateTime inputDate = GeneralDateTime.fromString(df.format(res.getDate("INPUT_DATE")), pattern);
-		ApplicationDate appDate = new ApplicationDate(GeneralDate.fromString(df2.format(res.getDate("APP_DATE")), pattern2));
-		ApplicationType appType = EnumAdaptor.valueOf(res.getInt("APP_TYPE"), ApplicationType.class);
-		String employeeID = res.getString("APPLICANTS_SID");
-		Application application = new Application(version, appID, prePostAtr, employeeID, appType, appDate, enteredPerson, inputDate, null);
-		if (res.getString("REASON_REVERSION") == null) {
-			application.setOpReversionReason(Optional.ofNullable(null));
-		}else {
-			application.setOpReversionReason(Optional.ofNullable(new ReasonForReversion(res.getString("REASON_REVERSION"))));			
-		}
-//		application.setAppDate(new ApplicationDate(GeneralDate.fromString(df2.format(res.getDate("APP_DATE")), pattern2)));
-		if (res.getInt("FIXED_REASON") == null) {
-			application.setOpAppStandardReasonCD(Optional.ofNullable(null));
-		}else {
-			application.setOpAppStandardReasonCD(Optional.ofNullable(new AppStandardReasonCode(res.getInt("FIXED_REASON"))));			
-		}
-		if (res.getString("APP_REASON") == null) {
-			application.setOpAppReason(Optional.ofNullable(null));
-		}else {
-			application.setOpAppReason(Optional.ofNullable(new AppReason(res.getString("APP_REASON"))));			
-		}
-//		application.setAppType(EnumAdaptor.valueOf(res.getInt("APP_TYPE"), ApplicationType.class));
-//		application.setEmployeeID(res.getString("APPLICANTS_SID"));
-		if (res.getDate("APP_START_DATE") == null) {
-			application.setOpAppStartDate(Optional.ofNullable(null));
-		}else {
-			application.setOpAppStartDate(Optional.of(new ApplicationDate(GeneralDate.fromString(df2.format(res.getDate("APP_START_DATE")), pattern2))));
-		}
-		if (res.getDate("APP_END_DATE") == null) {
-			application.setOpAppEndDate(Optional.ofNullable(null));
-		} else {
-			application.setOpAppEndDate(Optional.of(new ApplicationDate(GeneralDate.fromString(df2.format(res.getDate("APP_END_DATE")), pattern2))));
-		}
-		
-		if (res.getInt("STAMP_OPTION_ATR") == null) {
-			application.setOpStampRequestMode(Optional.ofNullable(null));
-		}else {
-			application.setOpStampRequestMode(Optional.of(EnumAdaptor.valueOf(res.getInt("STAMP_OPTION_ATR"), StampRequestMode.class)));
-		}
-		
-		AppOverTime appOverTime = new AppOverTime(application);
-		
-		Integer overtimeAtr = res.getInt("OVERTIME_ATR");
-		
-		String workTypeCode = res.getString("WORK_TYPE_CD");
-		
-		String workTimeCode = res.getString("WORK_TIME_CD");
-		
-		Integer workTimeStart1 = res.getInt("WORK_TIME_START1");
-		
-		Integer workTimeEnd1 = res.getInt("WORK_TIME_END1");
-		
-		Integer workTimeStart2 = res.getInt("WORK_TIME_START2");
-		
-		Integer workTimeEnd2 = res.getInt("WORK_TIME_END2");
-		
-		Integer divergenceNo1 = res.getInt("DIVERGENCE_NO1");
-		
-		String divergenceCD1 = res.getString("DIVERGENCE_CD1");
-		
-		String divergenceReason1 = res.getString("DIVERGENCE_REASON1");
-		
-		Integer divergenceNo2 = res.getInt("DIVERGENCE_NO2");
-		
-		String divergenceCD2 = res.getString("DIVERGENCE_CD2");
-		
-		String divergenceReason2 = res.getString("DIVERGENCE_REASON2");
-		
-		Integer flexExcessTime = res.getInt("FLEX_EXCESS_TIME");
-		
-		Integer overTimeNight = res.getInt("OVERTIME_NIGHT");
-		
-		Integer totalNight = res.getInt("TOTAL_NIGHT");
-		
-		Integer legalHdNight = res.getInt("LEGAL_HD_NIGHT");
-		
-		Integer nonLegalHdNight = res.getInt("NON_LEGAL_HD_NIGHT");
-		
-		Integer nonLegalPublicHdNight = res.getInt("NON_LEGAL_PUBLIC_HD_NIGHT");
-		
-		Integer breakTimeStart1 = res.getInt("BREAK_TIME_START1");
-		
-		Integer breakTimeEnd1 = res.getInt("BREAK_TIME_END1");
-		
-		Integer breakTimeStart2 = res.getInt("BREAK_TIME_START2");
-		
-		Integer breakTimeEnd2 = res.getInt("BREAK_TIME_END2");
-		
-		Integer breakTimeStart3 = res.getInt("BREAK_TIME_START3");
-		
-		Integer breakTimeEnd3 = res.getInt("BREAK_TIME_END3");
-		
-		Integer breakTimeStart4 = res.getInt("BREAK_TIME_START4");
-		
-		Integer breakTimeEnd4 = res.getInt("BREAK_TIME_END4");
-		
-		Integer breakTimeStart5 = res.getInt("BREAK_TIME_START5");
-		
-		Integer breakTimeEnd5 = res.getInt("BREAK_TIME_END5");
-		
-		Integer breakTimeStart6 = res.getInt("BREAK_TIME_START6");
-		
-		Integer breakTimeEnd6 = res.getInt("BREAK_TIME_END6");
-		
-		Integer breakTimeStart7 = res.getInt("BREAK_TIME_START7");
-		
-		Integer breakTimeEnd7 = res.getInt("BREAK_TIME_END7");
-		
-		Integer breakTimeStart8 = res.getInt("BREAK_TIME_START8");
-		
-		Integer breakTimeEnd8 = res.getInt("BREAK_TIME_END8");
-		
-		Integer breakTimeStart9 = res.getInt("BREAK_TIME_START9");
-		
-		Integer breakTimeEnd9 = res.getInt("BREAK_TIME_END9");
-		
-		Integer breakTimeStart10 = res.getInt("BREAK_TIME_START10");
-		
-		Integer breakTimeEnd10 = res.getInt("BREAK_TIME_END10");
-		
-		
-		appOverTime.setOverTimeClf(EnumAdaptor.valueOf(overtimeAtr, OvertimeAppAtr.class));
-		if (StringUtils.isNotBlank(workTimeCode) || StringUtils.isNotBlank(workTimeCode)) {
-			WorkInformation workInformation = new WorkInformation("", "");
-			appOverTime.setWorkInfoOp(Optional.of(workInformation));
-			if (StringUtils.isNotBlank(workTypeCode)) {
-				workInformation.setWorkTypeCode(workTypeCode);
-			}
-			if (StringUtils.isNotBlank(workTimeCode)) {
-				workInformation.setWorkTimeCode(workTimeCode);
-			}
-		}
-		List<TimeZoneWithWorkNo> workHoursOp = new ArrayList<TimeZoneWithWorkNo>();
-		List<TimeZoneWithWorkNo> breakTimeOp = new ArrayList<TimeZoneWithWorkNo>();
-		if (workTimeStart1 != null && workTimeEnd1 != null) {
-			
-			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, workTimeStart1, workTimeEnd1);
-			workHoursOp.add(timeZoneWithWorkNo);
-			appOverTime.setWorkHoursOp(Optional.of(workHoursOp));
-		}
-		if (workTimeStart2 != null && workTimeEnd2 != null) {
-			
-			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(2, workTimeStart2, workTimeEnd2);
-			workHoursOp.add(timeZoneWithWorkNo);		
-		}
-		appOverTime.setOpReversionReason(Optional.empty());
-		ReasonDivergence reasonDivergence1 = new ReasonDivergence();
-		ReasonDivergence reasonDivergence2 = new ReasonDivergence();
-		
-		ApplicationTime applicationTime = new ApplicationTime();
-		applicationTime.setFlexOverTime(Optional.ofNullable(flexExcessTime != null ? new AttendanceTimeOfExistMinus(flexExcessTime) : null));
-		// 112610
-		if (divergenceNo1 != null) {
-			reasonDivergence1.setDiviationTime(divergenceNo1);
-		}
-		if (divergenceCD1 != null) {
-			DiverdenceReasonCode reasonCode = new DiverdenceReasonCode(divergenceCD1);
-			reasonDivergence1.setReasonCode(reasonCode);
-		}
-		if (divergenceReason1 != null) {
-			DivergenceReason diReason = new DivergenceReason(divergenceReason1);
-			reasonDivergence1.setReason(diReason);
-		}
-		
-		if (divergenceNo2 != null) {
-			reasonDivergence2.setDiviationTime(divergenceNo2);
-		}
-		if (divergenceCD2 != null) {
-			DiverdenceReasonCode reasonCode = new DiverdenceReasonCode(divergenceCD2);
-			reasonDivergence2.setReasonCode(reasonCode);
-		}
-		if (divergenceReason2 != null) {
-			DivergenceReason diReason = new DivergenceReason(divergenceReason2);
-			reasonDivergence2.setReason(diReason);
-		}
-		List<ReasonDivergence> reasonDissociation;
-		List<ReasonDivergence> reasonDissociation2;
-		
-		if (!reasonDivergence1.isNullProp()) {
-			
-			reasonDissociation = new ArrayList<ReasonDivergence>();
-			reasonDissociation.add(reasonDivergence1);
-			applicationTime.setReasonDissociation(Optional.of(reasonDissociation));
-		}
-		
-		if (!reasonDivergence2.isNullProp()) {
-			reasonDissociation2 = new ArrayList<ReasonDivergence>();
-			reasonDissociation2.add(reasonDivergence2);
-			if(!applicationTime.getReasonDissociation().isPresent()) {
-				applicationTime.setReasonDissociation(Optional.of(reasonDissociation2));
-			}
-			if (applicationTime.getReasonDissociation().isPresent()) {
-				applicationTime.getReasonDissociation().get().add(reasonDivergence2);			
-			} 
-		}
 
-		OverTimeShiftNight overTimeShiftNight = new OverTimeShiftNight();
-		if (overTimeNight == null 
-				&& totalNight == null
-				&& legalHdNight == null 
-				&& nonLegalHdNight == null 
-				&& nonLegalPublicHdNight == null) {
-			applicationTime.setOverTimeShiftNight(Optional.empty());
-			
-		} else {
-			if (overTimeNight != null) {
-				overTimeShiftNight.setOverTimeMidNight(new AttendanceTime(overTimeNight));
-			}
-			if (totalNight != null) {
-				overTimeShiftNight.setMidNightOutSide(new AttendanceTime(totalNight));
-			}
-			List<HolidayMidNightTime> midNightHolidayTimes = new ArrayList<HolidayMidNightTime>();
-			if (legalHdNight != null) {
-				HolidayMidNightTime holidayMidNightTime = new HolidayMidNightTime();
-				holidayMidNightTime.setAttendanceTime(new AttendanceTime(legalHdNight));
-				holidayMidNightTime.setLegalClf(StaturoryAtrOfHolidayWork.WithinPrescribedHolidayWork);
-				midNightHolidayTimes.add(holidayMidNightTime);
-			}
-			
-			if (nonLegalHdNight != null) {
-				HolidayMidNightTime holidayMidNightTime = new HolidayMidNightTime();
-				holidayMidNightTime.setAttendanceTime(new AttendanceTime(nonLegalHdNight));
-				holidayMidNightTime.setLegalClf(StaturoryAtrOfHolidayWork.ExcessOfStatutoryHolidayWork);
-				midNightHolidayTimes.add(holidayMidNightTime);
-			}
-			
-			
-			if (nonLegalPublicHdNight != null) {
-				HolidayMidNightTime holidayMidNightTime = new HolidayMidNightTime();
-				holidayMidNightTime.setAttendanceTime(new AttendanceTime(nonLegalPublicHdNight));
-				holidayMidNightTime.setLegalClf(StaturoryAtrOfHolidayWork.PublicHolidayWork);
-				midNightHolidayTimes.add(holidayMidNightTime);
-			}
-			applicationTime.setOverTimeShiftNight(Optional.of(overTimeShiftNight));
-			
+		if (!CollectionUtil.isEmpty(krqdtAppOverTime.multipleOvertimes)) {
+			this.commandProxy().insertAll(krqdtAppOverTime.multipleOvertimes);
 		}
-		
-		if (breakTimeStart1 != null && breakTimeEnd1 != null) {
-			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart1, breakTimeEnd1);
-			breakTimeOp.add(timeZoneWithWorkNo);
-			appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));
-		}
-		
-		if (breakTimeStart2 != null && breakTimeEnd2 != null) {
-			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart2, breakTimeEnd2);
-			breakTimeOp.add(timeZoneWithWorkNo);
-			if (!appOverTime.getBreakTimeOp().isPresent()) {
-				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));				
-			}
-		}
-		if (breakTimeStart3 != null && breakTimeEnd3 != null) {
-			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart3, breakTimeEnd3);
-			breakTimeOp.add(timeZoneWithWorkNo);
-			if (!appOverTime.getBreakTimeOp().isPresent()) {
-				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));				
-			}
-		}
-		if (breakTimeStart4 != null && breakTimeEnd4 != null) {
-			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart4, breakTimeEnd4);
-			breakTimeOp.add(timeZoneWithWorkNo);
-			if (!appOverTime.getBreakTimeOp().isPresent()) {
-				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));				
-			}
-		}
-		
-		if (breakTimeStart5 != null && breakTimeEnd5 != null) {
-			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart5, breakTimeEnd5);
-			breakTimeOp.add(timeZoneWithWorkNo);
-			if (!appOverTime.getBreakTimeOp().isPresent()) {
-				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));				
-			}
-		}
-		
-		if (breakTimeStart6 != null && breakTimeEnd6 != null) {
-			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart6, breakTimeEnd6);
-			breakTimeOp.add(timeZoneWithWorkNo);
-			if (!appOverTime.getBreakTimeOp().isPresent()) {
-				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));				
-			}
-		}
-		
-		if (breakTimeStart7 != null && breakTimeEnd7 != null) {
-			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart7, breakTimeEnd7);
-			breakTimeOp.add(timeZoneWithWorkNo);
-			if (!appOverTime.getBreakTimeOp().isPresent()) {
-				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));				
-			}
-		}
-		
-		if (breakTimeStart8 != null && breakTimeEnd8 != null) {
-			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart8, breakTimeEnd8);
-			breakTimeOp.add(timeZoneWithWorkNo);
-			if (!appOverTime.getBreakTimeOp().isPresent()) {
-				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));				
-			}
-		}
-		
-		if (breakTimeStart9 != null && breakTimeEnd9 != null) {
-			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart9, breakTimeEnd9);
-			breakTimeOp.add(timeZoneWithWorkNo);
-			if (!appOverTime.getBreakTimeOp().isPresent()) {
-				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));				
-			}
-		}
-		
-		if (breakTimeStart10 != null && breakTimeEnd10 != null) {
-			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart10, breakTimeEnd10);
-			breakTimeOp.add(timeZoneWithWorkNo);
-			if (!appOverTime.getBreakTimeOp().isPresent()) {
-				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));				
-			}
-		}
-		
-
-		Integer applicationTime_detail = res.getInt("APPLICATION_TIME");
-		Integer year_month = res.getInt("YEAR_MONTH");
-		Integer actualTime = res.getInt("ACTUAL_TIME");
-		Integer limitErrorTime = res.getInt("LIMIT_ERROR_TIME");
-		Integer limitAlarmTime = res.getInt("LIMIT_ALARM_TIME");
-		Integer excLimitErrorTime = res.getInt("EXCEPTION_LIMIT_ERROR_TIME");
-		Integer excLimitAlarmTime = res.getInt("EXCEPTION_LIMIT_ALARM_TIME");
-		Integer numOfYear36Over = res.getInt("NUM_OF_YEAR36_OVER");
-		Integer actualTimeYear = res.getInt("ACTUAL_TIME_YEAR");
-		Integer limitTimeYear = res.getInt("LIMIT_TIME_YEAR");
-		Integer regApplicationTime = res.getInt("REG_APPLICATION_TIME");
-		Integer refActualTime = res.getInt("REG_ACTUAL_TIME");
-		Integer regLimitTime = res.getInt("REG_LIMIT_TIME");
-		Integer regLimitTimeMulti = res.getInt("REG_LIMIT_TIME_MULTI");
-		
-		Time36Agree time36Agree = new Time36Agree();
-		if (applicationTime_detail != null) {
-			time36Agree.setApplicationTime(new AttendanceTimeMonth(applicationTime_detail));			
-		}
-		Time36AgreeMonth agreeMonth = new Time36AgreeMonth();
-		agreeMonth.setActualTime(actualTime);
-		agreeMonth.setLimitErrorTime(limitErrorTime);
-		agreeMonth.setLimitAlarmTime(limitAlarmTime);
-		if (excLimitErrorTime != null) {
-			agreeMonth.setExceptionLimitErrorTime(excLimitErrorTime);			
-		}
-		if (excLimitAlarmTime != null) {
-			agreeMonth.setExceptionLimitAlarmTime(excLimitAlarmTime);			
-		}
-		agreeMonth.setNumOfYear36Over(numOfYear36Over);
-		time36Agree.setAgreeMonth(agreeMonth);
-		Time36AgreeAnnual agreeAnnual = new Time36AgreeAnnual();
-		agreeAnnual.setActualTime(new AttendanceTimeYear(actualTimeYear));
-		agreeAnnual.setLimitTime(new AgreementOneYearTime(limitTimeYear));
-		time36Agree.setAgreeAnnual(agreeAnnual);
-		
-		Time36AgreeUpperLimit time36AgreeUpperLimit = new Time36AgreeUpperLimit();
-		time36AgreeUpperLimit.setApplicationTime(new AttendanceTimeMonth(regApplicationTime));
-		Time36AgreeUpperLimitMonth agreeUpperLimitMonth = new Time36AgreeUpperLimitMonth();
-		agreeUpperLimitMonth.updateOverTime(refActualTime);
-		agreeUpperLimitMonth.updateUpperLimitTime(regLimitTime);
-		time36AgreeUpperLimit.setAgreeUpperLimitMonth(agreeUpperLimitMonth);
-		
-		Time36AgreeUpperLimitAverage agreeUpperLimitAverage = new Time36AgreeUpperLimitAverage();
-		List<Time36AgreeUpperLimitPerMonth> averageTimeLst = new ArrayList<Time36AgreeUpperLimitPerMonth>();
-		Integer startYm = res.getInt("START_YM");
-		Integer endYm = res.getInt("END_YM");
-		Integer avTime = res.getInt("AVE_TIME");
-		Integer totalTime = res.getInt("TOTAL_TIME");
-		Time36AgreeUpperLimitPerMonth time36AgreeUpperLimitPerMonth = new Time36AgreeUpperLimitPerMonth(
-				startYm,
-				endYm,
-				avTime,
-				totalTime);
-		averageTimeLst.add(time36AgreeUpperLimitPerMonth);
-		agreeUpperLimitAverage.setAverageTimeLst(averageTimeLst);
-		agreeUpperLimitAverage.setUpperLimitTime(new AgreementOneMonthTime(regLimitTimeMulti));
-		
-		return appOverTime;
 	}
+//	public AppOverTime toDomain(NtsResultRecord res) {
+//		String pattern = "yyyy/MM/dd HH:mm:ss";
+//		String pattern2 = "yyyy/MM/dd";
+//		DateFormat df = new SimpleDateFormat(pattern);
+//		DateFormat df2 = new SimpleDateFormat(pattern2);
+//		String appID = res.getString("APP_ID");
+//		Integer version = res.getInt("EXCLUS_VER");
+//		PrePostAtr prePostAtr = EnumAdaptor.valueOf(res.getInt("PRE_POST_ATR"), PrePostAtr.class);
+//		String enteredPerson = res.getString("ENTERED_PERSON_SID");
+//		GeneralDateTime inputDate = GeneralDateTime.fromString(df.format(res.getDate("INPUT_DATE")), pattern);
+//		ApplicationDate appDate = new ApplicationDate(GeneralDate.fromString(df2.format(res.getDate("APP_DATE")), pattern2));
+//		ApplicationType appType = EnumAdaptor.valueOf(res.getInt("APP_TYPE"), ApplicationType.class);
+//		String employeeID = res.getString("APPLICANTS_SID");
+//		Application application = new Application(version, appID, prePostAtr, employeeID, appType, appDate, enteredPerson, inputDate, null);
+//		if (res.getString("REASON_REVERSION") == null) {
+//			application.setOpReversionReason(Optional.ofNullable(null));
+//		}else {
+//			application.setOpReversionReason(Optional.ofNullable(new ReasonForReversion(res.getString("REASON_REVERSION"))));
+//		}
+////		application.setAppDate(new ApplicationDate(GeneralDate.fromString(df2.format(res.getDate("APP_DATE")), pattern2)));
+//		if (res.getInt("FIXED_REASON") == null) {
+//			application.setOpAppStandardReasonCD(Optional.ofNullable(null));
+//		}else {
+//			application.setOpAppStandardReasonCD(Optional.ofNullable(new AppStandardReasonCode(res.getInt("FIXED_REASON"))));
+//		}
+//		if (res.getString("APP_REASON") == null) {
+//			application.setOpAppReason(Optional.ofNullable(null));
+//		}else {
+//			application.setOpAppReason(Optional.ofNullable(new AppReason(res.getString("APP_REASON"))));
+//		}
+////		application.setAppType(EnumAdaptor.valueOf(res.getInt("APP_TYPE"), ApplicationType.class));
+////		application.setEmployeeID(res.getString("APPLICANTS_SID"));
+//		if (res.getDate("APP_START_DATE") == null) {
+//			application.setOpAppStartDate(Optional.ofNullable(null));
+//		}else {
+//			application.setOpAppStartDate(Optional.of(new ApplicationDate(GeneralDate.fromString(df2.format(res.getDate("APP_START_DATE")), pattern2))));
+//		}
+//		if (res.getDate("APP_END_DATE") == null) {
+//			application.setOpAppEndDate(Optional.ofNullable(null));
+//		} else {
+//			application.setOpAppEndDate(Optional.of(new ApplicationDate(GeneralDate.fromString(df2.format(res.getDate("APP_END_DATE")), pattern2))));
+//		}
+//
+//		if (res.getInt("STAMP_OPTION_ATR") == null) {
+//			application.setOpStampRequestMode(Optional.ofNullable(null));
+//		}else {
+//			application.setOpStampRequestMode(Optional.of(EnumAdaptor.valueOf(res.getInt("STAMP_OPTION_ATR"), StampRequestMode.class)));
+//		}
+//
+//		AppOverTime appOverTime = new AppOverTime(application);
+//
+//		Integer overtimeAtr = res.getInt("OVERTIME_ATR");
+//
+//		String workTypeCode = res.getString("WORK_TYPE_CD");
+//
+//		String workTimeCode = res.getString("WORK_TIME_CD");
+//
+//		Integer workTimeStart1 = res.getInt("WORK_TIME_START1");
+//
+//		Integer workTimeEnd1 = res.getInt("WORK_TIME_END1");
+//
+//		Integer workTimeStart2 = res.getInt("WORK_TIME_START2");
+//
+//		Integer workTimeEnd2 = res.getInt("WORK_TIME_END2");
+//
+//		Integer divergenceNo1 = res.getInt("DIVERGENCE_NO1");
+//
+//		String divergenceCD1 = res.getString("DIVERGENCE_CD1");
+//
+//		String divergenceReason1 = res.getString("DIVERGENCE_REASON1");
+//
+//		Integer divergenceNo2 = res.getInt("DIVERGENCE_NO2");
+//
+//		String divergenceCD2 = res.getString("DIVERGENCE_CD2");
+//
+//		String divergenceReason2 = res.getString("DIVERGENCE_REASON2");
+//
+//		Integer flexExcessTime = res.getInt("FLEX_EXCESS_TIME");
+//
+//		Integer overTimeNight = res.getInt("OVERTIME_NIGHT");
+//
+//		Integer totalNight = res.getInt("TOTAL_NIGHT");
+//
+//		Integer legalHdNight = res.getInt("LEGAL_HD_NIGHT");
+//
+//		Integer nonLegalHdNight = res.getInt("NON_LEGAL_HD_NIGHT");
+//
+//		Integer nonLegalPublicHdNight = res.getInt("NON_LEGAL_PUBLIC_HD_NIGHT");
+//
+//		Integer breakTimeStart1 = res.getInt("BREAK_TIME_START1");
+//
+//		Integer breakTimeEnd1 = res.getInt("BREAK_TIME_END1");
+//
+//		Integer breakTimeStart2 = res.getInt("BREAK_TIME_START2");
+//
+//		Integer breakTimeEnd2 = res.getInt("BREAK_TIME_END2");
+//
+//		Integer breakTimeStart3 = res.getInt("BREAK_TIME_START3");
+//
+//		Integer breakTimeEnd3 = res.getInt("BREAK_TIME_END3");
+//
+//		Integer breakTimeStart4 = res.getInt("BREAK_TIME_START4");
+//
+//		Integer breakTimeEnd4 = res.getInt("BREAK_TIME_END4");
+//
+//		Integer breakTimeStart5 = res.getInt("BREAK_TIME_START5");
+//
+//		Integer breakTimeEnd5 = res.getInt("BREAK_TIME_END5");
+//
+//		Integer breakTimeStart6 = res.getInt("BREAK_TIME_START6");
+//
+//		Integer breakTimeEnd6 = res.getInt("BREAK_TIME_END6");
+//
+//		Integer breakTimeStart7 = res.getInt("BREAK_TIME_START7");
+//
+//		Integer breakTimeEnd7 = res.getInt("BREAK_TIME_END7");
+//
+//		Integer breakTimeStart8 = res.getInt("BREAK_TIME_START8");
+//
+//		Integer breakTimeEnd8 = res.getInt("BREAK_TIME_END8");
+//
+//		Integer breakTimeStart9 = res.getInt("BREAK_TIME_START9");
+//
+//		Integer breakTimeEnd9 = res.getInt("BREAK_TIME_END9");
+//
+//		Integer breakTimeStart10 = res.getInt("BREAK_TIME_START10");
+//
+//		Integer breakTimeEnd10 = res.getInt("BREAK_TIME_END10");
+//
+//
+//		appOverTime.setOverTimeClf(EnumAdaptor.valueOf(overtimeAtr, OvertimeAppAtr.class));
+//		if (StringUtils.isNotBlank(workTimeCode) || StringUtils.isNotBlank(workTimeCode)) {
+//			WorkInformation workInformation = new WorkInformation("", "");
+//			appOverTime.setWorkInfoOp(Optional.of(workInformation));
+//			if (StringUtils.isNotBlank(workTypeCode)) {
+//				workInformation.setWorkTypeCode(workTypeCode);
+//			}
+//			if (StringUtils.isNotBlank(workTimeCode)) {
+//				workInformation.setWorkTimeCode(workTimeCode);
+//			}
+//		}
+//		List<TimeZoneWithWorkNo> workHoursOp = new ArrayList<TimeZoneWithWorkNo>();
+//		List<TimeZoneWithWorkNo> breakTimeOp = new ArrayList<TimeZoneWithWorkNo>();
+//		if (workTimeStart1 != null && workTimeEnd1 != null) {
+//
+//			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, workTimeStart1, workTimeEnd1);
+//			workHoursOp.add(timeZoneWithWorkNo);
+//			appOverTime.setWorkHoursOp(Optional.of(workHoursOp));
+//		}
+//		if (workTimeStart2 != null && workTimeEnd2 != null) {
+//
+//			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(2, workTimeStart2, workTimeEnd2);
+//			workHoursOp.add(timeZoneWithWorkNo);
+//		}
+//		appOverTime.setOpReversionReason(Optional.empty());
+//		ReasonDivergence reasonDivergence1 = new ReasonDivergence();
+//		ReasonDivergence reasonDivergence2 = new ReasonDivergence();
+//
+//		ApplicationTime applicationTime = new ApplicationTime();
+//		applicationTime.setFlexOverTime(Optional.ofNullable(flexExcessTime != null ? new AttendanceTimeOfExistMinus(flexExcessTime) : null));
+//		// 112610
+//		if (divergenceNo1 != null) {
+//			reasonDivergence1.setDiviationTime(divergenceNo1);
+//		}
+//		if (divergenceCD1 != null) {
+//			DiverdenceReasonCode reasonCode = new DiverdenceReasonCode(divergenceCD1);
+//			reasonDivergence1.setReasonCode(reasonCode);
+//		}
+//		if (divergenceReason1 != null) {
+//			DivergenceReason diReason = new DivergenceReason(divergenceReason1);
+//			reasonDivergence1.setReason(diReason);
+//		}
+//
+//		if (divergenceNo2 != null) {
+//			reasonDivergence2.setDiviationTime(divergenceNo2);
+//		}
+//		if (divergenceCD2 != null) {
+//			DiverdenceReasonCode reasonCode = new DiverdenceReasonCode(divergenceCD2);
+//			reasonDivergence2.setReasonCode(reasonCode);
+//		}
+//		if (divergenceReason2 != null) {
+//			DivergenceReason diReason = new DivergenceReason(divergenceReason2);
+//			reasonDivergence2.setReason(diReason);
+//		}
+//		List<ReasonDivergence> reasonDissociation;
+//		List<ReasonDivergence> reasonDissociation2;
+//
+//		if (!reasonDivergence1.isNullProp()) {
+//
+//			reasonDissociation = new ArrayList<ReasonDivergence>();
+//			reasonDissociation.add(reasonDivergence1);
+//			applicationTime.setReasonDissociation(Optional.of(reasonDissociation));
+//		}
+//
+//		if (!reasonDivergence2.isNullProp()) {
+//			reasonDissociation2 = new ArrayList<ReasonDivergence>();
+//			reasonDissociation2.add(reasonDivergence2);
+//			if(!applicationTime.getReasonDissociation().isPresent()) {
+//				applicationTime.setReasonDissociation(Optional.of(reasonDissociation2));
+//			}
+//			if (applicationTime.getReasonDissociation().isPresent()) {
+//				applicationTime.getReasonDissociation().get().add(reasonDivergence2);
+//			}
+//		}
+//
+//		OverTimeShiftNight overTimeShiftNight = new OverTimeShiftNight();
+//		if (overTimeNight == null
+//				&& totalNight == null
+//				&& legalHdNight == null
+//				&& nonLegalHdNight == null
+//				&& nonLegalPublicHdNight == null) {
+//			applicationTime.setOverTimeShiftNight(Optional.empty());
+//
+//		} else {
+//			if (overTimeNight != null) {
+//				overTimeShiftNight.setOverTimeMidNight(new AttendanceTime(overTimeNight));
+//			}
+//			if (totalNight != null) {
+//				overTimeShiftNight.setMidNightOutSide(new AttendanceTime(totalNight));
+//			}
+//			List<HolidayMidNightTime> midNightHolidayTimes = new ArrayList<HolidayMidNightTime>();
+//			if (legalHdNight != null) {
+//				HolidayMidNightTime holidayMidNightTime = new HolidayMidNightTime();
+//				holidayMidNightTime.setAttendanceTime(new AttendanceTime(legalHdNight));
+//				holidayMidNightTime.setLegalClf(StaturoryAtrOfHolidayWork.WithinPrescribedHolidayWork);
+//				midNightHolidayTimes.add(holidayMidNightTime);
+//			}
+//
+//			if (nonLegalHdNight != null) {
+//				HolidayMidNightTime holidayMidNightTime = new HolidayMidNightTime();
+//				holidayMidNightTime.setAttendanceTime(new AttendanceTime(nonLegalHdNight));
+//				holidayMidNightTime.setLegalClf(StaturoryAtrOfHolidayWork.ExcessOfStatutoryHolidayWork);
+//				midNightHolidayTimes.add(holidayMidNightTime);
+//			}
+//
+//
+//			if (nonLegalPublicHdNight != null) {
+//				HolidayMidNightTime holidayMidNightTime = new HolidayMidNightTime();
+//				holidayMidNightTime.setAttendanceTime(new AttendanceTime(nonLegalPublicHdNight));
+//				holidayMidNightTime.setLegalClf(StaturoryAtrOfHolidayWork.PublicHolidayWork);
+//				midNightHolidayTimes.add(holidayMidNightTime);
+//			}
+//			applicationTime.setOverTimeShiftNight(Optional.of(overTimeShiftNight));
+//
+//		}
+//
+//		if (breakTimeStart1 != null && breakTimeEnd1 != null) {
+//			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart1, breakTimeEnd1);
+//			breakTimeOp.add(timeZoneWithWorkNo);
+//			appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));
+//		}
+//
+//		if (breakTimeStart2 != null && breakTimeEnd2 != null) {
+//			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart2, breakTimeEnd2);
+//			breakTimeOp.add(timeZoneWithWorkNo);
+//			if (!appOverTime.getBreakTimeOp().isPresent()) {
+//				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));
+//			}
+//		}
+//		if (breakTimeStart3 != null && breakTimeEnd3 != null) {
+//			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart3, breakTimeEnd3);
+//			breakTimeOp.add(timeZoneWithWorkNo);
+//			if (!appOverTime.getBreakTimeOp().isPresent()) {
+//				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));
+//			}
+//		}
+//		if (breakTimeStart4 != null && breakTimeEnd4 != null) {
+//			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart4, breakTimeEnd4);
+//			breakTimeOp.add(timeZoneWithWorkNo);
+//			if (!appOverTime.getBreakTimeOp().isPresent()) {
+//				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));
+//			}
+//		}
+//
+//		if (breakTimeStart5 != null && breakTimeEnd5 != null) {
+//			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart5, breakTimeEnd5);
+//			breakTimeOp.add(timeZoneWithWorkNo);
+//			if (!appOverTime.getBreakTimeOp().isPresent()) {
+//				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));
+//			}
+//		}
+//
+//		if (breakTimeStart6 != null && breakTimeEnd6 != null) {
+//			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart6, breakTimeEnd6);
+//			breakTimeOp.add(timeZoneWithWorkNo);
+//			if (!appOverTime.getBreakTimeOp().isPresent()) {
+//				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));
+//			}
+//		}
+//
+//		if (breakTimeStart7 != null && breakTimeEnd7 != null) {
+//			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart7, breakTimeEnd7);
+//			breakTimeOp.add(timeZoneWithWorkNo);
+//			if (!appOverTime.getBreakTimeOp().isPresent()) {
+//				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));
+//			}
+//		}
+//
+//		if (breakTimeStart8 != null && breakTimeEnd8 != null) {
+//			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart8, breakTimeEnd8);
+//			breakTimeOp.add(timeZoneWithWorkNo);
+//			if (!appOverTime.getBreakTimeOp().isPresent()) {
+//				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));
+//			}
+//		}
+//
+//		if (breakTimeStart9 != null && breakTimeEnd9 != null) {
+//			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart9, breakTimeEnd9);
+//			breakTimeOp.add(timeZoneWithWorkNo);
+//			if (!appOverTime.getBreakTimeOp().isPresent()) {
+//				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));
+//			}
+//		}
+//
+//		if (breakTimeStart10 != null && breakTimeEnd10 != null) {
+//			TimeZoneWithWorkNo timeZoneWithWorkNo = new TimeZoneWithWorkNo(1, breakTimeStart10, breakTimeEnd10);
+//			breakTimeOp.add(timeZoneWithWorkNo);
+//			if (!appOverTime.getBreakTimeOp().isPresent()) {
+//				appOverTime.setBreakTimeOp(Optional.of(breakTimeOp));
+//			}
+//		}
+//
+//
+//		Integer applicationTime_detail = res.getInt("APPLICATION_TIME");
+//		Integer year_month = res.getInt("YEAR_MONTH");
+//		Integer actualTime = res.getInt("ACTUAL_TIME");
+//		Integer limitErrorTime = res.getInt("LIMIT_ERROR_TIME");
+//		Integer limitAlarmTime = res.getInt("LIMIT_ALARM_TIME");
+//		Integer excLimitErrorTime = res.getInt("EXCEPTION_LIMIT_ERROR_TIME");
+//		Integer excLimitAlarmTime = res.getInt("EXCEPTION_LIMIT_ALARM_TIME");
+//		Integer numOfYear36Over = res.getInt("NUM_OF_YEAR36_OVER");
+//		Integer actualTimeYear = res.getInt("ACTUAL_TIME_YEAR");
+//		Integer limitTimeYear = res.getInt("LIMIT_TIME_YEAR");
+//		Integer regApplicationTime = res.getInt("REG_APPLICATION_TIME");
+//		Integer refActualTime = res.getInt("REG_ACTUAL_TIME");
+//		Integer regLimitTime = res.getInt("REG_LIMIT_TIME");
+//		Integer regLimitTimeMulti = res.getInt("REG_LIMIT_TIME_MULTI");
+//
+//		Time36Agree time36Agree = new Time36Agree();
+//		if (applicationTime_detail != null) {
+//			time36Agree.setApplicationTime(new AttendanceTimeMonth(applicationTime_detail));
+//		}
+//		Time36AgreeMonth agreeMonth = new Time36AgreeMonth();
+//		agreeMonth.setActualTime(actualTime);
+//		agreeMonth.setLimitErrorTime(limitErrorTime);
+//		agreeMonth.setLimitAlarmTime(limitAlarmTime);
+//		if (excLimitErrorTime != null) {
+//			agreeMonth.setExceptionLimitErrorTime(excLimitErrorTime);
+//		}
+//		if (excLimitAlarmTime != null) {
+//			agreeMonth.setExceptionLimitAlarmTime(excLimitAlarmTime);
+//		}
+//		agreeMonth.setNumOfYear36Over(numOfYear36Over);
+//		time36Agree.setAgreeMonth(agreeMonth);
+//		Time36AgreeAnnual agreeAnnual = new Time36AgreeAnnual();
+//		agreeAnnual.setActualTime(new AttendanceTimeYear(actualTimeYear));
+//		agreeAnnual.setLimitTime(new AgreementOneYearTime(limitTimeYear));
+//		time36Agree.setAgreeAnnual(agreeAnnual);
+//
+//		Time36AgreeUpperLimit time36AgreeUpperLimit = new Time36AgreeUpperLimit();
+//		time36AgreeUpperLimit.setApplicationTime(new AttendanceTimeMonth(regApplicationTime));
+//		Time36AgreeUpperLimitMonth agreeUpperLimitMonth = new Time36AgreeUpperLimitMonth();
+//		agreeUpperLimitMonth.updateOverTime(refActualTime);
+//		agreeUpperLimitMonth.updateUpperLimitTime(regLimitTime);
+//		time36AgreeUpperLimit.setAgreeUpperLimitMonth(agreeUpperLimitMonth);
+//
+//		Time36AgreeUpperLimitAverage agreeUpperLimitAverage = new Time36AgreeUpperLimitAverage();
+//		List<Time36AgreeUpperLimitPerMonth> averageTimeLst = new ArrayList<Time36AgreeUpperLimitPerMonth>();
+//		Integer startYm = res.getInt("START_YM");
+//		Integer endYm = res.getInt("END_YM");
+//		Integer avTime = res.getInt("AVE_TIME");
+//		Integer totalTime = res.getInt("TOTAL_TIME");
+//		Time36AgreeUpperLimitPerMonth time36AgreeUpperLimitPerMonth = new Time36AgreeUpperLimitPerMonth(
+//				startYm,
+//				endYm,
+//				avTime,
+//				totalTime);
+//		averageTimeLst.add(time36AgreeUpperLimitPerMonth);
+//		agreeUpperLimitAverage.setAverageTimeLst(averageTimeLst);
+//		agreeUpperLimitAverage.setUpperLimitTime(new AgreementOneMonthTime(regLimitTimeMulti));
+//
+//		return appOverTime;
+//	}
 	@Override
 	public void remove(String companyID, String appID) {
 		this.commandProxy().remove(KrqdtAppOverTime.class, new KrqdtAppOvertimePK(companyID, appID));

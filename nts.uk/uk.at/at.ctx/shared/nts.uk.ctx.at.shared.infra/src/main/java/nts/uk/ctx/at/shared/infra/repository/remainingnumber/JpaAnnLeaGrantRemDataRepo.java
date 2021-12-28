@@ -218,6 +218,9 @@ public class JpaAnnLeaGrantRemDataRepo extends JpaRepository implements AnnLeaGr
 
 	@Override
 	public List<AnnualLeaveGrantRemainingData> checkConditionUniqueForAdd(String employeeId, GeneralDate grantDate) {
+		if (grantDate == null) {
+			return Collections.emptyList();
+		}
 		return this.queryProxy().query(CHECK_UNIQUE_SID_GRANTDATE_FOR_ADD, KRcmtAnnLeaRemain.class)
 				.setParameter("employeeId", employeeId)
 				.setParameter("grantDate", grantDate).getList(e -> toDomain(e));

@@ -9,6 +9,7 @@ import javax.ws.rs.Produces;
 import nts.arc.layer.ws.WebService;
 import nts.uk.ctx.at.shared.app.command.scherec.dailyattendanceitem.ControlOfAttendanceItemsCmd;
 import nts.uk.ctx.at.shared.app.command.scherec.dailyattendanceitem.UpdateControlOfAttendanceItemsCmdHandler;
+import nts.uk.ctx.at.shared.app.command.scherec.dailyattendanceitem.UpdateDailyAttendanceItemCommandHandler;
 import nts.uk.ctx.at.shared.app.find.scherec.dailyattendanceitem.ControlOfAttendanceItemsDto;
 import nts.uk.ctx.at.shared.app.find.scherec.dailyattendanceitem.ControlOfAttendanceItemsFinder;
 
@@ -20,6 +21,9 @@ public class ControlOfDailyWS extends WebService {
 
 	@Inject
 	private ControlOfAttendanceItemsFinder cOfAttendanceItemsFinder;
+	
+	@Inject
+	private UpdateDailyAttendanceItemCommandHandler updateDailyAttendanceItemCommandHandler;
 
 	@POST
 	@Path("findById/{id}")
@@ -31,5 +35,6 @@ public class ControlOfDailyWS extends WebService {
 	@Path("update")
 	public void update(ControlOfAttendanceItemsCmd command) {
 		this.uAttendanceItemsCmdHandler.handle(command);
+		this.updateDailyAttendanceItemCommandHandler.handle(command.getUpdateDailyAttendanceItemCommand());
 	}
 }

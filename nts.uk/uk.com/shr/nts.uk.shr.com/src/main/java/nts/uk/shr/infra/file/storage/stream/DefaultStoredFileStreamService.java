@@ -168,7 +168,7 @@ public class DefaultStoredFileStreamService implements StoredFileStreamService {
 			try {
 				Files.createDirectory(pathByTenant);
 			} catch (IOException e) {
-				FatalLog.write(DefaultStoredFileStreamService.class, "フォルダ作成に失敗：" + pathByTenant.toString());
+				throw FatalLog.writeThenException(this, "フォルダ作成に失敗：" + pathByTenant);
 			}
 		}
 

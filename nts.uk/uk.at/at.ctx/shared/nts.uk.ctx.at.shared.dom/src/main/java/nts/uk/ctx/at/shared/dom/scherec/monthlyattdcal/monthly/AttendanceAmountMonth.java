@@ -1,14 +1,14 @@
 package nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly;
 
-import nts.arc.primitive.IntegerPrimitiveValue;
-import nts.arc.primitive.constraint.IntegerRange;
+import nts.arc.primitive.LongPrimitiveValue;
+import nts.arc.primitive.constraint.LongRange;
 
 /**
  * 勤怠月間金額
  * @author shuichu_ishida
  */
-@IntegerRange(min = 0, max = 99999999)
-public class AttendanceAmountMonth extends IntegerPrimitiveValue<AttendanceAmountMonth> {
+@LongRange(min = -99999999999L, max = 99999999999L)
+public class AttendanceAmountMonth extends LongPrimitiveValue<AttendanceAmountMonth> {
 
 	/** serialVersionUID */
 	private static final long serialVersionUID = 1L;
@@ -17,7 +17,7 @@ public class AttendanceAmountMonth extends IntegerPrimitiveValue<AttendanceAmoun
 	 * コンストラクタ
 	 * @param amount 金額
 	 */
-	public AttendanceAmountMonth(Integer amount){
+	public AttendanceAmountMonth(long amount){
 		
 		super(amount);
 	}
@@ -27,7 +27,7 @@ public class AttendanceAmountMonth extends IntegerPrimitiveValue<AttendanceAmoun
 	 * @param amount 金額
 	 * @return 加算後の勤怠月間金額
 	 */
-	public AttendanceAmountMonth addAmount(Integer amount){
+	public AttendanceAmountMonth addAmount(long amount){
 	
 		return new AttendanceAmountMonth(this.v() + amount);
 	}

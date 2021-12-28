@@ -1,21 +1,42 @@
 package nts.uk.ctx.at.record.app.attendanceitem;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.log4j.Logger;
-import org.junit.Assert;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 
+import nts.arc.time.GeneralDate;
+import nts.uk.ctx.at.record.app.find.dailyattendance.timesheet.ouen.dto.OuenWorkTimeSheetOfDailyDto;
 import nts.uk.ctx.at.record.app.find.dailyperform.DailyRecordDto;
 import nts.uk.ctx.at.record.app.find.dailyperform.workinfo.dto.WorkInformationOfDailyDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyRecordWorkDto;
+import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDaily;
 import nts.uk.ctx.at.shared.dom.attendance.util.AttendanceItemUtilRes;
+import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.AttendanceItemIdContainer;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.AttendanceItemUtil.AttendanceItemType;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.ChoiceCode;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.OuenWorkTimeSheetOfDailyAttendance;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.SuppInfoCommentItem;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.SuppInfoNo;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.SuppInfoNumItem;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.SuppInfoSelectionItem;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.SuppInfoTimeItem;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.SuppNumValue;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.SupportFrameNo;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.TimeSheetOfAttendanceEachOuenSheet;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.WorkContent;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.WorkSuppComment;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.WorkSuppInfo;
+import nts.uk.ctx.at.shared.dom.worktime.predset.WorkNo;
 
 public class AttendanceItemRecordTest {
 
@@ -45,6 +66,52 @@ public class AttendanceItemRecordTest {
 //		
 //		Assert.assertTrue(missingIds.isEmpty());
 //	}
+
+	@Test
+	/** test item: 2251 -> 2650 */
+	public void test_dailyOuen() {
+		
+		List<OuenWorkTimeSheetOfDailyAttendance> ouenSheets = new ArrayList<>();
+		IntStream.range(1, 21).forEach(c -> ouenSheets.add(getOuen(c)));
+		OuenWorkTimeSheetOfDaily ouen = OuenWorkTimeSheetOfDaily.create("1", GeneralDate.today(), ouenSheets);
+		OuenWorkTimeSheetOfDailyDto dto = OuenWorkTimeSheetOfDailyDto.getDto(ouen);
+		List<Integer> itemIds = IntStream.range(2251, 2651).map(c -> c).boxed().collect(Collectors.toList());
+		List<ItemValue> values = AttendanceItemUtilRes.collect(dto, itemIds, AttendanceItemType.DAILY_ITEM);
+		values.stream().sorted((c1, c2) -> c1.itemId() - c2.itemId()).forEach(c -> {
+			assertThat(c.valueAsObjet()).isNotNull();
+//			System.out.println(c.path());
+//			System.out.println(c.getItemId() + " - " + c.getValue() + "-" + c.getValueType());
+		});
+		
+		OuenWorkTimeSheetOfDailyDto dto2 = OuenWorkTimeSheetOfDailyDto.getDto(null);
+		AttendanceItemUtilRes.merge(dto2, values, AttendanceItemType.DAILY_ITEM);
+		
+//		dto2.getOuenTimeSheet().stream().forEach(c -> {
+//			c.getWorkContent().getWorkSuppInfo().getComment().stream().forEach(x -> {
+//				assertThat(x.getValue()).isNotNull();
+//			});
+//			c.getWorkContent().getWorkSuppInfo().getNum().stream().forEach(x -> {
+//				assertThat(x.getValue()).isNotNull();
+//			});
+//			c.getWorkContent().getWorkSuppInfo().getSelection().stream().forEach(x -> {
+//				assertThat(x.getValue()).isNotNull();
+//			});
+//			c.getWorkContent().getWorkSuppInfo().getTime().stream().forEach(x -> {
+//				assertThat(x.getValue()).isNotNull();
+//			});
+//		});
+	}
+	
+	private OuenWorkTimeSheetOfDailyAttendance getOuen(int idx) {
+		return OuenWorkTimeSheetOfDailyAttendance.create(new SupportFrameNo(idx), 
+				WorkContent.create(null, Optional.empty(), Optional.of(new WorkSuppInfo(
+						IntStream.range(1, 6).boxed().map(x -> new SuppInfoTimeItem(new SuppInfoNo(x), new AttendanceTime(idx * 100 + x))).collect(Collectors.toList()),
+						IntStream.range(1, 6).boxed().map(x -> new SuppInfoNumItem(new SuppInfoNo(x), new SuppNumValue(idx * 100 + x))).collect(Collectors.toList()),
+						IntStream.range(1, 6).boxed().map(x -> new SuppInfoCommentItem(new SuppInfoNo(x), new WorkSuppComment("C" + (idx * 100 + x)))).collect(Collectors.toList()),
+						IntStream.range(1, 6).boxed().map(x -> new SuppInfoSelectionItem(new SuppInfoNo(x), new ChoiceCode("CC" + (idx * 100 + x)))).collect(Collectors.toList())))), 
+				TimeSheetOfAttendanceEachOuenSheet.create(new WorkNo(1), Optional.empty(), Optional.empty()), 
+				Optional.empty());
+	}
 	
 	@Test
 	public void test_toAttendanceItemDtoMonthly() {

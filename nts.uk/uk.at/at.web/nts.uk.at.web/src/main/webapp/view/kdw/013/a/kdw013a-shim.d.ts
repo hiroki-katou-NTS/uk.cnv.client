@@ -5,6 +5,12 @@ module nts.uk.ui.at.kdw013.a {
         readonly DELETE: string;
         readonly REGISTER: string;
         readonly CHANGE_DATE: string;
+        readonly START_F: string;
+        readonly ADD_FAV_TASK_F: string;
+        readonly UPDATE_TASK_NAME_F: string;
+        readonly START_G: string;
+        readonly ADD_FAV_TASK_G: string;
+        readonly UPDATE_TASK_NAME_G: string;
     };
 
     export type StartProcessDto = {
@@ -13,6 +19,8 @@ module nts.uk.ui.at.kdw013.a {
 
         // 参照可能職場・社員を取得する
         refWorkplaceAndEmployeeDto: GetRefWorkplaceAndEmployeeResultDto;
+
+		isChange: boolean;
     };
 
     export type ProcessInitialStartDto = {

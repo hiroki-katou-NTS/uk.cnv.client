@@ -93,7 +93,7 @@
             <div class="flex valign-center ml-10">
               <label id="A2_22">#{i18n.getText('KDL001_25')}</label>
               <a id="A2_23" class="hyperlink ml-10" href="#" data-bind="visible: isAttendanceRole">#{i18n.getText('KDL001_26')}</a>
-              <button id="A2_24" class="ml-10" data-bind="ntsHelpButton: { textId: 'KDL001_27', position: 'right top' }">?</button>
+              <button id="A2_24" class="ml-10" data-bind="ntsHelpButton: { textId: 'KDL001_27', position: 'right top' }, visible: isAttendanceRole">?</button>
             </div>
             <div class="query-zone">
               <div id="A2_25" class="panel panel-frame query-part" data-bind="foreach: defaultKeywords">

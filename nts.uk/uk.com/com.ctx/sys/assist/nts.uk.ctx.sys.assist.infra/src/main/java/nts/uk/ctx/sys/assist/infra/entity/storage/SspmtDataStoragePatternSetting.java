@@ -139,7 +139,7 @@ public class SspmtDataStoragePatternSetting extends UkJpaEntity
 	public void setPatternClassification(boolean patternClassification) {
 		if (pk == null)
 			pk = new SspmtDataStoragePatternSettingPk();
-		this.pk.patternClassification = patternClassification;
+		this.pk.patternClassification = BooleanUtils.toInteger(patternClassification);
 	}
 
 	@Override
@@ -168,7 +168,7 @@ public class SspmtDataStoragePatternSetting extends UkJpaEntity
 	@Override
 	public int getPatternClassification() {
 		if (pk != null)
-			return BooleanUtils.toInteger(pk.patternClassification);
+			return pk.patternClassification;
 		return 0;
 	}
 

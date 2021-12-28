@@ -41,7 +41,7 @@ public class RecoverWorkScheduleBeforeAppReflect {
 				Optional.empty(), new ArrayList<>(), workSchedule.getOutingTime(), workSchedule.getLstBreakTime(),
 				workSchedule.getOptAttendanceTime(), workSchedule.getOptTimeLeaving(),
 				workSchedule.getOptSortTimeWork(), Optional.empty(), Optional.empty(), Optional.empty(),
-				workSchedule.getLstEditState(), Optional.empty(), new ArrayList<>(), Optional.empty());
+				workSchedule.getLstEditState(), Optional.empty(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), Optional.empty());
 
 		// 申請取消の処理
 		DailyAfterAppReflectResult cancellationResult = CancellationOfApplication.process(require, application, date,

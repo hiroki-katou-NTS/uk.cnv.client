@@ -1,5 +1,7 @@
 package nts.uk.screen.at.app.kdw013.a;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,17 +14,9 @@ import lombok.Getter;
 @Getter
 public class WorkDetailsParamCommand {
 	// 応援勤務枠No: 応援勤務枠No
-	private int supportFrameNo;
+	private List<Integer> supportFrameNos;
 	
 	// 時間帯: 時間帯
 	private TimeZoneCommand timeZone;
-	// 作業グループ
-	private WorkGroupCommand workGroup;
-	
-	// 備考: 作業入力備考
-	private String remarks;
-	
-	// 勤務場所: 勤務場所コード
-	private String workLocationCD;
 
 }

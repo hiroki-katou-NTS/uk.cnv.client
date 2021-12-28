@@ -9,8 +9,6 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.ControlOfAttendanceI
 @Getter
 @Setter
 public class ControlOfAttendanceItemsDto {
-	
-
 	/**会社ID*/
 	private String companyID;
 	
@@ -20,23 +18,18 @@ public class ControlOfAttendanceItemsDto {
 	/**日別実績のヘッダ背景色*/
 	private String headerBgColorOfDailyPer;
 
-	/**時間項目の入力単位*/
-	private BigDecimal inputUnitOfTimeItem;
-	
-	public ControlOfAttendanceItemsDto(String companyID, int itemDailyID, String headerBgColorOfDailyPer, BigDecimal inputUnitOfTimeItem) {
+	public ControlOfAttendanceItemsDto(String companyID, int itemDailyID, String headerBgColorOfDailyPer) {
 		super();
 		this.companyID = companyID;
 		this.itemDailyID = itemDailyID;
 		this.headerBgColorOfDailyPer = headerBgColorOfDailyPer;
-		this.inputUnitOfTimeItem = inputUnitOfTimeItem;
 	}
 	
 	public static ControlOfAttendanceItemsDto fromDomain(ControlOfAttendanceItems domain) {
 		return new ControlOfAttendanceItemsDto(
 				domain.getCompanyID(),
 				domain.getItemDailyID(),
-				!domain.getHeaderBgColorOfDailyPer().isPresent() ?null:domain.getHeaderBgColorOfDailyPer().get().v(),
-				!domain.getInputUnitOfTimeItem().isPresent()?null: domain.getInputUnitOfTimeItem().get()
-				);
+				!domain.getHeaderBgColorOfDailyPer().isPresent() ?null:domain.getHeaderBgColorOfDailyPer().get().v()
+		);
 	}
 }

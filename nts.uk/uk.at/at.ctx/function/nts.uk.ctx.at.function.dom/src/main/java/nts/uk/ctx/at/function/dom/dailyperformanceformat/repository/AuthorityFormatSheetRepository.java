@@ -15,6 +15,8 @@ public interface AuthorityFormatSheetRepository {
 	
 	void add(AuthorityFormatSheet authorityFormatSheet);
 	
+	void add(List<AuthorityFormatSheet> listAuthorityFormatSheet);
+	
 	void update(AuthorityFormatSheet authorityFormatSheet);
 	
 	void remove(String companyId, DailyPerformanceFormatCode dailyPerformanceFormatCode);

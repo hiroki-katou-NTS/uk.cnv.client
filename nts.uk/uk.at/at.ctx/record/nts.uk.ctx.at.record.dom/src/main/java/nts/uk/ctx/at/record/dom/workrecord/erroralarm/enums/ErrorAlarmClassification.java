@@ -13,11 +13,11 @@ import lombok.AllArgsConstructor;
 public enum ErrorAlarmClassification {
 
 	/* エラー */
-	ERROR(0, "Enum_ErrorAlarmClassification_Error"),
+	ERROR(0, "エラー"),
 	/* アラーム */
-	ALARM(1, "Enum_ErrorAlarmClassification_Alarm"),
+	ALARM(1, "アラーム"),
 	/* その他 */
-	OTHER(2, "Enum_ErrorAlarmClassification_Other");
+	OTHER(2, "その他");
 
 	public final int value;
 

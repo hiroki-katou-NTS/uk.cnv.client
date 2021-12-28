@@ -20,5 +20,17 @@ public class Confirmer extends ValueObject {
 	
 	/** 確認日時 */
 	private GeneralDateTime confirmDateTime;
+	
+	// [C-1] 新規作成
+	/**
+	 * confirmSID
+	 * 
+	 * @return 確認者
+	 */
+	public static Confirmer createNew(String confirmSID) {
+		// $確認日時 = 日時#今()
+		// return 確認者#確認者(社員ID,$確認日時)
+		return new Confirmer(confirmSID, GeneralDateTime.now());
+	}
 
 }

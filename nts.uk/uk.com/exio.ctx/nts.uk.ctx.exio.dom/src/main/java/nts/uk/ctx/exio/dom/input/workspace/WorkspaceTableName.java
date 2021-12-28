@@ -7,7 +7,6 @@ import nts.uk.ctx.exio.dom.input.ExecutionContext;
 public class WorkspaceTableName {
 	
 	private final ExecutionContext context;
-	private final String workspaceName;
 
 	public String asRevised() {
 		return create("REVI_");
@@ -18,6 +17,6 @@ public class WorkspaceTableName {
 	}
 
 	private String create(String type) {
-		return TemporaryTable.createTableName(context, type + workspaceName);
+		return TemporaryTable.createTableName(context, type);
 	}
 }

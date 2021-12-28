@@ -265,6 +265,10 @@ module nts.uk.at.view.kmf002.e.sidebar {
 //                        self.isDisableSetUnitBtn(false) ;
 //                        
 //                    }
+                    if (_.isNil(data)) {
+                      dfd.resolve();
+                      return;
+                    }
                     if (data.managePublicHoliday == null) {
                         self.managePublicHoliday(ManagePubHD.MANAGE);
                         self.isDisableSetUnitBtn(false) ;

@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+    <ui:composition template="../../../../master/dialog.xhtml">
+        <ui:define name="htmlHead">
+            <script>
+                var dialogSize = {
+                    width: 400,
+                    height: 340
+                };
+            </script>
+
+            <com:scriptfile set="IGNITE" />
+            <com:stylefile path="./kdw013.k.main.css" />
+            <com:scriptfile path="./kdw013.k.vm.js" />
+        </ui:define>
+
+        <!-- PAGE CONTENT -->
+        <ui:define name="content">
+            <div id="contents-area">
+                <div data-bind="text: $i18n('KDW013_60')"></div>
+                <div style="margin-left: 10px;" class="content">
+                    <div tabindex="1" data-bind="ntsFormLabel: {text: $i18n('KDW013_61')}"></div>
+                    <div tabindex="2" class="data-input" data-bind="ntsDatePicker: {
+                        name: '#[KDW013_61]', 
+                        required: true, 
+                        value: $vm.data, 
+                        dateFormat: 'YYYY/MM/DD', 
+                        enable: true}"></div>
+                </div>
+            </div>
+            <div id="functions-area-bottom">
+                <button class="x-large proceed" tabindex="3" data-bind="text: $i18n('KDW013_43'), click: done"></button>
+                <button class="large" tabindex="4" data-bind="click: cancel, text: $i18n('KDW013_37')"></button>
+            </div>
+        </ui:define>
+    </ui:composition>
+</body>
+
+</html>

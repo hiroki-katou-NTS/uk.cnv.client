@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,6 +33,7 @@ import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItem;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemRepository;
 import nts.uk.ctx.at.shared.dom.workrecord.workperfor.dailymonthlyprocessing.enums.ExecutionType;
 import nts.uk.ctx.at.shared.dom.workrule.closure.service.GetClosureStartForEmployee;
+import nts.uk.screen.at.app.checkarbitraryitems.CheckArbitraryItems;
 import nts.uk.screen.at.app.dailymodify.command.DailyModifyResCommandFacade;
 import nts.uk.screen.at.app.dailymodify.query.DailyModifyQuery;
 import nts.uk.screen.at.app.dailymodify.query.DailyModifyResult;
@@ -59,6 +60,9 @@ public class ProcessDailyCalc {
 	
 	@Inject
 	private OptionalItemRepository optionalMasterRepo;
+	
+	@Inject
+	private CheckArbitraryItems checkArbitraryItems;
 	
 	@Inject
 	private RecordDomRequireService requireService;
@@ -97,7 +101,13 @@ public class ProcessDailyCalc {
 			List<DPItemValue> items = validatorDataDaily.checkCareItemDuplicate(itemCovert, itemOlds);
 			itemErrors.addAll(items);
 			List<DPItemValue> itemInputs = validatorDataDaily.checkInputData(itemCovert, itemValues);
+			// 開始終了時刻順序不正チェック
+			List<DPItemValue> itemInputsPlus = validatorDataDaily.checkInputDataPlus(itemCovert, itemValues);
+			// 任意項目の入力チェック
+			List<DPItemValue> checkInputOptionlItems = checkArbitraryItems.check(itemCovert, itemValues);
 			itemInputErors.addAll(itemInputs);
+			itemInputErors.addAll(itemInputsPlus);
+			itemInputErors.addAll(checkInputOptionlItems);
 			itemInputWorkType = lstNotFoundWorkType.stream().filter(
 					wt -> wt.getEmployeeId().equals(x.getKey().getLeft()) && wt.getDate().equals(x.getKey().getRight()))
 					.collect(Collectors.toList());

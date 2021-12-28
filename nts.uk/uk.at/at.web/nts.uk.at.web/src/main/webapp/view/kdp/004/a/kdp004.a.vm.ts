@@ -277,6 +277,11 @@ module nts.uk.at.view.kdp004.a {
 			}
 
 			alwaysLoadMessage(param: number) {
+				const vm = new ko.ViewModel();
+				vm.$date.interval(100);
+				setTimeout(() => {
+					vm.$date.interval( param * 60000);
+				}, 1000);
 				if (param > 0) {
 					setInterval(() => {
 						this.loadNotice();
@@ -555,11 +560,12 @@ module nts.uk.at.view.kdp004.a {
 			public clickBtn1(btn: any, layout: any) {
 
 				const vm = this;
+				const mVm = new ko.ViewModel()
 				vm.getWorkPlacesInfo();
 				nts.uk.ui.block.invisible();
-				let stampTime = moment(new Date()).format("HH:mm");
-				let stampDateTime = moment(new Date()).format();
-				
+				let stampTime = moment(mVm.$date.now()).format("HH:mm");
+				let stampDateTime = moment(mVm.$date.now()).format();
+
 				vm.doAuthent().done((res: IAuthResult) => {
 
 					if (res.isSuccess) {
@@ -914,7 +920,7 @@ module nts.uk.at.view.kdp004.a {
 					screen: "KDP004"
 				});
 
-				vm.$window.modal('/view/kdp/002/b/index.xhtml', {stampTime: stampTime});
+				vm.$window.modal('/view/kdp/002/b/index.xhtml', { stampTime: stampTime });
 			}
 
 			public openScreenC(button, layout, loginInfo) {

@@ -14,7 +14,7 @@ import nts.arc.time.GeneralDate;
 public class StartWorkInputPanelParam {
 
 	// 社員ID
-	private String sId;
+	private String employeeId;
 
 	// 基準日
 	private GeneralDate refDate;

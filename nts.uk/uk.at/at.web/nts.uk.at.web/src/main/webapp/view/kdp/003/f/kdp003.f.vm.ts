@@ -617,7 +617,6 @@ module nts.uk.at.kdp003.f {
 								.then(() => vm.$ajax('com', api, submitData))
 								.fail((data: TimeStampLoginData) => {
 									if (data.msgErrorId !== null) {
-										console.log(data);
 										dataResultLogin = data;
 										vm.$dialog.error({ messageId: data.messageId, message: data.message });
 										showDialogError = true;

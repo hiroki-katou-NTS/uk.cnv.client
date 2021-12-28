@@ -250,7 +250,7 @@ module nts.uk.at.view.kmp001.c {
 				oldIndex = _.map(ko.unwrap(vm.items), m => m.stampNumber).indexOf(command.cardNumber),
 				newIndex = oldIndex == ko.unwrap(vm.items).length - 1 ? oldIndex - 1 : oldIndex;
 
-			if (ko.toJS(vm.employee.employeeId) == '' || ko.toJS(vm.model.stampNumber) == '') {
+			if (ko.toJS(vm.employee.employeeId) == '' || ko.toJS(vm.model.stampNumber) == '' || ko.toJS(vm.employee.employeeId) == undefined ) {
 				vm.$dialog.info({ messageId: "Msg_1680" });
 			} else {
 				vm.$blockui("invisible");

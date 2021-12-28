@@ -51,7 +51,10 @@ class StampClock {
 
     public addCorrectionInterval(minute: number) {
         let self = this;
-		self.vm.$date.interval(minute * 60000);
+            self.vm.$date.interval(100);
+        setTimeout(() => {
+		    self.vm.$date.interval(minute * 60000);
+        }, 1000);
     }
 }
 

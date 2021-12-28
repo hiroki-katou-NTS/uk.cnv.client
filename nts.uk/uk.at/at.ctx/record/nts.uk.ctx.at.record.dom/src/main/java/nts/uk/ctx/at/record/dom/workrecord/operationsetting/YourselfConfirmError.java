@@ -11,11 +11,11 @@ public enum YourselfConfirmError {
 	/**
 	 * エラーを訂正するまでチェックできない
 	 */
-	CANNOT_CHECKED_WHEN_ERROR(1), 
-	/**
-	 * エラーを訂正するまで登録できない
-	 */
-	CANNOT_REGISTER_WHEN_ERROR(2);
+	CANNOT_CHECKED_WHEN_ERROR(1);
+//	/**
+//	 * エラーを訂正するまで登録できない
+//	 */
+//	CANNOT_REGISTER_WHEN_ERROR(2);
 	
 	public final int value;
 	

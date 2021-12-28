@@ -12,6 +12,7 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import lombok.val;
+import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.task.tran.AtomTask;
 import nts.arc.task.tran.TransactionService;
 import nts.gul.collection.CollectionUtil;
@@ -83,8 +84,10 @@ public class ProcessMonthlyCalc {
 		}
 		List<String> sids = new ArrayList<>();
 		sids.add(month.getEmployeeId());
+		CacheCarrier carrier = new CacheCarrier();
+		carrier.get(IntegrationOfDaily.class.getName(), () -> domainDailyNew);
 		//社員の月別実績を集計する
-		List<AtomTask> listAtomTask = monthlyAggregateForEmployeesPub.aggregate(cid, sids, checkUnLock);
+		List<AtomTask> listAtomTask = monthlyAggregateForEmployeesPub.aggregate(carrier, cid, sids, checkUnLock);
 		listAtomTask.forEach(x -> transaction.execute(x));
 		
 		// 集計後エラーチェック

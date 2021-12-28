@@ -32,12 +32,12 @@ public class ShiftEstimateImpl extends JpaRepository implements ShiftEstimateRep
 			+ " 		,eas.SPHD_ATR " + " 		,eas.HALF_DAY_ATR" + " 		,STUFF(( SELECT "
 			+ " ','+kpi.PREMIUM_NAME " + " 				 FROM KSCMT_EST_AGGREGATE eas "
 			//+ " INNER JOIN KSCMT_PER_COST_EXTRA_ITEM cei ON eas.CID = cei.CID "
-			+ " INNER JOIN 	KSCMT_PREMIUM_ITEM kpi ON eas.CID = kpi.CID AND "
+			+ " INNER JOIN 	KSRMT_PREMIUM_ITEM kpi ON eas.CID = kpi.CID AND "
 			//+ " eas.PREMIUM_NO = kpi.PREMIUM_NO "
 			+ "  WHERE eas.CID = ?cid AND kpi.USE_ATR= 1 ORDER BY kpi.PREMIUM_NO ASC FOR XML PATH ('') ), 1, 1, '' ) AS NAME"
 			+ " FROM KSCMT_EST_AGGREGATE eas "
 			//" INNER JOIN KSCMT_PER_COST_EXTRA_ITEM cei ON eas.CID = cei.CID "
-			+ " INNER JOIN KSCMT_PREMIUM_ITEM kpi ON eas.CID = kpi.CID AND " + "" +
+			+ " INNER JOIN KSRMT_PREMIUM_ITEM kpi ON eas.CID = kpi.CID AND " + "" +
 			//"eas.PREMIUM_NO = kpi.PREMIUM_NO " +
 			" AND kpi.USE_ATR= 1 "
 			+ " WHERE eas.CID = ?cid" + " 	GROUP BY eas.YEAR_HD_ATR ,eas.HAVY_HD_ATR ,eas.SPHD_ATR ,eas.HALF_DAY_ATR";

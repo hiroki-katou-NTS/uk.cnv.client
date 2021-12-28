@@ -2,12 +2,14 @@ package nts.uk.ctx.at.shared.infra.repository.holidaysetting.employee.carryForwa
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import javax.ejb.Stateless;
 
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.employee.carryForwarddata.PublicHolidayCarryForwardData;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.employee.carryForwarddata.PublicHolidayCarryForwardDataRepository;
 import nts.uk.ctx.at.shared.infra.entity.holidaysetting.employee.carryForwarddata.KshdtHdpubRem;
@@ -16,7 +18,7 @@ import nts.uk.ctx.at.shared.infra.entity.holidaysetting.employee.carryForwarddat
 @Stateless
 public class JpaPublicHolidayCarryForwardDataRepo extends JpaRepository implements PublicHolidayCarryForwardDataRepository{
 	
-	private static final String GET_ALL_BY_SID = "SELECT a FROM KshdtHdpubRem a WHERE k.pk.employeeId IN :emplyeeIds";
+	private static final String GET_ALL_BY_SID = "SELECT a FROM KshdtHdpubRem a WHERE a.pk.employeeId IN :emplyeeIds";
 	
 	private static final String REMOVE_BY_SID = "DELETE FROM KshdtHdpubRem a"
 			+ " WHERE a.pk.employeeId = :employeeId";
@@ -43,9 +45,9 @@ public class JpaPublicHolidayCarryForwardDataRepo extends JpaRepository implemen
 	@Override
 	public List<PublicHolidayCarryForwardData> getAll(List<String> employeeIds) {
 		List<PublicHolidayCarryForwardData> resultList = new ArrayList<>();
-		
+		if (CollectionUtil.isEmpty(employeeIds)) return Collections.emptyList();
 		resultList.addAll(this.queryProxy().query(GET_ALL_BY_SID,KshdtHdpubRem.class)
-				.setParameter("employeeId", employeeIds)
+				.setParameter("emplyeeIds", employeeIds)
 				.getList(entity -> PublicHolidayCarryForwardData.createFromJavaType(
 						entity.getPk().employeeId,
 						entity.getCarriedforward(),

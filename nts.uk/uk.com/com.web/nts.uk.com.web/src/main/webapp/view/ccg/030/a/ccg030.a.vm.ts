@@ -53,6 +53,7 @@ module ccg030.a.viewmodel {
         /** Creat new FlowMenu */
         createNewFlowMenu() {
             var self = this;
+            self.isCreate(true);
             var topPageCode = ko.mapping.toJS('');
             self.selectedFlowMenuCD(null);
             self.selectedFlowMenu().topPageCode("");
@@ -168,7 +169,7 @@ module ccg030.a.viewmodel {
             }
             else {
                 self.selectedFlowMenu(new model.FlowMenu());
-                self.isCreate(true);
+                self.createNewFlowMenu();
             }
             self.focusToInput();
             _.defer(() => { errors.clearAll(); });
@@ -197,7 +198,7 @@ module ccg030.a.viewmodel {
                 }
                 else {
                     self.findFlowMenu(null);
-                    self.isCreate(true);
+                    self.createNewFlowMenu();
                 }
                 dfd.resolve();
             }).fail((error) => {

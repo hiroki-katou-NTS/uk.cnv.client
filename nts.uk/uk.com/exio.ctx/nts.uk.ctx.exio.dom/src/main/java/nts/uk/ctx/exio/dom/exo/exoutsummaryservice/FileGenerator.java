@@ -44,7 +44,7 @@ public class FileGenerator extends AsposeCellsReportGenerator {
 		val sheet = workbook.getWorksheets().get(0);
 		val cells = sheet.getCells();
 
-		List<String> headers = dataSource.getHeaders();
+		val headers = dataSource.getHeaders();
 		List<Map<String, Object>> datas = dataSource.getDatas();
 		
 		int headerRowStart = 0;
@@ -99,25 +99,29 @@ public class FileGenerator extends AsposeCellsReportGenerator {
 		dataCell.setStyle(style);
 	}
 
-	private void drawHeader(Cells cells, List<String> headers, int headerRowStart) {
+	private void drawHeader(Cells cells, Map<String,String> headers, int headerRowStart) {
 
-		for (int j = 0; j < headers.size(); j++) {
+		int j = 0;
+		for ( val item:  headers.entrySet()) {
 			Cell header = cells.get(headerRowStart, START_COLUMN + j);
-			header.setValue(headers.get(j));
+			header.setValue(item.getValue());
 			Style style = this.getCellStyleNoBorder(header.getStyle());
 			header.setStyle(style);
+			j++;
 		}
 	}
 	
-	private void drawTableBody(Cells cells, List<String> headers, List<Map<String, Object>> datas, int dataRowStart) {
+	private void drawTableBody(Cells cells, Map<String,String> headers, List<Map<String, Object>> datas, int dataRowStart) {
 
 		for (int i = 0; i < datas.size(); i++) {
 			Map<String, Object> data = datas.get(i);
-			for (int j = 0; j < headers.size(); j++) {
+			int j = 0;
+			for ( val item:  headers.entrySet()) {
 				Cell dataCell = cells.get(dataRowStart + i, START_COLUMN + j);
-				dataCell.setValue(data.get(headers.get(j).replaceAll("[\"\']", "")));
+				dataCell.setValue(data.get(item.getKey()));
 				Style style = this.getCellStyleNoBorder(dataCell.getStyle());
 				dataCell.setStyle(style);
+				j++;
 			}
 		}
 	}

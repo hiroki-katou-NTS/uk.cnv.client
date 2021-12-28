@@ -80,7 +80,6 @@ public interface WorkplaceAdapter {
 	 * @return
 	 */
 	public List<String> getWorkplaceIdAndChildren(String companyId, GeneralDate baseDate, String workplaceId);
-	
 	/**
 	 * @name 所属職場を取得するAdapter
 	 * @param employeeID 	社員ID
@@ -88,10 +87,10 @@ public interface WorkplaceAdapter {
 	 * @return 	Map<社員ID,職場ID> 所属情報
 	 */
 	public Map<String, String> getAWorkplace(String employeeID, GeneralDate date);
-	
+
 	/**
-	 * @name 	所属職場リストを取得するAdapter	
-	 * @param employeeID  	List<職場ID>	
+	 * @name 	所属職場リストを取得するAdapter
+	 * @param employeeID  	List<職場ID>
 	 * @param date 年月日
 	 * @return 	社員一覧	Map<社員ID,職場ID>
 	 */

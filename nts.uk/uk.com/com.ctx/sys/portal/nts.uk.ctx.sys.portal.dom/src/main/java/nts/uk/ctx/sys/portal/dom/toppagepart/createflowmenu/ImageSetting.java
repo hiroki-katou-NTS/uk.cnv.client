@@ -1,7 +1,5 @@
 package nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu;
 
-import java.util.Optional;
-
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,21 +12,6 @@ import nts.arc.layer.dom.DomainObject;
 @EqualsAndHashCode(callSuper = false)
 @Builder
 public class ImageSetting extends DomainObject {
-
-	/**
-	 * 画像ファイルID
-	 */
-	private Optional<String> fileId;
-	
-	/**
-	 * 画像ファイル名
-	 */
-	private Optional<FileName> fileName;
-	
-	/**
-	 * 既定区分
-	 */
-	private FixedClassification isFixed;
 	
 	/**
 	 * サイズと位置
@@ -36,7 +19,7 @@ public class ImageSetting extends DomainObject {
 	private SizeAndPosition sizeAndPosition;
 	
 	/**
-	 * 比率
+	 * 画像情報
 	 */
-	private double ratio;
+	private ImageInformation imageInformation;
 }

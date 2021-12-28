@@ -10,11 +10,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import nts.arc.layer.app.command.JavaTypeResult;
 import nts.arc.layer.ws.WebService;
 import nts.uk.ctx.sys.env.app.command.mailserver.MailServerSaveCommand;
 import nts.uk.ctx.sys.env.app.command.mailserver.MailServerSaveCommandHandler;
 import nts.uk.ctx.sys.env.app.command.testsendmail.MailServerTestCommand;
 import nts.uk.ctx.sys.env.app.command.testsendmail.MailServerTestCommandHanlder;
+import nts.uk.ctx.sys.env.app.command.testsendmail.CheckDataChangedCommandHandler;
 import nts.uk.ctx.sys.env.app.find.mailserver.MailServerDto;
 import nts.uk.ctx.sys.env.app.find.mailserver.MailServerFinder;
 
@@ -37,6 +39,9 @@ public class MailServerWs extends WebService {
 	/** The testhandler. */
 	@Inject
 	MailServerTestCommandHanlder testhandler;
+	
+	@Inject
+	private CheckDataChangedCommandHandler checkDataChangedCommandHandler;
 	
 	/**
 	 * Find.
@@ -69,5 +74,11 @@ public class MailServerWs extends WebService {
 	@POST
 	public void testMailSetting(MailServerTestCommand command) {
 		this.testhandler.handle(command);
+	}
+	
+	@Path("checkDataChanged")
+	@POST
+	public JavaTypeResult<Boolean> validatePreTest(MailServerSaveCommand command) {
+		return new JavaTypeResult<>(this.checkDataChangedCommandHandler.handle(command));
 	}
 }

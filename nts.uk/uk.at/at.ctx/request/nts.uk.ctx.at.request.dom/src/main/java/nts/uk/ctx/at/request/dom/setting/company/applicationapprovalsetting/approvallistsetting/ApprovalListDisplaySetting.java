@@ -45,25 +45,32 @@ public class ApprovalListDisplaySetting {
 	 * 所属職場名表示
 	 */
 	private NotUseAtr displayWorkPlaceName;
+
+	/**
+	 * 承認機能を利用する
+	 */
+	private NotUseAtr useApprovalFunction;
 	
 	public ApprovalListDisplaySetting(String companyID, DisplayAtr appReasonDisAtr, DisplayAtr advanceExcessMessDisAtr,
-			DisplayAtr actualExcessMessDisAtr, WeekNumberDays warningDateDisAtr, NotUseAtr displayWorkPlaceName) {
+			DisplayAtr actualExcessMessDisAtr, WeekNumberDays warningDateDisAtr, NotUseAtr displayWorkPlaceName, NotUseAtr useApprovalFunction) {
 		this.companyID = companyID;
 		this.appReasonDisAtr = appReasonDisAtr;
 		this.advanceExcessMessDisAtr = advanceExcessMessDisAtr;
 		this.actualExcessMessDisAtr = actualExcessMessDisAtr;
 		this.warningDateDisAtr = warningDateDisAtr;
 		this.displayWorkPlaceName = displayWorkPlaceName;
+		this.useApprovalFunction = useApprovalFunction;
 	}
 
-	public static ApprovalListDisplaySetting create(String companyID, int appReasonDispAtr, int preExcessAtr, int atdExcessAtr, int warningDays, int dispWorkplace) {
+	public static ApprovalListDisplaySetting create(String companyID, int appReasonDispAtr, int preExcessAtr, int atdExcessAtr, int warningDays, int dispWorkplace, int useApprovalFunction) {
 		return new ApprovalListDisplaySetting(
 				companyID,
 				EnumAdaptor.valueOf(appReasonDispAtr, DisplayAtr.class),
 				EnumAdaptor.valueOf(preExcessAtr, DisplayAtr.class),
 				EnumAdaptor.valueOf(atdExcessAtr, DisplayAtr.class),
 				new WeekNumberDays(warningDays),
-				EnumAdaptor.valueOf(dispWorkplace, NotUseAtr.class)
+				EnumAdaptor.valueOf(dispWorkplace, NotUseAtr.class),
+				EnumAdaptor.valueOf(useApprovalFunction, NotUseAtr.class)
 		);
 	}
 

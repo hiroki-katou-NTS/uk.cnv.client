@@ -110,8 +110,6 @@ module nts.uk.ui.at.kdw013.share {
 
             ko.applyBindingsToNode(element, { 'input-time-raw': binding }, bindingContext);
 
-            element.removeAttribute('data-bind');
-
             return { controlsDescendantBindings: true };
         }
     }
@@ -131,11 +129,12 @@ module nts.uk.ui.at.kdw013.share {
             const $start = document.createElement('input');
             const $end = document.createElement('input');
             const $space = document.createElement('span');
-            const $wtime = document.createElement('span');
             const $value = document.createElement('span');
             const $error = document.createElement('div');
-            const update: () => void = allBindingsAccessor.get('update');
+            let update: KnockoutObservable<boolean> = allBindingsAccessor.get('update');
             const hasError: KnockoutObservable<boolean> = allBindingsAccessor.get('hasError');
+			const showInputTime: KnockoutObservable<boolean> = allBindingsAccessor.get('showInputTime');
+			const rangeParam: KnockoutObservable<number | null> = allBindingsAccessor.get('range');
             const excludeTimes: KnockoutObservableArray<BussinessTime> = allBindingsAccessor.get('exclude-times');
             const value = valueAccessor();
 
@@ -149,19 +148,10 @@ module nts.uk.ui.at.kdw013.share {
                     const start = ko.unwrap(startTime);
                     const end = ko.unwrap(endTime);
 
-                    if (_.isNil(start)) {
+                    if (_.isNil(start) || _.isNil(end) || start > end || showInputTime()) {	
                         return '';
                     }
-
-                    if (_.isNil(end)) {
-                        return '';
-                    }
-
-                    if (start > end) {
-                        return '';
-                    }
-
-                    return number2String(end - start);
+                    return $i18n('KDW013_25') + ' '+ number2String(end - start);
                 },
                 disposeWhenNodeIsRemoved: element
             });
@@ -200,12 +190,10 @@ module nts.uk.ui.at.kdw013.share {
                 .append($start)
                 .append($space)
                 .append($end)
-                .append($wtime)
                 .append($value)
                 .append($error);
 
             ko.applyBindingsToNode($space, { i18n: 'KDW013_30' }, bindingContext);
-            ko.applyBindingsToNode($wtime, { i18n: 'KDW013_25' }, bindingContext);
 
             ko.applyBindingsToNode($value, { text: range }, bindingContext);
 
@@ -218,15 +206,13 @@ module nts.uk.ui.at.kdw013.share {
                         const id = ko.unwrap(errorId);
                         const params = ko.unwrap(errorParams);
 
-                        viewModel.$nextTick(update);
-
                         if (!id) {
                             element.classList.remove('error');
 
                             if (ko.isObservable(hasError)) {
                                 hasError(false);
                             }
-
+							update(!update());
                             return '';
                         }
 
@@ -235,7 +221,7 @@ module nts.uk.ui.at.kdw013.share {
                         if (ko.isObservable(hasError)) {
                             hasError(true);
                         }
-
+						update(!update());
                         return viewModel.$i18n.message(id, params);
                     },
                     disposeWhenNodeIsRemoved: element
@@ -345,13 +331,17 @@ module nts.uk.ui.at.kdw013.share {
 
             startTime.subscribe((s: number | null) => {
                 const e: number | null = ko.unwrap(endTime);
-
+				if(s && endTime()){
+					rangeParam(endTime() - s);	
+				}
                 validateRange(s, e);
             });
 
             endTime.subscribe((e: number | null) => {
                 const s: number | null = ko.unwrap(startTime);
-
+				if(e && startTime()){
+					rangeParam(e - startTime());	
+				}
                 validateRange(s, e);
             });
 

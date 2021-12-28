@@ -239,7 +239,7 @@ public final class AttendanceItemUtilRes {
 			List<ItemValue> items, int layout, Optional<Integer> idxPlus, int idxLayout, Supplier<AttendanceItemDataGate> defaultGetter) {
 		
 		for (Entry<String, List<ItemValue>> g : groupEnum(items).entrySet()) {
-			String enumT = g.getKey();
+			String enumT = getEnum(g.getKey());
 
 			internalProcess(result, listV, layout, g.getValue(), 
 					Optional.of(enumT), idxPlus, l -> l.isEnum(enumT), idxLayout, defaultGetter);
@@ -251,7 +251,7 @@ public final class AttendanceItemUtilRes {
 		
 		for (Entry<String, List<ItemValue>> g : groupEnum(items).entrySet()) {
 			int idx = getIdx(g.getKey(), idxLayout);
-			String enumT = getEnum(g.getKey(), idx);
+			String enumT = getEnum(g.getKey());
 			
 			internalProcess(result, listV, layout, g.getValue(), 
 					Optional.of(enumT), Optional.of(idx),
@@ -264,7 +264,7 @@ public final class AttendanceItemUtilRes {
 		
 		for (Entry<String, List<ItemValue>> g : groupEnum(items).entrySet()) {
 			int idx = getIdx(g.getKey(), idxLayout);
-			String enumT = getEnum(g.getKey(), idx);
+			String enumT = getEnum(g.getKey());
 			
 			internalProcess(result, listV, layout, g.getValue(), 
 					Optional.of(enumT), Optional.of(idx), 
@@ -277,7 +277,7 @@ public final class AttendanceItemUtilRes {
 		
 		for (Entry<String, List<ItemValue>> g : groupEnum(items).entrySet()) {
 			int idx = getIdx(g.getKey(), idxLayout);
-			String enumT = getEnum(g.getKey(), idx);
+			String enumT = getEnum(g.getKey());
 			
 			internalProcess(result, listV, layout, g.getValue(), 
 					Optional.of(enumT), Optional.of(idx),
@@ -316,7 +316,7 @@ public final class AttendanceItemUtilRes {
 			List<ItemValue> items, int layout, Optional<Integer> idxPlus, int idxLayout) {
 		
 		for (Entry<String, List<ItemValue>> g : groupEnum(items).entrySet()) {
-			String enumT = g.getKey();
+			String enumT = getEnum(g.getKey());
 			
 			internalMergeList(defaultGetter, layout, listV, g.getValue(), 
 								Optional.of(enumT), idxPlus, v -> v.isEnum(enumT), idxLayout);
@@ -328,7 +328,7 @@ public final class AttendanceItemUtilRes {
 
 		for (Entry<String, List<ItemValue>> g : groupEnum(items).entrySet()) {
 			int idx = getIdx(g.getKey(), idxLayout);
-			String enumT = getEnum(g.getKey(), idx);
+			String enumT = getEnum(g.getKey());
 			
 			internalMergeList(defaultGetter, layout, listV, g.getValue(), 
 								Optional.of(enumT), Optional.of(idx), 
@@ -341,7 +341,7 @@ public final class AttendanceItemUtilRes {
 		
 		for (Entry<String, List<ItemValue>> g : groupEnum(items).entrySet()) {
 			int idx = getIdx(g.getKey(), idxLayout);
-			String enumT = getEnum(g.getKey(), idx);
+			String enumT = getEnum(g.getKey());
 			
 			internalMergeList(defaultGetter, layout, listV, g.getValue(), 
 								Optional.of(enumT), Optional.of(idx), 
@@ -354,7 +354,7 @@ public final class AttendanceItemUtilRes {
 		
 		for (Entry<String, List<ItemValue>> g : groupEnum(items).entrySet()) {
 			int idx = getIdx(g.getKey(), idxLayout);
-			String enumT = getEnum(g.getKey(), idx);
+			String enumT = getEnum(g.getKey());
 			
 			internalMergeList(defaultGetter, layout, listV, g.getValue(), 
 								Optional.of(enumT), Optional.of(idx), 
@@ -393,12 +393,14 @@ public final class AttendanceItemUtilRes {
 	public static int getIdx(String text, int idxLayout) {
 		if (StringUtil.isNullOrEmpty(text, false)) return -1;
 		
+		String noEnumTextPath = text.split(ItemConst.DEFAULT_ENUM_SEPERATOR)[0];
+		
+		String[] layouts = noEnumTextPath.split(ItemConst.DEFAULT_IDX_SEPERATOR);
+		
 		if (idxLayout == 0) {
 			
-			return getFirstIdx(text);
+			return getFirstIdx(layouts[0]);
 		}
-		
-		String[] layouts = text.split(ItemConst.DEFAULT_IDX_SEPERATOR);
 		
 		if (idxLayout >= layouts.length) {
 			return -1;
@@ -428,8 +430,10 @@ public final class AttendanceItemUtilRes {
 	
 	private static Map<String, List<ItemValue>> groupEnum(List<ItemValue> items) {
 		return items.stream().collect(Collectors.groupingBy(c -> {
-			String[] part = c.path().split(ItemConst.DEFAULT_ENUM_SEPERATOR);
-			return part[part.length - 1];
+			String[] parts = c.path().split(Pattern.quote(ItemConst.DEFAULT_ENUM_SEPERATOR));
+			if(parts.length>=2)
+				return parts[parts.length - 1];
+			return "";
 		}));
 	}
 	
@@ -438,12 +442,16 @@ public final class AttendanceItemUtilRes {
 		prop = getAfter(prop, ItemConst.DEFAULT_ENUM_SEPERATOR, 0);
 		
 		if (idxLayout > 0) {
-			prop = getAfter(prop, ItemConst.DEFAULT_INDEX_FIELD_NAME, 0);
+			prop = getAfter(prop, ItemConst.DEFAULT_IDX_SEPERATOR, 0);
+		}
+		
+		if (prop.contains(ItemConst.DEFAULT_IDX_SEPERATOR)) {
+			prop = prop.split(ItemConst.DEFAULT_IDX_SEPERATOR)[0];
 		}
 		
 		int idx = getIdx(prop, 0);
 		if (idx > 0) {
-			return getEnum(prop, idx);
+			return getEnum(prop);
 		}
 		return prop;
 	}
@@ -473,17 +481,13 @@ public final class AttendanceItemUtilRes {
 	    return path;
 	}
 
-	private static String getEnum(String key, Integer idx) {
-		if (idx < 10) {
-			return key.substring(0, key.length() - 1);
-		} else if (idx < 100) {
-			return key.substring(0, key.length() - 2);
-		} else if (idx < 1000) {
-			return key.substring(0, key.length() - 3);
-		} else {
-			return key.replaceAll(ItemConst.DEFAULT_NUMBER_REGEX, ItemConst.EMPTY_STRING);
-		} 
-//		return key.replaceAll(ItemConst.DEFAULT_NUMBER_REGEX, ItemConst.EMPTY_STRING);
+	private static String getEnum(String key) {
+		String[] parts = key.split(ItemConst.DEFAULT_ENUM_SEPERATOR);
+		
+		if (parts.length == 0) {
+			return "";
+		}
+		return parts[parts.length - 1].replaceAll(ItemConst.DEFAULT_NUMBER_REGEX, "");
 	} 
 
 	private static List<ItemValue> pathCorrect(AttendanceItemType type, Collection<ItemValue> items) {

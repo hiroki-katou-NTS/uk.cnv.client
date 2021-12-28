@@ -39,6 +39,7 @@ public class GetEmpCanReferService {
 
 		// sort
 		return sortEmployees(require, date, employeeIdList);
+
 	}
 
 	/**
@@ -66,6 +67,7 @@ public class GetEmpCanReferService {
 
 		// sort
 		return sortEmployees(require, date, employeeIdList);
+
 	}
 
 
@@ -101,19 +103,30 @@ public class GetEmpCanReferService {
 
 		// create search query
 		RegulationInfoEmpQuery query = new RegulationInfoEmpQuery();
-		query.setBaseDate(date);
-		query.setPeriodStart(period.start());
-		query.setPeriodEnd(period.end());
-		query.setSystemType(CCG001SystemType.EMPLOYMENT);	// 就業
-		query.setReferenceRange(SearchReferenceRange.ALL_REFERENCE_RANGE);	// 参照可能範囲すべて
+		{
+			// システム区分: 就業
+			query.setSystemType( CCG001SystemType.EMPLOYMENT );
+			// 検索参照範囲: 参照可能範囲すべて
+			query.setReferenceRange( SearchReferenceRange.ALL_REFERENCE_RANGE );
+
+			// 基準日
+			// TODO: 社員範囲検索Queryが修正されるまでは『期間』の終了日を基準日とする
+			query.setBaseDate( period.end() );
+
+			// 在職/休職/休業 判定期間
+			query.setPeriodStart( period.start() );
+			query.setPeriodEnd( period.end() );
+		}
 
 		if ( workplaceId.isPresent() ) {
-			query.setFilterByWorkplace(true);
-			query.setWorkplaceIds( Arrays.asList(workplaceId.get()) );
+			// 職場の指定あり⇒指定職場でフィルタする
+			query.setFilterByWorkplace( true );
+			query.setWorkplaceIds(Arrays.asList( workplaceId.get() ));
 		}
 
 		// search
 		return require.searchEmployee(query, require.getRoleID());
+
 	}
 
 	/**
@@ -123,9 +136,10 @@ public class GetEmpCanReferService {
 	 * @param employeeIdList 社員IDリスト
 	 * @return List<社員ID>
 	 */
-	private static List<String> sortEmployees (Require require, GeneralDate date, List<String> employeeIdList) {
+	private static List<String> sortEmployees(Require require, GeneralDate date, List<String> employeeIdList) {
 
 		return require.sortEmployee(employeeIdList, EmployeeSearchCallSystemType.EMPLOYMENT, null, date, null);
+
 	}
 
 

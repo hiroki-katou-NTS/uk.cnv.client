@@ -227,6 +227,7 @@ public class JpaWorkScheduleRepository extends JpaRepository implements WorkSche
 				oldData.get().kscdtSchTime.absenceTime = newData.kscdtSchTime.absenceTime;
 				oldData.get().kscdtSchTime.vacationAddTime = newData.kscdtSchTime.vacationAddTime;
 				oldData.get().kscdtSchTime.staggeredWhTime = newData.kscdtSchTime.staggeredWhTime;
+				
 			}
 
 			if (oldData.get().kscdtSchTime != null) {

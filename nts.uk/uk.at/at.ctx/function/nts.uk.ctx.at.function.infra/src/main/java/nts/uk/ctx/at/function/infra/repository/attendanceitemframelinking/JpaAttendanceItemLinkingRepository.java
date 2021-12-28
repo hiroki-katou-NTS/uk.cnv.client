@@ -27,6 +27,7 @@ public class JpaAttendanceItemLinkingRepository extends JpaRepository implements
 	private static final String FIND;
 	private static final String FIND_BY_ANY_ITEM;
 	private static final String FIND_BY_ITEM_ID_AND_TYPE;
+	private static final String FIND_BY_ITEM_ID_AND_TYPE_AND_CATEGORY;
 
 	private static final String FIND_BY_FRAME_NO = "SELECT a FROM KfnmtAttendanceLink a "
 			+ "WHERE a.kfnmtAttendanceLinkPK.frameNo IN :frameNos "
@@ -64,6 +65,14 @@ public class JpaAttendanceItemLinkingRepository extends JpaRepository implements
 		builderString.append("WHERE a.kfnmtAttendanceLinkPK.attendanceItemId IN :attendanceItemIds ");
 		builderString.append("AND a.kfnmtAttendanceLinkPK.typeOfItem = :typeOfItem ");
 		FIND_BY_ITEM_ID_AND_TYPE = builderString.toString();
+		
+		builderString = new StringBuilder();
+		builderString.append("SELECT a ");
+		builderString.append("FROM KfnmtAttendanceLink a ");
+		builderString.append("WHERE a.kfnmtAttendanceLinkPK.attendanceItemId IN :attendanceItemIds ");
+		builderString.append("AND a.kfnmtAttendanceLinkPK.typeOfItem = :typeOfItem ");
+		builderString.append("AND a.kfnmtAttendanceLinkPK.frameCategory = :frameCategory ");
+		FIND_BY_ITEM_ID_AND_TYPE_AND_CATEGORY = builderString.toString();
 	}
 
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -142,6 +151,24 @@ public class JpaAttendanceItemLinkingRepository extends JpaRepository implements
 			results.addAll(this.queryProxy().query(FIND_BY_ITEM_ID_AND_TYPE, KfnmtAttendanceLink.class)
 					.setParameter("attendanceItemIds", subList)
 					.setParameter("typeOfItem", type.value).getList());
+		});
+		return results.stream().map(f -> f.toDomain()).collect(Collectors.toList());
+	}
+    
+    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	@Override
+	public List<AttendanceItemLinking> getFullDataByAttdIdAndTypeAndCategory(List<Integer> attendanceItemIds, TypeOfItem type,int frameCategory) {
+		if(attendanceItemIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		List<KfnmtAttendanceLink> results  = new ArrayList<>();
+		CollectionUtil.split(attendanceItemIds, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subList -> {
+			results.addAll(this.queryProxy().query(FIND_BY_ITEM_ID_AND_TYPE_AND_CATEGORY, KfnmtAttendanceLink.class)
+					.setParameter("attendanceItemIds", subList)
+					.setParameter("typeOfItem", type.value)
+					.setParameter("frameCategory", frameCategory)
+					.getList());
+			
 		});
 		return results.stream().map(f -> f.toDomain()).collect(Collectors.toList());
 	}

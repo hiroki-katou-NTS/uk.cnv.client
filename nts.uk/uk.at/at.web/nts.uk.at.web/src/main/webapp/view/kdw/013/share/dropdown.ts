@@ -16,6 +16,9 @@ module nts.uk.ui.at.kdw013.share {
                 border-radius: 2px;
                 overflow: hidden;
             }
+            .dropdown-container{
+                overflow-y: auto;
+            }
             .nts-dropdown.error>div.dropdown-container {
                 border: 1px solid #ff6666 !important;
             }
@@ -36,7 +39,7 @@ module nts.uk.ui.at.kdw013.share {
                 color: #fff;
                 background-color: #007fff;
             }
-            .dropdown-container .highlight {
+            .dropdown-container .highlight , .dropdown-container .highlight div {
                 background-color: #91c8ff;
             }
             .nts-dropdown.show {
@@ -45,7 +48,7 @@ module nts.uk.ui.at.kdw013.share {
                 height: 31px;
             }
             .nts-dropdown.show.error {
-                height: 52px;
+                height: 54px;
             }
             .nts-dropdown.show>div.message {
                 display: none;
@@ -53,7 +56,8 @@ module nts.uk.ui.at.kdw013.share {
             .nts-dropdown.show>div.dropdown-container {
                 height: auto;
                 z-index: 3;
-                position: fixed;
+                position: absolute;
+                overflow-y: auto;
             }
             .nts-dropdown.show>div.dropdown-container {
                 background-color: #fff;
@@ -99,8 +103,10 @@ module nts.uk.ui.at.kdw013.share {
                 const selected = valueAccessor();
                 const name = allBindingsAccessor.get('name');
                 const items = allBindingsAccessor.get('items');
+                const visibleItemsCount = allBindingsAccessor.get('visibleItemsCount'); 
                 const required = allBindingsAccessor.get('required');
                 const hasError: undefined | KnockoutObservable<boolean> = allBindingsAccessor.get('hasError');
+				const flagError: undefined | KnockoutObservable<boolean> = allBindingsAccessor.get('flagError');
 
                 const msg = $('<div>', { class: 'message' }).get(0);
                 const subscribe = ($selected: string) => {
@@ -133,6 +139,9 @@ module nts.uk.ui.at.kdw013.share {
                                 $(msg).appendTo(element);
                                 element.classList.add('error');
                             }
+							if(flagError){
+								flagError(!flagError());	
+							}
                         });
                 }
 
@@ -142,9 +151,8 @@ module nts.uk.ui.at.kdw013.share {
                         const $required = ko.unwrap(required);
 
                         if ($required && !$selected) {
-                            return viewModel.$i18n.message('MsgB_2', [ko.unwrap(name)]);
+                            return nts.uk.resource.getMessage('MsgB_2', [ko.unwrap(name)]);
                         }
-
                         return '';
                     },
                     disposeWhenNodeIsRemoved: element
@@ -152,9 +160,7 @@ module nts.uk.ui.at.kdw013.share {
 
                 ko.applyBindingsToNode(msg, { text }, bindingContext);
 
-                ko.applyBindingsToNode(element, { component: { name: COMPONENT_NAME, params: { selected, items, required } } }, bindingContext);
-
-                element.removeAttribute('data-bind');
+                ko.applyBindingsToNode(element, { component: { name: COMPONENT_NAME, params: { selected, items, required, visibleItemsCount } } }, bindingContext);
 
                 element.setAttribute('role', randomId());
 
@@ -192,11 +198,17 @@ module nts.uk.ui.at.kdw013.share {
                             ko.tasks
                                 .schedule(() => {
                                     const { top, height } = $(element).children().get(0).getBoundingClientRect();
-
                                     if (top + height < innerHeight - 10) {
-                                        $ct.style.top = top + 'px';
+										let taskDetails = $('.taskDetails').last();
+										let lastTable = $('.taskDetails table').last();
+										if(taskDetails.offset().top + taskDetails.outerHeight(true) > lastTable.offset().top + lastTable.outerHeight(true)){
+											$ct.style.top = (height - 31) * -1 + 'px';	
+										}else{
+											$ct.style.top = '0px';
+										}
+                                        
                                     } else {
-                                        $ct.style.top = top - height + 31 + 'px';
+                                        $ct.style.top = (height - 31) * -1 + 'px';
                                     }
                                 });
                         }
@@ -221,10 +233,10 @@ module nts.uk.ui.at.kdw013.share {
                             const { code, name } = item;
 
                             $(element)
-                                .html(`<div style='height:31px;' >${code}</div><div style='margin-left:10px;' >${name}</div>`);
+                                .html(`<div style='height:31px;' >${code}</div><div style='margin-left:10px;white-space: nowrap;' >${name}</div>`);
                         } else {
                             $(element)
-                                .html(`<div style='height:31px;' ></div><div style='margin-left:10px;' >${vm.$i18n('KDW013_41')}</div>`);
+                                .html(`<div style='height:31px;' ></div><div style='margin-left:10px;white-space: nowrap;' >${vm.$i18n('KDW013_41')}</div>`);
                         }
                     },
                     disposeWhenNodeIsRemoved: element
@@ -254,9 +266,7 @@ module nts.uk.ui.at.kdw013.share {
             }
         }
 
-        @component({
-            name: COMPONENT_NAME,
-            template: `
+		let template = `
             <div class="dropdown-container">
                 <input type="text" class="nts-input" data-bind="
                         value: $component.filter,
@@ -276,12 +286,16 @@ module nts.uk.ui.at.kdw013.share {
                     <div style="width: 280px;overflow: auto;" data-bind="foreach: { data: $component.items, as: 'item' }"> 
                         <div style='display: flex;line-height: 31px;padding-left: 5px;' data-bind="click: function(item, evt) { $component.selecteItem(item, evt) }, css: { selected: item.selected, highlight: item.highlight }">  
                                     <div data-bind="text: item.code"></div>
-                                    <div style='margin-left:10px;' data-bind="text: item.name"></div> 
+                                    <div style='margin-left:10px;white-space: nowrap;' data-bind="text: item.name"></div> 
                         </div>
                     </div>
                 </div>
             </div>
             `
+
+        @component({
+            name: COMPONENT_NAME,
+            template: template
         })
         export class DropdownViewModel extends ko.ViewModel {
             show: KnockoutObservable<boolean> = ko.observable(false);
@@ -293,8 +307,10 @@ module nts.uk.ui.at.kdw013.share {
 
             filter: KnockoutObservable<string> = ko.observable('');
             highlight: KnockoutObservable<number> = ko.observable(-1);
+        
+            visibleItemsCount: number = 5;
 
-            constructor(private params: { selected: KnockoutObservable<string>; items: KnockoutObservableArray<DropdownItem>; required: undefined | boolean | KnockoutObservable<undefined | boolean>; }) {
+            constructor(private params: { selected: KnockoutObservable<string>; items: KnockoutObservableArray<DropdownItem>; required: undefined | boolean | KnockoutObservable<undefined | boolean>; visibleItemsCount: number }) {
                 super();
 
                 const vm = this;
@@ -336,6 +352,27 @@ module nts.uk.ui.at.kdw013.share {
                         return null;
                     }
                 });
+                vm.visibleItemsCount = params.visibleItemsCount;
+            }
+        
+            setvisibleItemCount(show: boolean){
+                const vm = this;
+                const { visibleItemsCount } = vm;
+            
+                if (show) {
+                    let height = (visibleItemsCount * 31) + 69;
+                    $(vm.$el).find('.dropdown-container').css({ "maxHeight": height });
+                    let ddlTop = $(vm.$el).find('.dropdown-container').offset().top;
+
+                    let selected = $(vm.$el).find('.dropdown-container').find('.selected');
+                    
+                    if (selected.offset()) {
+                        setTimeout(() => { $(vm.$el).find('.dropdown-container').scrollTop(0 - (ddlTop - selected.offset().top)) }, 50);
+                    }
+                } else {
+                    $(vm.$el).find('.dropdown-container').removeAttr('style');
+                    $(vm.$el).find('.dropdown-container').scrollTop(0);
+                }
             }
 
             mounted() {
@@ -355,12 +392,16 @@ module nts.uk.ui.at.kdw013.share {
                         const items = ko.unwrap(vm.items).map(({ id }) => id);
                         const selected = ko.unwrap(vm.params.selected);
                         const index = _.indexOf(items, selected);
-
+                        
                         if (index > -1) {
                             vm.highlight(index);
                         }
+                        
                     }
+                    vm.setvisibleItemCount(sh); 
                 });
+        
+                
 
                 ko.computed({
                     read: () => {
@@ -384,6 +425,9 @@ module nts.uk.ui.at.kdw013.share {
                             .resolve(true)
                             .then(() => {
                                 if (!ko.unwrap(show)) {
+									if($('.taskDetails').height() < 500){
+										$('.taskDetails').css({ "overflow-y": "unset"});
+									}
                                     vm.show(true);
                                 }
 
@@ -475,6 +519,8 @@ module nts.uk.ui.at.kdw013.share {
                             }
                         }
                     });
+            
+                
             }
 
             selecteItem(item: DropdownItem, evt: MouseEvent) {

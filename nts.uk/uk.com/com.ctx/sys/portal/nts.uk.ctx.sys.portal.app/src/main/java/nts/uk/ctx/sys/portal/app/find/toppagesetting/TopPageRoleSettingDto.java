@@ -22,9 +22,6 @@ public class TopPageRoleSettingDto {
 	/** The role set code. */
 	private String roleSetCode;
 	
-	/** The switch date. */
-	private Integer switchingDate;
-	
 	/** The login menu code. */
 	private String loginMenuCode;
 	
@@ -44,7 +41,6 @@ public class TopPageRoleSettingDto {
 				.loginMenuCode(domain.getMenuLogin().getLoginMenuCode().v())
 				.menuClassification(domain.getMenuLogin().getMenuClassification().value)
 				.system(domain.getMenuLogin().getSystem().value)
-				.switchingDate(domain.getSwitchingDate().v())
 				.topMenuCode(domain.getTopMenuCode().v())
 				.build();
 	}

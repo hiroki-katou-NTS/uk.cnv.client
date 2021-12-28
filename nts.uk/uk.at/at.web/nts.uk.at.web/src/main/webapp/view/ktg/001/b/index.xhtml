@@ -44,6 +44,14 @@
 						</td>
 					</tr>
 
+					<tr data-bind="visible: aggrRowVisible">
+						<td data-bind="text: $i18n('KTG001_4')"></td>
+						<td>
+							<div
+								data-bind="ntsCheckBox: { checked: aggrChecked }"></div>
+						</td>
+					</tr>
+
 					<tr data-bind="visible: dayRowVisible">
 						<td data-bind="text: $i18n('KTG001_2')"></td>
 						<td>
@@ -57,14 +65,6 @@
 						<td>
 							<div
 								data-bind="ntsCheckBox: { checked: monChecked }"></div>
-						</td>
-					</tr>
-
-					<tr data-bind="visible: aggrRowVisible">
-						<td data-bind="text: $i18n('KTG001_4')"></td>
-						<td>
-							<div
-								data-bind="ntsCheckBox: { checked: aggrChecked }"></div>
 						</td>
 					</tr>
 

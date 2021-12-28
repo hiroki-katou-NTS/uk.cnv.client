@@ -3,8 +3,12 @@ package nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice;
 import java.util.Optional;
 
 import nts.arc.task.tran.AtomTask;
+import nts.arc.time.GeneralDateTime;
+import nts.uk.ctx.at.record.dom.stamp.card.stampcard.ContractCode;
+import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 //import nts.uk.ctx.at.record.dom.stamp.management.ReservationArt;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
 
 /**
  * @author ThanhNX
@@ -16,6 +20,12 @@ public class RegisterStampData {
 	
 	//打刻を登録する
 	public static Optional<AtomTask> registerStamp(Require require, Stamp stamp) {
+		
+		if (require.existsStamp(stamp.getContractCode(), stamp.getCardNumber(), stamp.getStampDateTime(),
+				stamp.getType().getChangeClockArt())) {
+			return Optional.empty();
+		}
+		
 		// $AtomTask = AtomTask:
 		AtomTask atomTask = AtomTask.of(() -> {
 			require.insert(stamp);
@@ -29,5 +39,9 @@ public class RegisterStampData {
 
 		// [R-2] 打刻を追加する JpaStampDakokuRepository
 		public void insert(Stamp stamp);
+		
+		//exists(契約コード,打刻カード番号, 打刻日時,時刻変更区分)
+		public boolean existsStamp(ContractCode contractCode, StampNumber stampNumber, GeneralDateTime dateTime,
+				ChangeClockAtr changeClockArt) ;
 	}
 }

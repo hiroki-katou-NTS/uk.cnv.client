@@ -62,7 +62,7 @@ public class SspmtDataDeletionSelectionCategory extends UkJpaEntity implements S
 	public void setPatternClassification(int patternClassification) {
 		if (pk == null)
 			pk = new SspmtDataDeletionSelectionCategoryPK();
-		pk.patternClassification = BooleanUtils.toBoolean(patternClassification);
+		pk.patternClassification = patternClassification;
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class SspmtDataDeletionSelectionCategory extends UkJpaEntity implements S
 	@Override
 	public int getPatternClassification() {
 		if (pk != null)
-			return BooleanUtils.toInteger(pk.patternClassification);
+			return pk.patternClassification;
 		return 0;
 	}
 

@@ -13,4 +13,6 @@ public interface MonthlyRecordWorkTypeRepository {
 	void addMonthlyRecordWorkType(MonthlyRecordWorkType monthlyRecordWorkType);
 	
 	void updateMonthlyRecordWorkType(MonthlyRecordWorkType monthlyRecordWorkType);
+	
+	void copy(String companyId, String businessTypeCode, List<String> listBusinessTypeCode);
 }

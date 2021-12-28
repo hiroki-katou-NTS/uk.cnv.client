@@ -1,6 +1,10 @@
 package nts.uk.ctx.at.shared.infra.repository.scherec.dailyattendanceitem;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +39,12 @@ public class JpaDailyAttdItemAuthRepository extends JpaRepository implements Dai
 
 	private static final String SELECT_BY_KEY_ATT_ITEM_ID = SELECT_BY_KEY
 			+ " AND c.kshstDailyServiceTypeControlPK.itemDailyID IN :itemDailyIDs";
+	
+	// kdw002 ver7
+	private static final String FIND_BY_CID = "SELECT DISTINCT c.AUTHORITY_DAILY_ID" + " FROM KSHMT_DAY_ITEM_DISP_CTR c"
+			+ " WHERE c.CID = ? ";
+	
+	private static final String DELETE = "DELETE FROM KSHMT_DAY_ITEM_DISP_CTR WHERE CID = ? AND AUTHORITY_DAILY_ID = ?";
 
 	@Override
 	public Optional<DailyAttendanceItemAuthority> getDailyAttdItem(String companyID, String authorityDailyId) {
@@ -186,6 +196,36 @@ public class JpaDailyAttdItemAuthRepository extends JpaRepository implements Dai
 		DailyAttendanceItemAuthority dailyAttendanceItemAuthority = new DailyAttendanceItemAuthority(companyID,
 				authorityDailyId, data);
 		return Optional.of(dailyAttendanceItemAuthority);
+	}
+
+	@Override
+	public List<String> getDailytRolesByCid(String companyId) {
+		List<String> listFullData = new ArrayList<String>();
+		try (PreparedStatement statement = this.connection().prepareStatement(FIND_BY_CID)) {	
+			statement.setString(1, companyId);
+			ResultSet rs = statement.executeQuery();
+			while (rs.next()) {
+				String roleID = rs.getString("AUTHORITY_DAILY_ID");
+				if(!roleID.isEmpty())
+					listFullData.add(roleID);
+			}
+			if(listFullData.isEmpty())
+				return  Collections.emptyList();
+			return listFullData;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public void delete(String companyID, String roleID) {
+		try (PreparedStatement statement = this.connection().prepareStatement(DELETE)) {	
+			statement.setString(1, companyID);
+			statement.setString(2, roleID);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

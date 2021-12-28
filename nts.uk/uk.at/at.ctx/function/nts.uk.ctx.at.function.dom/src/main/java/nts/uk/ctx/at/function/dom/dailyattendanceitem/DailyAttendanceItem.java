@@ -14,6 +14,8 @@ public class DailyAttendanceItem {
 	private Integer typeOfAttendanceItem;
 
 	private Integer frameCategory;
+	
+	private String displayName;
 
 	public DailyAttendanceItem() {
 		super();

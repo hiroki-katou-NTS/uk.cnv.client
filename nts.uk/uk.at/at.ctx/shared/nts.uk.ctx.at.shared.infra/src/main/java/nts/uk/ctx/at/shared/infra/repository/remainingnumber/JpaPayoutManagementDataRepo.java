@@ -14,6 +14,7 @@ import javax.ejb.Stateless;
 import nts.arc.error.BusinessException;
 import nts.arc.layer.infra.data.DbConsts;
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.arc.layer.infra.data.database.DatabaseProduct;
 import nts.arc.layer.infra.data.jdbc.NtsResultSet;
 import nts.arc.layer.infra.data.jdbc.NtsStatement;
 import nts.arc.time.GeneralDate;
@@ -370,20 +371,22 @@ public class JpaPayoutManagementDataRepo extends JpaRepository implements Payout
 	public void addAll(List<PayoutManagementData> domains) {
 		String INS_SQL = "INSERT INTO KRCDT_PAYOUT_MNG (INS_DATE, INS_CCD , INS_SCD , INS_PG,"
 				+ " UPD_DATE , UPD_CCD , UPD_SCD , UPD_PG," 
-				+ " PAYOUT_ID, CID, SID, UNKNOWN_DATE, DAYOFF_DATE, EXPIRED_DATE, LAW_ATR, OCCURRENCE_DAYS,"
+				+ " PAYOUT_ID, CONTRACT_CD, CID, SID, UNKNOWN_DATE, DAYOFF_DATE, EXPIRED_DATE, LAW_ATR, OCCURRENCE_DAYS,"
 				+ " UNUSED_DAYS, STATE_ATR, DISAPEAR_DATE)"
 				+ " VALUES (INS_DATE_VAL, INS_CCD_VAL, INS_SCD_VAL, INS_PG_VAL,"
 				+ " UPD_DATE_VAL, UPD_CCD_VAL, UPD_SCD_VAL, UPD_PG_VAL,"
-				+ " PAYOUT_ID_VAL, CID_VAL, SID_VAL, UNKNOWN_DATE_VAL, DAYOFF_DATE_VAL, EXPIRED_DATE_VAL, LAW_ATR_VAL, OCCURRENCE_DAYS_VAL,"
+				+ " PAYOUT_ID_VAL, CONTRACT_CD_VAL, CID_VAL, SID_VAL, UNKNOWN_DATE_VAL, DAYOFF_DATE_VAL, EXPIRED_DATE_VAL, LAW_ATR_VAL, OCCURRENCE_DAYS_VAL,"
 				+ " UNUSED_DAYS_VAL, STATE_ATR_VAL, DATE_VAL); ";
 		String insCcd = AppContexts.user().companyCode();
 		String insScd = AppContexts.user().employeeCode();
 		String insPg = AppContexts.programId();
+		String contractCd = AppContexts.user().contractCode();
 		
 		String updCcd = insCcd;
 		String updScd = insScd;
 		String updPg = insPg;
 		StringBuilder sb = new StringBuilder();
+		boolean isPostgreSQL = this.database().is(DatabaseProduct.POSTGRESQL);
 		domains.parallelStream().forEach(c -> {
 			String sql = INS_SQL;
 			sql = sql.replace("INS_DATE_VAL", "'" + GeneralDateTime.now() + "'");
@@ -397,10 +400,15 @@ public class JpaPayoutManagementDataRepo extends JpaRepository implements Payout
 			sql = sql.replace("UPD_PG_VAL", "'" + updPg + "'");
 
 			sql = sql.replace("PAYOUT_ID_VAL", "'" + c.getPayoutId() + "'");
+			sql = sql.replace("CONTRACT_CD_VAL", "'" + contractCd + "'");
 			sql = sql.replace("CID_VAL", "'" + c.getCID()+ "'");
 			sql = sql.replace("SID_VAL", "'" + c.getSID()+ "'");
 			
-			sql = sql.replace("UNKNOWN_DATE_VAL", c.getPayoutDate().isUnknownDate() == true? "1":"0");
+			if (isPostgreSQL) {
+				sql = sql.replace("UNKNOWN_DATE_VAL", "" + c.getPayoutDate().isUnknownDate());
+			} else {
+	            sql = sql.replace("UNKNOWN_DATE_VAL", c.getPayoutDate().isUnknownDate() == true? "1":"0");
+			}
 			sql = sql.replace("DAYOFF_DATE_VAL", c.getPayoutDate().getDayoffDate().isPresent()
 					? "'" + c.getPayoutDate().getDayoffDate().get() +"'" : "null");
 			sql = sql.replace("EXPIRED_DATE_VAL", c.getExpiredDate() == null? "null" : "'" + c.getExpiredDate() + "'");

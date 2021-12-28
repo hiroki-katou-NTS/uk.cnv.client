@@ -39,19 +39,18 @@ public class StartWorkInputPanel {
 		// 2: <call>()
 		List<Task> taskList2 = getAvailableWorking.get(sId, refDate, new TaskFrameNo(2),
 				Optional.of(new TaskCode(workGroup.getWorkCD1().v())));
-
 		// 3: <call>()
 		List<Task> taskList3 = getAvailableWorking.get(sId, refDate, new TaskFrameNo(3),
-				Optional.of(new TaskCode(workGroup.getWorkCD2().toString())));
+				Optional.ofNullable(workGroup.getWorkCD2().map(x -> new TaskCode(x.v())).orElse(null)));
 
 		// 4: <call>()
 		List<Task> taskList4 = getAvailableWorking.get(sId, refDate, new TaskFrameNo(4),
-				Optional.of(new TaskCode(workGroup.getWorkCD3().toString())));
+				Optional.ofNullable(workGroup.getWorkCD3().map(x -> new TaskCode(x.v())).orElse(null)));
 
 		// 5: <call>()
 		List<Task> taskList5 = getAvailableWorking.get(sId, refDate, new TaskFrameNo(5),
-				Optional.of(new TaskCode(workGroup.getWorkCD4().toString())));
-		
+				Optional.ofNullable(workGroup.getWorkCD4().map(x -> new TaskCode(x.v())).orElse(null)));
+
 		return new StartWorkInputPanelResult(taskList1, taskList2, taskList3, taskList4, taskList5);
 
 	}

@@ -18,6 +18,7 @@ import nts.uk.screen.at.app.monthlyperformance.correction.MPUpdateColWidthComman
 import nts.uk.screen.at.app.monthlyperformance.correction.MonthlyPerformanceCorrectionProcessor;
 import nts.uk.screen.at.app.monthlyperformance.correction.MonthlyPerformanceReload;
 import nts.uk.screen.at.app.monthlyperformance.correction.command.MonModifyCommandFacade;
+import nts.uk.screen.at.app.monthlyperformance.correction.command.OutputRegisterKMW003;
 import nts.uk.screen.at.app.monthlyperformance.correction.dto.MPItemParent;
 import nts.uk.screen.at.app.monthlyperformance.correction.dto.MonthlyPerformanceCorrectionDto;
 import nts.uk.screen.at.app.monthlyperformance.correction.param.MonthlyPerformanceParam;
@@ -80,7 +81,7 @@ public class MonthlyPerformanceCorrectionWebService {
 	
 	@POST
 	@Path("addAndUpdate")
-	public Map<Integer, List<MPItemParent>> addAndUpdate(MPItemParent dataParent) {
+	public List<OutputRegisterKMW003> addAndUpdate(MPItemParent dataParent) {
 		return this.monModifyCommandFacade.insertItemDomain(dataParent);
 	}
 }

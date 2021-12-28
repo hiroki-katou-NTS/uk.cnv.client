@@ -243,7 +243,7 @@ module nts.uk.at.view.kdp.share {
 					vm.time(date);
 				});
 
-			setInterval(() => vm.time(vm.$date.now()), 100);
+			setInterval(() => vm.time(vm.$date.now()), 300);
 		}
 
 		mounted() {

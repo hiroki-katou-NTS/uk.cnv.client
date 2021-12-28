@@ -32,7 +32,52 @@ public class CalculateAttendanceTimeBySupportWorkServiceHelper {
 		
 		List<TimeLeavingWork> timeleavings = new ArrayList<>();
 		
-		TimeLeavingWork leavingWork = new TimeLeavingWork(new WorkNo(1), actualStamp, actualStamp);
+//		TimeLeavingWork leavingWork = new TimeLeavingWork(new WorkNo(1), actualStamp, actualStamp);
+		TimeLeavingWork leavingWork = new TimeLeavingWork(new WorkNo(1), Optional.of(actualStamp), Optional.of(actualStamp), true, true);
+		
+		timeleavings.add(leavingWork);
+		timeleavings.add(leavingWork);
+		
+		IntegrationOfDaily integrationOfDaily = new IntegrationOfDaily(
+				"employeeId",
+				GeneralDate.today(),
+				null,
+				null,
+				null,
+				Optional.empty(),
+				new ArrayList<>(),
+				Optional.empty(),
+				null,
+				Optional.empty(),
+				Optional.empty(),
+				Optional.empty(),
+				Optional.empty(),
+				Optional.empty(),
+				Optional.empty(),
+				new ArrayList<>(),
+				Optional.empty(),
+				new ArrayList<>(),
+				new ArrayList<>(),
+				new ArrayList<>(),
+				Optional.empty());
+				
+				return integrationOfDaily;
+	}
+	
+public static IntegrationOfDaily getIntegrationOfDaily1() {
+		
+//		TimeActualStamp actualStamp = new TimeActualStamp(new WorkStamp(new TimeWithDayAttr(100),
+//				new WorkLocationCD("001"),
+//				EnumAdaptor.valueOf(0, TimeChangeMeans.class)),
+//			new WorkStamp(new TimeWithDayAttr(200),
+//					new WorkLocationCD("002"),
+//					EnumAdaptor.valueOf(0, TimeChangeMeans.class)),
+//			1);
+		
+		List<TimeLeavingWork> timeleavings = new ArrayList<>();
+		
+//		TimeLeavingWork leavingWork = new TimeLeavingWork(new WorkNo(1), actualStamp, actualStamp);
+		TimeLeavingWork leavingWork = new TimeLeavingWork(new WorkNo(1), Optional.empty(), Optional.empty(), true, true);
 		
 		timeleavings.add(leavingWork);
 		timeleavings.add(leavingWork);
@@ -55,6 +100,8 @@ public class CalculateAttendanceTimeBySupportWorkServiceHelper {
 				Optional.empty(),
 				new ArrayList<>(),
 				Optional.empty(),
+				new ArrayList<>(),
+				new ArrayList<>(),
 				new ArrayList<>(),
 				Optional.empty());
 				

@@ -45,6 +45,10 @@ module nts.uk.at.view.kaf020.b {
 					params = __viewContext.transferred.value;
 				}
 			}
+			let screenCode: number = null;
+			if (params && !nts.uk.util.isNullOrUndefined(params.screenCode)) {
+				screenCode = params.screenCode;
+			}
             if (params && params.isAgentMode) vm.isAgentMode(params.isAgentMode);
             if (params != undefined && params.optionalItem) {
                 nts.uk.characteristics.save("KAF020InitParams", params.optionalItem);
@@ -66,8 +70,14 @@ module nts.uk.at.view.kaf020.b {
                 vm.application().opAppStartDate(paramDate);
                 vm.application().opAppEndDate(paramDate);
             }
+			let paramKAF000 = {
+				empLst: vm.empLst, 
+				dateLst: vm.dateLst, 
+				appType: vm.appType(),
+				screenCode
+			};
             vm.$blockui("show");
-            vm.loadData(vm.empLst, vm.dateLst, vm.appType()).then((loadFlag) => {
+            vm.loadData(paramKAF000).then((loadFlag) => {
                 if (loadFlag) {
                     if (params != undefined && params.optionalItem) {
                         return vm.fetchData(params.optionalItem);
@@ -87,18 +97,20 @@ module nts.uk.at.view.kaf020.b {
         fetchData(params: any) {
             const vm = this;
             let itemNoList = params.settingItems.map((item: any) => item.no);
-            $.when(vm.$ajax(PATH_API.getControlAttendance, {optionalItemNos: itemNoList}), vm.$ajax(PATH_API.listOptionalItem, {optionalItemNos: itemNoList})).done((controlAttendance: any, optionalItems: any) => {
+            // $.when(vm.$ajax(PATH_API.getControlAttendance, {optionalItemNos: itemNoList}), vm.$ajax(PATH_API.listOptionalItem, {optionalItemNos: itemNoList})).done((controlAttendance: any, optionalItems: any) => {
+            vm.$ajax(PATH_API.listOptionalItem, {optionalItemNos: itemNoList}).done((optionalItems: any) => {
                 let contents: Array<OptionalItemApplicationContent> = [];
                 params.settingItems.forEach((opItem: any) => {
                     let optionalItem: OptionalItem = _.find(optionalItems, {optionalItemNo: opItem.no});
-                    let controlOfAttendanceItem: any = _.find(controlAttendance, {itemDailyID: opItem.no + 640});
+                    // let controlOfAttendanceItem: any = _.find(controlAttendance, {itemDailyID: opItem.no + 640});
                     if (optionalItem) {
                         contents.push({
                             optionalItemName: optionalItem.optionalItemName,
                             optionalItemNo: optionalItem.optionalItemNo,
                             optionalItemAtr: optionalItem.optionalItemAtr,
                             unit: optionalItem.unit,
-                            inputUnitOfTimeItem: controlOfAttendanceItem ? controlOfAttendanceItem.inputUnitOfTimeItem : null,
+                            inputCheckbox: optionalItem.inputCheck,
+                            inputUnitOfItem: vm.getInputUnit(optionalItem.optionalItemAtr, optionalItem.calcResultRange),
                             description: optionalItem.description,
                             timeUpper: optionalItem.calcResultRange.timeRange.dailyTimeRange.upperLimit != null ? nts.uk.time.format.byId("Time_Short_HM", optionalItem.calcResultRange.timeRange.dailyTimeRange.upperLimit) : null,
                             timeLower: optionalItem.calcResultRange.timeRange.dailyTimeRange.lowerLimit != null ? nts.uk.time.format.byId("Time_Short_HM", optionalItem.calcResultRange.timeRange.dailyTimeRange.lowerLimit) : null,
@@ -111,6 +123,7 @@ module nts.uk.at.view.kaf020.b {
                             time: ko.observable(''),
                             times: ko.observable(),
                             amount: ko.observable(),
+                            timesChecked: ko.observable(false),
                             detail: '',
                             dispOrder: opItem.dispOrder
                         });
@@ -122,6 +135,41 @@ module nts.uk.at.view.kaf020.b {
             }).always(() => {
                 vm.$blockui("hide");
             });
+        }
+
+        getInputUnit(optionalItemAtr: number, calcResultRange: any): string  {
+            const vm = this;
+            if (optionalItemAtr == 0) {
+                switch (calcResultRange.timeInputUnit) {
+                    case 0: return vm.$i18n("KMK002_141");
+                    case 1: return vm.$i18n("KMK002_142");
+                    case 2: return vm.$i18n("KMK002_143");
+                    case 3: return vm.$i18n("KMK002_144");
+                    case 4: return vm.$i18n("KMK002_145");
+                    case 5: return vm.$i18n("KMK002_146");
+                    default: return null;
+                }
+            }
+            if (optionalItemAtr == 1) {
+                switch (calcResultRange.numberInputUnit) {
+                    case 0: return vm.$i18n("KMK002_150");
+                    case 1: return vm.$i18n("KMK002_151");
+                    case 2: return vm.$i18n("KMK002_152");
+                    case 3: return vm.$i18n("KMK002_153");
+                    default: return null;
+                }
+            }
+            if (optionalItemAtr == 2) {
+                switch (calcResultRange.amountInputUnit) {
+                    case 0: return vm.$i18n("KMK002_160");
+                    case 1: return vm.$i18n("KMK002_161");
+                    case 2: return vm.$i18n("KMK002_162");
+                    case 3: return vm.$i18n("KMK002_163");
+                    case 4: return vm.$i18n("KMK002_164");
+                    default: return null;
+                }
+            }
+            return null;
         }
 
         focusDate() {
@@ -152,7 +200,7 @@ module nts.uk.at.view.kaf020.b {
             vm.dataFetch().applicationContents().forEach((item: OptionalItemApplicationContent) => {
                 optionalItems.push({
                     itemNo: item.optionalItemNo,
-                    times: item.times(),
+                    times: item.inputCheckbox ? (item.timesChecked () ? 1 : null) : item.times(),
                     amount: item.amount(),
                     time: item.time()
                 });
@@ -241,6 +289,7 @@ module nts.uk.at.view.kaf020.b {
         optionalItemAtr: number
         unit: string
         description: string,
+        inputCheck: boolean;
     }
 
     interface DetailSreenInfo {

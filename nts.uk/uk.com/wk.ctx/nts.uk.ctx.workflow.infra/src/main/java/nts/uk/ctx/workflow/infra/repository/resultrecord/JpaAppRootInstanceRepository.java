@@ -14,12 +14,12 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.persistence.Query;
 
-import lombok.val;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.util.Strings;
 
 import lombok.SneakyThrows;
+import lombok.val;
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.layer.infra.data.DbConsts;
 import nts.arc.layer.infra.data.JpaRepository;
@@ -429,7 +429,7 @@ public class JpaAppRootInstanceRepository extends JpaRepository implements AppRo
 					Integer.valueOf(String.valueOf(mapper[6])),
 					Integer.valueOf(String.valueOf(mapper[7])),
 					Integer.valueOf(String.valueOf(mapper[8])),
-					BooleanUtils.toIntegerObject((Boolean) mapper[9]),
+					String.valueOf(mapper[9]).length() > 1 ? BooleanUtils.toIntegerObject(Boolean.valueOf(String.valueOf(mapper[9]))) : Integer.valueOf(String.valueOf(mapper[9])),
 					String.valueOf(mapper[10])))
 				.collect(Collectors.toList()));
 		return listFullData;

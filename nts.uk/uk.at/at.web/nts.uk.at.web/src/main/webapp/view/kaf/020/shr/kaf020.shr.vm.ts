@@ -27,9 +27,11 @@ module nts.uk.at.view.kaf020.shr.viewmodel {
                 <tr>
                     <td>
                         <!--B4_1-->
-                        <div class="label" style="white-space: normal" data-bind="text: optionalItemName"></div>
+                        <div style="min-height: 39px; display: flex; align-items: center;">
+                            <div class="label" style="white-space: normal" data-bind="text: optionalItemName"></div>
+                        </div>
                     </td>
-                    <td style="vertical-align: top">
+                    <td>
                         <!--B4_2-->
                         <!--time-->
                         <div data-bind="if: optionalItemAtr == 0">
@@ -44,7 +46,7 @@ module nts.uk.at.view.kaf020.shr.viewmodel {
                                         }, attr: {id: optionalItemNo}"/>
                         </div>
                         <!--number-->
-                        <div data-bind="if: optionalItemAtr == 1">
+                        <div data-bind="if: optionalItemAtr == 1 &amp;&amp; !inputCheckbox">
                             <input class="input" tabindex="0"
                                    data-bind="ntsNumberEditor: {
                                             name: '#[KAF020_22]',
@@ -53,6 +55,9 @@ module nts.uk.at.view.kaf020.shr.viewmodel {
                                             option: {grouplength: 3, decimallength: 2},
                                             enable: $parent.enableEdit() 
                                        }, attr: {id: optionalItemNo}"/>
+                        </div>
+                        <div data-bind="if: optionalItemAtr == 1 &amp;&amp; inputCheckbox" style="display: flex; flex-direction: column; align-items: center;">
+                            <div tabindex="0" data-bind="ntsCheckBox: {name: '#[KAF020_22]', checked: timesChecked, enable: $parent.enableEdit()}"></div>
                         </div>
                         <!--amount-->
                         <div data-bind="if: optionalItemAtr == 2">
@@ -66,14 +71,14 @@ module nts.uk.at.view.kaf020.shr.viewmodel {
                                        }, attr: {id: optionalItemNo}"/>
                         </div>
                     </td>
-                    <td style="vertical-align: top">
+                    <td style="text-align: center;">
                         <!--B4_3-->
-                        <div style="margin-top: 10px" class="label" data-bind="text: unit"></div>
+                        <span class="label" data-bind="text: optionalItemAtr == 1 &amp;&amp; inputCheckbox ? null : unit"></span>
                     </td>
                     <td>
                         <div data-bind="text: description" style="white-space: normal; word-break: break-all;"></div>
-                        <div data-bind="if: lowerCheck &#124;&#124; upperCheck &#124;&#124; unit &#124;&#124; optionalItemAtr == 0">
-                            <span class="label" style="margin-top: 6px">
+                        <div data-bind="if: (lowerCheck &#124;&#124; upperCheck &#124;&#124; unit &#124;&#124; optionalItemAtr == 0) &amp;&amp; !inputCheckbox">
+                            <span class="label">
                                 <span data-bind="if:lowerCheck &#124;&#124; upperCheck &#124;&#124; unit &#124;&#124; optionalItemAtr == 0">
                                     <span data-bind="text: $vm.$i18n('KAF020_25')"></span>
                                 </span>
@@ -105,11 +110,11 @@ module nts.uk.at.view.kaf020.shr.viewmodel {
                                         <span data-bind="text: amountUpper"></span>
                                     </span>
                                 </span>
-                                <span data-bind="if: lowerCheck &amp;&amp; upperCheck">
+                                <span data-bind="if: (lowerCheck &#124;&#124; upperCheck) &amp;&amp; (unit &#124;&#124; optionalItemAtr == 0)">
                                     <span data-bind="text: '、'"></span>
                                 </span>
                                 <span data-bind="if: unit &#124;&#124; optionalItemAtr == 0">
-                                    <span data-bind="text: inputUnitOfTimeItem"></span>
+                                    <span data-bind="text: inputUnitOfItem"></span>
                                     <span data-bind="if: optionalItemAtr == 0">
                                         <span data-bind="text: $vm.$i18n('KAF020_32')"></span>
                                     </span>
@@ -158,7 +163,8 @@ module nts.uk.at.view.kaf020.shr.viewmodel {
         optionalItemNo: number;
         optionalItemAtr: number;
         unit: string;
-        inputUnitOfTimeItem: number;
+        inputCheckbox: boolean;
+        inputUnitOfItem: string;
         timeUpper: number;
         timeLower: number;
         numberUpper: number;
@@ -171,6 +177,7 @@ module nts.uk.at.view.kaf020.shr.viewmodel {
         time: KnockoutObservable<string>;
         times: KnockoutObservable<number>;
         amount: KnockoutObservable<number>;
+        timesChecked: KnockoutObservable<boolean>;
         detail: string;
         dispOrder: number;
     }

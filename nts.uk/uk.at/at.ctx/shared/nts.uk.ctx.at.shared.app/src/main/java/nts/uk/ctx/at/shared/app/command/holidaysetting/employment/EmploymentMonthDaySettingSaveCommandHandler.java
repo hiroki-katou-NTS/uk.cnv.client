@@ -1,22 +1,20 @@
 package nts.uk.ctx.at.shared.app.command.holidaysetting.employment;
 
-import java.util.Optional;
-
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
 import nts.arc.layer.app.command.CommandHandler;
 import nts.arc.layer.app.command.CommandHandlerContext;
-import nts.uk.ctx.at.shared.dom.common.CompanyId;
-import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.common.Year;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.employment.EmploymentMonthDaySetting;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.employment.EmploymentMonthDaySettingRepository;
-import nts.uk.shr.com.context.AppContexts;
 
 /**
  * The Class EmploymentMonthDaySettingSaveCommandHandler.
  */
 @Stateless
+@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class EmploymentMonthDaySettingSaveCommandHandler extends CommandHandler<EmploymentMonthDaySettingSaveCommand> {
 	
 	/** The repository. */
@@ -28,23 +26,15 @@ public class EmploymentMonthDaySettingSaveCommandHandler extends CommandHandler<
 	 */
 	@Override
 	protected void handle(CommandHandlerContext<EmploymentMonthDaySettingSaveCommand> context) {
-		// Get Company Id
-		String companyId = AppContexts.user().companyId();
-		
 		// Get Command
 		EmploymentMonthDaySettingSaveCommand command = context.getCommand();
 		
 		// convert to domain
 		EmploymentMonthDaySetting domain = new EmploymentMonthDaySetting(command);
-		
-		Optional<EmploymentMonthDaySetting> optional = this.repository.findByYear(new CompanyId(companyId), command.getEmploymentCode(), new Year(command.getYear()));
-	
+
 		// save data
-		if(optional.isPresent()){
-			this.repository.update(domain);
-		} else {
-			this.repository.add(domain);
-		}
+		this.repository.remove(domain);
+		this.repository.add(domain);
 	}
 
 }

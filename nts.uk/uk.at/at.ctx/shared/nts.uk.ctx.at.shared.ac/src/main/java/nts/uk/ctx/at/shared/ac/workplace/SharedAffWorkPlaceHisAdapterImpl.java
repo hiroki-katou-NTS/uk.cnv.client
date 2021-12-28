@@ -88,8 +88,14 @@ public class SharedAffWorkPlaceHisAdapterImpl implements SharedAffWorkPlaceHisAd
 	}
 
 	@Override
+	public List<String> findWpkIdsBySid(String companyId, String employeeId, GeneralDate baseDate) {
+		return workplacePub.findWpkIdsBySid(companyId, employeeId, baseDate);
+	}
+	
+	@Override
 	public List<String> getWorkplaceIdAndUpper(String companyId, GeneralDate baseDate, String workplaceId) {
 		return this.workplacePub.getWorkplaceIdAndUpper(companyId, baseDate, workplaceId);
+
 	}
 
 }

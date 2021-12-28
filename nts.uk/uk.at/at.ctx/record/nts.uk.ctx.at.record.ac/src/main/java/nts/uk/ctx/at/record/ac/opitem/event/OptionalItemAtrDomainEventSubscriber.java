@@ -21,9 +21,12 @@ public class OptionalItemAtrDomainEventSubscriber implements DomainEventSubscrib
 
 	@Override
 	public void handle(OptionalItemUpdateDomainEvent domainEvent) {
-		OptionalItemAtrExport optItem = new OptionalItemAtrExport(domainEvent.getPerformanceAtr().value,
-				domainEvent.getOptionalItemAtr().value, domainEvent.getOptionalItemNo().v());
-		attendanceAtrService.updateAttendanceAtr(optItem);
+//		OptionalItemAtrExport optItem = new OptionalItemAtrExport(
+//				domainEvent.getPerformanceAtr().value,
+//				domainEvent.getOptionalItemAtr().value,
+//				domainEvent.getOptionalItemNo().v()
+//		);
+//		attendanceAtrService.updateAttendanceAtr(optItem);
 	}
 
 }

@@ -20,9 +20,9 @@ import nts.uk.ctx.at.shared.dom.workrule.closure.Closure;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureEmploymentRepository;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureRepository;
 import nts.uk.ctx.at.shared.dom.workrule.closure.service.ClosureService;
+import nts.uk.ctx.at.shared.dom.workrule.closure.service.ClosureService.RequireM3;
 import nts.uk.ctx.at.shared.dom.workrule.closure.service.EmployeeIdClosureIdDto;
 import nts.uk.ctx.at.shared.dom.workrule.closure.service.GetClosureIdReferEmployeeIds;
-import nts.uk.ctx.at.shared.dom.workrule.closure.service.ClosureService.RequireM3;
 import nts.uk.ctx.sys.auth.pub.role.RoleExportRepo;
 import nts.uk.ctx.sys.portal.dom.toppagepart.standardwidget.ApplicationStatusWidgetItem;
 import nts.uk.ctx.sys.portal.dom.toppagepart.standardwidget.ApproveWidgetRepository;
@@ -31,7 +31,6 @@ import nts.uk.ctx.sys.portal.dom.toppagepart.standardwidget.StandardWidgetType;
 import nts.uk.ctx.sys.portal.dom.toppagepart.standardwidget.TopPageDisplayYearMonthEnum;
 import nts.uk.screen.at.app.ktgwidget.ktg004.CurrentClosingPeriod;
 import nts.uk.screen.at.app.ktgwidget.ktg004.KTG004Finder;
-import nts.uk.screen.at.app.ktgwidget.ktg004.TopPageDisplayDateDto;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 import nts.uk.shr.com.i18n.TextResource;
@@ -76,15 +75,12 @@ public class StartScreenA {
 	 * @param employeeId 社員ID
 	 * @return
 	 */
-	public ExecutionResultNumberOfApplicationDto startScreenA(String cid, String employeeId, Optional<TopPageDisplayDateDto> topPageDisplayDate) {
+	public ExecutionResultNumberOfApplicationDto startScreenA(String cid, String employeeId) {
 		//＜CR＞表示年月が存在する
 		//存在しない場合
 		List<EmployeeIdClosureIdDto> employeeIdClosureId = new ArrayList<EmployeeIdClosureIdDto>();
-		if(!topPageDisplayDate.isPresent()) {
-			//アルゴリズム「社員(list)に対応する処理締めを取得する」を実行する
-			employeeIdClosureId = getClosureIdReferEmployeeIds.get( Arrays.asList(employeeId));
-		}
-		
+		//アルゴリズム「社員(list)に対応する処理締めを取得する」を実行する
+		employeeIdClosureId = getClosureIdReferEmployeeIds.get( Arrays.asList(employeeId));
 		
 		//アルゴリズム「指定した年月の期間を算出する」を実行する
 		//DatePeriod datePeriod = ClosureService.getClosurePeriod(ClosureService.createRequireM1(closureRepository, closureEmploymentRepo), topPageDisplayDate.isPresent()?topPageDisplayDate.get().getClosureId():employeeIdClosureId.get(0).getClosureId(), GeneralDate.today().yearMonth());
@@ -132,7 +128,7 @@ public class StartScreenA {
 		if (itemOpt.isPresent()) {
 			// 申請締切設定を取得する
 			DeadlineLimitCurrentMonth deadLine = appDeadlineSettingGet.getApplicationDeadline(cid, employeeId,
-				topPageDisplayDate.isPresent() ? topPageDisplayDate.get().getClosureId() : employeeIdClosureId.get(0).getClosureId());
+				employeeIdClosureId.get(0).getClosureId());
 			result.setDueDate(deadLine.getOpAppDeadline().map(x -> x).orElse(GeneralDate.today()));
 			result.setDeadlineSetting(deadLine.isUseAtr());
 		}
@@ -143,10 +139,10 @@ public class StartScreenA {
 			.collect(Collectors.toList());
 		//アルゴリズム「トップページの対象期間を取得する」を実行する
 		CurrentClosingPeriod currentClosingPeriod = KTG004Finder.getTargetPeriodOfTopPage(
-			topPageDisplayDate.isPresent() ? topPageDisplayDate.get().getClosureId() : employeeIdClosureId.get(0).getClosureId(),
-			new CurrentClosingPeriod(datePeriod.end().yearMonth().v(), datePeriod.start(), datePeriod.end()), 
+			employeeIdClosureId.get(0).getClosureId(),
+			new CurrentClosingPeriod(datePeriod.end().yearMonth().v(), datePeriod.start(), datePeriod.end().addYears(1)), 
 			Optional.empty(), 
-			topPageDisplayDate.isPresent() ? topPageDisplayDate.get().getTopPageYearMonthEnum() : TopPageDisplayYearMonthEnum.THIS_MONTH_DISPLAY);
+			TopPageDisplayYearMonthEnum.THIS_MONTH_DISPLAY);
 					
 		//いずれが表示する
 		if(!usedList.isEmpty()) {
@@ -158,6 +154,11 @@ public class StartScreenA {
 		//セット項目：
 		//申請件数の実行結果．勤怠担当者である＝取得した就業担当者か
 		result.setEmployeeCharge(isEmployeeCharge);
+		
+		result.setPeriod(DatePeriodDto.builder()
+				.startDate(datePeriod.start().toString())
+				.endDate(datePeriod.end().toString())
+				.build());
 		
 		return result;
 	}

@@ -62,6 +62,7 @@ public class ToppageAlarmDataTest {
 		//then
 		assertThat(domain.getIsResolved()).isFalse();
 		assertThat(domain.getOccurrenceDateTime()).isEqualTo(GeneralDateTime.FAKED_NOW);
+		assertThat(domain.getReadDateTime()).isEmpty();
 	}
 	
 	/**

@@ -14,6 +14,7 @@ public class ApprovalListDispSettingDto {
     private int atdExcessAtr;
     private int warningDays;
     private int dispWorkplaceNameAtr;
+    private int useApprovalFunction;
 
     public static ApprovalListDispSettingDto fromDomain(ApprovalListDisplaySetting domain) {
         return new ApprovalListDispSettingDto(
@@ -21,7 +22,8 @@ public class ApprovalListDispSettingDto {
                 domain.getAdvanceExcessMessDisAtr().value,
                 domain.getActualExcessMessDisAtr().value,
                 domain.getWarningDateDisAtr().v(),
-                domain.getDisplayWorkPlaceName().value
+                domain.getDisplayWorkPlaceName().value,
+                domain.getUseApprovalFunction().value
         );
     }
 }

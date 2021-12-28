@@ -303,7 +303,7 @@ public class JpaEmployeeDailyPerErrorRepository extends JpaRepository implements
 								rs.getString("SID"),
 								rs.getGeneralDate("PROCESSING_DATE"),
 								new ErrorAlarmWorkRecordCode(rs.getString("ERROR_CODE")),
-								Arrays.asList(rs.getInt("ATTENDANCE_ITEM_ID")),
+								rs.getInt("ATTENDANCE_ITEM_ID") == null? new ArrayList<>(): Arrays.asList(rs.getInt("ATTENDANCE_ITEM_ID")),
 								0,
 								rs.getString("ERROR_MESSAGE")));
 

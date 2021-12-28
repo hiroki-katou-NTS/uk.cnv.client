@@ -1,0 +1,57 @@
+.left-content {
+	display: inline-block;
+	width: 12%;
+    margin: 5px 0 5px 2%;
+}
+
+.right-content {
+	display: inline-block;
+	width: 75%;
+}
+
+.nts-switch-button {
+	width: 110px;
+}
+
+.ntsHelpButton {
+	margin-left: 5px;
+}
+
+.I4-spacing{
+	margin: 10px 0;
+	display: flex;
+}
+
+.mid-line-spacing{
+	margin: 0 12px;
+}
+
+.d-flex{
+	display: flex;
+	align-items: center;
+}
+
+#contents {
+	width: 1250px;
+}
+
+#I2_2 {
+	position: relative;
+    top: 9px;
+    width: 240px;
+}
+
+#I3_2 {
+	position: relative;
+	top: 12px;
+	width: 110px;
+}
+
+#I3_4 {
+	margin-left: 10px;
+}
+
+.has-info {
+	pointer-events: none;
+    opacity: 0.4;
+}

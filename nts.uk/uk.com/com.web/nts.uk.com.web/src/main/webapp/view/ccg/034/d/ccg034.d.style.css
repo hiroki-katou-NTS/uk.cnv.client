@@ -186,3 +186,6 @@
 #menu-creation-layout .menu-creation-item-container:hover > .ui-resizable-se {
   display: block !important;
 }
+.limited-label-view {
+  display: none !important;
+}

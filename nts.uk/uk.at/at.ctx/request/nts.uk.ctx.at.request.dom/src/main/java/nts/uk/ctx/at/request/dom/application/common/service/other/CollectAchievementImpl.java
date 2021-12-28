@@ -1,22 +1,17 @@
 package nts.uk.ctx.at.request.dom.application.common.service.other;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import nts.uk.ctx.at.request.dom.application.*;
+import nts.uk.ctx.at.request.dom.application.overtime.OvertimeAppAtr;
 import org.apache.logging.log4j.util.Strings;
 
 import nts.arc.time.GeneralDate;
 import nts.gul.collection.CollectionUtil;
-import nts.uk.ctx.at.request.dom.application.ApplicationRepository;
-import nts.uk.ctx.at.request.dom.application.ApplicationType;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.RecordWorkInfoAdapter;
 import nts.uk.ctx.at.request.dom.application.common.adapter.record.RecordWorkInfoImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.schedule.schedule.basicschedule.ScBasicScheduleAdapter;
@@ -406,9 +401,29 @@ public class CollectAchievementImpl implements CollectAchievement {
 	}
 
 	@Override
-	public List<PreAppContentDisplay> getPreAppContents(String companyID, String employeeID, List<GeneralDate> dateLst,
-			ApplicationType appType) {
+	public List<PreAppContentDisplay> getPreAppContents(String companyID, String employeeID, List<GeneralDate> dateLst, ApplicationType appType, Optional<OvertimeAppAtr> opOvertimeAppAtr) {
 		List<PreAppContentDisplay> result = new ArrayList<>();
+		if (appType == ApplicationType.OVER_TIME_APPLICATION && opOvertimeAppAtr.isPresent() && opOvertimeAppAtr.get() == OvertimeAppAtr.MULTIPLE_OVERTIME) {
+			List<Application> applications = applicationRepository.getByListDateReflectType2(
+					employeeID,
+					dateLst,
+					Arrays.asList(ApplicationType.OVER_TIME_APPLICATION.value),
+					Arrays.asList(ReflectedState.NOTREFLECTED.value, ReflectedState.WAITREFLECTION.value, ReflectedState.REFLECTED.value)
+			).stream().filter(a -> a.getPrePostAtr() == PrePostAtr.PREDICT).collect(Collectors.toList());
+			Map<String, AppOverTime> appOverTimes = appOverTimeRepository.getHashMapByID(companyID, applications.stream().map(Application::getAppID).collect(Collectors.toList()));
+			for (int i = applications.size() - 1; i >= 0; i--) {
+				AppOverTime appOverTime = appOverTimes.get(applications.get(i).getAppID());
+				if (appOverTime != null && appOverTime.getOverTimeClf() == OvertimeAppAtr.MULTIPLE_OVERTIME) {
+					result.add(new PreAppContentDisplay(
+							applications.get(i).getAppDate().getApplicationDate(),
+							Optional.of(appOverTime),
+							Optional.empty()
+					));
+					break;
+				}
+			}
+			return result;
+		}
 		// INPUT．申請対象日リストをチェックする
 		if(CollectionUtil.isEmpty(dateLst)) {
 			return Collections.emptyList();

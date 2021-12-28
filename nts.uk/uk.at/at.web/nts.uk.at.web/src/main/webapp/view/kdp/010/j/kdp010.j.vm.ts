@@ -264,7 +264,8 @@ module nts.uk.at.view.kdp010.j {
                 let self = this;
                 let dataI = {
                     dataShare: ko.toJS(self),
-                    buttonPositionNo: buttonPositionNo
+                    buttonPositionNo: buttonPositionNo,
+                    stampMeans: 3
                 }
                 nts.uk.ui.windows.setShared('KDP010_G', dataI);
                 nts.uk.ui.windows.sub.modal("/view/kdp/010/i/index.xhtml").onClosed(() => {

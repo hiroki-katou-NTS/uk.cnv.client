@@ -12,6 +12,10 @@ import java.util.List;
 public interface DailyPerformAuthorRepo {
 
 	public List<DailyPerformanceAuthority> get(String roleId);
+	
+	public List<DailyPerformanceAuthority> findByCid(String cid);
+	
+	public List<DailyPerformanceAuthority> findByCidAndRole(String cid, String roleId);
 
 	public void save(DailyPerformanceAuthority daiPerAuthority);
 
@@ -24,4 +28,6 @@ public interface DailyPerformAuthorRepo {
 	 * @return
 	 */
 	public boolean getAuthorityOfEmployee(String roleId, DailyPerformanceFunctionNo functionNo, boolean available);
+	
+	public void copy(String companyId, List<DailyPerformanceAuthority> sourceData, List<String> targetRoleList);
 }

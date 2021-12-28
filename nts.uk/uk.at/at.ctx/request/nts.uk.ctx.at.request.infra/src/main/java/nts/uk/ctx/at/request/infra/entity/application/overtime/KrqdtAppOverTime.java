@@ -6,13 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.JoinTable;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -172,6 +166,11 @@ public class KrqdtAppOverTime extends ContractUkJpaEntity implements Serializabl
 	@OneToMany(targetEntity = KrqdtAppOvertimeInput.class, mappedBy = "appOvertime", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinTable(name = "KRQDT_APP_OVERTIME_INPUT")
 	public List<KrqdtAppOvertimeInput> overtimeInputs;
+
+	@OneToMany(targetEntity = KrqdtAppOvertimeMultiTimes.class, mappedBy = "appOvertime", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinTable(name = "KRQDT_APP_OVERTIME_MULTI_TIMES")
+	@OrderBy("pk.overtimeNumber ASC")
+	public List<KrqdtAppOvertimeMultiTimes> multipleOvertimes;
 
 	@Override
 	protected Object getKey() {
@@ -381,7 +380,11 @@ public class KrqdtAppOverTime extends ContractUkJpaEntity implements Serializabl
 																			  .map(x -> x.toDomain())
 																			  .collect(Collectors.toList()));
 		}
-		
+
+		if (!CollectionUtil.isEmpty(multipleOvertimes)) {
+			appOverTime.setMultipleTimesOp(Optional.of(KrqdtAppOvertimeMultiTimes.toDomain(multipleOvertimes)));
+		}
+
 		return appOverTime;
 	}
 	

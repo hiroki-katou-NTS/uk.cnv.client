@@ -302,7 +302,8 @@ public class KTG027QueryProcessor {
 	 * @return
 	 * @param currentOrNextMonth
 	 */
-	public OvertimedDisplayForSuperiorsDto getOvertimeDisplayForSuperiorsDto(int currentOrNextMonth) {
+	public OvertimedDisplayForSuperiorsDto getOvertimeDisplayForSuperiorsDto(int currentOrNextMonth,
+			int closingId, String startDate, String endDate, int processingYm) {
 		val require = this.requireService.createRequire();
 		val cacheCarrier = new CacheCarrier();
 		String sID = AppContexts.user().employeeId();
@@ -319,17 +320,13 @@ public class KTG027QueryProcessor {
 			return result;
 		}
 
-		// 上長用の時間外時間表示．当月の締め情報．処理年月＝取得したドメインモデル「締め」．当月
-		// 上長用の時間外時間表示．当月の締め情報．締め開始日＝取得した締め期間．開始日
-		// 上長用の時間外時間表示．当月の締め情報．締め終了日＝取得した締め期間．終了日
-		// 上長用の時間外時間表示．ログイン者の締めID＝取得したドメインモデル「締め」．締めID
 		CurrentClosingPeriodExport closingInformationForCurrentMonth = CurrentClosingPeriodExport.builder()
-				.processingYm(closure.getClosureMonth().getProcessingYm().v())
-				.closureEndDate(lstClosure.get(0).getPeriod().end().toString())
-				.closureStartDate(lstClosure.get(0).getPeriod().start().toString())
+				.processingYm(processingYm)
+				.closureEndDate(endDate)
+				.closureStartDate(startDate)
 				.build();
 		result.setClosingInformationForCurrentMonth(closingInformationForCurrentMonth);
-		result.setClosureId(closure.getClosureId().value);
+		result.setClosureId(closingId);
 		// INPUT．表示年月＝当月表示
 		if (currentOrNextMonth == 1) {
 			// 対象年月を指定するログイン者の配下社員の時間外時間の取得
@@ -407,6 +404,13 @@ public class KTG027QueryProcessor {
 
 		// [RQ30]社員所属職場履歴を取得
 		SWkpHistImport sWkpHistImport = this.employeeAdapter.getSWkpHistByEmployeeID(sID, referencePeriod.get().end());
+		
+		if (sWkpHistImport == null) {
+			return AcquisitionOfOvertimeHoursOfEmployeesDto.builder()
+					.personalInformationOfSubordinateEmployees(new ArrayList<PersonEmpBasicInfoImport>())
+					.overtimeOfSubordinateEmployees(new ArrayList<AgreementTimeOfManagePeriodDto>())
+					.build();
+		}
 
 		// [No.573]職場の下位職場を基準職場を含めて取得する
 		List<String> lstWorkPlaceId = this.workplacePub.getWorkplaceIdAndChildren(
@@ -431,7 +435,7 @@ public class KTG027QueryProcessor {
 		// List＜管理期間の36協定時間＞
 		AcquisitionOfOvertimeHoursOfEmployeesDto result = AcquisitionOfOvertimeHoursOfEmployeesDto.builder()
 				.personalInformationOfSubordinateEmployees(listPersonEmp)
-				.OvertimeOfSubordinateEmployees(listAgreementTimeDetail).build();
+				.overtimeOfSubordinateEmployees(listAgreementTimeDetail).build();
 
 		return result;
 	}

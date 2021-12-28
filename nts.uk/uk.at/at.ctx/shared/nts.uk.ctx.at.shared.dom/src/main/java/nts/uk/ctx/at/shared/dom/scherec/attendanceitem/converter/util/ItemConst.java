@@ -23,7 +23,8 @@ public interface ItemConst extends Cloneable {
 	public final String DEFAULT_GET_TYPE = "getValueType";
 	public final String DEFAULT_SET_VALUE = "value";
 	public final String FAKED = "FAKED";
-
+	public final String IDX_WITH_ENUM_REG = "[0-9](_[0-9])*(-[^0-9]*[0-9]*)+$";
+	
 	public final String E_WORK_REF = "就業時間帯から参照";
 	public final String E_SCHEDULE_REF = "スケジュールから参照";
 	public final String E_CHILD_CARE = "育児";
@@ -129,7 +130,7 @@ public interface ItemConst extends Cloneable {
 
 	public final String DAILY_REMARKS_CODE = LAYOUT_Q;
 	public final String DAILY_REMARKS_NAME = "日別実績の備考";
-
+	
 	public final String DAILY_ERROR_NAME = "社員の日別実績エラー一覧";
 
 	public final String DAILY_SNAPSHOT_CODE = LAYOUT_S;
@@ -328,9 +329,13 @@ public interface ItemConst extends Cloneable {
 	public final String STRAIGHT_GO_BACK = "直行直帰";
 	public final String TOPPAGE = "トップページ";
 	public final String TRANSFER_HOLIDAY = "振休";
+	public final String MOVE = "移動";
+	public final String PRICE_UNIT = "単価";
 	public final String CHILD_CARE = "子の看護";
 	public final String CARE = "介護";
 	public final String SUPER_60 = "60H超休";
+	public final String DAY_SHIFT = "常勤";
+	public final String NIGHT_SHIFT = "夜勤";
 	public final String CUR_MONTH = "当月";
 	public final String NO = "不可";
 	public final String STANDARD = "基準";
@@ -343,6 +348,8 @@ public interface ItemConst extends Cloneable {
 	public final String WORKGROUP = "作業グループ";
 	public final String WORKCODE = "作業CD";
 	public final String WORKREMARKS = "作業入力備考";
+	public final String SELECTION = "選択";
+	public final String SUPP = "補足";
 	public final String THIS_YEAR = "本年";
 	public final String NEXT_YEAR = "翌年";
 	public final String NEXT_MONTH = "翌月";

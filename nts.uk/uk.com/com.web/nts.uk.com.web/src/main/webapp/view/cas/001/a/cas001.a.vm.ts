@@ -127,7 +127,8 @@ module nts.uk.com.view.cas001.a.viewmodel {
                     newCategory.loadRoleItems(self.currentRoleId(), categoryId).done(() => {
                         newCategory.setCategoryAuth(result);
                         self.currentRole().currentCategory(newCategory);
-                        if (categoryId.includes('CS00100')) {
+                        let currentCategory = _.find(self.roleCategoryList(), roleCate => roleCate.categoryId == categoryId);
+                        if (currentCategory && currentCategory.categoryCode == 'CS00100') {
                             self.itemListCbb([
                                 { code: 1, name: getText('CAS001_49') },
                                 { code: 3, name: getText('CAS001_51') }
@@ -416,6 +417,7 @@ module nts.uk.com.view.cas001.a.viewmodel {
     }
     export interface IPersonRoleCategory {
         categoryId: string;
+        categoryCode: string;
         categoryName: string;
         setting: boolean;
         categoryType: number;
@@ -455,6 +457,7 @@ module nts.uk.com.view.cas001.a.viewmodel {
         roleName: string;
         currentCategory: KnockoutObservable<PersonRoleCategory> = ko.observable(new PersonRoleCategory({
             categoryId: "",
+            categoryCode: "",
             categoryName: "",
             setting: true,
             categoryType: -1,
@@ -535,6 +538,7 @@ module nts.uk.com.view.cas001.a.viewmodel {
     export class PersonRoleCategory {
 
         categoryId: string;
+        categoryCode: string;
         categoryName: string;
         categoryType: number;
         setting: boolean;
@@ -569,6 +573,7 @@ module nts.uk.com.view.cas001.a.viewmodel {
         constructor(param: IPersonRoleCategory) {
             let self = this;
             self.categoryId = param ? param.categoryId : '';
+            self.categoryCode = param ? param.categoryCode : '';
             self.categoryName = param ? param.categoryName : '';
             self.categoryType = param ? param.categoryType : 0;
             self.setting = param ? param.setting : false;
@@ -653,7 +658,8 @@ module nts.uk.com.view.cas001.a.viewmodel {
                         text: getText('CAS001_51')
                     }];
 
-            if (CategoryId.includes('CS00100')) {
+            let currentCategory = _.find(screenModel.roleCategoryList(), (roleCate: PersonRoleCategory) => roleCate.categoryId == CategoryId);
+            if (currentCategory && currentCategory.categoryCode == 'CS00100') {
                 array3E = [{
                     value: '1',
                     text: getText('CAS001_49')
@@ -756,17 +762,17 @@ module nts.uk.com.view.cas001.a.viewmodel {
             }).always(() => {
                 //register click change all event
                 $(() => {
-                    
+                    let currentCategory = _.find(screenModel.roleCategoryList(), (roleCate: PersonRoleCategory) => roleCate.categoryId == self.categoryId);
                     $('#anotherSelectedAll_auth').on('click', 'label input', (e) => {
                         // find index of selected input
                         const index = Array.prototype.indexOf.call($('#anotherSelectedAll_auth')[0].childNodes, $(e.currentTarget).parent()[0]);
-                        screenModel.changeAll('anotherSelectedAll_auth', self.categoryId.includes('CS00100') && index == 1 ? 3 : index + 1);
+                        screenModel.changeAll('anotherSelectedAll_auth', currentCategory && currentCategory.categoryCode == 'CS00100' && index == 1 ? 3 : index + 1);
                     });
 
                     $('#seftSelectedAll_auth').on('click', 'label input', (e) => {
                         // find index of selected input
                         const index = Array.prototype.indexOf.call($('#seftSelectedAll_auth')[0].childNodes, $(e.currentTarget).parent()[0]);
-                        screenModel.changeAll('seftSelectedAll_auth', self.categoryId.includes('CS00100') && index == 1 ? 3 : index + 1);
+                        screenModel.changeAll('seftSelectedAll_auth', currentCategory && currentCategory.categoryCode == 'CS00100' && index == 1 ? 3 : index + 1);
                     });
 
                     $('.ui-iggrid-header').on('focus', function() {
@@ -826,6 +832,7 @@ module nts.uk.com.view.cas001.a.viewmodel {
     }
     export class PersonRoleCategoryCommand {
         categoryId: string;
+        categoryCode: string;
         categoryName: string;
         categoryType: number;
         allowPersonRef: number;
@@ -849,6 +856,7 @@ module nts.uk.com.view.cas001.a.viewmodel {
             let sm: ScreenModel = __viewContext['screenModel'];
 
             this.categoryId = param.categoryId;
+            this.categoryCode = param.categoryCode;
             this.categoryName = param.categoryName;
             this.categoryType = param.categoryType;
             this.allowPersonRef = sm.allowPersonRef();

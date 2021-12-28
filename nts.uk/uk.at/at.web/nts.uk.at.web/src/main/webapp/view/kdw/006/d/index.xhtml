@@ -9,6 +9,10 @@
     <ui:composition template="../../../../master/base.xhtml">
         <ui:define name="htmlHead">
             <com:scriptfile set="IGNITE" />
+			<com:stylefile path="/view/ccg/025/component/component.css" of="/nts.uk.com.web"/>
+			<com:scriptfile path="/view/ccg/025/component/component.vm.js" of="/nts.uk.com.web" />
+			<com:scriptfile path="/view/ccg/025/component/component.service.js" of="/nts.uk.com.web"/>
+
             <com:stylefile path="kdw006.d.main.css" />
             <com:scriptfile path="kdw006.d.start.js" />
             <com:scriptfile path="kdw006.d.vm.js" />
@@ -17,9 +21,11 @@
 		<ui:define name="content">
 			<div id="functions-area">
 				<a class="goback" tabindex="1"
-					data-bind="ntsLinkButton: { action: jumpTo.bind($data, sideBar) }">#{i18n.getText('KDW006_25')}</a>
+					data-bind="ntsLinkButton: { action: jumpTo }">#{i18n.getText('KDW006_25')}</a>
 				<button id="register-button" class="proceed" tabindex="2"
-					data-bind="click: saveData" style="margin-left: 85px;">#{i18n.getText('KDW006_26')}</button>
+					data-bind="click: saveData, enable: $root.errors.isEmpty" style="margin-left: 85px;">#{i18n.getText('KDW006_26')}</button>
+				<button id="copy-button" class="normal" tabindex="3"
+					data-bind="click: copyData, enable: mode() != 0" >#{i18n.getText('KDW006_52')}</button>
 			</div>
 			<div id="contents-area">
 				<div id="screen-e">
@@ -27,20 +33,12 @@
 						<tr>
 							<td id="left-side">
 								<div id='left-panel'
-									data-bind="ntsPanel:{width: '330px', height: '400px', direction: 'right', showIcon: true, visible: true}">
-									<table id="single-list" tabindex="3"
-										data-bind="ntsGridList: {
-			                            height: 350,
-			                            options : roleItems,
-			                            optionsValue : 'roleId',
-			                            columns: columns1,
-			                            multiple: false,
-			                            value: selectedItem
-			                    }">
-									</table>
+								style="margin-top: -20px; margin-left: -15px; margin-right: 15px;"
+									data-bind="with: $vm.componentCcg025">
+									<com:load style="background-color: inherit;" path="/nts.uk.com.web/view/ccg/025/component/index.xhtml"></com:load>
 								</div>
 							</td>
-							<td id="right-side"><table id="grid2" tabindex="4"></table></td>
+							<td id="right-side"><table id="grid2" tabindex="5"></table></td>
 						</tr>
 					</table>
 

@@ -30,6 +30,8 @@ public class ReferToTheStampingResultsDto {
 	private boolean display;
 	private String address;
 	
+	private boolean checkMobile;
+	
 	private List<EmpInfomationDto> listEmps;
 	
 }

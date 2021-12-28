@@ -7,6 +7,7 @@ import nts.uk.ctx.at.request.dom.application.ApplicationType;
 import nts.uk.ctx.at.request.dom.application.common.adapter.application.AtApplicationAdapter;
 import nts.uk.ctx.at.request.dom.application.common.adapter.application.dto.AtMenuNameQueryImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.application.dto.AtStandardMenuNameImport;
+import nts.uk.ctx.at.request.dom.application.overtime.OvertimeAppAtr;
 import nts.uk.ctx.at.request.dom.application.proxy.ProxyApplicationService;
 import nts.uk.ctx.at.request.dom.application.stamp.StampRequestMode;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.AppSetForProxyApp;
@@ -37,12 +38,11 @@ public class ProxyApplicationFinder {
     private final String OVERTIME_1_STRING_QUERY = "overworkatr=0";
     private final String OVERTIME_2_STRING_QUERY = "overworkatr=1";
     private final String OVERTIME_3_STRING_QUERY = "overworkatr=2";
+    private final String OVERTIME_4_STRING_QUERY = "overworkatr=3";
 
     /**
      * 申請種類選択
-     *
-     * @param employeeId
-     * @param applicationType
+     * @param proxyParamFind
      */
     public void selectApplicationByType(ProxyParamFind proxyParamFind) {
         this.proxyApplicationService.selectApplicationByType(proxyParamFind.getEmployeeIds(), proxyParamFind.getApplicationType());
@@ -89,6 +89,9 @@ public class ProxyApplicationFinder {
                         case 2:
                             queryString = OVERTIME_3_STRING_QUERY;
                             break;
+                        case 3:
+                            queryString = OVERTIME_4_STRING_QUERY;
+                            break;
                     }
                 }
 
@@ -133,7 +136,7 @@ public class ProxyApplicationFinder {
             throw new BusinessException("Msg_1709", "" + sids.size());
         }
         // input.申請種類をチェックする
-        if (sids.size() > 1 && (appType != ApplicationType.OVER_TIME_APPLICATION.value
+        if (sids.size() > 1 && ((appType != ApplicationType.OVER_TIME_APPLICATION.value || param.getOvertimeAppAtr() == OvertimeAppAtr.MULTIPLE_OVERTIME.value)
                 && appType != ApplicationType.HOLIDAY_WORK_APPLICATION.value)) {
             throw new BusinessException("Msg_1710", EnumAdaptor.valueOf(appType, ApplicationType.class).name);
         }

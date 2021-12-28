@@ -1,0 +1,221 @@
+/*!
+ * fc-datepicker v1.0.10
+ * https://fengyuanchen.github.io/fc-datepicker
+ *
+ * Copyright 2014-present Chen Fengyuan
+ * Released under the MIT license
+ *
+ * Date: 2020-09-29T14:46:09.037Z
+ */
+
+.fc-datepicker-container {
+  background-color: #fff;
+  direction: ltr;
+  font-size: 12px;
+  left: 0;
+  line-height: 30px;
+  position: fixed;
+  -webkit-tap-highlight-color: transparent;
+  top: 0;
+  -ms-touch-action: none;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 210px;
+  z-index: -1;
+}
+
+.fc-datepicker-container::before,
+.fc-datepicker-container::after {
+  border: 5px solid transparent;
+  content: " ";
+  display: block;
+  height: 0;
+  position: absolute;
+  width: 0;
+}
+
+.fc-datepicker-dropdown {
+  border: 1px solid #ccc;
+  -webkit-box-shadow: 0 3px 6px #ccc;
+  box-shadow: 0 3px 6px #ccc;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  position: absolute;
+  z-index: 1;
+}
+
+.fc-datepicker-inline {
+  position: static;
+}
+
+.fc-datepicker-top-left,
+.fc-datepicker-top-right {
+  border-top-color: #39f;
+}
+
+.fc-datepicker-top-left::before,
+.fc-datepicker-top-left::after,
+.fc-datepicker-top-right::before,
+.fc-datepicker-top-right::after {
+  border-top: 0;
+  left: 10px;
+  top: -5px;
+}
+
+.fc-datepicker-top-left::before,
+.fc-datepicker-top-right::before {
+  border-bottom-color: #39f;
+}
+
+.fc-datepicker-top-left::after,
+.fc-datepicker-top-right::after {
+  border-bottom-color: #fff;
+  top: -4px;
+}
+
+.fc-datepicker-bottom-left,
+.fc-datepicker-bottom-right {
+  border-bottom-color: #39f;
+}
+
+.fc-datepicker-bottom-left::before,
+.fc-datepicker-bottom-left::after,
+.fc-datepicker-bottom-right::before,
+.fc-datepicker-bottom-right::after {
+  border-bottom: 0;
+  bottom: -5px;
+  left: 10px;
+}
+
+.fc-datepicker-bottom-left::before,
+.fc-datepicker-bottom-right::before {
+  border-top-color: #39f;
+}
+
+.fc-datepicker-bottom-left::after,
+.fc-datepicker-bottom-right::after {
+  border-top-color: #fff;
+  bottom: -4px;
+}
+
+.fc-datepicker-top-right::before,
+.fc-datepicker-top-right::after,
+.fc-datepicker-bottom-right::before,
+.fc-datepicker-bottom-right::after {
+  left: auto;
+  right: 10px;
+}
+
+.fc-datepicker-panel > ul {
+  margin: 0;
+  padding: 0;
+  width: 102%;
+}
+
+.fc-datepicker-panel > ul::before,
+.fc-datepicker-panel > ul::after {
+  content: " ";
+  display: table;
+}
+
+.fc-datepicker-panel > ul::after {
+  clear: both;
+}
+
+.fc-datepicker-panel > ul > li {
+  background-color: #fff;
+  cursor: pointer;
+  float: left;
+  height: 30px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  width: 30px;
+}
+
+.fc-datepicker-panel > ul > li:hover {
+  background-color: rgb(229, 242, 255);
+}
+
+.fc-datepicker-panel > ul > li.muted,
+.fc-datepicker-panel > ul > li.muted:hover {
+  color: #999;
+}
+
+.fc-datepicker-panel > ul > li.highlighted {
+  
+}
+
+.fc-datepicker-panel > ul > li.highlighted:hover {
+  background-color: rgb(204, 229, 255);
+}
+
+.fc-datepicker-panel > ul > li.picked,
+.fc-datepicker-panel > ul > li.picked:hover {
+	border-radius: 25px;
+  /* color: #39f; */
+  background-color: rgb(229, 242, 255);
+}
+
+.fc-datepicker-panel > ul > li.disabled,
+.fc-datepicker-panel > ul > li.disabled:hover {
+  background-color: #fff;
+  color: #ccc;
+  cursor: default;
+}
+
+.fc-datepicker-panel > ul > li.disabled.highlighted,
+.fc-datepicker-panel > ul > li.disabled:hover.highlighted {
+  background-color: rgb(229, 242, 255);
+}
+
+.fc-datepicker-panel > ul > li[data-view="years prev"],
+.fc-datepicker-panel > ul > li[data-view="year prev"],
+.fc-datepicker-panel > ul > li[data-view="month prev"],
+.fc-datepicker-panel > ul > li[data-view="years next"],
+.fc-datepicker-panel > ul > li[data-view="year next"],
+.fc-datepicker-panel > ul > li[data-view="month next"],
+.fc-datepicker-panel > ul > li[data-view="next"] {
+  font-size: 18px;
+}
+
+.fc-datepicker-panel > ul > li[data-view="years current"],
+.fc-datepicker-panel > ul > li[data-view="year current"],
+.fc-datepicker-panel > ul > li[data-view="month current"] {
+  width: 150px;
+}
+
+.fc-datepicker-panel > ul[data-view="years"] > li,
+.fc-datepicker-panel > ul[data-view="months"] > li {
+  height: 52.5px;
+  line-height: 52.5px;
+  width: 52.5px;
+}
+
+.fc-datepicker-panel > ul[data-view="week"] > li,
+.fc-datepicker-panel > ul[data-view="week"] > li:hover {
+  background-color: #fff;
+  cursor: default;
+}
+
+.fc-datepicker-hide {
+  display: none;
+}
+
+
+
+.fc-datepicker-panel ul .sun
+ {
+	 color: #FF2D2D !important;
+}
+
+.fc-datepicker-panel ul .sat
+ {
+	 color: #0086EA !important;
+}
+

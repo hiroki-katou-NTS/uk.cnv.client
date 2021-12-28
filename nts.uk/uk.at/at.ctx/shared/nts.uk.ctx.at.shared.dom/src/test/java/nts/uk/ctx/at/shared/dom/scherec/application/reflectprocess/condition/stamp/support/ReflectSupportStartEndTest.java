@@ -113,7 +113,7 @@ public class ReflectSupportStartEndTest {
 
 		assertThat(actualResult).isEqualTo(Arrays.asList(939, 931));
 
-		assertThat(dailyApp.getOuenTimeSheet().get(1).getWorkNo()).isEqualTo(2);// 応援勤務枠No
+		assertThat(dailyApp.getOuenTimeSheet().get(1).getWorkNo().v()).isEqualTo(2);// 応援勤務枠No
 
 		assertThat(dailyApp.getOuenTimeSheet().get(1).getTimeSheet().getStart().get().getTimeWithDay().get().v())
 				.isEqualTo(666);// 時刻
@@ -200,7 +200,7 @@ public class ReflectSupportStartEndTest {
 
 		assertThat(actualResult).isEqualTo(Arrays.asList(940, 931));
 
-		assertThat(dailyApp.getOuenTimeSheet().get(1).getWorkNo()).isEqualTo(2);// 応援勤務枠No
+		assertThat(dailyApp.getOuenTimeSheet().get(1).getWorkNo().v()).isEqualTo(2);// 応援勤務枠No
 
 		assertThat(dailyApp.getOuenTimeSheet().get(1).getTimeSheet().getEnd().get().getTimeWithDay().get().v())
 				.isEqualTo(666);// 時刻

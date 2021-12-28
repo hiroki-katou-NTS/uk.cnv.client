@@ -12,7 +12,6 @@ import javax.inject.Inject;
 
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.i18n.I18NText;
-import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
@@ -23,7 +22,6 @@ import nts.uk.ctx.at.record.pub.monthly.MonthlyRecordValuesExport;
 import nts.uk.ctx.at.request.dom.application.appabsence.service.AbsenceServiceProcess;
 import nts.uk.ctx.at.request.dom.application.appabsence.service.CheckDispHolidayType;
 import nts.uk.ctx.at.request.dom.application.appabsence.service.NumberOfRemainOutput;
-import nts.uk.ctx.at.shared.dom.adapter.employment.ShareEmploymentAdapter;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeOfExistMinus;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHoliday;
@@ -31,11 +29,9 @@ import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHolidayRepository;
 import nts.uk.ctx.at.shared.dom.vacation.setting.ManageDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensLeaveComSetRepository;
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensatoryLeaveComSetting;
-import nts.uk.ctx.at.shared.dom.workrule.closure.Closure;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureEmploymentRepository;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureRepository;
 import nts.uk.ctx.at.shared.dom.workrule.closure.service.ClosureService;
-import nts.uk.ctx.at.shared.dom.workrule.closure.service.ClosureService.RequireM3;
 import nts.uk.ctx.sys.auth.pub.role.RoleExportRepo;
 import nts.uk.ctx.sys.portal.dom.toppagepart.standardwidget.ApproveWidgetRepository;
 import nts.uk.ctx.sys.portal.dom.toppagepart.standardwidget.DetailedWorkStatusSetting;
@@ -64,9 +60,6 @@ public class KTG004Finder {
 	
 	@Inject
 	private ClosureEmploymentRepository closureEmploymentRepo;
-	
-	@Inject 
-	private ShareEmploymentAdapter shareEmploymentAdapter;
 	
 	@Inject
 	private RoleExportRepo roleExportRepo;
@@ -128,45 +121,32 @@ public class KTG004Finder {
 		}
 	}
 	
-	public void getData(KTG004InputDto param) {
-		String cid = AppContexts.user().companyId();
-		String employeeId = AppContexts.user().employeeId();
-		TopPageDisplayYearMonthEnum topPageYearMonthEnum = EnumAdaptor.valueOf(param.getYearMonth(),TopPageDisplayYearMonthEnum.class);
-		this.startWorkStatus(cid, employeeId, topPageYearMonthEnum);
-	}
-	
 	//勤務状況を起動する
-	public AcquisitionResultOfWorkStatusOutput startWorkStatus(String cid, String employeeId, TopPageDisplayYearMonthEnum topPageYearMonthEnum) {
+	public AcquisitionResultOfWorkStatusOutput startWorkStatus(String cid, String employeeId, KTG004DisplayYearMonthParam param) {
+		TopPageDisplayYearMonthEnum topPageYearMonthEnum = EnumAdaptor.valueOf(param.getDisplayYearMonth(), TopPageDisplayYearMonthEnum.class);
 		AcquisitionResultOfWorkStatusOutput result = new AcquisitionResultOfWorkStatusOutput(); 
 		
 		//Get the settings of the specified widget - 指定するウィジェットの設定を取得する 
 		WorkStatusSettingDto setting = this.getApprovedDataWidgetStart();
 		result.setItemsSetting(setting.getItemsSetting());
 		result.setName(setting.getName());
+		result.setClosureId(param.getClosureId());
 		
-		//Get the processing deadline for employees - 社員に対応する処理締めを取得する
-		RequireM3 require = ClosureService.createRequireM3(closureRepo, closureEmploymentRepo, shareEmploymentAdapter);
-		Closure closure = ClosureService.getClosureDataByEmployee(require, new CacheCarrier(), employeeId, GeneralDate.today());
-		
-		//セット項目：//Set item:
-		//勤務状況の取得結果．締めID＝取得したドメインモデル「締め」．締めID
-		result.setClosureId(closure.getClosureId().value);
-		
-		//Calculate the period of the specified year and month - 指定した年月の期間を算出する
-		DatePeriod datePeriod = ClosureService.getClosurePeriod(closure, closure.getClosureMonth().getProcessingYm());
-		
-		//セット項目：
-		//勤務状況の取得結果．当月の締め情報．処理年月＝取得したドメインモデル「締め」．当月
-		//勤務状況の取得結果．当月の締め情報．締め期間＝取得した締め期間
-		//勤務状況の取得結果．表示する年月の締め情報＝勤務状況の取得結果．当月の締め情報
-		result.setClosingThisMonth(new CurrentClosingPeriod(closure.getClosureMonth().getProcessingYm().v(), datePeriod.start(), datePeriod.end()));
-		result.setClosingDisplay(result.getClosingThisMonth());
-		
-		//Get the target period of the top page - トップページの対象期間を取得する 
-		CurrentClosingPeriod currentClosingPeriod = this.getTargetPeriodOfTopPage(result.getClosureId(), result.getClosingThisMonth(), Optional.empty(), topPageYearMonthEnum);
-		if(topPageYearMonthEnum == TopPageDisplayYearMonthEnum.NEXT_MONTH_DISPLAY) {
-			result.setClosingDisplay(currentClosingPeriod);
+		// 表示年月から期間をセットする
+		Integer processingYm;
+		GeneralDate startDate, endDate;
+		if (topPageYearMonthEnum.equals(TopPageDisplayYearMonthEnum.THIS_MONTH_DISPLAY)) {
+			processingYm = param.getCurrentProcessingYm();
+			startDate = param.getCurrentProcessingYmStartDate();
+			endDate = param.getCurrentProcessingYmEndDate();
+		} else {
+			processingYm = param.getNextProcessingYm();
+			startDate = param.getNextProcessingYmStartDate();
+			endDate = param.getNextProcessingYmEndDate();
 		}
+		CurrentClosingPeriod closingPeriod = new CurrentClosingPeriod(processingYm, startDate, endDate);
+		result.setClosingThisMonth(closingPeriod);
+		result.setClosingDisplay(closingPeriod);
 		
 		if(topPageYearMonthEnum == TopPageDisplayYearMonthEnum.THIS_MONTH_DISPLAY) {
 			//Get work status data - 勤務状況のデータを取得する

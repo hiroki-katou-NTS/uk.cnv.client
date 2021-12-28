@@ -4,9 +4,6 @@
  *****************************************************************/
 package nts.uk.ctx.at.schedule.infra.repository.executionlog;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,8 +36,7 @@ import nts.uk.shr.com.context.AppContexts;
  */
 @Stateless
 //@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-public class JpaScheduleErrorLogRepository extends JpaRepository
-		implements ScheduleErrorLogRepository {
+public class JpaScheduleErrorLogRepository extends JpaRepository implements ScheduleErrorLogRepository {
 
 	/*
 	 * (non-Javadoc)
@@ -162,17 +158,17 @@ public class JpaScheduleErrorLogRepository extends JpaRepository
 	 */
 	@Override
 	public void add(ScheduleErrorLog domain) {
-		if (!this.checkExistErrorByKey(domain.getExecutionId(), domain.getEmployeeId(), domain.getDate())) {
-			this.commandProxy().insert(this.toEntity(domain));
-		}
+//		if (!this.checkExistErrorByKey(domain.getExecutionId(), domain.getEmployeeId(), domain.getDate())) {
+			this.commandProxy().insert(this.toEntity(domain)); 
+//		}
 	}
 	
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@Override
 	public void addByTransaction(ScheduleErrorLog domain) {
-		if (!this.checkExistErrorByKey(domain.getExecutionId(), domain.getEmployeeId(), domain.getDate())) {
+//		if (!this.checkExistErrorByKey(domain.getExecutionId(), domain.getEmployeeId(), domain.getDate())) { 
 			this.commandProxy().insert(this.toEntity(domain));
-		}
+//		}
 	}
 
 	@Override

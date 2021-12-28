@@ -56,10 +56,6 @@ module nts.uk.at.view.kdp002.t {
 
 				dfd.resolve();
 
-				console.log(self.share);
-				console.log(lstButton);
-				console.log(self.dataShare);
-
 				return dfd.promise();
 			}
 

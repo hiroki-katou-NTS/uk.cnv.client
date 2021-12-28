@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+<ui:composition template="../../../../master/dialog.xhtml">
+    <ui:define name="htmlHead">
+        <script>
+            var dialogSize = {
+                width : 500,
+                height : 370
+            };
+        </script>
+        <com:stylefile path="kha003.b.style.css"/>
+        <com:scriptfile path="kha003.b.vm.js"/>
+        <com:scriptfile set="IGNITE"/>
+    </ui:define>
+    <ui:define name="content">
+        <div id="contents-area" style="display: none" data-bind="visible: true" >
+            <div class="table" style="width: 100%;margin-top: 60px;" id="b_table">
+                <!-- B1_1 -->
+                <div class="cell valign-center" style="text-align: right">
+                    <div data-bind="ntsFormLabel: { enable: true, required:true }">#{i18n.getText('KHA003_50')}</div>
+                </div>
+                <!-- B1_2 -->
+                <div tabindex="1" data-bind="if:vm.totalUnit() == 0" class="cell valign-center" style="text-align: center">
+                    <div id="B1_2" tabindex="-1" data-bind="ntsDateRangePicker: {
+                      required: true,
+                      enable: enable,
+                      showNextPrevious: true,
+                      value: dateValue,
+                      name:'#[KHA003_51]',
+                      maxRange: 'oneYear'
+                     }"/>
+                </div>
+                <!-- B1_3 -->
+                <div data-bind="if:vm.totalUnit() == 1" class="cell valign-center" style="text-align: center">
+                    <div id="B1_3" tabindex="2" data-bind="ntsDateRangePicker: {
+                      required: true,
+                      enable: enable,
+                      showNextPrevious: true,
+                      type: 'yearmonth',
+                      value: dateValue,
+                      name:'#[KHA003_52]',
+                      maxRange: 'oneYear'
+                     }"/>
+                </div>
+            </div>
+        </div>
+        <div id="functions-area-bottom">
+            <!-- B2_1 -->
+                <button id="btn-f-close" tabindex="3" class="large proceed"
+                        data-bind="click:decide,enable: $root.errors.isEmpty,hasfocus: true">#{i18n.getText('KHA003_53')}</button>
+            <!-- B2_2 -->
+                <button id="btn-f-stop" tabindex="4" class="large"
+                        data-bind="click:cancel">#{i18n.getText('KHA003_54')}</button>
+        </div>
+    </ui:define>
+</ui:composition>
+</body>
+</html>

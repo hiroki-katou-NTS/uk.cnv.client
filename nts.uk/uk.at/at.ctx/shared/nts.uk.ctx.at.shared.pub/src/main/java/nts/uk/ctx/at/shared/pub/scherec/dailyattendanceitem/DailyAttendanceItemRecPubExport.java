@@ -33,9 +33,11 @@ public class DailyAttendanceItemRecPubExport {
 
 	/* ユーザーが値を変更できる */
 	private int nameLineFeedPosition;
+	
+	private String displayName;
 
 	public DailyAttendanceItemRecPubExport(String companyId, int attendanceItemId, String attendanceName, int displayNumber,
-			int userCanUpdateAtr, int dailyAttendanceAtr, int nameLineFeedPosition) {
+			int userCanUpdateAtr, int dailyAttendanceAtr, int nameLineFeedPosition, String displayName) {
 		super();
 		this.companyId = companyId;
 		this.attendanceItemId = attendanceItemId;
@@ -44,6 +46,7 @@ public class DailyAttendanceItemRecPubExport {
 		this.userCanUpdateAtr = userCanUpdateAtr;
 		this.dailyAttendanceAtr = dailyAttendanceAtr;
 		this.nameLineFeedPosition = nameLineFeedPosition;
+		this.displayName = displayName;
 	}
 
 }

@@ -56,7 +56,10 @@ public class OptionalAggrPeriodExecLogFinder {
 			Optional<AnyAggrPeriod> optAggr = aggrPeriodRepo.findOneByCompanyIdAndFrameCode(companyId, log.getAggrFrameCode().v());
 			List<AggrPeriodTarget> listTarget = targetRepo.findAll(log.getAggrId());
 			List<AggrPeriodInfor> listError = errorInfoRepo.findAll(log.getAggrId());
-			EmployeeRecordImport empInfo = lstEmpInfo.stream().filter(e -> e.getEmployeeId().equals(log.getExecutionEmpId())).collect(Collectors.toList()).get(0);
+			EmployeeRecordImport empInfo = lstEmpInfo.stream().filter(e -> e.getEmployeeId().equals(log.getExecutionEmpId()))
+					.findFirst()
+					.orElse(null);
+			if (empInfo == null) continue;
 			if (optAggr.isPresent()) {
 				AnyAggrPeriod aggr = optAggr.get();
 				OptionalAggrPeriodExecLogDto dto = new OptionalAggrPeriodExecLogDto(log.getAggrId(),

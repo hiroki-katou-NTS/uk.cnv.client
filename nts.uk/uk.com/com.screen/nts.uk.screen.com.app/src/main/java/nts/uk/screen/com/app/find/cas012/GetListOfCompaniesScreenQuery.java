@@ -27,7 +27,7 @@ public class GetListOfCompaniesScreenQuery {
     public List<CompanyImport> getListCompany() {
         val user = AppContexts.user();
         val contractCode = user.contractCode();
-        if (!user.roles().have().companyAdmin()){
+        if (!user.roles().have().systemAdmin()){
             throw  new BusinessException("Msg_1103");
         }
         return repo.getAllCompany(contractCode).stream()

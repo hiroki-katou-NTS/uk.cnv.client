@@ -8,8 +8,8 @@ import nts.uk.shr.com.context.AppContexts;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * ファイルストレージのパスを扱う
@@ -50,27 +50,21 @@ public class FileStoragePath {
         }
 
         Path path = getPathByTenant(tenantCode);
-        if (path == null) {
-            FatalLog.write(FileStoragePath.class, "テナント " + tenantCode + " のFileStorageが設定されていません。");
-        }
 
         File dir = new File(path.toString());
         if (!dir.exists()) {
-            FatalLog.write(FileStoragePath.class, "テナント " + tenantCode + " のFileStorageに対応するフォルダが存在しません。");
+            throw FatalLog.writeThenException(
+                    this, "テナント " + tenantCode + " のFileStorageに対応するフォルダ [" + path + "] が存在しません。");
         }
 
         return path;
     }
 
-    private final Map<String, Path> pathsByTenant = new HashMap<>();
-
     private Path getPathByTenant(String tenantCode) {
-
-        return pathsByTenant.computeIfAbsent(
-                tenantCode,
-                tc -> TenantLocatorClient.getFileStorage(tc)
-                        .map(f -> f.getStoragePath())
-                        .map(p -> new File(p).toPath())
-                        .orElse(null));
+        return TenantLocatorClient.getFileStorage(tenantCode)
+                .map(f -> f.getStoragePath())
+                .map(p -> new File(p).toPath())
+                .orElseThrow(() -> FatalLog.writeThenException(
+                        this, "テナント " + tenantCode + " のFileStorageが設定されていません。"));
     }
 }

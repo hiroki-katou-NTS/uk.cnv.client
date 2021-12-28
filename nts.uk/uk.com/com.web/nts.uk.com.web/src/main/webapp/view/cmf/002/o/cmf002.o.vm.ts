@@ -8,7 +8,11 @@ module nts.uk.com.view.cmf002.o.viewmodel {
     import getShared = nts.uk.ui.windows.getShared;
     import block = nts.uk.ui.block;
     import Ccg001ReturnedData = nts.uk.com.view.ccg.share.ccg.service.model.Ccg001ReturnedData;
-    const textLink =  nts.uk.resource.getText("CMF002_235");
+    import Moment = moment.Moment;
+    import isNullOrEmpty = nts.uk.util.isNullOrEmpty;
+    import isNullOrUndefined = nts.uk.util.isNullOrUndefined;
+    const textLink = nts.uk.resource.getText("CMF002_235");
+
     export class ScreenModel {
         //wizard
         stepList: Array<NtsWizardStep> = [];
@@ -19,7 +23,10 @@ module nts.uk.com.view.cmf002.o.viewmodel {
         selectedConditionCd: KnockoutObservable<string> = ko.observable('');
         selectedConditionName: KnockoutObservable<string> = ko.observable('');
 
-        periodDateValue: KnockoutObservable<any> = ko.observable({ startDate: moment.utc().format("YYYY/MM/DD"), endDate: moment.utc().format("YYYY/MM/DD") });
+        periodDateValue: KnockoutObservable<any> = ko.observable({
+            startDate: moment.utc().format("YYYY/MM/DD"),
+            endDate: moment.utc().format("YYYY/MM/DD")
+        });
         listOutputItem: KnockoutObservableArray<model.StandardOutputItem> = ko.observableArray([]);
         selectedOutputItemCode: KnockoutObservable<string> = ko.observable('');
 
@@ -52,26 +59,40 @@ module nts.uk.com.view.cmf002.o.viewmodel {
         endDate: KnockoutObservable<string> = ko.observable('');
         //Q5_1
         conditionSettingName: KnockoutObservable<string> = ko.observable('');
-        mode :KnockoutObservable<number> = ko.observable(MODE.NEW);
+        mode: KnockoutObservable<number> = ko.observable(MODE.NEW);
 
         isLoadScreenQ: boolean = false;
 
         roleAuthority: any;
+        exOutCtgDto:  KnockoutObservable<any> = ko.observable('');
+        closureId: KnockoutObservable<any> = ko.observable('');
+        closureLists: KnockoutObservableArray<any> = ko.observableArray([]);
 
+
+        show61DatePeriod: KnockoutObservable<boolean> = ko.observable(false);
+        show61YmPeriod: KnockoutObservable<boolean> = ko.observable(false);
+        show61Date: KnockoutObservable<boolean> = ko.observable(false);
+
+        show81DatePeriod: KnockoutObservable<boolean> = ko.observable(false);
+        show81YmPeriod: KnockoutObservable<boolean> = ko.observable(false);
+        show81Date: KnockoutObservable<boolean> = ko.observable(false);
+        baseDate: KnockoutObservable<any>;
+        valueItemFixedForm: KnockoutObservable<any>;
+        date61:  KnockoutObservable<any> = ko.observable('');
+        isNoData : KnockoutObservable<boolean> = ko.observable(true);
         constructor() {
             var self = this;
             //起動する
             self.stepList = [
                 // { content: '.step-1' },
-                { content: '.step-2' },
-                { content: '.step-3' },
-                { content: '.step-4' }
+                {content: '.step-2'},
+                {content: '.step-3'},
+                {content: '.step-4'}
             ];
             self.dataEmployeeId = [];
             self.valueItemFixedForm = ko.observable('');
             // set up date time P6_1
-            self.periodDateValue().start = ko.observable({});
-            self.stepSelected = ko.observable({ id: 'step-4', content: '.step-4' });
+            self.stepSelected = ko.observable({id: 'step-4', content: '.step-4'});
             self.alreadySettingPersonal = ko.observableArray([]);
             self.baseDate = ko.observable(new Date());
             self.selectedEmployee = ko.observableArray([]);
@@ -79,14 +100,12 @@ module nts.uk.com.view.cmf002.o.viewmodel {
             self.roleAuthority = getShared("CMF002O_PARAMS");
 
             //set up kcp005
-            let self = this;
-            self.baseDate = ko.observable(new Date());
             self.selectedCode = ko.observable('1');
             self.multiSelectedCode = ko.observableArray(["1"]);
             self.isShowAlreadySet = ko.observable(false);
             self.alreadySettingList = ko.observableArray([
-                { code: '1', isAlreadySetting: true },
-                { code: '2', isAlreadySetting: true }
+                {code: '1', isAlreadySetting: true},
+                {code: '2', isAlreadySetting: true}
             ]);
             self.isDialog = ko.observable(false);
             self.isShowNoSelectRow = ko.observable(false);
@@ -108,24 +127,141 @@ module nts.uk.com.view.cmf002.o.viewmodel {
                 isShowSelectAllButton: self.isShowSelectAllButton(),
                 maxRows: 8
             };
-            // set data selectedConditionName  P7_1
             self.selectedConditionCd.subscribe(data => {
-                if(!data){
+                if (!data) {
                     self.selectedConditionCd('');
                     self.selectedConditionName('');
                 }
-                else{
-                    let conditionName = _.find(self.listCondition(), { 'code': self.selectedConditionCd() }).name;
+                else {
+                    let conditionName = _.find(self.listCondition(), {'code': self.selectedConditionCd()}).name;
                     self.selectedConditionName(conditionName);
+                    let catelogoryId: number = _.find(self.listCondition(), {'code': self.selectedConditionCd()}).catelogoryId;
+                    block.invisible();
+                    service.getExOutCtgDto(catelogoryId).done(data => {
+                        if (data) {
+                            self.isNoData(false);
+                            let ex: ExOutCtgDto = data.exOutCtgDto;
+                            let closureExports: [any] = data.closureExports;
+                            self.closureLists(closureExports);
+
+                            self.exOutCtgDto(ex);
+                            self.periodDateValue({
+                                startDate: moment.utc().format("YYYY/MM/DD"),
+                                endDate: moment.utc().format("YYYY/MM/DD")
+                            });
+                            // show61DatePeriod
+                            //外部出期間区分
+                            let outingPeriodClassific = ex.outingPeriodClassific;
+                            let classificationToUse = ex.classificationToUse;
+                            if (outingPeriodClassific == OUTPUTCLASSS.DATE) {
+                                if (classificationToUse === TOUSE.DO_NOT_USE) {
+                                    self.show61DatePeriod(true);
+
+                                    self.show61YmPeriod(false);
+                                    self.show61Date(false);
+                                    self.show81DatePeriod(false);
+                                    self.show81YmPeriod(false);
+                                    self.show81Date(false);
+                                } else {
+                                    self.show81DatePeriod(true);
+
+                                    self.show61DatePeriod(false);
+                                    self.show61YmPeriod(false);
+                                    self.show61Date(false);
+                                    self.show81YmPeriod(false);
+                                    self.show81Date(false);
+                                }
+                            }
+                            if (outingPeriodClassific == OUTPUTCLASSS.YEAR_MONTH) {
+                                if (classificationToUse === TOUSE.DO_NOT_USE) {
+                                    self.show61YmPeriod(true);
+                                    self.show61DatePeriod(false);
+                                    self.show61Date(false);
+                                    self.show81DatePeriod(false);
+                                    self.show81YmPeriod(false);
+                                    self.show81Date(false);
+                                } else {
+                                    self.show81YmPeriod(true);
+                                    self.show61DatePeriod(false);
+                                    self.show61YmPeriod(false);
+                                    self.show61Date(false);
+                                    self.show81DatePeriod(false);
+                                    self.show81Date(false);
+                                }
+                            }
+                            if (outingPeriodClassific == OUTPUTCLASSS.REFERENCE_DATE) {
+                                let date =  moment.utc().format("YYYY/MM/DD");
+                                self.date61(date);
+                                self.show61Date(true);
+                                self.show61DatePeriod(false);
+                                self.show61YmPeriod(false);
+                                self.show81DatePeriod(false);
+                                self.show81YmPeriod(false);
+                                self.show81Date(false);
+
+                            }
+                            if (outingPeriodClassific == OUTPUTCLASSS.NO_SETTING) {
+                                self.show81Date(true);
+                                self.show61DatePeriod(false);
+                                self.show61YmPeriod(false);
+                                self.show61Date(false);
+                                self.show81DatePeriod(false);
+                                self.show81YmPeriod(false);
+
+                            }
+                        }else {
+                        }
+                    }).always(()=>{
+                        block.clear();
+                    });
                 }
             });
 
+            self.date61.subscribe((data)=>{
+                self.periodDateValue({
+                    startDate: data,
+                    endDate:  data
+                });
+                self.referenceDate(data);
+
+            });
+            self.periodDateValue.subscribe((data)=>{
+             let   periodStartDate =  moment.utc(self.periodDateValue().startDate, "YYYY/MM/DD").toISOString();
+            });
+            self.closureId.subscribe((closureId) => {
+                let cl = _.find(self.closureLists(), {'closureId': closureId});
+                let startDate = null;
+                let endDate = null;
+                if(!isNullOrUndefined(cl)){
+                     startDate = cl.startDate;
+                     endDate = cl.endDate;
+                }
+                if (self.show81Date()) {
+                    self.periodDateValue({
+                        startDate :null,
+                        endDate :null
+                    });
+                }
+                if (self.show81DatePeriod()) {
+                    self.periodDateValue({
+                        startDate :startDate,
+                        endDate :endDate
+                    });
+                }
+
+                if (self.show81YmPeriod()) {
+                    self.periodDateValue({
+                        startDate :startDate,
+                        endDate :endDate
+                    });
+                }
+            })
         }
+
         /**
-       * apply ccg001 search data to kcp005
-       */
+         * apply ccg001 search data to kcp005
+         */
         public applyKCP005ContentSearch(dataList: EmployeeSearchDto[]): void {
-            let self = this;
             let employeeSearchs: UnitModel[] = [];
             for (let employeeSearch of dataList) {
                 let employee: UnitModel = {
@@ -143,7 +279,7 @@ module nts.uk.com.view.cmf002.o.viewmodel {
             block.invisible();
             let self = this;
             $('.content.clearfix .body').attr('style', '');
-            service.getConditionSetting(new ParamToScreenP("","",self.roleAuthority.empRole[0])).done(res => {
+            service.getConditionSetting(new ParamToScreenP("", "", self.roleAuthority.empRole[0])).done(res => {
                 {
                     let dataCndSetCd: Array<StdOutputCondSetDto> = res;
                     self.loadListCondition(dataCndSetCd);
@@ -170,6 +306,7 @@ module nts.uk.com.view.cmf002.o.viewmodel {
 //            }
             $('#ex_output_wizard').ntsWizard("next");
         }
+
         previous() {
             $('#component-items-list').ntsError('clear');
 //            if($('.body.current').attr('id') == 'ex_output_wizard-p-1' ){
@@ -181,51 +318,25 @@ module nts.uk.com.view.cmf002.o.viewmodel {
         todoScreenQ() {
             let self = this;
             $('.content.clearfix .body').attr('style', '');
-            let isNextGetData: boolean = moment.utc(self.periodDateValue().startDate, "YYYY/MM/DD").diff(moment.utc(self.periodDateValue().endDate, "YYYY/MM/DD")) > 0;
-
-            if (isNextGetData) {
-                alertError({messageId: "Msg_662"});
-                return;
-            }else{
-                $('#P6_1').ntsError('clear');
-            }
             if (nts.uk.ui.errors.hasError()) {
                 return;
             }
             error.clearAll();
-
-
-
-            let catelogoryId: number = _.find(self.listCondition(), { 'code': self.selectedConditionCd() }).catelogoryId;
-            let isNextGetData: boolean = moment.utc(self.periodDateValue().startDate, "YYYY/MM/DD").diff(moment.utc(self.periodDateValue().endDate, "YYYY/MM/DD")) > 0;
-            if (!isNextGetData) {
-                service.getExOutCtgDto(catelogoryId).done(res => {
-                    {
-                        let data: ExOutCtgDto = res;
-                        if (data.categorySet == model.CATEGORY_SETTING.DATA_TYPE) {
-                            $('#ex_output_wizard').ntsWizard("goto", 1);
-                            self.isPNextToR(false);
-                            self.loadScreenQ();
-                        }
-                        else {
-                            $('#ex_output_wizard').ntsWizard("goto", 2);
-                            self.isPNextToR(true);
-                            self.initScreenR();
-                        }
-                    }
-
-                }).fail(res => {
-                    alertError(res);
-                });
-
-            }
-
+            let data: ExOutCtgDto = self.exOutCtgDto();
+                if (data.categorySet == model.CATEGORY_SETTING.DATA_TYPE) {
+                    $('#ex_output_wizard').ntsWizard("goto", 1);
+                    self.isPNextToR(false);
+                    self.loadScreenQ();
+                }
+                else {
+                    $('#ex_output_wizard').ntsWizard("goto", 2);
+                    self.isPNextToR(true);
+                    self.initScreenR();
+                }
         }
-
-
         //find list id from list code
         findListId(dataListCode: Array<string>): Array<string> {
-            return _.filter(this.dataCcg001, function(o) {
+            return _.filter(this.dataCcg001, function (o) {
                 return _.includes(dataListCode, o.employeeCode);
             }).map(item => item.employeeId);
         }
@@ -249,7 +360,7 @@ module nts.uk.com.view.cmf002.o.viewmodel {
             // 外部出力実行社員選択チェック
             self.dataEmployeeId = self.findListId(self.selectedCode());
             if (self.dataEmployeeId.length == 0) {
-                alertError({ messageId: 'Msg_657'});
+                alertError({messageId: 'Msg_657'});
                 //$('#component-items-list').ntsError('set', {messageId:"Msg_657"});
             }
             else {
@@ -261,7 +372,7 @@ module nts.uk.com.view.cmf002.o.viewmodel {
         initScreenR() {
             let self = this;
             service.getExOutSummarySetting(self.selectedConditionCd()).done(res => {
-                self.listOutputCondition(_.map(res.ctgItemDataCustomList, (itemData) =>{
+                self.listOutputCondition(_.map(res.ctgItemDataCustomList, (itemData) => {
                     itemData.conditions = self.formatData(itemData.conditions, itemData.dataType);
                     return itemData;
                 }));
@@ -276,18 +387,17 @@ module nts.uk.com.view.cmf002.o.viewmodel {
 
         formatData(data: string, typeData: number): string {
             let self = this;
-            if(_.isEmpty(data)) return data;
-            if(typeData == model.ITEM_TYPE.INS_TIME || typeData == model.ITEM_TYPE.TIME){
+            if (_.isEmpty(data)) return data;
+            if (typeData == model.ITEM_TYPE.INS_TIME || typeData == model.ITEM_TYPE.TIME) {
                 let typeFormat = typeData == model.ITEM_TYPE.INS_TIME ? "Clock_Short_HM" : "Time_Short_HM"
-                if(data.indexOf(textLink) != -1){
+                if (data.indexOf(textLink) != -1) {
                     return nts.uk.time.format.byId(typeFormat, Number(data.split(textLink)[0])) + textLink + nts.uk.time.format.byId(typeFormat, Number(data.split(textLink)[1]))
-                }else{
-                    return nts.uk.time.format.byId(typeFormat, Number(data.split("|")[0]))+ data.split("|")[1];
+                } else {
+                    return nts.uk.time.format.byId(typeFormat, Number(data.split("|")[0])) + data.split("|")[1];
                 }
-            }else{
+            } else {
                 return data;
             }
-            return "";
         }
 
         createExOutText() {
@@ -296,8 +406,15 @@ module nts.uk.com.view.cmf002.o.viewmodel {
             let self = this;
             let conditionSetCd = self.selectedConditionCd();
             let userId = "";
-            let startDate = self.periodDateValue().startDate;
-            let endDate = self.periodDateValue().endDate;
+            let startDate = moment.utc(self.periodDateValue().startDate, "YYYY/MM/DD").toISOString();
+            let lastDayOfMonth = moment.utc(self.periodDateValue().endDate, "YYYY/MM/DD");
+            let endDate = "";
+            if(self.show61YmPeriod()||self.show81YmPeriod()){
+                endDate = lastDayOfMonth.clone().endOf('month').toISOString();
+            }
+            else{
+                endDate = lastDayOfMonth.toISOString();
+            }
             let referenceDate = self.referenceDate();
             let standardType = true;
             let sidList = self.dataEmployeeId;
@@ -313,7 +430,6 @@ module nts.uk.com.view.cmf002.o.viewmodel {
                     selectedConditionCd: conditionSetCd,
                     selectedConditionName: self.selectedConditionName()
                 };
-
                 setShared("CMF002_R_PARAMS", params);
                 nts.uk.ui.windows.sub.modal("/view/cmf/002/s/index.xhtml").onClosed(() => {
                     $('#ex_output_wizard').ntsWizard("goto", 0);
@@ -329,7 +445,7 @@ module nts.uk.com.view.cmf002.o.viewmodel {
 
 
             let listItemModel: Array<model.ItemModel> = [];
-            _.forEach(dataCndSetCd, function(item) {
+            _.forEach(dataCndSetCd, function (item) {
                 listItemModel.push(new DisplayTableName(item.categoryId, item.conditionSetCd, item.conditionSetName));
             });
 
@@ -382,14 +498,14 @@ module nts.uk.com.view.cmf002.o.viewmodel {
                 showWorktype: true, // 勤種条件
                 isMutipleCheck: true, // 選択モード
                 /** Return data */
-                returnDataFromCcg001: function(data: Ccg001ReturnedData) {
+                returnDataFromCcg001: function (data: Ccg001ReturnedData) {
                     self.dataCcg001 = data.listEmployee;
                     self.applyKCP005ContentSearch(data.listEmployee);
                     self.referenceDate(data.baseDate);
                     $('#component-items-list').ntsError('clear');
                 }
             }
-            $('#component-items-list').ntsListComponent(self.listComponentOption).done(function() {
+            $('#component-items-list').ntsListComponent(self.listComponentOption).done(function () {
                 $('#component-items-list').focusComponent();
             });
             $('#com-ccg001').ntsGroupComponent(self.ccgcomponent);
@@ -421,6 +537,7 @@ module nts.uk.com.view.cmf002.o.viewmodel {
         code: string;
         isAlreadySetting: boolean;
     }
+
     class OutputCondition {
         seriNum: number;
         itemName: string;
@@ -436,11 +553,13 @@ module nts.uk.com.view.cmf002.o.viewmodel {
             this.displayClassfication = displayClassfication;
         }
     }
+
     class ParamToScreenP {
         modeScreen: string;
         cndSetCd: string;
-        roleId : string;
-        constructor(modeScreen: string, cndSetCd: string,roleId : string) {
+        roleId: string;
+
+        constructor(modeScreen: string, cndSetCd: string, roleId: string) {
             this.modeScreen = modeScreen;
             this.cndSetCd = cndSetCd;
             this.roleId = roleId;
@@ -458,7 +577,7 @@ module nts.uk.com.view.cmf002.o.viewmodel {
         sidList: Array<string>;
 
         constructor(conditionSetCd: string, userId: string, startDate: string,
-            endDate: string, referenceDate: string, standardType: boolean, sidList: Array<string>) {
+                    endDate: string, referenceDate: string, standardType: boolean, sidList: Array<string>) {
             this.conditionSetCd = conditionSetCd;
             this.userId = userId;
             this.startDate = moment.utc(startDate);
@@ -468,6 +587,7 @@ module nts.uk.com.view.cmf002.o.viewmodel {
             this.sidList = sidList;
         }
     }
+
     class StdOutputCondSetDto {
         cid: string;
         conditionSetCode: string;
@@ -478,9 +598,10 @@ module nts.uk.com.view.cmf002.o.viewmodel {
         conditionSetName: string;
         conditionOutputName: number;
         stringFormat: number;
+
         constructor(cid: string, conditionSetCode: string, categoryId: number, delimiter: number
             , itemOutputName: number, autoExecution: number, conditionSetName: string,
-            conditionOutputName: number, stringFormat: number) {
+                    conditionOutputName: number, stringFormat: number) {
             this.cid = cid;
             this.conditionSetCode = conditionSetCode;
             this.categoryId = categoryId;
@@ -492,6 +613,7 @@ module nts.uk.com.view.cmf002.o.viewmodel {
             this.stringFormat = stringFormat;
         }
     }
+
     class ExOutCtgDto {
         categoryId: number;
         officeHelperSysAtr: number;
@@ -504,9 +626,22 @@ module nts.uk.com.view.cmf002.o.viewmodel {
         explanation: string;
         displayOrder: number;
         defaultValue: boolean;
-        constructor(categoryId: number, officeHelperSysAtr: number, categoryName: string, categorySet: number
-            , personSysAtr: number, payrollSysAtr: number, functionNo: number,
-            functionName: string, explanation: string, displayOrder: number, defaultValue: boolean) {
+        outingPeriodClassific: number;
+        classificationToUse: number;
+
+        constructor(categoryId: number,
+                    officeHelperSysAtr: number,
+                    categoryName: string,
+                    categorySet: number,
+                    personSysAtr: number,
+                    payrollSysAtr: number,
+                    functionNo: number,
+                    functionName: string,
+                    explanation: string,
+                    displayOrder: number,
+                    defaultValue: boolean,
+                    outingPeriodClassific: number,
+                    classificationToUse: number) {
             this.categoryId = categoryId;
             this.officeHelperSysAtr = officeHelperSysAtr;
             this.categoryName = categoryName;
@@ -518,6 +653,8 @@ module nts.uk.com.view.cmf002.o.viewmodel {
             this.explanation = explanation;
             this.displayOrder = displayOrder;
             this.defaultValue = defaultValue;
+            this.outingPeriodClassific = outingPeriodClassific;
+            this.classificationToUse = classificationToUse;
         }
     }
 
@@ -572,11 +709,13 @@ module nts.uk.com.view.cmf002.o.viewmodel {
         /** Data returned */
         returnDataFromCcg001: (data: Ccg001ReturnedData) => void;
     }
+
     export interface IDisplayTableName {
         catelogoryId: number;
         code: number;
         name: string;
     }
+
     export class DisplayTableName {
         catelogoryId: number;
         code: number;
@@ -588,16 +727,53 @@ module nts.uk.com.view.cmf002.o.viewmodel {
             this.name = name;
         }
     }
+
     export interface IDisplayTableName {
         catelogoryId: number;
         code: number;
         name: string;
     }
+
+    export interface ClosureDisPlay {
+        catelogoryId: number;
+        code: number;
+        name: string;
+    }
+
     export enum MODE {
         NEW = 0,
         UPDATE = 1,
         NO = 2
     }
 
+    export  enum OUTPUTCLASSS {
+        /**
+         * 基準日
+         */
+        REFERENCE_DATE = 3,
+        /**
+         * 年月
+         */
+        YEAR_MONTH = 2,
+        /**
+         * 年月日
+         */
+        DATE = 1,
+        /**
+         * 設定なし
+         */
+        NO_SETTING = 0
+    }
 
+    export  enum TOUSE {
+        /**
+         * 使う
+         */
+        USE = 1,
+        /**
+         * 年月
+         */
+        DO_NOT_USE = 0
+
+    }
 }

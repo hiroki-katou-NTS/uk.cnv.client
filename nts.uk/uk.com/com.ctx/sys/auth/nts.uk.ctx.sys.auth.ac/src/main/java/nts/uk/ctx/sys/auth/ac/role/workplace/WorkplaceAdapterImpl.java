@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -149,7 +150,7 @@ public class WorkplaceAdapterImpl implements WorkplaceAdapter {
 
 	@Override
 	public Map<String, String> getAWorkplace(String employeeID, GeneralDate date) {
-		//$職場ID =  [No.650]社員が所属している職場を取得する(社員ID,基準日)		
+		//$職場ID =  [No.650]社員が所属している職場を取得する(社員ID,基準日)
 		AffWorkplaceHistoryItemExport i =  workplacePub.getAffWkpHistItemByEmpDate(employeeID, date);
 		
 		Map<String, String> result = new HashMap<String, String>();
@@ -163,13 +164,13 @@ public class WorkplaceAdapterImpl implements WorkplaceAdapter {
 	@Override
 	public Map<String, String> getByListIds(List<String> workPlaceIds, GeneralDate baseDate) {
 		Map<String, String> result = new HashMap<String, String>();
-		//	$所属職場 = 職場に所属する社員Publish.取得する(基準日,職場リスト)		
+		//	$所属職場 = 職場に所属する社員Publish.取得する(基準日,職場リスト)
 		List<AffWorkplaceHistoryItemExport3> list =  workplaceExportPub.getByListId(workPlaceIds, baseDate);
 		for (AffWorkplaceHistoryItemExport3 i : list) {
 			result.put(i.getEmployeeId(), i.getWorkplaceId());
 		}
-//		return $所属職場：																				
-//				map <$.社員ID,$.職場ID>																	
+//		return $所属職場：
+//				map <$.社員ID,$.職場ID>
 		return result;
 	}
 

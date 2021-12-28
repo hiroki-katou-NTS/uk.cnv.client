@@ -26,63 +26,63 @@ import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.taskmaster.TaskCode;
  *
  */
 
-//@RunWith(JMockit.class)
+@RunWith(JMockit.class)
 public class CheckWorkExpirationDateServiceTest {
 
-//	@Injectable
-//	private CheckWorkExpirationDateService.Require require;
-//
-//	GeneralDate date = GeneralDate.today();
-//	TaskFrameNo taskFrameNo = new TaskFrameNo(1);
-//	TaskFrameNo taskFrameNo2 = new TaskFrameNo(2);
-//	WorkCode code = new WorkCode("WorkCode");
-//
-//	List<TaskFrameSetting> frameSettingList = new ArrayList<>();
-//
-//	Task task = new Task(new TaskCode("Code"), taskFrameNo, null, new ArrayList<>(), new DatePeriod(date, date), null);
-//
-//	// error == false
-//	@Test
-//	public void testCheckWorkExpiration_1() {
-//
-//		new Expectations() {
-//			{
-//				require.getTask(taskFrameNo, code);
-//
-//				result = Optional.of(task);
-//			}
-//		};
-//
-//		CheckWorkExpirationDateService.check(require, date, taskFrameNo, Optional.of(code));
-//	}
-//
-//	// error == true
-//	// throw 2080
-//	@Test
-//	public void testCheckWorkExpiration_2() {
-//		frameSettingList.add(new TaskFrameSetting(taskFrameNo, new TaskFrameName("DUMMY"), null));
-//		frameSettingList.add(new TaskFrameSetting(taskFrameNo2, new TaskFrameName("DUMMY1"), null));
-//
-//		TaskFrameUsageSetting taskFrameUsageSetting = new TaskFrameUsageSetting(frameSettingList);
-//
-//		new Expectations() {
-//			{
-//				require.getTask(taskFrameNo, code);
-//
-//				require.getTaskFrameUsageSetting();
-//				result = taskFrameUsageSetting;
-//			}
-//		};
-//
-//		NtsAssert.businessException("Msg_2080",
-//				() -> CheckWorkExpirationDateService.check(require,
-//						date,
-//						taskFrameNo,
-//						Optional.of(code)));
-//	}
-//
-//	// error == false
-//	// task.get().checkExpirationDate(date) == true
+	@Injectable
+	private CheckWorkExpirationDateService.Require require;
+
+	GeneralDate date = GeneralDate.today();
+	TaskFrameNo taskFrameNo = new TaskFrameNo(1);
+	TaskFrameNo taskFrameNo2 = new TaskFrameNo(2);
+	WorkCode code = new WorkCode("WorkCode");
+
+	List<TaskFrameSetting> frameSettingList = new ArrayList<>();
+
+	Task task = new Task(new TaskCode("Code"), taskFrameNo, null, new ArrayList<>(), new DatePeriod(date, date), null);
+
+	// error == false
+	@Test
+	public void testCheckWorkExpiration_1() {
+
+		new Expectations() {
+			{
+				require.getTask(taskFrameNo, code);
+
+				result = Optional.of(task);
+			}
+		};
+
+		CheckWorkExpirationDateService.check(require, date, taskFrameNo, Optional.of(code));
+	}
+
+	// error == true
+	// throw 2080
+	@Test
+	public void testCheckWorkExpiration_2() {
+		frameSettingList.add(new TaskFrameSetting(taskFrameNo, new TaskFrameName("DUMMY"), null));
+		frameSettingList.add(new TaskFrameSetting(taskFrameNo2, new TaskFrameName("DUMMY1"), null));
+
+		TaskFrameUsageSetting taskFrameUsageSetting = new TaskFrameUsageSetting(frameSettingList);
+
+		new Expectations() {
+			{
+				require.getTask(taskFrameNo, code);
+
+				require.getTaskFrameUsageSetting();
+				result = taskFrameUsageSetting;
+			}
+		};
+
+		NtsAssert.businessException("Msg_2080",
+				() -> CheckWorkExpirationDateService.check(require,
+						date,
+						taskFrameNo,
+						Optional.of(code)));
+	}
+
+	// error == false
+	// task.get().checkExpirationDate(date) == true
 //	@Test
 //	public void testCheckWorkExpiration_3() {
 //		frameSettingList.add(new TaskFrameSetting(taskFrameNo, new TaskFrameName("DUMMY"), null));

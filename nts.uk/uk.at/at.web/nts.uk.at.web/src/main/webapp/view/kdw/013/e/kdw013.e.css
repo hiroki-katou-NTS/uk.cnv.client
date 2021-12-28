@@ -1,0 +1,32 @@
+.task-combobox {
+    width: 333px;
+}
+
+.kdw-013-e table tr{
+    height: 50px;
+}
+
+.kdw-013-e span {
+    width: unset !important;
+}
+
+.kdw013-function {
+    text-align: right !important;
+    padding-right: 10px !important;
+}
+
+#panel-e{
+    height: 350px;
+}
+
+.ui-igcombo-dropdown {
+    width: 335px !important;
+}
+.ui-igcombo-list {
+	overflow-x: auto !important;
+	width: 331px !important;
+}
+
+.ui-igcombo-dropdown .ui-igcombo-listitemholder {
+	overflow: unset !important;
+}

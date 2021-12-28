@@ -7,8 +7,10 @@ import javax.ws.rs.Produces;
 
 import nts.uk.screen.at.app.command.ktg.ktg004.WorkStatusSettingCommandHandler;
 import nts.uk.screen.at.app.ktgwidget.ktg004.AcquisitionResultOfWorkStatusOutput;
+import nts.uk.screen.at.app.ktgwidget.ktg004.AttendanceInforDto;
+import nts.uk.screen.at.app.ktgwidget.ktg004.GetAttendanceInforParam;
+import nts.uk.screen.at.app.ktgwidget.ktg004.KTG004DisplayYearMonthParam;
 import nts.uk.screen.at.app.ktgwidget.ktg004.KTG004Finder;
-import nts.uk.screen.at.app.ktgwidget.ktg004.TopPageDisplayDateDto;
 import nts.uk.screen.at.app.ktgwidget.ktg004.WorkStatusSettingDto;
 import nts.uk.shr.com.context.AppContexts;
 
@@ -36,11 +38,17 @@ public class KTG004WebService {
 	
 	@POST
 	@Path("getData")
-	public AcquisitionResultOfWorkStatusOutput getData(TopPageDisplayDateDto param) {
+	public AcquisitionResultOfWorkStatusOutput getData(KTG004DisplayYearMonthParam param) {
 		return ktg004Finder.startWorkStatus(
 				AppContexts.user().companyId(), 
 				AppContexts.user().employeeId(),
-				param.getTopPageYearMonthEnum());
+				param);
 	}
 	
+	@POST
+	@Path("getAttendanceInfor")
+	public AttendanceInforDto getAttendanceInfor(GetAttendanceInforParam param) {
+		return this.ktg004Finder.getWorkStatusData(AppContexts.user().companyId(), 
+				AppContexts.user().employeeId(), param.getItemsSetting(), param.getCurrentClosingPeriod());
+	}
 }

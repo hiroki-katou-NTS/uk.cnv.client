@@ -66,7 +66,7 @@ public class OiomtStdOutItem extends ContractUkJpaEntity implements Serializable
 	public StandardOutputItem toDomain() {
 		return new StandardOutputItem(this.stdOutItemPk.cid, this.stdOutItemPk.outItemCd, this.stdOutItemPk.condSetCd,
 				this.outItemName, this.itemType, this.oiomtCtgItems.stream().map(x -> {
-					return new CategoryItem(x.getCtgItemPk().ctgItemNo, x.getCtgId(), x.getOperationSymbol(),
+					return new CategoryItem(Integer.valueOf(x.getCtgItemPk().ctgItemNo), x.getCtgId(), x.getOperationSymbol(),
 							x.getCtgItemPk().displayOrder);
 				}).collect(Collectors.toList()));
 	}
@@ -78,7 +78,7 @@ public class OiomtStdOutItem extends ContractUkJpaEntity implements Serializable
 				domain.getOutputItemName().v(), domain.getItemType().value,
 				domain.getCategoryItems().stream().map(item -> {
 					return new OiomtCtgItem(
-							new OiomtCtgItemPk(item.getItemNo().v(), domain.getCid(), domain.getOutputItemCode().v(),
+							new OiomtCtgItemPk(item.getItemNo().v().toString(), domain.getCid(), domain.getOutputItemCode().v(),
 									domain.getConditionSettingCode().v(), item.getDisplayOrder()),
 							item.getCategoryId().v(),
 							item.getOperationSymbol().isPresent() ? item.getOperationSymbol().get().value : null,

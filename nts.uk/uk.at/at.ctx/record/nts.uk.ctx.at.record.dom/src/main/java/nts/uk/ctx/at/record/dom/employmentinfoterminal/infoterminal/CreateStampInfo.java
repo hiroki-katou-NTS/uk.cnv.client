@@ -68,7 +68,7 @@ public class CreateStampInfo implements DomainValue {
 		if (!stampType.isPresent())
 			return Optional.empty();
 
-		Stamp stamp = new Stamp(contractCode, new StampNumber(recept.getIdNumber().trim()), recept.getDateTime(), relieve,
+		Stamp stamp = new Stamp(contractCode, new StampNumber(recept.getIdNumber()), recept.getDateTime(), relieve,
 				stampType.get(), refActualResults, Optional.empty());
 
 //		StampRecord stampRecord = createStampRecord(contractCode, recept, stamp);

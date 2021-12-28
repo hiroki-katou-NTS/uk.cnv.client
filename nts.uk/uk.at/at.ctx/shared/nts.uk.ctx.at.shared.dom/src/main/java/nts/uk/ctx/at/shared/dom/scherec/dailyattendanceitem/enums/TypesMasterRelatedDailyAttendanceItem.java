@@ -19,7 +19,8 @@ public enum TypesMasterRelatedDailyAttendanceItem {
 	TIME_LIMIT_UPPER_SET(13, "時間外の上限設定"),
 	BUSINESS_TYPE(14,"勤務種別"),
 	SUPPORT_WORK(15,"作業"),
-	BONUS_PAY(16,"加給");
+	BONUS_PAY(16,"加給"),
+	WORK_SUPPLEMENT_OPT(19,"作業補足選択肢");
 
 	public final int value;
 	public final String name;

@@ -44,8 +44,7 @@ public class TopPageSettingServiceTest {
 				EnumAdaptor.valueOf(0, System.class),
 				EnumAdaptor.valueOf(0, MenuClassification.class), 
 				new LoginMenuCode(LOGIN_MENU_CODE)
-			),
-			new SwitchingDate(0)
+			)
 		);
 	
 	/**
@@ -60,8 +59,7 @@ public class TopPageSettingServiceTest {
 				new LoginMenuCode(LOGIN_MENU_CODE), 
 				new TopMenuCode(TOP_MENU_CODE), 
 				EnumAdaptor.valueOf(0, MenuClassification.class), 
-				EnumAdaptor.valueOf(0, System.class),
-				new SwitchingDate(0)));
+				EnumAdaptor.valueOf(0, System.class)));
 		new Expectations() {
 			{
 				require.getTopPagePersonSetting(COMPANY_ID, EMPLOYEE_ID);
@@ -98,8 +96,7 @@ public class TopPageSettingServiceTest {
 				new LoginMenuCode(LOGIN_MENU_CODE), 
 				new TopMenuCode(TOP_MENU_CODE), 
 				EnumAdaptor.valueOf(0, MenuClassification.class), 
-				EnumAdaptor.valueOf(0, System.class),
-				new SwitchingDate(0)));
+				EnumAdaptor.valueOf(0, System.class)));
 		new Expectations() {
 			{
 				require.getTopPagePersonSetting(COMPANY_ID, EMPLOYEE_ID);

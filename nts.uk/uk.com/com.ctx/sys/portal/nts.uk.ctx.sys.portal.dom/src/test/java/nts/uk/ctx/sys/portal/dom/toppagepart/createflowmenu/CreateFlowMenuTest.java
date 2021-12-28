@@ -22,7 +22,8 @@ public class CreateFlowMenuTest {
 
 	final MenuSettingDto menuDto = MenuSettingDto.builder().bold(0).cid("cid").column(0).flowMenuCode("code")
 			.fontSize(0).height(0).horizontalPosition(0).menuClassification(1).menuCode("menuCode").menuName("menuName")
-			.row(0).systemType(3).verticalPosition(0).width(0).build();
+			.row(0).systemType(3).verticalPosition(0).width(0).textColor("color").isFixed(null)
+			.ratio(null).fileId(null).fileName(null).build();
 	final ArrowSettingDto arrowDto = ArrowSettingDto.builder().cid("cid").column(0).fileName("fileName")
 			.flowMenuCode("code").height(0).row(0).width(0).build();
 	final FileAttachmentSettingDto fileDto = FileAttachmentSettingDto.builder().bold(0).cid("cid").column(0)
@@ -104,16 +105,16 @@ public class CreateFlowMenuTest {
 				.as("testFull fileAttachment")
 				.containsExactly(tuple("fileId", "content", 0, 0, Optional.empty(), Optional.empty(), 0, false, 0, 0, 0, 0));
 		assertThat(domain.getFlowMenuLayout().get().getImageSettings())
-				.extracting(x -> x.getFileId().isPresent() ? x.getFileId().get() : x.getFileId(),
-						x -> x.getFileName().isPresent() ? x.getFileName().get().v() : x.getFileName(),
-						x -> x.getIsFixed().value,
+				.extracting(x -> x.getImageInformation().getFileId().orElse(""),
+						x -> x.getImageInformation().getFileName().map(FileName::v).orElse(""),
+						x -> x.getImageInformation().getIsFixed().value,
 						x -> x.getSizeAndPosition().getColumn().v(),
 						x -> x.getSizeAndPosition().getHeight().v(),
 						x -> x.getSizeAndPosition().getRow().v(),
 						x -> x.getSizeAndPosition().getWidth().v())
 				.as("testFull image")
-				.containsExactly(tuple("fileId", Optional.empty(), 0, 0, 0, 0, 0),
-								 tuple(Optional.empty(), "fileName", 1, 0, 0, 0, 0));
+				.containsExactly(tuple("fileId", "", 0, 0, 0, 0, 0),
+								 tuple("", "fileName", 1, 0, 0, 0, 0));
 		assertThat(domain.getFlowMenuLayout().get().getLabelSettings())
 				.extracting(x -> x.getLabelContent().get().v(),
 						x -> x.getFontSetting().getPosition().getHorizontalPosition().value,
@@ -264,5 +265,54 @@ public class CreateFlowMenuTest {
 		assertThat(labelBuilder).as("testBuilder label").isNotNull();
 		assertThat(linkBuilder).as("testBuilder link").isNotNull();
 		assertThat(menuBuilder).as("testBuilder menu").isNotNull();
+	}
+	
+	@Test
+	public void testMenuNoImg() {
+		CreateFlowMenuDto dto = new CreateFlowMenuDto();
+		domainAll.setMemento(dto, "contractCd");
+		MenuSettingDto newData = menuDto;
+		dto.setMenuSettings(Arrays.asList(newData));
+		CreateFlowMenu domain = CreateFlowMenu.createFromMemento(dto);
+		domain.setMemento(dto, "contractCode");
+		Optional<ImageInformation> data = dto.getMenuSettings().get(0).getImageInformation();
+		
+		assertThat(data).isEmpty();
+	}
+	
+	@Test
+	public void testMenuDefaultImg() {
+		CreateFlowMenuDto dto = new CreateFlowMenuDto();
+		domainAll.setMemento(dto, "contractCd");
+		MenuSettingDto newData = MenuSettingDto.builder().bold(0).cid("cid").column(0).flowMenuCode("code")
+				.fontSize(0).height(0).horizontalPosition(0).menuClassification(1).menuCode("menuCode").menuName("menuName")
+				.row(0).systemType(3).verticalPosition(0).width(0).textColor("color").isFixed(FixedClassification.FIXED.value)
+				.ratio(1.0).fileId("fileId").fileName("fileName").build();
+		dto.setMenuSettings(Arrays.asList(newData));
+		CreateFlowMenu domain = CreateFlowMenu.createFromMemento(dto);
+		domain.setMemento(dto, "contractCode");
+		Optional<ImageInformation> data = dto.getMenuSettings().get(0).getImageInformation();
+		
+		assertThat(data).isPresent();
+		assertThat(data.get().getIsFixed()).isEqualTo(FixedClassification.FIXED);
+		assertThat(data.get().getFileName()).isPresent();
+	}
+	
+	@Test
+	public void testMenuUploadImg() {
+		CreateFlowMenuDto dto = new CreateFlowMenuDto();
+		domainAll.setMemento(dto, "contractCd");
+		MenuSettingDto newData = MenuSettingDto.builder().bold(0).cid("cid").column(0).flowMenuCode("code")
+				.fontSize(0).height(0).horizontalPosition(0).menuClassification(1).menuCode("menuCode").menuName("menuName")
+				.row(0).systemType(3).verticalPosition(0).width(0).textColor("color").isFixed(FixedClassification.RANDOM.value)
+				.ratio(1.0).fileId("fileId").fileName("fileName").build();
+		dto.setMenuSettings(Arrays.asList(newData));
+		CreateFlowMenu domain = CreateFlowMenu.createFromMemento(dto);
+		domain.setMemento(dto, "contractCode");
+		Optional<ImageInformation> data = dto.getMenuSettings().get(0).getImageInformation();
+		
+		assertThat(data).isPresent();
+		assertThat(data.get().getIsFixed()).isEqualTo(FixedClassification.RANDOM);
+		assertThat(data.get().getFileId()).isPresent();
 	}
 }

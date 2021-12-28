@@ -23,8 +23,8 @@ module nts.uk.at.view.kdp002.a {
 				
 				vm.$ajax('at', '/server/time/now')
 				.then((c) => {
-					const sysDate = moment(c).format('YYYY/MM/DD');;
-					const yearMonth = moment(c).format('YYYY/MM');
+					const sysDate = moment(c).utc().format('YYYY/MM/DD');;
+					const yearMonth = moment(c).utc().format('YYYY/MM');
 
 					self.yearMonth(yearMonth);
 					self.systemDate(sysDate);

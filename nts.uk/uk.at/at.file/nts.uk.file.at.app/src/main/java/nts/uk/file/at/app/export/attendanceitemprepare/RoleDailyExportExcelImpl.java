@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import nts.arc.enums.EnumAdaptor;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.record.app.find.dailyperformanceformat.BusinessTypeSortedFinder;
 import nts.uk.ctx.at.record.app.find.dailyperformanceformat.BusinessTypesFinder;
@@ -28,7 +27,6 @@ import nts.uk.ctx.at.record.dom.workrecord.operationsetting.FormatPerformance;
 import nts.uk.ctx.at.shared.app.find.scherec.attitem.AttItemFinder;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.adapter.attendanceitemname.AttItemAuthority;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.adapter.attendanceitemname.AttItemName;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.enums.TimeInputUnit;
 import nts.uk.ctx.at.shared.dom.workrule.businesstype.BusinessTypeCode;
 import nts.uk.ctx.bs.employee.app.find.employment.EmploymentFinder;
 import nts.uk.ctx.bs.employee.app.find.employment.dto.EmploymentDto;
@@ -153,6 +151,7 @@ public class RoleDailyExportExcelImpl {
         	sheetDatas.add(sheet5);
         }
         sheetDatas.add(sheet6);
+        sheetDatas.addAll(errorAlarmWorkRecordExportImpl.addSheet3(query)); //add sheet3 separately because of sheets' order
         sheetDatas.addAll(roleMonthlyExportExcelImpl.extraSheets(query,listEmployeeRoleDto,mapAttNameMonthlys,listAttItemNameMonthly,mode));
 
         return sheetDatas;
@@ -357,10 +356,14 @@ public class RoleDailyExportExcelImpl {
                 ColumnTextAlign.LEFT, "", true));
         columns.add(new MasterHeaderColumn("項目", TextResource.localize("KDW006_88"),
                 ColumnTextAlign.LEFT, "", true));
+        columns.add(new MasterHeaderColumn("表示名称", TextResource.localize("KDW002_65"),
+                ColumnTextAlign.LEFT, "", true));
+        columns.add(new MasterHeaderColumn("改行位置", TextResource.localize("KDW002_67"),
+                ColumnTextAlign.LEFT, "", true));
         columns.add(new MasterHeaderColumn("ヘッダー色", TextResource.localize("KDW006_152"),
                 ColumnTextAlign.LEFT, "", true));
-        columns.add(new MasterHeaderColumn("丸め単位", TextResource.localize("KDW006_153"),
-                ColumnTextAlign.LEFT, "", true));
+//        columns.add(new MasterHeaderColumn("丸め単位", TextResource.localize("KDW006_153"),
+//                ColumnTextAlign.LEFT, "", true));
         return columns;
     }
     
@@ -377,16 +380,33 @@ public class RoleDailyExportExcelImpl {
                     if(controlItem!=null){
                     	putDataEmptySheet2(data);
                         data.put("コード", c.getAttendanceItemDisplayNumber());
-                        data.put("項目", c.getAttendanceItemName());
-                    	 String color =controlItem.getHeaderBgColorOfDailyPer();
-                         if(color!=null){
-                        	 data.put("ヘッダー色", color.replace("#", ""));
-                         }
-//    	                    TimeInputUnit timeInputUnit = EnumAdaptor.valueOf(controlItem.getInputUnitOfTimeItem()==null?0:controlItem.getInputUnitOfTimeItem(), TimeInputUnit.class);
-    	                    data.put("丸め単位", controlItem.getInputUnitOfTimeItem()==null?0:controlItem.getInputUnitOfTimeItem());
-                        if(c.getTypeOfAttendanceItem()==null||c.getTypeOfAttendanceItem()!=5){
-    	                    	data.put("丸め単位","");
-    	                } 
+                        data.put("項目", c.getOldName());
+                        data.put("表示名称", c.getAttendanceItemName());
+                        data.put("改行位置", c.getNameLineFeedPosition());
+                        String color =controlItem.getHeaderBgColorOfDailyPer();
+                        if(color!=null){
+                        	data.put("ヘッダー色", color.replace("#", ""));
+                        }
+//    	                Float inputUnit = controlItem.getInputUnitOfTimeItem()==null ? 0 : controlItem.getInputUnitOfTimeItem();
+
+//    	                switch (c.getAttendanceAtr()) {
+//    	                	case 5:	//DailyAttendanceAtr.Time
+//    	                		data.put("丸め単位", inputUnit % 1 == 0 ? (int) Math.floor(inputUnit) + TextResource.localize("KDW006_154") :
+//    	                			inputUnit + TextResource.localize("KDW006_154"));
+//    	                		break;
+//    	                	case 2: //DailyAttendanceAtr.NumberOfTime
+//    	                		data.put("丸め単位", inputUnit % 1 == 0 ? (int) Math.floor(inputUnit) + TextResource.localize("KDW006_230") :
+//    	                			inputUnit + TextResource.localize("KDW006_230"));
+//    	                		break;
+//    	                	case 3: //DailyAttendanceAtr.AmountOfMoney
+//    	                		data.put("丸め単位", inputUnit % 1 == 0 ? (int) Math.floor(inputUnit) + TextResource.localize("KDW006_231"):
+//    	                			inputUnit + TextResource.localize("KDW006_231"));
+//    	                		break;
+//    	                	default:
+//    	                		data.put("丸め単位","");
+//    	                		break;
+//    	                }
+
                         datas.add(alignMasterDataSheet2(data));
                     }
                 });
@@ -398,23 +418,19 @@ public class RoleDailyExportExcelImpl {
     private void putDataEmptySheet2(Map<String, Object> data){
         data.put("コード","");
         data.put("項目","");
+        data.put("表示名称","");
+        data.put("改行位置","");
         data.put("ヘッダー色","");
-        data.put("丸め単位","");
+//        data.put("丸め単位","");
     }
     private MasterData alignMasterDataSheet2(Map<String, Object> data) {
-        /**
-         *     TIME_INPUT_1Min(0, "1分"),
-        TIME_INPUT_5Min(1, "5分"),
-        TIME_INPUT_10Min(2, "10分"),
-        TIME_INPUT_15Min(3, "15分"),
-        TIME_INPUT_30Min(4, "30分"),
-        TIME_INPUT_50Min(5, "60分");
-         */
         MasterData masterData = new MasterData(data, null, "");
         masterData.cellAt("コード").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
         masterData.cellAt("項目").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+        masterData.cellAt("表示名称").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+        masterData.cellAt("改行位置").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.RIGHT));
         masterData.cellAt("ヘッダー色").setStyle(MasterCellStyle.build().backgroundColor((data.get("ヘッダー色").toString())).horizontalAlign(ColumnTextAlign.LEFT));
-        masterData.cellAt("丸め単位").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.RIGHT));
+//        masterData.cellAt("丸め単位").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.RIGHT));
         return masterData;
     }
     

@@ -72,7 +72,6 @@ public class JpaTopPagePersonSettingRepository extends JpaRepository implements 
 		oldData.setTopMenuCode(newData.getTopMenuCode());
 		oldData.setSystem(newData.getSystem());
 		oldData.setMenuClassification(newData.getMenuClassification());
-		oldData.setSwitchingDate(newData.getSwitchingDate());
 		this.commandProxy().update(oldData);
 	}
 

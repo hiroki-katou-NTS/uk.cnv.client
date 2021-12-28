@@ -493,8 +493,7 @@ public class ReserveLeaveInfo implements Cloneable {
 						aggrPeriodWork.getPeriod().start());
 				
 				if(dummyData.isPresent()){
-					ReserveLeaveGrantRemainingData addData = new ReserveLeaveGrantRemainingData();
-					addData.setAllValue(dummyData.get());
+					ReserveLeaveGrantRemainingData addData = ReserveLeaveGrantRemainingData.of(dummyData.get());
 					this.grantRemainingList.add(addData);
 				}
 

@@ -2,6 +2,8 @@ package nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.enums;
 
 import lombok.AllArgsConstructor;
 
+// 日次勤怠項目の属性
+
 @AllArgsConstructor
 public enum DailyAttendanceAtr {
 
@@ -23,7 +25,11 @@ public enum DailyAttendanceAtr {
 	Charater(7),
 
 	/*申請*/
-	Application(8);
+	Application(8),
+	
+	/*数値*/
+	NumbericValue(9);
+	
 	public final int value;
 	
 }

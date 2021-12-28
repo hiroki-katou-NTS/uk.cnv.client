@@ -19,12 +19,14 @@ public class Ccg008Dto {
 	private String startDate;
 	
 	private String endDate;
+	
+	private String processDate;
 
 	/**
 	 * ビルトインユーザ用のダミーデータ
 	 * @return
 	 */
 	public static Ccg008Dto forBuiltInUser() {
-		return new Ccg008Dto(1, GeneralDate.today().yearMonth().v(), "", "");
+		return new Ccg008Dto(1, GeneralDate.today().yearMonth().v(), "", "", "");
 	}
 }

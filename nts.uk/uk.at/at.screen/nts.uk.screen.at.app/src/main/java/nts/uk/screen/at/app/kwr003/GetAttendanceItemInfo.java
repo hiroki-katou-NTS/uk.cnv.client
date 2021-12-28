@@ -108,39 +108,39 @@ public class GetAttendanceItemInfo {
 
     private Integer convertDailyToAttForms(Integer typeOfAttendanceItem, Integer masterType) {
         // ・属性：コード　＋　マスタの種類：勤務種類　→　勤務種類
-        if (typeOfAttendanceItem.equals(DailyAttendanceAtr.Code.value)
-                && masterType.equals(TypesMasterRelatedDailyAttendanceItem.WORK_TYPE.value)) {
+        if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(DailyAttendanceAtr.Code.value)
+                && masterType!=null && masterType.equals(TypesMasterRelatedDailyAttendanceItem.WORK_TYPE.value)) {
             return CommonAttributesOfForms.WORK_TYPE.value;
             // ・属性：コード　＋　マスタの種類：就業時間帯　→　就業時間帯
-        } else if (typeOfAttendanceItem.equals(DailyAttendanceAtr.Code.value)
-                && masterType.equals(TypesMasterRelatedDailyAttendanceItem.WORKING_HOURS.value)) {
+        } else if (typeOfAttendanceItem!=null &&typeOfAttendanceItem.equals(DailyAttendanceAtr.Code.value)
+                &&masterType!=null &&  masterType.equals(TypesMasterRelatedDailyAttendanceItem.WORKING_HOURS.value)) {
             return CommonAttributesOfForms.WORKING_HOURS.value;
             // ・属性：コード(上記除く)　→　なし(その他_文字数値)
-        } else if (typeOfAttendanceItem.equals(DailyAttendanceAtr.Code.value)) {
+        } else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(DailyAttendanceAtr.Code.value)) {
             return CommonAttributesOfForms.OTHER_CHARACTER_NUMBER.value;
             // ・マスタを参照する　→　なし(その他_文字数値)
-        } else if (typeOfAttendanceItem.equals(DailyAttendanceAtr.ReferToMaster.value)) {
+        } else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(DailyAttendanceAtr.ReferToMaster.value)) {
             return CommonAttributesOfForms.OTHER_CHARACTER_NUMBER.value;
             // ・回数　→　回数
-        } else if (typeOfAttendanceItem.equals(DailyAttendanceAtr.NumberOfTime.value)) {
+        } else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(DailyAttendanceAtr.NumberOfTime.value)) {
             return CommonAttributesOfForms.NUMBER_OF_TIMES.value;
             // ・金額　→　金額
-        } else if (typeOfAttendanceItem.equals(DailyAttendanceAtr.AmountOfMoney.value)) {
+        } else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(DailyAttendanceAtr.AmountOfMoney.value)) {
             return CommonAttributesOfForms.AMOUNT_OF_MONEY.value;
             // ・区分　→　なし(その他_数値)
-        } else if (typeOfAttendanceItem.equals(DailyAttendanceAtr.Classification.value)) {
+        } else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(DailyAttendanceAtr.Classification.value)) {
             return CommonAttributesOfForms.OTHER_NUMERICAL_VALUE.value;
             // ・時間　→　時間
-        } else if (typeOfAttendanceItem.equals(DailyAttendanceAtr.Time.value)) {
+        } else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(DailyAttendanceAtr.Time.value)) {
             return CommonAttributesOfForms.TIME.value;
             // ・時刻　→　時刻
-        } else if (typeOfAttendanceItem.equals(DailyAttendanceAtr.TimeOfDay.value)) {
+        } else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(DailyAttendanceAtr.TimeOfDay.value)) {
             return CommonAttributesOfForms.TIME_OF_DAY.value;
             // ・文字　→　なし(その他_文字)
-        } else if (typeOfAttendanceItem.equals(DailyAttendanceAtr.Charater.value)) {
+        } else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(DailyAttendanceAtr.Charater.value)) {
             return CommonAttributesOfForms.OTHER_CHARACTERS.value;
             // ・申請　→　なし(その他_数値)
-        } else if (typeOfAttendanceItem.equals(DailyAttendanceAtr.Application.value)) {
+        } else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(DailyAttendanceAtr.Application.value)) {
             return CommonAttributesOfForms.OTHER_NUMERICAL_VALUE.value;
         }
         return null;
@@ -148,38 +148,38 @@ public class GetAttendanceItemInfo {
 
     private Integer convertMonthlyToAttForms(Integer typeOfAttendanceItem) {
         //・時間　→　時間
-        if (typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.TIME.value)) {
+        if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.TIME.value)) {
             return CommonAttributesOfForms.TIME.value;
         }
         // ・回数　→　回数
-        else if (typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.NUMBER.value)) {
+        else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.NUMBER.value)) {
             return CommonAttributesOfForms.NUMBER_OF_TIMES.value;
             // ・日数　→　日数
-        } else if (typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.DAYS.value)) {
+        } else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.DAYS.value)) {
             return CommonAttributesOfForms.DAYS.value;
         }
         // ・金額　→　金額
-        else if (typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.AMOUNT.value)) {
+        else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.AMOUNT.value)) {
             return CommonAttributesOfForms.AMOUNT_OF_MONEY.value;
         }
         // ・マスタを参照する　→　なし(その他_文字数値)
-        else if (typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.REFER_TO_MASTER.value)) {
+        else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.REFER_TO_MASTER.value)) {
             return CommonAttributesOfForms.OTHER_CHARACTER_NUMBER.value;
         }
         //・コード　→　なし(その他_文字数値)
-        else if (typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.CODE.value)) {
+        else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.CODE.value)) {
             return CommonAttributesOfForms.OTHER_CHARACTER_NUMBER.value;
         }
         // 区分　→　なし(その他_数値)
-        else if (typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.CLASSIFICATION.value)) {
+        else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.CLASSIFICATION.value)) {
             return CommonAttributesOfForms.OTHER_NUMERICAL_VALUE.value;
         }
         // ・比率　→　なし(その他_数値)
-        else if (typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.RATIO.value)) {
+        else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.RATIO.value)) {
             return CommonAttributesOfForms.OTHER_NUMERICAL_VALUE.value;
         }
         // ・文字　→　なし(その他_文字)
-        else if (typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.CHARACTER.value)) {
+        else if (typeOfAttendanceItem!=null && typeOfAttendanceItem.equals(MonthlyAttendanceItemAtr.CHARACTER.value)) {
             return CommonAttributesOfForms.OTHER_CHARACTERS.value;
         } else
             return null;

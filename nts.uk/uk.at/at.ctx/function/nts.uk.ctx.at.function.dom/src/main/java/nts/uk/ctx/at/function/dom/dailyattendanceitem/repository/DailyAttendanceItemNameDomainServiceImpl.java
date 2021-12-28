@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.function.dom.dailyattendanceitem.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -14,6 +15,9 @@ import nts.uk.ctx.at.function.dom.attendanceitemframelinking.enums.TypeOfItem;
 import nts.uk.ctx.at.function.dom.attendanceitemname.service.AttendanceItemNameService;
 import nts.uk.ctx.at.function.dom.dailyattendanceitem.DailyAttendanceItem;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.adapter.attendanceitemname.AttItemName;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.service.CompanyDailyItemService;
+import nts.uk.shr.com.context.AppContexts;
+import nts.uk.shr.com.context.LoginUserContext;
 
 /*
  * NamPT
@@ -27,9 +31,15 @@ public class DailyAttendanceItemNameDomainServiceImpl implements DailyAttendance
 	@Inject
 	private AttendanceItemNameService attendanceItemNameService; 
 
+	@Inject
+	private CompanyDailyItemService companyDailyItemService;
 	@Override
 	public List<DailyAttendanceItem> getNameOfDailyAttendanceItem(List<Integer> dailyAttendanceItemIds) {
-		return attendanceItemNameService.getNameOfAttendanceItem(dailyAttendanceItemIds, TypeOfItem.Daily).stream()
+		//
+		LoginUserContext login = AppContexts.user();
+		String companyId = login.companyId();
+		List<AttItemName> data = companyDailyItemService.getDailyItems(companyId, Optional.empty(), dailyAttendanceItemIds, null);
+		return data.stream()
 				.map(item -> {
 					DailyAttendanceItem dto = new DailyAttendanceItem();
 					dto.setAttendanceItemId(item.getAttendanceItemId());
@@ -37,6 +47,7 @@ public class DailyAttendanceItemNameDomainServiceImpl implements DailyAttendance
 					dto.setAttendanceItemDisplayNumber(item.getAttendanceItemDisplayNumber());
 					dto.setTypeOfAttendanceItem(item.getTypeOfAttendanceItem());
 					dto.setFrameCategory(item.getFrameCategory());
+					dto.setDisplayName(item.getOldName());
 					return dto;
 				}).collect(Collectors.toList());
 	}

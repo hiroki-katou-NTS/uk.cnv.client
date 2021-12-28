@@ -17,6 +17,7 @@ module nts.uk.at.view.kml001.a {
       isLastItem: KnockoutObservable<Boolean> = ko.observable(false);
       standardDate: KnockoutObservable<string> = ko.observable(null);
       langId: KnockoutObservable<string> = ko.observable('ja');
+      unitPriceEnum: KnockoutObservableArray<any> = ko.observableArray(__viewContext.enums.UnitPrice);
       unitPriceOpt: KnockoutObservableArray<any> = ko.observableArray([]);
       selectedHistory: KnockoutObservable<vmbase.GridPersonCostCalculation> = ko.observable(null);
       defaultPremiumSettings: KnockoutObservableArray<any> = ko.observableArray([]);
@@ -28,6 +29,7 @@ module nts.uk.at.view.kml001.a {
 
         $('#formula-child-1').html(nts.uk.resource.getText('KML001_7').replace(/\n/g, '<br/>'));
         var self = this;
+        let temp: Array<any> = [];
         self.personCostList = ko.observableArray([]);
         self.currentPersonCost = ko.observable(
           new vmbase.PersonCostCalculation('', '', "", "9999/12/31", 0, '', null, [], 1, 0, 1, 0, 0)
@@ -51,14 +53,11 @@ module nts.uk.at.view.kml001.a {
           ko.observable(''),
           ko.observable('')
         ]);
+        _.each(self.unitPriceEnum(), item => {
+          temp.push({code: item.value, name: item.name});
+        })
 
-        self.unitPriceOpt([
-          { code: 0, name: self.$i18n('KML001_22') },
-          { code: 1, name: self.$i18n('KML001_23') },
-          { code: 2, name: self.$i18n('KML001_24') },
-          { code: 3, name: self.$i18n('KML001_26') },
-          { code: 4, name: self.$i18n('KML001_25') },
-        ]);
+        self.unitPriceOpt(temp);
 
         self.currentPersonCost().unitPrice.subscribe((newValue) => {
           self.changeUnitPrice(newValue);
@@ -282,7 +281,7 @@ module nts.uk.at.view.kml001.a {
                       if (!_.isNil(findItem)) {
                         let attendanceNames = [];
                         _.forEach(findItem.attendanceNames, (o) => {
-                          attendanceNames.push({...o, name: o.attendanceItemName});
+                          attendanceNames.push({shortAttendanceID:o.attendanceItemId, name: o.attendanceItemName});
                         });
                         self.currentPersonCost().premiumSets.push( 
                           new vmbase.PremiumSetting(

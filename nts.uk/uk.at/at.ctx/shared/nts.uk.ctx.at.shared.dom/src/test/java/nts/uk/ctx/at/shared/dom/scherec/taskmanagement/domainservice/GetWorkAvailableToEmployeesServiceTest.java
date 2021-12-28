@@ -28,53 +28,54 @@ import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.taskmaster.TaskCode;
  *
  */
 
-//@RunWith(JMockit.class)
+@RunWith(JMockit.class)
 public class GetWorkAvailableToEmployeesServiceTest {
-//
-//	@Injectable
-//	private GetWorkAvailableToEmployeesService.Require require;
-//
-//	private String companyID = "companyID";
-//	private String employeeID = "employeeID";
-//	private GeneralDate date = GeneralDate.today();
-//	private TaskFrameNo taskFrameNo = new TaskFrameNo(1);
-//
-//	private TaskFrameUsageSetting taskFrameUsageSetting = GetWorkAvailableToEmployeesServiceHelper.getTask();
-//	private Task task = GetWorkAvailableToEmployeesServiceHelper.getTaskDefault();
-//	private NarrowingDownTaskByWorkplace narrowingDown = GetWorkAvailableToEmployeesServiceHelper.getNarrowingDown();
-//	private List<Task> tasks = new ArrayList<>();
-//
-//	// $作業枠利用設定 isNull
-//	@Test
-//	public void test_1() {
-//
-//		new Expectations() {
-//			{
-//				require.getWorkFrameUsageSetting(companyID);
-//			}
-//		};
-//
-//		List<Task> result = GetWorkAvailableToEmployeesService.get(require, companyID, employeeID, date, taskFrameNo,
-//				Optional.empty());
-//		assertThat(result.isEmpty()).isTrue();
-//	}
-//
-//	// $作業枠利用設定 isNotNull
-//	// 作業枠NO <> 1 AND 上位枠作業コード.isPresent
-//	// if $職場別作業の絞込.isNotPresent()
-//	// $親作業 isnotPresent
+
+
+	@Injectable
+	private GetWorkAvailableToEmployeesService.Require require;
+
+	private String companyID = "companyID";
+	private String employeeID = "employeeID";
+	private GeneralDate date = GeneralDate.today();
+	private TaskFrameNo taskFrameNo = new TaskFrameNo(1);
+
+	private TaskFrameUsageSetting taskFrameUsageSetting = GetWorkAvailableToEmployeesServiceHelper.getTask();
+	private Task task = GetWorkAvailableToEmployeesServiceHelper.getTaskDefault();
+	private NarrowingDownTaskByWorkplace narrowingDown = GetWorkAvailableToEmployeesServiceHelper.getNarrowingDown();
+	private List<Task> tasks = new ArrayList<>();
+
+	// $作業枠利用設定 isNull
+	@Test
+	public void test_1() {
+
+		new Expectations() {
+			{
+				require.getTask();
+			}
+		};
+
+		List<Task> result = GetWorkAvailableToEmployeesService.get(require, companyID, employeeID, date, taskFrameNo,
+				Optional.empty());
+		assertThat(result.isEmpty()).isTrue();
+	}
+
+	// $作業枠利用設定 isNotNull
+	// 作業枠NO <> 1 AND 上位枠作業コード.isPresent
+	// if $職場別作業の絞込.isNotPresent()
+	// $親作業 isnotPresent
 //	@Test
 //	public void test_2() {
 //
 //		new Expectations() {
 //			{
-//				require.getWorkFrameUsageSetting(companyID);
+//				require.getTask();
 //				result = taskFrameUsageSetting;
 //				
-//				require.getListTask(companyID, date, taskFrameNo, new ArrayList<>());
+//				require.getListTask(date, taskFrameNo, new ArrayList<>());
 //				result = tasks;
 //
-//				require.getOptionalTask(companyID, taskFrameNo, new TaskCode("DUMMY"));
+//				require.getOptionalTask(taskFrameNo, new TaskCode("DUMMY"));
 //			}
 //		};
 //
@@ -82,8 +83,8 @@ public class GetWorkAvailableToEmployeesServiceTest {
 //				new TaskFrameNo(2), Optional.of(new TaskCode("DUMMY")));
 //		assertThat(result.isEmpty()).isTrue();
 //	}
-//
-//	// if $子作業.isEmpty AND $絞込作業.isEmpty
+
+	// if $子作業.isEmpty AND $絞込作業.isEmpty
 //	@Test
 //	public void test_3() {
 //
@@ -93,13 +94,13 @@ public class GetWorkAvailableToEmployeesServiceTest {
 //
 //		new Expectations() {
 //			{
-//				require.getWorkFrameUsageSetting(companyID);
+//				require.getTask();
 //				result = taskFrameUsageSetting;
 //
-//				require.getOptionalTask(companyID, taskFrameNo, new TaskCode("DUMMY"));
+//				require.getOptionalTask(taskFrameNo, new TaskCode("DUMMY"));
 //				result = Optional.of(task);
 //
-//				require.getListTask(companyID, date, taskFrameNo, new ArrayList<>());
+//				require.getListTask(date, taskFrameNo, new ArrayList<>());
 //				result = tasks;
 //
 //			}
@@ -118,8 +119,8 @@ public class GetWorkAvailableToEmployeesServiceTest {
 //				new TaskFrameNo(2), Optional.of(new TaskCode("DUMMY")));
 //		assertThat(result.isEmpty()).isTrue();
 //	}
-//
-//	// if $子作業.isEmpty AND $絞込作業.isEmpty
+
+	// if $子作業.isEmpty AND $絞込作業.isEmpty
 //	@Test
 //	public void test_4() {
 //
@@ -131,13 +132,13 @@ public class GetWorkAvailableToEmployeesServiceTest {
 //
 //		new Expectations() {
 //			{
-//				require.getOptionalTask(companyID, taskFrameNo, new TaskCode("DUMMY"));
+//				require.getOptionalTask(taskFrameNo, new TaskCode("DUMMY"));
 //				result = optTask;
 //
-//				require.getWorkFrameUsageSetting(companyID);
+//				require.getTask();
 //				result = taskFrameUsageSetting;
 //
-//				require.getListTask(companyID, date, taskFrameNo, new ArrayList<>());
+//				require.getListTask(date, taskFrameNo, new ArrayList<>());
 //				result = tasks;
 //			}
 //		};

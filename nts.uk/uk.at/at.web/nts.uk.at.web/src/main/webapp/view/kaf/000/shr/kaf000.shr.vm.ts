@@ -150,6 +150,7 @@ module nts.uk.at.view.kaf000.shr.viewmodel {
         employeeIds : Array<string>;
         baseDate: string;
 		isAgentMode?: boolean;
+		screenCode?: number;
 	}
     
     export module model {

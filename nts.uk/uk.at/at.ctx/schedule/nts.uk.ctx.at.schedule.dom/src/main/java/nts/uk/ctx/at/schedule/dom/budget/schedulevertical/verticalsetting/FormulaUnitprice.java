@@ -3,6 +3,7 @@ package nts.uk.ctx.at.schedule.dom.budget.schedulevertical.verticalsetting;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import nts.arc.enums.EnumAdaptor;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.employeeunitpricehistory.UnitPrice;
 /**
  * 平均単価計算式
  * @author phongtq

@@ -1884,10 +1884,11 @@ module nts.uk.com.view.ccg.share.ccg {
                     nts.uk.ui.dialog.alertError({ messageId: 'Msg_1199' });
                     return false;
                 }
+				/*
                 if (self.showWorktype && nts.uk.util.isNullOrEmpty(self.selectedWorkTypeCode())) {
                     nts.uk.ui.dialog.alertError({ messageId: 'Msg_1200' });
                     return false;
-                }
+                }*/
                 return true;
             }
 

@@ -517,7 +517,7 @@ public class DailyModifyRCommandFacade {
 
 				if (Thread.currentThread().getName().indexOf("REQUEST:") == 0) {
 					this.executerService
-							.submit(AsyncTask.builder().withContexts().threadName("Daily").build(asyncDaily));
+							.submit(AsyncTask.builder().threadName("Daily").build(asyncDaily));
 				} else {
 					asyncDaily.run();
 				}
@@ -536,7 +536,6 @@ public class DailyModifyRCommandFacade {
 							dataParent.getDateRange(), dataParent.getMode(), editFlex,dataParent.getCheckUnLock());
 					
 					if(resultCalcMonth.getErrorAfterCheck() !=null && resultCalcMonth.getListAggregatePastMonthResult().isEmpty()) {
-						RCDailyCorrectionResult resultMonth = resultCalcMonth.getResultUI();
 						ErrorAfterCalcDaily errorMonth = resultCalcMonth.getErrorAfterCheck();
 						// map error holiday into result
 						List<DPItemValue> lstItemErrorMonth = errorMonth.getResultErrorMonth()

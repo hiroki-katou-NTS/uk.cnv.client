@@ -140,7 +140,8 @@ public class WorkGroup implements DomainObject {
 	 */
 	private boolean checkWorkCode(Require require, TaskFrameUsageSetting taskFrameUsageSetting, TaskFrameNo taskFrameNo, Optional<WorkCode> code) {
 		//if $作業コード.isEmpty	return true	
-		if(!code.isPresent()) return true;
+		if (!code.isPresent() || taskFrameUsageSetting == null)
+			return true;
 		//$作業枠 = 作業枠利用設定.枠設定:																									
 				//filter $.利用区分 = する																							
 				//filter $.作業枠NO = 作業枠NO		
@@ -160,4 +161,66 @@ public class WorkGroup implements DomainObject {
 	
 //■Require
 	public static interface Require extends CheckWorkExpirationDateService.Require{}
+	/**
+	 * 作業枠の数を取得する
+	 * @return 作業枠の数
+	 */
+	public int getWorkCount() {
+		int count = 1;
+		if(this.workCD2.isPresent())
+			count++;
+		
+		if(this.workCD3.isPresent())
+			count++;
+		
+		if(this.workCD4.isPresent())
+			count++;
+		
+		if(this.workCD5.isPresent())
+			count++;
+		
+		return count;
+	}
+	
+	/**
+	 * 指定された作業枠までの作業グループに作り直す
+	 * @param workFrame
+	 * @return
+	 */
+	public WorkGroup reCreateUpToWorkFrame(int workFrame) {
+		Map<Integer, Optional<WorkCode>> newGroup = new HashMap<>();
+		for(int i = 0; i < workFrame; i++) {
+			newGroup.put(i, getWorkCode(i));
+		}
+		return WorkGroup.create(
+				this.workCD1,
+				newGroup.getOrDefault(2, Optional.empty()),
+				newGroup.getOrDefault(3, Optional.empty()),
+				newGroup.getOrDefault(4, Optional.empty()),
+				newGroup.getOrDefault(5, Optional.empty()));
+	}
+	
+	/**
+	 * 指定された作業枠の作業CDを取得する
+	 * @param workFrame
+	 * @return
+	 */
+	public Optional<WorkCode> getWorkCode(int workFrame) {
+		if(workFrame == 1)
+			return Optional.of(this.workCD1);
+		
+		if(workFrame == 2)
+			return this.workCD2;
+		
+		if(workFrame == 3)
+			return this.workCD3;
+		
+		if(workFrame == 4)
+			return this.workCD4;
+		
+		if(workFrame == 5)
+			return this.workCD5;
+		
+		return Optional.empty();
+	}
 }

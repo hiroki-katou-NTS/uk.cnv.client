@@ -55,7 +55,7 @@ public class KshdtHdpubRemHist extends ContractCompanyUkJpaEntity implements Ser
 		this.pk.yearMonth = domain.getHistYearMonth().v();
 		this.pk.closureId = domain.getClosureId().value;
 		this.pk.closeDay =domain.getClosureDate().getClosureDay().v();
-		this.pk.isLastDay = domain.getClosureDate().getLastDayOfMonth() ? 1: 0;
+		this.pk.isLastDay = domain.getClosureDate().getLastDayOfMonth();
 		this.registerType  = domain.getGrantRemainRegisterType().value;
 		this.carriedforward = domain.getNumberCarriedForward().v();
 	}

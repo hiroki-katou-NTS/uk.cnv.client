@@ -1,8 +1,10 @@
-module nts.uk.ui.at.kdw013.c {
+module nts.uk.ui.at.kdw013 {
 
     export type API = {
         readonly START: string;
         readonly SELECT: string;
+        readonly START_F: string;
+        readonly ADD_FAV_TASK_F: string;
     };
 
     export type TASK_FRAME_NO = 1 | 2 | 3 | 4 | 5;
@@ -68,7 +70,7 @@ module nts.uk.ui.at.kdw013.c {
 
     export type StartWorkInputPanelParam = {
         // 社員ID
-        sId: string;
+        employeeId: string;
 
         // 基準日
         refDate: string;
@@ -95,34 +97,115 @@ module nts.uk.ui.at.kdw013.c {
     };
 
     export type StartWorkInputPanelDto = {
-        /** 利用可能作業1リスト */
-        taskListDto1: TaskDto[];
+        /** List<作業マスタ情報> */
+        frameNoVsTaskFrameNos: FrameNoVsTaskFrameNosDto[];
 
-        /** 利用可能作業2リスト */
-        taskListDto2: TaskDto[];
+		/** List<勤務場所> */
+        workLocation: a.WorkLocationDto[];
 
-        /** 利用可能作業3リスト */
-        taskListDto3: TaskDto[];
-
-        /** 利用可能作業4リスト */
-        taskListDto4: TaskDto[];
-
-        /** 利用可能作業5リスト */
-        taskListDto5: TaskDto[];
+		//List<作業補足情報の選択肢詳細>
+		taskSupInfoChoicesDetails: TaskSupInfoChoicesDetailDto[];
+		
+		//List<工数実績項目>
+		manHourRecordItems: ManHourRecordItemDto[];
+		
+		//List<日次の勤怠項目>
+		attendanceItems: DailyAttendanceItemDto[];
+	
+		//List<工数実績項目と勤怠項目の紐付け>
+		manHourRecordAndAttendanceItemLink: ManHourRecordAndAttendanceItemLinkDto[];
+		
     };
 
+	export type FrameNoVsTaskFrameNosDto = {
+		//応援勤務枠No
+		frameNo: number;
+        /** 利用可能作業1リスト */
+        taskFrameNo1: TaskDto[];
+
+        /** 利用可能作業2リスト */
+        taskFrameNo2: TaskDto[];
+
+        /** 利用可能作業3リスト */
+        taskFrameNo3: TaskDto[];
+
+        /** 利用可能作業4リスト */
+        taskFrameNo4: TaskDto[];
+
+        /** 利用可能作業5リスト */
+        taskFrameNo5: TaskDto[];
+    };
+
+	export type DailyAttendanceItemDto = {
+		/* 勤怠項目ID */
+		 attendanceItemId: number;
+	
+		/* 勤怠項目名称 */
+		 attendanceName: string;
+	
+		/* 表示番号 */
+		 displayNumber: number;
+	
+		/* ユーザーが値を変更できる */
+		 userCanUpdateAtr: number;
+	
+		/* 勤怠項目属性 */
+		 dailyAttendanceAtr: number;
+	
+		/* 名称の改行位置*/
+		 nameLineFeedPosition: number;
+		
+		/* マスタの種類 */
+		masterType: number;
+
+		/* 怠項目のPrimitiveValue */
+		primitiveValue: number;
+
+		/* 表示名称 */
+		displayName: string;
+	}
+	
+	export type ManHourRecordAndAttendanceItemLinkDto = {
+		/** 応援勤務枠No*/
+		frameNo: number;
+		
+		/** 工数実績項目ID*/
+		itemId: number;
+		
+		/** 勤怠項目ID*/
+		attendanceItemId: number;
+	}
+
+
+	export type ManHourRecordItemDto = {
+		/** 項目ID*/
+        itemId: number;
+		/** 名称*/
+        name: string;
+		/** フォーマット設定に表示する*/
+        useAtr: number;
+    };
+
+	export type TaskSupInfoChoicesDetailDto = {
+		/** 履歴ID */
+		historyId: string;
+		/** 項目ID */
+		 itemId;
+		/** コード */
+		 code: string;
+		/** 名称 */
+		 name: string;
+		/** 外部コード */
+		 externalCode: string;
+    };
 
     export type EventModel = {
-        timeRange: KnockoutObservable<share.TimeRange>;
-
+        timeRange: KnockoutObservable<ITimeSpanForCalc>;
         task1: KnockoutObservable<string>;
         task2: KnockoutObservable<string>;
         task3: KnockoutObservable<string>;
         task4: KnockoutObservable<string>;
         task5: KnockoutObservable<string>;
-
-        workplace: KnockoutObservable<string>;
-        descriptions: KnockoutObservable<string>;
     };
 
     export type ConfirmContent = {
@@ -132,7 +215,7 @@ module nts.uk.ui.at.kdw013.c {
 
     export type SelectWorkItemParam = {
         //社員ID
-        sId: string;
+        employeeId: string;
 
         //基準日
         refDate: string;

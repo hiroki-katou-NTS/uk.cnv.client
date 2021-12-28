@@ -78,15 +78,7 @@ public class Role extends AggregateRoot {
 	
 	public Role(String roleId,RoleCode roleCode, RoleType roleType, EmployeeReferenceRange employeeReferenceRange,
 			RoleName name, ContractCode contractCode, RoleAtr assignAtr, String companyId) {
-		super();
-		this.roleId = roleId;
-		this.roleCode = roleCode;
-		this.roleType = roleType;
-		this.employeeReferenceRange = employeeReferenceRange;
-		this.name = name;
-		this.contractCode = contractCode;
-		this.assignAtr = assignAtr;
-		this.companyId = companyId;
+		this(roleId, contractCode, companyId, roleCode, name, roleType, assignAtr, employeeReferenceRange, Optional.empty());
 	}
 	
 	/**

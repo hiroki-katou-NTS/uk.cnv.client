@@ -4,6 +4,7 @@ import { storage } from '@app/utils';
 import { KdwS03DComponent } from 'views/kdw/s03/d';
 import { KdwS03FComponent } from 'views/kdw/s03/f';
 import { KdwS03GComponent } from 'views/kdw/s03/g';
+import { KdwS03IComponent } from 'views/kdw/s03/i';
 
 @component({
     name: 'kdws03amenu',
@@ -14,12 +15,14 @@ import { KdwS03GComponent } from 'views/kdw/s03/g';
         'kdws03d': KdwS03DComponent,
         'kdws03f': KdwS03FComponent,
         'kdws03g': KdwS03GComponent,
+        'kdws03i': KdwS03IComponent
     }
 })
 export class KdwS03AMenuComponent extends Vue {
     @Prop({ default: () => ({}) })
     public params: MenuParam;
     public dailyCorrectionState: any = null;
+    public selectedCode: string = '';
 
     public title: string = 'KdwS03AMenu';
 
@@ -50,6 +53,18 @@ export class KdwS03AMenuComponent extends Vue {
         let self = this;
         this.createMask();
         this.$modal('kdws03g', { 'remainDisplay': param, closureDate: self.params.closureDate });
+    }
+
+    public openKdws03i() {
+        let self = this;
+        this.createMask();
+        this.$modal('kdws03i', {selectedCode: this.dailyCorrectionState.paramData.lstControlDisplayItem.formatCode[0]}).then((params: any) => {            
+            self.selectedCode = params; 
+        });
+    }
+
+    public closeDialog() {
+        this.$close(this.selectedCode);
     }
 
     public processConfirmAll(processFlag: string) {
@@ -141,6 +156,7 @@ interface MenuParam {
     timeExcessReferButtonDis: boolean;
     allConfirmButtonDis: boolean;
     closureDate: any;
+    authoryView: boolean;
 }
 const servicePath = {
     confirmAll: 'screen/at/correctionofdailyperformance/confirmAll'

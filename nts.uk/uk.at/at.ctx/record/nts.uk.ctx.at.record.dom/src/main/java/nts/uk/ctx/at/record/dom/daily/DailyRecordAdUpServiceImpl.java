@@ -32,6 +32,8 @@ import nts.uk.ctx.at.record.dom.daily.attendanceleavinggate.repo.AttendanceLeavi
 import nts.uk.ctx.at.record.dom.daily.attendanceleavinggate.repo.PCLogOnInfoOfDailyRepo;
 import nts.uk.ctx.at.record.dom.daily.optionalitemtime.AnyItemValueOfDaily;
 import nts.uk.ctx.at.record.dom.daily.optionalitemtime.AnyItemValueOfDailyRepo;
+import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeOfDaily;
+import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeOfDailyRepo;
 import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDaily;
 import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDailyRepo;
 import nts.uk.ctx.at.record.dom.daily.remarks.RemarksOfDailyPerform;
@@ -117,6 +119,9 @@ public class DailyRecordAdUpServiceImpl implements DailyRecordAdUpService {
 	@Inject
 	private EmployeeDailyPerErrorRepository employeeErrorRepo;
 	
+	@Inject
+	private OuenWorkTimeOfDailyRepo ouenWorkTimeOfDailyRepo;
+
 	@Inject
 	private DailySnapshotWorkAdapter snapshotAdapter;
 	
@@ -334,5 +339,12 @@ public class DailyRecordAdUpServiceImpl implements DailyRecordAdUpService {
 		List<OuenWorkTimeSheetOfDaily> update = new ArrayList<>();
 		update.add(domain);
 		ouenWorkTimeSheetOfDailyRepo.insert(update);
+	}
+
+	@Override
+	public void adUpOuenWorkTime(Optional<OuenWorkTimeOfDaily> ouen) {
+		if (!ouen.isPresent())
+			return;
+		ouenWorkTimeOfDailyRepo.update(ouen.get());
 	}
 }

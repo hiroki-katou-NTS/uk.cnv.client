@@ -88,7 +88,10 @@ public class ApplicationExportService extends ExportService<AppPrintQuery> {
 								applicationTypeDisplay = ApplicationTypeDisplay.EARLY_OVERTIME;
 							} else if(overtimeAppAtr==OvertimeAppAtr.NORMAL_OVERTIME) {
 								applicationTypeDisplay = ApplicationTypeDisplay.NORMAL_OVERTIME;
-							} else {
+							}else if(overtimeAppAtr == OvertimeAppAtr.MULTIPLE_OVERTIME ){
+								applicationTypeDisplay = ApplicationTypeDisplay.OVERTIME_MULTIPLE_TIME;
+							}
+							else {
 								applicationTypeDisplay = ApplicationTypeDisplay.EARLY_NORMAL_OVERTIME;
 							}
 							condition2 = x.getOpApplicationTypeDisplay()==applicationTypeDisplay.value;

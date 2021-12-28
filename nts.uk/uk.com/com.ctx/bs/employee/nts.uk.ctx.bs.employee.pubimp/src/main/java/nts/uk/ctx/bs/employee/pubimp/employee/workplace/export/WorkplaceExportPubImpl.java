@@ -64,17 +64,17 @@ public class WorkplaceExportPubImpl implements WorkplaceExportPub {
 
 	@Override
 	public List<AffWorkplaceHistoryItemExport3> getByCID(String companyId, GeneralDate baseDate) {
-		//$職場情報一覧 = [No.559]運用している職場の情報をすべて取得する	
+		//$職場情報一覧 = [No.559]運用している職場の情報をすべて取得する
 		List<WorkplaceInforExport> list = workplacePub.getAllActiveWorkplaceInfor(companyId, baseDate);
-		//	$職場リスト = $職場情報一覧：map $.職場ID		
+		//	$職場リスト = $職場情報一覧：map $.職場ID
 		List<String> workPlaceIds = list.stream().map(c->c.getWorkplaceId()).collect(Collectors.toList());
-		//		return 職場（List）と基準日から所属職場履歴項目を取得する(職場リスト,基準日)		
+		//		return 職場（List）と基準日から所属職場履歴項目を取得する(職場リスト,基準日)
 		return workplacePub.getWorkHisItemfromWkpIdsAndBaseDate(workPlaceIds, baseDate);
 	}
 
 	@Override
 	public List<AffWorkplaceHistoryItemExport3> getByListId(List<String> workPlaceIds, GeneralDate baseDate) {
-		//return 職場（List）と基準日から所属職場履歴項目を取得する(職場リスト,基準日)		
+		//return 職場（List）と基準日から所属職場履歴項目を取得する(職場リスト,基準日)
 		return workplacePub.getWorkHisItemfromWkpIdsAndBaseDate(workPlaceIds, baseDate);
 	}
 }

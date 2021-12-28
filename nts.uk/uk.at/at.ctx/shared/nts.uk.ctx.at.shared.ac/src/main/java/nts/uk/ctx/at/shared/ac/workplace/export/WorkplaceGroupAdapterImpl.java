@@ -6,12 +6,14 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import lombok.val;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.shared.dom.common.EmployeeId;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.EmpOrganizationImport;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.WorkplaceGroupAdapter;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.WorkplaceGroupImport;
+import nts.uk.ctx.bs.employee.pub.workplace.master.WorkplacePub;
 import nts.uk.ctx.bs.employee.pub.workplace.workplacegroup.WorkplaceGroupPublish;
 
 /**
@@ -22,9 +24,11 @@ import nts.uk.ctx.bs.employee.pub.workplace.workplacegroup.WorkplaceGroupPublish
 @Stateless
 public class WorkplaceGroupAdapterImpl implements WorkplaceGroupAdapter {
 
-	@Inject private WorkplaceGroupPublish workplaceGroupPublish;
+	@Inject 
+	private WorkplaceGroupPublish workplaceGroupPublish;
 
-
+	@Inject
+	private WorkplacePub pub;
 
 	@Override
 	public List<WorkplaceGroupImport> getbySpecWorkplaceGroupID(List<String> workplaceGroupIds) {
@@ -66,6 +70,19 @@ public class WorkplaceGroupAdapterImpl implements WorkplaceGroupAdapter {
 
 		return workplaceGroupPublish.getAllReferableEmployees(employeeId, date, period);
 
+	}
+
+	/* 
+	 * revert commit eec80d76aea8820c3a178aba5440aa9cd219daa6
+	 * # fix bug 120974
+	 */
+	@Override
+	public String getAffWkpHistItemByEmpDate(String employeeID, GeneralDate date) {
+		val result =  pub.getAffWkpHistItemByEmpDate(employeeID, date);
+		String workPlaceId = "";
+		if (result != null)
+			workPlaceId = result.getWorkplaceId();
+		return workPlaceId;
 	}
 
 }

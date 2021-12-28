@@ -480,7 +480,7 @@ public class JpaAttendanceTimeOfWeekly extends JpaRepository implements Attendan
 		for (val premiumTime : premiumTimeMap.values()){
 			KrcdtWekAggrPremTime entityAggrPremTime = new KrcdtWekAggrPremTime();
 			val entityAggrPremTimeOpt = entityAggrPremTimeList.stream()
-					.filter(c -> c.PK.premiumTimeItemNo == premiumTime.getPremiumTimeItemNo()).findFirst();
+					.filter(c -> c.PK.premiumTimeItemNo == premiumTime.getPremiumTimeItemNo().value).findFirst();
 			if (entityAggrPremTimeOpt.isPresent()){
 				entityAggrPremTime = entityAggrPremTimeOpt.get();
 				entityAggrPremTime.fromDomainForUpdate(premiumTime);

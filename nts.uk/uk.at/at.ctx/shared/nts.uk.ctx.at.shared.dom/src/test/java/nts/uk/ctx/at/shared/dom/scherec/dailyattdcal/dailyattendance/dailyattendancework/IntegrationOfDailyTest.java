@@ -117,6 +117,8 @@ public class IntegrationOfDailyTest {
 					, Collections.emptyList()
 					, Optional.empty()
 					, Collections.emptyList()
+					, Collections.emptyList()
+					, Collections.emptyList()
 					, Optional.empty());
 		}
 

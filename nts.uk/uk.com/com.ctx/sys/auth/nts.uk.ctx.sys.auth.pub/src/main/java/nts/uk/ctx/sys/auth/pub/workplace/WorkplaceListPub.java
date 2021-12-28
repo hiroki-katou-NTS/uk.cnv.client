@@ -45,7 +45,6 @@ public interface WorkplaceListPub {
 	 * @return
 	 */
 	Optional<WorkPlaceAuthorityExport> getWorkPlaceAuthorityById(String companyId, String roleId, int functionNo);
-	
 	/**
 	 * @name 参照可能社員の所属職場を取得するPublish
 	 * @param userID ユーザID

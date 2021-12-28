@@ -52,6 +52,8 @@ import nts.uk.ctx.at.record.app.command.dailyperform.optionalitem.OptionalItemOf
 import nts.uk.ctx.at.record.app.command.dailyperform.optionalitem.OptionalItemOfDailyPerformCommandUpdateHandler;
 import nts.uk.ctx.at.record.app.command.dailyperform.ouen.OuenWorkTimeSheetOfDailyCommandAddHandler;
 import nts.uk.ctx.at.record.app.command.dailyperform.ouen.OuenWorkTimeSheetOfDailyCommandUpdateHandler;
+import nts.uk.ctx.at.record.app.command.dailyperform.ouen.OuenWorkTimeOfDailyCommandAddHandler;
+import nts.uk.ctx.at.record.app.command.dailyperform.ouen.OuenWorkTimeOfDailyCommandUpdateHandler;
 import nts.uk.ctx.at.record.app.command.dailyperform.remark.RemarkOfDailyCommandAddHandler;
 import nts.uk.ctx.at.record.app.command.dailyperform.remark.RemarkOfDailyCommandUpdateHandler;
 import nts.uk.ctx.at.record.app.command.dailyperform.shorttimework.ShortTimeOfDailyCommandAddHandler;
@@ -242,6 +244,14 @@ public class DailyRecordWorkCommandHandler extends RecordHandler {
 	@Inject
 	@AttendanceItemLayout(layout = DAILY_SUPPORT_TIME_CODE, jpPropertyName = DAILY_SUPPORT_TIME_NAME, index = 18)
 	private OuenWorkTimeSheetOfDailyCommandUpdateHandler supportUpdateHandler;
+
+	/** 日別実績の応援作業別勤怠時間 */
+	@Inject
+	@AttendanceItemLayout(layout = DAILY_SUPPORT_TIME_CODE, jpPropertyName = DAILY_SUPPORT_TIME_NAME, index = 18)
+	private OuenWorkTimeOfDailyCommandAddHandler ouenWorkTimeAddHandler;
+	@Inject
+	@AttendanceItemLayout(layout = DAILY_SUPPORT_TIME_CODE, jpPropertyName = DAILY_SUPPORT_TIME_NAME, index = 18)
+	private OuenWorkTimeOfDailyCommandUpdateHandler ouenWorkTimeUpdateHandler;
 
 	@Inject
 	private CalculateDailyRecordServiceCenter calcService;
@@ -713,6 +723,8 @@ public class DailyRecordWorkCommandHandler extends RecordHandler {
 			return isUpdate ? this.supportUpdateHandler : this.supportAddHandler;
 		case DAILY_SNAPSHOT_NAME:
 			return isUpdate ? this.snapshotUpdateHandler : this.snapshotAddHandler;
+		case DAILY_SUPPORT_TIME_NAME:
+			return isUpdate ? this.ouenWorkTimeUpdateHandler : this.ouenWorkTimeAddHandler;
 		default:
 			return null;
 		}

@@ -5,36 +5,39 @@ module nts.uk.at.view.kdw002.c {
         import getText = nts.uk.resource.getText;
         import infor = nts.uk.ui.dialog.info;
         export class ScreenModel {
+            // A4_1
             listAttdItem: Array<any>;
             dailyServiceTypeControl: KnockoutObservable<DailyAttendanceItemAuth>;
-            columns: Array<any>;
+            columns: KnockoutObservableArray<any>;;
             //monthly
             listAttdMonthlyItem: Array<any>;
-
+            // A2_1
             bussinessCodeItems: KnockoutObservableArray<BusinessType>;
             bussinessColumn: KnockoutObservableArray<any>;
             currentRoleId: KnockoutObservable<any>;
+            // ?
             txtSearch: KnockoutObservable<string>;
             //isDaily
             isDaily :boolean;
             sideBar :  KnockoutObservable<number>;
-            //datasource
+            // A3_1
             datasources :KnockoutObservableArray<any>;
             selectedList: any;
             
             listAttFullData  : any;
             listAttFullDataClone  : any;
-            
+            // ver7
+            roleItems: KnockoutObservableArray<EmployeeRoleDto> = ko.observableArray([]);
+            // isNew mode
+            isNewMode:  KnockoutObservable<boolean> = ko.observable(false);
+
             constructor(dataShare:any) {
                 var self = this;
                 self.bussinessCodeItems = ko.observableArray([]);
                 self.listAttdItem = [];
                 self.dailyServiceTypeControl = ko.observable(null);
-                self.isDaily = dataShare.ShareObject;
+                self.isDaily = dataShare === undefined ? false : dataShare.ShareObject;
                 self.sideBar =  ko.observable(1);
-                if(!self.isDaily){
-                    self.sideBar(2);
-                } 
                 //
                 self.datasources = ko.observableArray([]);
                 self.selectedList = ko.observableArray([]);
@@ -54,23 +57,23 @@ module nts.uk.at.view.kdw002.c {
                 self.currentRoleId.subscribe(roleId => {
                     self.currentRoleId(roleId);
                     _.defer(() => nts.uk.ui.block.invisible());
-                    
-                    var useTemplate = "<input tabindex='-1' type='checkbox' {{if ${toUse} }} checked {{/if}} onclick='useChanged(this, ${itemDailyID},${userCanUpdateAtr})' />";
-                    var youCanChangeItTemplate = "<input tabindex='-1' type='checkbox' {{if ${youCanChangeIt} }} checked {{/if}} onclick='youCanChangeItChanged(this, ${itemDailyID})' />";
-                    var canBeChangedByOthersTemplate = "<input tabindex='-1' type='checkbox' {{if ${canBeChangedByOthers} }} checked {{/if}} onclick='canBeChangedByOthersChanged(this, ${itemDailyID})' />";
 
-                    var useHeader = "<input  tabindex='-1' type='checkbox' id = 'useCheckAll' onclick='useHeaderChanged(this)'/> ";
-                    var youCanChangeItHeader =  "<input  tabindex='-1' type='checkbox' id = 'youCanCheckAll' onclick='youCanChangeItHeaderChanged(this)'/> ";
-                    var canBeChangedByOthersHeader = "<input  tabindex='-1'  type='checkbox' id = 'otherCheckAll' onclick='canBeChangedByOthersHeaderChanged(this)'/> ";
+                    var useHeader = `<input style="vertical-align: middle;" tabindex='-1' type='checkbox' id = 'useCheckAll' onclick='useHeaderChanged(this)'/> `;
+                    var youCanChangeItHeader =  `<input style="vertical-align: middle;" tabindex='-1' type='checkbox' id = 'youCanCheckAll' onclick='youCanChangeItHeaderChanged(this)'/> `;
+                    var canBeChangedByOthersHeader = `<input style="vertical-align: middle;" tabindex='-1'  type='checkbox' id = 'otherCheckAll' onclick='canBeChangedByOthersHeaderChanged(this)'/> `;
+                    // A4_2, A4_3, A4_4, A4_41, A4_8, A4_8.1, A4_9, A4_10, A4_11, A4_16, A4_18
                     self.columns = ko.observableArray([
                         { headerText: '', key: 'itemDailyID', width: 1, hidden: true },
-                        { headerText: getText('KDW002_3'), key: 'displayNumber', width: 70  , formatter: _.escape },
-                        { headerText: getText('KDW002_4'), key: 'itemDailyName', width: 220  , formatter: _.escape},
-                        { headerText: useHeader + getText('KDW002_5'), key: 'toUse', width: 120, template: useTemplate },
-                        { headerText: youCanChangeItHeader + getText('KDW002_6'), key: 'youCanChangeIt', width: 120, template: youCanChangeItTemplate },
-                        { headerText: canBeChangedByOthersHeader + getText('KDW002_7'), key: 'canBeChangedByOthers', width: 165, template: canBeChangedByOthersTemplate },
+                        { headerText: getText('KDW002_3'), key: 'displayNumber', width: 70, formatter: _.escape },
+                        { headerText: getText('KDW002_4'), key: 'itemDailyName', width: 220  , 
+										formatter: (keyValue: any) => { return '<div>' + _.escape(keyValue) + '</div>'} },
+                        { headerText: useHeader + getText('KDW002_5'), key: 'toUse', width: 120, 
+										formatter: (keyValue: any, itemValue: DisplayAndInputControl) => self.getUseTemplate(keyValue, itemValue) },
+                        { headerText: youCanChangeItHeader + getText('KDW002_6'), key: 'youCanChangeIt', width: 120, columnCssClass: 'column-style',
+										formatter: (keyValue: any, itemValue: DisplayAndInputControl) => self.getYouCanChangeItTemplate(keyValue, itemValue) },
+                        { headerText: canBeChangedByOthersHeader + getText('KDW002_7'), key: 'canBeChangedByOthers', width: 165, columnCssClass: 'column-style',
+										formatter: (keyValue: any, itemValue: DisplayAndInputControl) => self.getCanBeChangedByOthersTemplate(keyValue, itemValue) },
                         { headerText: '', key: 'userCanUpdateAtr', width: 1, hidden: true },
-
                     ]);
 
 
@@ -78,6 +81,7 @@ module nts.uk.at.view.kdw002.c {
                     if(roleId){
                         if(self.isDaily){
                              dfd = self.getDailyAttdItemByRoleID(roleId);
+
                         }else{
                              dfd = self.getMonthlyAttdItemByRoleID(roleId)
                         }
@@ -106,6 +110,12 @@ module nts.uk.at.view.kdw002.c {
                                     rowVirtualization: false,
                                   virtualizationMode: "continuous",
 //                                    virtualizationMode: "fixed",
+									dataRendered: () => {
+										nts.uk.ui.block.clear();
+									},
+									rendered: () => {
+								   		nts.uk.ui.block.clear();
+								    },
                                     columns: self.columns(),
                                     features: [
                                         {
@@ -136,23 +146,6 @@ module nts.uk.at.view.kdw002.c {
                                 });
                                  $("#grid").setupSearchScroll("igGrid", false);
                                  $("#grid").ntsGridList("setupScrollWhenBinding"); 
-                                let lengthData = self.dailyServiceTypeControl().displayAndInput.length;
-                                for (let i = 0; i < lengthData; i++) {
-                                    if (!self.dailyServiceTypeControl().displayAndInput[i].userCanUpdateAtr || !self.dailyServiceTypeControl().displayAndInput[i].toUse) {
-                                        if (!self.dailyServiceTypeControl().displayAndInput[i].userCanUpdateAtr) {
-                                            $("#grid").igGridUpdating("setCellValue", self.dailyServiceTypeControl().displayAndInput[i].itemDailyID, "canBeChangedByOthers", false);
-                                        }
-                                        var rowId = self.dailyServiceTypeControl().displayAndInput[i].itemDailyID;
-                                        var cellYouCanChangeIt = $("#grid").igGrid("cellById", rowId, "youCanChangeIt");
-                                        var cellCanBeChangedByOthers = $("#grid").igGrid("cellById", rowId, "canBeChangedByOthers");
-                                        cellYouCanChangeIt.addClass('readOnlyColorIsUse');
-                                        cellCanBeChangedByOthers.addClass('readOnlyColorIsUse');
-                                        cellYouCanChangeIt.children().prop("disabled", true);
-                                        cellCanBeChangedByOthers.children().prop("disabled", true);
-
-
-                                    }
-                                }
                             }
                             let listData = self.dailyServiceTypeControl().displayAndInput;
                             let notUseExist = _.find(listData, function(e){ return !e.toUse });
@@ -184,38 +177,151 @@ module nts.uk.at.view.kdw002.c {
                             }
                             $("#otherCheckAll").prop('checked', notOtherCheckAll);
                             
-                            nts.uk.ui.block.clear();
+                            //nts.uk.ui.block.clear();
                         }
                     );
                 });
 
                 self.txtSearch = ko.observable("");
             }
+
+			getUseTemplate(keyValue: any, itemValue: DisplayAndInputControl) {
+				let s = ``;
+				s += `<div style="margin-left: -2px; margin-right: -2px; padding-left: 2px; padding-right: 2px; color: transparent;">`;
+				if(itemValue.toUse) {
+					s+= `<div class="test-div"><input tabindex='-1' type='checkbox' checked `;
+				} else {
+					s+= `<div class="test-div"><input tabindex='-1' type='checkbox' `;
+				}
+				s += `onclick='useChanged(this, ${itemValue.itemDailyID},${itemValue.userCanUpdateAtr})' /></div>`;
+				s += `</div>`;
+				return s;
+			}
+			
+			getYouCanChangeItTemplate(keyValue: any, itemValue: DisplayAndInputControl) {
+				let s = ``;
+				let disable = !itemValue.userCanUpdateAtr || !itemValue.toUse;
+				if(disable) {
+					s += `<div style="position: absolute; top: 0; color: transparent; margin-left: -2px;" class="readOnlyColorIsUse">名名名名名名名名名名名名名名名名名名名名名名名名名名名名名名</div>`;
+				} else {
+					s += `<div style="position: absolute; top: 0; color: transparent; margin-left: -2px;">名名名名名名名名名名名名名名名名名名名名名名名名名名名名名名</div>`;
+				}
+				s += `<div style="margin-left: -2px; margin-right: -2px; padding-left: 2px; padding-right: 2px; color: transparent; position: inherit;"`;
+				if(itemValue.youCanChangeIt) {
+					s+= `<div class="test-div"><input tabindex='-1' type='checkbox' checked `;
+				} else {
+					s+= `<div class="test-div"><input tabindex='-1' type='checkbox' `;
+				}
+				if(disable) {
+					s += ` disabled `;
+				} else {
+					s += ``;
+				}
+				s += `onclick='youCanChangeItChanged(this, ${itemValue.itemDailyID})' /></div>`;
+				s += `</div>`;
+				return s;
+			}
+			
+			getCanBeChangedByOthersTemplate(keyValue: any, itemValue: DisplayAndInputControl) {
+				let s = ``;
+				let disable = !itemValue.userCanUpdateAtr || !itemValue.toUse;
+				if(disable) {
+					s += `<div style="position: absolute; top: 0; color: transparent; margin-left: -2px;" class="readOnlyColorIsUse">名名名名名名名名名名名名名名名名名名名名名名名名名名名名名名</div>`;
+				} else {
+					s += `<div style="position: absolute; top: 0; color: transparent; margin-left: -2px;">名名名名名名名名名名名名名名名名名名名名名名名名名名名名名名</div>`;
+				}
+				s += `<div style="margin-left: -2px; margin-right: -2px; padding-left: 2px; padding-right: 2px; color: transparent; position: inherit;"`;
+				if(itemValue.canBeChangedByOthers) {
+					s += `<div class="test-div"><input tabindex='-1' type='checkbox' checked `;
+				} else {
+					s += `<div class="test-div"><input tabindex='-1' type='checkbox' `;
+				}
+				if(disable) {
+					s += ` disabled `;
+				} else {
+					s += ``;
+				}
+				s += `onclick='canBeChangedByOthersChanged(this, ${itemValue.itemDailyID})' /></div>`;
+				s += `</div>`;
+				return s;
+			}
+			
+			getColumnClass(keyValue: any, itemValue: DisplayAndInputControl) {
+				let disable = !itemValue.userCanUpdateAtr || !itemValue.toUse;
+				if(disable) {
+					return "readOnlyColorIsUse";
+				} else {
+					return "";
+				}
+			}
             
-            jumpToHome(sidebar): void {
+            jumpToHome(): void {
                 let self = this;
-                nts.uk.request.jump("/view/kdw/006/a/index.xhtml", { ShareObject : sidebar() });
+                nts.uk.request.jump("/view/kdw/006/a/index.xhtml");
             }
             
             copy(): void {
-                var self = this;
-//                var bussinessCodeItems = self.bussinessCodeItems();
-//                var currentRoleId = self.currentRoleId();
-//                var bussinessCodeItem = _.find(self.bussinessCodeItems(), { businessTypeCode: self.currentRoleId() });
-//                var businessTypeName = bussinessCodeItem.roleName;
-//                var data = {
-//                    code: currentRoleId, name: businessTypeName, bussinessItems: bussinessCodeItems
-//                }
-//                let object: IObjectDuplication = {
-//                    code: bussinessCodeItem,
-//                    name: businessTypeName,
-//                    targetType: 1,
-//                    itemListSetting: bussinessCodeItems,
-//                    baseDate: moment(self.baseDate()).toDate()
-//                };
-//                nts.uk.ui.windows.sub.modal("com","/view/cdl/023/a/index.xhtml");
-//                
-//                nts.uk.ui.windows.setShared("KDW002_B_AUTHORITYTYPE", data);
+                let self = this
+                // ver7: get the config role
+                let empRole: EmployeeRoleDto = _.find(self.roleItems(), e => e.roleId == self.currentRoleId());
+                // isDaily
+                if(self.isDaily){
+                    service.getDailytRolesByCid().done((roleIDs: Array<any>) => {
+                        let param = {
+                            code: empRole.roleCode,
+                            name: empRole.roleName,
+                            targetType: 8,
+                            itemListSetting: roleIDs ? roleIDs : [],
+                            roleType: 3
+                        };
+                        console.log(param, 'param');        
+                        nts.uk.ui.windows.setShared("CDL023Input", param);
+                        nts.uk.ui.windows.sub.modal("com", "/view/cdl/023/a/index.xhtml").onClosed(() => {
+                            let data: Array<string>  = nts.uk.ui.windows.getShared("CDL023Output");
+                            if(data){
+                                let command: any = {};
+                                command.roleID = self.currentRoleId();
+                                command.destinationList = data;
+                                nts.uk.ui.block.invisible();
+                                service.copyDailyAttd(command).done(() => {
+                                    nts.uk.ui.dialog.info({ messageId: 'Msg_15' }).then(() => {        
+                                        
+                                    });
+                                }).always(() => {
+                                    //nts.uk.ui.block.clear();
+                                });
+                            }                               
+                        });
+                    });
+                } else {
+                    service.getMonthlytRolesByCid().done((roleIDs: Array<any>) => {
+                        let param = {
+                            code: empRole.roleCode,
+                            name: empRole.roleName,
+                            targetType: 8,
+                            itemListSetting: roleIDs ? roleIDs : [],
+                            roleType: 3
+                        };
+                        console.log(param, 'param');        
+                        nts.uk.ui.windows.setShared("CDL023Input", param);
+                        nts.uk.ui.windows.sub.modal("com", "/view/cdl/023/a/index.xhtml").onClosed(() => {
+                            let data: Array<string>  = nts.uk.ui.windows.getShared("CDL023Output");
+                            if(data){
+                                let command: any = {};
+                                command.roleID = self.currentRoleId();
+                                command.destinationList = data;
+                                nts.uk.ui.block.invisible();
+                                service.copyMonthlyAttd(command).done(() => {
+                                    nts.uk.ui.dialog.info({ messageId: 'Msg_15' }).then(() => {        
+
+                                    });
+                                }).always(() => {
+                                    //nts.uk.ui.block.clear();
+                                });
+                            }                              
+                        });
+                    });
+                }
             }
             
 
@@ -231,8 +337,9 @@ module nts.uk.at.view.kdw002.c {
                 $.when(dtdGetNameAttItemByType).done(() => {
                     service.getEmpRole().done(empRoles => {
                         if (!nts.uk.util.isNullOrUndefined(empRoles) && empRoles.length > 0) {
-                            let bussinessCodeItems = [];
-                            empRoles.forEach(empRole => {
+                            self.roleItems(_.sortBy(empRoles, ['roleCode']));
+                            let bussinessCodeItems: Array<any> = [];
+                            empRoles.forEach((empRole: any)  => {
                                 bussinessCodeItems.push(new BusinessType(empRole));
                                 //   self.bussinessCodeItems.push(new BusinessType(businessType));
                             });
@@ -262,11 +369,18 @@ module nts.uk.at.view.kdw002.c {
             }
 
             //get Daily Attd Item By Role ID
+            // do something
             getDailyAttdItemByRoleID(roleID: string) {
                 let self = this;
                 let dfd = $.Deferred();
                 let startTime: number = performance.now();
                 service.getDailyAttItemNew(roleID).done(function(data) {
+                    if (nts.uk.util.isNullOrUndefined(data) || data.length <= 0 || data.every((att: any) => att.authority == null)){
+                        self.isNewMode(true);
+                    } else {
+                        self.isNewMode(false);
+                    }
+                    
                     console.log("get setting by role: " + (performance.now() - startTime));
                     let listDefault: Array<DisplayAndInputControl> = [];
                     self.listAttFullDataClone(_.cloneDeep(self.listAttFullData()));
@@ -277,45 +391,8 @@ module nts.uk.at.view.kdw002.c {
                                 break;
                             }    
                         }
-                            
                         listDefault.push(DisplayAndInputControl.fromApp(attFullData));
                     });
-                    /*if (nts.uk.util.isNullOrUndefined(data)) {
-                        if (self.listAttdItem.length != 0) {
-                            for (let i = 0; i < self.listAttdItem.length; i++) {
-                                listDefault.push(
-                                    new DisplayAndInputControl(
-                                        self.listAttdItem[i].attendanceItemId,
-                                        self.listAttdItem[i].attendanceName,
-                                        self.listAttdItem[i].displayNumber,
-                                        self.listAttdItem[i].userCanUpdateAtr,
-                                        true,
-                                        false,
-                                        false));
-                            }
-                        }
-
-                    } else {
-                        if (self.listAttdItem.length != 0) {
-                            for (let j = 0; j < data.displayAndInput.length; j++) {
-                                for (let i = 0; i < self.listAttdItem.length; i++) {
-                                    if (data.displayAndInput[j].itemDailyID == self.listAttdItem[i].attendanceItemId) {
-                                        listDefault.push(
-                                            new DisplayAndInputControl(
-                                                self.listAttdItem[i].attendanceItemId,
-                                                self.listAttdItem[i].attendanceName,
-                                                self.listAttdItem[i].displayNumber,
-                                                self.listAttdItem[i].userCanUpdateAtr,
-                                                data.displayAndInput[j].toUse,
-                                                data.displayAndInput[j].canBeChangedByOthers,
-                                                data.displayAndInput[j].youCanChangeIt));
-                                        break;
-                                    }//end if        
-                                }//end for 2
-                            }//end for 1
-                        }//end if
-
-                    }//end else to*/
                     self.dailyServiceTypeControl(
                         new DailyAttendanceItemAuth("", roleID, _.sortBy(listDefault, ['displayNumber']))
                     );
@@ -330,10 +407,12 @@ module nts.uk.at.view.kdw002.c {
                 let self = this;
                 let dfd = $.Deferred();
                 service.getMontlyAttItemNew(roleID).done(function(data) {
+                    if (nts.uk.util.isNullOrUndefined(data) || data.length <= 0 || data.every((att: any) => att.authority == null)) {
+                        self.isNewMode(true);
+                    } else {
+                        self.isNewMode(false);
+                    }
                     let listDefault: Array<DisplayAndInputControl> = [];
-//                    _.each(data, item => {
-//                        listDefault.push(DisplayAndInputControl.fromApp(item));
-//                    })
                     self.listAttFullDataClone(_.cloneDeep(self.listAttFullData()));
                     _.each(self.listAttFullDataClone(), attFullData => {
                         for(let i=0;i<data.length;i++){
@@ -345,45 +424,6 @@ module nts.uk.at.view.kdw002.c {
                             
                         listDefault.push(DisplayAndInputControl.fromApp(attFullData));
                     });
-                    /*if (nts.uk.util.isNullOrUndefined(data)) {
-                        
-                        
-                        if (self.listAttdMonthlyItem.length != 0) {
-                            for (let i = 0; i < self.listAttdMonthlyItem.length; i++) {
-                                listDefault.push(
-                                    new DisplayAndInputControl(
-                                        self.listAttdMonthlyItem[i].attendanceItemId,
-                                        self.listAttdMonthlyItem[i].attendanceItemName,
-                                        self.listAttdMonthlyItem[i].attendanceItemDisplayNumber,
-                                        self.listAttdMonthlyItem[i].userCanUpdateAtr,
-                                        true,
-                                        false,
-                                        false));
-                            }
-                        }
-
-                    } else {
-                        
-                        if (self.listAttdMonthlyItem.length != 0) {
-                            for (let j = 0; j < data.listDisplayAndInputMonthly.length; j++) {
-                                for (let i = 0; i < self.listAttdMonthlyItem.length; i++) {
-                                    if (data.listDisplayAndInputMonthly[j].itemMonthlyId == self.listAttdMonthlyItem[i].attendanceItemId) {
-                                        listDefault.push(
-                                            new DisplayAndInputControl(
-                                                self.listAttdMonthlyItem[i].attendanceItemId,
-                                                self.listAttdMonthlyItem[i].attendanceItemName,
-                                                self.listAttdMonthlyItem[i].attendanceItemDisplayNumber,
-                                                self.listAttdMonthlyItem[i].userCanUpdateAtr,
-                                                data.listDisplayAndInputMonthly[j].toUse,
-                                                data.listDisplayAndInputMonthly[j].canBeChangedByOthers,
-                                                data.listDisplayAndInputMonthly[j].youCanChangeIt));
-                                        break;
-                                    }//end if        
-                                }//end for 2
-                            }//end for 1
-                        }//end if
-
-                    }//end else to*/
                     self.dailyServiceTypeControl(
                         new DailyAttendanceItemAuth("", roleID, _.sortBy(listDefault, ['displayNumber']))
                     );
@@ -392,51 +432,6 @@ module nts.uk.at.view.kdw002.c {
                 });
                 return dfd.promise();
             }
-            
-            /*
-            //daily
-            getListDailyAttdItem() {
-                let self = this;
-                let dfd = $.Deferred();
-                service.getListDailyAttdItem().done(function(data) {
-                    let listAttdID = _.map(data,item =>{return item.attendanceItemId; });
-                    service.getNameDaily(listAttdID).done(function(dataNew) {
-                        for(let i =0;i<data.length;i++){
-                            for(let j = 0;j<=dataNew.length; j++){
-                                if(data[i].attendanceItemId == dataNew[j].attendanceItemId ){
-                                    data[i].attendanceName = dataNew[j].attendanceItemName;
-                                    break;
-                                }  
-                            }    
-                        }
-                        
-                        self.listAttdItem = data; 
-                        dfd.resolve();   
-                    });
-                });
-                return dfd.promise();
-            }
-            //monthly
-            getListMonthlyAttdItem() {
-                let self = this;
-                let dfd = $.Deferred();
-                service.getListMonthlyAttdItem().done(function(data) {
-                    let listAttdID = _.map(data,item =>{return item.attendanceItemId; });
-                    service.getNameMonthly(listAttdID).done(function(dataNew) {
-                        for(let i =0;i<data.length;i++){
-                            for(let j = 0;j<=dataNew.length; j++){
-                                if(data[i].attendanceItemId == dataNew[j].attendanceItemId ){
-                                    data[i].attendanceItemName = dataNew[j].attendanceItemName;
-                                    break;
-                                }  
-                            }    
-                        }
-                        self.listAttdMonthlyItem = data; 
-                        dfd.resolve();
-                        });   
-                });
-                return dfd.promise();
-            }*/
 
             submitData(): void {
                 var self = this;
@@ -454,7 +449,7 @@ module nts.uk.at.view.kdw002.c {
                             
                         });
                     }).always(function() {
-                        nts.uk.ui.block.clear();
+                        //nts.uk.ui.block.clear();
                     });
                 }else{
                     let dataMonthly = dataSource.transformedData('afterfilteringandpaging');
@@ -486,7 +481,7 @@ module nts.uk.at.view.kdw002.c {
                             });
                         });
                     }).always(function() {
-                        nts.uk.ui.block.clear();
+                        //nts.uk.ui.block.clear();
                     });
                     
                 }
@@ -552,6 +547,7 @@ module nts.uk.at.view.kdw002.c {
         interface IBusinessType {
             roleId: string;
             roleName: string;
+            roleCode: string;
         }
 
         class BusinessType {
@@ -603,6 +599,7 @@ module nts.uk.at.view.kdw002.c {
         class DisplayAndInputControl {
             itemDailyID: number;
             itemDailyName: string;
+            displayName: string;
             displayNumber: number;
             userCanUpdateAtr: number;
             toUse: boolean;
@@ -613,7 +610,7 @@ module nts.uk.at.view.kdw002.c {
             static fromApp(app) {
                 let dto = new DisplayAndInputControl();
                 dto.itemDailyID = app.attendanceItemId;
-                dto.itemDailyName = app.attendanceItemName;
+                    dto.itemDailyName = app.attendanceItemName;
                 dto.displayNumber = app.attendanceItemDisplayNumber;
                 dto.userCanUpdateAtr = app.userCanUpdateAtr;
                 if (app.authority != null) {
@@ -667,6 +664,17 @@ module nts.uk.at.view.kdw002.c {
             }
 
         }
+            
+        class EmployeeRoleDto {
+            roleId: string;
+            roleCode: string;
+            roleName: string;
+            constructor(roleId: string, roleCode: string, roleName: string) {
+                this.roleId = roleId;
+                this.roleCode = roleCode;
+                this.roleName = roleName;
+            }
+        }
 
     }
     enum TypeInput {
@@ -685,26 +693,6 @@ function useChanged(element, rowId, userCanSet) {
         $("#grid").igGridUpdating('endEdit', true);
     }
     $("#grid").igGridUpdating("setCellValue", rowId, "toUse", value != true);
-
-    //get value youCanChangeIt,canBeChangedByOthers
-    var cellYouCanChangeIt = $("#grid").igGrid("cellById", rowId, "youCanChangeIt");
-    var cellCanBeChangedByOthers = $("#grid").igGrid("cellById", rowId, "canBeChangedByOthers");
-    //if toUse = true and nameLine = 1
-    if (value == true && userCanSet.toString() === "1") {
-        //set value and disable
-        cellYouCanChangeIt.addClass('readOnlyColorIsUse');
-        cellCanBeChangedByOthers.addClass('readOnlyColorIsUse');
-        cellYouCanChangeIt.children().prop("disabled", true);
-        cellCanBeChangedByOthers.children().prop("disabled", true);
-    } else if (value != true && userCanSet.toString() === "1") {
-        cellYouCanChangeIt.removeClass('readOnlyColorIsUse');
-        cellCanBeChangedByOthers.removeClass('readOnlyColorIsUse');
-        cellYouCanChangeIt.children().prop("disabled", false);
-        cellCanBeChangedByOthers.children().prop("disabled", false);
-    } else {
-        cellYouCanChangeIt.children().prop("disabled", true);
-        cellCanBeChangedByOthers.children().prop("disabled", true);
-    }
     
     let temp = $('#grid').data('igGrid').dataSource._data;
     let notUseExist = _.find(temp, function(e){ return !e.toUse });
@@ -769,103 +757,57 @@ function userCanSetChanged(element, rowId) {
 }
 
 function useHeaderChanged(element) {
-    var dataSource = $('#grid').data('igGrid').dataSource;
-    var filteredData = dataSource.transformedData('afterfilteringandpaging');
-    if (element.checked) {
-        var i;
-        var l = filteredData.length;
-        for (i = 0; i < l; i++) {
-            $("#grid").igGridUpdating("setCellValue", filteredData[i].itemDailyID, "toUse", true);
-            var rowId = filteredData[i].itemDailyID;
-            var cellYouCanChangeIt = $("#grid").igGrid("cellById", rowId, "youCanChangeIt");
-            var cellCanBeChangedByOthers = $("#grid").igGrid("cellById", rowId, "canBeChangedByOthers");
-            if (filteredData[i].userCanUpdateAtr.toString() === "1") {
-                if (cellYouCanChangeIt.hasClass('readOnlyColorIsUse')) {
-                    cellYouCanChangeIt.removeClass('readOnlyColorIsUse');
-                }
-                if (cellCanBeChangedByOthers.hasClass('readOnlyColorIsUse')) {
-                    cellCanBeChangedByOthers.removeClass('readOnlyColorIsUse');
-                }
-                cellYouCanChangeIt.children().prop("disabled", false);
-                cellCanBeChangedByOthers.children().prop("disabled", false);
-            } else {
-                cellYouCanChangeIt.children().prop("disabled", true);
-                cellCanBeChangedByOthers.children().prop("disabled", true);
-            }
-        }
-
-    } else {
-        var i;
-        var l = filteredData.length;
-        for (i = 0; i < l; i++) {
-            $("#grid").igGridUpdating("setCellValue", filteredData[i].itemDailyID, "toUse", false);
-            var rowId = filteredData[i].itemDailyID;
-            var cellYouCanChangeIt = $("#grid").igGrid("cellById", rowId, "youCanChangeIt");
-            var cellCanBeChangedByOthers = $("#grid").igGrid("cellById", rowId, "canBeChangedByOthers");
-            if (filteredData[i].userCanUpdateAtr.toString() === "1") {
-                if (!cellYouCanChangeIt.hasClass('readOnlyColorIsUse')) {
-                    cellYouCanChangeIt.addClass('readOnlyColorIsUse');
-                }
-                if (!cellCanBeChangedByOthers.hasClass('readOnlyColorIsUse')) {
-                    cellCanBeChangedByOthers.addClass('readOnlyColorIsUse');
-                }
-                cellYouCanChangeIt.children().prop("disabled", true);
-                cellCanBeChangedByOthers.children().prop("disabled", true);
-            } else {
-                cellYouCanChangeIt.children().prop("disabled", true);
-                cellCanBeChangedByOthers.children().prop("disabled", true);
-            }
-        }
-
-    }
+	nts.uk.ui.block.grayout();
+	var dataSource = $('#grid').data('igGrid').dataSource._data;
+	if(element.checked) {
+		_.forEach(dataSource, item => {
+			item.toUse = true;
+		});
+	} else {
+		_.forEach(dataSource, item => {
+			item.toUse = false;
+		});	
+	}
+	$("#grid").igGrid("option", "dataSource", dataSource);
 }
 
 
 function youCanChangeItHeaderChanged(element) {
-    var dataSource = $('#grid').data('igGrid').dataSource;
-    var filteredData = dataSource.transformedData('afterfilteringandpaging');
-    if (element.checked) {
-        var i;
-        var l = filteredData.length;
-        for (i = 0; i < l; i++) {
-            if (filteredData[i].userCanUpdateAtr.toString() === "1" && filteredData[i].toUse) {
-                $("#grid").igGridUpdating("setCellValue", filteredData[i].itemDailyID, "youCanChangeIt", true);
-            }
-        }
-    } else {
-        var i;
-        var l = filteredData.length;
-        for (i = 0; i < l; i++) {
-            if (filteredData[i].userCanUpdateAtr.toString() === "1" && filteredData[i].toUse) {
-                //update 
-                $("#grid").igGridUpdating("setCellValue", filteredData[i].itemDailyID, "youCanChangeIt", false);
-            }
-        }
-    }
-
+	nts.uk.ui.block.grayout();
+	var dataSource = $('#grid').data('igGrid').dataSource._data;
+	if(element.checked) {
+		_.forEach(dataSource, item => {
+			if(item.userCanUpdateAtr==1 && item.toUse) {
+				item.youCanChangeIt = true;
+			}
+		});
+	} else {
+		_.forEach(dataSource, item => {
+			if(item.userCanUpdateAtr==1 && item.toUse) {
+				item.youCanChangeIt = false;
+			}
+		});	
+	}
+	$("#grid").igGrid("option", "dataSource", dataSource);
 }
 
 function canBeChangedByOthersHeaderChanged(element) {
-    var dataSource = $('#grid').data('igGrid').dataSource;
-    var filteredData = dataSource.transformedData('afterfilteringandpaging');
-    if (element.checked) {
-        var i;
-        var l = filteredData.length;
-        for (i = 0; i < l; i++) {
-            if (filteredData[i].userCanUpdateAtr.toString() === "1" && filteredData[i].toUse) {
-                $("#grid").igGridUpdating("setCellValue", filteredData[i].itemDailyID, "canBeChangedByOthers", true);
-            }
-        }
-    } else {
-        var i;
-        var l = filteredData.length;
-        for (i = 0; i < l; i++) {
-            if (filteredData[i].userCanUpdateAtr.toString() === "1" && filteredData[i].toUse) {
-                $("#grid").igGridUpdating("setCellValue", filteredData[i].itemDailyID, "canBeChangedByOthers", false);
-            }
-        }
-
-    }
+	nts.uk.ui.block.grayout();
+	var dataSource = $('#grid').data('igGrid').dataSource._data;
+	if(element.checked) {
+		_.forEach(dataSource, item => {
+			if(item.userCanUpdateAtr==1 && item.toUse) {
+				item.canBeChangedByOthers = true;
+			}
+		});
+	} else {
+		_.forEach(dataSource, item => {
+			if(item.userCanUpdateAtr==1 && item.toUse) {
+				item.canBeChangedByOthers = false;
+			}
+		});	
+	}
+	$("#grid").igGrid("option", "dataSource", dataSource);
 }
 
 

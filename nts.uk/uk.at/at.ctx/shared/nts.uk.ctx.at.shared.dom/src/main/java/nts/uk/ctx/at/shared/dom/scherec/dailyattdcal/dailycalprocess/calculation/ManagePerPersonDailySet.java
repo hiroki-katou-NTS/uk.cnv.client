@@ -1,11 +1,16 @@
 package nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import lombok.Getter;
 import nts.uk.ctx.at.shared.dom.scherec.addsettingofworktime.AddSetting;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.setting.BonusPaySetting;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.timezone.outsideworktime.OverTimeSheet;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.SupportFrameNo;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.employeeunitpricehistory.EmployeeUnitPriceHistoryItem;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.WorkingHoursUnitPrice;
 import nts.uk.ctx.at.shared.dom.scherec.statutory.worktime.week.DailyUnit;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingConditionItem;
 
@@ -32,6 +37,9 @@ public class ManagePerPersonDailySet {
 	
 	/** 残業時間帯Require */
 	private OverTimeSheet.TransProcRequire overTimeSheetReq;
+
+	/** 社員単価履歴 */
+	private Optional<EmployeeUnitPriceHistoryItem> unitPrice;
 	
 	/** 平日時の所定時間設定
 	 *年休、欠勤の場合に実績に就業時間帯が埋まっていない時に使用する。
@@ -52,8 +60,8 @@ public class ManagePerPersonDailySet {
 			AddSetting addSetting,
 			Optional<BonusPaySetting> bonusPaySetting,
 			PredetermineTimeSetForCalc predetermineTimeSetByPersonWeekDay,
-			OverTimeSheet.TransProcRequire overTimeSheetReq) {
-		
+			OverTimeSheet.TransProcRequire overTimeSheetReq,
+			Optional<EmployeeUnitPriceHistoryItem> unitPrice) {
 		super();
 		this.personInfo = personInfo;
 		this.dailyUnit = dailyUnit;
@@ -61,5 +69,6 @@ public class ManagePerPersonDailySet {
 		this.bonusPaySetting = bonusPaySetting;
 		this.predetermineTimeSetByPersonWeekDay = predetermineTimeSetByPersonWeekDay;
 		this.overTimeSheetReq = overTimeSheetReq;
+		this.unitPrice = unitPrice;
 	}
 }

@@ -40,8 +40,10 @@ module nts.uk.com.view.cdl027.a.viewmodel {
             self.params = getShared("CDL027Params");
             self.targetStart = self.formatTargetDate(self.params.functionId, self.params.period.startDate);
             self.targetEnd = self.params.functionId == FUNCTION_ID.Monthly ? null : self.formatTargetDate(self.params.functionId, self.params.period.endDate);
+            // self.targetEnd = self.formatTargetDate(self.params.functionId, self.params.period.endDate);
             switch (self.params.functionId) {
                 case FUNCTION_ID.Daily: 
+                case FUNCTION_ID.Monthly: 
                 case FUNCTION_ID.Salary:
                 case FUNCTION_ID.Bonus:
                 case FUNCTION_ID.Year_end_adjustment:
@@ -58,6 +60,7 @@ module nts.uk.com.view.cdl027.a.viewmodel {
             block.grayout();
             service.getLogInfor(self.formatParams()).done((result: Array<any>) => {
                 if (result && result.length) {
+					result = _.sortBy(result, [function(o) { return o.modifiedDateTime; }]).reverse();
                     for (var i = 0; i < result.length; i++) {
                         let r = result[i];
                         self.items.push(new DataCorrectionLog(

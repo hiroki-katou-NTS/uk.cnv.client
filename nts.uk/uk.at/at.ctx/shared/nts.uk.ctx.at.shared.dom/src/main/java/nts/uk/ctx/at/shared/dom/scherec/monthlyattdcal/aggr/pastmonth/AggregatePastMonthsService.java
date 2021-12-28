@@ -27,7 +27,6 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.converter.MonthlyRec
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.roundingset.RoundingSetOfMonthly;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.vtotalmethod.AggregateMethodOfMonthly;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.vtotalmethod.WorkDaysNumberOnLeaveCount;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.vtotalmethod.WorkDaysNumberOnLeaveCountRepository;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.work.AggregateAttendanceTimeValue;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.work.AgreementTimeAggregateService;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.work.AnyItemAggregateService;
@@ -42,6 +41,7 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.flex.ConditionCal
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.verticaltotal.reservation.ReservationOfMonthly;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.outsideot.OutsideOTSetting;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.outsideot.holiday.SuperHD60HConMed;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.weekly.AttendanceTimeOfWeekly;
 import nts.uk.ctx.at.shared.dom.scherec.statutory.worktime.UsageUnitSetting;
 import nts.uk.ctx.at.shared.dom.scherec.statutory.worktime.monunit.MonthlyWorkTimeSet.LaborWorkTypeAttr;
 import nts.uk.ctx.at.shared.dom.scherec.statutory.worktime.monunit.MonthlyWorkTimeSetCom;
@@ -174,19 +174,24 @@ public class AggregatePastMonthsService {
 		
 		/** 労働制ごと期間を計算する */
 		val workConGroup = mergeWorkCondition(workCondition, period);
-		val aggrAttendanceTime = new AggregateAttendanceTimeValue(sid, ym, closureId, closureDate, period);
 		
-		for (val wc : workConGroup) {
-			
+		val aggrAttendanceTimes = workConGroup.stream().map(wc -> {
 			/** 月別実績の勤怠時間を集計 */
-			val aggrResult = new AggregateAttendanceTimeValue(sid, ym, closureId, closureDate, wc.getDatePeriod());
-			val attendanceTimeWeeks = aggrResult.getAttendanceTime().aggregateAttendanceTime(createRequire(require, aggrResults), 
-					cacheCarrier, cid, wc.getDatePeriod(), wc.getWorkingConditionItem(), companySets, employeeSets, 
-					dailyWorks, monthlyOldDatas, new HashMap<>());
+			AggregateAttendanceTimeValue aggrResult = new AggregateAttendanceTimeValue(sid, ym, closureId, closureDate, wc.getDatePeriod());
+			List<AttendanceTimeOfWeekly> attendanceTimeWeeks = aggrResult.getAttendanceTime().aggregateAttendanceTime(
+					createRequire(require, aggrResults), cacheCarrier, cid, wc.getDatePeriod(), wc.getWorkingConditionItem(), 
+					companySets, employeeSets, dailyWorks, monthlyOldDatas, new HashMap<>());
 			aggrResult.getAttendanceTimeWeeks().addAll(attendanceTimeWeeks);
+			return aggrResult;
+		}).collect(Collectors.toList());
+		
+		AggregateAttendanceTimeValue aggrAttendanceTime = aggrAttendanceTimes.stream().findFirst()
+				.orElseGet(() -> new AggregateAttendanceTimeValue(sid, ym, closureId, closureDate, period));
+		
+		for (int idx = 1; idx < aggrAttendanceTimes.size(); idx++) {
 			
 			/** データの合算 */
-			aggrAttendanceTime.sum(aggrResult);
+			aggrAttendanceTime.sum(aggrAttendanceTimes.get(idx));
 			
 		}
 		

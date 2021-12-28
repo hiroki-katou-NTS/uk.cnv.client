@@ -62,8 +62,6 @@ public class ScreenQueryExtractTargetEmployees {
 	@Inject
 	private WorkplaceGroupAdapter workplaceGroupAdapter;
 	@Inject
-	private RegulationInfoEmployeeAdapter regulInfoEmployeeAdap;
-	@Inject
 	private RegulationInfoEmployeePub regulInfoEmpPub;
 	@Inject
 	private  SortSettingRepository sortSettingRepo;
@@ -82,6 +80,7 @@ public class ScreenQueryExtractTargetEmployees {
 	@Inject
 	private NurseClassificationRepository nurseClassificationRepo;
 
+
 	final static String SPACE = " ";
 	final static String ZEZO_TIME = "00:00";
 	final static String DATE_TIME_FORMAT = "yyyy/MM/dd HH:mm";
@@ -89,7 +88,7 @@ public class ScreenQueryExtractTargetEmployees {
 	public List<EmployeeInformationImport> getListEmp(ExtractTargetEmployeesParam param) {
 
 		// step 1 get domainSv 組織を指定して参照可能な社員を取得する
-		RequireGetEmpImpl requireGetEmpImpl = new RequireGetEmpImpl(workplaceGroupAdapter, regulInfoEmployeeAdap, regulInfoEmpPub);
+		RequireGetEmpImpl requireGetEmpImpl = new RequireGetEmpImpl();
 		String epmloyeeId = AppContexts.user().employeeId();
 		TargetOrgIdenInfor targetOrgIdenInfor = param.targetOrgIdenInfor;
 		List<String> sids = GetEmpCanReferService.getByOrg(requireGetEmpImpl, epmloyeeId, param.systemDate, param.period, targetOrgIdenInfor);
@@ -125,14 +124,7 @@ public class ScreenQueryExtractTargetEmployees {
 	}
 
 	@AllArgsConstructor
-	private static class RequireGetEmpImpl implements GetEmpCanReferService.Require {
-
-		@Inject
-		private WorkplaceGroupAdapter workplaceGroupAdapter;
-		@Inject
-		private RegulationInfoEmployeeAdapter regulInfoEmpAdap;
-		@Inject
-		private RegulationInfoEmployeePub regulInfoEmpPub;
+	private class RequireGetEmpImpl implements GetEmpCanReferService.Require {
 
 		@Override
 		public List<String> getEmpCanReferByWorkplaceGroup(String empId, GeneralDate date, DatePeriod period, String workplaceGroupID) {
@@ -149,7 +141,7 @@ public class ScreenQueryExtractTargetEmployees {
 		@Override
 		public List<String> sortEmployee(List<String> lstmployeeId, EmployeeSearchCallSystemType sysAtr, Integer sortOrderNo,
 				GeneralDate referenceDate, Integer nameType) {
-			List<String> data = regulInfoEmpAdap.sortEmployee(
+			List<String> data = regulInfoEmpPub.sortEmployee(
 					AppContexts.user().companyId(),
 					lstmployeeId,
 					sysAtr.value,

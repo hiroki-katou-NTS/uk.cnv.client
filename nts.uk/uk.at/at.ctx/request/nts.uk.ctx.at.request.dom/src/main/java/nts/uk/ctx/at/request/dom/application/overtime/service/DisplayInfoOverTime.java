@@ -1,5 +1,6 @@
 package nts.uk.ctx.at.request.dom.application.overtime.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -9,12 +10,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.request.dom.application.common.service.setting.output.AppDispInfoStartupOutput;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.service.dto.CalculatedFlag;
+import nts.uk.ctx.at.request.dom.application.overtime.AppOverTime;
 import nts.uk.ctx.at.request.dom.application.overtime.CalculationResult;
 import nts.uk.ctx.at.request.dom.application.overtime.OvertimeAppAtr;
 import nts.uk.ctx.at.request.dom.application.overtime.CommonAlgorithm.InfoBaseDateOutput;
 import nts.uk.ctx.at.request.dom.application.overtime.CommonAlgorithm.InfoNoBaseDate;
 import nts.uk.ctx.at.request.dom.application.overtime.CommonAlgorithm.InfoWithDateApplication;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.breaking.BreakTimeSheet;
 import nts.uk.ctx.at.shared.dom.workdayoff.frame.WorkdayoffFrame;
+import nts.uk.ctx.at.shared.dom.worktime.common.TimeZone;
 
 /**
  * Refactor5
@@ -45,4 +49,10 @@ public class DisplayInfoOverTime {
 	private CalculatedFlag calculatedFlag;
 	// 申請中の勤務情報
 	private Optional<WorkInfo> workInfo = Optional.empty();
+	// 最新の複数回残業申請
+	private Optional<AppOverTime> latestMultipleOvertimeApp = Optional.empty();
+	// 計算の休憩時間帯
+	private List<BreakTimeSheet> calculatedBreakTimes = new ArrayList<>();
+	// 計算の勤務時間
+	private List<TimeZone> calculatedWorkTimes = new ArrayList<>();
 }

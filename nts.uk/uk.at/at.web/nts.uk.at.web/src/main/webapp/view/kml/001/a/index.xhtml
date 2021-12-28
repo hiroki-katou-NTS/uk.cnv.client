@@ -9,9 +9,12 @@
   <body>
     <ui:composition template="../../../../master/base.xhtml">
       <ui:define name="htmlHead">
+        <com:EnumScript>			
+          nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.employeeunitpricehistory.UnitPrice
+	    </com:EnumScript>
         <com:ValidatorScript>
-          nts.uk.ctx.at.schedule.dom.budget.premium.PremiumRate
-          nts.uk.ctx.at.schedule.dom.budget.premium.PersonCostMemo
+          nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.PremiumRate
+          nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.PersonCostMemo
         </com:ValidatorScript>
         <com:scriptfile set="IGNITE" />
         <com:scriptfile path="../shr/kml001.shr.servicebase.js" />
@@ -376,13 +379,7 @@
                                       tabindex="16"
                                       data-bind="ntsComboBox: {
                                                     name: '#[KML001_82]',
-                                                    options: [
-                                                        { code: 0, name: '#{i18n.getText('KML001_22')}' },
-                                                        { code: 1, name: '#{i18n.getText('KML001_23')}' },
-                                                        { code: 2, name: '#{i18n.getText('KML001_24')}' },
-                                                        { code: 3, name: '#{i18n.getText('KML001_26')}' },
-                                                        { code: 4, name: '#{i18n.getText('KML001_25')}' }
-                                                    ],
+                                                    options: $vm.unitPriceOpt(),                                                    
                                                     optionsValue: 'code',
                                                     value: $vm.currentPersonCost().premiumSets()[$index()].unitPrice,
                                                     optionsText: 'name',

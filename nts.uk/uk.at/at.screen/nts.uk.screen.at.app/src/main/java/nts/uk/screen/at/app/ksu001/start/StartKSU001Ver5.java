@@ -72,11 +72,24 @@ public class StartKSU001Ver5 {
 		resultStep1.setStartDate(startDate);
 		resultStep1.setEndDate(endDate);
 		
-		TargetOrgIdenInfor targetOrgIdenInfor = null;
-		if (resultStep1.targetOrgIdenInfor.unit == TargetOrganizationUnit.WORKPLACE.value) {
-			targetOrgIdenInfor = new TargetOrgIdenInfor(TargetOrganizationUnit.WORKPLACE,Optional.of(param.workplaceId == null ? resultStep1.targetOrgIdenInfor.workplaceId : param.workplaceId),Optional.empty());
+		int unit = 0;
+		String workplaceId = "";
+		String workplaceGroupId = "";
+		if (StringUtil.isNullOrEmpty(param.workplaceId, true) && StringUtil.isNullOrEmpty(param.workplaceGroupId, true)) {
+			unit = resultStep1.targetOrgIdenInfor.unit;
+			workplaceId = resultStep1.targetOrgIdenInfor.workplaceId;
+			workplaceGroupId = resultStep1.targetOrgIdenInfor.workplaceGroupId;
 		} else {
-			targetOrgIdenInfor = new TargetOrgIdenInfor(TargetOrganizationUnit.WORKPLACE_GROUP, Optional.empty(),Optional.of(param.workplaceGroupId == null ? resultStep1.targetOrgIdenInfor.workplaceGroupId : param.workplaceGroupId));
+			unit = param.unit;
+			workplaceId = param.workplaceId;
+			workplaceGroupId = param.workplaceGroupId ;
+		}
+		
+		TargetOrgIdenInfor targetOrgIdenInfor = null;
+		if (unit == TargetOrganizationUnit.WORKPLACE.value) {
+			targetOrgIdenInfor = new TargetOrgIdenInfor(TargetOrganizationUnit.WORKPLACE,Optional.of(workplaceId),Optional.empty());
+		} else {
+			targetOrgIdenInfor = new TargetOrgIdenInfor(TargetOrganizationUnit.WORKPLACE_GROUP, Optional.empty(),Optional.of(workplaceGroupId));
 		}
 
 		ExtractTargetEmployeesParam param2 = new ExtractTargetEmployeesParam(GeneralDate.today(), new DatePeriod(startDate, endDate), targetOrgIdenInfor);

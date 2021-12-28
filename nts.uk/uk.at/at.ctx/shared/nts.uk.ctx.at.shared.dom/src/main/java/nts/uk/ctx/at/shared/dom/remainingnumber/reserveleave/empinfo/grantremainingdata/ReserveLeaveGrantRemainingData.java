@@ -3,7 +3,6 @@ package nts.uk.ctx.at.shared.dom.remainingnumber.reserveleave.empinfo.grantremai
 import java.math.BigDecimal;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.error.BusinessException;
 import nts.arc.time.GeneralDate;
@@ -16,7 +15,6 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdat
 import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveUsedNumber;
 
 @Getter
-@NoArgsConstructor
 // domain name CS00038: 積立年休付与残数データ
 public class ReserveLeaveGrantRemainingData extends LeaveGrantRemainingData {
 

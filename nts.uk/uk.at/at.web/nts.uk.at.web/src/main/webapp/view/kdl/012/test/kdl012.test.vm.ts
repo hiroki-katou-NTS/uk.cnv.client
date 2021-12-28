@@ -22,6 +22,9 @@ module kdl012.test.viewmodel {
         // selectionTaskList: KnockoutObservableArray<ItemModel> = ko.observableArray([]);
 
         currentCodeList: KnockoutObservableArray<any> = ko.observableArray([]);
+        
+        sid: KnockoutObservable<string>
+        taskCode: KnockoutObservable<string>
 
         constructor() {
             super()
@@ -62,6 +65,9 @@ module kdl012.test.viewmodel {
                     columnCssClass: 'limited-label'
                 }
             ]);
+            
+            self.sid = ko.observable(__viewContext.user.employeeId);
+            self.taskCode = ko.observable('FS0001              ');
 
             self.startPage();
         }
@@ -99,7 +105,9 @@ module kdl012.test.viewmodel {
                     showExpireDate: self.selectedShowExpireDateCode() === "1",
                     workFrameNoSelection: self.workFrameNoSelection(),
                     referenceDate: moment(self.referenceDate()).format("YYYY/MM/DD"),
-                    selectionCodeList: self.selectionCodeList()
+                    selectionCodeList: self.selectionCodeList(),
+                    sid: self.sid(),
+                    taskCode: self.taskCode()
                 };
                 nts.uk.ui.windows.setShared('KDL012Params', request);
 

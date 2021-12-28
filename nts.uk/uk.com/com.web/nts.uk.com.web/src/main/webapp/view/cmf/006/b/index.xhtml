@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+<ui:composition template="/master/base.xhtml">
+    <ui:define name="htmlHead">
+        <script>
+            var dialogSize = {
+                width: 590,
+                height: 480
+            };
+        </script>
+        <com:scriptfile set="IGNITE"/>
+        <com:stylefile path="/view/ccg/025/component/component.css"/>
+        <com:scriptfile path="/view/ccg/025/component/component.vm.js"/>
+        <com:scriptfile path="/view/ccg/025/component/component.service.js"/>
+        <com:stylefile path="cmf006.b.style.css"/>
+        <com:scriptfile path="cmf006.b.vm.js"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="content-ui">
+            <div class="table row">
+                <div id="B1" class="cell title">#{i18n.getText('CMF006_7')}</div>
+            </div>
+            <div class="table row">
+                <div id="B2" class="cell" data-bind="ntsFormLabel: {}">#{i18n.getText('CMF006_8')}</div>
+                <div id="B2_1" class="cell col" data-bind="ntsFormLabel: {}">#{i18n.getText('CMF006_9')}</div>
+                <div id="B2_2" class="cell" style="width: 50px;" data-bind="text: sourceRoleCode"></div>
+                <div id="B2_3" class="cell" data-bind="text: sourceRoleName"></div>
+            </div>
+            <div class="table row"
+                 data-bind="with: $vm.componentCcg025">
+                <div id="B3" class="cell" data-bind="ntsFormLabel: {}">#{i18n.getText('CMF006_10')}</div>
+                <div id="B3_1" class="cell col" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('CMF006_9')}</div>
+                <div id='B3_2' tabindex="1">
+                    <ui:include src="/view/ccg/025/component/index.xhtml"/>
+                </div>
+            </div>
+            <div class="table row overwrite">
+                <div class="cell" style="width: 85px;"></div>
+                <div id="B4" class="cell" tabindex="2"
+                     data-bind="ntsCheckBox: { checked: overwrite, enable: true}">#{i18n.getText('CMF006_11')}</div>
+            </div>
+            <div class="set-row">
+                <hr/>
+            </div>
+        </div>
+        <div class="btn-function">
+            <button id="copy"
+                    data-bind="click: $vm.copy, enable : $root.errors.isEmpty"
+                    class="proceed large" tabindex="3">#{i18n.getText('CMF006_12')}</button>
+            <button data-bind="click: $vm.cancel"
+                    class="normal" tabindex="4">#{i18n.getText('CMF006_13')}</button>
+        </div>
+    </ui:define>
+</ui:composition>
+</body>
+</html>

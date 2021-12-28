@@ -15,11 +15,7 @@ import nts.uk.ctx.at.shared.dom.common.anyitem.AnyTimesMonth;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.optionalitemvalue.AnyItemAmount;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.optionalitemvalue.AnyItemTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.optionalitemvalue.AnyItemTimes;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.AmountRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcRangeCheck;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcResultRangeSetMemento;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.NumberRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.TimeRange;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.*;
 
 /**
  * The Class JpaCalcResultRangeSetMemento.
@@ -133,10 +129,10 @@ public class JpaCalcResultRangeSetMemento implements CalcResultRangeSetMemento {
             Optional<AnyAmountMonth> lowerMonAmountOpt = range.get().getMonthlyAmountRange().get().getLowerLimit();
             Optional<AnyAmountMonth> upperMonAmountOpt = range.get().getMonthlyAmountRange().get().getUpperLimit();
             
-            typeValue.setLowerDayTimeRange(lowerDailyAmountOpt.isPresent() ? lowerDailyAmountOpt.get().v() : null);
-            typeValue.setUpperDayTimeRange(upperDailyAmountOpt.isPresent() ? upperDailyAmountOpt.get().v() : null);
-            typeValue.setLowerMonTimeRange(lowerMonAmountOpt.isPresent() ? lowerMonAmountOpt.get().v() : null);
-            typeValue.setUpperMonTimeRange(upperMonAmountOpt.isPresent() ? upperMonAmountOpt.get().v() : null);
+            typeValue.setLowerDayAmountRange(lowerDailyAmountOpt.isPresent() ? lowerDailyAmountOpt.get().v() : null);
+            typeValue.setUpperdayAmountRange(upperDailyAmountOpt.isPresent() ? upperDailyAmountOpt.get().v() : null);
+            typeValue.setLowerMonAmountRange(lowerMonAmountOpt.isPresent() ? lowerMonAmountOpt.get().v() : null);
+            typeValue.setUpperMonAmountRange(upperMonAmountOpt.isPresent() ? upperMonAmountOpt.get().v() : null);
         }
 	}
 

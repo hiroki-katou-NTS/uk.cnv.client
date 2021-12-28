@@ -37,15 +37,15 @@ public class RoleSetPortalFinder {
 		EmployeeDto employee = employeeOpt.get();
 		Optional<RoleSetGrantedPersonDto> roleSetGrantedPerson = roleAdapter.getRoleSetPersonGrant(employee.getEmployeeId());
 		
-		String roleSetCd = null;
+		Optional<String> roleSetCd = Optional.empty();
 		if (roleSetGrantedPerson.isPresent()) {
-			roleSetCd = roleSetGrantedPerson.get().getRoleSetCd();
+			roleSetCd = roleSetGrantedPerson.map(roleSetPerson -> roleSetPerson.getRoleSetCd());
 		} else {
 			Optional<AffJobHistoryDto> jobHistory = roleAdapter.getAffJobHist(employee.getEmployeeId(), GeneralDate.today());
 			if (jobHistory.isPresent()) {
 				Optional<RoleSetGrantedJobTitleDetailDto> roleSetGrantedJobTitle = roleAdapter.getRoleSetJobTitleGrant(companyId, jobHistory.get().getJobTitleId());
 				if (roleSetGrantedJobTitle.isPresent()) {
-					roleSetCd = roleSetGrantedJobTitle.get().getRoleSetCd();
+					roleSetCd = roleSetGrantedJobTitle.map(roleSetJobTitle -> roleSetJobTitle.getRoleSetCd());
 				} else {
 					// TODO: Get 兼務職位履歴 and check if not present, then get default role set 
 					// otherwise, get RoleSetGrantedJobTitleDetailDto with retrieved job title Id
@@ -56,7 +56,7 @@ public class RoleSetPortalFinder {
 				roleSetCd = getDefaultRoleSet(companyId);
 			}
 		}
-		return Optional.ofNullable(roleSetCd);
+		return roleSetCd;
 	}
 	
 	/**
@@ -64,9 +64,9 @@ public class RoleSetPortalFinder {
 	 * @param companyId company Id
 	 * @return default role set
 	 */
-	private String getDefaultRoleSet(String companyId) {
+	private Optional<String> getDefaultRoleSet(String companyId) {
+		// デフォルトロールセットがない可能性がある　仕様が変わった
 		return roleAdapter.getDefaultRoleSet(companyId)
-				.orElseThrow(() -> new RuntimeException("Default role set not found."))
-				.getRoleSetCd();
+				.map(roleSet -> roleSet.getRoleSetCd());
 	}
 }

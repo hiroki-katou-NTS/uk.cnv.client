@@ -222,16 +222,16 @@ module nts.uk.com.cmf001.c {
                 } else {
                     mapping.revisingValue.codeConvert.convertDetailsText("");
                 }
-                if (!res.revisingValue || !res.revisingValue.timeHourlySegment){
+                if (!res.revisingValue || res.revisingValue.timeHourlySegment === undefined){
                     mapping.revisingValue.timeHourlySegment(1);
                 }
-                if (!res.revisingValue || !res.revisingValue.timeBaseNumber){
+                if (!res.revisingValue || res.revisingValue.timeBaseNumber === undefined){
                     mapping.revisingValue.timeBaseNumber(0);
                 }
-                if (!res.revisingValue || !res.revisingValue.timeDelimiter){
+                if (!res.revisingValue || res.revisingValue.timeDelimiter === undefined){
                     mapping.revisingValue.timeRounding(0);
                 }
-                if (!res.revisingValue || !res.revisingValue.timeRounding){
+                if (!res.revisingValue || res.revisingValue.timeRounding === undefined){
                     mapping.revisingValue.timeRounding(3);
                 }
 

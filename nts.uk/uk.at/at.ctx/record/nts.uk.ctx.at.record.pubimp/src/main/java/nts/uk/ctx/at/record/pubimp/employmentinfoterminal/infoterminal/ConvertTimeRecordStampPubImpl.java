@@ -11,8 +11,10 @@ import lombok.AllArgsConstructor;
 import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
+
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
+
 import nts.uk.ctx.at.auth.dom.adapter.login.IGetInfoForLogin;
 import nts.uk.ctx.at.record.dom.adapter.employeemanage.EmployeeManageRCAdapter;
 import nts.uk.ctx.at.record.dom.adapter.employmentinfoterminal.infoterminal.EmpDataImport;
@@ -42,6 +44,7 @@ import nts.uk.ctx.at.record.dom.workrecord.actuallock.ActualLockRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampDakokuRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.StampDataReflectResult;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
 import nts.uk.ctx.at.record.pub.employmentinfoterminal.infoterminal.ConvertTimeRecordStampPub;
 import nts.uk.ctx.at.record.pub.employmentinfoterminal.infoterminal.StampDataReflectResultExport;
 import nts.uk.ctx.at.record.pub.employmentinfoterminal.infoterminal.StampReceptionDataExport;
@@ -404,6 +407,12 @@ public class ConvertTimeRecordStampPubImpl implements ConvertTimeRecordStampPub 
 		@Override
 		public EmployeeImport employeeInfo(CacheCarrier cacheCarrier, String empId) {
 			return empEmployeeAdapter.findByEmpIdRequire(cacheCarrier, empId);
+		}
+		
+		@Override
+		public boolean existsStamp(ContractCode contractCode, StampNumber stampNumber, GeneralDateTime dateTime,
+				ChangeClockAtr changeClockArt) {
+			return stampDakokuRepository.existsStamp(contractCode, stampNumber, dateTime, changeClockArt);
 		}
 	}
 }

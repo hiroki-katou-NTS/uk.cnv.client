@@ -24,18 +24,18 @@ public class SelectTargetEmployee {
 	public SelectTargetEmployeeDto select(SelectTargetEmployeeParam param) {
 		SelectTargetEmployeeDto result = new SelectTargetEmployeeDto();
 
-		// call 対象社員の表示情報を取得する
-		EmployeeDisplayInfo employeeDisplayInfo = getEmployeeDisplayInfo.getInfo(param.getEmployeeId(),
-				param.getRefDate(), param.getDisplayPeriod().toDomain());
-
-		List<WorkGroupDto> workGroupDtos = employeeDisplayInfo.getWorkGroups().stream().map(m -> WorkGroupDto.toDto(m))
-				.collect(Collectors.toList());
-
-		result.setLstComfirmerDto(employeeDisplayInfo.getLstComfirmerDto());
-		result.setWorkGroupDtos(workGroupDtos);
-		result.setWorkCorrectionStartDate(employeeDisplayInfo.getDate());
-		result.setLstWorkRecordDetailDto(employeeDisplayInfo.getWorkRecordDetails().stream()
-				.map(m -> WorkRecordDetailDto.toDto(m)).collect(Collectors.toList()));
+//		// call 対象社員の表示情報を取得する
+//		EmployeeDisplayInfo employeeDisplayInfo = getEmployeeDisplayInfo.getInfo(param.getEmployeeId(),
+//				param.getRefDate(), param.getDisplayPeriod().toDomain());
+//
+//		List<WorkGroupDto> workGroupDtos = employeeDisplayInfo.getWorkGroups().stream().map(m -> WorkGroupDto.toDto(m))
+//				.collect(Collectors.toList());
+//
+//		result.setLstComfirmerDto(employeeDisplayInfo.getLstComfirmerDto());
+//		result.setWorkGroupDtos(workGroupDtos);
+//		result.setWorkCorrectionStartDate(employeeDisplayInfo.getDate());
+//		result.setLstWorkRecordDetailDto(employeeDisplayInfo.getWorkRecordDetails().stream()
+//				.map(m -> WorkRecordDetailDto.toDto(m)).collect(Collectors.toList()));
 
 		return result;
 	}

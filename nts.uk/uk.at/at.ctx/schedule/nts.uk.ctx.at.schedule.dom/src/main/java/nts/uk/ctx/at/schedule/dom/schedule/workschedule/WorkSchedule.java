@@ -403,6 +403,8 @@ public class WorkSchedule implements DomainAggregate {
 				, this.lstEditState
 				, Optional.empty()
 				, Collections.emptyList()
+				, Collections.emptyList()
+				, Collections.emptyList()
 				, Optional.empty());
 	}
 	

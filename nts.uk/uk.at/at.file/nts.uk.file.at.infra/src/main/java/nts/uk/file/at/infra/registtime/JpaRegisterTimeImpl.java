@@ -5,6 +5,8 @@ import java.util.*;
 
 import javax.ejb.Stateless;
 import javax.persistence.Query;
+
+import lombok.val;
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.arc.i18n.I18NText;
@@ -846,8 +848,9 @@ public class JpaRegisterTimeImpl extends JpaRepository implements RegistTimeRepo
 		String cid = AppContexts.user().companyId();
 		Query query = getEntityManager().createNativeQuery(SQL_EXPORT_SHEET_3.toString()).setParameter(1, cid);
 		try {
-			BigDecimal data = (BigDecimal) query.getSingleResult();
-			datas.add(toDataSheet3(data));
+			Boolean data = (Boolean) query.getSingleResult();
+			BigDecimal value = new BigDecimal(Boolean.valueOf(data).compareTo(false));
+			datas.add(toDataSheet3(value));
 		} catch (Exception e) {
 			for (int i = 0; i < 1; i++) {
 				datas.add(toDataEmptySheet3());
@@ -913,7 +916,7 @@ public class JpaRegisterTimeImpl extends JpaRepository implements RegistTimeRepo
 		int laborSystemAtr = 0;
 		Query query = getEntityManager().createNativeQuery(SQL_EXPORT_SHEET_4_8.toString()).
 				setParameter("cid", cid).
-				setParameter("laborSystemAtr", laborSystemAtr);
+				setParameter("laborSystemAtr", laborSystemAtr==1);
 		try {
 			Object[] data = (Object[]) query.getSingleResult();
 				int j = 0 ;
@@ -1083,7 +1086,7 @@ public class JpaRegisterTimeImpl extends JpaRepository implements RegistTimeRepo
 		int laborSystemAtr = 0;
 		Query query = getEntityManager().createNativeQuery(SQL_EXPORT_SHEET_5_9.toString()).
 				setParameter("cid", cid).
-				setParameter("laborSystemAtr", laborSystemAtr);
+				setParameter("laborSystemAtr", laborSystemAtr == 1);
 
 		List<Object[]> data =  query.getResultList();
 		try {
@@ -1199,7 +1202,7 @@ public class JpaRegisterTimeImpl extends JpaRepository implements RegistTimeRepo
 		int laborSystemAtr = 0;
 		Query query = getEntityManager().createNativeQuery(SQL_EXPORT_SHEET_6_10.toString()).
 				setParameter("cid", cid).
-				setParameter("laborSystemAtr", laborSystemAtr);
+				setParameter("laborSystemAtr", laborSystemAtr  == 1);
 
 		List<Object[]> data =  query.getResultList();
 		try {
@@ -1316,7 +1319,7 @@ public class JpaRegisterTimeImpl extends JpaRepository implements RegistTimeRepo
 		int laborSystemAtr = 0;
 		Query query = getEntityManager().createNativeQuery(SQL_EXPORT_SHEET_7_11.toString()).
 				setParameter("cid", cid).
-				setParameter("laborSystemAtr", laborSystemAtr);
+				setParameter("laborSystemAtr", laborSystemAtr == 1);
 
 		List<Object[]> data =  query.getResultList();
 		try {
@@ -1433,7 +1436,7 @@ public class JpaRegisterTimeImpl extends JpaRepository implements RegistTimeRepo
 		int laborSystemAtr = 1;
 		Query query = getEntityManager().createNativeQuery(SQL_EXPORT_SHEET_4_8.toString()).
 				setParameter("cid", cid).
-				setParameter("laborSystemAtr", laborSystemAtr);
+				setParameter("laborSystemAtr", laborSystemAtr == 1);
 		try {
 			Object[] data = (Object[]) query.getSingleResult();
 			int j = 0 ;
@@ -1496,7 +1499,7 @@ public class JpaRegisterTimeImpl extends JpaRepository implements RegistTimeRepo
 		int laborSystemAtr = 1;
 		Query query = getEntityManager().createNativeQuery(SQL_EXPORT_SHEET_5_9.toString()).
 				setParameter("cid", cid).
-				setParameter("laborSystemAtr", laborSystemAtr);
+				setParameter("laborSystemAtr", laborSystemAtr == 1);
 
 		@SuppressWarnings("unchecked")
 		List<Object[]> data =  query.getResultList();
@@ -1573,7 +1576,7 @@ public class JpaRegisterTimeImpl extends JpaRepository implements RegistTimeRepo
 		int laborSystemAtr = 1;
 		Query query = getEntityManager().createNativeQuery(SQL_EXPORT_SHEET_6_10.toString()).
 				setParameter("cid", cid).
-				setParameter("laborSystemAtr", laborSystemAtr);
+				setParameter("laborSystemAtr", laborSystemAtr == 1);
 
 		List<Object[]> data =  query.getResultList();
 		try {
@@ -1649,7 +1652,7 @@ public class JpaRegisterTimeImpl extends JpaRepository implements RegistTimeRepo
 		int laborSystemAtr = 1;
 		Query query = getEntityManager().createNativeQuery(SQL_EXPORT_SHEET_7_11.toString()).
 				setParameter("cid", cid).
-				setParameter("laborSystemAtr", laborSystemAtr);
+				setParameter("laborSystemAtr", laborSystemAtr == 1);
 
 		List<Object[]> data =  query.getResultList();
 		try {
@@ -1720,11 +1723,11 @@ public class JpaRegisterTimeImpl extends JpaRepository implements RegistTimeRepo
 	//sheet12
 	public List<MasterData> getDataExportSheet12(GeneralDate startDate, GeneralDate endDate) {
 		List<MasterData> datas = new ArrayList<>();
-		String startYM = startDate.yearMonth().toString();
-		String endYM = endDate.yearMonth().toString();
+		val startYM = startDate.yearMonth().v();
+		val endYM = endDate.yearMonth().v();
 		int startY = startDate.year();
 		int endY = endDate.year();
-		if(!endYM.substring(4, endYM.length()).equals(END_MONTH))
+		if(!endYM.toString().substring(4, endYM.toString().length()).equals(END_MONTH))
 			endY = endY-1;
 		String cid = AppContexts.user().companyId();
 		Query query = getEntityManager().createNativeQuery(SQL_EXPORT_SHEET_12.toString()).

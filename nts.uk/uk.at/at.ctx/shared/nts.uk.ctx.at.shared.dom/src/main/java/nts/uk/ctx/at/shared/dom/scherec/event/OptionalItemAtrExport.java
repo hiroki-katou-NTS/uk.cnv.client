@@ -24,10 +24,19 @@ public class OptionalItemAtrExport {
 	 */
 	private OptionalItemNo optionalItemNo;
 
-	public OptionalItemAtrExport(int performanceAtr, int optionalItemAtr, Integer optionalItemNo) {
+	private boolean use;
+
+	private boolean inputCheck;
+
+	private boolean calculated;
+
+	public OptionalItemAtrExport(int performanceAtr, int optionalItemAtr, Integer optionalItemNo, boolean use, boolean calculated, boolean inputCheck) {
 		super();
 		this.performanceAtr = EnumAdaptor.valueOf(performanceAtr, PerformanceAtr.class);
 		this.optionalItemAtr = EnumAdaptor.valueOf(optionalItemAtr, OptionalItemAtr.class);
 		this.optionalItemNo = new OptionalItemNo(optionalItemNo);
+		this.use = use;
+		this.inputCheck = inputCheck;
+		this.calculated = calculated;
 	}
 }

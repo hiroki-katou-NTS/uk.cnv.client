@@ -68,4 +68,10 @@ public class AutoCalFlexOvertimeSettingDto {
 
 	}
 
+	public static AutoCalFlexOvertimeSettingDto fromDomain(AutoCalFlexOvertimeSetting domain) {
+		AutoCalFlexOvertimeSettingDto result = new AutoCalFlexOvertimeSettingDto();
+		result.setFlexOtTime(AutoCalSettingDto.fromDomain(domain.getFlexOtTime()));
+		return result;
+	}
+
 }

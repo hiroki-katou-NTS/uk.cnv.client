@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import nts.arc.enums.EnumAdaptor;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.function.app.find.monthlycorrection.fixedformatmonthly.BusinessTypeSortedMonDto;
 import nts.uk.ctx.at.function.app.find.monthlycorrection.fixedformatmonthly.BusinessTypeSortedMonFinder;
@@ -27,7 +26,6 @@ import nts.uk.ctx.at.record.app.find.dailyperformanceformat.dto.BusinessTypeDto;
 import nts.uk.ctx.at.record.app.find.workrecord.authfuncrest.EmployeeRoleDto;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.adapter.attendanceitemname.AttItemAuthority;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.adapter.attendanceitemname.AttItemName;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.enums.TimeInputUnit;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.i18n.TextResource;
 import nts.uk.shr.infra.file.report.masterlist.data.ColumnTextAlign;
@@ -265,10 +263,14 @@ public class RoleMonthlyExportExcelImpl  {
                 ColumnTextAlign.LEFT, "", true));
         columns.add(new MasterHeaderColumn("項目", TextResource.localize("KDW006_88"),
                 ColumnTextAlign.LEFT, "", true));
+        columns.add(new MasterHeaderColumn("表示名称", TextResource.localize("KDW002_65"),
+                ColumnTextAlign.LEFT, "", true));
+        columns.add(new MasterHeaderColumn("改行位置", TextResource.localize("KDW002_67"),
+                ColumnTextAlign.LEFT, "", true));
         columns.add(new MasterHeaderColumn("ヘッダー色", TextResource.localize("KDW006_152"),
                 ColumnTextAlign.LEFT, "", true));
-        columns.add(new MasterHeaderColumn("丸め単位", TextResource.localize("KDW006_153"),
-                ColumnTextAlign.LEFT, "", true));
+//        columns.add(new MasterHeaderColumn("丸め単位", TextResource.localize("KDW006_153"),
+//                ColumnTextAlign.LEFT, "", true));
         return columns;
     }
     
@@ -286,15 +288,31 @@ public class RoleMonthlyExportExcelImpl  {
                     	 Map<String, Object> data = new HashMap<>();
                          putDataEmptySheet2(data);
                          data.put("コード", c.getAttendanceItemDisplayNumber());
-                         data.put("項目", c.getAttendanceItemName());
+                         data.put("項目", c.getOldName());
+                         data.put("表示名称", c.getAttendanceItemName());
+                         data.put("改行位置", c.getNameLineFeedPosition());
                         if(controlItem.getHeaderBgColorOfMonthlyPer()!=null){
                             data.put("ヘッダー色", controlItem.getHeaderBgColorOfMonthlyPer().replace("#", ""));
                         }
-                        TimeInputUnit timeInputUnit = EnumAdaptor.valueOf(controlItem.getInputUnitOfTimeItem()==null?0:controlItem.getInputUnitOfTimeItem(), TimeInputUnit.class);
-                        data.put("丸め単位", timeInputUnit.nameId);
-                        if(c.getTypeOfAttendanceItem()==null||c.getTypeOfAttendanceItem()!=1){
-                        	data.put("丸め単位","");
-                        }
+//                        Float inputUnit = controlItem.getInputUnitOfTimeItem()==null ? 0 : controlItem.getInputUnitOfTimeItem();
+    	                
+//    	                switch (c.getAttendanceAtr()) {
+//    	                	case 1:	//MonthlyAttendanceItemAtr.Time
+//    	                		data.put("丸め単位", inputUnit % 1 == 0 ? (int) Math.floor(inputUnit) + TextResource.localize("KDW006_154") :
+//    	                			inputUnit + TextResource.localize("KDW006_154"));
+//    	                		break;
+//    	                	case 2: //MonthlyAttendanceItemAtr.NumberOfTime
+//    	                		data.put("丸め単位", inputUnit % 1 == 0 ? (int) Math.floor(inputUnit) + TextResource.localize("KDW006_230") :
+//    	                			inputUnit + TextResource.localize("KDW006_230"));
+//    	                		break;
+//    	                	case 4: //MonthlyAttendanceItemAtr.AmountOfMoney
+//    	                		data.put("丸め単位", inputUnit % 1 == 0 ? (int) Math.floor(inputUnit) + TextResource.localize("KDW006_231"):
+//    	                			inputUnit + TextResource.localize("KDW006_231"));
+//    	                		break;
+//    	                	default:
+//    	                		data.put("丸め単位","");
+//    	                		break;
+//    	                }
                         datas.add(alignMasterDataSheet2(data));
                     }
                 });
@@ -306,23 +324,19 @@ public class RoleMonthlyExportExcelImpl  {
     private void putDataEmptySheet2(Map<String, Object> data){
         data.put("コード","");
         data.put("項目","");
+        data.put("表示名称", "");
+        data.put("改行位置", "");
         data.put("ヘッダー色","");
-        data.put("丸め単位","");
+//        data.put("丸め単位","");
     }
     private MasterData alignMasterDataSheet2(Map<String, Object> data) {
-        /**
-        TIME_INPUT_1Min(0, "1分"),
-        TIME_INPUT_5Min(1, "5分"),
-        TIME_INPUT_10Min(2, "10分"),
-        TIME_INPUT_15Min(3, "15分"),
-        TIME_INPUT_30Min(4, "30分"),
-        TIME_INPUT_50Min(5, "60分");
-         */
         MasterData masterData = new MasterData(data, null, "");
         masterData.cellAt("コード").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
         masterData.cellAt("項目").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+        masterData.cellAt("表示名称").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+        masterData.cellAt("改行位置").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.RIGHT));
         masterData.cellAt("ヘッダー色").setStyle(MasterCellStyle.build().backgroundColor((data.get("ヘッダー色").toString())).horizontalAlign(ColumnTextAlign.LEFT));
-        masterData.cellAt("丸め単位").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.RIGHT));
+//        masterData.cellAt("丸め単位").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.RIGHT));
         return masterData;
     }
     

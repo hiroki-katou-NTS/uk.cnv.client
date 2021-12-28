@@ -29,7 +29,7 @@ public class KshmtWtSearchCondition extends ContractUkJpaEntity implements Seria
 	 */
 	@NotNull
 	@Column(name = "USE_ATR")
-	public int useAtr;
+	public boolean useAtr;
 	
 	/**
 	 * 絞り込み条件名称

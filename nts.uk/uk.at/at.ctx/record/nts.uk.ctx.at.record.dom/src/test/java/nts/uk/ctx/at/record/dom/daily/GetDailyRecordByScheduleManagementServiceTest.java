@@ -108,7 +108,7 @@ public class GetDailyRecordByScheduleManagementServiceTest {
 		IntegrationOfDaily integrationOfDaily = new IntegrationOfDaily("emp1", GeneralDate.today(), null, null, null,
 				Optional.empty(), new ArrayList<>(), Optional.empty(), new BreakTimeOfDailyAttd(),
 				Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
-				Optional.empty(), new ArrayList<>(), Optional.empty(), new ArrayList<>(), Optional.empty()) ;
+				Optional.empty(), new ArrayList<>(), Optional.empty(), new ArrayList<>(),new ArrayList<>(),new ArrayList<>(), Optional.empty()) ;
 
 		val status = Helper.createEmployeeWorkingStatus("emp1", GeneralDate.today(), WorkingStatus.SCHEDULE_MANAGEMENT);
 		new MockUp<EmployeeWorkingStatus>() {

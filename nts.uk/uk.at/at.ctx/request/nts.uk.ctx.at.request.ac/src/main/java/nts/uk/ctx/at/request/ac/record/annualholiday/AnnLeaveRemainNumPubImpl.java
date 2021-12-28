@@ -12,6 +12,7 @@ import nts.uk.ctx.at.record.pub.remainnumber.annualleave.AnnLeaveRemainNumberPub
 import nts.uk.ctx.at.request.dom.application.annualholiday.AnnLeaveRemainAdapter;
 import nts.uk.ctx.at.request.dom.application.annualholiday.AnnualLeaveGrantExport;
 import nts.uk.ctx.at.request.dom.application.annualholiday.AnnualLeaveInfoExport;
+import nts.uk.ctx.at.request.dom.application.annualholiday.AnnualLeaveMaxDataExport;
 import nts.uk.ctx.at.request.dom.application.annualholiday.AnnualLeaveRemainingNumberExport;
 import nts.uk.ctx.at.request.dom.application.annualholiday.ReNumAnnLeaReferenceDateExport;
 
@@ -27,10 +28,14 @@ public class AnnLeaveRemainNumPubImpl implements AnnLeaveRemainAdapter{
 		AnnualLeaveRemainingNumberExport remainNumberNoMinusExport = new AnnualLeaveRemainingNumberExport( 
 				result.getAnnualLeaveRemainNumberExport().getRemainNumberNoMinusExport().getAnnualLeaveGrantPreTime(), 
 				result.getAnnualLeaveRemainNumberExport().getRemainNumberNoMinusExport().getAnnualLeaveGrantPostTime());
+		
+		AnnualLeaveMaxDataExport annualLeaveMaxDataExport = new AnnualLeaveMaxDataExport(result.getAnnualLeaveRemainNumberExport().
+				getAnnualLeaveMaxDataExport().getTimeAnnualLeaveMaxremainingMinutes());
 				
 		AnnualLeaveInfoExport annualLeaveRemainNumberExport = new AnnualLeaveInfoExport(
 				result.getAnnualLeaveRemainNumberExport().getYmd(), 
-				remainNumberNoMinusExport);
+				remainNumberNoMinusExport,
+				annualLeaveMaxDataExport);
 		
 		List<AnnualLeaveGrantExport> annualLeaveGrantExports = result.getAnnualLeaveGrantExports().stream()
 				.map(x -> {

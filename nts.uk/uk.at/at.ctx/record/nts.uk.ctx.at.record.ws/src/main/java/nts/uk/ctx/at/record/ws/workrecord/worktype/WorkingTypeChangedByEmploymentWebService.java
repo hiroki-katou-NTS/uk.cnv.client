@@ -14,8 +14,11 @@ import javax.ws.rs.Produces;
 
 import nts.uk.ctx.at.record.app.command.workrecord.worktype.CopyEmploymentCommand;
 import nts.uk.ctx.at.record.app.command.workrecord.worktype.CopyEmploymentCommandHandler;
+import nts.uk.ctx.at.record.app.command.workrecord.worktype.DeleteEmploymentSettingCommand;
+import nts.uk.ctx.at.record.app.command.workrecord.worktype.DeleteEmploymentSettingCommandHandler;
 import nts.uk.ctx.at.record.app.command.workrecord.worktype.WorkTypeEmploymentCommand;
 import nts.uk.ctx.at.record.app.command.workrecord.worktype.WorkTypeEmploymentCommandHandler;
+import nts.uk.ctx.at.record.app.find.workrecord.worktype.WorkTypeEmploymentFinder;
 import nts.uk.ctx.at.record.app.find.workrecord.worktype.WorkTypeGroupDto;
 import nts.uk.ctx.at.record.dom.workrecord.workingtype.WorkingTypeChangedByEmployment;
 import nts.uk.ctx.at.record.dom.workrecord.workingtype.WorkingTypeChangedByEmpRepo;
@@ -38,7 +41,13 @@ public class WorkingTypeChangedByEmploymentWebService {
 	private WorkTypeEmploymentCommandHandler handler;
 	
 	@Inject
+	private DeleteEmploymentSettingCommandHandler deleteHandler;
+	
+	@Inject
 	private CopyEmploymentCommandHandler copyHandler;
+	
+	@Inject
+	private WorkTypeEmploymentFinder finder;
 	
 	@POST
 	@Path("get/{empCode}")
@@ -72,4 +81,15 @@ public class WorkingTypeChangedByEmploymentWebService {
 		copyHandler.handle(command);
 	}
 
+	@POST
+	@Path("delete")
+	public void deleteEmploymentSetting(DeleteEmploymentSettingCommand command) {
+		deleteHandler.handle(command);
+	}
+	
+	@POST
+	@Path("getDistinctEmpCodeByCompanyId")
+	public List<String> getDistinctEmpCodeByCompanyId() {
+		return this.finder.getDistinctEmpCodeByCompanyId();
+	}
 }

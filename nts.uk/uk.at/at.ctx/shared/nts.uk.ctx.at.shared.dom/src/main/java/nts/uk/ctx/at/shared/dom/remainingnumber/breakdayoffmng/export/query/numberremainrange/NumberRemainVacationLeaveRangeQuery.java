@@ -7,6 +7,9 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import lombok.val;
 import nts.gul.util.value.Finally;
+import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.MngDataStatus;
+import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.OccurrenceDigClass;
+import nts.uk.ctx.at.shared.dom.remainingnumber.base.ManagementDataRemainUnit;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffDayTimeUnUse;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffRemainCarryForward;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.DayOffRemainDayAndTimes;
@@ -19,6 +22,7 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numb
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.SubstituteHolidayAggrResult;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.VacationDetails;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.vacationdetail.CalcNumCarryAtBeginMonthFromDaikyu;
+import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.vacationdetail.CorrectDaikyuFurikyuFixed;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.vacationdetail.GetSequentialVacationDetailDaikyu;
 import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveRemainingDayNumber;
 import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveRemainingTime;
@@ -47,6 +51,9 @@ public class NumberRemainVacationLeaveRangeQuery {
 				inputParam.getInterimMng(), inputParam.getProcessDate(), inputParam.getOptBeforeResult());
 		List<AccumulationAbsenceDetail> lstAccTemp = sequentialVacaDetail.getVacationDetail().getLstAcctAbsenDetail();
 
+		//休出振出管理データを補正する。
+		CorrectDaikyuFurikyuFixed.correct(sequentialVacaDetail.getVacationDetail(), sequentialVacaDetail.getSeqVacInfoList());
+		
 		// 代休、休出から月初の繰越数を計算
 		val calcNumCarry = CalcNumCarryAtBeginMonthFromDaikyu.calculate(require, inputParam.getCid(), inputParam.getSid(),
 				inputParam.getDateData(), sequentialVacaDetail.getVacationDetail(), inputParam.isMode());
@@ -89,7 +96,7 @@ public class NumberRemainVacationLeaveRangeQuery {
 	}
 
 	public static interface Require extends GetSequentialVacationDetailDaikyu.Require,
-			CalcNumCarryAtBeginMonthFromDaikyu.Require, OffsetProcessing.Require, CorrectOutputAccordTimeMagSetting.Require {
+			CalcNumCarryAtBeginMonthFromDaikyu.Require, OffsetProcessing.Require, CorrectOutputAccordTimeMagSetting.Require{
 
 	}
 

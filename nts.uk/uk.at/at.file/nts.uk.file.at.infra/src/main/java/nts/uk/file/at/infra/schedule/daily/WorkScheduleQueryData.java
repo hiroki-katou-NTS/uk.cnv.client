@@ -82,4 +82,7 @@ public class WorkScheduleQueryData {
 	
 	/** The lst work  */
 	List<CodeName> lstWork;
+	
+	/** The lst work  */
+	List<CodeName> lstWorkSupOption;
 }

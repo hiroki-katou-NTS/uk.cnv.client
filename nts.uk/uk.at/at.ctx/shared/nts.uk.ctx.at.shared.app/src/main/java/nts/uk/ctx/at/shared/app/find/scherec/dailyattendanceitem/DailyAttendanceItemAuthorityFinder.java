@@ -1,5 +1,7 @@
 package nts.uk.ctx.at.shared.app.find.scherec.dailyattendanceitem;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import javax.ejb.Stateless;
@@ -20,5 +22,13 @@ public class DailyAttendanceItemAuthorityFinder {
 		if(data.isPresent())
 			return DailyAttendanceItemAuthorityDto.fromDomain(data.get());
 		return null;
+	}
+	
+	// ドメインモデル「権限別月次項目制御」を取得する kdw002 ver7
+	public List<String> getDailytRolesByCid() {
+		List<String> listRoles = Collections.emptyList();
+		String companyID = AppContexts.user().companyId();
+		listRoles = repo.getDailytRolesByCid(companyID);
+		return listRoles;
 	}
 }

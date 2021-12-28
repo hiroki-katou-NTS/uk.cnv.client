@@ -6,7 +6,7 @@
 <body>
 	<ui:composition template="/master/dialog.xhtml">
 		<ui:define name="htmlHead">
-			<script>var dialogSize = { width: 635, height: 310 };</script>
+			<script>var dialogSize = { width: 740, height: 320 };</script>
 			<com:scriptfile set="IGNITE" />
 
 			<com:scriptfile path="../share/functional.js" />
@@ -15,35 +15,36 @@
 		</ui:define>
 		<ui:define name="content">
 			<div id="contents-area" class="kdw-013-d">
-				<table id="kdw-013-ddata" data-bind="
-						ntsGridList: {								
-							height: 200,
-							dataSource: $vm.dataSource,
-							primaryKey: 'overtimeLeaveAtr',
-							columns: [{
-								headerText: '',
-								key: 'overtimeLeaveAtr',
-								hidden: true
-							}, {
-								headerText: $vm.$i18n('KDW013_32'),
-								key: 'date',
-								width: '100px'
-							}, {
-								headerText: $vm.$i18n('KDW013_33'),
-								key: 'description',
-								width: '300px'
-							}, {
-								headerText: $vm.$i18n('KDW013_34'),
-								key: 'link',
-								width: '200px'
-							}],
-							value: ko.observable()
-						}
-					">
+				<table style="border-collapse: separate;">
+					<thead>
+						<tr>
+							<th style="width: 100px;" data-bind="i18n: 'KDW013_32'"></th>
+							<th style="width: 820px;" data-bind="i18n: 'KDW013_33'"></th>
+							<th style="width: 200px;" data-bind="i18n: 'KDW013_34'"></th>
+						</tr>
+
+
+					</thead>
+
+					<tbody data-bind="foreach: dataSource()">
+						<tr>
+							<td data-bind="text:$data.date "></td>
+							<td data-bind="text:$data.description "></td>
+							<com:ko-if bind="$data.overtimeLeaveAtr == 0">
+								<td><a class="btn-jump" tabindex = "1"
+									data-bind="ntsLinkButton: { action: $parent.jump.bind( {overtimeLeaveAtr:0 ,date:$data.date }) },text: '#{i18n.getText('KDW013_35')}'"></a></td>
+							</com:ko-if>
+							<com:ko-if bind="$data.overtimeLeaveAtr == 1">
+								<td><a class="btn-jump" tabindex = "1"
+									data-bind="ntsLinkButton: { action: $parent.jump.bind({overtimeLeaveAtr:1 ,date:$data.date }) },text: '#{i18n.getText('KDW013_36')}'"></a></td>
+							</com:ko-if>
+						</tr>
+					</tbody>
 				</table>
+				
 			</div>
 			<div id="functions-area-bottom" class="kdw-013-d">
-				<button data-bind="i18n: 'KDW013_37', click: $vm.close"></button>
+				<button tabindex = "2" data-bind="i18n: 'KDW013_37', click: $vm.close"></button>
 			</div>
 		</ui:define>
 	</ui:composition>

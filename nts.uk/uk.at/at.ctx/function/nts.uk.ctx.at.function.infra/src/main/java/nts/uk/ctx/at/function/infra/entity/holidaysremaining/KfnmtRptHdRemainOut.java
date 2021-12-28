@@ -66,126 +66,126 @@ public class KfnmtRptHdRemainOut extends ContractUkJpaEntity implements Serializ
      */
     @Basic(optional = false)
     @Column(name = "YEARLY_HOLIDAY")
-    public int yearlyHoliday;
+    public boolean yearlyHoliday;
 
     /**
      * ★内半日年休を出力する
      */
     @Basic(optional = false)
     @Column(name = "INSIDE_HALF_DAY")
-    public int insideHalfDay;
+    public boolean insideHalfDay;
 
     /**
      * 内時間年休残数を出力する
      */
     @Basic(optional = false)
     @Column(name = "INSIDE_HOURS")
-    public int insideHours;
+    public boolean insideHours;
 
     /**
      * 積立年休の項目を出力する
      */
     @Basic(optional = false)
     @Column(name = "YEARLY_RESERVED")
-    public int yearlyReserved;
+    public boolean yearlyReserved;
 
     /**
      * 代休の項目を出力する
      */
     @Basic(optional = false)
     @Column(name = "OUT_ITEM_SUB")
-    public int outItemSub;
+    public boolean outItemSub;
 
     /**
      * 代休未消化出力する
      */
     @Basic(optional = false)
     @Column(name = "REPRESENT_SUB")
-    public int representSub;
+    public boolean representSub;
 
     /**
      * 代休残数を出力する
      */
     @Basic(optional = false)
     @Column(name = "REMAIN_CHARGE_SUB")
-    public int remainChargeSub;
+    public boolean remainChargeSub;
 
     /**
      * 振休の項目を出力する
      */
     @Basic(optional = false)
     @Column(name = "PAUSE_ITEM")
-    public int pauseItem;
+    public boolean pauseItem;
 
     /**
      * 振休未消化を出力する
      */
     @Basic(optional = false)
     @Column(name = "UNDIGESTED_PAUSE")
-    public int undigestedPause;
+    public boolean undigestedPause;
 
     /**
      * 振休残数を出力する
      */
     @Basic(optional = false)
     @Column(name = "NUM_REMAIN_PAUSE")
-    public int numRemainPause;
+    public boolean numRemainPause;
 
     /**
      * 時間外超過項目を出力する:出力する時間外超過項目.時間外超過項目を出力する
      */
     @Basic(optional = false)
     @Column(name = "HD60H_ITEM")
-    public int hD60HItem;
+    public boolean hD60HItem;
 
     /**
      * 時間外超過項目を出力する:出力する時間外超過項目.時間外超過未消化を出力する
      */
     @Basic(optional = false)
     @Column(name = "HD60H_UNDIGESTED")
-    public int hD60HUndigested;
+    public boolean hD60HUndigested;
 
     /**
      * 時間外超過項目を出力する:出力する時間外超過項目.時間外超過未消化を出力する
      */
     @Basic(optional = false)
     @Column(name = "HD60H_REMAIN")
-    public int hD60HRemain;
+    public boolean hD60HRemain;
 
     /**
      * 公休の項目を出力する
      */
     @Basic(optional = false)
     @Column(name = "OUTPUT_ITEMS_HOLIDAYS")
-    public int outputItemsHolidays;
+    public boolean outputItemsHolidays;
 
     /**
      * 公休繰越数を出力する
      */
     @Basic(optional = false)
     @Column(name = "OUTPUT_HOLIDAY_FORWARD")
-    public int outputHolidayForward;
+    public boolean outputHolidayForward;
 
     /**
      * 公休月度残を出力する
      */
     @Basic(optional = false)
     @Column(name = "MONTHLY_PUBLIC")
-    public int monthlyPublic;
+    public boolean monthlyPublic;
 
     /**
      * 子の看護休暇の項目を出力する
      */
     @Basic(optional = false)
     @Column(name = "CHILD_CARE_LEAVE")
-    public int childCareLeave;
+    public boolean childCareLeave;
 
     /**
      * 介護休暇の項目を出力する
      */
     @Basic(optional = false)
     @Column(name = "NURSING_CARE_LEAVE")
-    public int nursingCareLeave;
+    public boolean nursingCareLeave;
 
     @OneToMany( mappedBy = "kfnmtHdRemainManage", orphanRemoval = true,cascade = CascadeType.ALL,  fetch = FetchType.LAZY)
     @JoinTable(name = "KFNMT_RPT_HD_REMAIN_HDSP")
@@ -228,24 +228,24 @@ public class KfnmtRptHdRemainOut extends ContractUkJpaEntity implements Serializ
         this.cid = cid;
         this.cd = cd;
         this.name = name;
-        this.yearlyHoliday = yearlyHoliday;
-        this.insideHalfDay = insideHalfDay;
-        this.insideHours = insideHours;
-        this.yearlyReserved = yearlyReserved;
-        this.outItemSub = outItemSub;
-        this.representSub = representSub;
-        this.remainChargeSub = remainChargeSub;
-        this.pauseItem = pauseItem;
-        this.undigestedPause = undigestedPause;
-        this.numRemainPause = numRemainPause;
-        this.hD60HItem = hD60HItem;
-        this.hD60HUndigested = hD60HUndigested;
-        this.hD60HRemain = hD60HRemain;
-        this.outputItemsHolidays = outputItemsHolidays;
-        this.outputHolidayForward = outputHolidayForward;
-        this.monthlyPublic = monthlyPublic;
-        this.childCareLeave = childCareLeave;
-        this.nursingCareLeave = nursingCareLeave;
+        this.yearlyHoliday = yearlyHoliday ==1;
+        this.insideHalfDay = insideHalfDay == 1;
+        this.insideHours = insideHours == 1;
+        this.yearlyReserved = yearlyReserved == 1;
+        this.outItemSub = outItemSub == 1;
+        this.representSub = representSub == 1;
+        this.remainChargeSub = remainChargeSub == 1;
+        this.pauseItem = pauseItem == 1;
+        this.undigestedPause = undigestedPause == 1;
+        this.numRemainPause = numRemainPause == 1;
+        this.hD60HItem = (hD60HItem==1);
+        this.hD60HUndigested = hD60HUndigested == 1;
+        this.hD60HRemain = hD60HRemain == 1;
+        this.outputItemsHolidays = outputItemsHolidays == 1;
+        this.outputHolidayForward = outputHolidayForward == 1;
+        this.monthlyPublic = monthlyPublic == 1;
+        this.childCareLeave = (childCareLeave == 1);
+        this.nursingCareLeave = nursingCareLeave == 1;
         this.kfnmtSpecialHolidays = kfnmtSpecialHolidays;
     }
 }

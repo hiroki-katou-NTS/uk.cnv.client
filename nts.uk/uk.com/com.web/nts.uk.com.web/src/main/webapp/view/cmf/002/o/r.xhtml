@@ -12,16 +12,79 @@
 			<div class="label" style="margin-bottom: 15px;">#{i18n.getText('CMF002_229')}</div>
 			
 			<table style="margin-bottom: 15px">
-				<tr>
-					<td style="padding: 5px 20px 5px 0px;">
-						<!--R4 処理する年月日(ラベル)-->
-						<div data-bind="ntsFormLabel: {required: true}">#{i18n.getText('CMF002_223')}</div>
+
+				<tr data-bind="if: show61DatePeriod " >
+					<td >
+						<div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_223')}</div>
 					</td>
-					<td>
-						<!--R4_1 処理期間開始日--> <label
-						data-bind="text: periodDateValue().startDate" /> <!--R4_3 接続記号-->
-						<label>#{i18n.getText('CMF002_235')}</label> <!--R4_2 処理期間終了日--> <label
-						data-bind="text: periodDateValue().endDate" />
+					<td data-bind="if: show61DatePeriod">
+						<!--P6_1 実行期間-->
+						<div id="P6_1_DatePeriod" tabindex="3"
+							 data-bind="ntsDateRangePicker: {
+												required: true,
+												enable : false,
+												value: periodDateValue }" />
+					</td>
+				</tr>
+				<!--2-->
+				<tr data-bind="if: show61YmPeriod ">
+					<td >
+						<div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_223')}</div>
+					</td>
+					<!--NOT_USE-->
+
+					<td data-bind="if: show61YmPeriod">
+						<div tabindex="3"
+							 data-bind="ntsDateRangePicker: {
+							 						type: 'yearmonth',
+													enable : false,
+													value: periodDateValue}">
+						</div>
+					</td>
+				</tr>
+				<!--3-->
+				<tr data-bind="if: show61Date">
+					<td >
+						<div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_223')}</div>
+					</td>
+
+					<td data-bind="if: show61Date">
+						<div id="P6_1_YmPeriod" tabindex="3"
+							 data-bind="ntsDatePicker: {
+													value: date61,
+													dateFormat: 'date',
+													valueFormat: 'YYYY/MM/DD',
+													enable : false
+													}">
+						</div>
+					</td>
+				</tr>
+				<!--4-->
+				<tr data-bind="if: show81DatePeriod ">
+					<td >
+						<div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_223')}</div>
+					</td>
+
+					<td data-bind="if: show81DatePeriod">
+						<div id="P8_1_DatePeriod" tabindex="3"
+							 data-bind="ntsDateRangePicker: {
+												required: true,
+												enable : false,
+												value: periodDateValue}" />
+					</td>
+				</tr>
+				<!--5-->
+				<tr data-bind="if: show81YmPeriod">
+					<td >
+						<div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_223')}</div>
+					</td>
+					<td data-bind="if: show81YmPeriod">
+						<div tabindex="3"
+							 data-bind="ntsDateRangePicker: {
+							 						type: 'yearmonth',
+													enable : false,
+													value: periodDateValue}">
+						</div>
 					</td>
 				</tr>
 				<tr>
@@ -29,6 +92,7 @@
 						<!--R5 条件コード/名称-->
 						<div data-bind="ntsFormLabel: {required: true}">#{i18n.getText('CMF002_78')}</div>
 					</td>
+
 					<td>
 						<!--R5_1 条件設定名-->
 						<div class="label">

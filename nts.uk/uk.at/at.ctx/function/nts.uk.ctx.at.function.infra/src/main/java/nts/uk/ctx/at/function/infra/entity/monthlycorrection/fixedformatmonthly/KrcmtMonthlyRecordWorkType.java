@@ -64,4 +64,12 @@ public class KrcmtMonthlyRecordWorkType extends ContractUkJpaEntity implements S
 				);
 	}
 	
+	public MonthlyRecordWorkType copyDomain(MonthlyRecordWorkType domain) {
+		return new MonthlyRecordWorkType(
+				this.krcmtMonthlyRecordWorkTypePK.companyID,
+				new BusinessTypeCode(this.krcmtMonthlyRecordWorkTypePK.businessTypeCode),
+				domain.getDisplayItem()
+				);
+	}
+	
 }

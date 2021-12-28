@@ -6,12 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.shared.dom.attendance.util.item.AttendanceItemDataGate;
-import nts.uk.ctx.at.shared.dom.attendance.util.item.AttendanceItemDataGate.PropType;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.ItemConst;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.anno.AttendanceItemLayout;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.anno.AttendanceItemValue;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ValueType;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workschedule.WorkScheduleTime;
 
 /** 勤務予定時間 */
 @Data
@@ -56,5 +56,10 @@ public class WorkScheduleTimeDto implements ItemConst, AttendanceItemDataGate {
 			return PropType.VALUE;
 		}
 		return PropType.OBJECT;
+	}
+
+	public static WorkScheduleTimeDto fromDomain(WorkScheduleTime domain) {
+		return new WorkScheduleTimeDto(domain.getTotal().v(), domain.getExcessOfStatutoryTime().v(),
+				domain.getWithinStatutoryTime().v());
 	}
 }

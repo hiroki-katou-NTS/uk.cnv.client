@@ -197,6 +197,8 @@ public class IntegrationOfDailyGetterImpl implements IntegrationOfDailyGetter {
 		
 		List<OuenWorkTimeSheetOfDaily> ouenSheets = ouenSheetRepo.find(employeeId, datePeriod);
 		
+		List<OuenWorkTimeOfDaily> ouenTimes = ouenWorkTimeOfDailyRepo.find(Arrays.asList(employeeId), datePeriod);
+		
 		List<DailySnapshotWorkImport> snapshots = snapshotAdapter.find(employeeId, datePeriod);
 
 		for(WorkInfoOfDailyPerformance attendanceTime : attendanceTimeList) {
@@ -247,11 +249,6 @@ public class IntegrationOfDailyGetterImpl implements IntegrationOfDailyGetter {
 			Optional<TemporaryTimeOfDailyAttd> temporaryTimeOfDailyAttd = temporaryTimeOfDailyPerformances.stream()
 					.filter(x -> x.getYmd().equals(ymd)).findFirst().map(x-> Optional.ofNullable(x.getAttendance())).orElse(Optional.empty());
 			
-			
-			
-			
-			
-			
 			IntegrationOfDaily daily = new IntegrationOfDaily(
 					attendanceTime.getEmployeeId(),
 					ymd,
@@ -272,16 +269,19 @@ public class IntegrationOfDailyGetterImpl implements IntegrationOfDailyGetter {
 					listEditStateOfDailyPerformances.stream().filter(x-> x.getYmd().equals(ymd)).map(x-> x.getEditState()).collect(Collectors.toList()),
 					temporaryTimeOfDailyAttd,
 					listRemarksOfDailyPerforms.stream().filter(x-> x.getYmd().equals(ymd)).map(c->c.getRemarks()).collect(Collectors.toList()),
+					ouenTimes.stream().filter(x -> x.getYmd().equals(ymd)).findFirst().map(x->x.getOuenTimes()).orElse(new ArrayList<>()),
+					ouenSheets.stream().filter(x -> x.getYmd().equals(ymd)).findFirst().map(x->x.getOuenTimeSheet()).orElse(new ArrayList<>()),
 					snapshots.stream().filter(x-> x.getYmd().equals(ymd)).findFirst().map(c -> c.getSnapshot().toDomain()));
 			
+
 			ouenSheets.stream().filter(x -> x.getYmd().equals(ymd)).findFirst().ifPresent(x -> {
 				daily.setOuenTimeSheet(x.getOuenTimeSheet());
 			});
 			
-			OuenWorkTimeOfDaily OuenTime = ouenWorkTimeOfDailyRepo.find(employeeId, attendanceTime.getYmd()); 
+			Optional<OuenWorkTimeOfDaily> OuenTime = ouenWorkTimeOfDailyRepo.find(employeeId, attendanceTime.getYmd()); 
 
-			if (OuenTime != null) {
-				daily.setOuenTime(OuenTime.getOuenTimes());
+			if (OuenTime.isPresent()) {
+				daily.setOuenTime(OuenTime.get().getOuenTimes());
 			}
 
 			returnList.add(daily);
@@ -340,6 +340,8 @@ public class IntegrationOfDailyGetterImpl implements IntegrationOfDailyGetter {
 		List<RemarksOfDailyPerform> listRemarksOfDailyPerforms = remarksRepository.getRemarks(employeeId, datePeriod);
 		
 		List<OuenWorkTimeSheetOfDaily> ouenSheets = ouenSheetRepo.find(employeeId, datePeriod);
+		
+		List<OuenWorkTimeOfDaily> ouenTimes = ouenWorkTimeOfDailyRepo.find(employeeId, datePeriod);
 		
 		List<DailySnapshotWorkImport> snapshots = snapshotAdapter.find(employeeId, datePeriod);
 		
@@ -413,12 +415,15 @@ public class IntegrationOfDailyGetterImpl implements IntegrationOfDailyGetter {
 					listEditStateOfDailyPerformances.stream().filter(x-> x.getYmd().equals(ymd) && x.getEmployeeId().equals(attendanceTime.getEmployeeId())).map(x-> x.getEditState()).collect(Collectors.toList()),
 					temporaryTimeOfDailyAttd,
 					listRemarksOfDailyPerforms.stream().filter(x-> x.getYmd().equals(ymd) && x.getEmployeeId().equals(attendanceTime.getEmployeeId())).map(c->c.getRemarks()).collect(Collectors.toList()),
+					ouenTimes.stream().filter(x -> x.getYmd().equals(ymd) && x.getEmpId().equals(attendanceTime.getEmployeeId())).findFirst().map(x->x.getOuenTimes()).orElse(new ArrayList<>()),
+					ouenSheets.stream().filter(x -> x.getYmd().equals(ymd) && x.getEmpId().equals(attendanceTime.getEmployeeId())).findFirst().map(x->x.getOuenTimeSheet()).orElse(new ArrayList<>()),
 					snapshots.stream().filter(x-> x.getYmd().equals(ymd) && x.getSid().equals(attendanceTime.getEmployeeId())).findFirst().map(c -> c.getSnapshot().toDomain()));
 			
+
 			ouenSheets.stream().filter(x -> x.getYmd().equals(ymd) && x.getEmpId().equals(attendanceTime.getEmployeeId())).findFirst().ifPresent(x -> {
 				daily.setOuenTimeSheet(x.getOuenTimeSheet());
 			});
-						
+
 			returnList.add(daily);
 		}
 		return returnList;

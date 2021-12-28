@@ -285,6 +285,9 @@ module nts.uk.at.view.kml002.k {
             self.$blockui("invisible");
             self.$ajax(Paths.GET_ESTIMATE_INFO_BY_CID).done((data: any) => {
                 if (data) {
+					data.esimatedInfoDto.months = _.sortBy(data.esimatedInfoDto.months, [function(o) { return o.frameNo; }]);
+					data.esimatedInfoDto.annuals = _.sortBy(data.esimatedInfoDto.annuals, [function(o) { return o.frameNo; }]);
+					data.esimatedInfoDto.listHandlingByNo = _.sortBy(data.esimatedInfoDto.listHandlingByNo, [function(o) { return o.frameNo; }]);
                     self.isUseageEmployment(data.useSetting);
                     for (let i = 1; i < 6; i++) {
                         if (data.esimatedInfoDto.months && 
@@ -482,6 +485,7 @@ module nts.uk.at.view.kml002.k {
                             }                            
                         })                        
                     });
+					data.listHandlingByNo  = _.sortBy(data.listHandlingByNo, [function(o) { return o.frameNo; }]);
 
                     for (let i = 1; i < 6; i++) {
                         if (i <= data.listHandlingByNo.length && data.listHandlingByNo[i - 1].frameNo == i) {

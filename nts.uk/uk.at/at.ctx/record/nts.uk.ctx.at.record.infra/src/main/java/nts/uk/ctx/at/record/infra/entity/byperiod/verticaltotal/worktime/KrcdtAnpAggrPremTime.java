@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.record.infra.entity.byperiod.KrcdtAnpAttendanceTime;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeMonth;
 import nts.uk.ctx.at.shared.dom.scherec.byperiod.AttendanceTimeOfAnyPeriodKey;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.ExtraTimeItemNo;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.AttendanceAmountMonth;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.verticaltotal.worktime.premiumtime.AggregatePremiumTime;
 import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
@@ -40,7 +41,7 @@ public class KrcdtAnpAggrPremTime extends ContractUkJpaEntity implements Seriali
 	public int premiumTime;
 	/** 割増金額 */
 	@Column(name = "PREMIUM_AMOUNT")
-	public int premiumAmount;
+	public long premiumAmount;
 
 	/** マッチング：任意期間別実績の勤怠時間 */
 	@ManyToOne
@@ -65,7 +66,7 @@ public class KrcdtAnpAggrPremTime extends ContractUkJpaEntity implements Seriali
 	public AggregatePremiumTime toDomain(){
 		
 		return AggregatePremiumTime.of(
-				this.PK.premiumTimeItemNo,
+				ExtraTimeItemNo.valueOf(this.PK.premiumTimeItemNo),
 				new AttendanceTimeMonth(this.premiumTime),
 				new AttendanceAmountMonth(this.premiumAmount));
 	}
@@ -80,7 +81,7 @@ public class KrcdtAnpAggrPremTime extends ContractUkJpaEntity implements Seriali
 		this.PK = new KrcdtAnpAggrPremTimePK(
 				key.getEmployeeId(),
 				key.getAnyAggrFrameCode().v(),
-				domain.getPremiumTimeItemNo());
+				domain.getPremiumTimeItemNo().value);
 		this.fromDomainForUpdate(domain);
 	}
 	

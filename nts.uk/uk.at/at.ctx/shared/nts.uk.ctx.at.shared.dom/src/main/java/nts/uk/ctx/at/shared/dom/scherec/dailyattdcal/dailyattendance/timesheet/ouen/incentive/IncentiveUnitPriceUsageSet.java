@@ -44,5 +44,17 @@ public class IncentiveUnitPriceUsageSet extends AggregateRoot {
 		WORKLOCATION(3);
 		
 		public final int value;
+		
+		public boolean isCompany() {
+			return this.equals(COMPANY);
+		}
+		
+		public boolean isWorkPlace() {
+			return this.equals(WORKPLACE);
+		}
+		
+		public boolean isWorkLocation() {
+			return this.equals(WORKLOCATION);
+		}
 	}
 }

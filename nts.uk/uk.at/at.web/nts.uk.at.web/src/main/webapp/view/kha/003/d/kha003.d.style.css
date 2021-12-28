@@ -1,0 +1,42 @@
+.cmm045-div-table {
+    width: 100%;
+}
+
+#content-table td {
+    border: 1px solid black;
+}
+
+thead tr td {
+    width: 150px;
+}
+
+.ui-iggrid table td {
+    vertical-align: baseline;
+}
+
+.ui-iggrid-header {
+    text-align: center;
+}
+
+.ui-iggrid .ui-iggrid-tablebody td {
+    height: 21px;
+    text-align: center;
+    padding: 5px;
+}
+
+tbody.ui-ig-record.ui-iggrid-record tr td {
+    padding: 5px;
+    white-space: nowrap;
+}
+
+.ui-iggrid table tr td, .ui-iggrid table tr th {
+    text-align: center;
+}
+
+.ui-iggrid table tr th {
+    background-color: #DDDDDD;
+}
+.ui-iggrid table tr th.ui-widget-header, .ui-iggrid table tr.ui-state-focus th.ui-widget-header, .ui-iggrid table tr.ui-ig-altrecord.ui-state-focus th.ui-widget-header {
+    color: #595959;
+    background-color: #DDDDDD;
+}

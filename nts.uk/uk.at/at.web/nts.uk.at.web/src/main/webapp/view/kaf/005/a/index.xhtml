@@ -78,11 +78,12 @@
 			</div>
 			<div style="display: inline-block; position: absolute; z-index: 10; margin-left: 70px;" data-bind="component: { name: 'kaf000-a-component9', params: isFromOther }"></div>
 			<div id="contents-area" style="background-color: inherit;">
-				<div class="two-panel" style="height: 100%; width: 1260px">
+				<div class="two-panel" style="height: 100%;"
+					 data-bind="style: {width: opOvertimeAppAtr() == 3 &amp;&amp; appDispInfoStartupOutput().appDispInfoNoDateOutput.displayStandardReason &amp;&amp; appDispInfoStartupOutput().appDispInfoNoDateOutput.displayAppReason ? '1344px' : '1260px'}">
 					<div class="left-panel"
-						style="width: calc(1260px - 388px); height: inherit; padding-bottom: 5px;">
+						style="width: calc(100% - 388px); height: inherit; padding-bottom: 5px;">
 						<div
-						style="border: 1px solid #CCC; height: inherit; overflow-y: auto; background-color: #fff; padding:0 10px; overflow-x: hidden;">
+						style="border: 1px solid #CCC; height: inherit; overflow-y: auto; background-color: #fff; padding:0 10px;">
 							<div style="height: fit-content;">
 								<div class="table"
 									style="border-bottom: 2px solid #B1B1B1; padding-bottom: 30px; margin-bottom: 30px; width: 100%;">
@@ -144,14 +145,16 @@
 															}"></div>
 	
 								<!-- -->
-	
-								<div style="margin-top: 10px"
-									data-bind="component: { name: 'kaf000-a-component5', 
+								<div data-bind="if: opOvertimeAppAtr() != 3">
+									<div style="margin-top: 10px"
+										 data-bind="component: { name: 'kaf000-a-component5',
 															params: {
 																appType: appType,
 																application: application,
 																appDispInfoStartupOutput: appDispInfoStartupOutput
-															} }"></div>
+															}
+												}"></div>
+								</div>
 	
 								<div data-bind="component: { name: 'kaf005-share-footer'}"></div>
 	

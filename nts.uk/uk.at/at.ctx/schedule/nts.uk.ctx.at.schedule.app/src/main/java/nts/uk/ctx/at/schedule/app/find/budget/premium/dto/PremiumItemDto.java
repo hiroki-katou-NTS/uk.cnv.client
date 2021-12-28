@@ -3,7 +3,7 @@ package nts.uk.ctx.at.schedule.app.find.budget.premium.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import nts.uk.ctx.at.schedule.dom.budget.premium.language.PremiumItemLanguage;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.PremiumItemLanguage;
 
 /**
  * 
@@ -23,7 +23,7 @@ public class PremiumItemDto {
 	private int useAtr;
 
 	public static PremiumItemDto fromDomainPremiumItemLanguage(PremiumItemLanguage premiumItem) {
-		return new PremiumItemDto(premiumItem.getCompanyID(), premiumItem.getDisplayNumber(),
+		return new PremiumItemDto(premiumItem.getCompanyID(), premiumItem.getDisplayNumber().value,
 				!premiumItem.getName().isPresent()?null:premiumItem.getName().get().v());
 	}
 

@@ -60,7 +60,7 @@ public class SspmtDataStorageSelectionCategory extends UkJpaEntity implements Se
 	public void setPatternClassification(int patternClassification) {
 		if (pk == null)
 			pk = new SspmtDataStorageSelectionCategoryPk();
-		pk.patternClassification = BooleanUtils.toBoolean(patternClassification);
+		pk.patternClassification = patternClassification;
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class SspmtDataStorageSelectionCategory extends UkJpaEntity implements Se
 	@Override
 	public int getPatternClassification() {
 		if (pk != null)
-			return BooleanUtils.toInteger(pk.patternClassification);
+			return pk.patternClassification;
 		return 0;
 	}
 

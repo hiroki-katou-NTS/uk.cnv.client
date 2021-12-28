@@ -13,6 +13,7 @@ module nts.uk.at.view.kaf020.a {
         dateLst: Array<string> = [];
         baseDate: string;
         isAgentMode: KnockoutObservable<boolean> = ko.observable(false);
+		screenCode: number = null;
 
 
         created(params: AppInitParam) {
@@ -27,6 +28,9 @@ module nts.uk.at.view.kaf020.a {
 			}
 
             if (!_.isEmpty(params)) {
+				if (!nts.uk.util.isNullOrUndefined(params.screenCode)) {
+					vm.screenCode = params.screenCode;
+				}
                 if (!_.isEmpty(params.employeeIds)) {
                     vm.empLst = params.employeeIds;
                 }
@@ -68,7 +72,8 @@ module nts.uk.at.view.kaf020.a {
                 empLst: vm.empLst,
                 dateLst: vm.dateLst,
                 isAgentMode: vm.isAgentMode(),
-                baseDate: vm.baseDate
+                baseDate: vm.baseDate,
+				screenCode: vm.screenCode
             });
         }
 

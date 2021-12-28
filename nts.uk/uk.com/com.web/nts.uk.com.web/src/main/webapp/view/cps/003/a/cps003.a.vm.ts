@@ -168,7 +168,7 @@ module cps003.a.vm {
                 if (cid) {
                     let cate = _.find(self.category.items(), c => c.id === self.category.catId());
                     if (cate) {
-                        if (cid.includes('CS00100')) {
+                        if (cate.categoryCode == 'CS00100') {
                             self.isCS00100(true);
                         } else {
                             self.isCS00100(false);

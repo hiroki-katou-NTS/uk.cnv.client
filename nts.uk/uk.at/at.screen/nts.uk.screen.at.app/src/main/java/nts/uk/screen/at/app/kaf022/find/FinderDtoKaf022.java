@@ -193,6 +193,7 @@ public class FinderDtoKaf022 {
 		queries.add(new StandardMenuNameQuery("KAF005", "A", Optional.of("overworkatr=0")));
 		queries.add(new StandardMenuNameQuery("KAF005", "A", Optional.of("overworkatr=1")));
 		queries.add(new StandardMenuNameQuery("KAF005", "A", Optional.of("overworkatr=2")));
+		queries.add(new StandardMenuNameQuery("KAF005", "A", Optional.of("overworkatr=3")));
 		queries.add(new StandardMenuNameQuery("KAF006", "A", Optional.empty()));
 		queries.add(new StandardMenuNameQuery("KAF007", "A", Optional.empty()));
 		queries.add(new StandardMenuNameQuery("KAF008", "A", Optional.empty()));

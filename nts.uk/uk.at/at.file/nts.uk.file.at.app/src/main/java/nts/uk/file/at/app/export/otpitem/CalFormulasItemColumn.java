@@ -8,6 +8,7 @@ public final class CalFormulasItemColumn {
 	public static final String KMK002_77 = "コード名";
 	public static final String KMK002_78 = "属性";
 	public static final String KMK002_79 = "単位";
+	public static final String KMK002_132 = "チェックボックスで入力する";
 	public static final String KMK002_80 = "計算区分";
 	public static final String KMK002_81 = "日別/月別";
 	public static final String KMK002_82 = "雇用条件区分";
@@ -32,6 +33,7 @@ public final class CalFormulasItemColumn {
 	public static final String KMK002_110 = I18NText.getText("KMK002_110");
 	public static final String KMK002_111 = I18NText.getText("KMK002_111");
 	public static final String KMK002_112 = I18NText.getText("KMK002_112");
+	public static final String KMK002_170 = I18NText.getText("KMK002_170");
 	public static final String KMK002_113 = I18NText.getText("KMK002_113");
 	public static final String KMK002_114 = I18NText.getText("KMK002_114");
 	

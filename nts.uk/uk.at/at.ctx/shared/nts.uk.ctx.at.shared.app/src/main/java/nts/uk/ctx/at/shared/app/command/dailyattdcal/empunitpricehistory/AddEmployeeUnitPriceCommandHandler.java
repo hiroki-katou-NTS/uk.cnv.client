@@ -57,6 +57,7 @@ public class AddEmployeeUnitPriceCommandHandler extends CommandHandlerWithResult
 			eupHist = eupHistOp.get();
 		}
 		
+		DateHistoryItem itemUpdate = null;
 		if (eupHist.getHistoryItems().size() > 0) {
 			List<DateHistoryItem> histItemList = eupHist.getHistoryItems();
 			Comparator<DateHistoryItem> compareByStartDate = 
@@ -66,14 +67,16 @@ public class AddEmployeeUnitPriceCommandHandler extends CommandHandlerWithResult
 			
 			DateHistoryItem itemToBeUpdated = histItemList.get(histItemList.size() - 1);
 			GeneralDate endDate = command.getStartDate().addDays(-1);
-			DateHistoryItem itemUpdate = new DateHistoryItem(itemToBeUpdated.identifier(), new DatePeriod(itemToBeUpdated.start(), endDate));
-			eupHistRepo.update(itemUpdate);
+			itemUpdate = new DateHistoryItem(itemToBeUpdated.identifier(), new DatePeriod(itemToBeUpdated.start(), endDate));
 		}
 		
 		GeneralDate endDate = command.getEndDate() != null ? command.getEndDate() : GeneralDate.max();
 		DateHistoryItem itemToBeAdded = new DateHistoryItem(newHistId, new DatePeriod(command.getStartDate(), endDate));
 		eupHist.add(itemToBeAdded);
 		
+		if (itemUpdate != null) {
+			eupHistRepo.update(itemUpdate);
+		}
 		eupHistRepo.add(command.getSId(), itemToBeAdded);
 		
 		List<UnitPricePerNumber> unitPrices = new ArrayList<UnitPricePerNumber>();

@@ -333,7 +333,7 @@ public class DailyCalculationRCommandFacade {
 		List<DailyModifyQuery> querys = new ArrayList<>();
 		mapSidDate.entrySet().forEach(x -> {
 			List<ItemValue> itemCovert = x.getValue().stream()
-					.map(y -> new ItemValue(y.getValue(), ValueType.valueOf(y.getValueType()), y.getLayoutCode(),
+					.map(y -> new ItemValue(y.getValue(),y.getValueType() == null?null: ValueType.valueOf(y.getValueType()), y.getLayoutCode(),////fixbug 121378, truyền auto null dc(tín bảo thế :)) )
 							y.getItemId()))
 					.collect(Collectors.toList()).stream().filter(distinctByKey(p -> p.itemId()))
 					.collect(Collectors.toList());

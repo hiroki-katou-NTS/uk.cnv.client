@@ -23,7 +23,9 @@ import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.CreateFlowMenuReposi
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.FileAttachmentSetting;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.FixedClassification;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.FlowMenuLayout;
+import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.ImageInformation;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.ImageSetting;
+import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.MenuSetting;
 import nts.uk.shr.com.context.AppContexts;
 
 @Stateless
@@ -68,11 +70,22 @@ public class CopyFileCommandHandler extends CommandHandlerWithResult<CopyFileCom
 		}
 		// Loop all 画像設定 to copy uploaded images
 		for (ImageSetting imageSetting : layout.getImageSettings()) {
-			if (imageSetting.getIsFixed().equals(FixedClassification.RANDOM)
-					&& imageSetting.getFileId().isPresent()) {
-				String fileId = imageSetting.getFileId().get();
-				imageSetting.setFileId(Optional.ofNullable(this.createFlowMenuFileService.copyFile(fileId)));
-				fileMap.put(fileId, imageSetting.getFileId().orElse(""));
+			if (imageSetting.getImageInformation().getIsFixed().equals(FixedClassification.RANDOM)
+					&& imageSetting.getImageInformation().getFileId().isPresent()) {
+				String fileId = imageSetting.getImageInformation().getFileId().get();
+				imageSetting.getImageInformation()
+						.setFileId(Optional.ofNullable(this.createFlowMenuFileService.copyFile(fileId)));
+				fileMap.put(fileId, imageSetting.getImageInformation().getFileId().orElse(""));
+			}
+		}
+		// Loop all メニュー設定 to copy uploaded images
+		for (MenuSetting menuSetting : layout.getMenuSettings()) {
+			if (!menuSetting.getImageInformation().isPresent()) continue;
+			ImageInformation imageInfo = menuSetting.getImageInformation().get();
+			if (imageInfo.getIsFixed().equals(FixedClassification.RANDOM) && imageInfo.getFileId().isPresent()) {
+				String fileId = imageInfo.getFileId().get();
+				imageInfo.setFileId(Optional.ofNullable(this.createFlowMenuFileService.copyFile(fileId)));
+				fileMap.put(fileId, imageInfo.getFileId().orElse(""));
 			}
 		}
 		// Copy フローメニューレイアウト fileId

@@ -39,6 +39,7 @@ import nts.uk.ctx.at.shared.dom.worktime.common.GetSubHolOccurrenceSetting;
 import nts.uk.ctx.at.shared.dom.worktime.common.OneDayTime;
 import nts.uk.ctx.at.shared.dom.worktime.common.SubHolTransferSet;
 import nts.uk.ctx.at.shared.dom.worktime.common.SubHolTransferSetAtr;
+import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimezoneCommonSet;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimezoneOtherSubHolTimeSet;
 import nts.uk.ctx.at.shared.dom.worktime.flowset.FlowWorkHolidayTimeZone;
 import nts.uk.ctx.at.shared.dom.worktype.AttendanceDayAttr;
@@ -947,5 +948,27 @@ public class HolidayWorkTimeSheet{
 				}
 			}
 		}
+	}
+	
+	/**
+	 * 重複する時間帯で作り直す
+	 * @param timeSpan 時間帯
+	 * @param commonSet 就業時間帯の共通設定
+	 * @return 休日出勤時間帯
+	 */
+	public Optional<HolidayWorkTimeSheet> recreateWithDuplicate(TimeSpanForDailyCalc timeSpan, Optional<WorkTimezoneCommonSet> commonSet) {
+		List<HolidayWorkFrameTimeSheetForCalc> duplicate = this.workHolidayTime.stream()
+				.filter(t -> t.getTimeSheet().checkDuplication(timeSpan).isDuplicated())
+				.collect(Collectors.toList());
+		
+		List<HolidayWorkFrameTimeSheetForCalc> recreated = duplicate.stream()
+					.map(f -> f.recreateWithDuplicate(timeSpan, commonSet))
+					.filter(f -> f.isPresent())
+					.map(f -> f.get())
+					.collect(Collectors.toList());
+		if(recreated.isEmpty()) {
+			Optional.empty();
+		}
+		return Optional.of(new HolidayWorkTimeSheet(recreated));
 	}
 }

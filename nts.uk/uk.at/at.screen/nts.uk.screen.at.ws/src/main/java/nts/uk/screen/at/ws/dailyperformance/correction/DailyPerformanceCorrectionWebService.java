@@ -33,9 +33,11 @@ import nts.uk.ctx.at.function.app.find.dailyperformanceformat.MonthlyPerfomanceA
 import nts.uk.ctx.at.record.app.find.dailyperform.DailyRecordDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyRecordWorkDto;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.adapter.attendanceitemname.AttItemName;
+import nts.uk.ctx.bs.employee.pub.workplace.master.WorkplacePub;
 import nts.uk.ctx.bs.employee.dom.employee.service.SearchEmployeeService;
 import nts.uk.ctx.bs.employee.dom.employee.service.dto.EmployeeSearchData;
 import nts.uk.ctx.bs.employee.dom.employee.service.dto.EmployeeSearchDto;
+
 import nts.uk.screen.at.app.dailymodify.command.DailyCalculationRCommandFacade;
 import nts.uk.screen.at.app.dailymodify.command.DailyModifyRCommandFacade;
 import nts.uk.screen.at.app.dailymodify.command.PersonalTightCommandFacade;
@@ -61,6 +63,8 @@ import nts.uk.screen.at.app.dailyperformance.correction.dto.DatePeriodInfo;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.EmpAndDate;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.ErAlWorkRecordShortDto;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.ErrorReferenceDto;
+import nts.uk.screen.at.app.dailyperformance.correction.dto.GetWkpIDOutput;
+import nts.uk.screen.at.app.dailyperformance.correction.dto.GetWkpIDParam;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.HolidayRemainNumberDto;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.cache.DPCorrectionStateParam;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.calctime.DCCalcTime;
@@ -170,6 +174,9 @@ public class DailyPerformanceCorrectionWebService {
 	@Inject
 	private DPCorrectionProcessorMob dpCorrectionProcessorMob;
 	
+	@Inject
+	private WorkplacePub workplacePub;
+
 	@Inject
 	private SearchEmployeeService searchEmployeeService;
 	
@@ -548,14 +555,14 @@ public class DailyPerformanceCorrectionWebService {
 				errorParam.getEmployeeIDLst(), 
 				errorParam.getAttendanceItemID());
 	}
-	
+
 	@POST
 	@Path("getMasterDialogMob")
 	public Map<Integer, List<CodeName>> getMasterDialog(MasterDialogParam masterDialogParam) {
 		String companyID = AppContexts.user().companyId();
 		Map<Integer, Map<String, CodeName>> allMasterData = dialogProcessor.getAllCodeNameWT(
 				masterDialogParam.getTypes(),
-				companyID,
+				companyID,				
 				masterDialogParam.getEmployeeID(),
 				masterDialogParam.getWorkTypeCD(),
 				masterDialogParam.getDate());
@@ -563,8 +570,41 @@ public class DailyPerformanceCorrectionWebService {
 	}
 	
 	@POST
+	@Path("getMasterTaskSupMob")
+	public Map<Integer, List<CodeName>> getMasterTaskSup(MasterDialogParam masterDialogParam) {
+		Map<Integer, Map<String, CodeName>> allMasterData = dialogProcessor.getAllCodeNameByItemId(				
+				masterDialogParam.getDate(), 
+				masterDialogParam.getItemIds());
+		return allMasterData.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> new ArrayList<CodeName>(entry.getValue().values())));
+	}
+
+	
+	@POST
 	@Path("getPrimitiveAll")
 	public Map<Integer, String> getPrimitiveAll() {
 		return DPHeaderDto.getPrimitiveAll();
+	}
+	
+	@SuppressWarnings("unchecked")
+    @POST
+	@Path("findWplIDByCode")
+	public GetWkpIDOutput findWplIDByCode(GetWkpIDParam param) {
+	    val domain  = session.getAttribute("domainEdits");
+        List<DailyRecordDto> dailyEdits = new ArrayList<>();
+        if(domain == null){
+            dailyEdits = cloneListDto((List<DailyRecordDto>) session.getAttribute("domainOlds"));
+        }else{
+            dailyEdits = (List<DailyRecordDto>) domain;
+        }
+        
+        Optional<DailyRecordDto> dailyEditOpt = dailyEdits.stream().filter(x -> {
+            return x.getDate().toString("yyyy/MM/dd").equals(param.getBaseDate());
+        }).findFirst();
+        
+        return new GetWkpIDOutput(dailyEditOpt.map(x -> x.getAffiliationInfo().getWorkplaceID()).orElse(null));
+//	    return new GetWkpIDOutput(workplacePub.getWkpNewByCdDate(
+//	            param.getCompanyId(), 
+//	            param.getWkpCode(), 
+//	            GeneralDate.fromString(param.baseDate, "yyyy/MM/dd")).orElse(null));
 	}
 }

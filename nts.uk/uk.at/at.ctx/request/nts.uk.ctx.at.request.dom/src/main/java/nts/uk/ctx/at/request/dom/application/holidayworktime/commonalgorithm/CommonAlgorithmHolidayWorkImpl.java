@@ -484,8 +484,8 @@ public class CommonAlgorithmHolidayWorkImpl implements ICommonAlgorithmHolidayWo
 			.filter(empInfo -> empInfo.getSid().equals(empId)).findFirst();
 			
 			//	事前内容の取得
-			List<PreAppContentDisplay> preAppContentDisplayLst = collectAchievement.getPreAppContents(companyId, empId, 
-					Arrays.asList(empAppHolidayWork.getApplication().getAppDate().getApplicationDate()), empAppHolidayWork.getApplication().getAppType());
+			List<PreAppContentDisplay> preAppContentDisplayLst = collectAchievement.getPreAppContents(companyId, empId,
+					Arrays.asList(empAppHolidayWork.getApplication().getAppDate().getApplicationDate()), empAppHolidayWork.getApplication().getAppType(), Optional.empty());
 			//	実績内容の取得
 			List<ActualContentDisplay> actualContentDisplayLst = collectAchievement.getAchievementContents(companyId, empId, 
 					Arrays.asList(empAppHolidayWork.getApplication().getAppDate().getApplicationDate()), empAppHolidayWork.getApplication().getAppType());

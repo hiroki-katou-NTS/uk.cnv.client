@@ -5,3 +5,14 @@
 #dialogClose {
 	margin-left: 10px;
 }
+
+input button{
+	margin-left: 6px;
+}
+.ui-iggrid table tr td, .ui-iggrid table tr th {
+    font-size: 12px !important ;
+   
+}
+span{
+	font-size: 12px !important;
+}

@@ -236,10 +236,15 @@ module nts.uk.at.view.ksu001.q {
             }
 
             private validateAll(): boolean {
-                $('#extBudgetTime').ntsEditor('validate');
-                $('#extBudgetMoney').ntsEditor('validate');
-                $('#extBudgetNumberPerson').ntsEditor('validate');
-                $('#extBudgetNumericalVal').ntsEditor('validate');
+				let self = this;
+				if(self.check()){
+                	$('#extBudgetTime').ntsEditor('validate');
+				}
+				if(self.check1()){
+                	$('#extBudgetMoney').ntsEditor('validate');
+				}
+                //$('#extBudgetNumberPerson').ntsEditor('validate');
+                //$('#extBudgetNumericalVal').ntsEditor('validate');
                 if (nts.uk.ui.errors.hasError()) {
                     return true;
                 }

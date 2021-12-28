@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+	<ui:composition template="/master/dialog.xhtml">
+		<ui:define name="htmlHead">
+			<script>var dialogSize = { width: 500, height: 510 };</script>
+			<com:scriptfile set="IGNITE" />
+			<com:ValidatorScript>
+				nts.uk.ctx.at.shared.dom.common.time.AttendanceTime
+			</com:ValidatorScript>
+
+			<com:scriptfile path="../share/functional.js" />
+			<com:stylefile path="./kdw013.e.css" />
+			<com:scriptfile path="./kdw013.e.vm.js" />
+		</ui:define>
+		<ui:define name="content">
+			<div id="contents-area" class="kdw-013-e">
+				<!--E1_1-->
+				<div class="panel panel-frame panel-width" id="panel-e">
+					<table>
+						<colgroup>
+							<col width="123px" />
+						</colgroup>
+						<tbody>
+							<tr>
+								<!-- E2_1 -->
+								<td>
+									<div data-bind="ntsFormLabel: {required: true, constraint: 'AttendanceTime'}">#{i18n.getText('KDW013_27')}</div>
+								</td>
+								<td>
+									<!-- E2_2 開始時刻 -->
+									<input tabindex="1"  id="editor-start"
+									data-bind="ntsTimeEditor: { 
+											mode: 'time',  
+											value:  startTime,
+											inputFormat: 'time', 
+											name: '#[KDW013_14]',
+											option: { width: '39px' },
+											required: true,
+											constraint: 'AttendanceTime'
+										}" />
+									<!-- E2_3 終了時刻-->
+									<span data-bind="i18n: 'KDW013_30'"></span>
+									<input tabindex="2"
+									data-bind="ntsTimeEditor: { 
+											mode: 'time',  
+											value:  endTime, 
+											inputFormat: 'time', 
+											name: '#[KDW013_31]',
+											option: { width: '39px' },
+											required: true,
+											constraint: 'AttendanceTime'
+										}" />
+								</td>
+							</tr>
+							<tr>
+								<!-- E3_1 作業時間 -->
+								<td>
+									<div data-bind="ntsFormLabel: {required: true, constraint: 'AttendanceTime'}">#{i18n.getText('KDW013_25')}</div>
+								</td>
+								<td> 
+									<input tabindex="3" 
+									data-bind="ntsTimeEditor: { 
+											mode: 'time',  
+											value: totalTime, 
+											inputFormat: 'time', 
+											name: '#[KDW013_25]',
+											option: { width: '39px' },
+											required: true,
+											constraint: 'AttendanceTime'
+										}" />
+								</td>
+							</tr>
+							<tr>
+								<!-- E4_1 -->
+								<td>
+                                	<div data-bind="ntsFormLabel: {required: true}, text: setTaskName1"></div>
+                                </td>
+								<!-- E4_2 -->
+								<!-- E4_3 -->
+								<td>
+									<div class="task-combobox" id="task-combobox1" style="vertical-align: bottom;" tabindex="4" 
+									data-bind="ntsComboBox: {
+										name: setTaskName1,
+										options: taskLst1,
+										optionsValue: 'taskCode',
+										optionsText: 'taskName',
+										value: selectedTaskCD1,
+										required: true,
+										visibleItemsCount: 10,
+										editable: true,
+									}"></div>
+								</td>
+							</tr>
+							<com:ko-if bind="useTask2">
+								<tr>
+									<!-- E6_1 -->
+									<td>
+                                		<div data-bind="ntsFormLabel: {}, text: setTaskName2"></div>
+                                	</td>
+									<!-- E6_2 -->
+									<!-- E6_3 -->
+									<td>
+										<div class="task-combobox" style="vertical-align: bottom;" tabindex="5" 
+										data-bind="ntsComboBox: {
+											name: setTaskName2,
+											options: taskLst2,
+											optionsValue: 'taskCode',
+											optionsText: 'taskName',
+											value: selectedTaskCD2,
+											visibleItemsCount: 10,
+											editable: true,
+									}"></div>
+									</td>
+								</tr>
+							</com:ko-if>
+							<com:ko-if bind="useTask3">
+								<tr>
+									<!-- E7_1 -->
+									<td>
+                                		<div data-bind="ntsFormLabel: {}, text: setTaskName3"></div>
+                                	</td>
+									<!-- E7_2 -->
+									<!-- E7_3 -->
+									<td>
+										<div class="task-combobox" style="vertical-align: bottom;" tabindex="6" 
+										data-bind="ntsComboBox: {
+											name: setTaskName3,
+											options: taskLst3,
+											optionsValue: 'taskCode',
+											optionsText: 'taskName',
+											value: selectedTaskCD3,
+											visibleItemsCount: 10,
+											editable: true,
+									}"></div>
+									</td>
+								</tr>
+							</com:ko-if>
+							<com:ko-if bind="useTask4">
+								<tr>
+									<!-- E8_1 -->
+									<td>
+                                		<div data-bind="ntsFormLabel: {}, text: setTaskName4"></div>
+                                	</td>
+									<!-- E8_2 -->
+									<!-- E8_3 -->
+									<td>
+										<div class="task-combobox" style="vertical-align: bottom;" tabindex="7" 
+										 data-bind="ntsComboBox: {
+											name: setTaskName4,
+											options: taskLst4,
+											optionsValue: 'taskCode',
+											optionsText: 'taskName',
+											value: selectedTaskCD4,
+											visibleItemsCount: 10,
+											editable: true,
+									}"></div>
+									</td>
+								</tr>
+							</com:ko-if>
+							<com:ko-if bind="useTask5">
+								<tr>
+									<!-- E8_1 -->
+									<td>
+                                		<div data-bind="ntsFormLabel: {}, text: setTaskName5"></div>
+                                	</td>
+									<!-- E8_2 -->
+									<!-- E8_3 -->
+									<td>
+										<div class="task-combobox" style="vertical-align: bottom;" tabindex="8" 
+										data-bind="ntsComboBox: {
+											name: setTaskName5,
+											options: taskLst5,
+											optionsValue: 'taskCode',
+											optionsText: 'taskName',
+											value: selectedTaskCD5,
+											visibleItemsCount: 10,
+											editable: true,
+									}"></div>
+									</td>
+								</tr>
+							</com:ko-if>
+						
+						</tbody>
+
+					</table>
+				</div>
+			</div>
+
+			<div id="functions-area-bottom" class="kdw013-function">
+				<button tabindex = "9" class="proceed normal" data-bind="i18n: 'KDW013_43', click: $vm.decide, enable: $root.errors.isEmpty "></button>
+				<button tabindex = "10" class="normal" data-bind="i18n: 'KDW013_37', click: $vm.close"></button>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+
+</html>

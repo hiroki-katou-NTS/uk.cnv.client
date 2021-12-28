@@ -231,6 +231,7 @@ module nts.uk.com.view.cdl023.a.viewmodel {
                     keyCancel = 'CDL009Cancel';
 
                     // set data share
+                    self.paramMsg1540 = '勤務種別';
                     shareData.codeList = listToDialog;
                     break;
 

@@ -39,8 +39,9 @@ public class JpaMonPerformanceFunRepository extends JpaRepository implements Mon
     @Override
     public void update(MonPerformanceFun domain){
         KrcmtMonPerformanceFun newMonPerformanceFun = KrcmtMonPerformanceFun.toEntity(domain);
-        KrcmtMonPerformanceFun updateMonPerformanceFun = this.queryProxy().find(newMonPerformanceFun.monPerformanceFunPk, KrcmtMonPerformanceFun.class).get();
+        KrcmtMonPerformanceFun updateMonPerformanceFun = this.queryProxy().find(newMonPerformanceFun.monPerformanceFunPk, KrcmtMonPerformanceFun.class).orElse(null);
         if (null == updateMonPerformanceFun) {
+        	this.add(domain);
             return;
         }
         updateMonPerformanceFun.comment = newMonPerformanceFun.comment;

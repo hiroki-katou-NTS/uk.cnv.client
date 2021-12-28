@@ -28,7 +28,7 @@ public class JpaWorkHoursFilterConditionRepository extends JpaRepository impleme
 
 	private KshmtWtSearchCondition toEntity(WorkHoursFilterCondition domain) {
 		KshmtWtSearchConditionPK pk = new KshmtWtSearchConditionPK(domain.getCid(), domain.getNo().v());
-		return new KshmtWtSearchCondition(pk, domain.getNotUseAtr().value,
+		return new KshmtWtSearchCondition(pk, domain.getNotUseAtr().isUse(),
 				domain.getName().map(WorkHoursFilterConditionName::v).orElse(null));
 	}
 

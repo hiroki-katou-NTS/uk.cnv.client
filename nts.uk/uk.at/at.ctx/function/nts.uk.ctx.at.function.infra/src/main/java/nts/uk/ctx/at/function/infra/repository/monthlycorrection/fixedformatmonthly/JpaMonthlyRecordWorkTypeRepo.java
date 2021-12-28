@@ -18,6 +18,7 @@ import nts.uk.ctx.at.function.infra.entity.monthlycorrection.fixedformatmonthly.
 import nts.uk.ctx.at.function.infra.entity.monthlycorrection.fixedformatmonthly.KrcmtMonthlyActualResultRC;
 import nts.uk.ctx.at.function.infra.entity.monthlycorrection.fixedformatmonthly.KrcmtMonthlyActualResultRCPK;
 import nts.uk.ctx.at.function.infra.entity.monthlycorrection.fixedformatmonthly.KrcmtMonthlyRecordWorkType;
+import nts.uk.ctx.at.shared.dom.workrule.businesstype.BusinessTypeCode;
 
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 @Stateless
@@ -27,6 +28,8 @@ public class JpaMonthlyRecordWorkTypeRepo extends JpaRepository implements Month
 
 	private static final String GET_MON_BY_CODE = GET_ALL_MON + " AND a.krcmtMonthlyRecordWorkTypePK.businessTypeCode = :businessTypeCode";
 	private static final String GET_MON_BY_LIST_CODE = GET_ALL_MON + " AND a.krcmtMonthlyRecordWorkTypePK.businessTypeCode IN :businessTypeCode";
+	
+	private static final String GET_BY_LISTCODE = "SELECT a FROM KrcmtMonthlyRecordWorkType a WHERE a.krcmtMonthlyRecordWorkTypePK.companyID = :companyId and a.krcmtMonthlyRecordWorkTypePK.businessTypeCode IN :listCode";
 
 	@Override
 	public List<MonthlyRecordWorkType> getAllMonthlyRecordWorkType(String companyID) {
@@ -150,5 +153,37 @@ public class JpaMonthlyRecordWorkTypeRepo extends JpaRepository implements Month
 			}
 		}
 	}
+
+	@Override
+	public void copy(String companyId, String businessTypeCode, List<String> listBusinessTypeCode) {
+		
+		MonthlyRecordWorkType selectedDomain = this.getMonthlyRecordWorkTypeByCode(companyId, businessTypeCode).get();
+		
+		List<KrcmtMonthlyRecordWorkType> listEntity = this.queryProxy().query(GET_BY_LISTCODE, KrcmtMonthlyRecordWorkType.class)
+				.setParameter("companyId", companyId)
+				.setParameter("listCode", listBusinessTypeCode)
+				.getList();
+		
+		if (!listEntity.isEmpty()) {
+			this.commandProxy().removeAll(listEntity);
+			this.getEntityManager().flush();
+		}
+		
+		
+//		List<KrcmtMonthlyRecordWorkType> copyList = listEntity.stream()
+//						.map(e -> e.copyDomain(selectedDomain))
+//						.map(e -> KrcmtMonthlyRecordWorkType.toEntity(e))
+//						.collect(Collectors.toList());
+		
+		List<KrcmtMonthlyRecordWorkType> copyList = listBusinessTypeCode.stream()
+				.map(e -> new MonthlyRecordWorkType(selectedDomain.getCompanyID(), new BusinessTypeCode(e), selectedDomain.getDisplayItem()))
+				.map(e -> KrcmtMonthlyRecordWorkType.toEntity(e))
+				.collect(Collectors.toList());
+		
+		this.commandProxy().insertAll(copyList);
+		
+	}
+
+	
 
 }

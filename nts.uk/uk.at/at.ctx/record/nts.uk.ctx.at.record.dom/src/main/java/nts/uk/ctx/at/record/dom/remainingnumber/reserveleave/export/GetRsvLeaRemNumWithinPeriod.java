@@ -374,7 +374,7 @@ public class GetRsvLeaRemNumWithinPeriod {
 		AtomicInteger grantNumber = new AtomicInteger(0);
 		grantTotal.entrySet().stream().forEach(x -> {
 			// 積立年休付与WORKを作成 → 端数処理
-			GrantWork grantWork = GrantWork.of(x.getKey(), new LeaveGrantDayNumber(x.getValue()),
+			GrantWork grantWork = GrantWork.of(x.getKey().addDays(1), new LeaveGrantDayNumber(x.getValue()),
 					grantNumber.incrementAndGet());
 
 			// 積立年休付与WORKに追加

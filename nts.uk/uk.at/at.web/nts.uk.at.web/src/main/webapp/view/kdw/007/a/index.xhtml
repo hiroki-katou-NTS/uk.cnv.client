@@ -29,14 +29,28 @@
 			
 			<ui:define name="content">
 				<div id="functions-area">
-					<a class="goback" tabindex="4" data-bind="ntsLinkButton: { action: jumpTo.bind($data, sideBar) }">#{i18n.getText('KDW007_17')}</a>
-					<button tabindex="1" data-bind="click: setNewMode">#{i18n.getText('KDW007_2')}</button>
-					<button id="register-button" class="proceed" tabindex="2"  data-bind="click: update, enable: $root.errors.isEmpty">#{i18n.getText('KDW007_3')}</button>
-					<button id = "delete-button" class="danger" tabindex="3" data-bind="click: remove, enable: !isNewMode() &amp;&amp; showTypeAtr() != 1 ">#{i18n.getText('KDW007_4')}</button>
+					<!--A1_6-->
+					<a class="goback" tabindex="4"
+									data-bind="ntsLinkButton: { action: jumpTo }">#{i18n.getText('KDW007_17')}</a>
+					<!--A1_1-->
+					<button tabindex="1"
+									data-bind="click: setNewMode">#{i18n.getText('KDW007_2')}</button>
+					<!--A1_2-->
+					<button id="register-button" class="proceed" tabindex="2"
+									data-bind="click: update, enable: $root.errors.isEmpty">#{i18n.getText('KDW007_3')}</button>
+					<!--A1_3-->
+					<button id = "delete-button" class="danger" tabindex="3" 
+									data-bind="click: remove, enable: !isNewMode() &amp;&amp; showTypeAtr() != 1 ">#{i18n.getText('KDW007_4')}</button>
+					<!--A1_4-->
+					<com:ko-if bind="screenMode() == 0">
+						<button id = "copy-button" class="normal" 
+										data-bind="if: screenMode() === 0, click: duplicate, enable:  !isNewMode() &amp;&amp; showTypeAtr() != 1 ">#{i18n.getText('KDW007_112')}</button>
+					</com:ko-if>
 				</div>
 				<div id="contents-area" class="fixed-flex-layout">
 					<div class="fixed-flex-layout-left">
 						<com:ko-if bind="screenMode() == 0">
+							<!--A11_1, A11_2-->
 							<div id="showtypeCbb" tabindex="6" data-bind="ntsComboBox: {
 								options: enumShowTypeAtr,
 								optionsValue: 'code',
@@ -47,6 +61,7 @@
 									{ prop: 'name', length: 10 },
 								]}"></div><br/>
 						</com:ko-if>
+						<!--A2_1, A2_2, A2_3, A2_4, A2_5-->
 						<table id="lstErrorAlarm" tabindex="5" data-bind="ntsGridList: {								
 							height: 370,
 							dataSource: lstFilteredData,
@@ -59,7 +74,9 @@
 					
 					<div class="fixed-flex-layout-right">
 						<div class="valign-center control-group">
+							<!--A3_1-->
 							<div  data-bind="ntsFormLabel: { constraint: 'ErrorAlarmWorkRecordCodeNewMode', required: true}">#{i18n.getText('KDW007_6')}</div>
+							<!--A3_2-->
 							<input id="errorAlarmWorkRecordCode" class="need-check" tabindex="7" data-bind="ntsTextEditor: {
 								name: '#[KDW007_6]',
 								value: selectedErrorAlarm().code,
@@ -67,7 +84,9 @@
 								required: true,
 								enable: isNewMode
 								}" />
+							<!--A3_3-->
 							<div id="labelName" data-bind="ntsFormLabel: { constraint: 'ErrorAlarmWorkRecordName', required: true}">#{i18n.getText('KDW007_7')}</div>
+							<!--A3_4-->
 							<input id="errorAlarmWorkRecordName" tabindex="8" class="need-check" data-bind="ntsTextEditor: {
 							    name: '#[KDW007_7]',
 								value: selectedErrorAlarm().name,
@@ -76,8 +95,10 @@
 								enable: true
 								}" />
 						</div>
-						<div class="valign-center control-group d-flex">	
+						<div class="valign-center control-group d-flex">
+							<!--A3_5-->	
 							<div id="labelUseAtr" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KDW007_8')}</div>
+							<!--A3_6-->
 							<div id="useAtr" class="cf" tabindex="9" data-bind="ntsSwitchButton: {
 								options: listUseAtr,
 								optionsValue: 'code',
@@ -85,30 +106,38 @@
 								value: selectedErrorAlarm().useAtr,
 								enable: true }"></div>
 						</div>
+						<!--A4_1-->
 						<div id="tab-panel"  tabindex="10" data-bind="ntsTabPanel: { dataSource: tabs, active: selectedTab}">
-							<!-- Tab 1 -->
+							<!-- Tab 1 --> <!--A4_2-->
 							<div class="settingTab">
 								<div class="valign-center control-group d-flex">
+									<!--A4_6-->
 									<div id="type-label" data-bind="ntsFormLabel: {}">#{i18n.getText('KDW007_10')}</div>
+									<!--A4_7-->
 									<div id="typeAtr" class="cf" data-bind="ntsSwitchButton: {
 										options: listTypeAtr,
 										optionsValue: 'code',
 										optionsText: 'name',
 										value: selectedErrorAlarm().typeAtr,
-										enable: selectedErrorAlarm().fixedAtr() != 1 }"></div>
+										enable: ko.computed(function(){return selectedErrorAlarm().fixedAtr() != 1}, this) }"></div>
 								</div>
-									
+								<!--A4_22-->
 								<div class="label" id="noticed-label">#{i18n.getText('KDW007_91')}</div>
 								
 								<div class="valign-center control-group d-flex">
+									<!--A4_23-->
 									<div id="remark-cancel-label" data-bind="ntsFormLabel: {}">#{i18n.getText('KDW007_105')}</div>
+									<!--A4_24-->
 									<div id="remarkCancelErrorInput" class="cf" data-bind="ntsSwitchButton: {
 										options: listRemarkCancelErrorInput,
 										optionsValue: 'code',
 										optionsText: 'name',
-										value: selectedErrorAlarm().remarkCancelErrorInput,
-										enable: selectedErrorAlarm().fixedAtr() != 1 &amp;&amp; selectedErrorAlarm().typeAtr() != 2  }"></div>
+										enable: ko.computed(function(){return selectedErrorAlarm().fixedAtr() != 1 &amp;&amp; selectedErrorAlarm().typeAtr() != 2}, this),
+										value: selectedErrorAlarm().remarkCancelErrorInput
+										  }"></div>
+									<!--A4_25-->
 									<div id="remark-no-label" data-bind="ntsFormLabel: {}">#{i18n.getText('KDW007_106')}</div>
+									<!--A4_26-->
 									<div id="remarkColumnNo" data-bind="ntsComboBox: {
 										options: listRemarkColumnNo,
 										optionsValue: 'code',
@@ -123,15 +152,17 @@
 										]}"></div>
 								</div>
 								<div class="valign-center control-group">
+									<!--A4_8-->
 									<div id="color-display-target-item-label" data-bind="ntsFormLabel: {}">#{i18n.getText('KDW007_11')}</div>
-									<button id="color-display-target-item-button" data-bind="click:openSelectAtdItemColorDialog, enable: isAtdItemColor">#{i18n.getText('KDW007_12')}</button>
+									<!--A4_9-->
+									<button id="color-display-target-item-button" data-bind="click:openSelectAtdItemColorDialog, enable: selectedErrorAlarm().typeAtr() != 2 &amp;&amp; (isNewMode() === true  || selectedErrorAlarm().fixedAtr() != 1) ">#{i18n.getText('KDW007_12')}</button>
+									<!-- ver22_enable: <button id="color-display-target-item-button" data-bind="click:openSelectAtdItemColorDialog, enable: isAtdItemColor">#{i18n.getText('KDW007_12')}</button> -->
+									<!--A4_10-->
 									<span id="color-display-target-item-span" data-bind="text: selectedErrorAlarm().errorDisplayItemName"></span>
 								</div>
-								<div class="valign-center control-group">
-									<div id="color-label" data-bind="ntsFormLabel: {}">#{i18n.getText('KDW007_13')}</div>
-									<div id="colorpicker" data-bind="ntsColorPicker: {value: selectedErrorAlarm().messageColor, enable: selectedErrorAlarm().typeAtr() != 2, width: 100}"/>
-								</div>
+								<!--A4_13-->
 								<div id="message-label" data-bind="ntsFormLabel: {constraint: 'DisplayMessage', required: false }">#{i18n.getText('KDW007_14')}</div>
+								<!--A4_14-->
 								<textarea id="messageDisplay" class="need-check" data-bind="ntsMultilineEditor: { 
 								    name: '#[KDW007_14]',
 									value: selectedErrorAlarm().displayMessage, 
@@ -139,12 +170,19 @@
 									required: false, 
 									resizeable: false,
 									enable: selectedErrorAlarm().typeAtr()!=2 }" /><br/>
-								<div id="boldAtr" data-bind="ntsCheckBox: { checked: selectedErrorAlarm().boldAtr, 
+								<div class="valign-center control-group" style="margin-top: 10px;">
+									<!--A4_11-->
+									<div id="color-label" style="margin-top: 5px;" data-bind="ntsFormLabel: {}">#{i18n.getText('KDW007_13')}</div>
+									<!--A4_12-->
+									<div id="colorpicker" data-bind="ntsColorPicker: {value: selectedErrorAlarm().messageColor, enable: selectedErrorAlarm().typeAtr() != 2, width: 100}"/>
+									<!--A4_15-->
+									<div id="boldAtr" data-bind="ntsCheckBox: { checked: selectedErrorAlarm().boldAtr, 
 																	enable: selectedErrorAlarm().typeAtr()!=2, 
 																	text: '#{i18n.getText('KDW007_15')}' }"></div>
+								</div>
 							</div>
 							<!-- End Tab 1 -->
-							<!-- Tab 2 -->
+							<!-- Tab 2 --> <!--A4_3-->
 							<div class="checkScopeTab">
 								<table class="table-template">
 								      <col width="50"/>
@@ -197,14 +235,17 @@
 																					    	required: selectedErrorAlarm().alCheckTargetCondition.filterByJobTitle}" />
 									    </td>
 									  </tr>
-									  <tr>
-									    <td>
+									  <tr data-bind="if: ootsukaOption() === true">
+									    <!--A5_14-->
+										<td>
 									    	<div id="chkFilterBusinessType" data-bind="ntsCheckBox: { 
 									    						checked: selectedErrorAlarm().alCheckTargetCondition.filterByBusinessType }"></div>
 									    </td>
+										<!--A5_15-->
 									    <td>
 									    	<button data-bind="click: chooseBusinessType, enable: true">#{i18n.getText('KDW007_58')}</button>
 									    </td> 
+										<!--A5_16-->
 									    <td>
 									    	<input id="displayLstBusinessType" class="display-list-label need-check" data-bind="ntsTextEditor: {name: '#[KDW007_58]',value: selectedErrorAlarm().alCheckTargetCondition.displayLstBusinessType, 
 																					    	readonly: true, 
@@ -214,7 +255,7 @@
 								</table>
 							</div>
 							<!-- End Tab 2 -->
-							<!-- Tab 3 -->
+							<!-- Tab 3 --> <!--A4_4-->
 							<div class="conditionSettingTab1">
 								<table class="table-template">
 									<col width="150"/>
@@ -357,7 +398,7 @@
 								</table>
 							</div>
 							<!-- End Tab 3 -->
-							<!-- Tab 4 -->
+							<!-- Tab 4 --> <!-- A4_5 -->
 							<div class="conditionSettingTab2">
 								<span>#{i18n.getText('KDW007_68')}</span><br/>
 								<table class="table-template">
@@ -521,11 +562,11 @@
 								</table>
 							</div>
 							<!-- End Tab 4 -->
-							<!-- Tab 5 -->
+							<!-- Tab 5 --> <!-- A4_16-->
 							<div class="applicationTab">
 								<span>#{i18n.getText('KDW007_80')}</span><br/>
 								<table id="application-type-grid-list" data-bind="ntsGridList: {
-									height: 312,
+									height: 335,
 									options: lstApplicationType,
 									optionsValue: 'code',
 									columns: appTypeGridlistColumns,

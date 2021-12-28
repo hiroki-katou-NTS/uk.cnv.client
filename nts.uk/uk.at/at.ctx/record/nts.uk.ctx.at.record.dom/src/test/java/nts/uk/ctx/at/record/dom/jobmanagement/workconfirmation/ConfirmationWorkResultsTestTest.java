@@ -30,59 +30,32 @@ import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.taskmaster.TaskCode;
  */
 
 
-//@RunWith(JMockit.class)
+@RunWith(JMockit.class)
 public class ConfirmationWorkResultsTestTest {
 
-//	@Injectable
-//	private GetWorkAvailableToEmployeesService.Require require;
-//	
-//	private String companyID = "companyID";
-//	private String employeeID = "employeeID";
-//	private GeneralDate date = GeneralDate.today();
-//	private TaskFrameNo taskFrameNo = new TaskFrameNo(2);
-//	private TaskCode taskCodes = new TaskCode("taskCodes");
-//	
-//	private TaskFrameSetting taskFrameSetting = new TaskFrameSetting(new TaskFrameNo(2),
-//			new TaskFrameName("TaskFrameName"),
-//			EnumAdaptor.valueOf(1, UseAtr.class));
-//	
-//	private List<TaskFrameSetting> frameSettingList = new ArrayList<>();
-//	
-//	
-//	// require.getTask() == null
-////	@Test
-////	public void test() {
-////
-////		new Expectations() {
-////			{
-////				require.getTask();
-////			}
-////		};
-////		
-////		assertThat((GetWorkAvailableToEmployeesService.get(require, 
-////				companyID, 
-////				employeeID, 
-////				date, 
-////				taskFrameNo, 
-////				Optional.of(taskCodes)))
-////				.isEmpty()).isTrue();
-////	}
-//	
-//	
-//	//if $職場別作業の絞込.isNotPresent()	
+	@Injectable
+	private GetWorkAvailableToEmployeesService.Require require;
+	
+	private String companyID = "companyID";
+	private String employeeID = "employeeID";
+	private GeneralDate date = GeneralDate.today();
+	private TaskFrameNo taskFrameNo = new TaskFrameNo(2);
+	private TaskCode taskCodes = new TaskCode("taskCodes");
+	
+	private TaskFrameSetting taskFrameSetting = new TaskFrameSetting(new TaskFrameNo(2),
+			new TaskFrameName("TaskFrameName"),
+			EnumAdaptor.valueOf(1, UseAtr.class));
+	
+	private List<TaskFrameSetting> frameSettingList = new ArrayList<>();
+	
+	
+	// require.getTask() == null
 //	@Test
-//	public void test_1() {
-//		frameSettingList.add(taskFrameSetting);
-//		frameSettingList.add(taskFrameSetting);
-//		
-//		TaskFrameUsageSetting task = new TaskFrameUsageSetting(frameSettingList);
+//	public void test() {
 //
 //		new Expectations() {
 //			{
 //				require.getTask();
-//				result = task;
-//				
-//				require.findWpkIdsBySid(employeeID, date);
 //			}
 //		};
 //		
@@ -94,8 +67,35 @@ public class ConfirmationWorkResultsTestTest {
 //				Optional.of(taskCodes)))
 //				.isEmpty()).isTrue();
 //	}
-//	
-//	//if $職場別作業の絞込.isPresent()	
+	
+	
+	//if $職場別作業の絞込.isNotPresent()	
+	@Test
+	public void test_1() {
+		frameSettingList.add(taskFrameSetting);
+		frameSettingList.add(taskFrameSetting);
+		
+		TaskFrameUsageSetting task = new TaskFrameUsageSetting(frameSettingList);
+
+		new Expectations() {
+			{
+				require.getTask();
+				result = task;
+				
+				require.findWpkIdsBySid(employeeID, date);
+			}
+		};
+		
+		assertThat((GetWorkAvailableToEmployeesService.get(require, 
+				companyID, 
+				employeeID, 
+				date, 
+				taskFrameNo, 
+				Optional.of(taskCodes)))
+				.isEmpty()).isTrue();
+	}
+	
+	//if $職場別作業の絞込.isPresent()	
 //		@Test
 //		public void test_2() {
 //			frameSettingList.add(taskFrameSetting);

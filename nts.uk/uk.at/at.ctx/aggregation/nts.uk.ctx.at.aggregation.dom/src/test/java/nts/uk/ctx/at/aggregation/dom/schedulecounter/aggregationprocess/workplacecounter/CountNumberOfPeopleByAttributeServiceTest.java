@@ -335,6 +335,8 @@ public class CountNumberOfPeopleByAttributeServiceTest {
 					, Collections.emptyList()
 					, Optional.empty()
 					, Collections.emptyList()
+					, Collections.emptyList()
+					, Collections.emptyList()
 					, Optional.empty());
 		}
 

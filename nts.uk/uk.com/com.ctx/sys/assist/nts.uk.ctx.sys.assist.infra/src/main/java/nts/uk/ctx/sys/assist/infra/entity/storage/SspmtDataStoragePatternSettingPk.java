@@ -27,7 +27,7 @@ public class SspmtDataStoragePatternSettingPk implements Serializable {
 	 * パターン区分
 	 */
 	@Column(name = "PATTERN_ATR")
-	public boolean patternClassification;
+	public int patternClassification;
 	
 	/**
 	 * パターンコード

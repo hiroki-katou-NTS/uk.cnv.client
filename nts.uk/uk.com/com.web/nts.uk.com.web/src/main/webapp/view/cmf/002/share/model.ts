@@ -75,8 +75,8 @@ module nts.uk.com.view.cmf002.share.model {
     // }
     export enum CATEGORY_SETTING {
         /**
-       * 出力しない
-       */
+         * 出力しない
+         */
         CATEGORY_SETTING = 0,
         /**
          * データ系タイプ
@@ -85,11 +85,8 @@ module nts.uk.com.view.cmf002.share.model {
         /**
          * マスタ系タイプ(基準日のみ設定)
          */
-        MASTER_TYPE = 7,
-        /**
-         * マスタ系対ぴ(設定なし)
-         */
-        MASTER_SYSTEM = 8
+        MASTER_TYPE = 7
+
     }
 
 

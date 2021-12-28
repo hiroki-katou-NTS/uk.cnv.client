@@ -131,11 +131,23 @@ public class RemainCreateInforByScheDataImpl implements RemainCreateInforByScheD
 	// 勤務予定から日別勤怠(Work)を作成する
 	private IntegrationOfDaily toDailyDomain(WorkSchedule workSchedule) {
 		return new IntegrationOfDaily(workSchedule.getEmployeeID(), workSchedule.getYmd(), workSchedule.getWorkInfo(),
-				CalAttrOfDailyAttd.createAllCalculate(), workSchedule.getAffInfo(), Optional.empty(), new ArrayList<>(),
-				workSchedule.getOutingTime(), workSchedule.getLstBreakTime(), workSchedule.getOptAttendanceTime(),
-				workSchedule.getOptTimeLeaving(), workSchedule.getOptSortTimeWork(), Optional.empty(), Optional.empty(),
-				Optional.empty(), workSchedule.getLstEditState(), Optional.empty(), new ArrayList<>(),
-				Optional.empty());
+				CalAttrOfDailyAttd.createAllCalculate(), workSchedule.getAffInfo(), 
+				Optional.empty(),//pcLogOnInfo
+				new ArrayList<>(),//employeeError
+				workSchedule.getOutingTime(),
+				workSchedule.getLstBreakTime(),
+				workSchedule.getOptAttendanceTime(),
+				workSchedule.getOptTimeLeaving(),//
+				workSchedule.getOptSortTimeWork(), //
+				Optional.empty(),//specDateAttr
+				Optional.empty(),//attendanceLeavingGate
+				Optional.empty(), //anyItemValue
+				workSchedule.getLstEditState(), 
+				Optional.empty(),//tempTime
+				new ArrayList<>(),//remarks
+				new ArrayList<>(),//ouenTime
+				new ArrayList<>(),//ouenTimeSheet
+				Optional.empty());//snapshot
 	}
 
 	@AllArgsConstructor

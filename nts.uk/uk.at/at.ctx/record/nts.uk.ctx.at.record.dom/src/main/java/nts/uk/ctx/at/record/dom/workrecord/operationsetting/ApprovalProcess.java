@@ -18,10 +18,10 @@ public class ApprovalProcess extends AggregateRoot
     */
     private String cid;
     
-    /**
-     * 職位ID
-     */
-     private String jobTitleId;
+//    /**
+//     * 職位ID
+//     */
+//     private String jobTitleId;
      
     /**
     * 日の承認者確認を利用する
@@ -38,11 +38,11 @@ public class ApprovalProcess extends AggregateRoot
     */
     private YourselfConfirmError supervisorConfirmError;
     
-    public static ApprovalProcess createFromJavaType(String cid, String jobTitleId, 
+    public static ApprovalProcess createFromJavaType(String cid, 
 											    		int useDailyBossChk, 
 											    		int useMonthBossChk, 
 											    		Integer supervisorConfirmError){
-        ApprovalProcess  approvalProcess =  new ApprovalProcess(cid, jobTitleId, 
+        ApprovalProcess  approvalProcess =  new ApprovalProcess(cid,
         														useDailyBossChk, useMonthBossChk,  
         														supervisorConfirmError == null ? null : EnumAdaptor.valueOf(supervisorConfirmError, YourselfConfirmError.class));
         return approvalProcess;

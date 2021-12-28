@@ -96,6 +96,9 @@ public interface ApplicationRepository {
 	 * @return
 	 */
 	public List<Application> getByListDateReflectType(String sid, List<GeneralDate> dateData, List<Integer> reflect, List<Integer> appType);
+
+	List<Application> getByListDateReflectType2(String sid, List<GeneralDate> dateData, List<Integer> appTypes, List<Integer> reflectStatuses);
+
 	/**
 	 * 
 	 * @param sid

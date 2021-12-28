@@ -1,6 +1,8 @@
 package nts.uk.ctx.health.infra.api.entity.emoji.manage;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -10,7 +12,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.health.dom.emoji.manage.EmijiName;
 import nts.uk.ctx.health.dom.emoji.manage.EmojiStateDetail;
 import nts.uk.ctx.health.dom.emoji.manage.EmojiStateMng;
@@ -88,26 +89,28 @@ public class HhlmtMoodMgt extends UkJpaEntity
 	}
 
 	@Override
-	public void setEmojiStateSetting(EmojiStateDetail emojiStateSetting) {
-		this.manageEmojiState = emojiStateSetting.getEmojiType().value;
-		switch (emojiStateSetting.getEmojiType()) {
-		case WEARY:
-			this.wearyMoodName = emojiStateSetting.getEmijiName().v();
-			break;
-		case SAD:
-			this.sadMoodName = emojiStateSetting.getEmijiName().v();
-			break;
-		case AVERAGE:
-			this.averageMoodName = emojiStateSetting.getEmijiName().v();
-			break;
-		case GOOD:
-			this.goodMoodName = emojiStateSetting.getEmijiName().v();
-			break;
-		case HAPPY:
-			this.happyMoodName = emojiStateSetting.getEmijiName().v();
-			break;
-		default:
-			break;
+	public void setEmojiStateSetting(List<EmojiStateDetail> emojiStateSettings) {
+		for (EmojiStateDetail emojiStateSetting : emojiStateSettings) {
+			
+			switch (emojiStateSetting.getEmojiType()) {
+			case WEARY:
+				this.wearyMoodName = emojiStateSetting.getEmijiName().v();
+				break;
+			case SAD:
+				this.sadMoodName = emojiStateSetting.getEmijiName().v();
+				break;
+			case AVERAGE:
+				this.averageMoodName = emojiStateSetting.getEmijiName().v();
+				break;
+			case GOOD:
+				this.goodMoodName = emojiStateSetting.getEmijiName().v();
+				break;
+			case HAPPY:
+				this.happyMoodName = emojiStateSetting.getEmijiName().v();
+				break;
+			default:
+				break;
+			}
 		}
 	}
 
@@ -117,31 +120,51 @@ public class HhlmtMoodMgt extends UkJpaEntity
 	}
 
 	@Override
-	public EmojiStateDetail getEmojiStateSetting() {
-		String emijiName = "";
-		EmojiType emojiType = EnumAdaptor.valueOf(this.manageEmojiState, EmojiType.class);
-		switch (emojiType) {
-		case WEARY:
-			emijiName = this.wearyMoodName;
-			break;
-		case SAD:
-			emijiName = this.sadMoodName;
-			break;
-		case AVERAGE:
-			emijiName = this.averageMoodName;
-			break;
-		case GOOD:
-			emijiName = this.goodMoodName;
-			break;
-		case HAPPY:
-			emijiName = this.happyMoodName;
-			break;
-		default:
-			break;
-		}
-		return EmojiStateDetail.builder()
-				.emijiName(new EmijiName(emijiName))
-				.emojiType(emojiType)
+	public List<EmojiStateDetail> getEmojiStateSettings() {
+		
+		List<EmojiStateDetail> emojiStateDetails = new ArrayList<>();
+		
+		EmojiStateDetail weary = EmojiStateDetail.builder()
+				.emijiName(new EmijiName(this.wearyMoodName))
+				.emojiType(EmojiType.WEARY)
 				.build();
+		
+		EmojiStateDetail sad = EmojiStateDetail.builder()
+				.emijiName(new EmijiName(this.sadMoodName))
+				.emojiType(EmojiType.SAD)
+				.build();
+		
+		EmojiStateDetail average = EmojiStateDetail.builder()
+				.emijiName(new EmijiName(this.averageMoodName))
+				.emojiType(EmojiType.AVERAGE)
+				.build();
+		
+		EmojiStateDetail good = EmojiStateDetail.builder()
+				.emijiName(new EmijiName(this.goodMoodName))
+				.emojiType(EmojiType.GOOD)
+				.build();
+		
+		EmojiStateDetail happy = EmojiStateDetail.builder()
+				.emijiName(new EmijiName(this.happyMoodName))
+				.emojiType(EmojiType.HAPPY)
+				.build();
+		
+		emojiStateDetails.add(weary);
+		emojiStateDetails.add(sad);
+		emojiStateDetails.add(average);
+		emojiStateDetails.add(good);
+		emojiStateDetails.add(happy);
+		
+		return emojiStateDetails;
+	}
+	
+	@Override
+	public Integer getManageEmojiState() {
+		return this.manageEmojiState;
+	}
+	
+	@Override
+	public void setManageEmojiState(Integer manageEmojiState) {
+		this.manageEmojiState = manageEmojiState;
 	}
 }

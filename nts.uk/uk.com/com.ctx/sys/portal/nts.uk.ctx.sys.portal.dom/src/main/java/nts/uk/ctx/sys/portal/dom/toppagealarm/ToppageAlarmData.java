@@ -87,6 +87,7 @@ public class ToppageAlarmData extends AggregateRoot {
 	public void updateOccurrenceDateTime(GeneralDateTime dateTime) {
 		this.isResolved = false;
 		this.occurrenceDateTime = dateTime;
+		this.readDateTime = Optional.empty();
 	}
 	
 	/*

@@ -29,9 +29,8 @@ public class CancelConfirmationWorkResultsService {
 		if (!confirmationWorkResults.isPresent()) 
 			//	return Optional.Empty
 			return Optional.empty();
-		//$削除後の確認状態 = $作業実績の確認.確認者一覧:														
-			//except $.社員ID = 確認者
-		confirmationWorkResults.get().removeConfirmer(confirmSid);
+		//$作業実績の確認.解除する(確認者)
+		confirmationWorkResults.get().release(confirmSid);
 		//	if $削除後の確認状態.確認者一覧.isEmpty
 		if(confirmationWorkResults.get().getConfirmers().isEmpty())
 			//return Atom Task:																			

@@ -438,8 +438,8 @@ public class OtherHolidayInfoService {
 			// TODO QA
 			DesignatedTime commonSet = commonSetMap.get(c.getKey());
 			String newID = null;
-			int aDay = commonSet.getOneDayTime().v();
-			int aHalf = commonSet.getHalfDayTime().v();
+			int aDay = commonSet == null ? 0 : commonSet.getOneDayTime().v();
+			int aHalf = commonSet == null ? 0 : commonSet.getHalfDayTime().v();
 			while (remainNumberTpm.compareTo(ZERO) > 0) {
 				newID = IdentifierUtil.randomUniqueId();
 				if (remainNumberTpm.compareTo(ONE) >= 0) {

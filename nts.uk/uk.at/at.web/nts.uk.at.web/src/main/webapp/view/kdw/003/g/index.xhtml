@@ -1,0 +1,180 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+    <ui:composition template="../../../../master/dialog.xhtml">
+        <ui:define name="htmlHead">
+            <script>var dialogSize = { width: 1150, height: 660 };</script>
+            <com:ValidatorScript>
+                nts.uk.shr.com.time.TimeWithDayAttr
+            </com:ValidatorScript>
+            <com:scriptfile set="IGNITE" />           
+            <com:stylefile path="/view/ccg/share/style.css" of="/nts.uk.com.web" />			
+			<com:scriptfile path="/view/kcp/share/list.js" of="/nts.uk.com.web" />
+			<com:scriptfile path="/view/kcp/share/tree.js" of="/nts.uk.com.web" />
+			<com:scriptfile path="/view/ccg/share/ccg.service.js" of="/nts.uk.com.web" />
+			<com:scriptfile path="/view/ccg/share/ccg.vm.js" of="/nts.uk.com.web" />
+            <com:scriptfile path="/view/kcp/009/kcp009.js" of="/nts.uk.com.web" />
+
+            <com:stylefile path="kdw003.g.style.css" />
+            <com:scriptfile path="kdw003.g.vm.js" />
+        </ui:define>
+
+        <ui:define name="content">
+            <div id="functions-area">
+                <!--G1-1-->
+                <button class="normal" tabindex="1" data-bind="click: resetData, enable: enableNewBtn" >#{i18n.getText('KDW003_134')}</button>
+                <!--G1-2-->
+                <button class="proceed" tabindex="2" data-bind="click: registerOrUpdate" >#{i18n.getText('KDW003_135')}</button>
+                <!--G1-3-->
+                <button class="normal" tabindex="3"  data-bind="click: openDialogCDL023, enable: enableNewBtn">#{i18n.getText('KDW003_136')}</button>
+                <!--G1-4-->
+                <button class="danger" tabindex="4"   data-bind="click: remove, enable: enableDeleteBtn">#{i18n.getText('KDW003_137')}</button>
+                <!--G1-5-->
+                <button class="normal"  tabindex="5" data-bind="click: closeDialog">#{i18n.getText('KDW003_38')}</button>
+            </div>
+            <div id="contents-area">               
+                <!--G2-1-->
+                <div tabindex="6"  style="margin-left: 10px; margin-top: 10px; " id="ccgcomponent" ></div>
+                <!--G3-1-->
+                <div tabindex="7" style="margin-left: 110px;" id="emp-component"></div>
+                
+                <!--G4-2-->
+                <div id="left-content" tabindex="8" class="fixed-flex-layout-left">                    
+                    <div
+                        data-bind="ntsPanel:{width: '260px', height: '446px', direction: 'right', showIcone: true, visible: true}">
+                        <table id="single-list" data-bind="ntsGridList: {								
+                            height: 438,
+                            dataSource: listHistPeriod,
+                            primaryKey: 'id',
+                            columns: columns,
+                            rows: 12,
+                            multiple: false,
+                            value: selectedHist
+                        }"></table>
+                    </div>                   
+                
+                </div>
+                <div id="right-content" class="fixed-flex-layout-right">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td>
+                                <!-- <div data-bind="ntsFormLabel:{ required:true }">
+                                    #{i18n.getText('KDW003_18')}</div> -->
+                                    <div>
+                                        #{i18n.getText('KDW003_18')}</div>
+                            </td>
+                            <!--G5-3 & G5-4-->
+                            <td>
+                                <div>
+                                    <div id ="startDate" data-bind="ntsDatePicker: {value: startDate, dateType:'date', dateFormat:'YYYY/MM/DD' }"></div> ～
+                                    <span data-bind="text: endDate"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-bind="if: enableTaskFrame1 ">
+                            <td>
+                                <!--G5-5-->
+                                <div data-bind="text: frameName1"></div>
+                            </td>
+                            <td colspan="2">
+                                <!--G5-6-->
+                                <div id="taskFrame1" tabindex="10" data-bind="ntsComboBox: {
+                                            options: listTaskFrame1,
+                                            width: 410,
+                                            optionsValue: 'taskCode',
+                                            visibleItemsCount: 10,
+                                            value: selectedTaskCode1,
+                                            editable: true,
+                                            optionsText: 'displayName',                                  
+                                            columns: [                                               
+                                                { prop: 'displayName', length: 16 },
+                                            ]}"></div>
+                            </td>
+                        </tr>
+                        <tr data-bind="if: enableTaskFrame2 ">
+                            <td>
+                                <!--G5-8-->
+                                <div data-bind="text: frameName2"></div>
+                            </td>
+                            <td>
+                                <!--G5-9-->
+                                <div id="task-list" tabindex="11" data-bind="ntsComboBox: {
+                                    options: listTaskFrame2,
+                                    width: 310,
+                                    optionsValue: 'taskCode',
+                                    visibleItemsCount: 10,
+                                    value: selectedTaskCode2,
+                                    editable: true,
+                                    optionsText: 'displayName',                                  
+                                    columns: [
+                                        { prop: 'displayName', length: 16 },
+                                    ]}"></div>
+                            </td>
+                        </tr>
+                        
+                        <tr data-bind="if: enableTaskFrame3 ">
+                            <td>
+                                <div data-bind="text: frameName3"></div>
+                            </td>
+                            <td>
+                                <!--G5-12-->
+                                <div id="task-list" tabindex="12" data-bind="ntsComboBox: {
+                                    options: listTaskFrame3,
+                                    width: 230,
+                                    optionsValue: 'taskCode',
+                                    visibleItemsCount: 10,
+                                    value: selectedTaskCode3,
+                                    editable: true,
+                                    optionsText: 'displayName',                                  
+                                    columns: [
+                                        { prop: 'displayName', length: 16 },
+                                    ]}"></div>
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr data-bind="if: enableTaskFrame4 ">
+                            <td><div data-bind="text: frameName4"></div></td>
+                            <td>
+                                <!--G5-15-->
+                                <div id="task-list" tabindex="13" data-bind="ntsComboBox: {
+                                    options: listTaskFrame4,
+                                    width: 230,
+                                    optionsValue: 'taskCode',
+                                    visibleItemsCount: 10,
+                                    value: selectedTaskCode4,
+                                    editable: true,
+                                    optionsText: 'displayName',                                  
+                                    columns: [
+                                        { prop: 'displayName', length: 16 },
+                                    ]}"></div>
+                            </td>
+                        </tr>
+                        <tr data-bind="if: enableTaskFrame5 ">
+                            <td><div data-bind="text: frameName5"></div></td>
+                            <td>
+                                <!--G5-18-->
+                                <div id="task-list" tabindex="14" data-bind="ntsComboBox: {
+                                    options: listTaskFrame5,
+                                    width: 230,
+                                    optionsValue: 'taskCode',
+                                    visibleItemsCount: 10,
+                                    value: selectedTaskCode5,
+                                    editable: true,
+                                    optionsText: 'displayName',                                  
+                                    columns: [
+                                        { prop: 'displayName', length: 16 },
+                                    ]}"></div>
+                            </td>
+                        </tr>
+                    </table>                    
+                </div>
+            </div>
+        </ui:define>
+    </ui:composition>
+</body>
+
+</html>

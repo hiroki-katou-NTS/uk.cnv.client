@@ -4,7 +4,9 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.app.command.ot.autocalsetting;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalAtrOvertime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalOvertimeSetting;
@@ -17,6 +19,8 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.TimeLimitUpp
  */
 @Setter
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class AutoCalOvertimeSettingDto {
 
 	/** The early ot time. */
@@ -149,5 +153,16 @@ public class AutoCalOvertimeSettingDto {
 							.valueOf(command.getLegalMidOtTime().getUpLimitOtSet()),
 					AutoCalAtrOvertime.valueOf(command.getLegalMidOtTime().getCalAtr()));
 		}
+	}
+
+	public static AutoCalOvertimeSettingDto fromDomain(AutoCalOvertimeSetting domain) {
+
+		return new AutoCalOvertimeSettingDto(
+				AutoCalSettingDto.fromDomain(domain.getEarlyOtTime()),
+				AutoCalSettingDto.fromDomain(domain.getEarlyMidOtTime()),
+				AutoCalSettingDto.fromDomain(domain.getNormalOtTime()),
+				AutoCalSettingDto.fromDomain(domain.getNormalMidOtTime()),
+				AutoCalSettingDto.fromDomain(domain.getLegalOtTime()),
+				AutoCalSettingDto.fromDomain(domain.getLegalMidOtTime()));
 	}
 }

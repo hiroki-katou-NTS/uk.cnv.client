@@ -15,6 +15,7 @@ import lombok.Data;
 public class DPAttendanceItem {
 	private Integer id;
 	private String name;
+	private String displayName;
 	private Integer displayNumber;
 	private boolean userCanSet;
 	private Integer lineBreakPosition;

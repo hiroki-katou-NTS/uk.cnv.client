@@ -3,6 +3,8 @@ package nts.uk.ctx.at.shared.infra.repository.scherec.taskmanagement.taskmaster;
 import lombok.val;
 import nts.arc.layer.infra.data.DbConsts;
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.arc.layer.infra.data.jdbc.NtsResultSet;
+import nts.arc.layer.infra.data.jdbc.NtsStatement;
 import nts.arc.primitive.PrimitiveValueBase;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
@@ -241,6 +243,29 @@ public class JpaTaskingRepository extends JpaRepository implements TaskingReposi
         return rs.isPresent();
     }
 
+    @Override
+    public List<Task> getListTask(String cid, Integer taskFrameNo, List<String> codes) {
+//        if (codes.isEmpty()) return new ArrayList<>();
+        EntityManager em = this.getEntityManager();
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<KsrmtTaskMaster> criteriaQuery = criteriaBuilder.createQuery(KsrmtTaskMaster.class);
+        Root<KsrmtTaskMaster> root = criteriaQuery.from(KsrmtTaskMaster.class);
+        criteriaQuery.select(root);
+        List<KsrmtTaskMaster> result = new ArrayList<>();
+        CollectionUtil.split(codes, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, code -> {
+            // Predicate where clause
+            List<Predicate> conditions = new ArrayList<>();
+            conditions.add(criteriaBuilder.equal(root.get(KsrmtTaskMaster_.pk).get(KsrmtTaskMasterPk_.CID), cid));
+            List<String> stringListCodes = new ArrayList<>(code);
+            conditions.add(criteriaBuilder.equal(root.get(KsrmtTaskMaster_.pk).get(KsrmtTaskMasterPk_.FRAMENO), taskFrameNo));
+            conditions.add(root.get(KsrmtTaskMaster_.pk).get(KsrmtTaskMasterPk_.CD).in(stringListCodes));
+            criteriaQuery.where(conditions.toArray(new Predicate[]{}));
+            TypedQuery<KsrmtTaskMaster> query = em.createQuery(criteriaQuery);
+            result.addAll(query.getResultList());
+
+        });
+        return getListTask(result);
+    }
 
     private List<Task> getListTask(List<KsrmtTaskMaster> masterList) {
         return masterList.stream().map(this::getListTask).sorted(Comparator.comparing(Task::getCode)).collect(Collectors.toList());

@@ -110,8 +110,43 @@ public class SptmtFlowLayoutMenu extends UkJpaEntity implements Serializable {
 	 * 縦の位置
 	 */
 	@Basic(optional = false)
-	@Column(name = "VERTICAL_PISITION")
+	@Column(name = "VERTICAL_POSITION")
 	private int verticalPosition;
+	
+	/**
+	 * 文字の色
+	 */
+	@Basic(optional = false)
+	@Column(name = "TEXT_COLOR")
+	private String textColor;
+	
+	/**
+	 * 既定区分
+	 */
+	@Basic(optional = true)
+	@Column(name = "DEFAULT_ATR")
+	private Integer defaultAtr;
+	
+	/**
+	 * 画像ファイルID
+	 */
+	@Basic(optional = true)
+	@Column(name = "IMG_FILE_ID")
+	private String imgFileId;
+	
+	/**
+	 * 画像ファイル名
+	 */
+	@Basic(optional = true)
+	@Column(name = "IMG_FILE_NAME")
+	private String imgFileName;
+	
+	/**
+	 * 比率
+	 */
+	@Basic(optional = true)
+	@Column(name = "RATIO")
+	private Double ratio;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumns({

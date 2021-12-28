@@ -41,8 +41,10 @@ module nts.uk.com.view.cmm051.b {
 
         execution() {
             let vm = this;
-            $("#daterangepicker").find(".ntsStartDatePicker").trigger("validate");
-            $("#daterangepicker").find(".ntsEndDatePicker").trigger("validate");
+            $(".nts-input").trigger("validate");
+            if (nts.uk.ui.errors.hasError()) {
+                return;
+            }
             setShared("dataToScreenA",{
                 startDate: vm.periodDate().startDate.format("YYYY/MM/DD"),
                 endDate: vm.periodDate().endDate.format("YYYY/MM/DD"),

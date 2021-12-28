@@ -17,4 +17,6 @@ public class CompanyMonthDaySettingRemoveCommand {
 	
 	/** The year. */
 	private int year;
+	
+	private int startMonth;
 }

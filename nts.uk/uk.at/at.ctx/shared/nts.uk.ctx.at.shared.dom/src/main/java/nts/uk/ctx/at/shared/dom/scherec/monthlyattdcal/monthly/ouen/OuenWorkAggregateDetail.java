@@ -23,7 +23,7 @@ public class OuenWorkAggregateDetail implements DomainObject {
 	}
 	
 	public static OuenWorkAggregateDetail empty() {
-		return OuenWorkAggregateDetail.create(new AttendanceTimeMonth(0), new AttendanceAmountMonth(0));
+		return OuenWorkAggregateDetail.create(new AttendanceTimeMonth(0), new AttendanceAmountMonth(0L));
 	}
 	
 	public static OuenWorkAggregateDetail create(

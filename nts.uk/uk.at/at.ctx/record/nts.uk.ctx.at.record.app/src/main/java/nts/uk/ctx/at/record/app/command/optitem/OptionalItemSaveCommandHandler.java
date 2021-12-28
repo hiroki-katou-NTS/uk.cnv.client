@@ -16,21 +16,14 @@ import nts.arc.layer.app.command.CommandHandler;
 import nts.arc.layer.app.command.CommandHandlerContext;
 import nts.uk.ctx.at.record.app.find.optitem.OptionalItemService;
 import nts.uk.ctx.at.shared.dom.common.CompanyId;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.repository.ControlOfAttendanceItemsRepository;
-import nts.uk.ctx.at.shared.dom.scherec.event.PerformanceAtr;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattendanceitem.ControlOfMonthlyItemsRepository;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcResultRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItem;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemNameOther;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemNameOtherRepository;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemPolicy;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemRepository;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemUpdateDomainEvent;
+import nts.uk.ctx.at.shared.dom.scherec.event.OptionalItemAtrExport;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.*;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.calculation.CalcResultRangeRepository;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.calculation.Formula;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.calculation.FormulaRepository;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.calculation.disporder.FormulaDispOrder;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.calculation.disporder.FormulaDispOrderRepository;
+import nts.uk.ctx.at.shared.dom.scherec.service.AttendanceAtrService;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.i18n.LanguageConsts;
 
@@ -57,18 +50,15 @@ public class OptionalItemSaveCommandHandler extends CommandHandler<OptionalItemS
 	
 	@Inject
 	private OptionalItemNameOtherRepository itemNameOtherRepo;
-	
-	@Inject
-    private ControlOfMonthlyItemsRepository monthlyControlRepository;
-    
-    @Inject
-    private ControlOfAttendanceItemsRepository dailyControlRepository;
 
     @Inject
     private OptionalItemService optItemService;
     
     @Inject
     private CalcResultRangeRepository calcRepo;
+
+	@Inject
+	private AttendanceAtrService attendanceAtrService;
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -91,7 +81,7 @@ public class OptionalItemSaveCommandHandler extends CommandHandler<OptionalItemS
 		int optionalItemNo = command.getOptionalItemNo().v();
 		
 		// Get calc result range
-		CalcResultRange calResult = command.getCalculationResultRange();
+		CalcResultRange calResult = command.getInputControlSetting().getCalcResultRange();
 
 		// Map to list domain Formula
 		List<Formula> formulas = command.getFormulas().stream().map(item -> {
@@ -126,12 +116,7 @@ public class OptionalItemSaveCommandHandler extends CommandHandler<OptionalItemS
 			this.optItemRepo.update(dom);
 			
 			// update result range
-			this.calcRepo.update(companyId, optionalItemNo, calResult);
-			
-			// update control unit item
-			if (dom.getPerformanceAtr().equals(PerformanceAtr.MONTHLY_PERFORMANCE)) {
-			    
-			}
+//			this.calcRepo.update(companyId, optionalItemNo, calResult);
 
 			// Remove all existing formulas
 			this.formulaRepo.remove(companyId, optionalItemNo);
@@ -141,10 +126,16 @@ public class OptionalItemSaveCommandHandler extends CommandHandler<OptionalItemS
 			this.formulaRepo.create(formulas);
 			this.orderRepo.create(dispOrders);
 
-			// Fire optional item update event
-			// ドメインモデル「任意項目．属性」を更新した場合Event「任意項目の属性が更新された」を発行する
-			OptionalItemUpdateDomainEvent event = new OptionalItemUpdateDomainEvent(dom.getOptionalItemNo(), dom.getOptionalItemAtr(), dom.getPerformanceAtr());
-			event.toBePublished();
+			// EA修正履歴NO.4071
+			// EA修正履歴NO.4079
+			this.attendanceAtrService.updateAttendanceAtr(new OptionalItemAtrExport(
+					dom.getPerformanceAtr().value,
+					dom.getOptionalItemAtr().value,
+					dom.getOptionalItemNo().v(),
+					dom.getUsageAtr() == OptionalItemUsageAtr.USE,
+					dom.getCalcAtr() == CalculationClassification.CALC,
+					dom.getInputControlSetting().isInputWithCheckbox()
+			));
 		}
 	}
 

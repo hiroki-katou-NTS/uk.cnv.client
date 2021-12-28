@@ -731,7 +731,10 @@ module nts.uk.at.kdp003.a {
 							const { nameSelectArt } = stampSetting;
 
 							// update interval for display datetime
-							vm.$date.interval(stampSetting.correctionInterval * 60000);
+							vm.$date.interval(100);
+							setTimeout(() => {
+								vm.$date.interval(stampSetting.correctionInterval * 60000);
+							}, 1000);
 
 							// clear message and show screen
 							vm.message(null);
@@ -1079,8 +1082,8 @@ module nts.uk.at.kdp003.a {
 			const vm = this;
 			const { buttonPage, employeeData } = vm;
 			const { selectedId, employees, nameSelectArt } = ko.toJS(employeeData) as EmployeeListData;
-			let stampTime = moment(new Date()).format("HH:mm");
-			let stampDateTime = moment(new Date()).format();
+			let stampTime = moment(vm.$date.now()).format("HH:mm");
+			let stampDateTime = moment(vm.$date.now()).format();
 			
 			const reloadSetting = () =>
 				$.Deferred()

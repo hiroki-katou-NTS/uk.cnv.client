@@ -1,9 +1,11 @@
 package nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
@@ -27,6 +29,9 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.ManageReGetClass;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.PredetermineTimeSetForCalc;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.timezone.withinworkinghours.WithinWorkTimeSheet;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.employeeunitpricehistory.EmployeeUnitPriceHistoryItem;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.PersonCostCalculation;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.WorkingHoursUnitPrice;
 import nts.uk.ctx.at.shared.dom.scherec.statutory.worktime.week.DailyUnit;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingConditionItem;
 import nts.uk.ctx.at.shared.dom.worktime.IntegrationOfWorkTime;
@@ -44,6 +49,7 @@ import nts.uk.shr.com.enumcommon.NotUseAtr;
  * 日別勤怠の所定内時間(new)
  * @author keisuke_hoshina
  */
+@AllArgsConstructor
 @Getter
 public class WithinStatutoryTimeOfDaily {
 	//就業時間
@@ -59,8 +65,9 @@ public class WithinStatutoryTimeOfDaily {
 	//所定内深夜時間
 	@Setter
 	private WithinStatutoryMidNightTime withinStatutoryMidNightTime = new WithinStatutoryMidNightTime(TimeDivergenceWithCalculation.sameTime(new AttendanceTime(0)));
-
-	/** 所定内労働時間金額   -  就業時間金額 ? **/
+	/** 単価 **/
+	private WorkingHoursUnitPrice unitPrice = WorkingHoursUnitPrice.ZERO;
+	/** 就業時間金額 **/
 	@Setter
 	private AttendanceAmountDaily withinWorkTimeAmount = new AttendanceAmountDaily(0);
 
@@ -78,25 +85,6 @@ public class WithinStatutoryTimeOfDaily {
 		this.actualWorkTime = actualTime;
 		this.withinPrescribedPremiumTime = premiumTime;
 		this.actualWithinPremiumTime = AttendanceTime.ZERO;
-		this.withinStatutoryMidNightTime = midNightTime;
-	}
-
-	/**
-	 * Constructor （このクラス内でしか使用しないコンストラクタ）
-	 * 実働所定内割増時間は永続化しない、月次でも使用しない。
-	 * その為、このコンストラクタを使用して外部に公開するメソッドは作成しない。
-	 * @param workTime 就業時間
-	 * @param actualTime 実働就業時間
-	 * @param premiumTime 所定内割増時間
-	 * @param actualPremiumTime 実働所定内割増時間
-	 * @param midNightTime 所定内深夜時間
-	 */
-	private WithinStatutoryTimeOfDaily(AttendanceTime workTime,AttendanceTime actualTime, AttendanceTime premiumTime,
-			AttendanceTime actualPremiumTime, WithinStatutoryMidNightTime midNightTime) {
-		this.workTime = workTime;
-		this.actualWorkTime = actualTime;
-		this.withinPrescribedPremiumTime = premiumTime;
-		this.actualWithinPremiumTime = actualPremiumTime;
 		this.withinStatutoryMidNightTime = midNightTime;
 	}
 
@@ -208,8 +196,23 @@ public class WithinStatutoryTimeOfDaily {
 				vacationClass,
 				workTimeCode,
 				predetermineTimeSetByPersonInfo);
-
-		return new WithinStatutoryTimeOfDaily(workTime, actualTime, withinpremiumTime, actualWithinPremiumTime, midNightTime);
+		
+		//単価
+		WorkingHoursUnitPrice unitPrice = WorkingHoursUnitPrice.ZERO;
+		//就業時間金額
+		AttendanceAmountDaily workTimeAmount = AttendanceAmountDaily.ZERO;
+		
+		Optional<PersonCostCalculation> personCost = recordReget.getCompanyCommonSetting().getPersonnelCostSetting().get(recordReget.getIntegrationOfDaily().getYmd());
+		Optional<EmployeeUnitPriceHistoryItem> employeeUnitPrice = recordReget.getPersonDailySetting().getUnitPrice();
+		
+		if(personCost.isPresent() && employeeUnitPrice.isPresent()) {
+			//単価を取得する
+			unitPrice = personCost.get().getWorkTimeUnitPrice(recordReget.getPersonDailySetting().getUnitPrice().get());
+			//就業時間金額の計算
+			BigDecimal beforeRound = workTime.hourWithDecimal().multiply(BigDecimal.valueOf(unitPrice.v()));
+			workTimeAmount = personCost.get().getRoundingSetting().roundWorkTimeAmount(beforeRound);
+		}
+		return new WithinStatutoryTimeOfDaily(workTime, actualTime, withinpremiumTime, actualWithinPremiumTime, midNightTime, unitPrice, workTimeAmount);
 	}
 
 	/**
@@ -310,17 +313,19 @@ public class WithinStatutoryTimeOfDaily {
 	 * @param workTimeIncludeVacationTime
 	 * @param withinPrescribedPremiumTime
 	 * @param withinStatutoryMidNightTime
-	 * @param vacationAddTime
+	 * @param withinWorkTimeAmount
 	 * @return
 	 */
 	public static WithinStatutoryTimeOfDaily createWithinStatutoryTimeOfDaily(AttendanceTime workTime,
 																	   AttendanceTime actualWorkTime,
 																	   AttendanceTime withinPrescribedPremiumTime,
-																	   WithinStatutoryMidNightTime withinStatutoryMidNightTime) {
+																	   WithinStatutoryMidNightTime withinStatutoryMidNightTime,
+																	   AttendanceAmountDaily withinWorkTimeAmount) {
 		WithinStatutoryTimeOfDaily withinStatutoryTimeOfDaily = new WithinStatutoryTimeOfDaily(workTime,actualWorkTime,withinPrescribedPremiumTime,withinStatutoryMidNightTime);
 		withinStatutoryTimeOfDaily.actualWorkTime = actualWorkTime;
 		withinStatutoryTimeOfDaily.withinPrescribedPremiumTime = withinPrescribedPremiumTime;
 		withinStatutoryTimeOfDaily.withinStatutoryMidNightTime = withinStatutoryMidNightTime;
+		withinStatutoryTimeOfDaily.withinWorkTimeAmount = withinWorkTimeAmount;
 		return withinStatutoryTimeOfDaily;
 	}
 
@@ -357,7 +362,9 @@ public class WithinStatutoryTimeOfDaily {
 											  this.actualWorkTime,
 											  this.withinPrescribedPremiumTime,
 											  this.actualWithinPremiumTime,
-											  this.withinStatutoryMidNightTime!=null?this.withinStatutoryMidNightTime.calcDiverGenceTime():this.withinStatutoryMidNightTime);
+											  this.withinStatutoryMidNightTime!=null?this.withinStatutoryMidNightTime.calcDiverGenceTime():this.withinStatutoryMidNightTime,
+											  this.unitPrice,
+											  this.withinWorkTimeAmount);
 	}
 
 	/**
@@ -468,7 +475,8 @@ public class WithinStatutoryTimeOfDaily {
 
 	public static WithinStatutoryTimeOfDaily defaultValue(){
 		return new WithinStatutoryTimeOfDaily(AttendanceTime.ZERO, AttendanceTime.ZERO, AttendanceTime.ZERO, AttendanceTime.ZERO,
-				new WithinStatutoryMidNightTime(TimeDivergenceWithCalculation.defaultValue()));
+				new WithinStatutoryMidNightTime(TimeDivergenceWithCalculation.defaultValue()), WorkingHoursUnitPrice.ZERO,
+				AttendanceAmountDaily.ZERO);
 	}
 
 	/**
@@ -543,7 +551,7 @@ public class WithinStatutoryTimeOfDaily {
 	}
 
 	/**
-	 * 実働所定内割増を計算する
+	 * 実働所定内割増時間を計算する
 	 * @param recordReget 時間帯作成、時間計算で再取得が必要になっているクラスたちの管理クラス
 	 * @param vacationClass 休暇クラス
 	 * @param workType 勤務種類
@@ -592,5 +600,19 @@ public class WithinStatutoryTimeOfDaily {
 				predetermineTimeSetByPersonInfo,
 				NotUseAtr.USE)		//遅刻早退は常に控除する
 				.getWithinPremiumTime();
+	}
+
+	/**
+	 * 就業時間金額を再計算する
+	 * @param personCost 人件費計算設定
+	 */
+	public void reCalcWithinWorkTimeAmount(Optional<PersonCostCalculation> personCost) {
+		//就業時間金額の計算
+		BigDecimal beforeRound = workTime.hourWithDecimal().multiply(BigDecimal.valueOf(unitPrice.v()));
+		if(!personCost.isPresent()) {
+			this.withinWorkTimeAmount = new AttendanceAmountDaily(beforeRound.intValue());
+			return;
+		}
+		this.withinWorkTimeAmount = personCost.get().getRoundingSetting().roundWorkTimeAmount(beforeRound);
 	}
 }

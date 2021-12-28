@@ -63,8 +63,12 @@ module nts.uk.at.view.kaf011.a.viewmodel {
 					vm.params = params;
 				}
 			}
-			let paramDate;
+			let paramDate,
+				screenCode: number = null;
 			if(vm.params){
+				if (!nts.uk.util.isNullOrUndefined(params.screenCode)) {
+					screenCode = params.screenCode;
+				}
 				if (!_.isEmpty(vm.params.baseDate)) {
 					paramDate = moment(vm.params.baseDate).format('YYYY/MM/DD');
 					vm.absenceLeaveApp.application.appDate(paramDate);
@@ -78,8 +82,14 @@ module nts.uk.at.view.kaf011.a.viewmodel {
 					vm.isAgentMode(vm.params.isAgentMode);
 				}
 			}
+			let paramKAF000 = {
+				empLst: vm.params?vm.params.employeeIds:[], 
+				dateLst: paramDate?[paramDate]:[], 
+				appType: vm.appType(),
+				screenCode
+			};
 			vm.$blockui("grayout");
-			vm.loadData(vm.params?vm.params.employeeIds:[], paramDate?[paramDate]:[], vm.appType()).then((loadDataFlag: any) => {
+			vm.loadData(paramKAF000).then((loadDataFlag: any) => {
 				if(loadDataFlag) {
 					vm.$blockui("grayout");
 					return vm.$ajax('at/request/application/holidayshipment/startPageARefactor',{sIDs: [], appDate: [], appDispInfoStartup: vm.appDispInfoStartupOutput()});

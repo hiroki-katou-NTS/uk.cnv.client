@@ -27,7 +27,7 @@ public class WorkScheduleToIntegrationOfDailyPubImpl implements WorkScheduleToIn
 					workSchedule.getWorkInfo(), CalAttrOfDailyAttd.createAllCalculate(), workSchedule.getAffInfo(), Optional.empty(), new ArrayList<>(),
 					workSchedule.getOutingTime(), workSchedule.getLstBreakTime(), workSchedule.getOptAttendanceTime(),
 					workSchedule.getOptTimeLeaving(), workSchedule.getOptSortTimeWork(), Optional.empty(), Optional.empty(),
-					Optional.empty(), workSchedule.getLstEditState(), Optional.empty(), new ArrayList<>(), Optional.empty());
+					Optional.empty(), workSchedule.getLstEditState(), Optional.empty(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), Optional.empty());
 		});
 		
 	}

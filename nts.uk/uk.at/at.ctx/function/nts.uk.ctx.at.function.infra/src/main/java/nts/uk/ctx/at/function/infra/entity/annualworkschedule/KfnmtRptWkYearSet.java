@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.function.infra.entity.annualworkschedule;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -115,7 +116,7 @@ public class KfnmtRptWkYearSet extends ContractUkJpaEntity implements Serializab
 	public List<ItemsOutputToBookTable> getListItemsOutput() {
 		return this.lstKfnmtRptWkYearItems.stream().map(t -> {
 			return ItemsOutputToBookTable.createFromMemento(t);
-		}).collect(Collectors.toList());
+		}).sorted(Comparator.comparing(ItemsOutputToBookTable::getSortBy)).collect(Collectors.toList());
 	}
 
 	@Override

@@ -222,8 +222,8 @@ public class DailyCorrectionLogProcessor extends DataCorrectionLogProcessor {
 						case 5:
 							Pair<String, String> pairWpkCodeNameBef = listWorkplaceIdDateName.get(correctedItem.getBefore());
 							Pair<String, String> pairWpkCodeNameAft = listWorkplaceIdDateName.get(correctedItem.getAfter());
-							String workplaceNameBef = correctedItem.getBefore() != null ? pairWpkCodeNameBef.getLeft() + " " + pairWpkCodeNameBef.getRight() : null;
-							String workplaceNameAft = correctedItem.getAfter() != null ? pairWpkCodeNameAft.getLeft() + " " + pairWpkCodeNameAft.getRight() : null;
+							String workplaceNameBef = correctedItem.getBefore() != null ? pairWpkCodeNameBef == null ? null : (pairWpkCodeNameBef.getLeft() + " " + pairWpkCodeNameBef.getRight()) : null;
+							String workplaceNameAft = correctedItem.getAfter() != null ? pairWpkCodeNameAft == null ? null : (pairWpkCodeNameAft.getLeft() + " " + pairWpkCodeNameAft.getRight()) : null;
 							itemInfo = correctedItem.toItemInfo(workplaceNameBef, workplaceNameAft);
 							break;
 						case 6:

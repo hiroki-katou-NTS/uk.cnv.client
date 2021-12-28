@@ -2471,6 +2471,15 @@ module nts.uk.at.view.ksu003.a.viewmodel {
 				}, 10);
 			}
 			let self = this, dfd = $.Deferred(), updatedCells = $("#extable-ksu003").exTable("updatedCells"), params = [];
+			if (updatedCells.length == 1){
+				let checkUpdate = _.filter(self.disableDs, (z : any) => {
+					return z.index ==  updatedCells[0].rowIndex && updatedCells[0].value === "なし";
+				})
+				
+				if (checkUpdate.length > 0) {
+					updatedCells = [];
+				}
+			}
 			block.grayout();
 			// đăng ký với mode bình thường
 			if (self.selectedDisplayPeriod() == 1) {

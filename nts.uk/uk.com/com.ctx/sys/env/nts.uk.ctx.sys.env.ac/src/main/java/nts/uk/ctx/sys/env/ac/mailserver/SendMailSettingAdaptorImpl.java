@@ -76,7 +76,7 @@ public class SendMailSettingAdaptorImpl implements SendMailSettingAdaptor {
 		
 		SendMailEncryptedConnectionType encryptType = SendMailEncryptedConnectionType.NONE;
 		switch (mailServer.getEncryptionMethod()) {
-		case TSL:
+		case TLS:
 			encryptType = SendMailEncryptedConnectionType.TLS;
 		case SSL:
 			encryptType = SendMailEncryptedConnectionType.SSL;

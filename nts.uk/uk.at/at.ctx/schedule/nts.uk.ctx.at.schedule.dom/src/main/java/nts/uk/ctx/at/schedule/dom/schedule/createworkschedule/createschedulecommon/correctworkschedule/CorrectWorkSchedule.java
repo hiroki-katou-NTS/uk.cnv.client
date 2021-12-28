@@ -7,7 +7,6 @@ import java.util.Optional;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import nts.arc.enums.EnumAdaptor;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.schedule.dom.schedule.workschedule.WorkSchedule;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
@@ -50,7 +49,8 @@ public class CorrectWorkSchedule {
 		IntegrationOfDaily integrationOfDaily = new IntegrationOfDaily(employeeId, targetDate, workSchedule.getWorkInfo(), calAttrOfDailyAttd, workSchedule.getAffInfo(), 
 				Optional.empty(), new ArrayList<>(), workSchedule.getOutingTime(), workSchedule.getLstBreakTime(), workSchedule.getOptAttendanceTime(), 
 				workSchedule.getOptTimeLeaving(), workSchedule.getOptSortTimeWork(), Optional.empty(), Optional.empty(), 
-				Optional.empty(), workSchedule.getLstEditState(), Optional.empty(), new ArrayList<>(), Optional.empty());
+				Optional.empty(), workSchedule.getLstEditState(), Optional.empty(), new ArrayList<>(), new ArrayList<>(),
+				new ArrayList<>(), Optional.empty());
 		//勤怠ルールの補正処理 
 		
 		ChangeDailyAttendance changeAtt = new ChangeDailyAttendance(true, false, false, true, ScheduleRecordClassifi.SCHEDULE, false);
@@ -89,7 +89,7 @@ public class CorrectWorkSchedule {
 		integrationOfDaily.setYmd(targetDate);
 		lstInteOfDaily.add(integrationOfDaily);
 		CalculateOption calculateOption = new CalculateOption(false, true);
-		lstInteOfDaily = centerNew.calculatePassCompanySetting(calculateOption, lstInteOfDaily, EnumAdaptor.valueOf(ExecutionType.NORMAL_EXECUTION.value, ExecutionType.class));
+		lstInteOfDaily = centerNew.calculatePassCompanySetting(calculateOption, lstInteOfDaily, ExecutionType.NORMAL_EXECUTION);
 		
 		return lstInteOfDaily;
 	}

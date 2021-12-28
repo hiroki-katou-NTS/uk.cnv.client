@@ -233,11 +233,12 @@ module nts.uk.at.view.kaf022.a.viewmodel {
                             obj.appType == 0 ? obj.otAppBeforeAccepRestric.opEarlyOvertime : null,
                             obj.appType == 0 ? obj.otAppBeforeAccepRestric.opNormalOvertime : null,
                             obj.appType == 0 ? obj.otAppBeforeAccepRestric.opEarlyNormalOvertime : null,
+                            obj.appType == 0 ? obj.otAppBeforeAccepRestric.opMultipleOvertime : null,
                             obj.afterhandRestriction.allowFutureDay
                         )
                     );
                 } else {
-                    self.dataReceptionRestrictionSettings.push(new ReceptionRestrictionSetting(getText(self.appTypeLabels[index]), appType.value, 0, 0, 1, null, null, null, 0));
+                    self.dataReceptionRestrictionSettings.push(new ReceptionRestrictionSetting(getText(self.appTypeLabels[index]), appType.value, 0, 0, 1, null, null, null, null, 0));
                 }
             });
 
@@ -401,9 +402,12 @@ module nts.uk.at.view.kaf022.a.viewmodel {
         normalOvertime: KnockoutObservable<number>;
         // 時刻（早出残業・通常残業）
         earlyNormalOvertime: KnockoutObservable<number>;
+        // 時刻（複数回残業）
+        multipleOvertime: KnockoutObservable<number>;
+
         requiredA7_23: KnockoutObservable<boolean>;
         constructor(appTypeName: string, appType: number, useAtr: number, dateBeforehandRestrictions: number,
-                    methodCheck: number, earlyOvertime: number, normalOvertime: number, earlyNormalOvertime: number, allowFutureDay: number) {
+                    methodCheck: number, earlyOvertime: number, normalOvertime: number, earlyNormalOvertime: number, multipleOvertime: number, allowFutureDay: number) {
             this.appTypeName = appTypeName;
             this.appType = appType;
             this.useAtr = ko.observable(useAtr == 1);
@@ -412,6 +416,7 @@ module nts.uk.at.view.kaf022.a.viewmodel {
             this.earlyOvertime = ko.observable(earlyOvertime);
             this.normalOvertime = ko.observable(normalOvertime);
             this.earlyNormalOvertime = ko.observable(earlyNormalOvertime);
+            this.multipleOvertime = ko.observable(multipleOvertime);
             this.allowFutureDay = ko.observable(allowFutureDay == 1);
 
             this.requiredA7_23 = ko.observable(methodCheck == 0);

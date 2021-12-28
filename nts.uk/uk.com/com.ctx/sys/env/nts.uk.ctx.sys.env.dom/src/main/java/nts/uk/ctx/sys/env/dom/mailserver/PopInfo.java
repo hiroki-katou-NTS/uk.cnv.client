@@ -4,6 +4,8 @@
  *****************************************************************/
 package nts.uk.ctx.sys.env.dom.mailserver;
 
+import java.util.Comparator;
+
 import lombok.Getter;
 import lombok.Setter;
 import nts.arc.layer.dom.DomainObject;
@@ -14,7 +16,7 @@ import nts.arc.layer.dom.DomainObject;
 @Getter
 @Setter
 // POP情報
-public class PopInfo extends DomainObject {
+public class PopInfo extends DomainObject implements Comparable<PopInfo> {
 	
 	/** The server. */
 	// サーバ
@@ -39,5 +41,13 @@ public class PopInfo extends DomainObject {
 		this.server = server;
 		this.useServer = useServer;
 		this.port = port;
+	}
+	
+	@Override
+	public int compareTo(PopInfo o) {
+		return Comparator.comparing(PopInfo::getServer)
+				.thenComparing(PopInfo::getUseServer)
+				.thenComparing(PopInfo::getPort)
+				.compare(this, o);
 	}
 }

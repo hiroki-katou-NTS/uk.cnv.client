@@ -40,8 +40,6 @@ public class FileExportService extends ExportService<FileExportCommand> {
 
 	@Inject
 	private StoredFileStreamService fileStreamService;
-	
-	public static final String DATA_STORE_PATH = ServerSystemProperties.fileStoragePath();
 
 	@Override
 	protected void handle(ExportServiceContext<FileExportCommand> context) {
@@ -61,7 +59,7 @@ public class FileExportService extends ExportService<FileExportCommand> {
 
 	public Optional<ExtractionResponseDto> extract(String fileId) throws IOException {
 		try (InputStream inputStream = this.fileStreamService.takeOutFromFileId(fileId)) {
-			Path destinationDirectory = Paths.get(DATA_STORE_PATH + "//packs" + "//" + fileId);
+			Path destinationDirectory = Paths.get(new FileStoragePath().getPathOfCurrentTenant().toString() + "//packs" + "//" + fileId);
 			ExtractStatus status = FileArchiver.create(ArchiveFormat.ZIP).extract(inputStream, destinationDirectory);
 			if (!status.equals(ExtractStatus.SUCCESS)) {
 				return Optional.empty();

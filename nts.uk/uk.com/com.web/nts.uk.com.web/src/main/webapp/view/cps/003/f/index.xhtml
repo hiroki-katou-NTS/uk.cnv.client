@@ -71,7 +71,7 @@
 					<div class="form-group" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('CPS003_80')}</div>
 					<div class="form-group change-box">
 						<div data-bind="cps003fValue: { itemData: itemData, value: value, replacer: replacer }"></div>
-						<div class="change-desc">#{i18n.getText('CPS003_82')}</div>
+						<div class="change-desc" data-bind="style: { marginLeft: itemData().amount ? '35px' : '0', marginTop: itemData().amount ? '-5px' : '0' }">#{i18n.getText('CPS003_82')}</div>
 					</div>
 				</div>
 				<div class="caret caret-bottom"></div>

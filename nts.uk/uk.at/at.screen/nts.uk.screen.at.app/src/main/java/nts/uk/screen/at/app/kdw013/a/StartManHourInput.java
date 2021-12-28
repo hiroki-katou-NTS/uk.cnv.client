@@ -1,10 +1,12 @@
 package nts.uk.screen.at.app.kdw013.a;
 
 import java.util.List;
+import java.util.Optional;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import nts.uk.ctx.at.record.dom.stampmanagement.workplace.WorkLocation;
+import nts.uk.ctx.at.record.dom.jobmanagement.displayformat.ManHrInputDisplayFormat;
 import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.taskframe.TaskFrameUsageSetting;
 import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.taskmaster.Task;
 
@@ -15,6 +17,7 @@ import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.taskmaster.Task;
  */
 @Getter
 @Setter
+@AllArgsConstructor
 public class StartManHourInput {
 	
 	/** 作業枠利用設定 */
@@ -23,7 +26,7 @@ public class StartManHourInput {
 	/** List<作業>*/
 	private List<Task> tasks;
 	
-	/** List<勤務場所> */
-	private List<WorkLocation> workLocations;
+	/** Optional<工数入力表示フォーマット> */
+	private Optional<ManHrInputDisplayFormat> manHrInputDisplayFormat;
 	
 }

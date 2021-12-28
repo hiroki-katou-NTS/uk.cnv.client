@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.record.ws.dailyperformanceformat;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.ws.rs.POST;
@@ -11,6 +12,8 @@ import javax.ws.rs.Produces;
 import nts.arc.layer.ws.WebService;
 import nts.uk.ctx.at.record.app.command.dailyperformanceformat.AddBusinessTypeDailyCommand;
 import nts.uk.ctx.at.record.app.command.dailyperformanceformat.AddBusinessTypeDailyCommandHandler;
+import nts.uk.ctx.at.record.app.command.dailyperformanceformat.CopybusinessTypeDailyCommand;
+import nts.uk.ctx.at.record.app.command.dailyperformanceformat.CopybusinessTypeDailyCommandHandler;
 import nts.uk.ctx.at.record.app.command.dailyperformanceformat.UpdateBusinessTypeDailyCommand;
 import nts.uk.ctx.at.record.app.command.dailyperformanceformat.UpdateBusinessTypeDailyCommandHandler;
 import nts.uk.ctx.at.record.app.find.dailyperformanceformat.BusinessTypeDailyDetailFinder;
@@ -30,18 +33,36 @@ public class BusinessTypeFormatDailyWebService extends WebService {
 
 	@Inject
 	private UpdateBusinessTypeDailyCommandHandler updateBusinessTypeDailyCommandHandler;
+	
+	@Inject
+	private CopybusinessTypeDailyCommandHandler copybusinessTypeDailyCommandHandler;
 
 	@Inject
 	private SheetNoFinder sheetNoFinder;
-
-//	@Inject
-//	private DailyPerformanceFinder dailyPerformanceFinder;
+	
+	@POST
+	@Path("copy")
+	public void copy(CopybusinessTypeDailyCommand command) {
+		this.copybusinessTypeDailyCommandHandler.handle(command);
+	}
+	
+	@POST
+	@Path("findAllBusinessTypeCode")
+	public List<String> getAllBusinessTypeCode() {
+		return this.sheetNoFinder.getAllBusinessTypeCode();
+	}
 
 	@POST
 	@Path("findBusinessTypeDailyDetail/{businessTypeCode}/{sheetNo}")
 	public BusinessTypeFormatDailyDto getAll(@PathParam("businessTypeCode") String businessTypeCode,
 			@PathParam("sheetNo") BigDecimal sheetNo) {
 		return this.businessTypeDailyDetailFinder.getDetail(businessTypeCode, sheetNo);
+	}
+	
+	@POST
+	@Path("checkDailyMode/{businessTypeCode}")
+	public int checkDailyMode(@PathParam("businessTypeCode") String businessTypeCode) {
+		return this.businessTypeDailyDetailFinder.checkDailyMode(businessTypeCode);
 	}
 
 	@POST

@@ -8,6 +8,7 @@ import nts.uk.ctx.at.shared.dom.common.amount.AttendanceAmountDaily;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.premiumtime.PremiumTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.premiumtime.PremiumTimeOfDailyPerformance;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.ExtraTimeItemNo;
 
 public class PremiumTimeHelperInAggregation {
 	
@@ -36,7 +37,7 @@ public class PremiumTimeHelperInAggregation {
 	
 	private static PremiumTime createPremiumTime(Integer premiumTimeNo, AttendanceTime premitumTime) {
 		
-		return new PremiumTime(premiumTimeNo, premitumTime, new AttendanceAmountDaily(0));
+		return new PremiumTime(ExtraTimeItemNo.valueOf(premiumTimeNo), premitumTime, new AttendanceAmountDaily(0));
 	}
 
 }

@@ -260,7 +260,7 @@ public class AsposePersonalScheduleByDateExportGenerator extends AsposeCellsRepo
                 }
 
                 // C3_2_1
-                if (item.getWorkType().equals(WorkTimeForm.FIXED.value)) {
+                if (item.getWorkType() != null && item.getWorkType().equals(WorkTimeForm.FIXED.value)) {
                     val shape1a = calculateConvertToShape(pixelOfColumn, graphStartTime, item.getStartTime1(), item.getEndTime1());
                     if (shape1a.getColumn() != null) {
                         drawRectangle(shapes, rowCount, shape1a.getColumn(), shape1a.getWidth(), shape1a.getLeft(), getBarColor(BarType.FIXED_WORKING_HOURS), false, null);
@@ -275,7 +275,7 @@ public class AsposePersonalScheduleByDateExportGenerator extends AsposeCellsRepo
                 }
 
                 // C3_2_4
-                if (item.getWorkType().equals(WorkTimeForm.FLOW.value)) {
+                if (item.getWorkType() != null && item.getWorkType().equals(WorkTimeForm.FLOW.value)) {
                     val shape4a = calculateConvertToShape(pixelOfColumn, graphStartTime, item.getStartTime1(), item.getEndTime1());
                     if (shape4a.getColumn() != null) {
                         drawRectangle(shapes, rowCount, shape4a.getColumn(), shape4a.getWidth(), shape4a.getLeft(), getBarColor(BarType.FLOWING_WORKING_HOURS), false, null);
@@ -290,7 +290,7 @@ public class AsposePersonalScheduleByDateExportGenerator extends AsposeCellsRepo
                 }
 
                 // C3_2_5
-                if (item.getWorkType().equals(WorkTimeForm.FLEX.value)) {
+                if (item.getWorkType() != null && item.getWorkType().equals(WorkTimeForm.FLEX.value)) {
                     val shape5 = calculateConvertToShape(pixelOfColumn, graphStartTime, item.getStartTime1(), item.getEndTime1());
                     if (shape5.getColumn() != null) {
                         drawRectangle(shapes, rowCount, shape5.getColumn(), shape5.getWidth(), shape5.getLeft(), getBarColor(BarType.FLEX_WORKING_HOURS), false, null);

@@ -6,8 +6,8 @@ import nts.uk.ctx.at.shared.dom.common.CompanyId;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.common.PublicHolidayMonthSetting;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.common.Year;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.employment.EmploymentMonthDaySettingSetMemento;
-import nts.uk.ctx.at.shared.infra.entity.holidaysetting.employment.KshmtHdpubMonthdaysEmp;
 import nts.uk.ctx.at.shared.infra.entity.holidaysetting.employment.KshmtEmpMonthDaySetPK;
+import nts.uk.ctx.at.shared.infra.entity.holidaysetting.employment.KshmtHdpubMonthdaysEmp;
 
 /**
  * The Class JpaEmploymentMonthDaySettingSetMemento.
@@ -75,7 +75,7 @@ public class JpaEmploymentMonthDaySettingSetMemento implements EmploymentMonthDa
 				entity.setKshmtEmpMonthDaySetPK(new KshmtEmpMonthDaySetPK());
 				entity.getKshmtEmpMonthDaySetPK().setCid(this.companyId);
 				entity.getKshmtEmpMonthDaySetPK().setEmpCd(this.empCd);
-				entity.getKshmtEmpMonthDaySetPK().setManageYear(this.year);
+				entity.getKshmtEmpMonthDaySetPK().setManageYear(item.getPublicHdManagementYear().v());
 				entity.getKshmtEmpMonthDaySetPK().setMonth(item.getMonth());
 				entity.setInLegalHd(item.getInLegalHoliday().v());
 				
@@ -83,14 +83,13 @@ public class JpaEmploymentMonthDaySettingSetMemento implements EmploymentMonthDa
 			});
 		} else {
 			this.listKshmtEmpMonthDaySet.stream().forEach(e -> {
-				e.getKshmtEmpMonthDaySetPK().setCid(this.companyId);
-				e.getKshmtEmpMonthDaySetPK().setManageYear(this.year);
-				e.getKshmtEmpMonthDaySetPK().setMonth(publicHolidayMonthSettings.stream()
-														.filter(item -> e.getKshmtEmpMonthDaySetPK().getMonth() == item.getMonth())
-																	.findFirst().get().getMonth());
-				e.setInLegalHd(publicHolidayMonthSettings.stream()
+				PublicHolidayMonthSetting data = publicHolidayMonthSettings.stream()
 						.filter(item -> e.getKshmtEmpMonthDaySetPK().getMonth() == item.getMonth())
-									.findAny().get().getInLegalHoliday().v());
+						.findFirst().get();
+				e.getKshmtEmpMonthDaySetPK().setCid(this.companyId);
+				e.getKshmtEmpMonthDaySetPK().setManageYear(data.getPublicHdManagementYear().v());
+				e.getKshmtEmpMonthDaySetPK().setMonth(data.getMonth());
+				e.setInLegalHd(data.getInLegalHoliday().v());
 			});
 		}
 	}

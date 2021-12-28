@@ -98,7 +98,7 @@ public class JpaShiftPaletteComRepository extends JpaRepository implements Shift
 		while (rs.next()) {
 			listFullData
 					.add(new FullShiftPallets(rs.getString("CID"), Integer.valueOf(rs.getString("PAGE")),
-							rs.getString("PAGE_NAME"), Integer.valueOf(rs.getString("USE_ATR")) == 1 ? true : false,
+							rs.getString("PAGE_NAME"), rs.getBoolean("USE_ATR"),
 							rs.getString("NOTE"),
 							rs.getString("POSITION") != null ? Integer.valueOf(rs.getString("POSITION")) : null,
 							rs.getString("POSITION_NAME"), rs.getString("POSITION_ORDER") != null

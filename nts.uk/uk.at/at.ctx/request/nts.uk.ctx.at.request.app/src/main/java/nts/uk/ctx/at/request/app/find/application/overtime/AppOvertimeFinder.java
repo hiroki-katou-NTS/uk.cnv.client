@@ -8,6 +8,14 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import nts.uk.ctx.at.request.app.find.application.overtime.dto.AppOverTimeDto;
+import nts.uk.ctx.at.request.app.find.application.overtime.dto.MultipleOvertimeContentDto;
+import nts.uk.ctx.at.request.dom.application.PrePostAtr;
+import nts.uk.ctx.at.request.dom.application.common.service.other.output.AchievementDetail;
+import nts.uk.ctx.at.request.dom.application.overtime.*;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.enums.UseAtr;
+import nts.uk.ctx.at.shared.dom.workdayoff.frame.WorkdayoffFrameRepository;
+import nts.uk.shr.com.context.AppContexts;
 import org.apache.commons.lang3.StringUtils;
 
 import nts.arc.enums.EnumAdaptor;
@@ -19,8 +27,6 @@ import nts.uk.ctx.at.request.app.find.application.overtime.dto.DetailOutputDto;
 import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.common.service.newscreen.output.ConfirmMsgOutput;
 import nts.uk.ctx.at.request.dom.application.common.service.setting.output.AppDispInfoStartupOutput;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOverTime;
-import nts.uk.ctx.at.request.dom.application.overtime.OvertimeAppAtr;
 import nts.uk.ctx.at.request.dom.application.overtime.CommonAlgorithm.CheckBeforeOutput;
 import nts.uk.ctx.at.request.dom.application.overtime.CommonAlgorithm.ICommonAlgorithmOverTime;
 import nts.uk.ctx.at.request.dom.application.overtime.service.DisplayInfoOverTime;
@@ -42,11 +48,17 @@ public class AppOvertimeFinder {
 	
 	@Inject
 	private ICommonAlgorithmOverTime commonAlgorithmOverTime;
+
+	@Inject
+	private AppOverTimeRepository appOverTimeRepo;
+
+	@Inject
+    private WorkdayoffFrameRepository workdayoffFrameRepo;
 	
 	/**
 	 * Refactor5
 	 * start at A
-	 * @param paramOverTimeStart
+	 * @param param
 	 * @return
 	 */
 	public DisplayInfoOverTimeDto start(ParamOverTimeStart param) {
@@ -73,9 +85,30 @@ public class AppOvertimeFinder {
 				startTimeSPR,
 				endTimeSPR,
 				agent
-				);
+        );
+
 		return DisplayInfoOverTimeDto.fromDomain(output);
 	}
+
+	public MultiOvertimWithWorkDayOffDto getLatestMultipleOvertimeApp(String employeeId, GeneralDate date, int prePostAtr) {
+		PrePostAtr prePost = EnumAdaptor.valueOf(prePostAtr, PrePostAtr.class);
+		return appOverTimeRepo.findLatestMultipleOvertimeApp(employeeId, date, prePost)
+				.map(i -> {
+                    List<OvertimeApplicationSetting> breakTimes = i.getApplicationTime().getApplicationTime().stream()
+                            .filter(j -> j.getAttendanceType() == AttendanceType_Update.BREAKTIME)
+                            .collect(Collectors.toList());
+                    List<Integer> frameNos = breakTimes.stream().map(t -> t.getFrameNo().v()).collect(Collectors.toList());
+                    List<WorkdayoffFrameDto> dayOffWorkFrames = workdayoffFrameRepo.findByUseAtr(AppContexts.user().companyId(), UseAtr.USE.value).stream()
+                            .filter(f -> frameNos.contains(f.getWorkdayoffFrNo().v().intValue()))
+                            .map(WorkdayoffFrameDto::fromDomain).collect(Collectors.toList());
+
+				    return new MultiOvertimWithWorkDayOffDto(
+							AppOverTimeDto.fromDomain(i),
+                            dayOffWorkFrames
+                    );
+                }).orElse(null);
+	}
+
 	public DisplayInfoOverTimeDto changeDate(ParamOverTimeChangeDate param) {
 		DisplayInfoOverTime output = param.displayInfoOverTime.toDomain();
 		String companyId = param.companyId;
@@ -83,7 +116,8 @@ public class AppOvertimeFinder {
 		if (StringUtils.isNotBlank(param.dateOp)) {
 			dateOp = Optional.of(GeneralDate.fromString(param.dateOp, PATTERN_DATE));	
 		}
-		
+
+        OvertimeAppAtr overtimeAppAtr = EnumAdaptor.valueOf(param.overtimeAppAtr, OvertimeAppAtr.class);
 		AppDispInfoStartupOutput appDispInfoStartupOutput = param.appDispInfoStartupDto.toDomain();
 		Optional<Integer> startTimeSPR = Optional.ofNullable(param.startTimeSPR);
 		
@@ -93,7 +127,7 @@ public class AppOvertimeFinder {
 				companyId,
 				param.employeeId,
 				dateOp,
-				EnumAdaptor.valueOf(param.overtimeAppAtr, OvertimeAppAtr.class),
+                overtimeAppAtr,
 				appDispInfoStartupOutput,
 				startTimeSPR,
 				endTimeSPR,
@@ -106,6 +140,7 @@ public class AppOvertimeFinder {
 				output,
 				param.agent
 				);
+
 		return DisplayInfoOverTimeDto.fromDomain(output);
 	}
 	
@@ -144,20 +179,27 @@ public class AppOvertimeFinder {
 		if (StringUtils.isNotBlank(param.dateOp)) {
 			dateOp = Optional.of(GeneralDate.fromString(param.dateOp, PATTERN_DATE));	
 		}
-		
+
+		OvertimeWorkMultipleTimes multiOvertime = MultipleOvertimeContentDto.toDomain(param.multipleOvertimeContents);
+		Optional<AchievementDetail> opAchievementDetail = param.appDispInfoStartupDto.toDomain().getAppDispInfoWithDateOutput().getOpActualContentDisplayLst().isPresent()
+				? param.appDispInfoStartupDto.toDomain().getAppDispInfoWithDateOutput().getOpActualContentDisplayLst().get().get(0).getOpAchievementDetail()
+				: Optional.empty();
 		DisplayInfoOverTime output = overtimeService.calculate(
 				companyId,
 				param.employeeId,
 				dateOp,
+				EnumAdaptor.valueOf(param.overtimeAtr, OvertimeAppAtr.class),
 				EnumAdaptor.valueOf(param.prePostInitAtr, PrePostInitAtr.class),
 				param.overtimeLeaveAppCommonSet.toDomain(),
 				param.advanceApplicationTime == null ? null : param.advanceApplicationTime.toDomain(),
 				param.achieveApplicationTime == null ? null : param.achieveApplicationTime.toDomain(),
 				param.workContent.toDomain(),
 				param.overtimeAppSetCommand.toDomain(companyId),
-				param.agent
-				);
-		
+				param.agent,
+                multiOvertime.getOvertimeHours(),
+                multiOvertime.getOvertimeReasons(),
+				opAchievementDetail
+        );
 		
 		return DisplayInfoOverTimeDto.fromDomainCalculation(output);
 	}

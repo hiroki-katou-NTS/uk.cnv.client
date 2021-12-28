@@ -150,6 +150,11 @@ public class AccumulationAbsenceDetail implements Cloneable{
 						Collectors.summingDouble(x -> x.getAssocialInfo().getDayNumberUsed().v()),
 						x -> new LeaveRemainingDayNumber(x)));
 	}
+	
+	//未相殺数を更新する
+	public void updateUsedDay(double day) {
+		this.unbalanceNumber.day = new ManagementDataRemainUnit(this.unbalanceNumber.day.v() - day);
+	}
 	public static interface Require {
 
 		/**

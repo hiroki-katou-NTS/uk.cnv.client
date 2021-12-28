@@ -1,15 +1,21 @@
 /* css panel */
-.panel-left {
-  height: 380px;
-  width: 235px;
-  margin-top: 45px;
-  margin-left: 30px;
-}
-
+.panel-center,
+.panel-left,
 .panel-right {
   height: 380px;
   width: 235px;
   margin-top: 45px;
+}
+
+.panel-left {
+  margin-left: 30px;
+}
+
+.panel-center {
+  margin-left: 125px;
+}
+
+.panel-right {
   margin-left: 80px;
 }
 
@@ -73,7 +79,7 @@
 }
 
 .width-btn {
-  width: 165px;
+  width: 170px;
 }
 
 .fix-btn {
@@ -83,9 +89,8 @@
 .font24 {
   font-size: 24px;
 }
-#A1_1 {
-  font-size: 1.5rem;
-}
-#A2_1 {
+#A1_1,
+#A2_1,
+#A3_1 {
   font-size: 1.5rem;
 }

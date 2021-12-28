@@ -47,7 +47,8 @@ public class ScriptFile extends UIComponentBase {
     public static Set<String> FILES_FULLCALENDAR = new  LinkedHashSet<String>(Arrays.asList(new String[] {
     	"/lib/generic/fullcalendar/main.min.js",
     	"/lib/generic/fullcalendar/locales/ja.js",
-    	"/lib/generic/fullcalendar/locales/vi.js"
+    	"/lib/generic/fullcalendar/locales/vi.js",
+    	"/lib/generic/fullcalendar/datepicker/fc-datepicker.js"
     }));
     
     @SuppressWarnings("serial")

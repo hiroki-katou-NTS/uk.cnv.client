@@ -2,7 +2,7 @@ package nts.uk.screen.at.app.kdw013.a;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -12,20 +12,11 @@ import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.record.dom.adapter.workplace.GetAllEmployeeWithWorkplaceAdapter;
 import nts.uk.ctx.at.record.dom.adapter.workplace.GetWorkplaceOfEmployeeAdapter;
-import nts.uk.ctx.at.record.dom.daily.ouen.GetTheWorkYouUseMostRecentlyService;
-import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDaily;
-import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDailyRepo;
+import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.confirmationstatus.change.confirm.DailyLock;
 import nts.uk.ctx.at.record.dom.jobmanagement.manhourrecordreferencesetting.ManHourRecordReferenceSetting;
 import nts.uk.ctx.at.record.dom.jobmanagement.manhourrecordreferencesetting.ManHourRecordReferenceSettingRepository;
 import nts.uk.ctx.at.record.dom.workrecord.actualsituation.CheckShortageFlex;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.work.WorkCode;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.work.WorkGroup;
-import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.repo.taskframe.TaskFrameUsageSettingRepository;
-import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.repo.taskmaster.TaskingRepository;
-import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.taskframe.TaskFrameNo;
-import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.taskframe.TaskFrameUsageSetting;
-import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.taskmaster.Task;
-import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.taskmaster.TaskCode;
+import nts.uk.screen.at.app.kdw013.query.GetEstimatedTimeZones;
 import nts.uk.shr.com.context.AppContexts;
 
 /**
@@ -44,85 +35,72 @@ public class GetEmployeeDisplayInfo {
 	private GetWorkConfirmationStatus getWorkConfirmationStatus;
 
 	@Inject
-	private OuenWorkTimeSheetOfDailyRepo ouenRepo;
-
-	@Inject
-	private TaskingRepository taskRepo;
-
-	@Inject
-	private TaskFrameUsageSettingRepository taskFrameUsageSettingRepo;
-
-	@Inject
 	private CheckShortageFlex checkShortageFlex;
 
 	@Inject
 	private GetDailyPerformanceData getDailyPerformanceData;
-	
+
 	@Inject
 	private GetWorkplaceOfEmployeeAdapter getWorkplaceOfEmployeeAdapter;
-	
+
 	@Inject
 	private GetAllEmployeeWithWorkplaceAdapter getAllEmployeeWithWorkplaceAdapter;
 
+	@Inject
+	private GetEstimatedTimeZones getEstimatedTimeZones;
+
+	@Inject
+	private GetLockStatusOfDay getLockStatusOfDay;
+
 	/**
 	 * 
-	 * @param sid
-	 * @param refDate
-	 * @param period
-	 * @return
+	 * @param sid 社員ID
+	 * @param refDate 基準日
+	 * @param period 表示期間
+	 * @param itemIds 対象項目リスト： List<工数実績項目ID>
 	 */
-	public EmployeeDisplayInfo getInfo(String sid, GeneralDate refDate, DatePeriod period) {
-		EmployeeDisplayInfo employeeDisplayInfo = new EmployeeDisplayInfo();
+	public EmployeeDisplayInfo getInfo(String sid, GeneralDate refDate, DatePeriod period, List<String> itemIds) {
 
-		// 1: 取得する(@Require, 社員ID, 年月日):List<作業グループ>
-		RequireImpl require = new RequireImpl(ouenRepo, taskRepo, taskFrameUsageSettingRepo);
-		RequireImpl1 require1 = new RequireImpl1(workChangeablePeriodSettingRepo, checkShortageFlex, getWorkplaceOfEmployeeAdapter,getAllEmployeeWithWorkplaceAdapter);
+		EmployeeDisplayInfo result = new EmployeeDisplayInfo();
 
-		List<WorkGroup> workGroups = GetTheWorkYouUseMostRecentlyService.get(require, sid);
-		employeeDisplayInfo.setWorkGroups(workGroups);
+		String companyId = AppContexts.user().companyId();
 
-		// 2: get(ログイン会社ID)
-		Optional<ManHourRecordReferenceSetting> OptWorkChangeablePeriodSetting = workChangeablePeriodSettingRepo
-				.get(AppContexts.user().companyId());
+		// 1. get(ログイン会社ID) 工数実績参照設定
 
-		// 3: [作業変更可能期間設定.isPresent]:作業修正可能開始日付を取得する(@Require, 社員ID):年月日
-		if (OptWorkChangeablePeriodSetting.isPresent()) {
-			GeneralDate date = OptWorkChangeablePeriodSetting.get().getWorkCorrectionStartDate(require1, sid);
-			employeeDisplayInfo.setDate(date);
-		}
+		this.workChangeablePeriodSettingRepo.get(companyId).ifPresent(ms -> {
+			// 2. 作業修正可能開始日付を取得する(@Require, 社員ID) 作業変更可能期間設定.isPresent
+			RequireImpl1 require = new RequireImpl1(workChangeablePeriodSettingRepo, checkShortageFlex,
+					getWorkplaceOfEmployeeAdapter, getAllEmployeeWithWorkplaceAdapter);
+			GeneralDate workStartDate = ms.getWorkCorrectionStartDate(require, sid);
 
-		// 4: <call>(社員ID,基準日)
-		employeeDisplayInfo.setLstComfirmerDto(getWorkConfirmationStatus.get(sid, refDate));
+			result.setWorkStartDate(workStartDate);
+		});
 
-		// 5: <call>(社員ID,表示期間)
-		employeeDisplayInfo.setWorkRecordDetails(getDailyPerformanceData.get(sid, period));
+		// 3. call 社員ID,基準日 List＜確認者>
 
-		return employeeDisplayInfo;
-	}
+		List<ConfirmerDto> confirms = this.getWorkConfirmationStatus.get(sid, refDate);
 
-	@AllArgsConstructor
-	public class RequireImpl implements GetTheWorkYouUseMostRecentlyService.Require {
+		result.setLstComfirmerDto(confirms);
 
-		private OuenWorkTimeSheetOfDailyRepo ouenRepo;
+		// 4: <call>(社員ID,表示期間,対象項目リスト)
+		GetDailyPerformanceDataResult dailyPerformanceData = getDailyPerformanceData.get(sid, period,
+				itemIds.stream().filter(x -> x != null).map(x -> Integer.valueOf(x)).collect(Collectors.toList()));
 
-		private TaskingRepository taskRepo;
+		result.setDailyPerformanceData(dailyPerformanceData);
 
-		private TaskFrameUsageSettingRepository taskFrameUsageSettingRepo;
+		// 5. 工数入力目安時間帯を取得する
 
-		@Override
-		public Optional<Task> getTask(TaskFrameNo taskFrameNo, WorkCode code) {
-			return taskRepo.getOptionalTask(AppContexts.user().companyId(), taskFrameNo, new TaskCode(code.v()));
-		}
+		dailyPerformanceData.getLstIntegrationOfDaily().forEach(id -> {
+			result.getEstimateZones().add(EstimatedTimeZoneDto.fromDomain(this.getEstimatedTimeZones.get(id)));
+		});
 
-		@Override
-		public TaskFrameUsageSetting getTaskFrameUsageSetting() {
-			return taskFrameUsageSettingRepo.getWorkFrameUsageSetting(AppContexts.user().companyId());
-		}
+		// 6. 日の実績のロック状況を取得する
 
-		@Override
-		public List<OuenWorkTimeSheetOfDaily> findOuenWorkTimeSheetOfDaily(String empId, DatePeriod targetPeriod) {
-			return ouenRepo.find(empId, targetPeriod);
-		}
+		List<DailyLock> lockInfos = this.getLockStatusOfDay.get(sid, period);
+
+		result.setLockInfos(lockInfos.stream().map(li -> DailyLockDto.fromDomain(li)).collect(Collectors.toList()));
+
+		return result;
 	}
 
 	@AllArgsConstructor
@@ -131,9 +109,9 @@ public class GetEmployeeDisplayInfo {
 		private ManHourRecordReferenceSettingRepository workChangeablePeriodSettingRepo;
 
 		private CheckShortageFlex checkShortageFlex;
-		
+
 		private GetWorkplaceOfEmployeeAdapter getWorkplaceOfEmployeeAdapter;
-		
+
 		private GetAllEmployeeWithWorkplaceAdapter getAllEmployeeWithWorkplaceAdapter;
 
 		@Override

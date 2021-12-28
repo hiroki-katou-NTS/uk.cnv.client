@@ -5,21 +5,9 @@
 package nts.uk.ctx.at.record.infra.repository.optitem;
 
 import java.util.Optional;
-
 import org.apache.commons.lang3.BooleanUtils;
-
 import nts.uk.ctx.at.record.infra.entity.optitem.KrcmtAnyfResultRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.AmountRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcRangeCheck;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcResultRangeGetMemento;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.DailyAmountRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.DailyTimeRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.DailyTimesRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.MonthlyAmountRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.MonthlyTimeRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.MonthlyTimesRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.NumberRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.TimeRange;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.*;
 
 /**
  * The Class JpaCalcResultRangeGetMemento.

@@ -143,6 +143,7 @@ public class NumberCompensatoryLeavePeriodProcess {
 		public List<PayoutManagementData> getPayoutMana(String sid) {
 			return payoutManagementDataRepository.getSid(AppContexts.user().companyId(), sid);
 		}
+
 	}
 
 	@Getter
@@ -209,7 +210,7 @@ public class NumberCompensatoryLeavePeriodProcess {
 			this.closureRepo = closureRepo;
 			return this;
 		}
-
+		
 		public RequireImpl build() {
 			return new RequireImpl(this);
 		}

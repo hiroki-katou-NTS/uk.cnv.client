@@ -53,6 +53,7 @@ export class Kdws03AComponent extends Vue {
     public rownum: number = 0;
     public rowHeight: number = 0;
     public displayFormat: any = '0';
+    public formatCode: string = '';
     public lstDataSourceLoad: Array<any> = [];
     public lstDataHeader: Array<any> = [];
     public optionalHeader: Array<any> = [];
@@ -227,7 +228,16 @@ export class Kdws03AComponent extends Vue {
     //日別実績データの取得
     public startPage() {
         let self = this;
+        let selectedCode: Array<any> = [];
+        let cache: any = storage.session.getItem('selectedCode');
         self.$mask('show', { message: true });
+
+        // if (!_.isNil(self.formatCode) && self.formatCode != '') {
+        //     selectedCode.push(self.formatCode);
+        // }    
+        if (!_.isNil(cache)) {
+            selectedCode.push(cache.selectedCode);
+        }  
 
         let param = {
             changePeriodAtr: self.params.changePeriodAtr,
@@ -244,6 +254,7 @@ export class Kdws03AComponent extends Vue {
             displayDateRange: null,
             transitionDesScreen: self.params.transitionDesScreen,
             closureId: self.params.closureID,
+            formatCodes: selectedCode
         };
 
         self.$http.post('at', servicePath.initMOB, param).then(async (result: { data: any }) => {
@@ -663,6 +674,7 @@ export class Kdws03AComponent extends Vue {
     //メニュー画面を開く
     public openMenu() {
         let self = this;
+        let authory: any = _.find(self.paramData.authorityDto, (x) => x.functionNo == 8 ); 
         if (self.displayFormat == '0') {//個人別モード
             self.$modal('kdws03amenu',
                 {
@@ -673,7 +685,9 @@ export class Kdws03AComponent extends Vue {
                     monthActualReferButtonDis: this.dPCorrectionMenuDto.monthActualReferButtonDis,
                     timeExcessReferButtonDis: this.dPCorrectionMenuDto.timeExcessReferButtonDis,
                     selfConfirm: this.paramData.showPrincipal,
-                    closureDate: self.dateRanger.startDate
+                    closureDate: self.dateRanger.startDate,
+                    functionNoView: authory.availability,
+                    authoryView: self.paramData.disItem.settingUnit,
                 }).then((param: any) => {
                     if (param != undefined && param.openB) {
                         //open B
@@ -692,13 +706,20 @@ export class Kdws03AComponent extends Vue {
                             'paramData': self.paramData
                         });
                     }
+
+                    // close dialog I
+                    if (!_.isNil(param)) {
+                        self.formatCode = param;
+                        this.startPage();
+                    }
+
                     if (!_.isNil(param) && param.reload) {
                         this.startPage();
                     }
 
                 });
         } else {//日付別モード
-            this.$modal('kdws03c').then((paramOpenB: any) => {
+            self.$modal('kdws03c').then((paramOpenB: any) => {
                 if (paramOpenB != undefined && paramOpenB.openB) {
                     //open B
                     let rowData = null;
@@ -898,4 +919,6 @@ interface Params {
     transitionDesScreen: any;
     // エラー参照を起動する
     errorRefStartAtr: boolean;
+
+    formatCodes: Array<string>;
 }

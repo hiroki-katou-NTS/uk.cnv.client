@@ -12,18 +12,7 @@ import lombok.Setter;
 import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.at.record.app.command.optitem.calculation.FormulaDto;
 import nts.uk.ctx.at.shared.dom.common.CompanyId;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcResultRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalculationClassification;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.DescritionOptionalItem;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.EmpConditionAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.NoteOptionalItem;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemGetMemento;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemName;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemNo;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemUsageAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.PerformanceAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.UnitOfOptionalItem;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.*;
 import nts.uk.shr.com.context.AppContexts;
 
 /**
@@ -67,6 +56,8 @@ public class OptionalItemSaveCommand implements OptionalItemGetMemento {
 	private String note;
 	
 	private String description;
+
+	private boolean inputCheck;
 
 	/*
 	 * (non-Javadoc)
@@ -152,8 +143,16 @@ public class OptionalItemSaveCommand implements OptionalItemGetMemento {
 	 * getCalculationResultRange()
 	 */
 	@Override
-	public CalcResultRange getCalculationResultRange() {
-		return new CalcResultRange(this.calcResultRange);
+	public InputControlSetting getInputControlSetting() {
+		return new InputControlSetting(
+				this.inputCheck,
+				new CalcResultRange(this.calcResultRange),
+				Optional.of(new DailyResultInputUnit(
+						Optional.ofNullable(this.calcResultRange.getTimeInputUnit() == null ? null : EnumAdaptor.valueOf(this.calcResultRange.getTimeInputUnit(), TimeItemInputUnit.class)),
+						Optional.ofNullable(this.calcResultRange.getNumberInputUnit() == null ? null : EnumAdaptor.valueOf(this.calcResultRange.getNumberInputUnit(), NumberItemInputUnit.class)),
+						Optional.ofNullable(this.calcResultRange.getAmountInputUnit() == null ? null : EnumAdaptor.valueOf(this.calcResultRange.getAmountInputUnit(), AmountItemInputUnit.class))
+				))
+		);
 	}
 
 	/* (non-Javadoc)

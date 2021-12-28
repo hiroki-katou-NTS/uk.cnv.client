@@ -117,13 +117,13 @@ public class PersonInformationRoleFinder {
 	 * @param roleId
 	 * @return
 	 */
-	public RoleDto getRoleByRoleId(String roleId ){
+	public Optional<RoleDto> getRoleByRoleId(String roleId ){
 
 		Optional<Role> optRole = roleRepo.findByRoleId(roleId);
 		if (optRole.isPresent()) {
-		 return RoleDto.fromDomain(optRole.get());
+		 return Optional.of(RoleDto.fromDomain(optRole.get()));
 		}
-		return null;
+		return Optional.empty();
 	}
 	
 	public boolean userHasRoleType (int roleType){

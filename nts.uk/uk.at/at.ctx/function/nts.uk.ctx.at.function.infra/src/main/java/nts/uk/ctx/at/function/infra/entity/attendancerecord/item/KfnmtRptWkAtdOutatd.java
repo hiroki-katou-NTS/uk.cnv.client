@@ -58,7 +58,7 @@ public class KfnmtRptWkAtdOutatd extends UkJpaEntity implements Serializable {
 	private long columnIndex;
 
 	/** The position. */
-	@Column(name = "[POSITION]")
+	@Column(name = "POSITION", table = "KFNMT_RPT_WK_ATD_OUTATD")
 	private long position;
 
 	/** The output atr. */

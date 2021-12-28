@@ -39,6 +39,8 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.PredetermineTimeSetForCalc;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.timezone.outsideworktime.OverTimeSheet;
 import nts.uk.ctx.at.shared.dom.scherec.dailyprocess.calc.FactoryManagePerPersonDailySet;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.employeeunitpricehistory.EmployeeUnitPriceHistoryItem;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.employeeunitpricehistory.EmployeeUnitPriceHistoryRepositoly;
 import nts.uk.ctx.at.shared.dom.scherec.statutory.worktime.UsageUnitSetting;
 import nts.uk.ctx.at.shared.dom.scherec.statutory.worktime.algorithm.DailyStatutoryLaborTime;
 import nts.uk.ctx.at.shared.dom.scherec.statutory.worktime.week.DailyUnit;
@@ -89,6 +91,10 @@ public class FactoryManagePerPersonDailySetImpl implements FactoryManagePerPerso
 	/* 休暇加算設定 */
 	@Inject
 	private HolidayAddtionRepository hollidayAdditonRepository;
+
+	/* 社員単価履歴 */
+	@Inject
+	private EmployeeUnitPriceHistoryRepositoly employeeUnitPriceHistoryRepositoly;
 	
 	@Inject
 	private RecordDomRequireService requireService;
@@ -189,10 +195,13 @@ public class FactoryManagePerPersonDailySetImpl implements FactoryManagePerPerso
 					this.sysEmploymentHisAdapter,
 					this.compensLeaveComSetRepo,
 					this.compensLeaveEmSetRepo);
+
+			/*社員単価履歴*/
+			Optional<EmployeeUnitPriceHistoryItem> unitPrice = this.employeeUnitPriceHistoryRepositoly.get(daily.getEmployeeId(), daily.getYmd());
 			
 			return Optional.of(new ManagePerPersonDailySet(nowWorkingItem, dailyUnit,
 								addSetting, bonusPaySetting, predetermineTimeSetByPersonWeekDay,
-								overTimeSheetRequire));
+								overTimeSheetRequire, unitPrice));
 		}
 		catch(RuntimeException e) {
 			return Optional.empty();

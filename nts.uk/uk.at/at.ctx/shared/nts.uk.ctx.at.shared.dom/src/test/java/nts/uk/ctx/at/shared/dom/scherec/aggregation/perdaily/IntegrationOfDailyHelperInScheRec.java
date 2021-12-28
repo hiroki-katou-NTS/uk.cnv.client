@@ -113,6 +113,8 @@ public class IntegrationOfDailyHelperInScheRec {
 					, new ArrayList<>()	// 編集状態
 					, Optional.empty()	// 臨時出退勤
 					, new ArrayList<>()	// 備考
+					, new ArrayList<>()	// 応援作業時間
+					, new ArrayList<>()	// 応援作業時間帯
 					, Optional.empty()	// スナップショット
 				);
 

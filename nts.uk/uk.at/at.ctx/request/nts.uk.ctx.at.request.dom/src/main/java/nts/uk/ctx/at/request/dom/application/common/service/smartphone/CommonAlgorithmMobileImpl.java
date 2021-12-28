@@ -315,7 +315,9 @@ public class CommonAlgorithmMobileImpl implements CommonAlgorithmMobile {
 					companyID, 
 					employeeID, 
 					appDateLst, 
-					appType);
+					appType,
+					opOvertimeAppAtr
+			);
 			opPreAppContentDisplayLst = Optional.of(preAppContentDisplayLst);
 		}
 		// 取得した内容を返す

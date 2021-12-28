@@ -423,7 +423,8 @@ module nts.uk.at.view.kdp010.h {
 				let dataG = {
 					dataShare: self.dataShare == null ? shareH : self.dataShare,
 					buttonPositionNo: enumVal,
-                    fromScreen: self.mode == 0? 'A': ''
+                    fromScreen: self.mode == 0? 'A': '',
+					stampMeans: self.mode
 				}
 				nts.uk.ui.windows.setShared('KDP010_G', dataG);
 				nts.uk.ui.windows.sub.modal("/view/kdp/010/i/index.xhtml").onClosed(() => {

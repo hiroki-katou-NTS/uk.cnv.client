@@ -62,3 +62,19 @@
 table#gridList tbody td:nth-child(1) {
     text-align: right;
 }
+
+.div_line {
+	margin-top: 1px;
+	float: left;
+	clear: both;
+	width: 100%;
+}
+table.detail-data tr td{
+	vertical-align: middle;
+	height: 50px;
+}
+
+#A7_2{
+	width: 155px !important;
+}
+

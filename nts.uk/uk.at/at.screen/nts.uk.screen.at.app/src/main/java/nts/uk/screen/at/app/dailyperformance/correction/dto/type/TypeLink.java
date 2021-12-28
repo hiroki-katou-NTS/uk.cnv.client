@@ -32,7 +32,9 @@ public enum TypeLink {
 	
 	WORK(15, "作業"),
 	
-	ADDITION(16, "加給");
+	ADDITION(16, "加給"),
+	
+	WORK_SUP_OPTION(19,"作業補足選択肢");
 
 	/** The value. */
 	public int value;

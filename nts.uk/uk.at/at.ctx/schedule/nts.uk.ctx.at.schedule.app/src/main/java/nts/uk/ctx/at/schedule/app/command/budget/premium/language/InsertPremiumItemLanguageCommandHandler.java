@@ -7,9 +7,11 @@ import javax.inject.Inject;
 
 import nts.arc.layer.app.command.CommandHandler;
 import nts.arc.layer.app.command.CommandHandlerContext;
-import nts.uk.ctx.at.schedule.dom.budget.premium.PremiumName;
-import nts.uk.ctx.at.schedule.dom.budget.premium.language.PremiumItemLanguage;
-import nts.uk.ctx.at.schedule.dom.budget.premium.language.PremiumItemLanguageRepository;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.ExtraTimeItemNo;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.PremiumItemLanguage;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.PremiumItemLanguageRepository;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.PremiumName;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.outsideot.overtime.language.LanguageId;
 import nts.uk.shr.com.context.AppContexts;
 
 @Stateless
@@ -25,7 +27,7 @@ public class InsertPremiumItemLanguageCommandHandler extends CommandHandler<List
 		for(InsertPremiumItemLanguageCommand item : command.getListData()) {
 			Optional<PremiumItemLanguage> data = repo.findById(companyId, item.getDisplayNumber(), item.getLangID());
 			PremiumItemLanguage premiumItemLanguage = new PremiumItemLanguage(item.getCompanyID(),
-					item.getDisplayNumber(), item.getLangID(),
+					ExtraTimeItemNo.valueOf(item.getDisplayNumber()), new LanguageId(item.getLangID()),
 					(item.getName() == null || item.getName().equals("")) ? null
 							: new PremiumName(item.getName()));
 			if (data.isPresent()) {

@@ -31,4 +31,9 @@ public class ApplicationExportDto {
 	 * 反映状態
 	 */
 	private Integer reflectState;
+	
+	/**
+	 * 事前事後区分
+	 */
+	private int prePostAtr;
 }

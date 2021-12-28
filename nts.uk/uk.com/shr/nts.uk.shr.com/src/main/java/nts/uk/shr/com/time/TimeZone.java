@@ -1,6 +1,7 @@
 package nts.uk.shr.com.time;
 
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * refactor 4
@@ -9,6 +10,7 @@ import lombok.Getter;
  *
  */
 @Getter
+@Setter
 public class TimeZone {
 	
 	/**

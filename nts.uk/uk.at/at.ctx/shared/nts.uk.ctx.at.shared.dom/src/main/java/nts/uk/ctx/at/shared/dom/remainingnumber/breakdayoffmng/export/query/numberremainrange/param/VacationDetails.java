@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.MngDataStatus;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.OccurrenceDigClass;
 import nts.uk.ctx.at.shared.dom.remainingnumber.base.DigestionAtr;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.AccumulationAbsenceDetailComparator;
@@ -84,7 +85,19 @@ public class VacationDetails {
 				.mapToInt(x -> x.getUnbalanceNumber().getTime().map(y -> y.v()).orElse(0)).sum();
 		return new UnoffsetNumSeqVacation(new LeaveRemainingDayNumber(daySum), new LeaveRemainingTime(timeSum));
 	}
+
+	// [10] 発生の確定データを取得する
+	public List<AccumulationAbsenceDetail> getOccrFixed() {
+		return this.getOccurrenceNotDateUnknown().stream().filter(x -> x.getDataAtr() == MngDataStatus.CONFIRMED)
+				.collect(Collectors.toList());
+	}
 	
+	// [11] 指定した日付の消化暫定データを取得する
+	public Optional<AccumulationAbsenceDetail> getDigestTempWithDate(GeneralDate date) {
+		return this.getDigestNotDateUnknown().stream().filter(
+				x -> x.getDateOccur().getDayoffDate().get().equals(date) && x.getDataAtr() != MngDataStatus.CONFIRMED)
+				.findFirst();
+	}
 	
 	// [1] 該当する日の休暇明細を取得
 	private Optional<AccumulationAbsenceDetail> getVacStateForAppDay(GeneralDate correspDay) {

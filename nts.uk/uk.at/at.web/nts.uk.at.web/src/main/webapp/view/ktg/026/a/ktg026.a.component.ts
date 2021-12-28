@@ -462,18 +462,10 @@ module nts.uk.at.view.ktg026.a {
         dialogParam: any;
 
         legendOptions: any;
+        cache: any;
 
-        constructor(private cache: { currentOrNextMonth: 1 | 2; } | null) {
+        constructor() {
             super();
-
-            if (!this.cache) {
-                this.cache = { currentOrNextMonth: 1 };
-            } else {
-                if (typeof this.cache.currentOrNextMonth === 'undefined') {
-                    this.cache.currentOrNextMonth = 1;
-                }
-            }
-
             const vm = this;
 
             vm.chartStyle = ko.computed({
@@ -506,16 +498,6 @@ module nts.uk.at.view.ktg026.a {
 
         created(param?: any) {
             const vm = this;
-            vm.isDialog = param && !!param.mode;
-            vm.dialogParam = vm.isDialog ? param : null;
-            const { $user, cache } = vm;
-            const { employeeId } = vm.isDialog ? vm.dialogParam:  $user;
-            // 1: 従業員参照モード 2: 上長参照モード
-            const { currentOrNextMonth } = (cache || { currentOrNextMonth: 1 });
-            const targetDate: any = vm.isDialog ? vm.dialogParam.targetDate : null;
-            let targetYear: any = vm.isDialog ? vm.dialogParam.targetYear : null;
-
-            const command = { employeeId, targetDate, targetYear, currentOrNextMonth };
             vm.legendOptions = {
                 items: [
                     { colorCode: '#99FF66', labelText: vm.$i18n('KTG026_2') },
@@ -526,6 +508,18 @@ module nts.uk.at.view.ktg026.a {
                 + '<div style="color: #{colorCode};" data-bind="ntsFormLabel: { required: false }">#{labelText}</div>'
                 + '</div>'
             };
+            
+            const startScreen = () => {
+            vm.isDialog = param && !!param.mode;
+            vm.dialogParam = vm.isDialog ? param : null;
+            const { $user, cache } = vm;
+            const { employeeId } = vm.isDialog ? vm.dialogParam:  $user;
+            // 1: 従業員参照モード 2: 上長参照モード
+            const { currentOrNextMonth, closureId, processDate } = cache;
+            const targetDate: any = vm.isDialog ? vm.dialogParam.targetDate : null;
+            let targetYear: any = vm.isDialog ? vm.dialogParam.targetYear : null;
+
+            const command = { closureID: closureId, employeeId, targetDate, targetYear, currentOrNextMonth, processingYm: processDate };
 
             vm
                 .$blockui('invisibleView')
@@ -533,20 +527,16 @@ module nts.uk.at.view.ktg026.a {
                 .then((response: EmployeesOvertimeDisplay) => {
                     if (!!response) {
                         vm.employeesOvertime = response;
-                        const { yearIncludeThisMonth, yearIncludeNextMonth } = response;
+                        const { displayYear } = response;
 
                         // ???
                         vm.employeeName(response.empInfo.businessName);
-
-                        vm.$window.storage('KTG026_TARGET')
+                        vm.$window.storage('KTG026_INITIAL_DATA')
                             .then((rs: {isRefresh: boolean, target: any}) => {
-                                if (rs && rs.isRefresh) {
-                                    targetYear = rs.target;
-                                }
-                                
+                                targetYear = rs && rs.isRefresh && rs.target ? rs.target : null;
                                 const year = !_.isNil(targetYear) && !_.isEmpty(targetYear)
                                 ? targetYear
-                                : ((currentOrNextMonth === 1 ? yearIncludeThisMonth : yearIncludeNextMonth) || '');
+                                : displayYear;
     
                                 vm.targetYear(year.toString());
                             })
@@ -565,6 +555,12 @@ module nts.uk.at.view.ktg026.a {
                         $('.ktg-026-a.ui-resizable').trigger('wg.resize');
                     });
                 });
+            };
+
+            // Rq609 is called here, by cache of ccg008
+            vm.$window.storage('cache')
+                .then(obj => vm.cache = obj)
+                .then(() => startScreen());
         }
 
         mounted() {
@@ -576,7 +572,7 @@ module nts.uk.at.view.ktg026.a {
                     vm.$validate('#ktg026-datepick').then(valid => {
                         if (!valid || _.isEmpty(targetYear)) return;
 
-                        vm.$window.storage('KTG026_TARGET', {
+                        vm.$window.storage('KTG026_INITIAL_DATA', {
                             isRefresh: false,
                             target: targetYear
                         });

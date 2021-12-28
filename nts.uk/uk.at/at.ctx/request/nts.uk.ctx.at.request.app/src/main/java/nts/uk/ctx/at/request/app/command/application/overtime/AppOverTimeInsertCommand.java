@@ -8,9 +8,12 @@ import lombok.NoArgsConstructor;
 import nts.arc.enums.EnumAdaptor;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.request.app.command.application.common.ApplicationInsertCmd;
-import nts.uk.ctx.at.request.dom.application.Application;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOverTime;
-import nts.uk.ctx.at.request.dom.application.overtime.OvertimeAppAtr;
+import nts.uk.ctx.at.request.dom.application.AppReason;
+import nts.uk.ctx.at.request.dom.application.overtime.*;
+import nts.uk.ctx.at.request.dom.setting.company.appreasonstandard.AppStandardReasonCode;
+import nts.uk.ctx.at.shared.dom.common.time.TimeSpanForCalc;
+import nts.uk.shr.com.time.TimeWithDayAttr;
+import org.apache.commons.lang3.StringUtils;
 
 
 @NoArgsConstructor
@@ -29,32 +32,15 @@ public class AppOverTimeInsertCommand {
 	
 	// 勤務情報
 	public WorkInformationCommand workInfoOp;
+
+	public List<MultipleOvertimeContentCommand> multipleOvertimeContents;
 	
 	public ApplicationInsertCmd application;
-	
-	public AppOverTimeInsertCommand(
-			Integer overTimeClf,
-			ApplicationTimeCommand applicationTime,
-			List<TimeZoneWithWorkNoCommand> breakTimeOp,
-			List<TimeZoneWithWorkNoCommand> workHoursOp,
-			WorkInformationCommand workInfoOp
-			) {
-		
-		this.overTimeClf = overTimeClf;
-		this.applicationTime = applicationTime;
-		this.breakTimeOp = breakTimeOp;
-		this.workHoursOp = workHoursOp;
-		this.workInfoOp = workInfoOp;
-		
-	}
-	public Application toDomainApplication() {
-		return application.toDomain();
-	}
+
 	public AppOverTime toDomain() {
-		
-		
+		OvertimeAppAtr overtimeAppAtr = EnumAdaptor.valueOf(overTimeClf, OvertimeAppAtr.class);
 		return new AppOverTime(
-				EnumAdaptor.valueOf(overTimeClf, OvertimeAppAtr.class),
+				overtimeAppAtr,
 				applicationTime == null ? null : applicationTime.toDomain(),
 				CollectionUtil.isEmpty(breakTimeOp) ?
 						Optional.empty() : 
@@ -66,6 +52,23 @@ public class AppOverTimeInsertCommand {
 							Optional.of(workHoursOp.stream()
 									.map(x -> x.toDomain())
 									.collect(Collectors.toList())),
-				workInfoOp == null ? Optional.empty() : Optional.of(workInfoOp.toDomain()));
+				workInfoOp == null ? Optional.empty() : Optional.of(workInfoOp.toDomain()),
+				overtimeAppAtr != OvertimeAppAtr.MULTIPLE_OVERTIME || CollectionUtil.isEmpty(multipleOvertimeContents)
+						? Optional.empty()
+						: Optional.of(OvertimeWorkMultipleTimes.create(
+								multipleOvertimeContents.stream()
+										.map(i -> new OvertimeHour(
+												new OvertimeNumber(i.getFrameNo()),
+												new TimeSpanForCalc(new TimeWithDayAttr(i.getStartTime()), new TimeWithDayAttr(i.getEndTime()))
+										)).collect(Collectors.toList()),
+								multipleOvertimeContents.stream()
+										.filter(i -> i.getFixedReasonCode() != null || !StringUtils.isEmpty(i.getAppReason()))
+										.map(i -> new OvertimeReason(
+												new OvertimeNumber(i.getFrameNo()),
+												Optional.ofNullable(i.getFixedReasonCode() == null ? null : new AppStandardReasonCode(i.getFixedReasonCode())),
+												Optional.ofNullable(StringUtils.isEmpty(i.getAppReason()) ? null : new AppReason(i.getAppReason()))
+										)).collect(Collectors.toList())
+						))
+		);
 	}
 }

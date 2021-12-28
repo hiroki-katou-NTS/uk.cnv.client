@@ -11,6 +11,8 @@ import javax.ws.rs.Produces;
 
 import nts.arc.layer.ws.WebService;
 import nts.uk.ctx.at.function.app.command.monthlycorrection.fixedformatmonthly.BusinessTypeSortedMonCmd;
+import nts.uk.ctx.at.function.app.command.monthlycorrection.fixedformatmonthly.CopyMonthlyCmd;
+import nts.uk.ctx.at.function.app.command.monthlycorrection.fixedformatmonthly.CopyMonthlyCmdHandler;
 import nts.uk.ctx.at.function.app.command.monthlycorrection.fixedformatmonthly.MonthlyRecordWorkTypeCmd;
 import nts.uk.ctx.at.function.app.command.monthlycorrection.fixedformatmonthly.UpdateBusinessTypeSortedMonCmdHandler;
 import nts.uk.ctx.at.function.app.command.monthlycorrection.fixedformatmonthly.UpdateMonthlyRecordWorkTypeCmdHandler;
@@ -37,6 +39,9 @@ public class MonthlyRecordWorkTypeWS extends WebService {
 	
 	@Inject
 	private BusinessTypeSortedMonFinder businessFinder;
+	
+	@Inject
+	private CopyMonthlyCmdHandler copyHandler;
 	
 	@POST
 	@Path("findall")
@@ -69,5 +74,10 @@ public class MonthlyRecordWorkTypeWS extends WebService {
 		return data;
 	}
 	
+	@POST
+	@Path("copy")
+	public void copyMonthly(CopyMonthlyCmd command) {
+		this.copyHandler.handle(command);
+	}
 	
 }

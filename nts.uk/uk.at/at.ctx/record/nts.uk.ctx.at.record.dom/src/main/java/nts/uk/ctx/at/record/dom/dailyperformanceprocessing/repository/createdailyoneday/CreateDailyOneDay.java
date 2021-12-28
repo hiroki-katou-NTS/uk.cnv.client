@@ -81,4 +81,5 @@ public class CreateDailyOneDay {
 		return new OutputCreateDailyOneDay( listErrorMessageInfo, integrationOfDaily.get(), new ArrayList<>(), changeDailyAtt);
 		
 	}
+
 }

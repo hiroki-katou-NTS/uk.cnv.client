@@ -4,7 +4,7 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
-import nts.uk.screen.at.app.kdw013.a.OvertimeLeaveTime;
+import nts.uk.screen.at.app.kdw013.a.OvertimeLeaveTimeDto;
 
 /**
  * 
@@ -19,6 +19,6 @@ public class RegisterWorkContentDto {
 	private List<ErrorMessageInfoDto> lstErrorMessageInfo;
 	
 	// List<残業休出時間>
-	private List<OvertimeLeaveTime> lstOvertimeLeaveTime;
+	private List<OvertimeLeaveTimeDto> lstOvertimeLeaveTime;
 	
 }

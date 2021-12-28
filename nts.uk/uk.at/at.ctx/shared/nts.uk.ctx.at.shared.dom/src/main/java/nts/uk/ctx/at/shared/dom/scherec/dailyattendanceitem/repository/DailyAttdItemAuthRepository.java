@@ -26,4 +26,8 @@ public interface DailyAttdItemAuthRepository {
 	 */
 	Optional<DailyAttendanceItemAuthority> getDailyAttdItemByAttItemId(String companyID, String authorityDailyId,
 			List<Integer> attendanceItemIds);
+	
+	List<String> getDailytRolesByCid(String companyId);
+	
+	void delete(String companyID, String roleID);
 }

@@ -11,7 +11,7 @@
 }
 
 #labelUseAtr {
-	width: 69px;
+	width: 70px;
 }
 
 #type-label, #remark-cancel-label, #color-label, #color-display-target-item-label,
@@ -19,8 +19,12 @@
 	width: 180px;
 }
 
-#noticed-label, #boldAtr {
-	margin-left: 189px;
+#noticed-label {
+	margin-left: 187px;
+}
+
+#boldAtr {
+	margin-left: 10px;
 }
 
 #noticed-label {
@@ -82,4 +86,8 @@ div[id^="tab"] {
 
 .d-flex {
 	display: flex;
+}
+
+.tabs-list {
+	padding: 7px !important;	
 }

@@ -65,6 +65,16 @@ public class DataItem {
 	public static DataItem of(int itemNo, GeneralDate value) {
 		return new DataItem(itemNo, value);
 	}
+
+	/**
+	 * bool型
+	 * @param itemNo
+	 * @param value
+	 * @return
+	 */
+	public static DataItem of(int itemNo, boolean value) {
+		return new DataItem(itemNo, value);
+	}
 	
 	public String getString() {
 		return value != null ? (String) value : null;

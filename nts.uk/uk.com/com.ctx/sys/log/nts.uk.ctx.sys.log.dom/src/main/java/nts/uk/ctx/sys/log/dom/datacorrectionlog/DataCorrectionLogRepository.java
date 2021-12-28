@@ -19,6 +19,7 @@ import nts.uk.shr.com.security.audittrail.correction.content.TargetDataType;
 public interface DataCorrectionLogRepository {
 
 	List<DataCorrectionLog> getAllLogData(TargetDataType targetDataType, List<String> listEmployeeId, YearMonth ym, GeneralDate ymd);
+	List<DataCorrectionLog> getAllLogDataByYM(TargetDataType targetDataType, List<String> listEmployeeId, YearMonth ym, GeneralDate ymd);
 	
 	List<DataCorrectionLog> getAllLogData(TargetDataType targetDataType, List<String> listEmployeeId, DatePeriod datePeriod);
 

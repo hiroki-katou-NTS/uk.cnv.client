@@ -1,6 +1,5 @@
 package nts.uk.ctx.at.record.infra.repository.divergence.time;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -159,6 +158,7 @@ public class JpaDivergenceReasonInputMethodRepository extends JpaRepository
 
 	@Override
 	public List<DivergenceReasonInputMethod> getByCidAndLstTimeInfo(String companyId, List<Integer> divTimeNos) {
+		divTimeNos = divTimeNos.stream().filter(no -> no != null).distinct().collect(Collectors.toList());
 		return this.queryProxy().query(FIND_DVGC_TIME_V2, KrcmtDvgcTime.class)
 				.setParameter("cid", companyId)
 				.setParameter("no", divTimeNos)

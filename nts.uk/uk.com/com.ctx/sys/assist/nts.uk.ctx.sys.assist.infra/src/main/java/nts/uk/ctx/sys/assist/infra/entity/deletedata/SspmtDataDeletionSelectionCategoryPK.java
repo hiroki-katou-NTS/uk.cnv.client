@@ -30,7 +30,7 @@ public class SspmtDataDeletionSelectionCategoryPK implements Serializable {
 	 * パターン区分
 	 */
 	@Column(name = "PATTERN_ATR")
-	public boolean patternClassification;
+	public int patternClassification;
 	
 	/**
 	 * 契約コード

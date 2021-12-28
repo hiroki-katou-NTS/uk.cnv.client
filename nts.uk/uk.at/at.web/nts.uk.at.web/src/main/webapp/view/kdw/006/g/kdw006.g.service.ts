@@ -5,8 +5,10 @@ module nts.uk.at.view.kdw006.g.service {
         defaultValue : "at/screen/worktype/find/dailyworktypekdw006",
         getWorkType: 'at/record/workrecord/worktype/get/',
         register: 'at/record/workrecord/worktype/register',
+        deleteEmploymentSetting: 'at/record/workrecord/worktype/delete',
         checkSetting: 'at/record/workrecord/worktype/checkSetting',
-        copy: "at/record/workrecord/worktype/copy"
+        copy: "at/record/workrecord/worktype/copy",
+        getDistinctEmpCodeByCompanyId: 'at/record/workrecord/worktype/getDistinctEmpCodeByCompanyId',
     }
 
     export function getAllWorkTypes(): JQueryPromise<any> {
@@ -30,6 +32,13 @@ module nts.uk.at.view.kdw006.g.service {
     
     export function copy(command: any): JQueryPromise<Array<any>> {
         return nts.uk.request.ajax("at", paths.copy, command);
+    }
+
+    export function deleteEmploymentSetting(employmentCode : any): JQueryPromise<Array<any>> {
+        return nts.uk.request.ajax("at", paths.deleteEmploymentSetting, employmentCode);
+    }
+    export function getDistinctEmpCodeByCompanyId(): JQueryPromise<Array<any>> {
+        return nts.uk.request.ajax("at", paths.getDistinctEmpCodeByCompanyId);
     }
 
     export function register(employmentCode: string, groups1: any, groups2 : any): JQueryPromise<Array<any>> {

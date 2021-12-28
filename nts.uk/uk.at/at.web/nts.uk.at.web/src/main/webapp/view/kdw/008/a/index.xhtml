@@ -31,6 +31,9 @@
 					<button tabindex="2" class="normal" data-bind="click : setNewMode">#{i18n.getText('KDW008_2')}</button>
 					<button tabindex="3" class="proceed"
 						data-bind="click : addOrUpdateClick , enable: $root.errors.isEmpty">#{i18n.getText('KDW008_3')}</button>
+					<button class="normal" data-bind="click: duplicate, enable: isUpdate"> 
+						#{i18n.getText('KDW008_37')}
+					</button>
 					<button tabindex="4" class="danger"
 						data-bind="click : remove, enable : isRemove">#{i18n.getText('KDW008_4')}</button>
 				</span>
@@ -180,7 +183,7 @@
 										   	<button class="danger" data-bind="click : btnSheetNo ,enable : enableSheetNo">#{i18n.getText('KDW008_34')}</button>
 										</div>
 										<!-- <div style="margin-top: 10px;">#{i18n.getText('KDW008_24')}</div> -->
-										<div  tabindex="-1" style="margin-top: 10px; margin-left: 411px; margin-bottom: -10px" >#{i18n.getText('KDW008_29')}</div>
+										<div  tabindex="-1" style="margin-top: 10px; margin-left: 413px; margin-bottom: -10px" >#{i18n.getText('KDW008_29')}</div>
 										<div style="margin-top: 10px; display: inline-block;">
 											<div tabindex="12" id="swap-list3"
 												data-bind="ntsSwapList: {

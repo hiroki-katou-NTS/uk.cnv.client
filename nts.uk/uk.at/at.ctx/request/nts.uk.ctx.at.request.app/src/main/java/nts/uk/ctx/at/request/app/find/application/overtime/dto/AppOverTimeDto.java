@@ -27,6 +27,8 @@ public class AppOverTimeDto {
 	
 	// 勤務情報
 	public WorkInformationDto workInfoOp;
+
+	public List<MultipleOvertimeContentDto> multipleOvertimeContents;
 	
 	public static AppOverTimeDto fromDomain(AppOverTime appOverTime) {
 	
@@ -42,6 +44,8 @@ public class AppOverTimeDto {
 							.stream()
 							.map(x -> TimeZoneWithWorkNoDto.fromDomain(x))
 							.collect(Collectors.toList()),
-				WorkInformationDto.fromDomain(appOverTime.getWorkInfoOp().orElse(null)));
+				WorkInformationDto.fromDomain(appOverTime.getWorkInfoOp().orElse(null)),
+				appOverTime.getMultipleTimesOp().isPresent() ? MultipleOvertimeContentDto.toDto(appOverTime.getMultipleTimesOp().get()) : null
+		);
 	}
 }

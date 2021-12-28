@@ -76,6 +76,14 @@ public class CanonicalItem {
 	public static CanonicalItem of(int itemNo, GeneralDateTime value) {
 		return new CanonicalItem(itemNo, value);
 	}
+
+	/**
+	 * bool型
+	 * @return
+	 */
+	public static CanonicalItem of(int itemNo, boolean value){
+		return new CanonicalItem(itemNo, value);
+	}
 	
 
 	public String getString() {
@@ -101,6 +109,8 @@ public class CanonicalItem {
 	public GeneralDateTime getDateTime() {
 		return value != null ? (GeneralDateTime) value : null;
 	}
+
+	public Boolean getBoolean(){ return value != null ? (boolean) value : null;}
 	
 	public boolean isNull() {
 		return value == null;

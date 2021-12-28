@@ -255,4 +255,15 @@ public interface AppContentService {
 	 */
 	public String getAnnualHolidayContent(AppReason appReason, DisplayAtr appReasonDisAtr, ScreenAtr screenAtr,
 			List<TimeLeaveApplicationDetail> leaveApplicationDetails, AppStandardReasonCode appStandardReasonCD);
+
+	/**
+	 * UniversalK.就業.KAF_申請.CMM045_申請一覧・承認一覧.A:申請一覧画面ver4.アルゴリズム.各申請データを作成.残業申請データを作成.残業申請複数回データを作成.残業申請複数回データを作成
+	 * @param appReasonDisAtr 申請理由表示区分
+	 * @param appHolidayWorkData 申請データ(残業申請）
+	 * @param screenAtr ScreenID
+	 * @param result 申請理由内容
+	 * @return 申請理由内容
+	 */
+
+	public String getOvertimeApplicationDataMultiTime(DisplayAtr appReasonDisAtr,AppOverTimeData appOverTimeData,ScreenAtr screenAtr,String appReasonContent);
 }

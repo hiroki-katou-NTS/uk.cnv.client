@@ -4,7 +4,7 @@ import lombok.val;
 import nts.arc.layer.app.command.CommandHandler;
 import nts.arc.layer.app.command.CommandHandlerContext;
 import nts.uk.ctx.at.schedule.app.command.budget.premium.command.DeleteLaborCalculationSettingCommand;
-import nts.uk.ctx.at.schedule.dom.budget.premium.PersonCostCalculationDomainService;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.PersonCostCalculationDomainService;
 import nts.uk.shr.com.context.AppContexts;
 
 import javax.ejb.Stateless;

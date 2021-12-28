@@ -77,8 +77,8 @@
           <div class="arrow-container">
             <div class="arrow"></div>
           </div>
-          <div class="menu-creation-layout-container">
-            <div id="menu-creation-layout" data-bind="foreach: itemList, sortableList: itemList">
+          <div class="menu-creation-layout-container" id="menu-creation-layout-container">
+            <div id="menu-creation-layout" data-bind="ntsSortable: {data: itemList}">
               <div class="menu-creation-item-container" data-bind="attr: { id: itemType }">
                 <div class="menu-creation-item" data-bind="attr: { 'id': itemType }">
                   <div class="widget-setting bg-green">
@@ -104,17 +104,17 @@
                       <com:ko tag="if" bind="isKDP001()">
                         <div data-bind="widget: 'kdp-001-a'"></div>
                       </com:ko>
-                      <com:ko tag="if" bind ="$vm.isRender()">
+                      <com:ko tag="if" bind ="$vm.isRenderKTG001()">
                         <com:ko tag="if" bind="isKTG001()">
                           <div data-bind="widget: 'ktg-001-a'"></div>
                         </com:ko>
                       </com:ko>
-                      <com:ko tag="if" bind ="$vm.isRender()">
+                      <com:ko tag="if" bind ="$vm.isRenderKTG005()">
                         <com:ko tag="if" bind="isKTG005()">
                           <div data-bind="widget: 'ktg-005-a'"></div>
                         </com:ko>
                       </com:ko>
-                      <com:ko tag="if" bind ="$vm.isRender()">
+                      <com:ko tag="if" bind ="$vm.isRenderKTG004()">
                         <com:ko tag="if" bind="isKTG004()">
                           <div data-bind="widget: 'ktg-004-a'"></div>
                         </com:ko>

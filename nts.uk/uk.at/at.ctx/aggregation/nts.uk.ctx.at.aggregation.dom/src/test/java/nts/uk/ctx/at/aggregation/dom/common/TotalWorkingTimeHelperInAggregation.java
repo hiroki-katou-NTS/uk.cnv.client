@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import nts.gul.util.value.Finally;
+import nts.uk.ctx.at.shared.dom.common.amount.AttendanceAmountDaily;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeOfExistMinus;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.ExcessOfStatutoryMidNightTime;
@@ -87,7 +88,8 @@ public class TotalWorkingTimeHelperInAggregation {
 				new AttendanceTime(0), 
 				new AttendanceTime(0), 
 				new WithinStatutoryMidNightTime(
-						TimeDivergenceWithCalculation.sameTime(new AttendanceTime(0))));
+						TimeDivergenceWithCalculation.sameTime(new AttendanceTime(0))),
+				new AttendanceAmountDaily(0));
 	}
 	
 	private static ExcessOfStatutoryTimeOfDaily createExcessOfStatutoryTimeOfDaily() {

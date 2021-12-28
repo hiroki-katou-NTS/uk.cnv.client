@@ -61,9 +61,6 @@ public class SptmtTopPagePerson extends UkJpaEntity implements TopPagePersonSett
 	
 	@Column(name = "LOGIN_MENU_CLS")
 	private int menuClassification;
-	
-	@Column(name = "SWITCH_DATE")
-	private int switchingDate;
     
 	@Override
 	protected Object getKey() {
@@ -86,24 +83,13 @@ public class SptmtTopPagePerson extends UkJpaEntity implements TopPagePersonSett
 		return null;
 	}
 
-	@Override
-	public void setSwitchingDate(Integer switchingDate) {
-		this.switchingDate = switchingDate;
-	}
-
-	@Override
-	public Integer getSwitchingDate() {
-		return this.switchingDate;
-	}
-
 	public TopPagePersonSetting toDomain() {
 		return new TopPagePersonSetting(
 				this.getEmployeeId(),
 				new LoginMenuCode(this.loginMenuCode),
 				new TopMenuCode(this.topMenuCode),
 				EnumAdaptor.valueOf(this.menuClassification, MenuClassification.class), 
-				EnumAdaptor.valueOf(this.system, System.class),
-				new SwitchingDate(this.switchingDate));
+				EnumAdaptor.valueOf(this.system, System.class));
 	}
 
 	@Override

@@ -1,7 +1,11 @@
+#contents-area {
+  padding-bottom: 0px !important;
+}
 .div-line {
   margin-left: 20px;
   margin-bottom: 10px;
   display: flex;
+  flex-wrap: wrap;
 }
 .column-label {
   width: 150px;
@@ -23,9 +27,43 @@
 .radio-wrapper .ntsRadioBox {
   margin: 3px 0px;
 }
+.image-setting {
+  margin-left: 158px;
+}
+.image-type-setting > .flex.valign-center:not(:last-child) {
+  margin-bottom: 5px !important;
+}
+.pic-preview, .pic-choose {
+  width: 60px;
+  height: 60px;
+  border: 1px solid black;
+}
+.preview-image {
+  margin-top: 45px;
+  margin-left: 5px;
+}
+.choose-button {
+  width: 100px;
+}
 .div-line:last-child {
   margin-bottom: 0px !important;
 }
+#F5_2 {
+  width: 280px;
+}
 #F8_3 {
   width: 140px;
+}
+#F9_3_3 .nts-input {
+  display: none;
+}
+#F9_10 {
+  height: 125px;
+  overflow: auto;
+}
+#F9_5_1, #F9_5_2 {
+  font-size: 0.9em;
+}
+#F9_5_2 {
+  margin-left: 10px;
 }

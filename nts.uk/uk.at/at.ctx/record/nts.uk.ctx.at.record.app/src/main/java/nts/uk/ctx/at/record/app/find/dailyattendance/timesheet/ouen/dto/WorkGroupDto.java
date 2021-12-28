@@ -14,6 +14,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.u
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.anno.AttendanceItemValue;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ValueType;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.work.WorkGroup;
 
 /**
  * @author laitv
@@ -48,6 +49,25 @@ public class WorkGroupDto  implements ItemConst, AttendanceItemDataGate{
 	@AttendanceItemLayout(layout = LAYOUT_K, jpPropertyName = WORKCODE + LAYOUT_E)
 	@AttendanceItemValue()
 	private String workCD5;
+	
+	public static WorkGroupDto from(WorkGroup domain) {
+		if (domain == null) return null;
+		
+		if (domain.getWorkCD1() == null 
+				&& !domain.getWorkCD2().isPresent() && !domain.getWorkCD3().isPresent()
+				&& !domain.getWorkCD4().isPresent() && !domain.getWorkCD5().isPresent())
+			return null;
+		
+		return new WorkGroupDto(domain.getWorkCD1() == null ? "" : domain.getWorkCD1().v(), 
+								domain.getWorkCD2().map(c -> c.v()).orElse(null), 
+								domain.getWorkCD3().map(c -> c.v()).orElse(null), 
+								domain.getWorkCD4().map(c -> c.v()).orElse(null), 
+								domain.getWorkCD5().map(c -> c.v()).orElse(null));
+	}
+
+	public WorkGroup domain() {
+		return WorkGroup.create(workCD1, workCD2, workCD3, workCD4, workCD5);
+	}
 
 	@Override
 	protected WorkGroupDto clone() {

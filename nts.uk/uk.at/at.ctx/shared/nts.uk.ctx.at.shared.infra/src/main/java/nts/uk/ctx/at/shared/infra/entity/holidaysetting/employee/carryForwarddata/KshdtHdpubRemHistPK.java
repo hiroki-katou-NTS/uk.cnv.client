@@ -40,5 +40,5 @@ public class KshdtHdpubRemHistPK implements Serializable{
 	/** 締め日.末日とする */
 	@Column(name = "IS_LAST_DAY")
 	@Basic(optional = false)
-	public int isLastDay;
+	public boolean isLastDay;
 }

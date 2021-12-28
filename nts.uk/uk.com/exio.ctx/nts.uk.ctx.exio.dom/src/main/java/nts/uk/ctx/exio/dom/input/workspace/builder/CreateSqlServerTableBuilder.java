@@ -111,6 +111,9 @@ public class CreateSqlServerTableBuilder extends CreateTableBuilder {
                 case AUTONUMBER:
                     sql.append("int IDENTITY(1,1)");
                     break;
+                case BOOLEAN:
+                    sql.append("decimal(1)");
+                    break;
                 default:
                     throw new RuntimeException("error: " + type);
             }

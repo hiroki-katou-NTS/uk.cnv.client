@@ -14,4 +14,6 @@ public class CheckEmployeeParam {
 
     private List<String> lstEmployeeId;
 
+    private Integer overtimeAppAtr;
+
 }

@@ -56,6 +56,7 @@
                     nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.optionalitemvalue.AnyItemTimes
                     nts.uk.ctx.at.shared.dom.common.anyitem.AnyTimesMonth
                     nts.uk.ctx.at.shared.dom.workrule.businesstype.BusinessTypeCode
+                    nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.SuppNumValue
                 </com:ValidatorScript>
             </ui:define>
 
@@ -65,16 +66,16 @@
                         <button style="margin-left: 15px" class="proceed"
                                 data-bind="enable: $root.errors.isEmpty &amp;&amp; !changeConditionExtract(), visible:showButton().available1, click: proceed ">#{i18n.getText('KDW003_4')}</button>
                         <button
-                            data-bind="enable: $root.errors.isEmpty &amp;&amp; !changeConditionExtract(), visible: showButton().available4, click: proceedSave">#{i18n.getText('KDW003_5')}</button>
-                        <button
                             data-bind="enable: !changeConditionExtract(), visible: showButton().available2, click: btnCalculation_Click">#{i18n.getText('KDW003_6')}</button>
                         <button
                             data-bind="enable: !changeConditionExtract(), visible: showButton().available3, click: btnReCalculation_Click">#{i18n.getText('KDW003_12')}</button>
-                        <button data-bind="enable: !changeConditionExtract(), click: employmentOk, visible:false">#{i18n.getText('KDW003_65')}</button>
+                        <button data-bind="enable: !changeConditionExtract(), click: employmentOk, visible: showButton().available26Confirm">#{i18n.getText('KDW003_65')}</button>
                         <button
                             data-bind="click: tighProcessShow, enable:indentityMonth().enableButton &amp;&amp; !changeConditionExtract(), visible: showButton().available9() &amp;&amp; indentityMonth().show26 &amp;&amp; !indentityMonth().hideAll">#{i18n.getText('KDW003_88')}</button>
                         <button
                             data-bind="click: tighProcessRelease, enable:indentityMonth().enableButton &amp;&amp; !changeConditionExtract(), visible: showButton().available9() &amp;&amp; !indentityMonth().show26 &amp;&amp; !indentityMonth().hideAll" >#{i18n.getText('KDW003_124')}</button>
+                        <button 
+                        	data-bind="click: showSupportWorkDialog, visible: showWorkLoad">#{i18n.getText('KDW003_133')}</button>
                         <!-- 本人締め処理 -->
                         <button
                             data-bind="enable: !changeConditionExtract(), click : changeExtractionCondition, visible: showButton().available5">#{i18n.getText('KDW003_13')}</button>
@@ -189,19 +190,16 @@
 		                                <tbody>
 		                                    <tr>
 		                                        <td class="ui-widget-body remain-compen-day">
-		                                        	<!-- <span class="text-holiday" data-bind="text: dataHoliday().compensationDay"></span> -->
-                                                    <a class="hyperlink" href="" data-bind="text: dataHoliday().compensationDay, click: openKDL005Dialog"></a>
-                                                </td>
+		                                        	<a class="text-holiday hyperlink" style="color: inherit;" data-bind="text: dataHoliday().compensationDay, click: openKDL005Dialog"></a>
+		                                       	</td>
 		                                        <td class="ui-widget-body remain-subst-day">
-                                                    <!-- <span class="text-holiday" data-bind="text: dataHoliday().substitute"></span> -->
-                                                    <a class="hyperlink" href="" data-bind="text: dataHoliday().substitute, click: openKDL009Dialog"></a>
+		                                        	<a class="text-holiday hyperlink" style="color: inherit;" data-bind="text: dataHoliday().substitute, click: openKDL009Dialog"></a>
 		                                        </td>
 		                                        <td class="ui-widget-body remain-annual-day">
-                                                    <!-- <span class="text-holiday" data-bind="text: dataHoliday().annualDay"></span> -->
-                                                    <a class="hyperlink" href="" data-bind="text: dataHoliday().annualDay, click: openKDL020Dialog"></a>
+		                                        	<a class="text-holiday hyperlink" style="color: inherit;" data-bind="text: dataHoliday().annualDay, click: openKDL020Dialog"></a>
 		                                        </td>
 		                                        <td class="ui-widget-body remain-reserve-day">
-                                                    <span class="text-holiday" data-bind="text: dataHoliday().reserve"></span>
+		                                        	<a class="text-holiday hyperlink" style="color: inherit;" data-bind="text: dataHoliday().reserve, click: openkdl029Dialog"></a>
 		                                        </td>
 		                                        <td class="ui-widget-body remain-childCare-day">
                                                     <!-- <span class="text-holiday" data-bind="text: dataHoliday().childCareValue"></span> -->
@@ -262,11 +260,8 @@
                                 <div style="display: inline-block; margin-bottom: 1px;">
                                 <button id="btn-signAll" data-bind="css: {'btn-signAll2' : unLock() == true, 'btn-signAll': unLock() == false} , click: signAll">#{i18n.getText('KDW003_23')}</button>
                                 <button id="btn-releaseAll" data-bind="click: releaseAll">#{i18n.getText('KDW003_71')}</button>
-                                <button id="btnVacationRemaining"
-		                                        data-bind="enable: !changeConditionExtract(), visible: referenceVacation().allVacation(), 
-		                                        			click: btnVacationRemaining_Click ">#{i18n.getText('KDW003_21')}</button>
 		                        <button id="btnComfirmAttendance"
-		                                    data-bind="click : referencesActualResult, visible:false">#{i18n.getText('KDW003_22')}</button>
+		                                    data-bind="click : referencesActualResult, visible: showButton().available23">#{i18n.getText('KDW003_22')}</button>
 		                         <div id="dislayFormatLblf" style="margin-left: 10px" data-bind="ntsFormLabel: {}">#{i18n.getText('KDW003_19')}</div>
 		                          <div id="cbDisplayFormat"
 		                                     data-bind="ntsComboBox: {
@@ -284,7 +279,7 @@
                                         data-bind="enable: !changeConditionExtract(), click: btnSaveColumnWidth_Click, visible : showButton().available11">#{i18n.getText('KDW003_24')}</button>
                                 <div class="setting-container">
                                     <button id="btn-setting"
-                                            data-bind="click: btnSetting_Click , visible:true">&#9881;</button>
+                                            data-bind="click: btnSetting_Click , visible:true"><i data-bind="ntsIcon: { no: 5, width: 20, height: 25 }"></i></button>
                                     <div id="setting-content">
                                         <div data-bind="ntsFormLabel: {}">#{i18n.getText('KDW003_28')}</div>
                                         <div id="cbCursorMoveDirection"

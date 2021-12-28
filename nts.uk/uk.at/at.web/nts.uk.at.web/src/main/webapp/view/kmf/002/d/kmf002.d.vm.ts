@@ -21,6 +21,7 @@ module nts.uk.at.view.kmf002.d {
             commonTableMonthDaySet: KnockoutObservable<CommonTableMonthDaySet>;
             enableSave: KnockoutObservable<boolean>;
             enableDelete: KnockoutObservable<boolean>;
+            startMonth: number;
 
             constructor() {
                 let _self = this;
@@ -140,7 +141,7 @@ module nts.uk.at.view.kmf002.d {
             private remove(): void {
                 let _self = this;
                 nts.uk.ui.dialog.confirm({ messageId: "Msg_18" }).ifYes(() => {
-                    service.remove(_self.commonTableMonthDaySet().fiscalYear(), _self.selectedCode()).done(() => {
+                    service.remove(_self.commonTableMonthDaySet().fiscalYear(), _self.selectedCode(), _self.startMonth).done(() => {
                         _self.alreadySettingList.remove(function(s) { return s.code == _self.selectedCode() });
                         _self.getDataFromService();
                         nts.uk.ui.dialog.info({ messageId: "Msg_16" });
@@ -157,30 +158,42 @@ module nts.uk.at.view.kmf002.d {
                     _self.setDefaultMonthDay();
                     return;
                 }
-                 $.when(service.find(_self.commonTableMonthDaySet().fiscalYear(), _self.selectedCode()), 
-                                    service.findFirstMonth()).done(function(data: any, data2: any) {
-                    if (typeof data === "undefined") {
-                        /** 
-                         *   create value null for prepare create new 
-                        **/
-                        _self.commonTableMonthDaySet().arrMonth.removeAll();
-                        for (let i=data2.startMonth-1; i<12; i++) {
-                            _self.commonTableMonthDaySet().arrMonth.push({'month': ko.observable(i+1), 'day': ko.observable(0), 'enable': ko.observable(true)});    
-                        }
-                        for (let i=0; i<data2.startMonth-1; i++) {
-                            _self.commonTableMonthDaySet().arrMonth.push({'month': ko.observable(i+1), 'day': ko.observable(0), 'enable': ko.observable(true)});    
-                        } 
-                        _self.enableDelete(false);
-                    } else {
-                        _self.commonTableMonthDaySet().arrMonth.removeAll();
-                        for (let i=data2.startMonth-1; i<12; i++) {
-                            _self.commonTableMonthDaySet().arrMonth.push({'month': ko.observable(data.publicHolidayMonthSettings[i].month), 'day': ko.observable(data.publicHolidayMonthSettings[i].inLegalHoliday), 'enable': ko.observable(true)});    
-                        }
-                        for (let i=0; i<data2.startMonth-1; i++) {
-                            _self.commonTableMonthDaySet().arrMonth.push({'month': ko.observable(data.publicHolidayMonthSettings[i].month), 'day': ko.observable(data.publicHolidayMonthSettings[i].inLegalHoliday), 'enable': ko.observable(true)});    
-                        } 
-                        _self.enableDelete(true);
-                    }          
+                const currentYear = _self.commonTableMonthDaySet().fiscalYear();
+                const nextYear = moment.utc(currentYear, "YYYY").add(1, 'year').format("YYYY");
+                 $.when(service.find(currentYear, _self.selectedCode()), 
+                        service.find(nextYear, _self.selectedCode()),
+                                    service.findFirstMonth()).done(function(data: any, data1: any, data2: any) {
+                  _self.startMonth = data2.startMonth;
+                  // Get current year data
+                  let currentYearData: model.PublicHolidayMonthSettingDto[] = _.filter(data?.publicHolidayMonthSettings || [], item => item.month >= data2.startMonth);
+                  const hasCurrentData = !_.isEmpty(currentYearData);
+                  // Add default values if not exists
+                  for (let i = data2.startMonth; i <= 12; i++) {
+                    if (!_.find(currentYearData, item => item.month === i)) {
+                      currentYearData.push(new model.PublicHolidayMonthSettingDto(currentYear, i, 0));
+                    }
+                  }
+                  currentYearData = _.orderBy(currentYearData, "month");
+                  // Get next year data
+                  let nextYearData: model.PublicHolidayMonthSettingDto[] = _.filter(data1?.publicHolidayMonthSettings || [], item => item.month < data2.startMonth);
+                  const hasNextData = !_.isEmpty(nextYearData);
+                  // Add default values if not exists
+                  for (let i = 1; i < data2.startMonth; i++) {
+                    if (!_.find(nextYearData, item => item.month === i)) {
+                      nextYearData.push(new model.PublicHolidayMonthSettingDto(nextYear, i, 0));
+                    }
+                  }
+                  nextYearData = _.orderBy(nextYearData, "month");
+                  const arr = _.chain(currentYearData).concat(nextYearData)
+                  .map(item => {
+                    return {
+                      'month': ko.observable(item.month),
+                      'day': ko.observable(item.inLegalHoliday),
+                      'enable': ko.observable(true)
+                    };
+                  }).value();
+                  _self.commonTableMonthDaySet().arrMonth(arr);
+                  _self.enableDelete(hasCurrentData || hasNextData);
                 });
             }
             

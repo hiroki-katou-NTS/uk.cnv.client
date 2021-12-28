@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+	<ui:composition template="../../../../../master/base.xhtml">
+		<ui:define name="htmlHead">
+			<com:scriptfile set="IGNITE" />
+
+			<com:stylefile path="kdl013.a.test.style.css" />
+			<com:scriptfile path="kdl013.a.test.vm.js" />
+
+		</ui:define>
+		<ui:define name="content">
+			<div id="functions-area">
+				<button data-bind="click: openDialog">Open KDL013</button>
+			</div>
+			
+			<div id="content-area" style="margin: 10px 50px;">		
+				Choose date:<div style="margin: 10px;" data-bind="ntsDatePicker: {value: date, dateType:'date', dateFormat:'YYYY/MM/DD' }"></div>
+				<br />
+				Choose attendance item:<div style="margin: 10px;"  id="combo-box" data-bind="ntsComboBox: {
+						name: 'Sample List',
+						options: items,
+						optionsValue: 'code',
+						visibleItemsCount: 20,
+						value: selectedCode,
+						optionsText: 'name',
+						editable: true,
+						enable: true,
+						required: false,
+						selectFirstIfNull: true,
+						columns: [
+							{ prop: 'code', length: 8 },
+							{ prop: 'name', length: 18 },
+						]}">
+				</div>
+				<!-- <div style="margin: 20px 0px 0px 20px ; font-weight: bold;">Has Error ?:
+					<div data-bind="ntsRadioBoxGroup: {
+						options: itemList,
+						optionsValue: 'id',
+						optionsText: 'name',
+						value: selectedId,
+						enable: enable}">
+					</div>
+				</div>				
+
+				<div style="margin: 10px 0px 0px 20px; font-weight: bold;">Error Registration List:</div>
+				<div style="margin: 10px 0px 0px 20px;">
+					<table id="multi-list" data-bind="ntsGridList: {
+								height: 300,
+								options: items,
+								optionsValue: 'id',
+								columns: columns,
+								multiple: true,
+								value: currentCodeList
+							}"></table>
+				</div>
+			</div>		
+			<div style="display: inline-block;">
+				<div style="margin: 10px 0px 0px 20px;font-weight: bold;">Order employeeId list:</div>
+				<div style="margin: 10px 0px 0px 20px;">
+					<textarea class="inputValue" rows="5" cols="40"
+						data-bind="ntsMultilineEditor: { value: employeeIdList }" />
+				</div> -->
+			</div> 
+
+		</ui:define>
+	</ui:composition>
+</body>
+
+</html>

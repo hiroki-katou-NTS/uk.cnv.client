@@ -19,6 +19,7 @@ import nts.uk.ctx.at.record.app.command.dailyperform.erroralarm.EmployeeDailyPer
 import nts.uk.ctx.at.record.app.command.dailyperform.goout.OutingTimeOfDailyPerformanceCommand;
 import nts.uk.ctx.at.record.app.command.dailyperform.optionalitem.OptionalItemOfDailyPerformCommand;
 import nts.uk.ctx.at.record.app.command.dailyperform.ouen.OuenWorkTimeSheetOfDailyCommand;
+import nts.uk.ctx.at.record.app.command.dailyperform.ouen.OuenWorkTimeOfDailyCommand;
 import nts.uk.ctx.at.record.app.command.dailyperform.remark.RemarkOfDailyCommand;
 import nts.uk.ctx.at.record.app.command.dailyperform.shorttimework.ShortTimeOfDailyCommand;
 import nts.uk.ctx.at.record.app.command.dailyperform.snapshot.SnapshotOfDailyPerformCommand;
@@ -28,6 +29,7 @@ import nts.uk.ctx.at.record.app.command.dailyperform.workinfo.WorkInformationOfD
 import nts.uk.ctx.at.record.app.command.dailyperform.workrecord.AttendanceTimeByWorkOfDailyCommand;
 import nts.uk.ctx.at.record.app.command.dailyperform.workrecord.TimeLeavingOfDailyPerformanceCommand;
 import nts.uk.ctx.at.record.app.find.dailyperform.DailyRecordDto;
+import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeOfDaily;
 import nts.uk.ctx.at.shared.app.util.attendanceitem.DailyWorkCommonCommand;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TemporaryTimeOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingOfDailyAttd;
@@ -126,6 +128,10 @@ public class DailyRecordWorkCommand extends DailyWorkCommonCommand {
 	@Getter
 	private final OuenWorkTimeSheetOfDailyCommand ouenSheet = new  OuenWorkTimeSheetOfDailyCommand();
 
+	/** 応援作業時間: 日別実績の応援作業別勤怠時間 */
+	@Getter
+	private final OuenWorkTimeOfDailyCommand ouenWorkTime = new OuenWorkTimeOfDailyCommand();
+
 	public DailyWorkCommonCommand getCommand(String domain) {
 		switch (domain) {
 		case DAILY_WORK_INFO_NAME:
@@ -164,6 +170,8 @@ public class DailyRecordWorkCommand extends DailyWorkCommonCommand {
 			return this.remarks;
 		case DAILY_SUPPORT_TIMESHEET_NAME:
 			return this.ouenSheet;
+		case DAILY_SUPPORT_TIME_NAME:
+			return this.ouenWorkTime;
 		default:
 			return null;
 		}
@@ -174,7 +182,8 @@ public class DailyRecordWorkCommand extends DailyWorkCommonCommand {
 				DAILY_SNAPSHOT_NAME, DAILY_OUTING_TIME_NAME, DAILY_BREAK_TIME_NAME, DAILY_ATTENDANCE_TIME_NAME,
 				DAILY_ATTENDANCE_TIME_BY_WORK_NAME, DAILY_ATTENDACE_LEAVE_NAME, DAILY_SHORT_TIME_NAME,
 				DAILY_SPECIFIC_DATE_ATTR_NAME, DAILY_ATTENDANCE_LEAVE_GATE_NAME, DAILY_OPTIONAL_ITEM_NAME,
-				DAILY_EDIT_STATE_NAME, DAILY_TEMPORARY_TIME_NAME, DAILY_PC_LOG_INFO_NAME, DAILY_REMARKS_NAME, DAILY_SUPPORT_TIMESHEET_NAME);
+				DAILY_EDIT_STATE_NAME, DAILY_TEMPORARY_TIME_NAME, DAILY_PC_LOG_INFO_NAME, DAILY_REMARKS_NAME,
+				DAILY_SUPPORT_TIMESHEET_NAME, DAILY_SUPPORT_TIME_NAME);
 	}
 
 	@Override
@@ -197,6 +206,7 @@ public class DailyRecordWorkCommand extends DailyWorkCommonCommand {
 		this.temporaryTime.setRecords(fullDto.getTemporaryTime().orElse(null));
 		this.pcLogInfo.setRecords(fullDto.getPcLogInfo().orElse(null));
 		this.remarks.setRecords(fullDto.getRemarks());
+		this.ouenWorkTime.setRecords(fullDto.getOuenWorkTime().orElse(null));
 		this.snapshot.setRecords(fullDto.getSnapshot().orElse(null));
 		this.ouenSheet.setRecords(fullDto.getOuenTimeSheet());
 	}
@@ -223,6 +233,7 @@ public class DailyRecordWorkCommand extends DailyWorkCommonCommand {
 		this.pcLogInfo.forEmployee(employeId);
 		this.remarks.forEmployee(employeId);
 		this.ouenSheet.forEmployee(employeId);
+		this.ouenWorkTime.forEmployee(employeId);
 	}
 
 	@Override
@@ -247,6 +258,7 @@ public class DailyRecordWorkCommand extends DailyWorkCommonCommand {
 		this.pcLogInfo.withDate(date);
 		this.remarks.withDate(date);
 		this.ouenSheet.withDate(date);
+		this.ouenWorkTime.withDate(date);
 	}
 
 	public DailyRecordDto toDto() {
@@ -270,6 +282,7 @@ public class DailyRecordWorkCommand extends DailyWorkCommonCommand {
 //				.withErrors(errors.getData())
 				.withWorkInfo(workInfo.toDto())
 				.workingDate(getWorkDate())
+				.withOuenWorkTime(ouenWorkTime.toDto())
 				.withSnapshot(snapshot.toDto().orElse(null))
 				.withOuenSheet(ouenSheet.toDto())
 				.complete();
@@ -326,6 +339,8 @@ public class DailyRecordWorkCommand extends DailyWorkCommonCommand {
 				
 		Optional<TemporaryTimeOfDailyAttd> temporaryTime = this.getTemporaryTime().toDomain().map(c -> c.getAttendance());
 				
+		Optional<OuenWorkTimeOfDaily> ouenWorkTime = this.getOuenWorkTime().toDomain();
+				
 		Optional<SnapShot> snapshot = this.getSnapshot().toDomain();
 		
 		List<OuenWorkTimeSheetOfDailyAttendance> ouenSheet = this.getOuenSheet().toDomain();
@@ -348,6 +363,8 @@ public class DailyRecordWorkCommand extends DailyWorkCommonCommand {
 										this.getEditState().toDomain().stream().map(c->c.getEditState()).collect(Collectors.toList()), 
 										temporaryTime,
 										this.getRemarks().toDomain().stream().map(c->c.getRemarks()).collect(Collectors.toList()),
+										ouenWorkTime.isPresent() ? ouenWorkTime.get().getOuenTimes() : new ArrayList<>(),
+										new ArrayList<>(),
 										snapshot);
 		integrationOfDaily.setOuenTimeSheet(ouenSheet);
 		return integrationOfDaily;

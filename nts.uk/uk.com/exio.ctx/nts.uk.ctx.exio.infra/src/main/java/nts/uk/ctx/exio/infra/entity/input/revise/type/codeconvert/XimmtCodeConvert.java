@@ -36,14 +36,14 @@ public class XimmtCodeConvert extends ContractUkJpaEntity implements Serializabl
 	
 	/* 変換対象外を受け入れる */
 	@Column(name = "IMPORT_WITHOUT_SETTING")
-	private int importWithoutSetting;
+	private boolean importWithoutSetting;
 	
 	public static final JpaEntityMapper<XimmtCodeConvert> MAPPER = new JpaEntityMapper<>(XimmtCodeConvert.class);
 	
 	public static XimmtCodeConvert toEntity(XimmtReviseItemPK parentPk, ExternalImportCodeConvert domain) {
 		return new XimmtCodeConvert(
 				XimmtCodeConvertPK.of(parentPk),
-				domain.isImportWithoutSetting() ? 1 : 0);
+				domain.isImportWithoutSetting());
 	}
 	
 	@Override

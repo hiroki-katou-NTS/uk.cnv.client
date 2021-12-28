@@ -204,6 +204,8 @@ public class PrevisionalCalculationServiceImpl implements ProvisionalCalculation
 				Collections.emptyList(), //editState
 				Optional.empty(), //tempTime
 				new ArrayList<>(),//remarks
+				new ArrayList<>(),//ouenTime
+				new ArrayList<>(),//ouenTimeSheet
 				Optional.empty());
 		return Optional.of(data);
 	}

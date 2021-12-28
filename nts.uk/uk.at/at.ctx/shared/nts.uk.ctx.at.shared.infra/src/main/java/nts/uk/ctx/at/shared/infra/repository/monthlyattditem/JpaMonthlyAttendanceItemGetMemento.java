@@ -123,6 +123,12 @@ public class JpaMonthlyAttendanceItemGetMemento implements MonthlyAttendanceItem
 	}
 
 	@Override
+	public Optional<AttendanceName> getDisplayName() {
+		return this.entity.getDisplayName() == null ?  Optional.empty()
+				: Optional.of(new AttendanceName(entity.getDisplayName()));
+	}
+
+	@Override
 	public DisplayMonthResultsMethod getTwoMonthlyDisplay() {
 		return EnumAdaptor.valueOf(this.entity.getTwoMonthlyDisplay(), DisplayMonthResultsMethod.class) ;
 	}

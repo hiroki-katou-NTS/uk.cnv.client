@@ -20,6 +20,6 @@ public class ControlOfAttendanceItemsDtoExcel {
 	private String headerBgColorOfDailyPer;
 
 	/**時間項目の入力単位*/
-	private Integer inputUnitOfTimeItem;
+//	private Float inputUnitOfTimeItem;
 	
 }

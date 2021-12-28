@@ -1,5 +1,7 @@
 package nts.uk.screen.at.ws.kdw.kdw013;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import nts.arc.time.GeneralDate;
@@ -21,5 +23,8 @@ public class ChangeDateParam {
 
 	// 表示期間
 	private DatePeriodCommand displayPeriod;
-	
+
+	// 対象項目リスト
+	private List<String> itemIds;
+
 }

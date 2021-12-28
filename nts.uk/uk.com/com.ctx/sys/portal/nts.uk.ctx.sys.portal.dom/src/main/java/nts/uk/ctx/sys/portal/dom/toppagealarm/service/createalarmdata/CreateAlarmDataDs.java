@@ -31,12 +31,15 @@ public class CreateAlarmDataDs {
 			
 			if (delExInfo.getAlarmClassification() == AlarmClassification.AUTO_EXEC_BUSINESS_ERR
 					|| delExInfo.getAlarmClassification() == AlarmClassification.AUTO_EXEC_OPERATION_ERR) {
-				UpdateAutoRunAlarmDs.create(rq1, cid, delExInfo.getAlarmClassification(), delExInfo.getSids());
+				UpdateAutoRunAlarmDs.create(rq1, cid, delExInfo.getAlarmClassification(), delExInfo.getSids())
+				.run();
 			}
 			
 			if (delExInfo.getAlarmClassification() == AlarmClassification.ALARM_LIST) {
 				UpdateAlarmDataDs.create(rq2, cid, delExInfo.getSids(), delExInfo.getAlarmListParttenCode().orElse(""), 
-						new ArrayList<>(), delExInfo.getDisplayEmpClassfication().value);
+						new ArrayList<>(), delExInfo.getDisplayEmpClassfication().value)
+				.run();
+				
 			}
 		}
 		

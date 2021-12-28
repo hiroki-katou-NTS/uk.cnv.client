@@ -135,7 +135,7 @@ public class TransferCanonicalData {
 		val importingDomain = require.getImportingDomain(context.getDomainId());
 		val base = require.getConversionSource(importingDomain.getName());
 		
-		val tableName = new WorkspaceTableName(context, importingDomain.getName());
+		val tableName = new WorkspaceTableName(context);
 		
 		// Source側のテーブル名を一時テーブルの名前に変更する必要がある
 		return new ConversionSource(

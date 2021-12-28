@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import nts.uk.ctx.at.function.dom.attendanceitemframelinking.AttendanceItemLinking;
+import nts.uk.ctx.at.function.dom.attendanceitemframelinking.enums.FrameCategory;
 import nts.uk.ctx.at.function.dom.attendanceitemframelinking.enums.TypeOfItem;
 
 public interface AttendanceItemLinkingRepository {
@@ -51,6 +52,15 @@ public interface AttendanceItemLinkingRepository {
 	List<AttendanceItemLinking> getFullDataByAttdIdAndType(List<Integer> attendanceItemIds, TypeOfItem type);
 	
 
+	/**
+	 * @author tutk
+	 * Get Full Data AttendanceItemLinking  by type and list attendanceItemIds and category
+	 * @param attendanceItemIds
+	 * @return
+	 */
+	List<AttendanceItemLinking> getFullDataByAttdIdAndTypeAndCategory(List<Integer> attendanceItemIds, TypeOfItem type,int frameCategory);
+	
+	
 	/**
 	 * List<使用不可の残業系勤怠項目ID＞を取得する Nhận dánh sách < Attendance items liên quan đến Overtime ID  không thể sử dụng được>
 	 *

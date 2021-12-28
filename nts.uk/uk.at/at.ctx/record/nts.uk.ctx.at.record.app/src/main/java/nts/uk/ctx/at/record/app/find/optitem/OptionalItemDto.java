@@ -11,18 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import nts.uk.ctx.at.record.app.find.optitem.calculation.FormulaDto;
 import nts.uk.ctx.at.shared.dom.common.CompanyId;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcResultRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalculationClassification;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.DescritionOptionalItem;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.EmpConditionAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.NoteOptionalItem;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemName;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemNo;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemSetMemento;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemUsageAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.PerformanceAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.UnitOfOptionalItem;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.*;
 
 /**
  * The Class OptionalItemDto.
@@ -66,6 +55,8 @@ public class OptionalItemDto implements OptionalItemSetMemento {
 	
 	/** The description */
 	private String description;
+
+	private boolean inputCheck;
 
 	/*
 	 * (non-Javadoc)
@@ -158,9 +149,15 @@ public class OptionalItemDto implements OptionalItemSetMemento {
 	 * CalculationResultRange)
 	 */
 	@Override
-	public void setCalculationResultRange(CalcResultRange calculationResultRange) {
+	public void setInputControlSetting(InputControlSetting inputControlSetting) {
 		this.calcResultRange = new CalcResultRangeDto();
-		calculationResultRange.saveToMemento(this.calcResultRange);
+		inputControlSetting.getCalcResultRange().saveToMemento(this.calcResultRange);
+		if (inputControlSetting.getDailyInputUnit().isPresent()) {
+			this.calcResultRange.setTimeInputUnit(inputControlSetting.getDailyInputUnit().get().getTimeItemInputUnit().map(i -> i.value).orElse(null));
+			this.calcResultRange.setNumberInputUnit(inputControlSetting.getDailyInputUnit().get().getNumberItemInputUnit().map(i -> i.value).orElse(null));
+			this.calcResultRange.setAmountInputUnit(inputControlSetting.getDailyInputUnit().get().getAmountItemInputUnit().map(i -> i.value).orElse(null));
+		}
+		this.inputCheck = inputControlSetting.isInputWithCheckbox();
 	}
 
 	/*

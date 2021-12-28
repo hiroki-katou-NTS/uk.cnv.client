@@ -28,14 +28,14 @@ public class CalcResultOfAnyItem {
 	 * @param optionalItemAtr
 	 * @return
 	 */
-	public CalcResultOfAnyItem reCreateCalcResultOfAnyItem(BigDecimal value, OptionalItemAtr optionalItemAtr) {
+	public CalcResultOfAnyItem reCreateCalcResultOfAnyItem(Optional<BigDecimal> value, OptionalItemAtr optionalItemAtr) {
 		switch (optionalItemAtr) {
 		case NUMBER:
-			return new CalcResultOfAnyItem(this.optionalItemNo, Optional.of(value), Optional.empty(), Optional.empty());
+			return new CalcResultOfAnyItem(this.optionalItemNo, value, Optional.empty(), Optional.empty());
 		case AMOUNT:
-			return new CalcResultOfAnyItem(this.optionalItemNo, Optional.empty(), Optional.empty(), Optional.of(value));
+			return new CalcResultOfAnyItem(this.optionalItemNo, Optional.empty(), Optional.empty(), value);
 		case TIME:
-			return new CalcResultOfAnyItem(this.optionalItemNo, Optional.empty(), Optional.of(value), Optional.empty());
+			return new CalcResultOfAnyItem(this.optionalItemNo, Optional.empty(), value, Optional.empty());
 		default:
 			throw new RuntimeException("unknown value of enum OptionalItemAtr");
 		}

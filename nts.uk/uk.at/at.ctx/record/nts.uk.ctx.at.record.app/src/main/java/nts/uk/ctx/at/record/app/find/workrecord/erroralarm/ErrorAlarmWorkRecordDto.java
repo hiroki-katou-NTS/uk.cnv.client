@@ -216,7 +216,7 @@ public class ErrorAlarmWorkRecordDto {
 				domain.getFixedAtr() ? 0
 						: conditionDomain.getAtdItemCondition().getGroup2().getConditionOperator().value,
 				domain.getFixedAtr() ? false : conditionDomain.getAtdItemCondition().isUseGroup2());
-		if (!domain.getFixedAtr()) {
+			if (!domain.getFixedAtr()) {
 			// Set AlarmCheckTargetConditionDto
 			errorAlarmWorkRecordDto.setAlCheckTargetCondition(new AlarmCheckTargetConditionDto(
 					conditionDomain.getCheckTargetCondtion().getFilterByBusinessType(),
@@ -230,6 +230,7 @@ public class ErrorAlarmWorkRecordDto {
 							.map(lstCode -> lstCode.v()).collect(Collectors.toList()),
 					conditionDomain.getCheckTargetCondtion().getLstClassificationCode().stream()
 							.map(lstCode -> lstCode.v()).collect(Collectors.toList())));
+			
 			WorkTypeConditionDto wtypeConditionDto = new WorkTypeConditionDto();
 			WorkTimeConditionDto wtimeConditionDto = new WorkTimeConditionDto();
 			// Set WorkTypeConditionDto
@@ -297,6 +298,19 @@ public class ErrorAlarmWorkRecordDto {
 				erAlAtdItemConditionGroup2.add(erAlAtdItemConditionDto);
 			}
 			errorAlarmWorkRecordDto.setErAlAtdItemConditionGroup2(erAlAtdItemConditionGroup2);
+		} else if(conditionDomain.getCheckTargetCondtion() != null){ // kdw007_ver22
+			errorAlarmWorkRecordDto.setAlCheckTargetCondition(new AlarmCheckTargetConditionDto(
+					conditionDomain.getCheckTargetCondtion().getFilterByBusinessType(),
+					conditionDomain.getCheckTargetCondtion().getFilterByJobTitle(),
+					conditionDomain.getCheckTargetCondtion().getFilterByEmployment(),
+					conditionDomain.getCheckTargetCondtion().getFilterByClassification(),
+					conditionDomain.getCheckTargetCondtion().getLstBusinessTypeCode().stream()
+							.map(lstCode -> lstCode.v()).collect(Collectors.toList()),
+					conditionDomain.getCheckTargetCondtion().getLstJobTitleId(),
+					conditionDomain.getCheckTargetCondtion().getLstEmploymentCode().stream()
+							.map(lstCode -> lstCode.v()).collect(Collectors.toList()),
+					conditionDomain.getCheckTargetCondtion().getLstClassificationCode().stream()
+							.map(lstCode -> lstCode.v()).collect(Collectors.toList())));
 		}
 		return errorAlarmWorkRecordDto;
 	}

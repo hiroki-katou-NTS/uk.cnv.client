@@ -25,7 +25,8 @@ public class StyleFile extends UIComponentBase {
     }));
     
     public static Set<String> FILES_FULLCALENDAR = new  LinkedHashSet<String>(Arrays.asList(new String[] {
-    		"/lib/generic/fullcalendar/main.min.css"
+    		"/lib/generic/fullcalendar/main.min.css",
+    		"/lib/generic/fullcalendar/datepicker/fc-datepicker.css"
     }));
 
     @SuppressWarnings("serial")

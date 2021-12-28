@@ -19,7 +19,7 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.verticaltotal.wor
 public class WorkAmountOfMonthlyDto implements ItemConst, AttendanceItemDataGate {
 	
 	/** 就業時間金額 */
-	private int workTimeAmount;
+	private long workTimeAmount;
 	
 	public static WorkAmountOfMonthlyDto from(WorkAmountOfMonthly domain) {
 		WorkAmountOfMonthlyDto dto = new WorkAmountOfMonthlyDto();

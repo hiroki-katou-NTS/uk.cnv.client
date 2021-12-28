@@ -35,7 +35,7 @@ public class KsrdtReflectAppHist extends ContractUkJpaEntity implements Serializ
 
 	// 再反映
 	@Column(name = "RE_REFLECT_ATR")
-	public int reReflect;
+	public boolean reReflect;
 
 	// 実行ID
 	@Column(name = "EXECUTION_ID")

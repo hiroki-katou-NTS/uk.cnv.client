@@ -50,6 +50,12 @@ public class CalcResultRangeDto implements CalcResultRangeSetMemento {
      */
     private Integer amountLower;
 
+    private Integer timeInputUnit;
+
+    private Integer numberInputUnit;
+
+    private Integer amountInputUnit;
+
 
     @Override
     public void setUpperLimit(CalcRangeCheck upper) {

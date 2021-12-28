@@ -67,5 +67,6 @@ interface RowData {
     code: string;//コード
     name: string;//エラー内容
     employeeID: string; 
+    type: string;
     attendanceItemList: Array<number>;   
 }

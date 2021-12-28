@@ -46,6 +46,11 @@ module nts.uk.at.view.kaf022.v.viewmodel {
                     (_.find(menus, m => m.programId == "KAF005" && m.queryString == "overworkatr=2") || {displayName: null}).displayName || getText("KAF022_777")
                 ),
                 new MenuModel(
+                    "KAF005A3",
+                    !!_.find(appSetForProxyApp, o => o.appType == 0 && o.overtimeAppAtr == 3),
+                    (_.find(menus, m => m.programId == "KAF005" && m.queryString == "overworkatr=3") || {displayName: null}).displayName || getText("KAF022_802")
+                ),
+                new MenuModel(
                     "KAF006A",
                     !!_.find(appSetForProxyApp, o => o.appType == 1),
                     (_.find(menus, m => m.programId == "KAF006") || {displayName: null}).displayName || getText("KAF022_4")
@@ -116,6 +121,8 @@ module nts.uk.at.view.kaf022.v.viewmodel {
                             return {appType: 0, overtimeAppAtr: 1, stampRequestMode: null};
                         case "KAF005A2":
                             return {appType: 0, overtimeAppAtr: 2, stampRequestMode: null};
+                        case "KAF005A3":
+                            return {appType: 0, overtimeAppAtr: 3, stampRequestMode: null};
                         case "KAF006A":
                             return {appType: 1, overtimeAppAtr: null, stampRequestMode: null};
                         case "KAF007A":

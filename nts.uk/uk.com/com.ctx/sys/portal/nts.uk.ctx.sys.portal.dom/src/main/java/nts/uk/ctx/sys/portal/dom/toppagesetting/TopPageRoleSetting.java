@@ -38,9 +38,8 @@ public class TopPageRoleSetting extends TopPageSettings implements DomainAggrega
 			LoginMenuCode loginMenuCode, 
 			TopMenuCode topMenuCode, 
 			MenuClassification menuClassification, 
-			System system, 
-			SwitchingDate switchingDate) {
-		super(topMenuCode, new MenuLogin(system, menuClassification, loginMenuCode), switchingDate);
+			System system) {
+		super(topMenuCode, new MenuLogin(system, menuClassification, loginMenuCode));
 		this.companyId = companyId;
 		this.roleSetCode = roleSetCode;
 	}
@@ -55,7 +54,6 @@ public class TopPageRoleSetting extends TopPageSettings implements DomainAggrega
 		this.companyId = memento.getCompanyId();
 		this.roleSetCode = new RoleSetCode(memento.getRoleSetCode());
 		this.topMenuCode = new TopMenuCode(memento.getTopMenuCode());
-		this.switchingDate = new SwitchingDate(memento.getSwitchingDate());
 		this.menuLogin = new MenuLogin(
 				EnumAdaptor.valueOf(memento.getSystem(), System.class),
 				EnumAdaptor.valueOf(memento.getMenuClassification(), MenuClassification.class),
@@ -66,7 +64,6 @@ public class TopPageRoleSetting extends TopPageSettings implements DomainAggrega
 		memento.setCompanyId(companyId);
 		memento.setRoleSetCode(roleSetCode.v());
 		memento.setTopMenuCode(topMenuCode.v());
-		memento.setSwitchingDate(switchingDate.v());
 		memento.setSystem(menuLogin.getSystem().value);
 		memento.setMenuClassification(menuLogin.getMenuClassification().value);
 		memento.setLoginMenuCode(menuLogin.getLoginMenuCode().v());
@@ -76,7 +73,6 @@ public class TopPageRoleSetting extends TopPageSettings implements DomainAggrega
 		void setCompanyId(String companyID);
 		void setRoleSetCode(String roleSetCode);
 		void setTopMenuCode(String topMenuCode);
-		void setSwitchingDate(Integer switchingDate);
 		void setSystem(int system);
 		void setMenuClassification(int menuClassification);
 		void setLoginMenuCode(String loginMenuCode);
@@ -87,7 +83,6 @@ public class TopPageRoleSetting extends TopPageSettings implements DomainAggrega
 		String getCompanyId();
 		String getRoleSetCode();
 		String getTopMenuCode();
-		Integer getSwitchingDate();
 		int getSystem();
 		int getMenuClassification();
 		String getLoginMenuCode();

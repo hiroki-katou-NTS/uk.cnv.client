@@ -30,6 +30,10 @@ import nts.uk.ctx.at.record.dom.approvalmanagement.ApprovalProcessingUseSetting;
 import nts.uk.ctx.at.record.dom.approvalmanagement.repository.ApprovalProcessingUseSettingRepository;
 import nts.uk.ctx.at.record.dom.daily.DailyRecordAdUpService;
 import nts.uk.ctx.at.record.dom.daily.optionalitemtime.AnyItemValueOfDaily;
+import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeOfDaily;
+import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeOfDailyRepo;
+import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDaily;
+import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDailyRepo;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.CreatingDailyResultsCondition;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.CreatingDailyResultsConditionRepository;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.getperiodcanprocesse.AchievementAtr;
@@ -66,6 +70,7 @@ import nts.uk.ctx.at.shared.dom.scherec.closurestatus.ClosureStatusManagement;
 import nts.uk.ctx.at.shared.dom.scherec.closurestatus.ClosureStatusManagementRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.CommonCompanySettingForCalc;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.OuenWorkTimeSheetOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.editstate.EditStateOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.CalculationState;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.ManagePerCompanySet;
@@ -199,7 +204,7 @@ public class DailyCalculationEmployeeServiceImpl implements DailyCalculationEmpl
 		
 		
 		this.parallel.forEach(employeeIds, employeeId -> {
-			// Imported（就業）「所属雇用履歴」を取得する (Lấy dữ liệu)
+			// Imported（就業）「所属雇用履歴」を取得する (L･y d・ liﾇu)
 			List<EmploymentHistShareImport> listEmploymentHis = this.employmentAdapterShare.findByEmployeeIdOrderByStartDate(employeeId);
 
 			GetPeriodCanProcesseRequireImpl require = new GetPeriodCanProcesseRequireImpl(closureStatusManagementRepo,
@@ -299,7 +304,7 @@ public class DailyCalculationEmployeeServiceImpl implements DailyCalculationEmpl
 			
 			LockStatus lockStatus = LockStatus.UNLOCK;
 			if(IsCalWhenLock ==null || IsCalWhenLock == false) {
-				//アルゴリズム「実績ロックされているか判定する」を実行する (Chạy xử lý)
+				//アルゴリズム「実績ロックされているか判定する」を実行する (Ch｡y x・ ly)
 				//実績ロックされているか判定する
 				lockStatus = lockStatusService.getDetermineActualLocked(cid, 
 						stateInfo.getIntegrationOfDaily().getYmd(), closureEmploymentOptional.get().getClosureId(), PerformanceType.DAILY);
@@ -339,6 +344,9 @@ public class DailyCalculationEmployeeServiceImpl implements DailyCalculationEmpl
 				}
 			}
 		}
+		// 暫定データの登録
+		// o｡n them nay toi khong chｯc chｯn lｯm vi toi ﾑi chiｿu thiｿt kｿ EA khong giﾑng lｯm. Nhｰng test thi th･y ch｡y ｰ・c theo yeu cｧu c・a bug 118478
+		this.interimData.registerDateChange(cid, employeeId, datePeriod.datesBetween());
 		return Pair.of(check, afterCalcRecord);
 	}
 	
@@ -365,8 +373,12 @@ public class DailyCalculationEmployeeServiceImpl implements DailyCalculationEmpl
 					? Optional.of(new AnyItemValueOfDaily(value.getEmployeeId(), value.getYmd(),
 							value.getAnyItemValue().get()))
 					: Optional.empty();
+			Optional<OuenWorkTimeOfDaily> ouenTime = Optional.empty();
+			if(!value.getOuenTime().isEmpty()) {
+				ouenTime = Optional.of(OuenWorkTimeOfDaily.create(value.getEmployeeId(), value.getYmd(), value.getOuenTime()));
+			}
 			this.registAttendanceTime(value.getEmployeeId(),value.getYmd(),
-					attdTimeOfDailyPer,anyItem);
+					attdTimeOfDailyPer,anyItem,ouenTime);
 		}
 		
 		if(value.getAffiliationInfor() != null) {
@@ -413,7 +425,7 @@ public class DailyCalculationEmployeeServiceImpl implements DailyCalculationEmpl
 	public ProcessState calculateForOnePerson(String companyId, String employeeId,
 			DatePeriod datePeriod, Optional<Consumer<ProcessState>> counter, String executeLogId, boolean isCalWhenLock ) {
 		
-		// Imported（就業）「所属雇用履歴」を取得する (Lấy dữ liệu)
+		// Imported（就業）「所属雇用履歴」を取得する (L･y d・ liﾇu)
 		List<EmploymentHistShareImport> listEmploymentHisShare = this.employmentAdapterShare.findByEmployeeIdOrderByStartDate(employeeId);
 		//実績処理できる期間を取得する
 		GetPeriodCanProcesseRequireImpl require = new GetPeriodCanProcesseRequireImpl(closureStatusManagementRepo,
@@ -457,7 +469,7 @@ public class DailyCalculationEmployeeServiceImpl implements DailyCalculationEmpl
 								Closure closureData = ClosureService.getClosureDataByEmployee(
 										requireService.createRequire(), new CacheCarrier(),
 										employeeId, stateInfo.getIntegrationOfDaily().getYmd());
-								//アルゴリズム「実績ロックされているか判定する」を実行する (Chạy xử lý)
+								//アルゴリズム「実績ロックされているか判定する」を実行する (Ch｡y x・ ly)
 								//実績ロックされているか判定する
 								lockStatus = lockStatusService.getDetermineActualLocked(cid, 
 										stateInfo.getIntegrationOfDaily().getYmd(),  closureData.getClosureId().value, PerformanceType.DAILY);
@@ -521,8 +533,9 @@ public class DailyCalculationEmployeeServiceImpl implements DailyCalculationEmpl
 	 * データ更新
 	 * @param attendanceTime 日別実績の勤怠時間
 	 */
-	private void registAttendanceTime(String empId,GeneralDate ymd,AttendanceTimeOfDailyPerformance attendanceTime, Optional<AnyItemValueOfDaily> anyItem){
-		adTimeAndAnyItemAdUpService.addAndUpdate(empId,ymd,Optional.of(attendanceTime), anyItem);	
+	private void registAttendanceTime(String empId,GeneralDate ymd,AttendanceTimeOfDailyPerformance attendanceTime,
+			Optional<AnyItemValueOfDaily> anyItem, Optional<OuenWorkTimeOfDaily> ouenTime){
+		adTimeAndAnyItemAdUpService.addAndUpdate(empId,ymd,Optional.of(attendanceTime), anyItem, ouenTime);	
 	}
 	
 	@AllArgsConstructor

@@ -15,6 +15,7 @@ import nts.uk.ctx.at.record.dom.daily.optionalitemtime.AnyItemValueOfDailyRepo;
 import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeOfDailyRepo;
 import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDailyRepo;
 import nts.uk.ctx.at.record.dom.daily.remarks.RemarksOfDailyPerformRepo;
+import nts.uk.ctx.at.record.dom.daily.timegroup.TaskTimeGroupRepository;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.createdailyoneday.deleteworkinfor.sysdomain.DeleteSystemDomain;
 import nts.uk.ctx.at.record.dom.editstate.repository.EditStateOfDailyPerformanceRepository;
 import nts.uk.ctx.at.record.dom.shorttimework.repo.ShortTimeOfDailyPerformanceRepository;
@@ -75,6 +76,9 @@ public class DeleteWorkInfor {
 	@Inject
 	private OuenWorkTimeSheetOfDailyRepo ouenSheet;
 	
+	@Inject
+	private TaskTimeGroupRepository taskTimeGroupRepository;
+	
 	public void deleteWorkInfor(String companyId,String employeeId,GeneralDate ymd) {
 		
 		//「情報」系のドメイン削除する
@@ -111,6 +115,9 @@ public class DeleteWorkInfor {
 		
 		// 「日別実績の応援作業時間帯」を削除する
 		ouenSheet.remove(employeeId, ymd);
+		
+		//「日別実績の作業時間帯グループ」を削除する
+		taskTimeGroupRepository.delete(employeeId, ymd);
 	}
 
 }

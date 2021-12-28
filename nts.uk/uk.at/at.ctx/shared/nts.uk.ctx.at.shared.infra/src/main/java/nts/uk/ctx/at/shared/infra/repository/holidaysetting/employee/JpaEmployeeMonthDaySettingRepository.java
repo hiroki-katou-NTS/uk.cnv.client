@@ -23,9 +23,10 @@ import nts.uk.ctx.at.shared.dom.common.CompanyId;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.common.Year;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.employee.EmployeeMonthDaySetting;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.employee.EmployeeMonthDaySettingRepository;
-import nts.uk.ctx.at.shared.infra.entity.holidaysetting.employee.KshmtHdpubMonthdaysSya;
+import nts.uk.ctx.at.shared.infra.entity.holidaysetting.employee.KshmtEmployeeMonthDaySetPK;
 import nts.uk.ctx.at.shared.infra.entity.holidaysetting.employee.KshmtEmployeeMonthDaySetPK_;
 import nts.uk.ctx.at.shared.infra.entity.holidaysetting.employee.KshmtEmployeeMonthDaySet_;
+import nts.uk.ctx.at.shared.infra.entity.holidaysetting.employee.KshmtHdpubMonthdaysSya;
 
 /**
  * The Class JpaEmployeeMonthDaySettingRepository.
@@ -93,9 +94,22 @@ public class JpaEmployeeMonthDaySettingRepository extends JpaRepository implemen
 	 * @see nts.uk.ctx.bs.employee.dom.holidaysetting.employee.EmployeeMonthDaySettingRepository#remove(nts.uk.ctx.bs.employee.dom.common.CompanyId, java.lang.String, nts.uk.ctx.bs.employee.dom.holidaysetting.common.Year)
 	 */
 	@Override
-	public void remove(CompanyId companyId, String employee, Year year) {
-		List<KshmtHdpubMonthdaysSya> result = this.findBy(companyId, employee, year, null);
-		this.commandProxy().removeAll(result);
+	public void remove(CompanyId companyId, String employee, Year year, Integer startMonth) {
+		Year nextYear = new Year(year.v() + 1);
+		List<Year> years = Arrays.asList(year, nextYear);
+		List<KshmtHdpubMonthdaysSya> entities = years.stream()
+				.map(y -> this.findBy(companyId, employee, y, null))
+				.flatMap(List::stream)
+				.filter(data -> {
+					if (data.getKshmtEmployeeMonthDaySetPK().getManageYear() == year.v()) {
+						return data.getKshmtEmployeeMonthDaySetPK().getMonth() >= startMonth;
+					} else if (data.getKshmtEmployeeMonthDaySetPK().getManageYear() == nextYear.v()) {
+						return data.getKshmtEmployeeMonthDaySetPK().getMonth() < startMonth;
+					}
+					return false;
+				})
+				.collect(Collectors.toList());
+		this.commandProxy().removeAll(entities);
 	}
 	
 	/**
@@ -183,5 +197,15 @@ public class JpaEmployeeMonthDaySettingRepository extends JpaRepository implemen
 			}
 		}
 		return domain;
+	}
+
+	@Override
+	public void remove(EmployeeMonthDaySetting domain) {
+		List<KshmtEmployeeMonthDaySetPK> primaryKeys = domain.getPublicHolidayMonthSettings().stream()
+				.map(data -> new KshmtEmployeeMonthDaySetPK(domain.getCompanyId().v(), domain.getEmployeeId(),
+						data.getPublicHdManagementYear().v().shortValue(), data.getMonth().shortValue()))
+				.collect(Collectors.toList());
+		this.commandProxy().removeAll(KshmtHdpubMonthdaysSya.class, primaryKeys);
+		this.getEntityManager().flush();
 	}
 }

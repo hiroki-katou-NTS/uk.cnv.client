@@ -71,6 +71,7 @@ import nts.uk.screen.at.app.query.ksu.ksu002.a.GetWorkActualOfWorkInfo002;
 import nts.uk.screen.at.app.query.ksu.ksu002.a.KSU002Finder;
 import nts.uk.shr.com.company.CompanyAdapter;
 import nts.uk.shr.com.context.AppContexts;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -195,8 +196,8 @@ public class BasicInformationQuery {
         // Loop：年月日 in Input.対象期間
         period.datesBetween().forEach(date -> {
             val historyData = historyCache.get(date);
-            String workPplaceId = historyData.get().getHistoryItem().getWorkplaceId();
-            if (historyData.isPresent() && !workPplaceId.isEmpty()) {
+            String workPplaceId = historyData.isPresent() ? historyData.get().getHistoryItem().getWorkplaceId() : "";
+            if (historyData.isPresent() && StringUtils.isNotEmpty(workPplaceId)) {
                 TargetOrgIdenInfor targetOrgIdenInfor = TargetOrgIdenInfor.creatIdentifiWorkplace(workPplaceId);
                 // 作成する(Require, 年月日, 対象組織識別情報)
                 DateInformation information = DateInformation.create(new DateInformation.Require() {

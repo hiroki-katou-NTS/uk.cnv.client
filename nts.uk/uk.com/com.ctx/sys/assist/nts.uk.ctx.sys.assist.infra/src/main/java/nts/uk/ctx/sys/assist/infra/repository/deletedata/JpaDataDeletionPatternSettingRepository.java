@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
-import org.apache.commons.lang3.BooleanUtils;
 
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.sys.assist.dom.deletedata.DataDeletionPatternSetting;
@@ -40,7 +39,7 @@ public class JpaDataDeletionPatternSettingRepository extends JpaRepository imple
 	@Override
 	public Optional<DataDeletionPatternSetting> findByPk(String contractCd, String patternCd, int patternAtr) {
 		return this.queryProxy().find(
-				new SspmtDataDeletionPatternSettingPK(contractCd, patternCd, BooleanUtils.toBoolean(patternAtr)),
+				new SspmtDataDeletionPatternSettingPK(contractCd, patternCd, patternAtr),
 				SspmtDataDeletionPatternSetting.class)
 				.map(DataDeletionPatternSetting::createFromMemento);
 	}
@@ -56,7 +55,7 @@ public class JpaDataDeletionPatternSettingRepository extends JpaRepository imple
 				new SspmtDataDeletionPatternSettingPK(
 						domain.getContractCode().v(), 
 						domain.getPatternCode().v(),
-						BooleanUtils.toBoolean(domain.getPatternClassification().value)),
+						domain.getPatternClassification().value),
 				SspmtDataDeletionPatternSetting.class).get();
 		domain.setMemento(entity);
 		this.commandProxy().update(entity);
@@ -66,7 +65,7 @@ public class JpaDataDeletionPatternSettingRepository extends JpaRepository imple
 	public void delete(String contractCd, String patternCd, int patternAtr) {
 		this.commandProxy().remove(
 				SspmtDataDeletionPatternSetting.class,
-				new SspmtDataDeletionPatternSettingPK(contractCd, patternCd, BooleanUtils.toBoolean(patternAtr)));
+				new SspmtDataDeletionPatternSettingPK(contractCd, patternCd, patternAtr));
 	}
 	
 	private SspmtDataDeletionPatternSetting toEntity(DataDeletionPatternSetting domain) {

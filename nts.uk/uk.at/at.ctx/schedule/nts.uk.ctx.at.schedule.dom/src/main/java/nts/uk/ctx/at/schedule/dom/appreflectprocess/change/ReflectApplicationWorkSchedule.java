@@ -74,7 +74,8 @@ public class ReflectApplicationWorkSchedule {
 				workSchedule.getWorkInfo(), CalAttrOfDailyAttd.createAllCalculate(), workSchedule.getAffInfo(), Optional.empty(), new ArrayList<>(),
 				workSchedule.getOutingTime(), workSchedule.getLstBreakTime(), workSchedule.getOptAttendanceTime(),
 				workSchedule.getOptTimeLeaving(), workSchedule.getOptSortTimeWork(), Optional.empty(), Optional.empty(),
-				Optional.empty(), workSchedule.getLstEditState(), Optional.empty(), new ArrayList<>(), snapshot);
+				Optional.empty(), workSchedule.getLstEditState(), Optional.empty(), new ArrayList<>(), new ArrayList<>(),
+				new ArrayList<>(), snapshot);
 
 		IntegrationOfDaily domainBeforeReflect = createDailyDomain(require, domainDaily);
 

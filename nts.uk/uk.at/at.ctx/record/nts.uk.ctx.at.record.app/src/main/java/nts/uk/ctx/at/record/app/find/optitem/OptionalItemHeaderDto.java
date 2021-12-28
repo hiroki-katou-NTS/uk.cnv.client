@@ -9,18 +9,7 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import nts.uk.ctx.at.shared.dom.common.CompanyId;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcResultRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalculationClassification;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.DescritionOptionalItem;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.EmpConditionAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.NoteOptionalItem;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemName;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemNo;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemSetMemento;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemUsageAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.PerformanceAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.UnitOfOptionalItem;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.*;
 
 /**
  * The Class OptionalItemHeaderDto.
@@ -136,7 +125,7 @@ public class OptionalItemHeaderDto implements OptionalItemSetMemento {
 	 * CalculationResultRange)
 	 */
 	@Override
-	public void setCalculationResultRange(CalcResultRange calculationResultRange) {
+	public void setInputControlSetting(InputControlSetting calculationResultRange) {
 		// Not used.
 	}
 

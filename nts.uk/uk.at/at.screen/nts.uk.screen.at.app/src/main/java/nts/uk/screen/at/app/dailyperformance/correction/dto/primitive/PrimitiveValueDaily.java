@@ -53,7 +53,13 @@ public enum PrimitiveValueDaily {
 	
 	CountMonth(59, "月次任意回数", "AnyTimesMonth"),
 	
-	ReasonCode(60, "乖離理由コード", "DiverdenceReasonCode");
+	ReasonCode(60, "乖離理由コード", "DiverdenceReasonCode"),
+	
+	SuppNumValue(73, "作業補足数値", "SuppNumValue"),
+	
+	WorkSuppComment(74, "作業補足コメント", "WorkSuppComment"),
+	
+	ChoiceCode(75, "作業補足情報の選択肢コード", "ChoiceCode");
 	
 	
 	public final int value;

@@ -107,6 +107,9 @@ public class CreatePostgresqlTableBuilder extends CreateTableBuilder {
                 case AUTONUMBER:
                     sql.append("serial");
                     break;
+                case BOOLEAN:
+                    sql.append("boolean");
+                    break;
                 default:
                     throw new RuntimeException("error: " + type);
             }

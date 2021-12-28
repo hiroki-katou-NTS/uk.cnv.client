@@ -6,6 +6,7 @@ package nts.uk.ctx.at.schedule.dom.schedule.basicschedule.personalfee;
 
 import lombok.Getter;
 import nts.arc.layer.dom.DomainObject;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.ExtraTimeItemNo;
 
 /**
  * The Class WorkSchedulePersonFee.

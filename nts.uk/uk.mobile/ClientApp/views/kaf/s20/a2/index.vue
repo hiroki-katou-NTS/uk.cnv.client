@@ -66,54 +66,56 @@
               <div class="collapse">
                 <div class="card-body">
                   <span style="display: block;">{{item.description}}</span>
-                  <span v-if="item.lowerCheck || item.upperCheck || item.unit || item.optionalItemAtr == 0">
-                    {{ 'KAF020_25' | i18n }}
-                  </span>
-                  <span v-if="item.lowerCheck || item.upperCheck">
-                    {{ 'KAF020_26' | i18n}}
-                  </span>
-                  <span v-if="item.lowerCheck">
-                    <span v-if="item.optionalItemAtr == 0 && item.timeLower != null">
-                      {{ item.timeLower | timedr }}
+                  <span v-if="(item.lowerCheck || item.upperCheck || item.unit || item.optionalItemAtr == 0) && !item.inputCheckbox">
+                    <span v-if="item.lowerCheck || item.upperCheck || item.unit || item.optionalItemAtr == 0">
+                      {{ 'KAF020_25' | i18n }}
                     </span>
-                    <span v-if="item.optionalItemAtr == 1">
-                      {{ item.numberLower }}
+                    <span v-if="item.lowerCheck || item.upperCheck">
+                      {{ 'KAF020_26' | i18n}}
                     </span>
-                    <span v-if="item.optionalItemAtr == 2">
-                      {{ item.amountLower }}
+                    <span v-if="item.lowerCheck">
+                      <span v-if="item.optionalItemAtr == 0 && item.timeLower != null">
+                        {{ item.timeLower | timedr }}
+                      </span>
+                      <span v-if="item.optionalItemAtr == 1">
+                        {{ item.numberLower }}
+                      </span>
+                      <span v-if="item.optionalItemAtr == 2">
+                        {{ item.amountLower }}
+                      </span>
                     </span>
-                  </span>
-                  <span v-if="item.lowerCheck || item.upperCheck">
-                    {{'KAF020_27' | i18n}}
-                  </span>
-                  <span v-if="item.upperCheck">
-                    <span v-if="item.optionalItemAtr == 0 && item.timeUpper != null">
-                      {{ item.timeUpper | timedr }}
+                    <span v-if="item.lowerCheck || item.upperCheck">
+                      {{'KAF020_27' | i18n}}
                     </span>
-                    <span v-if="item.optionalItemAtr == 1">
-                      {{ item.numberUpper }}
+                    <span v-if="item.upperCheck">
+                      <span v-if="item.optionalItemAtr == 0 && item.timeUpper != null">
+                        {{ item.timeUpper | timedr }}
+                      </span>
+                      <span v-if="item.optionalItemAtr == 1">
+                        {{ item.numberUpper }}
+                      </span>
+                      <span v-if="item.optionalItemAtr == 2">
+                        {{ item.amountUpper }}
+                      </span>
                     </span>
-                    <span v-if="item.optionalItemAtr == 2">
-                      {{ item.amountUpper }}
+                    <span v-if="(item.lowerCheck || item.upperCheck) && (item.unit || item.optionalItemAtr == 0)">
+                      {{'、'}}
                     </span>
-                  </span>
-                  <span v-if="item.lowerCheck && item.upperCheck">
-                    {{'、'}}
-                  </span>
-                  <span v-if="item.unit || item.optionalItemAtr == 0">
-                    <span>
-                      {{item.inputUnitOfTimeItem}}
+                    <span v-if="item.unit || item.optionalItemAtr == 0">
+                      <span>
+                        {{item.inputUnitOfItem}}
+                      </span>
+                      <span v-if="item.optionalItemAtr == 0">
+                        {{'KAF020_32' | i18n}}
+                      </span>
+                      <span v-else>
+                        {{item.unit}}
+                      </span>
+                      {{'KAF020_28' | i18n}}
                     </span>
-                    <span v-if="item.optionalItemAtr == 0">
-                      {{'KAF020_32' | i18n}}
+                    <span v-if="item.lowerCheck || item.upperCheck || item.unit || item.optionalItemAtr == 0">
+                      {{'KAF020_29' | i18n}}
                     </span>
-                    <span v-else>
-                      {{item.unit}}
-                    </span>
-                    {{'KAF020_28' | i18n}}
-                  </span>
-                  <span v-if="item.lowerCheck || item.upperCheck || item.unit || item.optionalItemAtr == 0">
-                    {{'KAF020_29' | i18n}}
                   </span>
                 </div>
               </div>
@@ -121,32 +123,26 @@
           </div>
           <!-- A2_6_4_1 -->
           <div class="position-relative mt-2">
-            <nts-time-editor
-              v-bind:class="'item-' + item.optionalItemNo"
-              v-model="item.time"
-              v-if="item.optionalItemAtr == 0"
-              v-bind:show-title="false"
-              v-bind:record-id="index"
-              time-input-type="time-duration"
-              v-bind:columns="{ input: 'col-10' }"
+            <kafs20-time-input
+                    v-if="item.optionalItemAtr == 0"
+                    v-bind:item="item"
             />
-            <nts-number-editor
-              v-bind:class="'item-' + item.optionalItemNo"
-              v-model="item.number"
-              v-if="item.optionalItemAtr == 1"
-              v-bind:show-title="false"
-              v-bind:record-id="index"
-              v-bind:columns="{ input: 'col-10' }"
+            <kafs20-number-input
+                    v-if="item.optionalItemAtr == 1 && !item.inputCheckbox"
+                    v-bind:item="item"
             />
-            <nts-number-editor
-              v-bind:class="'item-' + item.optionalItemNo"
-              v-model="item.amount"
-              v-if="item.optionalItemAtr == 2"
-              v-bind:show-title="false"
-              v-bind:record-id="index"
-              v-bind:columns="{ input: 'col-10' }"
+            <nts-checkbox
+                    style="text-align: center;"
+                    v-bind:class="'item-' + item.optionalItemNo"
+                    v-model="item.number"
+                    v-bind:value="1"
+                    v-if="item.optionalItemAtr == 1 && item.inputCheckbox"
             />
-            <span class="position-absolute">{{ item.unit }}</span>
+            <kafs20-amount-input
+                    v-if="item.optionalItemAtr == 2"
+                    v-bind:item="item"
+            />
+            <span class="position-absolute">{{ item.inputCheckbox ? '' : item.unit }}</span>
           </div>
         </div>
       </div>

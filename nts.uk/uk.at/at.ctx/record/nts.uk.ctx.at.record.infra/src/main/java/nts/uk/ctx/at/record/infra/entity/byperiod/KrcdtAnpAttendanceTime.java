@@ -136,11 +136,11 @@ public class KrcdtAnpAttendanceTime extends ContractUkJpaEntity implements Seria
 
 	/** 就業時間金額 */
 	@Column(name = "WORK_TIME_AMOUNT")
-	public int workTimeAmount;
+	public long workTimeAmount;
 	
 	/** 割増金額合計 */
 	@Column(name = "PREMIUM_AMOUNT_TOTAL")
-	public int premiumAmountTotal;
+	public long premiumAmountTotal;
 	
 	/** 就業時間 */
 	@Column(name = "WORK_TIME")

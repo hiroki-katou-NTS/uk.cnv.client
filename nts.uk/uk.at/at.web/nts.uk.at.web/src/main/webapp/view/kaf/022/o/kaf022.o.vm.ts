@@ -39,7 +39,8 @@ module nts.uk.at.view.kaf022.o.viewmodel {
             self.overtimeAppOptions = ko.observableArray([
                 new ItemModel(OVERTIME.EARLY, getText("Enum_APP_OVERTIME_EARLY")),
                 new ItemModel(OVERTIME.NORMAL, getText("Enum_APP_OVERTIME_NORMAL")),
-                new ItemModel(OVERTIME.EARLY_NORMAL, getText("Enum_APP_OVERTIME_EARLY_NORMAL"))
+                new ItemModel(OVERTIME.EARLY_NORMAL, getText("Enum_APP_OVERTIME_EARLY_NORMAL")),
+                new ItemModel(OVERTIME.MULTIPLE, getText("Enum_APP_OVERTIME_MULTIPLE"))
             ]);
             self.selectedOvertimeAppAtr = ko.observable(OVERTIME.EARLY);
 
@@ -53,10 +54,13 @@ module nts.uk.at.view.kaf022.o.viewmodel {
                 if (value != null) {
                     self.manualChange = true;
                     nts.uk.ui.block.invisible();
-                    $.when(self.getData(value, self.selectedFlexWorkAtr()), service.getOTQuota()).done((result1, allOtQuotaSettings: Array<OTQuota>) => {
+                    self.getData(value, self.selectedFlexWorkAtr()).done(() => {
                         self.overtimeWorkFrames().forEach((frame: OTWorkFrame) => {
-                            frame.checked(self.overTimeQuotaSettings().map(q => q.overTimeFrame).indexOf(frame.no) >= 0);
-                            frame.enable(value != OVERTIME.EARLY_NORMAL || !_.find(allOtQuotaSettings, s => s.flexAtr == self.selectedFlexWorkAtr() && s.overtimeAtr != OVERTIME.EARLY_NORMAL && s.overTimeFrame == frame.no));
+                            if (frame.no != -1) {
+                                frame.checked(self.overTimeQuotaSettings().map(q => q.overTimeFrame).indexOf(frame.no) >= 0);
+                                // frame.enable(value != OVERTIME.EARLY_NORMAL || !_.find(allOtQuotaSettings, s => s.flexAtr == self.selectedFlexWorkAtr() && s.overtimeAtr != OVERTIME.EARLY_NORMAL && s.overTimeFrame == frame.no));
+                                frame.enable(true);
+                            }
                         });
                         self.manualChange = false;
                     }).fail(() => {
@@ -66,18 +70,22 @@ module nts.uk.at.view.kaf022.o.viewmodel {
                     });
                 } else {
                     self.overtimeWorkFrames().forEach((frame: OTWorkFrame) => {
-                        frame.checked(false);
-                        frame.enable(false);
+                        if (frame.no != -1) {
+                            frame.checked(false);
+                            frame.enable(false);
+                        }
                     });
                 }
             });
             self.selectedFlexWorkAtr.subscribe(value => {
                 self.manualChange = true;
                 nts.uk.ui.block.invisible();
-                $.when(self.getData(self.selectedOvertimeAppAtr(), value), service.getOTQuota()).done((result1, allOtQuotaSettings: Array<OTQuota>) => {
+                self.getData(self.selectedOvertimeAppAtr(), value).done(() => {
                     self.overtimeWorkFrames().forEach(frame => {
-                        frame.checked(self.overTimeQuotaSettings().map(q => q.overTimeFrame).indexOf(frame.no) >= 0);
-                        frame.enable(self.selectedOvertimeAppAtr() != OVERTIME.EARLY_NORMAL || !_.find(allOtQuotaSettings, s => s.flexAtr == value && s.overtimeAtr != OVERTIME.EARLY_NORMAL && s.overTimeFrame == frame.no));
+                        if (frame.no != -1) {
+                            frame.checked(self.overTimeQuotaSettings().map(q => q.overTimeFrame).indexOf(frame.no) >= 0);
+                            // frame.enable(self.selectedOvertimeAppAtr() != OVERTIME.EARLY_NORMAL || !_.find(allOtQuotaSettings, s => s.flexAtr == value && s.overtimeAtr != OVERTIME.EARLY_NORMAL && s.overTimeFrame == frame.no));
+                        }
                     });
                     self.manualChange = false;
                 }).fail(() => {
@@ -93,7 +101,7 @@ module nts.uk.at.view.kaf022.o.viewmodel {
                 },
                 write: function (value) {
                     self.overtimeWorkFrames().forEach((m: OTWorkFrame) => {
-                        if (m.enable()) m.checked(value);
+                        if (m.enable() && m.no != -1) m.checked(value);
                     });
                 },
                 owner: self
@@ -135,16 +143,15 @@ module nts.uk.at.view.kaf022.o.viewmodel {
                         self.handleCheck
                     );
                 }));
+                self.overtimeWorkFrames.push(new OTWorkFrame(
+                    true,
+                    -1,
+                    getText("KAF022_797"),
+                    false,
+                    self.handleCheck
+                ));
                 self.selectedOvertimeAppAtr.valueHasMutated();
                 dfd.resolve();
-                // $.when(self.getData(self.selectedOvertimeAppAtr(), self.selectedFlexWorkAtr()), service.getOTQuota()).done((result1: any, allOtQuotaSettings: Array<OTQuota>) => {
-                //
-                // }).fail((error: any) => {
-                //     dfd.reject();
-                //     alert(error);
-                // }).always(() => {
-                //     nts.uk.ui.block.clear();
-                // });
             }).fail((error: any) => {
                 dfd.reject();
                 alert(error);
@@ -170,7 +177,7 @@ module nts.uk.at.view.kaf022.o.viewmodel {
         saveOTQuotaSet() {
             const self = this;
             nts.uk.ui.block.invisible();
-            const data = self.overTimeQuotaSettings().filter(i => !!_.find(self.overtimeWorkFrames(), s => s.no == i.overTimeFrame));
+            const data = self.overTimeQuotaSettings().filter(i => !!_.find(self.overtimeWorkFrames(), s => s.no != -1 && s.no == i.overTimeFrame));
             service.registerOTQuota(ko.toJS(data)).done(() => {
                 nts.uk.ui.dialog.info({ messageId: "Msg_15" }).then(function() {
                     // self.closeDialog();
@@ -226,7 +233,8 @@ module nts.uk.at.view.kaf022.o.viewmodel {
     enum OVERTIME {
         EARLY = 0,
         NORMAL = 1,
-        EARLY_NORMAL = 2
+        EARLY_NORMAL = 2,
+        MULTIPLE = 3
     }
 
 }

@@ -72,6 +72,10 @@ public class KrcmtAnyv extends ContractUkJpaEntity implements Serializable {
 	@Column(name = "ITEM_NOTE")
 	private String note;
 
+	// INPUT_WITH_CHECKBOX
+	@Column(name = "INPUT_WITH_CHECKBOX")
+	private boolean inputCheck;
+
 	/** The krcst calc result range. */
 	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@PrimaryKeyJoinColumns({ @PrimaryKeyJoinColumn(name = "CID", referencedColumnName = "CID"),

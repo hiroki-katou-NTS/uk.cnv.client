@@ -264,6 +264,9 @@ public class ReflectAttendanceClock {
 	 */
 	public ReflectStampOuput checkReflectByLookPriority(String companyId, Stamp stamp, AttendanceAtr attendanceAtr,TimePrintDestinationOutput timePrintDestinationOutput,
 			IntegrationOfDaily integrationOfDaily) {
+		if(timePrintDestinationOutput.getStampSourceInfo() != TimeChangeMeans.REAL_STAMP) {
+			return ReflectStampOuput.REFLECT;
+		}
 		if (integrationOfDaily.getWorkInformation() != null) {
 			//打刻設定を取得する
 			WorkTimezoneStampSet stampSet = this.getStampSetting(companyId,

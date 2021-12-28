@@ -35,11 +35,9 @@ public class ConfirmationWorkResultsTest {
 	@Test
 	public void testAddConfirmer() {
 		
-		Confirmer confirmer = new Confirmer(confirmSID, GeneralDateTime.now());
-		
 		ConfirmationWorkResults confirmationWorkResults = new ConfirmationWorkResults(targetSID, targetYMD, confirmers);
 		
-		confirmationWorkResults.addConfirmer(confirmer);
+		confirmationWorkResults.confirm(confirmSID);
 		
 		assertThat((confirmationWorkResults).getConfirmers().isEmpty())
 		.isFalse();
@@ -60,7 +58,7 @@ public class ConfirmationWorkResultsTest {
 		
 		ConfirmationWorkResults confirmationWorkResults = new ConfirmationWorkResults(targetSID, targetYMD, confirmers);
 		
-		confirmationWorkResults.removeConfirmer(confirmSID);
+		confirmationWorkResults.release(confirmSID);
 		
 		assertThat((confirmationWorkResults).getConfirmers().isEmpty())
 		.isTrue();

@@ -34,7 +34,7 @@ public class JpaPublicHolidayCarryForwardHistoryRepo extends JpaRepository imple
 				domain.getHistYearMonth().v(),
 				domain.getClosureId().value,
 				domain.getClosureDate().getClosureDay().v(),
-				domain.getClosureDate().getLastDayOfMonth() ? 1 : 0
+				domain.getClosureDate().getLastDayOfMonth()
 				);
 		
 		Optional<KshdtHdpubRemHist> entityOpt = this.queryProxy().find(pk, KshdtHdpubRemHist.class);

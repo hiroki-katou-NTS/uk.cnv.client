@@ -880,4 +880,30 @@ public class FlexWithinWorkTimeSheet extends WithinWorkTimeSheet{
 		return deductionTimeSheet.exceptTimeSheet(
 				DeductionAtr.Deduction, DeductionClassification.GO_OUT, coreTimeSheet);
 	}
+	
+	/**
+	 * 重複する時間帯で作り直す
+	 * @param timeSpan 時間帯
+	 * @param commonSet 就業時間帯の共通設定
+	 * @return 就業時間内時間帯
+	 */
+	@Override
+	public FlexWithinWorkTimeSheet recreateWithDuplicate(TimeSpanForDailyCalc timeSpan, Optional<WorkTimezoneCommonSet> commonSet) {
+		List<WithinWorkTimeFrame> frames = this.withinWorkTimeFrame.stream()
+				.filter(t -> t.getTimeSheet().checkDuplication(timeSpan).isDuplicated())
+				.collect(Collectors.toList());
+		
+		List<WithinWorkTimeFrame> duplicate = frames.stream()
+				.map(f -> f.recreateWithDuplicate(timeSpan, commonSet))
+				.filter(f -> f.isPresent())
+				.map(f -> f.get())
+				.collect(Collectors.toList());
+		
+		return new FlexWithinWorkTimeSheet(
+				duplicate,
+				this.shortTimeSheet,
+				this.leaveEarlyDecisionClock,
+				this.lateDecisionClock,
+				this.coreTimeSheet);
+	}
 }

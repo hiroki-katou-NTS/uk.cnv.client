@@ -1,0 +1,17 @@
+#contents-area {
+  column-gap: 20px;
+}
+.content-right {
+  flex-direction: column;
+}
+.content-right div.form-label {
+  min-width: 115px;
+  max-width: 350px;
+}
+.content-right div.label {
+  display: flex;
+  align-items: center;
+}
+.content-right.fixed-flex-layout {
+  row-gap: 20px;
+}

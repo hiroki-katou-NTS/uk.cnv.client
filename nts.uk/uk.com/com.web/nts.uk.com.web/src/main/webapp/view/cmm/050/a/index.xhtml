@@ -9,11 +9,15 @@
 		<ui:define name="htmlHead">
 			<com:ValidatorScript>
 					nts.uk.ctx.sys.env.dom.mailserver.Password
-					nts.uk.ctx.sys.env.dom.mailserver.EmailAuthentication
+					nts.uk.ctx.sys.env.dom.mailserver.MailAddress
 					nts.uk.ctx.sys.env.dom.mailserver.Port
 					nts.uk.ctx.sys.env.dom.mailserver.Server
 			</com:ValidatorScript>
-
+      <com:EnumScript>
+        nts.uk.ctx.sys.env.dom.mailserver.AuthenticationMethod
+        nts.uk.ctx.sys.env.dom.mailserver.UseServer
+        nts.uk.ctx.sys.env.dom.mailserver.EncryptionMethod
+      </com:EnumScript>
 			<com:stylefile path="cmm050.a.main.css" />
 			<com:scriptfile set="IGNITE" />
 
@@ -23,305 +27,160 @@
 		</ui:define>
 		<ui:define name="content">
 			<div id="functions-area">
-				<button id="mail_setting_register" class="proceed" tabindex="2"
+				<button id="mail_setting_register" class="proceed" tabindex="1"
 					style="margin-left: 45px" data-bind="click: registerMailSetting , enable: $root.errors.isEmpty ">#{i18n.getText('CMM050_3')}</button>
+        <button id="A1_2" data-bind="click: showDialogTest, 
+          enable: ko.computed(function() { return $root.errors.isEmpty() &amp;&amp; isEnableButtonTest() })" tabindex="2">#{i18n.getText('CMM050_5')}</button>
 			</div>
 			<div id="contents-area">
-				<div id="right-content">
-					<table class="table_content">
-						<colgroup>
-							<col width="230px" />
-							<col width="*" />
-						</colgroup>
-
-						<tr>
-							<td class="row_1">
-								<div
-									data-bind="ntsFormLabel: { 
-										constraint: ['EmailAuthentication'], 
-										required: true }">#{i18n.getText('CMM050_4')}</div>
-							</td>
-							<td>
-								<div class="input_002">
-									<input id="email_auth"
-										data-bind="ntsTextEditor: {
-											name: '#[CMM050_4]',
-											value: emailAuth,
-											required: true,
-											option: {width: '680px'},
-                                           	constraint: 'EmailAuthentication'}" />
-								</div>
-								<!-- <button id="test_send_mail"
-									data-bind="click: showDialogTest, enable: isEnableButtonTest"
-									class="btnStyle">#{i18n.getText('CMM050_5')}</button> -->
-							</td>
-						</tr>
-
-						<tr>
-							<td>
-								<div data-bind="ntsFormLabel: {required: true}">
-									#{i18n.getText('CMM050_6')}</div>
-							</td>
-							<td>
-								<div class="cf"
-									data-bind="ntsSwitchButton: {
-										options: useServerArray,
-										optionsValue: 'value',
-										optionsText: 'name',
-										value: useAuth}"></div>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<div data-bind="ntsFormLabel: {required: true}">
-									#{i18n.getText('CMM050_9')}
-								</div>
-							</td>
-							<td>
-								<div id="combo-box"
-									data-bind="ntsComboBox: {
-										options: authMethodArray,
-										optionsValue: 'value',
-										value: authMethod,
-										optionsText: 'text',
-										enable: authMethodEnable,
-										editable: false,
-										columns: [
-											{ prop: 'text', length: 15 }
-										]}"></div>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<div
-									data-bind="ntsFormLabel: {constraint: 'Password', required: true}">
-									#{i18n.getText('CMM050_10')}
-								</div>
-							</td>
-							<td>
-								<div class="input_002">
-									<input id="password"
-										data-bind="ntsTextEditor: {
-											name: '#[CMM050_10]',
-											value: password,
-											required: true,
-											enable: authMethodEnable,
-											option: {textmode: 'password'},
-                                           	constraint: 'Password'}" />
-								</div>
-							</td>
-						</tr>
-					</table>
-
-					<div class="method_info">
-						<p style="margin-bottom: 20px">#{i18n.getText('CMM050_11')}</p>
-						<table class="table_content_smtp">
-							<colgroup>
-								<col width="230px" />
-								<col width="*" />
-							</colgroup>
-
-							<tr>
-								<td class="row_1">
-									<div
-										data-bind="ntsFormLabel: { 
-											constraint: ['Port'], 
-											required: true }">#{i18n.getText('CMM050_12')}</div>
-								</td>
-								<td>
-									<div>
-										<input id="smtp_port"
-											data-bind="ntsNumberEditor: {
-												name: '#[CMM050_12]',
-												value: smtpPort,
-												required: true,
-												option: {width: '45px', textalign: 'left'},
-	                                           	constraint: 'Port'}" />
-
-										<span data-bind="text: computedText"></span>
-									</div>
-								</td>
-							</tr>
-
-							<tr>
-								<td>
-									<div
-										data-bind="ntsFormLabel: { 
-											constraint: ['Server'], 
-											required: true }">#{i18n.getText('CMM050_14')}</div>
-								</td>
-								<td>
-									<div class="port_input">
-										<input id="smtp_server"
-											data-bind="ntsTextEditor: {
-												name: '#[CMM050_14]',
-												value: smtpServer,
-												required: true,
-												option: {width: '800px'},
-	                                           	constraint: 'Server'}" />
-									</div>
-								</td>
-							</tr>
-						</table>
-
-						<p style="margin: 20px 0" data-bind="visible: haveImapSetting">#{i18n.getText('CMM050_20')}</p>
-						<table class="table_content_imap"
-							data-bind="visible: haveImapSetting">
-							<colgroup>
-								<col width="230px" />
-								<col width="*" />
-							</colgroup>
-
-							<tr>
-								<td class="row_1">
-									<div
-										data-bind="ntsFormLabel: { 
-											constraint: ['Port'], 
-											required: true }">#{i18n.getText('CMM050_21')}</div>
-								</td>
-								<td class="valign-center">
-									<div class="port_input">
-										<input id="imap_port"
-											data-bind="ntsNumberEditor: {
-												name: '#[CMM050_21]',
-												value: imapPort,
-												required: true,
-												option: {width: '45px', textalign: 'left'},
-	                                           	constraint: 'Port'}" />
-										<span>#{i18n.getText('CMM050_22')}</span>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<div data-bind="ntsFormLabel: {required: true}">
-										#{i18n.getText('CMM050_18')}</div>
-								</td>
-								<td>
-									<div class="cf"
-										data-bind="ntsSwitchButton: {
-											options: useServerArray,
-											optionsValue: 'value',
-											optionsText: 'name',
-											value: imapUseServer}"></div>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<div
-										data-bind="ntsFormLabel: { 
-											constraint: ['Server'], 
-											required: true }">#{i18n.getText('CMM050_23')}</div>
-								</td>
-								<td>
-									<div>
-										<input id="imap_server"
-											data-bind="ntsTextEditor: {
-												name: '#[CMM050_23]',
-												value: imapServer,
-												enable: imapServerEnable,
-												option: {width: '840px'},
-												required: true,
-	                                           	constraint: 'Server'}" />
-									</div>
-								</td>
-							</tr>
-						</table>
-
-						<p style="margin: 20px 0" data-bind="visible: havePopSetting">#{i18n.getText('CMM050_15')}</p>
-						<table class="table_content_pop"
-							data-bind="visible: havePopSetting">
-							<colgroup>
-								<col width="230px" />
-								<col width="*" />
-							</colgroup>
-
-							<tr>
-								<td class="row_1">
-									<div
-										data-bind="ntsFormLabel: { 
-											constraint: ['Port'], 
-											required: true }">#{i18n.getText('CMM050_16')}</div>
-								</td>
-								<td class="valign-center">
-									<div>
-										<input id="pop_port"
-											data-bind="ntsNumberEditor: {
-												name: '#[CMM050_16]',
-												value: popPort,
-												required: true,
-												option: {width: '45px', textalign: 'left'},
-	                                           	constraint: 'Port'}" />
-										<span>#{i18n.getText('CMM050_17')}</span>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<div data-bind="ntsFormLabel: {required: true}">
-										#{i18n.getText('CMM050_18')}</div>
-								</td>
-								<td>
-									<div class="cf"
-										data-bind="ntsSwitchButton: {
-											options: useServerArray,
-											optionsValue: 'value',
-											optionsText: 'name',
-											value: popUseServer}"></div>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<div
-										data-bind="ntsFormLabel: { 
-											constraint: ['Server'], 
-											required: true }">#{i18n.getText('CMM050_19')}</div>
-								</td>
-								<td>
-									<div>
-										<input id="pop_server"
-											data-bind="ntsTextEditor: {
-												name: '#[CMM050_19]',
-												value: popServer,
-												enable: popServerEnable,
-												required: true,
-												option: {width: '800px'},
-	                                           	constraint: 'Server'}" />
-									</div>
-								</td>
-							</tr>
-						</table>
-
-						<p style="margin: 20px 0" data-bind="visible: haveEncryptMethod">#{i18n.getText('CMM050_24')}</p>
-						<table class="table_content_setting_encrypt"
-							data-bind="visible: haveEncryptMethod">
-							<colgroup>
-								<col width="230px" />
-								<col width="*" />
-							</colgroup>
-							<tr>
-								<td class="row_1">
-									<div data-bind="ntsFormLabel: { required: true }">
-										#{i18n.getText('CMM050_25')}</div>
-								</td>
-								<td>
-									<div id="combo-box"
-										data-bind="ntsComboBox: {
-											options: encryptionMethodArray,
-											visibleItemsCount: 20,
-											optionsValue: 'value',
-											value: encryptionMethod,
-											optionsText: 'text',
-											enable: true,
-											columns: [
-												{ prop: 'text', length: 5 },
-											]}"></div>
-								</td>
-							</tr>
-						</table>
-					</div>
-				</div>
-			</div>
+        <div class="common-setting setting-zone">
+          <div class="flex valign-center">
+            <label id="A8_1" class="setting-label">#{i18n.getText('CMM050_11')}</label>
+            <div id="A3_2" data-bind="ntsCheckBox: { checked: useSmtpAuthen }" tabindex="3">#{i18n.getText('CMM050_33')}</div>
+          </div>
+          <div class="flex valign-center">
+            <div id="A8_5" class="setting-label" data-bind="ntsFormLabel: { required: true, constraint: 'Server' }">#{i18n.getText('CMM050_14')}</div>
+            <input id="A8_6" class="address-input" data-bind="ntsTextEditor: {
+              value: smtpServer,
+              constraint: 'Server',
+              required: true,
+              name: '#[CMM050_14]'
+            }" tabindex="4" />
+          </div>
+          <div class="flex valign-center">
+            <div id="A8_2" class="setting-label" data-bind="ntsFormLabel: { required: true, constraint: 'Port' }">#{i18n.getText('CMM050_12')}</div>
+            <input id="A8_3" class="port-input" data-bind="ntsNumberEditor: {
+              value: smtpPort,
+              constraint: 'Port',
+              required: true,
+              name: '#[CMM050_12]'
+            }" tabindex="5" />
+            <label id="A8_4" class="ml-10" data-bind="text: computedText"></label>
+          </div>
+          <com:ko-if bind="useSmtpAuthen">
+            <div class="flex valign-center">
+              <div id="A4_1" class="setting-label" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('CMM050_9')}</div>
+              <div id="A4_2" data-bind="ntsComboBox: {
+                name: '#[CMM050_9]',
+                options: authMethodArray,
+                optionsValue: 'value',
+                optionsText: 'name',
+                value: authMethod,
+                columns: [
+                  { prop: 'name', length: 20 }
+                ]
+              }" tabindex="6"></div>
+              <com:ko-if bind="authMethod() === 2 || authMethod() === 3">
+                <div id="A11_2" class="ml-10" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('CMM050_25')}</div>
+              </com:ko-if>
+              <com:ko-if bind="authMethod() === 2 || authMethod() === 3">
+                <div id="A11_3" class="ml-10" data-bind="ntsComboBox: {
+                  name: '#[CMM050_25]',
+                  options: encryptionMethodArray,
+                  optionsValue: 'value',
+                  optionsText: 'name',
+                  value: encryptionMethod,
+                  columns: [
+                    { prop: 'name', length: 5 }
+                  ]
+                }" tabindex="7"></div>
+              </com:ko-if>
+            </div>
+          </com:ko-if>
+          <div class="flex valign-center">
+            <div id="A2_1" class="setting-label" data-bind="ntsFormLabel: { required: true, constraint: 'MailAddress' }">#{i18n.getText('CMM050_4')}</div>
+            <input id="A2_2" class="address-input" data-bind="ntsTextEditor: {
+              value: emailAuth,
+              constraint: 'MailAddress',
+              required: true,
+              name: '#[CMM050_4]'
+            }" tabindex="7" />
+          </div>
+          <com:ko-if bind="useSmtpAuthen">
+            <div class="flex valign-center">
+              <div id="A5_1" class="setting-label" data-bind="ntsFormLabel: { required: true, constraint: 'Password' }">#{i18n.getText('CMM050_10')}</div>
+              <input id="A5_2" data-bind="ntsTextEditor: {
+                value: password,
+                constraint: 'Password',
+                required: true,
+                name: '#[CMM050_10]',
+                option: {
+                  width: '300px',
+                  textmode: 'password'
+                }
+              }" tabindex="8" />
+            </div>
+          </com:ko-if>
+        </div>
+        <div class="pop-setting setting-zone" data-bind="if: useSmtpAuthen() &amp;&amp; authMethod() === 0">
+          <div class="flex valign-center">
+            <label id="A9_1">#{i18n.getText('CMM050_15')}</label>
+          </div>
+          <div class="flex valign-center">
+            <div id="A9_2" class="setting-label" data-bind="ntsFormLabel: { required: true, constraint: 'Port' }">#{i18n.getText('CMM050_16')}</div>
+            <input id="A9_3" class="port-input" data-bind="ntsTextEditor: {
+              value: popPort,
+              constraint: 'Port',
+              required: true,
+              name: '#[CMM050_16]',
+            }" tabindex="10" />
+            <label id="A9_4" class="ml-10">#{i18n.getText('CMM050_17')}</label>
+          </div>
+          <div class="flex valign-center">
+            <div id="A9_5" class="setting-label" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('CMM050_18')}</div>
+            <div id="A9_6" data-bind="ntsSwitchButton: {
+              name: '#[CMM050_18]',
+              options: useServerArray,
+              optionsValue: 'value',
+              optionsText: 'name',
+              value: popUseServer
+            }" tabindex="11"></div>
+          </div>
+          <div class="flex valign-center">
+            <div id="A9_9" class="setting-label" data-bind="ntsFormLabel: { required: true, constraint: 'Server' }">#{i18n.getText('CMM050_19')}</div>
+            <input id="A9_10" class="address-input" data-bind="ntsTextEditor: {
+              value: popServer,
+              constraint: 'Server',
+              required: popUseServer() === 0,
+              name: '#[CMM050_19]',
+            }" tabindex="12" />
+          </div>
+        </div>
+        <div class="imap-setting setting-zone" data-bind="if: useSmtpAuthen() &amp;&amp; authMethod() === 1">
+          <div class="flex valign-center">
+            <label id="A10_1">#{i18n.getText('CMM050_20')}</label>
+          </div>
+          <div class="flex valign-center">
+            <div id="A10_2" class="setting-label" data-bind="ntsFormLabel: { required: true, constraint: 'Port' }">#{i18n.getText('CMM050_21')}</div>
+            <input id="A10_3" class="port-input" data-bind="ntsTextEditor: {
+              value: imapPort,
+              constraint: 'Port',
+              required: true,
+              name: '#[CMM050_21]',
+            }" tabindex="13" />
+            <label id="A10_4" class="ml-10">#{i18n.getText('CMM050_22')}</label>
+          </div>
+          <div class="flex valign-center">
+            <div id="A10_5" class="setting-label" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('CMM050_18')}</div>
+            <div id="A10_6" data-bind="ntsSwitchButton: {
+              name: '#[CMM050_18]',
+              options: useServerArray,
+              optionsValue: 'value',
+              optionsText: 'name',
+              value: imapUseServer
+            }" tabindex="14"></div>
+          </div>
+          <div class="flex valign-center">
+            <div id="A10_9" class="setting-label" data-bind="ntsFormLabel: { required: true, constraint: 'Server' }">#{i18n.getText('CMM050_23')}</div>
+            <input id="A10_10" class="address-input" data-bind="ntsTextEditor: {
+              value: imapServer,
+              constraint: 'Server',
+              required: imapUseServer() === 0,
+              name: '#[CMM050_23]',
+            }" tabindex="15" />
+          </div>
+        </div>
+      </div>
 		</ui:define>
 	</ui:composition>
 </body>

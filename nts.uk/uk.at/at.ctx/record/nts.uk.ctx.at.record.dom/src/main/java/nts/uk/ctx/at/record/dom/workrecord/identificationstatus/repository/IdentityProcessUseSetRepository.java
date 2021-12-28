@@ -7,9 +7,5 @@ import nts.uk.ctx.at.record.dom.workrecord.identificationstatus.IdentityProcessU
 public interface IdentityProcessUseSetRepository {
 	
 	Optional<IdentityProcessUseSet> findByKey(String companyId);
-	
-	void insertIdentity(IdentityProcessUseSet identity);
-	
-	void updateIdentity(IdentityProcessUseSet identity);
 
 }

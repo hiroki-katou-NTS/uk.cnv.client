@@ -27,9 +27,9 @@
 			<div id="functions-area">
 				<div>
 					<!-- A1_1: Button 承認 -->
-					<button class="proceed" tabindex = "1" data-bind = "click: function(){ return appListApprove(false); }, visible: mode()==1, enable: isActiveApprove">#{i18n.getText('CMM045_3')}</button>
+					<button class="proceed" tabindex = "1" data-bind = "click: function(){ return appListApprove(false); }, visible: useApprovalFunction()==1 &amp;&amp; mode() == 1 , enable: isActiveApprove">#{i18n.getText('CMM045_3')}</button>
 					<!-- A1_3 -->
-					<button class="proceed" tabindex="2" data-bind = "click: function(){ appListApprove(true); }, visible: mode()==1, enable: isActiveApprove">#{i18n.getText('CMM045_80')}</button>
+					<button class="proceed" tabindex="2" data-bind = "click: function(){ appListApprove(true); }, visible: useApprovalFunction()==1 &amp;&amp; mode() == 1, enable: isActiveApprove">#{i18n.getText('CMM045_80')}</button>
 					<!-- A1_2: Button 印刷 -->
 					<button tabindex="3" data-bind="click: print, enable: items().length > 0">#{i18n.getText('CMM045_4')}</button>
 				</div>

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.request.app.find.application.holidayshipment.dto.AbsRecDetailParaDto;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.AbsRecRemainMngOfInPeriod;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.algorithm.param.CompenLeaveAggrResult;
@@ -57,7 +58,7 @@ public class RemainingHolidayInforDto {
 
 	public AbsRecRemainMngOfInPeriod toDomain() {
 	    return new AbsRecRemainMngOfInPeriod(
-	            lstAbsRecMng.stream().map(x -> x.toDomain()).collect(Collectors.toList()), 
+	            CollectionUtil.isEmpty(lstAbsRecMng) ? Collections.emptyList() : lstAbsRecMng.stream().map(x -> x.toDomain()).collect(Collectors.toList()), 
 	            remainDays, 
 	            unDigestedDays, 
 	            occurrenceDays, 

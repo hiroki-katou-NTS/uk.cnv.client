@@ -65,8 +65,12 @@ module nts.uk.at.view.kaf002_ref.b.viewmodel {
             
             self.application = ko.observable(new Application(self.appType()));
 			self.application().opStampRequestMode(1);
-
+			
+			let screenCode: number = null;
 			if (!_.isEmpty(params)) {
+				if (!nts.uk.util.isNullOrUndefined(params.screenCode)) {
+					screenCode = params.screenCode;
+				}
 				if (!_.isEmpty(params.employeeIds)) {
 					empLst = params.employeeIds;
 				}
@@ -81,7 +85,13 @@ module nts.uk.at.view.kaf002_ref.b.viewmodel {
 					self.isAgentMode(params.isAgentMode);
 				}
 			}
-            self.loadData(empLst, dateLst, self.appType())
+			let paramKAF000 = {
+				empLst, 
+				dateLst, 
+				appType: self.appType(),
+				screenCode
+			};
+            self.loadData(paramKAF000)
                 .then((loadDataFlag: any) => {
                     self.appDispInfoStartupOutput.subscribe(value => {
                         if (value) { 

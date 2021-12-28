@@ -25,7 +25,7 @@ public class KrqdtAppAnyvPk {
 
     @Basic
     @Column(name = "ANYV_CD")
-    public String anyvCd;
+    public int anyvCd;
 
     @Basic
     @Column(name = "ANYV_NO")

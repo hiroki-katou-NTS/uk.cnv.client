@@ -20,6 +20,7 @@ public enum DataType {
 	DATE		(3, (s, name, value) -> s.paramDate(name, (GeneralDate) value)),
 	DATETIME	(4, (s, name, value) -> s.paramDateTime(name, (GeneralDateTime) value)),
 	AUTONUMBER	(5, (s, name, value) -> s.paramLong(name, (Long) value)),
+	BOOLEAN		(6, (s, name, value) -> s.paramBoolean(name, (Boolean) value)),
 	;
 
 	public final int value;
@@ -37,7 +38,7 @@ public enum DataType {
 	 */
 	public static DataType of(ItemType itemType) {
 		
-		// DATETIMEはItemTypeには無い
+		// DATETIME,BOOLEANはItemTypeには無い
 		
 		switch (itemType) {
 		case STRING:

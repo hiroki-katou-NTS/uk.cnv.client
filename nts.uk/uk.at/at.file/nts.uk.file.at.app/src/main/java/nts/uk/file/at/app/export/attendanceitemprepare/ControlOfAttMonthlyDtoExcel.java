@@ -13,5 +13,5 @@ public class ControlOfAttMonthlyDtoExcel {
 	
 	private String headerBgColorOfMonthlyPer;
 
-	private Integer inputUnitOfTimeItem;
+//	private Float inputUnitOfTimeItem;
 }

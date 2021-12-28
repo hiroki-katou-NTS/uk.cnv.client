@@ -19,7 +19,7 @@ public class JpaCreatingDailyResultsConditionRepository extends JpaRepository
 	}
 
 	private KrcmtCreateDailyDataCondition toEntity(CreatingDailyResultsCondition domain) {
-		return new KrcmtCreateDailyDataCondition(domain.getCid(), domain.getIsCreatingFutureDay().value);
+		return new KrcmtCreateDailyDataCondition(domain.getCid(), domain.getIsCreatingFutureDay().isUse());
 	}
 
 	@Override

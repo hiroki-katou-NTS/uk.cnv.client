@@ -6,12 +6,15 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.time.GeneralDate;
 import nts.gul.collection.CollectionUtil;
@@ -21,9 +24,16 @@ import nts.uk.ctx.at.record.app.find.dailyperformanceformat.AttendanceItemsFinde
 import nts.uk.ctx.at.record.app.find.dailyperformanceformat.dto.AttdItemDto;
 import nts.uk.ctx.at.record.app.find.workrecord.erroralarm.ErrorAlarmWorkRecordDto;
 import nts.uk.ctx.at.record.app.find.workrecord.erroralarm.condition.ErAlAtdItemConditionDto;
+import nts.uk.ctx.at.record.dom.jobmanagement.manhourrecordreferencesetting.ManHourRecordReferenceSetting;
+import nts.uk.ctx.at.record.dom.jobmanagement.manhourrecordreferencesetting.ManHourRecordReferenceSettingRepository;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.ErrorAlarmWorkRecord;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.ErrorAlarmWorkRecordRepository;
+import nts.uk.ctx.at.record.dom.workrecord.erroralarm.ErrorAlarmConditionRepository;
+import nts.uk.ctx.at.record.dom.workrecord.erroralarm.condition.AlCheckTargetCondition;
+import nts.uk.ctx.at.record.dom.workrecord.erroralarm.condition.ErrorAlarmCondition;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.enums.ErrorAlarmClassification;
+import nts.uk.ctx.at.record.dom.workrecord.erroralarm.primitivevalue.CheckedTimeDuration;
+import nts.uk.ctx.at.record.dom.workrecord.erroralarm.primitivevalue.ColorCode;
 import nts.uk.ctx.at.shared.app.find.worktype.WorkTypeDto;
 import nts.uk.ctx.at.shared.app.find.worktype.WorkTypeFinder;
 import nts.uk.ctx.at.shared.dom.employeeworkway.businesstype.BusinessType;
@@ -64,6 +74,9 @@ public class ErrorAlarmWorkRecordExportImpl {
        private ErrorAlarmWorkRecordRepository repository;
        
        @Inject
+       private ErrorAlarmConditionRepository errorAlarmConditionRepository;
+       
+       @Inject
        private EmploymentRepository employmentRepository;
        
        @Inject
@@ -82,6 +95,9 @@ public class ErrorAlarmWorkRecordExportImpl {
 	   private WorkTypeFinder find;
        @Inject
        private AttendanceItemsFinder attendanceItemsFinder;
+       
+       @Inject
+       private ManHourRecordReferenceSettingRepository manHourRecordReferenceSettingRepository;
       
        public List<MasterData> getMasterDatas(MasterListExportQuery query) {
     	   List<String> header = new ArrayList<>();
@@ -299,6 +315,7 @@ public class ErrorAlarmWorkRecordExportImpl {
                                   }
                            }
                           
+                           if (AppContexts.optionLicense().customize().ootsuka()) { //※1
                            //17
                             if(c.getAlCheckTargetCondition().isFilterByBusinessType() == false){
                                   data.put(header.get(17), "-");
@@ -322,6 +339,7 @@ public class ErrorAlarmWorkRecordExportImpl {
                                          sValues18 = String.join(",", codeAndBusinessType);
                                          data.put(header.get(18), sValues18);
                                   }
+                           }
                            }
                            
                            // 19
@@ -836,6 +854,11 @@ public class ErrorAlarmWorkRecordExportImpl {
     	   			TextResource.localize("KDW006_184"));
               String headerColumn = "header";
               for(int i = 1 ; i <= 40; i++){
+            	  if (i == 17 || i == 18) { //※1
+            		  if (!AppContexts.optionLicense().customize().ootsuka()) {
+            			  continue;
+            		  }
+            	  }
             	  columns.add(new MasterHeaderColumn(headerColumn+i,header.get(i), ColumnTextAlign.LEFT,
   		                "", true));  
               }
@@ -853,14 +876,38 @@ public class ErrorAlarmWorkRecordExportImpl {
        private List<MasterHeaderColumn> getHeaderColumnTwos(MasterListExportQuery query) {
               List<MasterHeaderColumn> columns = new ArrayList<>();
               
-              columns.add(new MasterHeaderColumn("コード", "コード", ColumnTextAlign.LEFT,
-                           "", true));
-              columns.add(new MasterHeaderColumn("名称", "名称", ColumnTextAlign.LEFT,
-                           "", true));
-              columns.add(new MasterHeaderColumn("使用区分", "使用区分", ColumnTextAlign.LEFT,
-                           "", true));
-              columns.add(new MasterHeaderColumn("申請", "申請", ColumnTextAlign.LEFT,
-                           "", true));
+              columns.add(new MasterHeaderColumn("コード", TextResource.localize("KDW006_106"), ColumnTextAlign.LEFT,
+                      "", true));
+              columns.add(new MasterHeaderColumn("名称", TextResource.localize("KDW006_90"), ColumnTextAlign.LEFT,
+                      "", true));
+              columns.add(new MasterHeaderColumn("使用区分", TextResource.localize("KDW006_155"), ColumnTextAlign.LEFT,
+                      "", true));
+              columns.add(new MasterHeaderColumn("設定 メッセージ色", TextResource.localize("KDW006_160"), ColumnTextAlign.LEFT,
+                      "", true));
+              columns.add(new MasterHeaderColumn("設定 表示するメッセージ", TextResource.localize("KDW006_161"), ColumnTextAlign.LEFT,
+                      "", true));
+              columns.add(new MasterHeaderColumn("設定 メッセージを太字にする", TextResource.localize("KDW006_162"), ColumnTextAlign.LEFT,
+                      "", true));
+              columns.add(new MasterHeaderColumn("チェック対象範囲設定 雇用", TextResource.localize("KDW006_163"), ColumnTextAlign.LEFT,
+                      "", true));
+              columns.add(new MasterHeaderColumn("チェック対象範囲設定 雇用 選択内容", TextResource.localize("KDW006_164"), ColumnTextAlign.LEFT,
+                      "", true));
+              columns.add(new MasterHeaderColumn("チェック対象範囲設定 分類", TextResource.localize("KDW006_165"), ColumnTextAlign.LEFT,
+                      "", true));
+              columns.add(new MasterHeaderColumn("チェック対象範囲設定 分類 選択内容", TextResource.localize("KDW006_166"), ColumnTextAlign.LEFT,
+                      "", true));
+              columns.add(new MasterHeaderColumn("チェック対象範囲設定 職位", TextResource.localize("KDW006_167"), ColumnTextAlign.LEFT,
+                      "", true));
+              columns.add(new MasterHeaderColumn("チェック対象範囲設定 職位 選択内容", TextResource.localize("KDW006_168"), ColumnTextAlign.LEFT,
+                      "", true));
+              if (AppContexts.optionLicense().customize().ootsuka()) {
+            	  columns.add(new MasterHeaderColumn("チェック対象範囲設定 勤務種別", TextResource.localize("KDW006_169"), ColumnTextAlign.LEFT,
+                          "", true));
+                  columns.add(new MasterHeaderColumn("チェック対象範囲設定 勤務種別 選択内容", TextResource.localize("KDW006_170"), ColumnTextAlign.LEFT,
+                          "", true));
+              }
+              columns.add(new MasterHeaderColumn("申請", TextResource.localize("KDW006_184"), ColumnTextAlign.LEFT,
+                      "", true));
               return columns;
        }
        private List<MasterData> getMasterDataTwo(MasterListExportQuery query) {
@@ -874,46 +921,219 @@ public class ErrorAlarmWorkRecordExportImpl {
            listErrorAlarmWorkRecord = listErrorAlarmWorkRecord.stream().filter(eral -> eral.getCode().v().startsWith("S"))
                      .sorted(Comparator.comparing(ErrorAlarmWorkRecord::getCode, Comparator.nullsLast(ErrorAlarmWorkRecordCode::compareTo)))
                            .collect(Collectors.toList());
+           listErrorAlarmWorkRecord.forEach(erAlWr -> {
+        	   Optional<ErrorAlarmCondition> errorAlarmCondition = 
+        			   errorAlarmConditionRepository.findConditionByErrorAlamCheckId(erAlWr.getErrorAlarmCheckID());
+        	   if (errorAlarmCondition.isPresent()) {
+        		   erAlWr.setErrorAlarmCondition(errorAlarmCondition.get());
+        	   }
+           });
+           GeneralDate lastDate =  GeneralDate.ymd(9999, 12, 31);
+           List<JobTitleInfo> listJobs = jobTitleInfoRepository.findAll(companyId, lastDate);
+           List<BusinessType> listBusinessType = businessTypesRepository.findAll(companyId);
+           List<Employment> listEmp =  employmentRepository.findAll(companyId);
+           List<Classification> listClass = classificationRepository.getAllManagementCategory(companyId);
+           Map<ClassificationCode,Classification> mapListClass = listClass.stream()
+                   .collect(Collectors.toMap(Classification::getClassificationCode, Function.identity()));
+           Map<EmploymentCode,Employment> mapListEmp = listEmp.stream()
+                   .collect(Collectors.toMap(Employment::getEmploymentCode, Function.identity()));
+  	       Map<BusinessTypeCode , BusinessType> maplistBusinessType = listBusinessType.stream()
+                   .collect(Collectors.toMap(BusinessType::getBusinessTypeCode, Function.identity()));
+           List<JobTitleItemDto> listJobDtos = listJobs.stream()
+                   .map(job -> JobTitleItemDto.builder()
+                                 .id(job.getJobTitleId())
+                                 .code(job.getJobTitleCode().v())
+                                 .name(job.getJobTitleName().v())
+                                 .build())
+                   .sorted((job1, job2) -> job1.getCode().compareTo(job2.getCode()))
+                   .collect(Collectors.toList());
+           Map<String, JobTitleItemDto> mapListJobs = listJobDtos.stream()
+                   .collect(Collectors.toMap(JobTitleItemDto::getId, Function.identity()));
+          
            if(CollectionUtil.isEmpty(listErrorAlarmWorkRecord)){
               return null;
            }else{
               listErrorAlarmWorkRecord.stream().forEach(c->{
-                     List<String> lstApp = new ArrayList<>();
-                     Map<String, Object> data = new HashMap<>();
-                           putEmptyDataTwo(data);
+                  List<String> lstApp = new ArrayList<>();
+                  ErrorAlarmCondition errorAlarmCondition = c.getErrorAlarmCondition();
+                  AlCheckTargetCondition checkTargetCondition = errorAlarmCondition.getCheckTargetCondtion();
+                  Map<String, Object> data = new HashMap<>();
+                        putEmptyDataTwo(data);
                            
-                           data.put("コード", c.getCode().v().substring(1));
-                           data.put("名称", c.getName());
-                           if(c.getUseAtr()){
-                                  data.put("使用区分", "使用する");
-                           }else{
-//                                  data.put("使用区分", "使用しない");
-                        	   return;
-                           }
-                           List<Integer> listApplication  = c.getLstApplication();
-                           Collections.sort(listApplication);
-                           if(CollectionUtil.isEmpty(listApplication)){
-                                  data.put("申請", "");
-                           }else{
-                        	  
-                        	   for (Integer key : listApplication) {
-                        		   String appName = EnumAdaptor.valueOf(key, ApplicationTypeExport.class).nameId;
-                        		   if(appName!=null){
-                        			   lstApp.add(appName);
-                        		   }
-							}
-                        	   if(!CollectionUtil.isEmpty(lstApp)){
-                                  data.put("申請", String.join(",", lstApp));
-                        	   }
-                           }
-                     MasterData masterData = new MasterData(data, null, "");
-                           masterData.cellAt("コード").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
-                           masterData.cellAt("名称").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
-                           masterData.cellAt("使用区分").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
-                           masterData.cellAt("申請").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
-                           datas.add(masterData);
+                        data.put("コード", c.getCode().v().substring(1)); //G11_1
+                        data.put("名称", c.getName()); //G11_2
+                        if(c.getUseAtr()){ //G11_3
+                        	data.put("使用区分", TextResource.localize("KDW006_185"));
+                        }else{
+//                        	data.put("使用区分", TextResource.localize("KDW006_186"));		//không in những item useAtr=false, giống commit bef4cb7
+                        	return;
+                        }
+
+                        ColorCode messageColor = c.getMessage().getMessageColor();
+                        if (messageColor != null) {
+                        	data.put("設定 メッセージ色", messageColor.v().replace("#", "")); //G11_5
+                        }
+                        
+                        data.put("設定 表示するメッセージ", errorAlarmCondition.getDisplayMessage().v()); //G11_6
+                        
+                        if (c.getMessage().getBoldAtr()) { //G11_7
+                        	data.put("設定 メッセージを太字にする", "〇");
+                        } else {
+                        	data.put("設定 メッセージを太字にする", "-");
+                        }
+                        
+                        if (!checkTargetCondition.getFilterByEmployment()) { //G11_8
+                        	data.put("チェック対象範囲設定 雇用", "-");
+                        } else {
+                        	data.put("チェック対象範囲設定 雇用", "〇");
+                        	List<String> lstEmpCode = checkTargetCondition.getLstEmploymentCode().stream()
+                        			.map(code -> code.v())
+                        			.collect(Collectors.toList());
+                            Collections.sort(lstEmpCode);
+                            List<String> codeAndNameEmp = new ArrayList<>();
+                            for (String key : lstEmpCode) {
+                            	EmploymentCode keyEmp = new EmploymentCode(key);
+                                Employment emp = mapListEmp.get(keyEmp);
+                                if (emp != null) {
+                                	codeAndNameEmp.add(emp.getEmploymentCode().v() + emp.getEmploymentName().v());
+                                } else {
+                                	codeAndNameEmp.add(key+TextResource.localize("KDW006_226"));
+								}
+                            }
+                                      
+                            if (CollectionUtil.isEmpty(lstEmpCode)) { //G11_9
+                                data.put("チェック対象範囲設定 雇用 選択内容", "");
+                            } else {
+                                data.put("チェック対象範囲設定 雇用 選択内容", String.join(",", codeAndNameEmp));
+                            }
+                        }
+                        
+                        if (!checkTargetCondition.getFilterByClassification()) { //G11_10
+                        	data.put("チェック対象範囲設定 分類", "-");
+                        } else {
+                            data.put("チェック対象範囲設定 分類", "〇");
+                            List<String> lstClassificationCode= checkTargetCondition.getLstClassificationCode().stream()
+                        			.map(code -> code.v())
+                        			.collect(Collectors.toList());
+                            Collections.sort(lstClassificationCode);
+                            List<String> codeAndNameClassification = new ArrayList<>();
+                            for (String key : lstClassificationCode) {
+                            	ClassificationCode keyClass = new ClassificationCode(key);
+                                Classification classification = mapListClass.get(keyClass);
+                                if(classification!=null){
+                                	codeAndNameClassification.add(classification.getClassificationCode().v() + classification.getClassificationName().v());
+                                } else {
+                                    codeAndNameClassification.add(key+TextResource.localize("KDW006_226"));
+								}
+                                            
+                            }
+                            if (CollectionUtil.isEmpty(codeAndNameClassification)) { //G11_11
+                                data.put("チェック対象範囲設定 分類 選択内容", "");
+                            } else {
+                            	data.put("チェック対象範囲設定 分類 選択内容", String.join(",", codeAndNameClassification));
+                            }
+                        }
+                        
+                        if (!checkTargetCondition.getFilterByJobTitle()) { //G11_12
+                        	data.put("チェック対象範囲設定 職位", "-");
+                        } else {
+                        	data.put("チェック対象範囲設定 職位", "〇");
+                            List<String> lstJobTitleId= checkTargetCondition.getLstJobTitleId();
+                            List<JobTitleItemDto> listJobTitleItemDto = new ArrayList<>();
+                            List<String> lstJobTitleIdDeleted = new ArrayList<>();
+                            if (!CollectionUtil.isEmpty(lstJobTitleId)) {
+                            	for (String key : lstJobTitleId) {
+                            		JobTitleItemDto jobTitleItemDto = mapListJobs.get(key);
+                                    if (jobTitleItemDto != null) {
+                                    	listJobTitleItemDto.add(jobTitleItemDto);
+                                    } else {
+                                    	lstJobTitleIdDeleted.add(key);
+                                    }
+                         	    }
+                            }
+                            List<String> codeAndNameJobTitle = new ArrayList<>();
+                            if (!CollectionUtil.isEmpty(listJobTitleItemDto)) {
+                            	listJobTitleItemDto.sort(Comparator.comparing(JobTitleItemDto::getCode));
+                                for (JobTitleItemDto jobTitleItemDto : listJobTitleItemDto) {
+                                	if (jobTitleItemDto != null) {
+                                		codeAndNameJobTitle.add(jobTitleItemDto.getCode()+jobTitleItemDto.getName());
+                                    }
+                                }
+                            }
+                               
+                            if (CollectionUtil.isEmpty(codeAndNameJobTitle)) { //G11_13
+                                data.put("チェック対象範囲設定 職位 選択内容", "");
+                            } else {
+                            	String stringJobTitleValue = String.join(",", codeAndNameJobTitle);
+                                for (int i = 0 ; i <lstJobTitleIdDeleted.size(); i++) {
+                                	stringJobTitleValue += "," + TextResource.localize("KDW006_226");
+								}
+                            	data.put("チェック対象範囲設定 職位 選択内容", stringJobTitleValue);
+                            }
+                        }
+                       
+                        if (AppContexts.optionLicense().customize().ootsuka()) { //※1
+                        	if(!checkTargetCondition.getFilterByBusinessType()){ //G11_14
+	                            data.put("チェック対象範囲設定 勤務種別", "-");
+	                        } else {
+	                            data.put("チェック対象範囲設定 勤務種別", "〇");
+	                            List<String> lstBusinessTypeCode= checkTargetCondition.getLstBusinessTypeCode().stream()
+	                        			.map(code -> code.v())
+	                        			.collect(Collectors.toList());
+	                            Collections.sort(lstBusinessTypeCode);
+	                            List<String> codeAndBusinessType = new ArrayList<>();
+	                            for (String key : lstBusinessTypeCode) {
+	                            	BusinessTypeCode keyBz = new BusinessTypeCode(key);
+	                                BusinessType businessType = maplistBusinessType.get(keyBz);
+	                                if (businessType != null) {
+	                                	codeAndBusinessType.add(businessType.getBusinessTypeCode().v() + businessType.getBusinessTypeName());
+	                                } else {
+	                                    codeAndBusinessType.add(key+TextResource.localize("KDW006_226"));
+									}
+	                            }
+	                            if (CollectionUtil.isEmpty(codeAndBusinessType)) { //G11_15
+	                                data.put("チェック対象範囲設定 勤務種別 選択内容", "");
+	                            } else {
+	                            	data.put("チェック対象範囲設定 勤務種別 選択内容", String.join(",", codeAndBusinessType));
+	                            }
+	                        }
+                        }
+                        
+                        List<Integer> listApplication  = c.getLstApplication();
+                        Collections.sort(listApplication);
+                        if(CollectionUtil.isEmpty(listApplication)){
+                            data.put("申請", "");
+                        }else{
+                        	for (Integer key : listApplication) {
+                        		String appName = EnumAdaptor.valueOf(key, ApplicationTypeExport.class).nameId;
+                        		if(appName!=null){
+                        			lstApp.add(appName);
+                        		}
+                        	}
+                        	if(!CollectionUtil.isEmpty(lstApp)){
+                               data.put("申請", String.join(",", lstApp));
+                        	}
+                        }
+                  MasterData masterData = new MasterData(data, null, "");
+	                  masterData.cellAt("コード").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	                  masterData.cellAt("名称").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	                  masterData.cellAt("使用区分").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	                  masterData.cellAt("設定 メッセージ色").setStyle(MasterCellStyle.build().backgroundColor((data.get("設定 メッセージ色").toString())).horizontalAlign(ColumnTextAlign.LEFT));
+	                  masterData.cellAt("設定 表示するメッセージ").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	                  masterData.cellAt("設定 メッセージを太字にする").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	                  masterData.cellAt("チェック対象範囲設定 雇用").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	                  masterData.cellAt("チェック対象範囲設定 雇用 選択内容").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	                  masterData.cellAt("チェック対象範囲設定 分類").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	                  masterData.cellAt("チェック対象範囲設定 分類 選択内容").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	                  masterData.cellAt("チェック対象範囲設定 職位").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	                  masterData.cellAt("チェック対象範囲設定 職位 選択内容").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	                  if (AppContexts.optionLicense().customize().ootsuka()) {
+	                	  masterData.cellAt("チェック対象範囲設定 勤務種別").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	                	  masterData.cellAt("チェック対象範囲設定 勤務種別 選択内容").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));   
+	                  }
+	                  masterData.cellAt("申請").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	                  datas.add(masterData);
               });
-              
            }
               return datas;
        }
@@ -922,9 +1142,161 @@ public class ErrorAlarmWorkRecordExportImpl {
               data.put("コード", "");
               data.put("名称", "");
               data.put("使用区分", "");
+              data.put("設定 メッセージ色", "");
+              data.put("設定 表示するメッセージ", "");
+              data.put("設定 メッセージを太字にする", "");
+              data.put("チェック対象範囲設定 雇用", "");
+              data.put("チェック対象範囲設定 雇用 選択内容", "");
+              data.put("チェック対象範囲設定 分類", "");
+              data.put("チェック対象範囲設定 分類 選択内容", "");
+              data.put("チェック対象範囲設定 職位", "");
+              data.put("チェック対象範囲設定 職位 選択内容", "");      
+              if (AppContexts.optionLicense().customize().ootsuka()) {
+            	  data.put("チェック対象範囲設定 勤務種別", "");
+                  data.put("チェック対象範囲設定 勤務種別 選択内容", "");
+              }
               data.put("申請", "");
               
        }
+       
+    public List<SheetData> addSheet3(MasterListExportQuery query){
+           List<SheetData> listSheetData = new ArrayList<>();
+           SheetData sheet3 = new SheetData(getMasterData3(query), getHeaderColumn3(query), null, null, TextResource.localize("KDW006_252"), MasterListMode.NONE);
+           listSheetData.add(sheet3);
+           return listSheetData;
+    }
+       
+    private List<MasterHeaderColumn> getHeaderColumn3(MasterListExportQuery query) {
+    	   List<MasterHeaderColumn> columns = new ArrayList<>();
+           columns.add(new MasterHeaderColumn("項目", TextResource.localize("KDW006_88"), ColumnTextAlign.LEFT, "", true)); //M10_1
+           columns.add(new MasterHeaderColumn("columnB", "", ColumnTextAlign.LEFT, "", true));
+           columns.add(new MasterHeaderColumn("値", TextResource.localize("KDW006_89"), ColumnTextAlign.LEFT, "", true)); //M10_2
+           return columns;
+    }
+    
+    private List<MasterData> getMasterData3(MasterListExportQuery query) {
+    	String companyId = AppContexts.user().companyId();
+    	
+    	Optional<ManHourRecordReferenceSetting> manHourRecordReferenceSettingOpt = manHourRecordReferenceSettingRepository.get(companyId);
+    	
+    	Optional<ErrorAlarmWorkRecord> errorAlarmWorkRecordOpt = repository.findByCode("T001");
+    	
+    	Optional<ErrorAlarmCondition> errorAlarmConditionOpt = Optional.empty();
+    	if (errorAlarmWorkRecordOpt.isPresent()) {
+    		errorAlarmConditionOpt = errorAlarmConditionRepository.findConditionByErrorAlamCheckId(errorAlarmWorkRecordOpt.get().getErrorAlarmCheckID());
+    	}
+        
+    	List<MasterData> datas = new ArrayList<>();
+        Map<String, Object> data = new HashMap<>();
+        putDataEmpty3(data);
+        
+        //referenceRange
+        data.put("項目", TextResource.localize("KDW006_234")); //M12_1
+        if (manHourRecordReferenceSettingOpt.isPresent()) {
+        	data.put("値", manHourRecordReferenceSettingOpt.get().getReferenceRange().nameId); //M11_1
+        }
+        datas.add(alignMasterData3(data, AlignmentType.LEFT));
+    	putDataEmpty3(data);
+    	
+    	//elapseMonths
+        data.put("項目", TextResource.localize("KDW006_235")); //M12_2
+        if (manHourRecordReferenceSettingOpt.isPresent()) {
+        	data.put("値", manHourRecordReferenceSettingOpt.get().getElapsedMonths().nameId); //M11_2
+        }
+        datas.add(alignMasterData3(data, AlignmentType.LEFT));
+    	putDataEmpty3(data);
+    	
+    	//errorAlarm useAtr
+    	data.put("項目", TextResource.localize("KDW006_237")); //M12_3
+    	if (errorAlarmWorkRecordOpt.isPresent()) {
+    		if (errorAlarmWorkRecordOpt.get().getUseAtr()) { //M11_3
+    			data.put("値", TextResource.localize("KDW006_185")); 
+    		} else {
+    			data.put("値", TextResource.localize("KDW006_186")); 
+    		}
+        }
+        datas.add(alignMasterData3(data, AlignmentType.LEFT));
+        putDataEmpty3(data);
+        
+        //errorAlarm alarmValue
+    	data.put("columnB", TextResource.localize("KDW006_249")); //M12_4
+    	if (errorAlarmConditionOpt.isPresent()) {
+    		Integer alarmValue = ((CheckedTimeDuration) errorAlarmConditionOpt.get().getAtdItemCondition().getGroup1().getLstErAlAtdItemCon().get(0).getCompareRange().getEndValue()).v();
+    		data.put("値", timeToString(alarmValue)); //M11_4
+        }
+        datas.add(alignMasterData3(data, AlignmentType.RIGHT));
+        putDataEmpty3(data);
+        
+        //errorAlarm displayMessage
+    	data.put("columnB", TextResource.localize("KDW006_251")); //M12_5
+    	if (errorAlarmConditionOpt.isPresent()) {
+    		data.put("値", errorAlarmConditionOpt.get().getDisplayMessage().v()); //M11_5
+        }
+        datas.add(alignMasterData3(data, AlignmentType.LEFT));
+        putDataEmpty3(data);
+        
+        //errorAlarm messageColor
+    	data.put("columnB", TextResource.localize("KDW006_243")); //M12_6
+    	if (errorAlarmWorkRecordOpt.isPresent()) {
+    		ColorCode messageColor = errorAlarmWorkRecordOpt.get().getMessage().getMessageColor();
+            if (messageColor != null) {
+            	data.put("値", messageColor.v().replace("#", "")); //M11_6
+            }
+        }
+        datas.add(alignMasterData3(data, AlignmentType.BACKGROUNDCOLOR));
+        putDataEmpty3(data);
+        
+        //errorAlarm boldAtr
+    	data.put("columnB", TextResource.localize("KDW006_250")); //M12_7
+    	if (errorAlarmWorkRecordOpt.isPresent()) {
+    		if	(errorAlarmWorkRecordOpt.get().getMessage().getBoldAtr()) { //M11_7
+    			data.put("値", "〇");
+    		} else {
+    			data.put("値", "-");
+    		}
+        }
+        datas.add(alignMasterData3(data, AlignmentType.LEFT));
+        putDataEmpty3(data);
+        
+    	return datas;
+    }
+    
+    private MasterData alignMasterData3(Map<String, Object> data, AlignmentType type) {
+        MasterData masterData = new MasterData(data, null, "");
+        masterData.cellAt("項目").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+        masterData.cellAt("columnB").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+        switch (type) {
+        	case LEFT:
+	        	masterData.cellAt("値").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	        	break;
+        	case RIGHT:
+	        	masterData.cellAt("値").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.RIGHT));
+	        	break;
+        	case BACKGROUNDCOLOR:
+        		masterData.cellAt("値").setStyle(MasterCellStyle.build().backgroundColor((data.get("値").toString())).horizontalAlign(ColumnTextAlign.LEFT));
+	        	break;
+	        default:
+	        	masterData.cellAt("値").setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+	        	break;
+        }
+        return masterData;
+    }
+
+    private void putDataEmpty3(Map<String, Object> data) {
+        data.put("項目", "");
+        data.put("columnB", "");
+        data.put("値", "");
+    }
+    
+    //custom enum for sheet 3
+    @AllArgsConstructor
+    private enum AlignmentType{
+    	LEFT(0),
+    	RIGHT(1),
+    	BACKGROUNDCOLOR(2);
+    	@Getter
+    	public final int value;
+    }
        private String timeToString(int value) {
               if (value % 60 < 10) {
                      return String.valueOf(value / 60) + ":0" + String.valueOf(value % 60);

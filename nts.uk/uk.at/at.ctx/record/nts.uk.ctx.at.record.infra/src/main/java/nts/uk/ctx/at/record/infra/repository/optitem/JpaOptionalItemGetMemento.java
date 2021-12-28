@@ -10,18 +10,7 @@ import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.at.record.infra.entity.optitem.KrcmtAnyv;
 import nts.uk.ctx.at.record.infra.entity.optitem.KrcmtAnyfResultRange;
 import nts.uk.ctx.at.shared.dom.common.CompanyId;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcResultRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalculationClassification;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.DescritionOptionalItem;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.EmpConditionAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.NoteOptionalItem;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemGetMemento;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemName;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemNo;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemUsageAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.PerformanceAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.UnitOfOptionalItem;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.*;
 
 /**
  * The Class JpaOptionalItemGetMemento.
@@ -139,11 +128,19 @@ public class JpaOptionalItemGetMemento implements OptionalItemGetMemento {
 	 * getCalculationResultRange()
 	 */
 	@Override
-	public CalcResultRange getCalculationResultRange() {
-		return new CalcResultRange(new JpaCalcResultRangeGetMemento(
-				this.krcstCalcResultRange != null
-						? this.krcstCalcResultRange
-						: this.typeValue.getKrcstCalcResultRange()));
+	public InputControlSetting getInputControlSetting() {
+		if (this.krcstCalcResultRange != null)
+			return new InputControlSetting(
+					this.typeValue.isInputCheck(),
+					new CalcResultRange(new JpaCalcResultRangeGetMemento(this.krcstCalcResultRange)),
+					this.krcstCalcResultRange.getDailyInputUnit()
+			);
+		else
+			return new InputControlSetting(
+					this.typeValue.isInputCheck(),
+					new CalcResultRange(new JpaCalcResultRangeGetMemento(this.typeValue.getKrcstCalcResultRange())),
+					this.typeValue.getKrcstCalcResultRange().getDailyInputUnit()
+			);
 	}
 
 	/* (non-Javadoc)

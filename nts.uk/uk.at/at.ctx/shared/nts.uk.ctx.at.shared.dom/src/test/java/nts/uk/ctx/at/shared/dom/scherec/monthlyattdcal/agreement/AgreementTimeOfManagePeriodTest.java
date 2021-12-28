@@ -150,7 +150,7 @@ public class AgreementTimeOfManagePeriodTest {
         	    									Finally.of(TimeDivergenceWithCalculation.createTimeWithCalculation(new AttendanceTime(0), new AttendanceTime(0))), null)), null, null))), null, null, null, null, null, null, null, null, null, null), null, null), null, null, null);
         	dailyRecords.add(
         			new IntegrationOfDaily(sid, GeneralDate.ymd(ym, day), new WorkInfoOfDailyAttendance(new WorkInformation("aa", "aa"), null, null, null, null, null, null),
-        					null, null, null, null, null, null, Optional.of(attendanceTime), null, null, null, null, null, null, null, null, null));
+        					null, null, null, null, null, null, Optional.of(attendanceTime), null, null, null, null, null, null, null, new ArrayList<>(), new ArrayList<>(),  null, null));
     		
         	if (holiWork > 48) {
         		holiWork -= 48;

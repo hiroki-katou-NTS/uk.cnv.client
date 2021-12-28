@@ -29,9 +29,9 @@ public class AdjustRemainingNumberInformation {
 		
 		
 		// 年休残数詳細情報DTO．時間年休の年間上限時間　＝　＃KDL020_65 - 内容：{0}利用可
-		//　{0}　＝　Input．基準日時点年休残数．年休情報．残数．時間年休(マイナスなし)．年休残数（付与前）時間　+　Input．基準日時点年休残数．年休情報．残数．時間年休(マイナスなし)．年休残数（付与後）時間
-		int annMaxTime = reNumAnnLeave.getAnnualLeaveRemainNumberExport().getRemainNumberNoMinusExport().getAnnualLeaveGrantPreTime().intValue() +
-				reNumAnnLeave.getAnnualLeaveRemainNumberExport().getRemainNumberNoMinusExport().getAnnualLeaveGrantPostTime().intValue();
+		//　{0}　＝　Input．基準日時点年休残数．年休情報．上限データ.上限残時間
+		int annMaxTime = reNumAnnLeave.getAnnualLeaveRemainNumberExport().
+				getAnnualLeaveMaxDataExport().getTimeAnnualLeaveMaxremainingMinutes().intValue();
 		String annMaxTimeText = this.getHoursMinu(annMaxTime);
 		
 		// 年休残数詳細情報DTO．時間年休の年間上限時間をセット

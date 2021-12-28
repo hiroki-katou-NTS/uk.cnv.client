@@ -1,9 +1,12 @@
 package nts.uk.ctx.at.record.app.find.dailyperform.dto;
 
+import java.util.Optional;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import nts.uk.ctx.at.shared.dom.common.time.TimeSpanForCalc;
 
 /**
  * 計算用時間帯
@@ -28,5 +31,10 @@ public class TimeSpanForCalcDto {
 	@Override
 	public TimeSpanForCalcDto clone() {
 		return new TimeSpanForCalcDto(start, end);
+	}
+
+	public static TimeSpanForCalcDto fromDomain(Optional<TimeSpanForCalc> domain) {
+		return domain.map(ts -> new TimeSpanForCalcDto(ts.getStart().v(), ts.getEnd().v())).orElse(null);
+
 	}
 }

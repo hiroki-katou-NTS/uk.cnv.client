@@ -31,7 +31,7 @@ public class DailyAttendanceItemRecPubImpl implements DailyAttendanceItemRecPub 
 		List<DailyAttendanceItemRecPubExport> attendanceItemPubDtos = dailyAttendanceItemList.stream().map(f -> {
 			return new DailyAttendanceItemRecPubExport(f.getCompanyId(), f.getAttendanceItemId(),
 					f.getAttendanceName().v(), f.getDisplayNumber(), f.getUserCanUpdateAtr().value,
-					f.getDailyAttendanceAtr().value, f.getNameLineFeedPosition());
+					f.getDailyAttendanceAtr().value, f.getNameLineFeedPosition(), f.getDisplayName().isPresent() ? f.getDisplayName().get().v() : "");
 		}).collect(Collectors.toList());
 
 		return attendanceItemPubDtos;
@@ -42,7 +42,7 @@ public class DailyAttendanceItemRecPubImpl implements DailyAttendanceItemRecPub 
 		List<DailyAttendanceItem> attendanceItems = this.dailyAttendanceItemRepository.getList(companyId);
 		
 		List<DailyAttendanceItemRecPubExport> dailyAttendanceItemRecPubDtos = attendanceItems.stream().map(f -> {
-			return new DailyAttendanceItemRecPubExport(f.getCompanyId(), f.getAttendanceItemId(), f.getAttendanceName().v(), f.getDisplayNumber(), f.getUserCanUpdateAtr().value, f.getDailyAttendanceAtr().value, f.getNameLineFeedPosition());
+			return new DailyAttendanceItemRecPubExport(f.getCompanyId(), f.getAttendanceItemId(), f.getAttendanceName().v(), f.getDisplayNumber(), f.getUserCanUpdateAtr().value, f.getDailyAttendanceAtr().value, f.getNameLineFeedPosition(), f.getDisplayName().isPresent() ? f.getDisplayName().get().v() : "");
 		}).collect(Collectors.toList());
 		return dailyAttendanceItemRecPubDtos;
 	}

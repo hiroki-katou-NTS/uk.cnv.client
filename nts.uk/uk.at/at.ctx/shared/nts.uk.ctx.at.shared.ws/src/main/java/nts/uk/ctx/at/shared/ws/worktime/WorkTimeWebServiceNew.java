@@ -272,6 +272,13 @@ public class WorkTimeWebServiceNew extends WebService {
     public WorkTimeResultDto findAllNew(FindByCodeDto dto) {
         return this.workTimeSetFinder.findByCodeNew(dto.codes, dto.workPlaceId, dto.baseDate);
     }
+    
+  //----------------Update KDLS01
+    @POST
+    @Path("get_worktimes_kdls01")
+    public List<WorkTimeDto> getWorktimesKdls01(FindByCodeMobileDto param) {
+        return this.workTimeSetFinder.findByCodeKDLS01(param.codes, param.workTimeSelected, param.workPlaceId, param.referenceDate, param.display);
+    }
 }
 
 @Value
@@ -284,4 +291,14 @@ class FindByCodeDto{
     List<String> codes;
     String workPlaceId;
     String baseDate;
+}
+
+@AllArgsConstructor
+@Getter
+class FindByCodeMobileDto{
+    List<String> codes;
+    String workPlaceId;
+    String referenceDate;
+    String workTimeSelected;
+    boolean display;
 }

@@ -54,4 +54,9 @@ public class ImageSettingDto {
 	 * height
 	 */
 	private int height;
+	
+	/**
+	 * 比率
+	 */
+	private double ratio;
 }

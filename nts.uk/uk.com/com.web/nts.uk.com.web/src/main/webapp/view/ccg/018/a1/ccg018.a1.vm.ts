@@ -133,22 +133,16 @@ module ccg018.a1.viewmodel {
             key: 'topMenuCode',
             dataType: 'string',
             width: '240px',
-            ntsControl: 'Combobox1'
-          },
-          {
-            headerText: nts.uk.resource.getText('CCG018_51'),
-            key: 'switchingDate',
-            dataType: 'number',
-            width: '100px',
-            ntsControl: 'Combobox2',
-            class: 'switch-date'
+            ntsControl: 'Combobox1',
+            tabIndex: 2,
           },
           {
             headerText: nts.uk.resource.getText('CCG018_10'),
             key: 'uniqueCode',
             dataType: 'string',
             width: '240px',
-            ntsControl: 'Combobox3'
+            ntsControl: 'Combobox3',
+            tabIndex: 2,
           },
         ],
         headerRendered: (evt: any, ui: any) => {
@@ -176,18 +170,7 @@ module ccg018.a1.viewmodel {
             controlType: 'ComboBox',
             visibleItemsCount: 5,
             dropDownAttachedToBody: false,
-            enable: true
-          },
-          {
-            name: 'Combobox2',
-            options: vm.listSwitchDate(),
-            optionsValue: 'value',
-            optionsText: 'text',
-            columns: comboColumns2,
-            controlType: 'ComboBox',
-            visibleItemsCount: 5,
-            dropDownAttachedToBody: false,
-            enable: true
+            enable: true,
           },
           {
             name: 'Combobox3',
@@ -198,7 +181,7 @@ module ccg018.a1.viewmodel {
             controlType: 'ComboBox',
             visibleItemsCount: 5,
             dropDownAttachedToBody: false,
-            enable: true
+            enable: true,
           }
         ]
       });
@@ -210,6 +193,10 @@ module ccg018.a1.viewmodel {
         .find('.nts-combo-container')
         .find('.ui-igcombo-field').focus();
       });
+
+      if (_.isEmpty(vm.lisTopPageRoleSet())) {
+        $('#grid2-wrapper').focus();
+      }
     }
 
     save() {
@@ -275,22 +262,22 @@ module ccg018.a1.viewmodel {
   }
   export class ITopPageRoleSet {
     roleSetCode: string;
-    switchingDate: number;
     loginMenuCode: string;
     topMenuCode: string;
     menuClassification: number;
     system: number;
     name: string;
+    switchingDate: number = 0;
   }
   class TopPageRoleSet {
     roleSetCode: string;
     name: string;
     topMenuCode: string;
-    switchingDate: number = 0;
     system: number;
     menuClassification: number;
     loginMenuCode: string;
     uniqueCode: string;
+    switchingDate: number = 0;
     //beacause there can exist same code, so create uniqueCode = loginMenuCd+ system+ menuClassification
     // uniqueCode: KnockoutObservable<string> = ko.observable('');
 
@@ -299,8 +286,8 @@ module ccg018.a1.viewmodel {
       vm.roleSetCode = param.roleSetCode;
       vm.name = param.name;
       vm.topMenuCode = param.topMenuCode;
-      vm.switchingDate = param.switchingDate;
       vm.loginMenuCode = param.loginMenuCode;
+      vm.switchingDate = param.switchingDate;
       vm.system = param.system;
       vm.menuClassification = param.menuClassification;
       vm.uniqueCode = nts.uk.text.format("{0}{1}{2}", param.loginMenuCode, param.system, param.menuClassification);

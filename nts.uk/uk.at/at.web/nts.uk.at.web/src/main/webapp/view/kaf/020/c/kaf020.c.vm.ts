@@ -59,13 +59,14 @@ module nts.uk.at.view.kaf020.c.viewmodel {
                     let contents: Array<OptionalItemApplicationContent> = [];
                     applicationDto.optionalItems.forEach((optionalItem: any) => {
                         let item: any = _.find(applicationDto.application.optionalItems, {itemNo: optionalItem.optionalItemNo});
-                        let controlOfAttendanceItem: any = _.find(applicationDto.controlOfAttendanceItems, {itemDailyID: optionalItem.optionalItemNo + 640});
+                        // let controlOfAttendanceItem: any = _.find(applicationDto.controlOfAttendanceItems, {itemDailyID: optionalItem.optionalItemNo + 640});
                         contents.push({
                             optionalItemName: optionalItem.optionalItemName,
                             optionalItemNo: optionalItem.optionalItemNo,
                             optionalItemAtr: optionalItem.optionalItemAtr,
                             unit: optionalItem.unit,
-                            inputUnitOfTimeItem: controlOfAttendanceItem ? controlOfAttendanceItem.inputUnitOfTimeItem : null,
+                            inputCheckbox: optionalItem.inputCheck,
+                            inputUnitOfItem: vm.getInputUnit(optionalItem.optionalItemAtr, optionalItem.calcResultRange),
                             description: optionalItem.description,
                             timeUpper: optionalItem.calcResultRange.timeUpper != null ? nts.uk.time.format.byId("Time_Short_HM", optionalItem.calcResultRange.timeUpper) : null,
                             timeLower: optionalItem.calcResultRange.timeLower != null ? nts.uk.time.format.byId("Time_Short_HM", optionalItem.calcResultRange.timeLower) : null,
@@ -76,8 +77,9 @@ module nts.uk.at.view.kaf020.c.viewmodel {
                             upperCheck: optionalItem.calcResultRange.upperCheck,
                             lowerCheck: optionalItem.calcResultRange.lowerCheck,
                             time: ko.observable(item ? item.time : null),
-                            times: ko.observable(item ? item.times : null),
+                            times: ko.observable(item && !optionalItem.inputCheck ? item.times : null),
                             amount: ko.observable(item ? item.amount : null),
+                            timesChecked: ko.observable(item && optionalItem.inputCheck ? (item.times != 0 && item.times != null) : null),
                             detail: '',
                             dispOrder: optionalItem.dispOrder
                         });
@@ -99,6 +101,41 @@ module nts.uk.at.view.kaf020.c.viewmodel {
             });
         }
 
+        getInputUnit(optionalItemAtr: number, calcResultRange: any): string  {
+            const vm = this;
+            if (optionalItemAtr == 0) {
+                switch (calcResultRange.timeInputUnit) {
+                    case 0: return vm.$i18n("KMK002_141");
+                    case 1: return vm.$i18n("KMK002_142");
+                    case 2: return vm.$i18n("KMK002_143");
+                    case 3: return vm.$i18n("KMK002_144");
+                    case 4: return vm.$i18n("KMK002_145");
+                    case 5: return vm.$i18n("KMK002_146");
+                    default: return null;
+                }
+            }
+            if (optionalItemAtr == 1) {
+                switch (calcResultRange.numberInputUnit) {
+                    case 0: return vm.$i18n("KMK002_150");
+                    case 1: return vm.$i18n("KMK002_151");
+                    case 2: return vm.$i18n("KMK002_152");
+                    case 3: return vm.$i18n("KMK002_153");
+                    default: return null;
+                }
+            }
+            if (optionalItemAtr == 2) {
+                switch (calcResultRange.amountInputUnit) {
+                    case 0: return vm.$i18n("KMK002_160");
+                    case 1: return vm.$i18n("KMK002_161");
+                    case 2: return vm.$i18n("KMK002_162");
+                    case 3: return vm.$i18n("KMK002_163");
+                    case 4: return vm.$i18n("KMK002_164");
+                    default: return null;
+                }
+            }
+            return null;
+        }
+
         reload() {
             const vm = this;
             if (vm.appType() === AppType.OPTIONAL_ITEM_APPLICATION) {
@@ -117,7 +154,7 @@ module nts.uk.at.view.kaf020.c.viewmodel {
             dataFetch.applicationContents.forEach((item: OptionalItemApplicationContent) => {
                 optionalItems.push({
                     itemNo: item.optionalItemNo,
-                    times: item.times ,
+                    times: item.inputCheckbox ? (item.timesChecked ? 1 : null) : item.times,
                     amount: item.amount,
                     time: item.time
                 });
@@ -145,16 +182,15 @@ module nts.uk.at.view.kaf020.c.viewmodel {
 						});
                     }
                 }).fail(err => {
-                    if (err && err.messageId) {
-                        if (err && _.includes(["Msg_1692", "Msg_1693"], err.messageId) && err.parameterIds.length > 1) {
-                            let id = '#' + err.parameterIds[1];
+                    if (err.errors) {
+                        err.errors.forEach((error: any) => {
+                            let id = '#' + error.parameterIds[1];
                             vm.$errors({
-                                [id]: err
+                                [id]: error
                             });
-                        }
-                        if (err.messageId == "Msg_236" || err.messageId == "Msg_324" || err.messageId == "Msg_237" || err.messageId == "Msg_238") {
-                            vm.$dialog.error(err);
-                        }
+                        });
+                    } else if (err.messageId == "Msg_236" || err.messageId == "Msg_324" || err.messageId == "Msg_237" || err.messageId == "Msg_238") {
+                        vm.$dialog.error(err);
                     }
                 }).always(() => {
                     vm.$blockui("hide");

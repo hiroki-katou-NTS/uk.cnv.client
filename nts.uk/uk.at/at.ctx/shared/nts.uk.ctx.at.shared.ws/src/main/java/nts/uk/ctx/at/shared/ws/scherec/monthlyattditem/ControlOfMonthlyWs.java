@@ -9,6 +9,7 @@ import javax.ws.rs.Produces;
 import nts.arc.layer.ws.WebService;
 import nts.uk.ctx.at.shared.app.command.scherec.monthlyattendanceitem.ControlOfMonthlyCmd;
 import nts.uk.ctx.at.shared.app.command.scherec.monthlyattendanceitem.UpdateControlOfMonthlyCmdHandler;
+import nts.uk.ctx.at.shared.app.command.scherec.monthlyattendanceitem.UpdateMonthlyAttendanceItemCommandHandler;
 import nts.uk.ctx.at.shared.app.find.scherec.monthlyattditem.ControlOfMonthlyDto;
 import nts.uk.ctx.at.shared.app.find.scherec.monthlyattditem.ControlOfMonthlyFinder;
 
@@ -18,6 +19,9 @@ public class ControlOfMonthlyWs extends WebService {
 	
 	@Inject
 	private UpdateControlOfMonthlyCmdHandler handler;
+	
+	@Inject
+	private UpdateMonthlyAttendanceItemCommandHandler updateMonthlyAttendanceItemCommandHandler;
 
 	@Inject
 	private ControlOfMonthlyFinder finder;
@@ -32,5 +36,6 @@ public class ControlOfMonthlyWs extends WebService {
 	@Path("update")
 	public void update(ControlOfMonthlyCmd command) {
 		this.handler.handle(command);
+		this.updateMonthlyAttendanceItemCommandHandler.handle(command.getUpdateMonthlyAttendanceItemCommand());
 	}
 }

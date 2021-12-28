@@ -5,6 +5,8 @@ package nts.uk.ctx.at.record.ws.workrecord.authfuncrest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.inject.Inject;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -14,12 +16,15 @@ import javax.ws.rs.Produces;
 import nts.arc.layer.ws.WebService;
 import nts.uk.ctx.at.record.app.command.workrecord.authfuncrest.AuthFuncRestrictionCommand;
 import nts.uk.ctx.at.record.app.command.workrecord.authfuncrest.AuthFuncRestrictionCommandHandler;
+import nts.uk.ctx.at.record.app.command.workrecord.authfuncrest.CopyDailyPerformanceAuthorityCommand;
+import nts.uk.ctx.at.record.app.command.workrecord.authfuncrest.CopyDailyPerformanceAuthorityCommandHandler;
 import nts.uk.ctx.at.record.app.find.workrecord.authfuncrest.EmployeeRoleDto;
 import nts.uk.ctx.at.record.app.find.workrecord.authfuncrest.EmploymentRoleFinder;
 import nts.uk.ctx.at.record.app.find.workrecord.authfuncrest.FunctionalRestrictionWithAuthorityDto;
 import nts.uk.ctx.at.record.dom.workrecord.authormanage.DailyPerformanceAuthority;
 import nts.uk.ctx.at.record.dom.workrecord.authormanage.DailyPerformAuthorRepo;
 import nts.uk.ctx.at.record.dom.workrecord.authormanage.DailyPerformanceFunction;
+import nts.uk.shr.com.context.AppContexts;
 import nts.uk.ctx.at.record.dom.workrecord.authormanage.DailyPerformFuncRepo;
 
 /**
@@ -41,6 +46,9 @@ public class AuthorityFunctionalRestrictionWebService extends WebService {
 	
 	@Inject
 	private EmploymentRoleFinder employmentRoleFinder; 
+	
+	@Inject
+	private CopyDailyPerformanceAuthorityCommandHandler copyHandler;
 
 	@POST
 	@Path("find-emp-roles")
@@ -75,6 +83,26 @@ public class AuthorityFunctionalRestrictionWebService extends WebService {
 	@Path("register")
 	public void registerAuthFuncRestriction(AuthFuncRestrictionCommand command) {
 		authFuncRestHandler.handle(command);
+	}
+	
+	@POST
+	@Path("getRoleIds")
+	public List<String> getRoleIds() {
+		String cid = AppContexts.user().companyId();
+		//ドメインモデル「勤務実績の権限」を取得する
+		List<DailyPerformanceAuthority> daiPerAuthors = dailyPerAuthRepo.findByCid(cid);
+		//取得した「勤務実績の権限．ロールID」を返す
+		List<String> roleIds = daiPerAuthors.stream()
+				.map(daiPerAuthor -> daiPerAuthor.getRoleID())
+				.distinct()
+				.collect(Collectors.toList());
+		return roleIds;
+	}
+	
+	@POST
+	@Path("copyDaiPerfAuth")
+	public void copyDaiPerfAuth(CopyDailyPerformanceAuthorityCommand command) {
+		copyHandler.handle(command);
 	}
 
 }

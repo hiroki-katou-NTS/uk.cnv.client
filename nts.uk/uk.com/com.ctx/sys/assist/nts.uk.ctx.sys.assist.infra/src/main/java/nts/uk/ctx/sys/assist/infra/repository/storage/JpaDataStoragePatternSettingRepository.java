@@ -32,7 +32,7 @@ public class JpaDataStoragePatternSettingRepository extends JpaRepository
 	@Transactional(value = TxType.REQUIRES_NEW)
 	public Optional<DataStoragePatternSetting> findByContractCdAndPatternCdAndPatternAtr(String contractCd,
 			String patternCd, int patternAtr) {
-		return this.queryProxy().find(new SspmtDataStoragePatternSettingPk(contractCd, BooleanUtils.toBoolean(patternAtr), patternCd),
+		return this.queryProxy().find(new SspmtDataStoragePatternSettingPk(contractCd, patternAtr, patternCd),
 				SspmtDataStoragePatternSetting.class).map(DataStoragePatternSetting::createFromMemento);
 	}
 
@@ -69,7 +69,7 @@ public class JpaDataStoragePatternSettingRepository extends JpaRepository
 	@Override
 	public void delete(String contractCd, String patternCd, int patternAtr) {
 		this.commandProxy().remove(SspmtDataStoragePatternSetting.class,
-								   new SspmtDataStoragePatternSettingPk(contractCd, BooleanUtils.toBoolean(patternAtr), patternCd));
+								   new SspmtDataStoragePatternSettingPk(contractCd, patternAtr, patternCd));
 	}
 
 	private SspmtDataStoragePatternSetting toEntity(DataStoragePatternSetting domain) {

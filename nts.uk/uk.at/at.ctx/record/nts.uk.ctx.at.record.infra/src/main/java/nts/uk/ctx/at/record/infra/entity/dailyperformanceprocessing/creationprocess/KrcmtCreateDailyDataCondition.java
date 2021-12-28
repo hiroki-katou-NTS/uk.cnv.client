@@ -35,7 +35,7 @@ public class KrcmtCreateDailyDataCondition extends ContractUkJpaEntity implement
 	 */
 	@NotNull
 	@Column(name = "IS_FUTURE_DAY")
-	public int isFutureDay;
+	public boolean isFutureDay;
 
 	@Override
 	protected Object getKey() {

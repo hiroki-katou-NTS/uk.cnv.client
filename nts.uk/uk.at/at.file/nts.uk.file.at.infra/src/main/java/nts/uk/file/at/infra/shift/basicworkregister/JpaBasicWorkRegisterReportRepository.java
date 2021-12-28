@@ -20,25 +20,25 @@ import nts.uk.shr.com.i18n.TextResource;
 @Stateless
 public class JpaBasicWorkRegisterReportRepository extends JpaRepository implements BasicWorkRegisterReportRepository {
 
-	private static final String SELECT_COMPANY_BASIC_WORK = "SELECT a.WORK_DAY_ATR, ISNULL(a.WKTP_CD, ''), "
-			+ "ISNULL(b.NAME, '') AS WORK_TYPE_NAME, ISNULL(a.WKTM_CD, ''), ISNULL(c.NAME,'') AS WORK_TIME_NAME  "
+	private static final String SELECT_COMPANY_BASIC_WORK = "SELECT a.WORKING_DAY_ATR, COALESCE(a.WKTP_CD, ''), "
+			+ "COALESCE(b.NAME, '') AS WORK_TYPE_NAME, COALESCE(a.WKTM_CD, ''), COALESCE(c.NAME,'') AS WORK_TIME_NAME  "
 			+ " FROM KSCMT_STANDARD_WORK_CMP a "
 			+ " LEFT JOIN KSHMT_WKTP b ON b.CD = a.WKTP_CD AND b.CID = a.CID"
 			+ " LEFT JOIN KSHMT_WT c ON c.WORKTIME_CD = a.WKTM_CD AND c.CID = a.CID AND c.ABOLITION_ATR = 1"
 			+ " WHERE a.CID = ?companyId ORDER BY a.WORKING_DAY_ATR ASC";
 	
 	private static final String GET_WORKSPACE_BASIC_WORK = "SELECT a.WKP_ID, "
-			+ "a.WORKING_DAY_ATR, ISNULL(a.WKTP_CD, '') as WORK_TYPE_CD, "
-			+ "ISNULL(b.NAME, '') AS WORK_TYPE_NAME, "
-			+ "ISNULL(a.WKTM_CD, '') as WORKING_CD, "
-			+ "ISNULL(c.NAME,'') AS WORK_TIME_NAME"
+			+ "a.WORKING_DAY_ATR, COALESCE(a.WKTP_CD, '') as WORK_TYPE_CD, "
+			+ "COALESCE(b.NAME, '') AS WORK_TYPE_NAME, "
+			+ "COALESCE(a.WKTM_CD, '') as WORKING_CD, "
+			+ "COALESCE(c.NAME,'') AS WORK_TIME_NAME"
 			+ "	FROM KSCMT_STANDARD_WORK_WKP a "
 			+ "	LEFT JOIN KSHMT_WKTP b ON b.CD = a.WKTP_CD AND b.CID = ?companyId"
 			+ "	LEFT JOIN KSHMT_WT c ON c.WORKTIME_CD = a.WKTM_CD AND c.CID = b.CID AND c.ABOLITION_ATR = 1";
 	
 	private static final String GET_CLASS_BASIC_WORK = "SELECT b.CLS_CD, a.CLSNAME, b.WORKING_DAY_ATR, "
-			+ "ISNULL(b.WKTP_CD, '') as WORK_TYPE_CD, ISNULL(c.NAME, '') AS WORK_TYPE_NAME, "
-			+ "ISNULL(b.WKTM_CD, '') as WORKING_CD, ISNULL(d.NAME,'') AS WORK_TIME_NAME "
+			+ "COALESCE(b.WKTP_CD, '') as WORK_TYPE_CD, COALESCE(c.NAME, '') AS WORK_TYPE_NAME, "
+			+ "COALESCE(b.WKTM_CD, '') as WORKING_CD, COALESCE(d.NAME,'') AS WORK_TIME_NAME "
 			+ "	FROM  KSCMT_STANDARD_WORK_CLS b"
 			+ "	LEFT JOIN BSYMT_CLASSIFICATION a ON b.CID = a.CID and b.CLS_CD = a.CLSCD"
 			+ "	LEFT JOIN KSHMT_WKTP c ON c.CD =b.WKTP_CD and c.CID = b.CID"

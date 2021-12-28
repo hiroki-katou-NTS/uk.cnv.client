@@ -14,8 +14,17 @@ public class ApprovalListDispSettingCommand {
     private int atdExcessAtr;
     private int warningDays;
     private int dispWorkplaceNameAtr;
+    private int useApprovalFunction;
 
     public ApprovalListDisplaySetting toDomain(String companyId) {
-        return ApprovalListDisplaySetting.create(companyId, appReasonDispAtr, preExcessAtr, atdExcessAtr, warningDays, dispWorkplaceNameAtr);
+        return ApprovalListDisplaySetting.create(
+                companyId,
+                appReasonDispAtr,
+                preExcessAtr,
+                atdExcessAtr,
+                warningDays,
+                dispWorkplaceNameAtr,
+                useApprovalFunction
+        );
     }
 }

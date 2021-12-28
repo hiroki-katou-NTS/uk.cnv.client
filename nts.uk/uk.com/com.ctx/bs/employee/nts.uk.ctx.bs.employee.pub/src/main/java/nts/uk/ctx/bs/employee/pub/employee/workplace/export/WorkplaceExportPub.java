@@ -39,7 +39,6 @@ public interface WorkplaceExportPub {
 	
 	//RQ560_HieuTT
 	public List<WorkplaceInforExport> getWkpRQ560(String companyId, List<String> listWkpId, GeneralDate baseDate);
-	
 	/**
 	 * @name 全ての職場の所属社員を取得するPublish
 	 * @param companyId 会社ID	会社ID
@@ -47,7 +46,7 @@ public interface WorkplaceExportPub {
 	 * @return 	所属職場リスト	List＜所属職場履歴項目＞
 	 */
 	public List<AffWorkplaceHistoryItemExport3> getByCID(String companyId, GeneralDate baseDate);
-	
+
 	/**
 	 * @name 職場に所属する社員Publish
 	 * @param workPlaceIds 職場リスト List<職場ID>		
@@ -55,5 +54,5 @@ public interface WorkplaceExportPub {
 	 * @return 	所属職場リスト	List＜所属職場履歴項目＞
 	 */
 	public List<AffWorkplaceHistoryItemExport3> getByListId(List<String> workPlaceIds, GeneralDate baseDate);
-	
+
 }

@@ -42,9 +42,6 @@ public class JpaAggregateSettingGetMemento implements AggregateSettingGetMemento
 	@Override
 	public List<ExtraTimeItemNo> getPremiumNo() {
 		List<ExtraTimeItemNo> list = new ArrayList<>();
-		this.kscstEstAggregateSet.getKscstPerCostExtraItem().stream().forEach(e -> {
-			list.add(new ExtraTimeItemNo(e.getKmnmpPremiumItemPK().displayNumber));
-		});
 		return list;
 	}
 

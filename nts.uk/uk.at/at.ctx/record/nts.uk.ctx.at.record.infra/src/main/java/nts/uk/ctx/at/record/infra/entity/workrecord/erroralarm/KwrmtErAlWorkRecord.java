@@ -362,7 +362,6 @@ public class KwrmtErAlWorkRecord extends ContractUkJpaEntity implements Serializ
 				Collections.emptyList(), (0), (0), null, null, null, Collections.emptyList(), Collections.emptyList(),
 				(0), (0), null, null, null, Collections.emptyList(), Collections.emptyList(), (0), (0), "0", null, null,
 				null, 0);
-		if (!domain.getFixedAtr()) {
 			// Set Check target condition
 			int filterByBusinessType = conditionDomain.getCheckTargetCondtion().getFilterByBusinessType() ? (1) : (0);
 			int filterByJobTitle = (conditionDomain.getCheckTargetCondtion().getFilterByJobTitle() ? 1 : 0);
@@ -381,6 +380,7 @@ public class KwrmtErAlWorkRecord extends ContractUkJpaEntity implements Serializ
 			List<KrcmtEralClass> lstClassification = conditionDomain.getCheckTargetCondtion().getLstClassificationCode()
 					.stream().map(clssCd -> new KrcmtEralClass(new KrcstErAlClassPK(eralCheckId, clssCd.v(),domain.getCompanyId())))
 					.collect(Collectors.toList());
+		if (!domain.getFixedAtr()) {
 			// Set worktype condition
 			int workTypeUseAtr = conditionDomain.getWorkTypeCondition().isUse() ? 1 : 0;
 			int wtCompareAtr = conditionDomain.getWorkTypeCondition().getComparePlanAndActual().value;
@@ -460,7 +460,65 @@ public class KwrmtErAlWorkRecord extends ContractUkJpaEntity implements Serializ
 					group2UseAtr, atdItemConditionGroup1, krcstErAlConGroup1, atdItemConditionGroup2,
 					krcstErAlConGroup2,
 					conditionDomain.getContinuousPeriod() != null ? conditionDomain.getContinuousPeriod().v() : 0);
+		} 
+
+		KwrmtErAlWorkRecord entity = new KwrmtErAlWorkRecord(kwrmtErAlWorkRecordPK, errorAlarmName, fixedAtr, useAtr,
+				domain.getRemarkCancelErrorInput().isUse(), domain.getRemarkColumnNo(), typeAtr, boldAtr,
+				messageColor.equals("") ? null : messageColor, cancelableAtr, errorDisplayItem, eralCheckId,
+				krcmtErAlCondition, krcstErAlApplication, cancelRoleId);
+		return entity;
+	}
+	public static KwrmtErAlWorkRecord fromDomainFixed(ErrorAlarmWorkRecord domain, ErrorAlarmCondition conditionDomain) {
+		// Set PK
+		KwrmtErAlWorkRecordPK kwrmtErAlWorkRecordPK = new KwrmtErAlWorkRecordPK(AppContexts.user().companyId(),
+				domain.getCode().v());
+		// Set main data KwrmtErAlWorkRecord
+		String errorAlarmName = domain.getName().v();
+		boolean fixedAtr = domain.getFixedAtr();
+		boolean useAtr = domain.getUseAtr();
+		int typeAtr = domain.getTypeAtr().value;
+		boolean boldAtr = domain.getMessage().getBoldAtr();
+		String messageColor = domain.getMessage().getMessageColor().v();
+		boolean cancelableAtr = domain.getCancelableAtr();
+		Integer errorDisplayItem = domain.getErrorDisplayItem();
+		String eralCheckId = domain.getErrorAlarmCheckID();
+		List<KrcmtEralApplication> krcstErAlApplication = domain.getLstApplication().stream()
+				.map(appTypeCd -> new KrcmtEralApplication(
+						new KrcstErAlApplicationPK(AppContexts.user().companyId(), domain.getCode().v(), (appTypeCd))))
+				.collect(Collectors.toList());
+		String cancelRoleId = domain.getCancelRoleId();
+		String messageDisplay = conditionDomain.getDisplayMessage().v();
+		KrcmtErAlCondition krcmtErAlCondition = new KrcmtErAlCondition(eralCheckId,domain.getCompanyId(), messageDisplay, (0),
+				Collections.emptyList(), (0), Collections.emptyList(), (0), Collections.emptyList(), (0),
+				Collections.emptyList(), (0), (0), null, null, null, Collections.emptyList(), Collections.emptyList(),
+				(0), (0), null, null, null, Collections.emptyList(), Collections.emptyList(), (0), (0), "0", null, null,
+				null, 0);
+		if (domain.getFixedAtr()) { // kdw007 ver22
+			// Set Check target condition
+			int filterByBusinessType = conditionDomain.getCheckTargetCondtion().getFilterByBusinessType() ? (1) : (0);
+			int filterByJobTitle = (conditionDomain.getCheckTargetCondtion().getFilterByJobTitle() ? 1 : 0);
+			int filterByEmployment = (conditionDomain.getCheckTargetCondtion().getFilterByEmployment() ? 1 : 0);
+			int filterByClassification = (conditionDomain.getCheckTargetCondtion().getFilterByClassification() ? 1 : 0);
+			List<KrcmtEralBusinessType> lstBusinessType = conditionDomain.getCheckTargetCondtion()
+					.getLstBusinessTypeCode().stream().map(businessTypeCd -> new KrcmtEralBusinessType(
+							new KrcstErAlBusinessTypePK(eralCheckId, businessTypeCd.v(),domain.getCompanyId())))
+					.collect(Collectors.toList());
+			List<KrcmtEralJobTitle> lstJobTitle = conditionDomain.getCheckTargetCondtion().getLstJobTitleId().stream()
+					.map(jobTitleId -> new KrcmtEralJobTitle(new KrcstErAlJobTitlePK(eralCheckId, jobTitleId,domain.getCompanyId())))
+					.collect(Collectors.toList());
+			List<KrcmtEralEmployment> lstEmployment = conditionDomain.getCheckTargetCondtion().getLstEmploymentCode()
+					.stream().map(emptCd -> new KrcmtEralEmployment(new KrcstErAlEmploymentPK(eralCheckId, emptCd.v(),domain.getCompanyId())))
+					.collect(Collectors.toList());
+			List<KrcmtEralClass> lstClassification = conditionDomain.getCheckTargetCondtion().getLstClassificationCode()
+					.stream().map(clssCd -> new KrcmtEralClass(new KrcstErAlClassPK(eralCheckId, clssCd.v(),domain.getCompanyId())))
+					.collect(Collectors.toList());
+			krcmtErAlCondition = new KrcmtErAlCondition(eralCheckId,domain.getCompanyId(), messageDisplay, filterByBusinessType,
+					lstBusinessType, filterByJobTitle, lstJobTitle, filterByEmployment, lstEmployment,
+					filterByClassification, lstClassification,(0), (0), null, null, null, Collections.emptyList(), Collections.emptyList(),
+					(0), (0), null, null, null, Collections.emptyList(), Collections.emptyList(), (0), (0), "0", null, null,
+					null, 0);		
 		}
+		
 		KwrmtErAlWorkRecord entity = new KwrmtErAlWorkRecord(kwrmtErAlWorkRecordPK, errorAlarmName, fixedAtr, useAtr,
 				domain.getRemarkCancelErrorInput().isUse(), domain.getRemarkColumnNo(), typeAtr, boldAtr,
 				messageColor.equals("") ? null : messageColor, cancelableAtr, errorDisplayItem, eralCheckId,

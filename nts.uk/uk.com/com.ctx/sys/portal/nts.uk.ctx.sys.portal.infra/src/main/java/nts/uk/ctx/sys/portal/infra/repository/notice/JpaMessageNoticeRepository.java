@@ -241,8 +241,10 @@ public class JpaMessageNoticeRepository extends JpaRepository implements Message
 	public List<MessageNotice> getMsgRefBySidForPeriod(DatePeriod period, String sid) {
 		@SuppressWarnings("unchecked")
 		List<Object[]> resultList = this.getEntityManager().createNativeQuery(NATIVE_GET_REF_BY_SID_FOR_PERIOD)
-				.setParameter("endDate", period.end().toString()).setParameter("startDate", period.start().toString())
-				.setParameter("sid", sid).getResultList();
+				.setParameter("endDate", period.end().date())
+				.setParameter("startDate", period.start().date())
+				.setParameter("sid", sid)
+				.getResultList();
 
 		List<MessageNotice> list = resultList.stream().map(item -> {
 			String formatDate = "";

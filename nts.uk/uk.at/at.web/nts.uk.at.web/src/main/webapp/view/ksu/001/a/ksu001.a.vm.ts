@@ -589,10 +589,10 @@ module nts.uk.at.view.ksu001.a.viewmodel {
                 shiftPalletUnit : self.userInfor.shiftPalletUnit, // 1: company , 2 : workPlace 
                 pageNumberCom   : self.userInfor.shiftPalettePageNumberCom,
                 pageNumberOrg   : self.userInfor.shiftPalettePageNumberOrg,
-                getActualData   : !_.isNil(self.userInfor) ? self.userInfor.achievementDisplaySelected : false, 
+                getActualData   : self.userInfor.achievementDisplaySelected, 
                 listShiftMasterNotNeedGetNew: self.userInfor.shiftMasterWithWorkStyleLst, // List of shifts không cần lấy mới
                 listSid: self.listSid(),
-                unit: !_.isNil(self.userInfor) ? self.userInfor.unit : 0,
+                unit: self.userInfor.unit,
                 workplaceId     : self.userInfor.workplaceId,
                 workplaceGroupId: self.userInfor.workplaceGroupId,
                 personTotalSelected: self.useCategoriesPersonalValue(), // A11_1
@@ -676,8 +676,8 @@ module nts.uk.at.view.ksu001.a.viewmodel {
                 viewMode: ViewMode.SHORTNAME,
                 startDate: self.dateTimePrev(),
                 endDate:   self.dateTimeAfter() ,
-                getActualData: !_.isNil(self.userInfor) ? self.userInfor.achievementDisplaySelected : false,
-                unit: !_.isNil(self.userInfor) ? self.userInfor.unit : 0,
+                getActualData: self.userInfor.achievementDisplaySelected,
+                unit: self.userInfor.unit,
                 workplaceId     : self.userInfor.workplaceId,
                 workplaceGroupId: self.userInfor.workplaceGroupId,
                 personTotalSelected: self.useCategoriesPersonalValue(), // A11_1
@@ -735,8 +735,8 @@ module nts.uk.at.view.ksu001.a.viewmodel {
                 viewMode: ViewMode.TIME,
                 startDate: self.dateTimePrev(),
                 endDate: self.dateTimeAfter(),
-                getActualData: !_.isNil(self.userInfor) ? self.userInfor.achievementDisplaySelected : false,
-                unit: !_.isNil(self.userInfor) ? self.userInfor.unit : 0,
+                getActualData: self.userInfor.achievementDisplaySelected,
+                unit: self.userInfor.unit,
                 workplaceId     : self.userInfor.workplaceId,
                 workplaceGroupId: self.userInfor.workplaceGroupId,
                 personTotalSelected: self.useCategoriesPersonalValue(), // A11_1
@@ -3682,7 +3682,7 @@ module nts.uk.at.view.ksu001.a.viewmodel {
                         let wkpEventName     = rs.wkpEventName;
                         // update lai header grid
                         self.updateHeader().done(() => {
-                            if (userInfor.disPlayFormat == ViewMode.TIME) {
+                            if (self.userInfor.disPlayFormat == ViewMode.TIME) {
                                 // enable những cell đã disable trước đó đi rồi sau khi update grid mới disable đi được
                                 self.enableCellsTime();
                                 self.diseableCellsTime();

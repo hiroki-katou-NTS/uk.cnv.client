@@ -134,7 +134,7 @@ public class SspmtDataDeletionPatternSetting extends UkJpaEntity implements Seri
 	public void setPatternClassification(boolean patternClassification) {
 		if (pk == null)
 			pk = new SspmtDataDeletionPatternSettingPK();
-		pk.patternClassification = patternClassification;
+		pk.patternClassification = BooleanUtils.toInteger(patternClassification);
 	}
 
 	@Override
@@ -164,7 +164,7 @@ public class SspmtDataDeletionPatternSetting extends UkJpaEntity implements Seri
 	@Override
 	public int getPatternClassification() {
 		if (pk != null)
-			return BooleanUtils.toInteger(pk.patternClassification);
+			return pk.patternClassification;
 		return 0;
 	}
 

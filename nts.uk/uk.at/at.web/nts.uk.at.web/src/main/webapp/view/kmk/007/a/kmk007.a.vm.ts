@@ -265,6 +265,7 @@ module nts.uk.at.view.kmk007.a.viewmodel {
                         self.currentAfternoonCls(itemWorkType.afternoonCls);
 
                         let cwt = self.currentWorkType();
+                        
                         {
                             cwt.workTypeCode(itemWorkType.workTypeCode);
                             cwt.name(itemWorkType.name);
@@ -276,8 +277,9 @@ module nts.uk.at.view.kmk007.a.viewmodel {
                             cwt.abolishAtr(itemWorkType.abolishAtr);
                             cwt.memo(itemWorkType.memo);
                             cwt.workAtr(itemWorkType.workAtr);
-                            cwt.calculatorMethod(itemWorkType.calculatorMethod);
+                            // cwt.calculatorMethod(itemWorkType.calculatorMethod);
                         }
+                        
                         if (cwt.workAtr() === 0) {
                           cwt.oneDayCls(itemWorkType.oneDayCls);
                           cwt.oneDayCls.valueHasMutated();
@@ -290,7 +292,7 @@ module nts.uk.at.view.kmk007.a.viewmodel {
                           self.setWorkTypeSet(cwt.morning(), itemWorkType.morning);
                           self.setWorkTypeSet(cwt.afternoon(), itemWorkType.afternoon);
                         }
-                        
+                        cwt.calculatorMethod(itemWorkType.calculatorMethod);
                     });
                 } else {
                     self.isCreated(true);

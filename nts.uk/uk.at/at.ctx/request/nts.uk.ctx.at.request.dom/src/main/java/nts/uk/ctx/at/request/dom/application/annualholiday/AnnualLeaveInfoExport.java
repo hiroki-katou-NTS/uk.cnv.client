@@ -50,7 +50,7 @@ public class AnnualLeaveInfoExport {
 	/**
 	 * 上限データ
 	 */
-	//private AnnualLeaveMaxDataExport annualLeaveMaxDataExport;
+	private AnnualLeaveMaxDataExport annualLeaveMaxDataExport;
 	
 	/**
 	 * 付与情報

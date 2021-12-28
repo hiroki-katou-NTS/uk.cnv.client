@@ -6,6 +6,7 @@ package nts.uk.ctx.at.shared.app.command.ot.autocalsetting.wkp;
 
 import lombok.Getter;
 import lombok.Setter;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalSetting;
 
 /**
  * Gets the cal atr.
@@ -38,6 +39,11 @@ public class AutoCalSettingDto {
 	
 	public AutoCalSettingDto() {
 		super();
+	}
+
+	public static AutoCalSettingDto fromDomain(AutoCalSetting domain) {
+
+		return new AutoCalSettingDto(domain.getUpLimitORtSet().value, domain.getCalAtr().value);
 	}
 
 	

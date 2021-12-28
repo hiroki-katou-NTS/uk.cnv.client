@@ -1,10 +1,12 @@
 package nts.uk.ctx.at.request.dom.application.common.service.other;
 
 import java.util.List;
+import java.util.Optional;
 
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.request.dom.application.ApplicationType;
 import nts.uk.ctx.at.request.dom.application.common.service.other.output.ActualContentDisplay;
+import nts.uk.ctx.at.request.dom.application.overtime.OvertimeAppAtr;
 
 /**
  * 13.実績を取得する
@@ -40,6 +42,6 @@ public interface CollectAchievement {
 	 * @param appType 申請種類
 	 * @return
 	 */
-	public List<PreAppContentDisplay> getPreAppContents(String companyID, String employeeID, List<GeneralDate> dateLst, ApplicationType appType);
+	public List<PreAppContentDisplay> getPreAppContents(String companyID, String employeeID, List<GeneralDate> dateLst, ApplicationType appType, Optional<OvertimeAppAtr> opOvertimeAppAtr);
 	
 }

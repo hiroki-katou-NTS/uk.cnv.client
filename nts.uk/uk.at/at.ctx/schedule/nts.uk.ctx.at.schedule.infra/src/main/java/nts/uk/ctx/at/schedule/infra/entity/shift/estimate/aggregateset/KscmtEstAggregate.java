@@ -17,7 +17,6 @@ import javax.persistence.Table;
 
 import lombok.Getter;
 import lombok.Setter;
-import nts.uk.ctx.at.schedule.infra.entity.budget.premium.KscmtPremiumItem;
 import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 
 /**
@@ -53,8 +52,6 @@ public class KscmtEstAggregate extends ContractUkJpaEntity implements Serializab
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "kscstEstAggregateSet", orphanRemoval = true, fetch = FetchType.LAZY)
 //	public List<KscmtPerCostExtraItem> kscstPerCostExtraItem;
     /** The kscst per cost extra item. */
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "kscstEstAggregateSet", orphanRemoval = true, fetch = FetchType.LAZY)
-	public List<KscmtPremiumItem> kscstPerCostExtraItem;
 	/* (non-Javadoc)
 	 * @see nts.arc.layer.infra.data.entity.JpaEntity#getKey()
 	 */

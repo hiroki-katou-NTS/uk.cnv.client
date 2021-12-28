@@ -108,7 +108,7 @@ public class StampReceptionData implements ReceptionData {
 	}
 	
 	public String getIdNumber() {
-		return idNumber.trim();
+		return idNumber;
 	}
 	
 	public String getLeavingCategory() {

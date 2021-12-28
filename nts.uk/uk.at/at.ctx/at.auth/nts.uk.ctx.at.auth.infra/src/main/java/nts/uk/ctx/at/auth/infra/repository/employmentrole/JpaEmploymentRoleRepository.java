@@ -6,11 +6,9 @@ import java.util.Optional;
 import javax.ejb.Stateless;
 
 import lombok.val;
-import nts.arc.enums.EnumAdaptor;
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.at.auth.dom.employmentrole.EmploymentRole;
 import nts.uk.ctx.at.auth.dom.employmentrole.EmploymentRoleRepository;
-import nts.uk.shr.com.enumcommon.NotUseAtr;
 import nts.uk.ctx.at.auth.infra.entity.employmentrole.KacmtRoleAttendance;
 
 @Stateless
@@ -29,19 +27,7 @@ public class JpaEmploymentRoleRepository extends JpaRepository implements Employ
 	@Override
 	public Optional<EmploymentRole> getEmploymentRoleById( String roleId) {
 		val entityOpt = this.queryProxy().find(roleId,KacmtRoleAttendance.class);
-		if(!entityOpt.isPresent()){
-			return Optional.empty();
-		}else {
-			val entity = entityOpt.get();
-			val domain = new EmploymentRole(
-					entity.roleID,
-					entity.companyID,
-					EnumAdaptor.valueOf(entity.futureDateRefPermit, NotUseAtr.class)
-			);
-			return Optional.of(domain);
-
-		}
-
+		return entityOpt.map(KacmtRoleAttendance::toDomain);
 	}
 
 	@Override

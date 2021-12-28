@@ -13,10 +13,4 @@ public interface DaiPerformanceFunRepository
 
     Optional<DaiPerformanceFun> getDaiPerformanceFunById(String cid);
 
-    void add(DaiPerformanceFun domain);
-
-    void update(DaiPerformanceFun domain);
-
-    void remove(String cid);
-
 }

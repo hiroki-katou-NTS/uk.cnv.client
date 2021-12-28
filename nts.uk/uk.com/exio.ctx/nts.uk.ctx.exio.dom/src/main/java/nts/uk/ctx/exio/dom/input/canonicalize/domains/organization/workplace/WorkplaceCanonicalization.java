@@ -157,7 +157,7 @@ public class WorkplaceCanonicalization implements DomainCanonicalization {
 	private List<RecordWithPeriod> putDeleteFlag(List<RecordWithPeriod> records) {
 		
 		return records.stream()
-				.map(r -> r.canonicalize(i -> i.optionalItem(CanonicalItem.of(Items.削除フラグ, 0))))
+				.map(r -> r.canonicalize(i -> i.optionalItem(CanonicalItem.of(Items.削除フラグ, false))))
 				.collect(toList());
 	}
 	

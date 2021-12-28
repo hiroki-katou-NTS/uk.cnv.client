@@ -145,11 +145,6 @@ public class JpaRoleRepository extends JpaRepository implements RoleRepository {
 
 	@Override
 	public void update(Role role) {
-		Integer approvalAuthority = null;
-		Optional<Boolean> approvalAuthorityOpt = role.getApprovalAuthority();
-		if(approvalAuthorityOpt.isPresent()){
-			approvalAuthority = approvalAuthorityOpt.get()? 1: 0;
-		}
 		SacmtRole updateEntity = this.queryProxy().find(role.getRoleId(), SacmtRole.class).get();
 		updateEntity.setCid(role.getCompanyId());
 		updateEntity.setRoleType(role.getRoleType().value);
@@ -157,7 +152,7 @@ public class JpaRoleRepository extends JpaRepository implements RoleRepository {
 		updateEntity.setName(role.getName().toString());
 		updateEntity.contractCd = (role.getContractCode().toString());
 		updateEntity.setAssignAtr(role.getAssignAtr().value);
-		updateEntity.setApprovalAuthority(approvalAuthority);
+		updateEntity.setApprovalAuthority(role.getApprovalAuthority().orElse(null));
 		this.commandProxy().update(updateEntity);		
 	}
 	
@@ -167,11 +162,6 @@ public class JpaRoleRepository extends JpaRepository implements RoleRepository {
 	}
 	
 	private SacmtRole  toEntity(Role role){
-		Integer approvalAuthority = null;
-		Optional<Boolean> approvalAuthorityOpt = role.getApprovalAuthority();
-		if(approvalAuthorityOpt.isPresent()){
-			approvalAuthority = approvalAuthorityOpt.get()? 1: 0;
-		}
 		SacmtRole entity = new SacmtRole();
 		entity.setRoleId(role.getRoleId());
 		entity.setCid(role.getCompanyId());
@@ -181,7 +171,7 @@ public class JpaRoleRepository extends JpaRepository implements RoleRepository {
 		entity.setName(role.getName().toString());
 		entity.contractCd = (role.getContractCode().toString());
 		entity.setAssignAtr(role.getAssignAtr().value);
-		entity.setApprovalAuthority(approvalAuthority);
+		entity.setApprovalAuthority(role.getApprovalAuthority().orElse(null));
 		return entity;
 	}
 

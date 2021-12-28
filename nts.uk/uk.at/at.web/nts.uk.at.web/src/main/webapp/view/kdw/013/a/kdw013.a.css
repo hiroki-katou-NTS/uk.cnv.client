@@ -1,0 +1,101 @@
+.ui-accordion .ui-accordion-content{
+	    padding: 0px !important;
+}
+
+.popup-area-f {
+	padding: 10px !important;
+	text-align: right;
+	width: 268px;
+}
+
+.popup-area-g  {
+	padding: 10px !important;
+	text-align: right;
+	width: 268px;
+}
+
+.popup-area-i{
+	padding: 10px !important;
+	max-height: 517px;
+	text-overflow: ellipsis;
+	overflow: auto;
+}
+
+.pb10 {
+	padding-bottom: 10px !important;
+}
+
+.pb20 {
+	padding-bottom: 20px !important;
+}
+
+.align-left {
+	text-align: left;
+}
+
+.pr10 {
+	padding-right: 10px;
+}
+
+.panel-width {
+	width: 276px;
+	border-radius: 0 !important;
+}
+
+#taskInfo div:not(:last-child) {
+	border-bottom: none;
+}
+
+.pl15 {
+	padding-left: 15px;
+}
+
+.go-button {
+	border: 0; 
+	box-shadow: none;
+}
+
+.icon-edit {
+	vertical-align: top;
+}
+
+#tbl-task tr td:nth-child(2) {
+    text-align: right !important;
+}
+
+#tbl-task {
+	max-width: 282px;
+	word-break: break-all;
+}
+
+.edit-button {
+	margin-left: unset !important;
+	min-width: unset !important;
+}
+
+.fc-task-events  .fav-icon:after , .fc-oneday-events  .fav-icon:after  {
+	content: '\2807';
+	font-size: 15px;
+	text-align: end;
+}
+
+#name-i {
+	width: 232px;
+}
+
+.closeG {
+	 box-shadow: none;
+	 border: none;
+	 border-radius: 50%;
+	 width: 30px;
+}
+.show {
+	visibility: visible !important;
+}
+.pr27 {
+	padding-right: 27px;
+}
+.contents-area{
+	background-color: #f0ffff !important;
+	padding-top: 0px !important;
+}

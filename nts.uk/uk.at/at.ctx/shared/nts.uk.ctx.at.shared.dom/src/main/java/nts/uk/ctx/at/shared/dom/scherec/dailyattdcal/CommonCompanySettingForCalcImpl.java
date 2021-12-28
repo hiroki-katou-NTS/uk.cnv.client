@@ -18,6 +18,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.declare.DeclareSetRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.deviationtime.deviationtimeframe.DivergenceTimeRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.midnighttimezone.MidNightTimeSheet;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.PersonCostCalculationRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.zerotime.ZeroTimeRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyprocess.calc.CalculateOption;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemRepository;
@@ -91,6 +92,11 @@ public class CommonCompanySettingForCalcImpl implements CommonCompanySettingForC
 	@Inject
 	private OvertimeWorkFrameRepository overtimeFrameRepository;
 	
+	@Inject
+	/** 人件費計算設定 */
+	private PersonCostCalculationRepository personCostCalculationRepository;
+	
+	
 //	@Inject
 //	private EmployeeWtSettingRepository employeeWtSettingRepository;
 	
@@ -118,6 +124,7 @@ public class CommonCompanySettingForCalcImpl implements CommonCompanySettingForC
 									  formulaOrderRepository.findAll(companyId),
 									  empConditionRepository.findAll(companyId, optionalItems.stream().map(oi -> oi.getOptionalItemNo().v()).collect(Collectors.toList())),
 									  zeroTimeRepository.findByCId(companyId),
+									  personCostCalculationRepository.getHistAnPerCost(companyId),
 									  specificWorkRuleRepository.findUpperLimitWkHourByCid(companyId),
 									  usageSetting,
 									// 深夜時間帯(2019.3.31時点ではNotマスタ参照で動作している)

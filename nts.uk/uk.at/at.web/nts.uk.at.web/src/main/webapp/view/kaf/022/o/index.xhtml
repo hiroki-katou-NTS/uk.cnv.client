@@ -7,7 +7,7 @@
 <body>
 <ui:composition template="../../../../master/dialog.xhtml">
     <ui:define name="htmlHead">
-        <script>var dialogSize = { width: 650, height: 530 };</script>
+        <script>var dialogSize = { width: 650, height: 560 };</script>
         <com:scriptfile set="IGNITE" />
 
         <com:scriptfile path="kaf022.o.service.js" />
@@ -46,7 +46,7 @@
                 <div style="padding-top: 10px">
                     <table id="o3_2"
                            data-bind="ntsGridList: {
-                            height: 96,
+                            height: 120,
                             dataSource: overtimeAppOptions,
                             primaryKey: 'code',
                             columns: columns,
@@ -72,7 +72,7 @@
                             </tr>
                         </thead>
                         <tbody data-bind="foreach : overtimeWorkFrames">
-                            <tr>
+                            <tr data-bind="if: $parent.selectedFlexWorkAtr() == 1 &#124;&#124; no != -1">
                                 <td style="text-align: center; padding-top: 3px">
                                     <div data-bind="ntsCheckBox: { checked: checked, enable: enable }"/>
                                 </td>

@@ -172,6 +172,9 @@ public class ItemValue {
 			break;
 		case DATE:
 			// In case of value is empty or null return null
+			if ("Invalid date".equals(this.value)) {	
+				this.value = null;
+			}
 			if (StringUtils.isEmpty(this.value)) {
 				convertedValue = null;
 			} else {

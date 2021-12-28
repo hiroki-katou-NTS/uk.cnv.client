@@ -92,7 +92,7 @@ public class OverTimeRegisterServiceImpl implements OverTimeRegisterService {
 			AppOverTime appOverTime,
 			AppDispInfoStartupOutput appDispInfoStartupOutput
 			) {
-		Application application = (Application) appOverTime;
+		Application application = appOverTime.getApplication();
 		// ドメインモデル「残業申請」を更新する
 		appUpdateRepository.update(application);
 		appOverTimeRepository.update(appOverTime);

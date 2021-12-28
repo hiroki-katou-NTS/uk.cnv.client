@@ -152,7 +152,7 @@ public class OuenTimeOfMonthlyDto implements ItemConst, AttendanceItemDataGate {
 		/**　合計金額: 勤怠月間金額　*/
 		@AttendanceItemValue(type = ValueType.AMOUNT_NUM)
 		@AttendanceItemLayout(jpPropertyName = AMOUNT, layout = LAYOUT_B)
-		private int amount;
+		private long amount;
 		
 		public static OuenWorkAggregateDetailDto from(OuenWorkAggregateDetail domain) {
 			

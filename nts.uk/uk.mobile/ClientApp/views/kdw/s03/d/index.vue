@@ -23,9 +23,11 @@
       <tr class="uk-bg-green">
         <!-- D3_2: 日付（ヘッダ）-->
         <th class="pl-0 pr-0 text-center">{{'KDWS03_41' | i18n}}</th>
-        <!-- D3_2: 日付（ヘッダ）-->
+         <!-- D3_8: エラー区分（ヘッダ)-->
+        <th class="pl-0 pr-0 text-center">{{'KDWS03_81' | i18n}}</th>
+        <!-- D3_3: コード（ヘッダ）-->
         <th class="pl-0 pr-0 text-center">{{'KDWS03_42' | i18n}}</th>
-        <!-- D3_2: 日付（ヘッダ）-->
+        <!-- D3_4:エラー内容（ヘッダ）-->
         <th>{{'KDWS03_43' | i18n}}</th>
       </tr>
     </thead>
@@ -33,6 +35,8 @@
       <tr v-for="(rowData, index) in rowDatas" v-bind:key="index" v-on:click="openDialogE(rowData)">
         <!-- D3_5: 日付-->
         <td class="pl-0 pr-0 text-center">{{ rowData.date | date('DD日(dd)') }}</td>
+        <!-- D3_9: 日付-->
+        <td class="pl-0 pr-0 text-center">{{ rowData.type }}</td>
         <!-- D3_6: 日付-->
         <td class="pl-0 pr-0 text-center">{{ rowData.code }}</td>
         <td class="pl-0 pr-0">

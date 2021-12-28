@@ -79,4 +79,29 @@ public class MenuSettingDto {
 	 * 縦の位置
 	 */
 	private int verticalPosition;
+	
+	/**
+	 * 文字の色
+	 */
+	private String textColor;
+	
+	/**
+	 * 既定区分
+	 */
+	private Integer isFixed;
+	
+	/**
+	 * 比率
+	 */
+	private Double ratio;
+	
+	/**
+	 * 画像ファイルID
+	 */
+	private String fileId;
+	
+	/**
+	 * 画像ファイル名
+	 */
+	private String fileName;
 }

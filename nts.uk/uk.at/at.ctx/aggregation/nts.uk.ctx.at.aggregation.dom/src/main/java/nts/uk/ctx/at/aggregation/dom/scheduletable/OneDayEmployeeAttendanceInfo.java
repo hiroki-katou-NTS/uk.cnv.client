@@ -9,6 +9,7 @@ import lombok.val;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.premiumtime.PremiumTime;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.ExtraTimeItemNo;
 import nts.uk.ctx.at.shared.dom.workrule.shiftmaster.ShiftMaster;
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSetting;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
@@ -209,8 +210,7 @@ public class OneDayEmployeeAttendanceInfo<T> {
 					.getPremiumTimeOfDailyPerformance();
 			
 			ScheduleTableAttendanceItem.getLaborCostTimeTypes().forEach( (laborItem, laborCostItemNumber) -> {
-				
-				Optional<PremiumTime> preniumTime = preniumTimeOfDailyPerformance.getPremiumTime(laborCostItemNumber);
+				Optional<PremiumTime> preniumTime = preniumTimeOfDailyPerformance.getPremiumTime(ExtraTimeItemNo.valueOf(laborCostItemNumber));
 				
 				if ( preniumTime.isPresent() ) {
 					laborCostTimeMap.put(laborItem, (T) preniumTime.get().getPremitumTime() );

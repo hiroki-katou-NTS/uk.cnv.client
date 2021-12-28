@@ -7,6 +7,8 @@ import nts.arc.primitive.constraint.StringMaxLength;
 
 /**
  * メールアドレス
+ * @author thanhpv
+ *
  */
 @StringMaxLength(256)
 @StringCharType(CharType.ANY_HALF_WIDTH)

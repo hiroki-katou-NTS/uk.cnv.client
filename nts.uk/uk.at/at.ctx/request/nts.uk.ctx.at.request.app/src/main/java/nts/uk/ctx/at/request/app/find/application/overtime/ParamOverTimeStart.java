@@ -23,7 +23,9 @@ public class ParamOverTimeStart {
 	public String dateOp;
 	
 	public Integer overtimeAppAtr;
-	
+
+	public Integer prePostAtr;
+
 	public AppDispInfoStartupCmd appDispInfoStartupDto;
 	
 	public Integer startTimeSPR;

@@ -46,8 +46,6 @@ import nts.uk.ctx.at.schedule.dom.executionlog.ScheduleErrorLogRepository;
 import nts.uk.ctx.at.schedule.dom.executionlog.ScheduleExecutionLog;
 import nts.uk.ctx.at.schedule.dom.executionlog.ScheduleExecutionLogRepository;
 import nts.uk.ctx.at.schedule.dom.schedule.algorithm.WorkRestTimeZoneDto;
-import nts.uk.ctx.at.schedule.dom.schedule.basicschedule.BasicSchedule;
-import nts.uk.ctx.at.schedule.dom.schedule.basicschedule.BasicScheduleRepository;
 import nts.uk.ctx.at.shared.dom.adapter.employment.employwork.leaveinfo.EmpLeaveHistoryAdapter;
 import nts.uk.ctx.at.shared.dom.adapter.employment.employwork.leaveinfo.EmpLeaveWorkHistoryAdapter;
 import nts.uk.ctx.at.shared.dom.adapter.employment.employwork.leaveinfo.EmpLeaveWorkPeriodImport;
@@ -90,10 +88,6 @@ import nts.uk.shr.infra.i18n.resource.I18NResourcesForUK;
 public class ScheduleCreatorExecutionService {
 	@Inject
 	private ManagedParallelWithContext parallel;
-
-	/** The basic schedule repository. */
-	@Inject
-	private BasicScheduleRepository basicScheduleRepository;
 
 	/** The schedule execution log repository. */
 	@Inject
@@ -307,8 +301,8 @@ public class ScheduleCreatorExecutionService {
 		this.parallel.forEach(
 				scheduleCreators.stream().sorted((a,b) -> a.getEmployeeId().compareTo(b.getEmployeeId())).collect(Collectors.toList()),
 				scheduleCreator -> {					
-					transactionService.execute(() -> createScheOnePerson(command, scheduleExecutionLog, asyncTask, companyId, exeId, period, masterCache,
-						companySetting, checkStop, carrier, scheduleCreator));
+					createScheOnePerson(command, scheduleExecutionLog, asyncTask, companyId, exeId, period, masterCache,
+						companySetting, checkStop, carrier, scheduleCreator);
 
 		});
 
@@ -355,9 +349,6 @@ public class ScheduleCreatorExecutionService {
 			final int unitMonthsOfTransaction = 2;
 			dateAfterCorrection.forEachByMonths(unitMonthsOfTransaction, subPeriod -> {
 
-				List<BasicSchedule> listBasicSchedule = this.basicScheduleRepository.findSomePropertyWithJDBC(
-						Arrays.asList(scheduleCreator.getEmployeeId()), subPeriod);
-
 				// 勤務予定作成する
 				this.transaction.execute(
 						command,
@@ -367,7 +358,6 @@ public class ScheduleCreatorExecutionService {
 						exeId,
 						subPeriod,
 						masterCache,
-						listBasicSchedule,
 						companySetting,
 						scheduleCreator,
 						carrier);

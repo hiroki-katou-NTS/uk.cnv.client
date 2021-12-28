@@ -78,10 +78,10 @@
 										visible: showButton().available_A1_1,
 										enable: showButton().enable_A1_1, click : insertUpdate" class="proceed">#{i18n.getText('KMW003_2')}</button>
 					<!--A1_2 保存ボタン--> 
-					<button data-bind="{visible: showButton().available_A1_2(),
-										enable: showButton().enable_A1_2, click : insertUpdate2}">#{i18n.getText('KMW003_3')}</button>
+					<!-- <button data-bind="{visible: showButton().available_A1_2(),
+										enable: showButton().enable_A1_2, click : insertUpdate2}">#{i18n.getText('KMW003_3')}</button> -->
 					<!--A1_3 就業確定ボタン--> 
-					<!-- <button data-bind="{}">#{i18n.getText('KMW003_4')}</button> -->
+					<button data-bind="{click: openKDL006 ,visible:employmentConfirm}">#{i18n.getText('KMW003_4')}</button>
 					<!--A1_4 抽出条件の設定ボタン--> 
 					<!-- <button data-bind="{visible: showButton().available_A1_4, click: extractCondition}">#{i18n.getText('KMW003_5')}</button> -->
 					<!--A1_5 表示項目の選択ボタン--> 

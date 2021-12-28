@@ -119,6 +119,11 @@ public class JpaMonthlyAttendanceItemSetMemento implements MonthlyAttendanceItem
 		this.entity.setPrimitiveValue(primitiveValue.map(x -> x.value).orElse(null));
 	}
 
+	@Override
+	public void setDisplayName(Optional<AttendanceName> displayName) {
+		this.entity.setDisplayName(displayName.isPresent() ? displayName.get().v() : null);
+	}
+
 	/**
 	 * Sets the two monthly display.
 	 *

@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+    <ui:composition template="/master/base.xhtml">
+        <ui:define name="htmlHead">
+
+            <com:ValidatorScript>
+                nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.ChoiceCode
+                nts.uk.ctx.at.record.dom.jobmanagement.tasksupplementaryinforitemsetting.ChoiceName
+                nts.uk.ctx.at.record.dom.jobmanagement.tasksupplementaryinforitemsetting.ExternalCode
+            </com:ValidatorScript>
+
+            <com:scriptfile set="IGNITE" />
+            <com:stylefile path="./kdw006.k.main.css" />
+            <com:scriptfile path="./kdw006.k.vm.js" />
+
+        </ui:define>
+
+        <ui:define name="content">
+            <div id="functions-area">
+                <a tabindex="1" class="goback"
+                    data-bind="ntsLinkButton: { jump: '/view/kdw/006/a/index.xhtml' },text: $i18n('KDW006_25')"></a>
+                <button tabindex="2"
+                    data-bind="text: $i18n('KDW006_322'), enable: $vm.screenMode() == 2, click: $vm.new"></button>
+                <button tabindex="3" class="proceed"
+                    data-bind="text: $i18n('KDW006_26'), enable: $vm.screenMode() == 1 || $vm.screenMode() == 2, click: $vm.addOrUpdate"></button>
+                <button tabindex="4" class="danger"
+                    data-bind="text: $i18n('KDW006_306'), enable: $vm.screenMode() == 2, click: $vm.delete"></button>
+            </div>
+            <div id="content-area" class="view-kdw">
+                <div class="left-content">
+                    <div class="column-1">
+                        <div class="title" data-bind="text: $i18n('KDW006_323')"></div>
+                        <div tabindex="5" style="margin-left: 25px;" id="combo-box" data-bind="ntsComboBox: {
+                            name: $i18n('KDW006_323'),
+                            options: $vm.itemWorks,
+                            optionsValue: 'itemId',
+                            width: 255,
+                            visibleItemsCount: 5,
+                            value: $vm.selectedItemWork,
+                            optionsText: 'name',
+                            editable: $vm.isEditable,
+                            enable: $vm.isEnable,
+                            columns: [
+                                { prop: 'name', length: 10 }
+                            ]}"></div>
+                    </div>
+                    <div class="column-2">
+                        <span data-bind="text: $i18n('KDW006_324')"></span>
+                        <samp data-bind="text: $vm.modelHistory.startDate"></samp>
+                        <samp data-bind="if: disable"> ~ </samp>
+                        <samp data-bind="text: $vm.modelHistory.endDate"></samp>
+                        <button tabindex="6" data-bind="text: $i18n('履歴選択'), click: $vm.openViewL"></button>
+                    </div>
+                    <div tabindex="7" class="column-3">
+                        <table id="single-list" data-bind="ntsGridList: {
+							height: 315,
+							options: $vm.historys,
+							optionsValue: 'code',
+							columns: [
+								{ headerText: $i18n('KDW006_44'), prop: 'code', width: 90 },
+								{ headerText: $i18n('KDW006_45'), prop: 'name', width: 240 }
+							],
+							multiple: false,
+							value: $vm.currentCode
+						}">
+                        </table>
+                    </div>
+                </div>
+                <div class="right-content">
+                    <div class="column1" style="padding-top: 48px;">
+                        <div style="width: 100px;" data-bind="ntsFormLabel: { required: true }, text: i18n='KDW006_44'">
+                        </div>
+                        <input tabindex="8" class="inputCode" data-bind="ntsTextEditor: {
+                            value: $vm.model.code,
+                            name:'#[KDW006_44]',
+                            enable: $vm.screenMode() == 1,
+                            required: true,
+                            constraint: 'ChoiceCode',
+                            width: 200}" />
+                    </div>
+                    <div class="column2" style="padding-top: 20px;">
+                        <div style="width: 100px;" data-bind="ntsFormLabel: { required: true }, text: i18n='KDW006_45'">
+                        </div>
+                        <input tabindex="9" class="inputName" data-bind="ntsTextEditor: {
+                            value: $vm.model.name,
+                            name:'#[KDW006_45]',
+                            enable: $vm.screenMode() == 1 || $vm.screenMode() == 2,
+                            required: true,
+                            constraint: 'ChoiceName',
+                            width: 200}" />
+                    </div>
+                    <div class="column3" style="padding-top: 20px;">
+                        <div style="width: 100px;"
+                            data-bind="ntsFormLabel: { required: false }, text: i18n='KDW006_326'"></div>
+                        <input tabindex="10" class="inputMemo" data-bind="ntsTextEditor: {
+                                value: $vm.model.externalCode, 
+                                name:'#[KDW006_326]', 
+                                enable: $vm.screenMode() == 1 || $vm.screenMode() == 2,
+                                constraint: 'ExternalCode',
+                                width: 200}" />
+                    </div>
+                </div>
+            </div>
+        </ui:define>
+
+    </ui:composition>
+</body>
+
+</html>

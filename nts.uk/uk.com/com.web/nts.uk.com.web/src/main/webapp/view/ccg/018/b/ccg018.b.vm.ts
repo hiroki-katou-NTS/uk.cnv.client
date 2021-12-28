@@ -28,6 +28,7 @@ module ccg018.b.viewmodel {
         // Options
         baseDate: KnockoutObservable<Date>;
         selectedEmployee: KnockoutObservableArray<EmployeeSearchDto>;
+
         listSwitchDate: KnockoutObservableArray<number> = ko.observableArray();
         selectedSwitchDate: KnockoutObservable<number> = ko.observable(0);
 
@@ -82,11 +83,10 @@ module ccg018.b.viewmodel {
                 });
                 self.findTopPagePersonSet();
             });
-
             self.isEmpty = ko.computed(function() {
-                return !nts.uk.ui.errors.hasError();
+              return !nts.uk.ui.errors.hasError();
             });
-
+            
             self.listSwitchDate(self.getSwitchDateLists());
         }
 
@@ -125,6 +125,7 @@ module ccg018.b.viewmodel {
                 showJobTitle: true, // 職位条件
                 showWorktype: true, // 勤種条件
                 isMutipleCheck: true, // 選択モード
+                tabindex: 4,
 
                 /** Return data */
                 returnDataFromCcg001: function(data: Ccg001ReturnedData) {
@@ -149,7 +150,8 @@ module ccg018.b.viewmodel {
                 selectType: 4,
                 isShowSelectAllButton: false,
                 employeeInputList: self.items,
-                isRemoveFilterWhenReload: false
+                isRemoveFilterWhenReload: false,
+                tabindex: -1,
             };
             $('#sample-component').ntsListComponent(listComponentOption);
         }

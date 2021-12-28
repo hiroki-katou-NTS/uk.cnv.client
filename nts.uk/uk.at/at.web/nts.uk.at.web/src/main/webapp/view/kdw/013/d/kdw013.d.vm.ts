@@ -11,14 +11,6 @@ module nts.uk.ui.at.kdw013.d {
     const $vm = new ko.ViewModel();
 
     const { OVER_TIME_APPLICATION } = OverTimeLeaveAtr;
-
-    const map2Link = (otAtr: OverTimeLeaveAtr) => {
-        if (otAtr === OVER_TIME_APPLICATION) {
-            return $vm.$i18n('KDW013_35');
-        }
-
-        return $vm.$i18n('KDW013_36');
-    };
     const map2Description = (otAtr: OverTimeLeaveAtr, time: number) => {
         if (otAtr === OVER_TIME_APPLICATION) {
             return $vm.$i18n('KDW013_38', [formatTime(time, 'Time_Short_HM')]);
@@ -46,7 +38,6 @@ module nts.uk.ui.at.kdw013.d {
                     overtimeLeaveAtr,
                     date,
                     time,
-                    link: map2Link(overtimeLeaveAtr),
                     description: map2Description(overtimeLeaveAtr, time)
                 }))
                 .value();
@@ -55,49 +46,25 @@ module nts.uk.ui.at.kdw013.d {
         }
 
         mounted() {
-            const vm = this;
-            const { employeeId } = vm.$user;
-
-            $(vm.$el)
-                // patch click link
-                // D1_7のリンクをクリックすると、申請画面を別のタブで起動する
-                .on('click', 'td[aria-describedby="kdw-013-ddata_link"]', (evt: JQueryEventObject) => {
-                    const ds = ko.unwrap(vm.dataSource);
-                    const di = $(evt.target).closest('tr[data-id]').data('id');
-                    const exist = _.find(ds, ({ overtimeLeaveAtr }) => overtimeLeaveAtr === di);
-
-                    if (exist) {
-                        const params: KAF005Params = {
+            $('.btn-jump').first().focus();
+        }
+        
+        jump() {
+            const pr = this;
+            
+            const params: KAF005Params = {
                             appType: 1,
-                            baseDate: exist.date,
-                            employeeIds: [employeeId],
+                            baseDate: pr.date,
+                            employeeIds: [$vm.$user.employeeId],
                             isAgentMode: false
                         };
-                        if (exist.overtimeLeaveAtr !== OVER_TIME_APPLICATION) {
-                            vm.$jump.blank('at', '/view/kaf/010/a/index.xhtml', params);
-                        } else {
-                            vm.$jump.blank('at', '/view/kaf/005/a/index.xhtml?overworkatr=2', params);
-                        }
-                    }
-                });
+            
+            if (pr.overtimeLeaveAtr !== OVER_TIME_APPLICATION) {
+                $vm.$jump.blank('at', '/view/kaf/010/a/index.xhtml', params);
+            } else {
+                $vm.$jump.blank('at', '/view/kaf/005/a/index.xhtml?overworkatr=2', params);
+            }
 
-            $(vm.$el)
-                // remove grid tabindex
-                .find('#kdw-013-ddata_container')
-                .removeAttr('tabindex')
-                // find link & set tabindex
-                .find('td[aria-describedby="kdw-013-ddata_link"]')
-                .attr('tabindex', '1')
-                .on('keydown', (evt) => {
-                    if (evt.keyCode === 13) {
-                        evt.preventDefault();
-
-                        $(evt.target).trigger('click');
-                    }
-                })
-                // focus to first link
-                .first()
-                .focus();
         }
 
         // close dialog

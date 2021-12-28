@@ -38,6 +38,10 @@ module nts.uk.com.view.cmm051.c {
 
         execution() {
             let vm = this;
+            $(".nts-input").trigger("validate");
+            if (nts.uk.ui.errors.hasError()) {
+                return;
+            }
             setShared("dataToScreenA",{
                 startDate: vm.periodDate().startDate.format("YYYY/MM/DD"),
                 endDate: vm.periodDate().endDate.format("YYYY/MM/DD"),

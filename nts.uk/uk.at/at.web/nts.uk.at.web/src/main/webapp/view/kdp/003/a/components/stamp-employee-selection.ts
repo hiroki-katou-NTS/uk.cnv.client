@@ -12,7 +12,7 @@ module nts.uk.at.kdp003.a {
 		</div>
 		<div class="list-group">
 			<button class="check-out-of-list" data-bind="
-					i18n: '一覧にない社員で打刻する',
+					i18n: 'KDP003_112',
 					click: loginEmployeeNotInList,
 					css: { 
 						'active': ko.toJS(options.selectedId) === null

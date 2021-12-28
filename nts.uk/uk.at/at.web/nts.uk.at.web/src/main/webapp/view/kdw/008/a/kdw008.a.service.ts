@@ -3,6 +3,8 @@ module nts.uk.at.view.kdw008.a.service {
     var paths = {
         addDailyDetail: "at/function/dailyperformanceformat/addAuthorityDailyFormat",
         updateDailyDetail: "at/function/dailyperformanceformat/updateAuthorityDailyFormat",
+        duplicateDailyDetail: "at/function/dailyperformanceformat/duplicateAuthorityDailyFormat",
+        getAllByCIDAndCode: "at/function/dailyperformanceformat/findAllByCompanyIdAndCode/{0}",
 
 
         getListAuthorityDailyFormatCode: "at/function/dailyperformanceformat/getAuthorityDailyFormatCode",
@@ -40,6 +42,10 @@ module nts.uk.at.view.kdw008.a.service {
 
     }
 
+    export function duplicateDailyDetail(DuplicateDailyDetailCmd: any): JQueryPromise <any>{
+        return nts.uk.request.ajax("at", paths.duplicateDailyDetail, DuplicateDailyDetailCmd);
+    }
+
     export function addDailyDetail(AddAuthorityDailyFormatCommand: any, isMobile: boolean): JQueryPromise<any> {
         let _path = !isMobile ? paths.addDailyDetail : paths.addMobileDailyDetail;
         return nts.uk.request.ajax("at", _path, AddAuthorityDailyFormatCommand);
@@ -49,6 +55,11 @@ module nts.uk.at.view.kdw008.a.service {
         let _path = !isMobile ? paths.updateDailyDetail : paths.updateMobileDailyDetail;
         return nts.uk.request.ajax("at", _path, UpdateAuthorityDailyFormatCommand);
     };
+
+    export function getAllByCIDAndCode(formatCode: string): JQueryPromise<any> {
+        let _path = nts.uk.text.format(paths.getAllByCIDAndCode, formatCode);
+        return nts.uk.request.ajax("at", _path);
+    }
 
 
 

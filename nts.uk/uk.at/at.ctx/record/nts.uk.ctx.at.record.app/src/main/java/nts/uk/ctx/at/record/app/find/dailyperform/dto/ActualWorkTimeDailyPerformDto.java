@@ -28,6 +28,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.premiumtime
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime.ActualWorkingTimeOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime.ConstraintTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime.TotalWorkingTime;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.ExtraTimeItemNo;
 
 /** 日別実績の勤務実績時間 */
 @Data
@@ -36,9 +37,8 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime.To
 public class ActualWorkTimeDailyPerformDto implements ItemConst, AttendanceItemDataGate {
 
 	/** 割増時間: 日別実績の割増時間 */
-	@AttendanceItemLayout(layout = LAYOUT_A, jpPropertyName = PREMIUM, 
-			listMaxLength = 10, indexField = DEFAULT_INDEX_FIELD_NAME)
-	private List<PremiumTimeDto> premiumTimes;
+	@AttendanceItemLayout(layout = LAYOUT_A, jpPropertyName = PREMIUM)
+	private PremiumTimeOfDailyPerformDto premiumTime;
 
 	/** 拘束差異時間: 勤怠時間 */
 	@AttendanceItemLayout(layout = LAYOUT_B, jpPropertyName = RESTRAINT + DIFF)
@@ -65,7 +65,7 @@ public class ActualWorkTimeDailyPerformDto implements ItemConst, AttendanceItemD
 	@Override
 	public ActualWorkTimeDailyPerformDto clone() {
 		return new ActualWorkTimeDailyPerformDto(
-						premiumTimes == null ? null : premiumTimes.stream().map(t -> t.clone()).collect(Collectors.toList()),
+						premiumTime == null ? null : premiumTime.clone(),
 						constraintDifferenceTime,
 						constraintTime == null ? null : constraintTime.clone(),
 						timeDifferenceWorkingHours,
@@ -75,7 +75,7 @@ public class ActualWorkTimeDailyPerformDto implements ItemConst, AttendanceItemD
 
 	public static ActualWorkTimeDailyPerformDto toActualWorkTime(ActualWorkingTimeOfDaily domain) {
 		return domain == null ? null : new ActualWorkTimeDailyPerformDto(
-						getPremiumTime(domain.getPremiumTimeOfDailyPerformance()),
+						PremiumTimeOfDailyPerformDto.toDto(domain.getPremiumTimeOfDailyPerformance()),
 						getAttendanceTime(domain.getConstraintDifferenceTime()),
 						getConstraintTime(domain.getConstraintTime()),
 						getAttendanceTime(domain.getTimeDifferenceWorkingHours()),
@@ -100,14 +100,6 @@ public class ActualWorkTimeDailyPerformDto implements ItemConst, AttendanceItemD
 								: domain.getLateNightConstraintTime().valueAsMinutes());
 	}
 
-	private static List<PremiumTimeDto> getPremiumTime(PremiumTimeOfDailyPerformance domain) {
-		return domain == null ? new ArrayList<>() : ConvertHelper.mapTo(domain.getPremiumTimes(),
-						c -> new PremiumTimeDto(
-								c.getPremitumTime().valueAsMinutes(),
-								c.getPremiumTimeNo(),
-								c.getPremiumAmount().v()));
-	}
-
 	public ActualWorkingTimeOfDaily toDomain() {
 		return ActualWorkingTimeOfDaily.of(
 					totalWorkingTime == null ? TotalWorkingTime.createAllZEROInstance() : totalWorkingTime.toDomain(), 
@@ -120,10 +112,7 @@ public class ActualWorkTimeDailyPerformDto implements ItemConst, AttendanceItemD
 										c.getNo(),
 										c.getDivergenceReason() == null ? null : new DivergenceReasonContent(c.getDivergenceReason()),
 										c.getDivergenceReasonCode() == null ? null : new DiverdenceReasonCode(c.getDivergenceReasonCode())))),
-				new PremiumTimeOfDailyPerformance(ConvertHelper.mapTo(premiumTimes,
-										c -> new PremiumTime(c.getNo(), 
-												toAttendanceTime(c.getPremitumTime()),
-												new AttendanceAmountDaily(c.getPremitumAmount())))));
+				premiumTime.toDomain());
 	}
 	
 	public void correct(List<EditStateOfDailyPerformanceDto> editStates) {
@@ -158,7 +147,7 @@ public class ActualWorkTimeDailyPerformDto implements ItemConst, AttendanceItemD
 	public AttendanceItemDataGate newInstanceOf(String path) {
 		switch (path) {
 		case PREMIUM:
-			return new PremiumTimeDto();
+			return new PremiumTimeOfDailyPerformDto();
 		case DIVERGENCE:
 			return new DivergenceTimeDto();
 		case RESTRAINT:
@@ -175,6 +164,8 @@ public class ActualWorkTimeDailyPerformDto implements ItemConst, AttendanceItemD
 	@Override
 	public Optional<AttendanceItemDataGate> get(String path) {
 		switch (path) {
+		case PREMIUM:
+			return Optional.ofNullable(this.premiumTime);
 		case RESTRAINT:
 			return Optional.ofNullable(this.constraintTime);
 		case TOTAL_LABOR:
@@ -188,7 +179,6 @@ public class ActualWorkTimeDailyPerformDto implements ItemConst, AttendanceItemD
 	@Override
 	public int size(String path) {
 		switch (path) {
-		case PREMIUM:
 		case DIVERGENCE:
 			return 10;
 		default:
@@ -201,7 +191,6 @@ public class ActualWorkTimeDailyPerformDto implements ItemConst, AttendanceItemD
 	@Override
 	public PropType typeOf(String path) {
 		switch (path) {
-		case PREMIUM:
 		case DIVERGENCE:
 			return PropType.IDX_LIST;
 		case (RESTRAINT + DIFF):
@@ -216,8 +205,6 @@ public class ActualWorkTimeDailyPerformDto implements ItemConst, AttendanceItemD
 	@SuppressWarnings("unchecked")
 	public <T extends AttendanceItemDataGate> List<T> gets(String path) {
 		switch (path) {
-		case PREMIUM:
-			return (List<T>) this.premiumTimes;
 		case DIVERGENCE:
 			return (List<T>) this.divergenceTime;
 		default:
@@ -244,6 +231,9 @@ public class ActualWorkTimeDailyPerformDto implements ItemConst, AttendanceItemD
 	@Override
 	public void set(String path, AttendanceItemDataGate value) {
 		switch (path) {
+		case PREMIUM:
+			this.premiumTime = (PremiumTimeOfDailyPerformDto) value;
+			break;
 		case RESTRAINT:
 			this.constraintTime = (ConstraintTimeDto) value;
 			break;
@@ -259,9 +249,6 @@ public class ActualWorkTimeDailyPerformDto implements ItemConst, AttendanceItemD
 	@SuppressWarnings("unchecked")
 	public <T extends AttendanceItemDataGate> void set(String path, List<T> value) {
 		switch (path) {
-		case PREMIUM:
-			this.premiumTimes = (List<PremiumTimeDto>) value;
-			break;
 		case DIVERGENCE:
 			this.divergenceTime = (List<DivergenceTimeDto>) value;
 			break;

@@ -7,20 +7,23 @@ import java.util.Optional;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.request.dom.application.ApplicationType;
 import nts.uk.ctx.at.request.dom.application.common.service.newscreen.output.ConfirmMsgOutput;
+import nts.uk.ctx.at.request.dom.application.common.service.other.output.AchievementDetail;
 import nts.uk.ctx.at.request.dom.application.common.service.other.output.ActualContentDisplay;
 import nts.uk.ctx.at.request.dom.application.common.service.setting.output.AppDispInfoStartupOutput;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.AppHolidayWork;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.service.dto.CheckBeforeOutputMulti;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOverTime;
-import nts.uk.ctx.at.request.dom.application.overtime.ApplicationTime;
-import nts.uk.ctx.at.request.dom.application.overtime.OvertimeAppAtr;
+import nts.uk.ctx.at.request.dom.application.overtime.*;
 import nts.uk.ctx.at.request.dom.application.overtime.CommonAlgorithm.CheckBeforeOutput;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.applicationsetting.applicationtypesetting.PrePostInitAtr;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.appovertime.OvertimeAppSet;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.overtimerestappcommon.OvertimeLeaveAppCommonSet;
+import nts.uk.ctx.at.shared.dom.WorkInformation;
+import nts.uk.ctx.at.shared.dom.common.TimeZoneWithWorkNo;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.breaking.BreakTimeSheet;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeCode;
+import org.apache.commons.lang3.tuple.Pair;
 
 public interface OvertimeService {
 	/**
@@ -46,18 +49,22 @@ public interface OvertimeService {
 	 * @param agent
 	 * @return 残業申請の表示情報
 	 */
-	public DisplayInfoOverTime calculate(
+	DisplayInfoOverTime calculate(
 			String companyId,
 			String employeeId,
-			Optional<GeneralDate> dateOp, 
+			Optional<GeneralDate> dateOp,
+			OvertimeAppAtr overtimeAppAtr,
 			PrePostInitAtr prePostInitAtr,
 			OvertimeLeaveAppCommonSet overtimeLeaveAppCommonSet,
 			ApplicationTime advanceApplicationTime, 
 			ApplicationTime achieveApplicationTime,
 			WorkContent workContent,
 			OvertimeAppSet overtimeAppSet,
-			Boolean agent
-			);
+			Boolean agent,
+			List<OvertimeHour> overtimeHours,
+			List<OvertimeReason> overtimeReasons,
+			Optional<AchievementDetail> opAchievementDetail
+	);
 	/**
 	 * Refactor5 19_計算処理
 	 * UKDesign.UniversalK.就業.KAF_申請.KAF005_残業申請.A：残業申請（新規登録）.アルゴリズム.19_計算処理
@@ -439,4 +446,28 @@ public interface OvertimeService {
 			String companyId,
 			AppOverTime appOverTime,
 			DisplayInfoOverTime displayInfoOverTime);
+
+	/**
+	 * UKDesign.UniversalK.就業.KAF_申請.KAF005_残業申請.A：残業申請（新規登録）.アルゴリズム.残業申請の新規登録（複数人版）
+	 * 残業時間を計算のために勤務時間、休憩時間帯を判断する
+	 * @param companyId
+	 * @param employeeId
+	 * @param appDate
+	 * @param overtimeHours
+	 * @param overtimeReasons
+	 * @param workingHours
+	 * @param workInformation
+	 * @param achievementDetail
+	 * @return
+	 */
+	Pair<List<TimeZoneWithWorkNo>, List<BreakTimeSheet>> getWorkingHoursAndBreakHours(
+			String companyId,
+			String employeeId,
+			GeneralDate appDate,
+			List<OvertimeHour> overtimeHours,
+			List<OvertimeReason> overtimeReasons,
+			List<TimeZoneWithWorkNo> workingHours,
+			WorkInformation workInformation,
+			Optional<AchievementDetail> achievementDetail
+	);
 }

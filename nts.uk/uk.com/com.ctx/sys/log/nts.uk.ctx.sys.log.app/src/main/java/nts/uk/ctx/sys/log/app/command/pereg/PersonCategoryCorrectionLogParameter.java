@@ -106,12 +106,16 @@ public class PersonCategoryCorrectionLogParameter implements IPeregCorrection, S
 				return value;
 			case TIME:
 			case TIMEPOINT:
+				if ("".equals(value)) {
+					return null;
+				}
 				return new Integer(new BigDecimal(value).intValue());
 			case NUMBERIC_BUTTON:
 			case NUMERIC:
 				if(value.equals("")) return new BigDecimal(0);
 				return new BigDecimal(value);
 			case DATE:
+				if ("Invalid date".equals(value)) return null;
 				return GeneralDate.fromString(value, "yyyy/MM/dd");
 			default:
 				return null;

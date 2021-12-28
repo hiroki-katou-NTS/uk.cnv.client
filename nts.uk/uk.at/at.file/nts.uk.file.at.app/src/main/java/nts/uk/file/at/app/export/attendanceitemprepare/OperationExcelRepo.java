@@ -3,6 +3,7 @@ package nts.uk.file.at.app.export.attendanceitemprepare;
 import java.util.List;
 import java.util.Optional;
 
+import nts.uk.ctx.at.record.dom.confirmemployment.RestrictConfirmEmployment;
 import nts.uk.ctx.at.record.dom.workrecord.operationsetting.ApprovalProcess;
 import nts.uk.ctx.at.record.dom.workrecord.operationsetting.DaiPerformanceFun;
 import nts.uk.ctx.at.record.dom.workrecord.operationsetting.FormatPerformance;
@@ -50,6 +51,12 @@ public interface OperationExcelRepo {
 	 * @return
 	 */
 	List<ApplicationCallExport> findByCom(String companyId);
+	/**
+	 * 
+	 * @param companyId
+	 * @return
+	 */
+	Optional<RestrictConfirmEmployment> getRestrictConfirmEmploymentByCompanyId(String companyId);
 	/**
 	 * 
 	 * @param companyId

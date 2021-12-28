@@ -65,6 +65,8 @@ public class AppOverTimeCommand {
 							Optional.of(workHoursOp.stream()
 									.map(x -> x.toDomain())
 									.collect(Collectors.toList())),
-				workInfoOp == null ? Optional.empty() : Optional.of(workInfoOp.toDomain()));
+				workInfoOp == null ? Optional.empty() : Optional.of(workInfoOp.toDomain()),
+				Optional.empty()
+		);
 	}
 }

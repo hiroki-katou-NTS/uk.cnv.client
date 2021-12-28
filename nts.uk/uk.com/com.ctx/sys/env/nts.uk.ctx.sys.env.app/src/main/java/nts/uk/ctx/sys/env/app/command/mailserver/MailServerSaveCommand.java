@@ -6,9 +6,9 @@ package nts.uk.ctx.sys.env.app.command.mailserver;
 
 import lombok.Data;
 import nts.uk.ctx.sys.env.dom.mailserver.AuthenticationMethod;
-import nts.uk.ctx.sys.env.dom.mailserver.EmailAuthentication;
 import nts.uk.ctx.sys.env.dom.mailserver.EncryptionMethod;
 import nts.uk.ctx.sys.env.dom.mailserver.ImapInfo;
+import nts.uk.ctx.sys.env.dom.mailserver.MailAddress;
 import nts.uk.ctx.sys.env.dom.mailserver.MailServerGetMemento;
 import nts.uk.ctx.sys.env.dom.mailserver.Password;
 import nts.uk.ctx.sys.env.dom.mailserver.PopInfo;
@@ -92,8 +92,8 @@ public class MailServerSaveCommand implements MailServerGetMemento {
 	 * @see nts.uk.ctx.sys.env.dom.mailserver.MailServerGetMemento#getEmailAuthentication()
 	 */
 	@Override
-	public EmailAuthentication getEmailAuthentication() {
-		return new EmailAuthentication(this.emailAuthencation);
+	public MailAddress getEmailAuthentication() {
+		return new MailAddress(this.emailAuthencation);
 	}
 
 	/* (non-Javadoc)

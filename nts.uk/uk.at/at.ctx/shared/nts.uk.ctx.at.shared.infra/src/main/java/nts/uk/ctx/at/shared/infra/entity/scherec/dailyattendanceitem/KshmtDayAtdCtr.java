@@ -27,35 +27,30 @@ public class KshmtDayAtdCtr extends ContractUkJpaEntity implements Serializable 
 	@Column(name = "HEADER_BACKGROUND_COLOR")
 	public String headerBgColorOfDailyPer;
 
-	@Column(name = "INPUT_UNIT")
-	public BigDecimal inputUnitOfTimeItem;
-
 	@Override
 	protected Object getKey() {
 		return kshmtDayAtdCtrPK;
 	}
 
-	public KshmtDayAtdCtr(KshmtDayAtdCtrPK kshmtDayAtdCtrPK,
-			String headerBgColorOfDailyPer, BigDecimal inputUnitOfTimeItem) {
+	public KshmtDayAtdCtr(KshmtDayAtdCtrPK kshmtDayAtdCtrPK, String headerBgColorOfDailyPer) {
 		super();
 		this.kshmtDayAtdCtrPK = kshmtDayAtdCtrPK;
 		this.headerBgColorOfDailyPer = headerBgColorOfDailyPer;
-		this.inputUnitOfTimeItem = inputUnitOfTimeItem;
-
 	}
 
 	public static KshmtDayAtdCtr toEntity(ControlOfAttendanceItems domain) {
 		return new KshmtDayAtdCtr(
 				new KshmtDayAtdCtrPK(domain.getCompanyID(), domain.getItemDailyID()),
-				domain.getHeaderBgColorOfDailyPer().isPresent() ? domain.getHeaderBgColorOfDailyPer().get().v() : null,
-				domain.getInputUnitOfTimeItem().isPresent() ? domain.getInputUnitOfTimeItem().get() : null);
+				domain.getHeaderBgColorOfDailyPer().isPresent() ? domain.getHeaderBgColorOfDailyPer().get().v() : null
+		);
 	}
 
 	public ControlOfAttendanceItems toDomain() {
-		return new ControlOfAttendanceItems(this.kshmtDayAtdCtrPK.companyID,
+		return new ControlOfAttendanceItems(
+				this.kshmtDayAtdCtrPK.companyID,
 				this.kshmtDayAtdCtrPK.itemDailyID,
-				(this.headerBgColorOfDailyPer != null) ? new HeaderBackgroundColor(this.headerBgColorOfDailyPer) : null,
-				this.inputUnitOfTimeItem);
+				(this.headerBgColorOfDailyPer != null) ? new HeaderBackgroundColor(this.headerBgColorOfDailyPer) : null
+		);
 	}
 
 }

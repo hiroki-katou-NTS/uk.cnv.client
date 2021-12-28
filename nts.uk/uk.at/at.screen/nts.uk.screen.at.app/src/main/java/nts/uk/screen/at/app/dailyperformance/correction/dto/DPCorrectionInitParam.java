@@ -34,4 +34,6 @@ public class DPCorrectionInitParam {
 	public String transitionDesScreen;
 	public DPCorrectionStateParam dpStateParam;
 	public Integer closureId;
+	
+	public List<String> formatCodes;
 }

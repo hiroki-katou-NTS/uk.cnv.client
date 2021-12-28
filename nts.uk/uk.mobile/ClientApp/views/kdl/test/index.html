@@ -4,18 +4,31 @@
                 name='Selected WorkType Codes'/>
         <nts-checkbox v-model="isSelectWorkTime" v-bind:value="1" v-bind:disabled="false">select work time</nts-checkbox>
         <button v-on:click="openKDL002()" class="btn btn-secondary btn-block">Open KDL002</button>
-        <nts-text-editor
-        v-model="seledtedWkTimeCDs"
-        name='Selected WorkTime Codes'/>
+        <nts-text-editor v-model="seledtedWkTimeCDs" name='Selected WorkTime Codes'/>
         
+        <nts-text-editor v-model="workplaceID" name='workplaceID'/>
+
+        <nts-text-editor v-model="referenceDate" name='referenceDate'/>
+
         <nts-checkbox v-model="isAddNone" v-bind:value="1" v-bind:disabled="false">display 選択なし</nts-checkbox>
         
-        <button v-on:click="openKDL001()" class="btn btn-secondary btn-block">Open KDL001</button>
+        <button v-on:click="openKDL001()" class="btn btn-secondary btn-block">Open KDLS01</button>
          <div>
                 <div class="row"> wktypeCD:   {{selectedWorkType.workTypeCode}} </div>
                 <div class="row"> wktypeName:   {{selectedWorkType.name}} </div>
                 <div class="row"> wktimeCD:   {{selectedWorkTime.code}} </div>
                 <div class="row"> wktimeName:   {{selectedWorkTime.name}} </div>
+         </div>
+
+         <nts-text-editor v-model="frameNo" name='frameNo'/>
+         <nts-text-editor v-model="dateKDLS12" name='dateKDLS12'/>
+         <nts-text-editor v-model="selectedCode" name='selectedCode'/>
+         <nts-text-editor v-model="sidkdls12" name='EmployeeId(Optional)'/>
+         <nts-text-editor v-model="taskCodekdls12" name='TaskCode(Optional)'/>
+         <button v-on:click="openKDLS12()" class="btn btn-secondary btn-block">Open KDLS12</button>
+         <div>
+                <div class="row"> TaskCode:   {{selectedTask.code}} </div>
+                <div class="row"> TaskName:   {{selectedTask.taskName}} </div>
          </div>
     
 </div>

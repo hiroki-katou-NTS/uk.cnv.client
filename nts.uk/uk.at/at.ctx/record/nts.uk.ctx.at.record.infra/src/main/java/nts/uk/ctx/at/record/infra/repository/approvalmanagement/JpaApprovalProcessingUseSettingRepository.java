@@ -18,7 +18,7 @@ import nts.arc.layer.infra.data.jdbc.NtsResultSet;
 import nts.uk.ctx.at.record.dom.approvalmanagement.ApprovalProcessingUseSetting;
 import nts.uk.ctx.at.record.dom.approvalmanagement.repository.ApprovalProcessingUseSettingRepository;
 import nts.uk.ctx.at.record.infra.entity.approvalmanagement.KrcmtBossCheckNotJob;
-import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtApprovalProcess;
+import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtDayFuncControl;
 
 /**
  * @author hungnm
@@ -30,15 +30,15 @@ public class JpaApprovalProcessingUseSettingRepository extends JpaRepository
 
 	public static final String SEL_USE_JB_SET_BY_CID = "SELECT c FROM KrcmtBossCheckNotJob c WHERE c.krcstAppProUseJbSetPK.cId = :companyId";
 
-	private ApprovalProcessingUseSetting fromEntity(Optional<KrcmtApprovalProcess> krcstAppProUseSet,
+	private ApprovalProcessingUseSetting fromEntity(Optional<KrcmtDayFuncControl> krcmtDayFuncControl,
 			List<KrcmtBossCheckNotJob> lstKrcstAppProUseJbSet) {
-		if (krcstAppProUseSet.isPresent()) {
-			ApprovalProcessingUseSetting domain = new ApprovalProcessingUseSetting(krcstAppProUseSet.get().approvalProcessPk.cid,
-					krcstAppProUseSet.get().useDailyBossChk == 1,
-					krcstAppProUseSet.get().useMonthBossChk == 1,
+		if (krcmtDayFuncControl.isPresent()) {
+			ApprovalProcessingUseSetting domain = new ApprovalProcessingUseSetting(krcmtDayFuncControl.get().dayFuncControlPk.cid,
+					krcmtDayFuncControl.get().dayBossChk == 1,
+					krcmtDayFuncControl.get().monBossChk == 1,
 					lstKrcstAppProUseJbSet.stream().map((entity) -> {
 						return entity.krcstAppProUseJbSetPK.jobId;
-					}).collect(Collectors.toList())).setSupervisorConfirmErrorAtr(krcstAppProUseSet.get().supervisorConfirmError.intValue());
+					}).collect(Collectors.toList())).setSupervisorConfirmErrorAtr(krcmtDayFuncControl.get().dayBossChkError.intValue());
 			return domain;
 		} else {
 			return null;
@@ -51,14 +51,14 @@ public class JpaApprovalProcessingUseSettingRepository extends JpaRepository
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Optional<ApprovalProcessingUseSetting> findByCompanyId(String companyId) {
 		
-		Optional<KrcmtApprovalProcess> krcstAppProUseSet;
+		Optional<KrcmtDayFuncControl> krcmtDayFuncControl;
 		{
-			String sql = "select * from KRCMT_BOSS_CHECK_SET"
+			String sql = "select * from KRCMT_DAY_FUNC_CONTROL"
 					+ " where CID = ?";
 			try (val stmt = this.connection().prepareStatement(sql)) {
 				stmt.setString(1, companyId);
-				krcstAppProUseSet = new NtsResultSet(stmt.executeQuery())
-						.getSingle(rec -> KrcmtApprovalProcess.MAPPER.toEntity(rec));
+				krcmtDayFuncControl = new NtsResultSet(stmt.executeQuery())
+						.getSingle(rec -> KrcmtDayFuncControl.MAPPER.toEntity(rec));
 			}
 		}
 		
@@ -73,7 +73,7 @@ public class JpaApprovalProcessingUseSettingRepository extends JpaRepository
 			}
 		}
 		
-		return Optional.ofNullable(fromEntity(krcstAppProUseSet, lstKrcstAppProUseJbSet));
+		return Optional.ofNullable(fromEntity(krcmtDayFuncControl, lstKrcstAppProUseJbSet));
 	}
 
 }

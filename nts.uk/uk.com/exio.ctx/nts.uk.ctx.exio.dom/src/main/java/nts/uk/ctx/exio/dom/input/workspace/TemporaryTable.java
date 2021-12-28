@@ -1,18 +1,12 @@
 package nts.uk.ctx.exio.dom.input.workspace;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.val;
 import nts.arc.layer.infra.data.database.DatabaseProduct;
 import nts.arc.layer.infra.data.jdbc.JdbcProxy;
 import nts.uk.ctx.exio.dom.input.ExecutionContext;
 import nts.uk.ctx.exio.dom.input.workspace.builder.CreateTableBuilder;
-import nts.uk.ctx.exio.dom.input.workspace.datatype.DataTypeConfiguration;
 
 /**
  * 外部受入の一時テーブルを扱う

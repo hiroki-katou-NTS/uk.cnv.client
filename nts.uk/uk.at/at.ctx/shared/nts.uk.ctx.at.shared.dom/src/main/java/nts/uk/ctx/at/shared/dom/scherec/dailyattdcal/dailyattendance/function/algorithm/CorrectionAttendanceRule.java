@@ -106,7 +106,6 @@ public class CorrectionAttendanceRule implements ICorrectionAttendanceRule {
 
 	@Inject
 	private WorkingConditionRepository workingConditionRepo;
-	
 	@Inject
 	private CorrectionShortWorkingHour correctShortWorkingHour;
 	
@@ -116,7 +115,7 @@ public class CorrectionAttendanceRule implements ICorrectionAttendanceRule {
 
 		String companyId = AppContexts.user().companyId();
 
-		val optionalItems =
+		val optionalItems = 
 				optionalItem.findAll(companyId).stream()
 				.collect(Collectors.toMap(c -> c.getOptionalItemNo().v(), c -> c));
 
@@ -137,7 +136,7 @@ public class CorrectionAttendanceRule implements ICorrectionAttendanceRule {
 		IntegrationOfDaily afterDomain = correctionAfterTimeChange
 				.corection(domainDaily, changeAtt, workCondOpt).getRight();
 
-		if (changeAtt.workInfo || changeAtt.isDirectBounceClassifi()) {
+		if (changeAtt.workInfo || changeAtt.isDirectBounceClassifi() ) {
 			// 変更する勤怠項目を確認
 			//// 勤務情報変更後の補正
 			afterDomain = correctionAfterChangeWorkInfo.correction(companyId, afterDomain, workCondOpt,
@@ -147,6 +146,7 @@ public class CorrectionAttendanceRule implements ICorrectionAttendanceRule {
 		
 		//出退勤変更後の補正
 		if(changeAtt.attendance) {
+
 			SupportDataWorkImport workImport = supportAdapter.correctionAfterChangeAttendance(afterDomain);
 			
 			if(workImport != null)

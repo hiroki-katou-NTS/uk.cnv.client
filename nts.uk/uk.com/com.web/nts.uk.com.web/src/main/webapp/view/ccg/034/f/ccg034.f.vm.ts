@@ -8,6 +8,7 @@ module nts.uk.com.view.ccg034.f {
   const API = {
     getMenuList: "sys/portal/standardmenu/findByMenuAndWebMenu"
   };
+  const MAXIMUM_IMAGE_COUNT = 4;
 
   @bean()
   export class ScreenModel extends ko.ViewModel {
@@ -41,6 +42,7 @@ module nts.uk.com.view.ccg034.f {
     // Common text attribute
     fontSize: KnockoutObservable<number> = ko.observable(11);
     isBold: KnockoutObservable<boolean> = ko.observable(false);
+    textColorValue: KnockoutObservable<string> = ko.observable(null);
     horizontalAlign: KnockoutObservable<number> = ko.observable(nts.uk.com.view.ccg034.share.model.HorizontalAlign.LEFT);
     verticalAlign: KnockoutObservable<number> = ko.observable(nts.uk.com.view.ccg034.share.model.VerticalAlign.TOP);
     horizontalAlignList: ItemModel[] = [
@@ -53,24 +55,45 @@ module nts.uk.com.view.ccg034.f {
       { code: VerticalAlign.CENTER, name: getText('CCG034_84') },
       { code: VerticalAlign.BOTTOM, name: getText('CCG034_85') }
     ];
+    // Image menu
+    originalFileId: string = null;
+    imageOption: ItemModel[] = [
+      { code: -1, name: getText('CCG034_131') },
+      { code: 0, name: getText('CCG034_132') },
+      { code: 1, name: getText('CCG034_133') }
+    ];
+    imageType: KnockoutObservable<number> = ko.observable(null);
+    imageSrc: KnockoutObservable<string> = ko.observable(null);
+    imageList: ItemModel[] = [];
+    uploadedFileName: KnockoutObservable<string> = ko.observable(null);
+    fileSize: KnockoutObservable<number> = ko.observable(0);
+    displayFileSize: KnockoutObservable<string> = ko.computed(() => {
+      const vm = this;
+      if (vm.fileSize() >= 1024) {
+        return nts.uk.text.format(getText("CCG034_125"), vm.fileSize() / 1024) + "MB";
+      }
+      return nts.uk.text.format(getText("CCG034_125"), vm.fileSize()) + "KB";
+    });
+    fileId: KnockoutObservable<string> = ko.observable(null);
+    uploadSrc: KnockoutObservable<string> = ko.observable(null);
+    isDisplayFileSize: KnockoutComputed<boolean>;
+
+    constructor() {
+      super();
+      const vm = this;
+      vm.isDisplayFileSize = ko.computed(() => {
+        if (vm.imageType() === 1 && !_.isNil(vm.fileId()) && !_.isEmpty(vm.fileId())) {
+          const isExist = ko.observable(false);
+          vm.$ajax("/shr/infra/file/storage/isexist/" + vm.fileId()).then((result: boolean) => isExist(result));
+          return isExist();
+        }
+        return false;
+      });
+    }
 
     created(params: any) {
       const vm = this;
       vm.partData = params;
-    }
-
-    mounted() {
-      const vm = this;
-      // Binding part data
-      vm.horizontalAlign(vm.partData.alignHorizontal);
-      vm.verticalAlign(vm.partData.alignVertical);
-      vm.menuName(vm.partData.menuName);
-      vm.menuCode(vm.partData.menuCode);
-      vm.menuClassification(vm.partData.menuClassification);
-      vm.menuSystemType(vm.partData.systemType);
-      vm.fontSize(vm.partData.fontSize);
-      vm.isBold(vm.partData.isBold);
-      vm.menuUrl(vm.partData.menuUrl);
 
       vm.selectedMenuCode.subscribe(value => {
         const item = _.find(vm.menuList(), { id: value });
@@ -97,7 +120,46 @@ module nts.uk.com.view.ccg034.f {
           vm.filteredMenuList(vm.menuList());
         }
       });
+
+      vm.imageType.subscribe(value => {
+        $("#F9_10").ntsPopup("hide");
+        if (value === 1 && !nts.uk.text.isNullOrEmpty(vm.fileId())) {
+          vm.$ajax("/shr/infra/file/storage/isexist/" + vm.fileId()).then((isExist: boolean) => {
+            if (isExist) {
+              vm.$ajax("/shr/infra/file/storage/infor/" + vm.fileId()).then((res: any) => {
+                vm.fileSize(Math.round(Number(res.originalSize) / 1024));
+                vm.updatePreview();
+              });
+            }
+          });
+        }
+        // Fix tabindex
+        $("#F9_3_3 .browser-button").attr("tabindex", value === 1 ? 7 : -1);
+      });
+    }
+
+    mounted() {
+      const vm = this;
+      // Binding part data
+      vm.horizontalAlign(vm.partData.alignHorizontal);
+      vm.verticalAlign(vm.partData.alignVertical);
+      vm.menuName(vm.partData.menuName);
+      vm.menuCode(vm.partData.menuCode);
+      vm.menuClassification(vm.partData.menuClassification);
+      vm.menuSystemType(vm.partData.systemType);
+      vm.fontSize(vm.partData.fontSize);
+      vm.isBold(vm.partData.isBold);
+      vm.menuUrl(vm.partData.menuUrl);
+      vm.textColorValue(vm.partData.textColor);
+      vm.fileId(vm.partData.fileId);
+      vm.imageType(vm.partData.isFixed ?? -1);
+      vm.originalFileId = vm.fileId();
+      if (!nts.uk.text.isNullOrEmpty(vm.partData.fileName)) {
+        vm.imageSrc(vm.partData.fileName);
+      }
+
       vm.findMenuData();
+      vm.createPopUp();
       $("#F6_2").focus();
     }
 
@@ -126,11 +188,69 @@ module nts.uk.com.view.ccg034.f {
         .always(() => vm.$blockui("clear"));
     }
 
+    uploadFinished(data: any) {
+      const vm = this;
+      if (vm.fileId() !== vm.originalFileId && !nts.uk.text.isNullOrEmpty(vm.fileId())) {
+        (nts.uk.request as any).file.remove(vm.fileId());
+      }
+      vm.fileId(data.id);
+      vm.fileSize(Math.round(Number(data.originalSize) / 1024));
+      vm.updatePreview();
+    }
+
+    private updatePreview() {
+      const vm = this;
+      const container = $("#F9_4_3");
+      container.html("");
+      container.append($("<img class='pic-preview'/>").attr("src", (nts.uk.request as any).liveView(vm.fileId())));
+    }
+
+    createPopUp() {
+      const vm = this;
+      // Generate image list
+      for (let index = 0; index < 40; index++) {
+        vm.imageList.push({ code: index, name: `../../share/resources/ccg034/i/CCG034I_${nts.uk.text.padLeft(String(index + 1), '0', 3)}.png` });
+      }
+      // Adding images inside popup
+      for (let imageRow = 0; imageRow < vm.imageList.length; imageRow += MAXIMUM_IMAGE_COUNT) {
+        let toAppend = "";
+        for (let imageCol = imageRow; imageCol < imageRow + MAXIMUM_IMAGE_COUNT; imageCol++) {
+          toAppend += `<img id="F9_10_1_${imageCol}" data-index="${imageCol}" src="${vm.imageList[imageCol].name}" class="pic-choose" data-bind="click: chooseImage" tabindex="8" />`;
+        }
+        const template = `<div>${toAppend}</div>`;
+        $("#F9_10").append(template);
+        // Rebind Knockout for the newly added div
+        ko.applyBindings(vm, $("#F9_10 > div:last-child")[0]);
+      }
+
+      $("#F9_10").ntsPopup({
+        position: {
+          my: "left top",
+          at: "left bottom",
+          of: "#F9_3_2"
+        },
+        showOnStart: false,
+        dismissible: false
+      });
+      $("#F9_3_2").on("click", () => $("#F9_10").ntsPopup("toggle"));
+    }
+
+    chooseImage(data: any, event: any) {
+      const vm = this;
+      const index: number = $(event.currentTarget).data("index");
+      const item = vm.imageList[index];
+      vm.imageSrc(item.name);
+      $("#F9_10").ntsPopup("hide");
+    }
+
     /**
      * Close dialog
      */
     public closeDialog() {
       const vm = this;
+      if (vm.fileId() !== vm.partData.originalFileId && !nts.uk.text.isNullOrEmpty(vm.fileId())) {
+        (nts.uk.request as any).file.remove(vm.fileId());
+      }
       vm.$window.close();
     }
 
@@ -141,6 +261,7 @@ module nts.uk.com.view.ccg034.f {
       const vm = this;
       vm.$validate().then((valid: boolean) => {
         if (valid) {
+          const image = new Image();
           // Update part data
           vm.partData.alignHorizontal = vm.horizontalAlign();
           vm.partData.alignVertical = vm.verticalAlign();
@@ -151,6 +272,23 @@ module nts.uk.com.view.ccg034.f {
           vm.partData.fontSize = Number(vm.fontSize());
           vm.partData.isBold = vm.isBold();
           vm.partData.menuUrl = vm.menuUrl();
+          vm.partData.textColor = vm.textColorValue();
+          vm.partData.isFixed = vm.imageType() === -1 ? null : vm.imageType();
+          // ImageType === 0
+          if (vm.imageType() === 0) {
+            vm.partData.fileName = vm.imageSrc();
+            image.src = vm.imageSrc();
+            if (vm.fileId() !== vm.partData.originalFileId && !nts.uk.text.isNullOrEmpty(vm.fileId())) {
+              (nts.uk.request as any).file.remove(vm.fileId());
+            }
+          } else if (vm.imageType() === 1) {
+            // ImageType === 1
+            vm.partData.fileId = vm.fileId();
+            image.src = vm.fileId() ? (nts.uk.request as any).liveView(vm.fileId()) : null;
+            vm.partData.originalFileId = vm.originalFileId;
+          }
+          
+          vm.partData.ratio = (image.naturalHeight / image.naturalWidth) || 0;
           // Return data
           vm.$window.close(vm.partData);
         }

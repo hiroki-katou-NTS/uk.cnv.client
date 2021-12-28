@@ -130,7 +130,7 @@ public abstract class OccurenceHolidayCanonicalizationBase implements DomainCano
 		
 		// 日付不明
 		boolean isDateUnknown = interm.getItemByNo(Items.TARGET_DATE).map(d -> d.getValue()).orElse(null) == null;
-		interm = interm.addCanonicalized(CanonicalItem.of(Items.TARGET_DATE_UNKNOWN, isDateUnknown ? 1 : 0));
+		interm = interm.addCanonicalized(CanonicalItem.of(Items.TARGET_DATE_UNKNOWN, isDateUnknown));
 		
 		interm = canonicalizeExtends(require, context, interm);
 		

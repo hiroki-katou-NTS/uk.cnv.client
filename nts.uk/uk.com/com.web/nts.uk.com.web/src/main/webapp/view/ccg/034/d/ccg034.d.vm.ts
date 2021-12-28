@@ -746,6 +746,12 @@ module nts.uk.com.view.ccg034.d {
         fontSize: dto.fontSize,
         isBold: dto.bold === 1,
         menuUrl: null,
+        textColor: dto.textColor,
+        isFixed: dto.isFixed,
+        ratio: dto.ratio,
+        fileId: dto.fileId,
+        fileName: dto.fileName,
+        originalFileId: dto.fileId
       });
       // Set part data to map
       vm.mapPartData[vm.partClientId] = newPartData;
@@ -909,6 +915,19 @@ module nts.uk.com.view.ccg034.d {
       switch (originPartData.partType) {
         case MenuPartType.PART_MENU:
           newPartData = new PartDataMenuModel(originPartData);
+          const menuFileId = (originPartData as PartDataMenuModel).fileId;
+          if (LayoutUtils.isValidFile(menuFileId)) {
+            vm.$ajax(nts.uk.text.format(API.copyFile, (originPartData as PartDataMenuModel).fileId))
+            .then(res => {
+              (newPartData as PartDataMenuModel).fileId = res.fileId;
+              (newPartData as PartDataMenuModel).originalFileId = null;
+              vm.modifiedPartList.added.push(res.fileId);
+            });
+          } else {
+            (newPartData as PartDataMenuModel).fileId = "";
+            (newPartData as PartDataMenuModel).originalFileId = null;
+            vm.modifiedPartList.added.push(null);
+          }
           break;
         case MenuPartType.PART_LABEL:
           newPartData = new PartDataLabelModel(originPartData);
@@ -982,6 +1001,15 @@ module nts.uk.com.view.ccg034.d {
           vm.$window.modal('/view/ccg/034/f/index.xhtml', selectedPartData)
             .then((result: PartDataModel) => {
               if (result && !nts.uk.text.isNullOrEmpty(String(result.clientId))) {
+                const partMenu = (result as PartDataMenuModel);
+                // Only prepare for delete if has changes
+                if (!_.find(vm.modifiedPartList.added, partMenu.fileId) && partMenu.fileId !== partMenu.originalFileId) {
+                  vm.modifiedPartList.added.push(partMenu.fileId);
+                }
+                if (!_.find(vm.modifiedPartList.deleted, partMenu.originalFileId) 
+                  && (partMenu.fileId !== partMenu.originalFileId || (partMenu.isFixed !== 1 && !_.isEmpty(partMenu.originalFileId)))) {
+                  vm.modifiedPartList.deleted.push(partMenu.originalFileId);
+                }
                 // Update part data
                 vm.mapPartData[partClientId] = result;
                 // Update part DOM
@@ -1159,6 +1187,7 @@ module nts.uk.com.view.ccg034.d {
       const partClientId = Number($part.attr(KEY_DATA_ITEM_CLIENT_ID));
       const partData: PartDataModel = vm.mapPartData[partClientId];
       switch (partData.partType) {
+        case MenuPartType.PART_MENU:
         case MenuPartType.PART_ATTACHMENT:
         case MenuPartType.PART_IMAGE:
           const part = partData as any;
@@ -1218,7 +1247,6 @@ module nts.uk.com.view.ccg034.d {
       const listPartData: PartDataModel[] = [];
       const $layout: JQuery = $('<div>')
         .css({ 'width': CREATION_LAYOUT_WIDTH, 'height': CREATION_LAYOUT_HEIGHT });
-      _.forEach(_.uniq(vm.modifiedPartList.deleted), fileId => vm.removeFile(fileId));
       for (const partClientId in vm.mapPartData) {
         listPartData.push(vm.mapPartData[partClientId]);
         $layout.append(LayoutUtils.buildPartHTML(vm.mapPartData[partClientId]));
@@ -1244,12 +1272,17 @@ module nts.uk.com.view.ccg034.d {
               height: data.height,
               fontSize: data.fontSize,
               bold: data.isBold ? 1 : 0,
-              horizontalPosition: data.alignHorizontal,
-              verticalPosition: data.alignVertical,
+              horizontalPosition: _.isNil(data.isFixed) ? data.alignHorizontal : HorizontalAlign.MIDDLE,
+              verticalPosition: _.isNil(data.isFixed) ? data.alignVertical : VerticalAlign.BOTTOM,
               systemType: data.systemType,
               menuClassification: data.menuClassification,
               menuCode: data.menuCode,
               menuName: data.menuName,
+              textColor: data.textColor,
+              isFixed: data.isFixed,
+              ratio: data.ratio,
+              fileId: data.isFixed === 1 ? data.fileId : null,
+              fileName: data.fileName
             }))
             .value();
           const listLabelSettingDto: LabelSettingDto[] = _.chain(listPartData)
@@ -1338,6 +1371,16 @@ module nts.uk.com.view.ccg034.d {
               arrowSettings: listArrowSettingDto,
             }),
           });
+          // Filter for unused fileIds and deleted them
+          _.remove(vm.modifiedPartList.deleted,
+            fileId => _.isEmpty(_.filter(listMenuSettingDto, data => data.isFixed !== null && data.fileId === fileId))
+                   && _.isEmpty(_.filter(listFileAttachmentSettingDto, data => data.fileId === fileId))
+                   && _.isEmpty(_.filter(listImageSettingDto, data => data.fileId === fileId)))
+          .forEach(fileId => vm.removeFile(fileId));
+          _.remove(vm.modifiedPartList.added, 
+            fileId => !_.isEmpty(_.filter(listMenuSettingDto, data => data.isFixed !== null && data.fileId === fileId))
+                   || !_.isEmpty(_.filter(listFileAttachmentSettingDto, data => data.fileId === fileId))
+                   || !_.isEmpty(_.filter(listImageSettingDto, data => data.fileId === fileId)));
           return vm.$ajax(API.updateLayout, updateLayoutParams);
         })
         // [After] save layout data
@@ -1368,7 +1411,7 @@ module nts.uk.com.view.ccg034.d {
       htmlContent += `<link rel="stylesheet" type="text/css" href="/nts.uk.com.js.web/lib/nittsu/ui/style/stylesheets/base.css">`;
       htmlContent += `</head>`;
       htmlContent += `<body>`;
-      htmlContent += `<div class="content-container" style="width: ${vm.maxWidth()}px; height: ${vm.maxHeight()}px;">`;
+      htmlContent += `<div class="content-container" style="width: ${vm.maxWidth()}px; height: ${vm.maxHeight()}px; margin: auto; position: relative;">`;
       htmlContent += $layout.html();
       htmlContent += `</div>`;
       htmlContent += `</body>`;
@@ -1520,6 +1563,7 @@ module nts.uk.com.view.ccg034.d {
      */
     static renderPartDOMMenu($partContainer: JQuery, partData: PartDataMenuModel): JQuery {
       const vm = this;
+      const hasImg = !_.isNil(partData.isFixed);
       $partContainer
         // Set PartData attr
         .outerWidth(partData.width)
@@ -1535,19 +1579,62 @@ module nts.uk.com.view.ccg034.d {
         // Set PartDataLabelModel attr
         .css({
           'display': 'flex',
-          'justify-content': vm.getHorizontalClass(partData.alignHorizontal),
-          'align-items': vm.getVerticalClass(partData.alignVertical),
+          'justify-content': vm.getHorizontalClass(!hasImg ? partData.alignHorizontal : HorizontalAlign.MIDDLE),
+          'align-items': vm.getVerticalClass(!hasImg ? partData.alignVertical : VerticalAlign.BOTTOM),
         });
+      // Render menu image
+      if (hasImg) {
+        $part.css({ 'display': 'grid', 'grid-auto-columns': '100%', 'grid-auto-rows': 'minmax(0, 1fr) max-content' });
+        let $imageContent = $part.find('.part-image-content');
+        const src = (partData.isFixed === 0) ? partData.fileName : (this.isValidFile(partData.fileId) ? (nts.uk.request as any).liveView(partData.fileId) : '');
+        if (!$imageContent.length) {
+          $imageContent = $("<img>", { 'class': 'part-image-content' });
+        }
+        $imageContent
+          .attr('src', src);
+        // Set image scale by original ratio
+        const partRatio = partData.height / partData.width;
+        const imageRatio = partData.ratio;
+        if (partRatio > imageRatio) {
+          $imageContent.css({
+            'width': '100%',
+            'height': 'auto',
+          });
+        } else {
+          $imageContent.css({
+            'width': 'auto',
+            'height': '100%',
+          });
+        }
+        $imageContent.css({
+          'display': 'block',
+          'margin': '5px auto auto',
+          'max-height': '90%',
+          'object-fit': 'contain'
+        });
+        $imageContent.appendTo($part);
+      } else {
+        $part.removeProp("grid-auto-columns");
+        $part.removeProp("grid-auto-rows");
+        $part.find("img").remove();
+      }
       // Render label
       let $menuName = $part.find('.part-menu-name');
       if (!$menuName.length) {
         $menuName = $("<span>", { 'class': 'part-menu-name' });
+      }
+      if (hasImg) {
+        $menuName.addClass("limited-label").css("text-align", "center");
+      } else {
+        $menuName.removeProp("text-align");
+        $menuName.removeClass("limited-label");
       }
       $menuName
         .text(partData.menuName)
         .css({
           'font-size': partData.fontSize,
           'font-weight': partData.isBold ? 'bold' : 'normal',
+          'color': partData.textColor
         })
         .addClass('hyperlink');
       $menuName.appendTo($part);
@@ -1856,8 +1943,8 @@ module nts.uk.com.view.ccg034.d {
     static getPartSize(partType: string): PartSize {
       switch (partType) {
         case MenuPartType.PART_MENU:
-          // 4 x 2 cell
-          return new PartSize({ width: CELL_SIZE * 4, height: CELL_SIZE * 2 });
+          // 3 x 3 cell
+          return new PartSize({ width: CELL_SIZE * 3, height: CELL_SIZE * 3 });
         case MenuPartType.PART_LABEL:
           // 4 x 2 cell
           return new PartSize({ width: CELL_SIZE * 4, height: CELL_SIZE * 2 });
@@ -1887,13 +1974,15 @@ module nts.uk.com.view.ccg034.d {
       switch (partData.partType) {
         case MenuPartType.PART_MENU:
           const partDataMenuModel: PartDataMenuModel = (partData as PartDataMenuModel);
+          partDataMenuModel.originalFileId = partDataMenuModel.fileId;
+          const hasImg = !_.isNil(partDataMenuModel.isFixed);
           const $partMenuHTML: JQuery = $('<a>', { 'href': `${location.origin}${partDataMenuModel.menuUrl}`, 'target': '_top' })
             .text(partDataMenuModel.menuName)
             .addClass(CSS_CLASS_CCG034_HYPERLINK)
             .css({
               'font-size': `${partDataMenuModel.fontSize}px`,
               'font-weight': partDataMenuModel.isBold ? 'bold' : 'normal',
-              'color': '#0066CC',
+              'color': partDataMenuModel.textColor,
               'text-decoration': 'underline',
               'cursor': 'pointer',
             });
@@ -1906,12 +1995,43 @@ module nts.uk.com.view.ccg034.d {
               'width': `${partDataMenuModel.width}px`,
               'height': `${partDataMenuModel.height}px`,
               'display': 'flex',
-              'align-items': LayoutUtils.getVerticalClass(partDataMenuModel.alignVertical),
-              'justify-content': LayoutUtils.getHorizontalClass(partDataMenuModel.alignHorizontal),
+              'justify-content': LayoutUtils.getHorizontalClass(!hasImg ? partDataMenuModel.alignHorizontal : HorizontalAlign.MIDDLE),
+              'align-items': LayoutUtils.getVerticalClass(!hasImg ? partDataMenuModel.alignHorizontal : VerticalAlign.BOTTOM),
               'overflow': 'hidden',
               'text-overflow': 'ellipsis',
-            })
-            .append($partMenuHTML);
+            });
+          if (hasImg) {
+            const src = (partDataMenuModel.isFixed === 0) ? partDataMenuModel.fileName : (this.isValidFile(partDataMenuModel.fileId) ? (nts.uk.request as any).liveView(partDataMenuModel.fileId) : '');
+            const partRatio = partDataMenuModel.height / partDataMenuModel.width;
+            const imageRatio = partDataMenuModel.ratio;
+            $partHTML.css({ 'display': 'grid', 'grid-auto-columns': '100%', 'grid-auto-rows': 'minmax(0, 1fr) max-content' });
+            const $partImageContainer = $('<a>', { 'href': `${location.origin}${partDataMenuModel.menuUrl}`, 'target': '_top' })
+              .addClass(CSS_CLASS_CCG034_HYPERLINK)
+              .css({ "align-self": "start", "height": "100%" });
+            const $partImage = $("<img>")
+              .addClass("ccg034-hyperlink")
+              .attr("src", src);
+            if (partRatio > imageRatio) {
+              $partImage.css({
+                'width': '100%',
+                'height': 'auto',
+              });
+            } else {
+              $partImage.css({
+                'width': 'auto',
+                'height': '100%',
+              });
+            }
+            $partImage.css({
+              'display': 'block',
+              'margin': '5px auto auto',
+              'max-height': '90%',
+              'object-fit': 'contain'
+            });
+            $partMenuHTML.addClass("limited-label").css("text-align", "center");
+            $partHTML.prepend($partImageContainer.append($partImage));
+          }
+          $partHTML.append($partMenuHTML);
           break;
         case MenuPartType.PART_LABEL:
           const partDataLabelModel: PartDataLabelModel = (partData as PartDataLabelModel);
@@ -1970,6 +2090,7 @@ module nts.uk.com.view.ccg034.d {
           break;
         case MenuPartType.PART_ATTACHMENT:
           const partDataAttachmentModel: PartDataAttachmentModel = (partData as PartDataAttachmentModel);
+          partDataAttachmentModel.originalFileId = partDataAttachmentModel.fileId;
           const fileLink: string = `${location.origin}/nts.uk.com.web/webapi/shr/infra/file/storage/get/${partDataAttachmentModel.fileId}`;
           const $partAttachmentHTML: JQuery = $('<a>', { 'href': fileLink, 'target': '_blank' })
             .text(partDataAttachmentModel.linkContent || partDataAttachmentModel.fileName)
@@ -1999,6 +2120,7 @@ module nts.uk.com.view.ccg034.d {
           break;
         case MenuPartType.PART_IMAGE:
           const partDataImageModel: PartDataImageModel = (partData as PartDataImageModel);
+          partDataImageModel.originalFileId = partDataImageModel.fileId;
           const $partImageHTML: JQuery = $('<img>', {
             'src': partDataImageModel.isFixed === 0
               ? partDataImageModel.fileName
@@ -2119,6 +2241,12 @@ module nts.uk.com.view.ccg034.d {
     fontSize = 11;
     isBold = true;
     menuUrl: string = null;
+    textColor: string = "#000000";
+    isFixed: number = null;
+    ratio: number = null;
+    fileId: string = "";
+    fileName: string = "";
+    originalFileId: string = "";
 
     constructor(init?: Partial<PartDataMenuModel>) {
       super(init);
@@ -2242,6 +2370,11 @@ module nts.uk.com.view.ccg034.d {
     menuClassification: number;
     menuCode: string;
     menuName: string;
+    textColor: string;
+    isFixed: number;
+    ratio: number;
+    fileId: string;
+    fileName: string;
 
     constructor(init?: Partial<MenuSettingDto>) {
       $.extend(this, init);

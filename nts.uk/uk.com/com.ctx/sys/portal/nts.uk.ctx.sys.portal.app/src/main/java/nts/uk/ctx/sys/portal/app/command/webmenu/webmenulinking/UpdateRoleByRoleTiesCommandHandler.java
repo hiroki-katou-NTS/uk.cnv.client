@@ -10,6 +10,8 @@ import nts.uk.ctx.sys.portal.dom.webmenu.webmenulinking.RoleByRoleTies;
 import nts.uk.ctx.sys.portal.dom.webmenu.webmenulinking.RoleByRoleTiesRepository;
 import nts.uk.shr.com.context.AppContexts;
 
+import java.util.Optional;
+
 @Stateless
 public class UpdateRoleByRoleTiesCommandHandler extends CommandHandler<RoleByRoleTiesCommand> {
 
@@ -22,16 +24,14 @@ public class UpdateRoleByRoleTiesCommandHandler extends CommandHandler<RoleByRol
 		
 		RoleByRoleTies newRole = new RoleByRoleTies(role.getRoleId(), AppContexts.user().companyId(), new WebMenuCode( role.getWebMenuCd()));
 
-// TODO　修正お願いいたします。
-/*		Optional<RoleByRoleTies> checkData = repo.getRoleByRoleTiesById(newRole.getRoleId());
-		
+		Optional<RoleByRoleTies> checkData = repo.getByRoleIdAndCompanyId(newRole.getRoleId(),AppContexts.user().companyId());
+
 		if(checkData.isPresent()) {
 			repo.updateRoleByRoleTies(newRole);
 			
 		} else {
 			repo.insertRoleByRoleTies(newRole);;
 		}
-*/
-		
+
 	}
 }

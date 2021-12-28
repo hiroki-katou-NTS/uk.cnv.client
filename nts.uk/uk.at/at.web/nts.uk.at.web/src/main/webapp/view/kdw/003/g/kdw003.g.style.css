@@ -1,0 +1,45 @@
+#contents-area {
+	width: 1500px;
+	height: 520px;
+	overflow: hidden;
+}
+
+#left-content {
+	padding: 10px 0px 0px 7px;
+    margin-left: 110px;
+	float: left;
+	width: 230px;
+    height: 460px;
+} 
+#right-content {
+	margin-left: 10px;
+	float: left;
+	margin-top: 10px;
+}
+
+
+table#employ_view {
+    width: 902px;
+}
+
+td {
+	padding: 5px;
+	text-align: left;
+}
+
+.ui-igcombo-wrapper {
+    width: 330px !important;
+}
+
+
+.custom {
+	position: relative;
+	width: 40px;
+	top: 17px;
+	left: 16px;
+}
+
+.nts-searchbbox-wrapper {
+    margin-bottom: -10px !important;
+    margin-left: 10px !important;
+}

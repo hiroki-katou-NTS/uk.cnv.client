@@ -147,7 +147,8 @@ module nts.uk.at.view.kdp002.a {
             public clickBtn1(btn: any, layout: any) {
                 const vm = this;
                 const view = new ko.ViewModel();
-				let stampTime = moment(new Date()).format("HH:mm");
+
+				let stampTime = moment(view.$date.now()).format("HH:mm");
 				
                 nts.uk.ui.block.invisible();
                 nts.uk.request

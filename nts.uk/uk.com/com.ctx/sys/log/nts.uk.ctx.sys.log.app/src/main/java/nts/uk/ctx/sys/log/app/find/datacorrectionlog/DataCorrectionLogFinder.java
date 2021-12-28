@@ -48,7 +48,7 @@ public class DataCorrectionLogFinder {
 		List<DataCorrectionLog> listCorrectionLog = new ArrayList<>();
 		if (params.getFunctionId() == 3) {
 			// ※この分岐は月別修正から呼び出し時のみ - ※ This branch only from the monthly correction to calling
-			listCorrectionLog = correctionLogRepo.getAllLogData(convertFuncId(params.getFunctionId()),
+			listCorrectionLog = correctionLogRepo.getAllLogDataByYM(convertFuncId(params.getFunctionId()),
 					params.getListEmployeeId(), new YearMonth(params.getStartYm()), params.getEndYmd());
 		} else if (params.getStartYmd() != null && params.getEndYmd() != null) {
 			listCorrectionLog = correctionLogRepo.getAllLogData(convertFuncId(params.getFunctionId()),

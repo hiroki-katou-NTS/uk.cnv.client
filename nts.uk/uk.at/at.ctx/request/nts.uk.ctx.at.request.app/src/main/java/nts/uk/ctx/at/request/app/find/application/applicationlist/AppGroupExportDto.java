@@ -22,4 +22,9 @@ public class AppGroupExportDto {
 	 * appTypeName,申請表示名※
 	 */
 	private String appTypeName;
+	
+	/**
+	 * 事前事後区分
+	 */
+	private int prePostAtr;
 }

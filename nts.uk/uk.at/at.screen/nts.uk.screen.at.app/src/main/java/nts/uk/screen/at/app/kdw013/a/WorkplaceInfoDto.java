@@ -2,6 +2,7 @@ package nts.uk.screen.at.app.kdw013.a;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import nts.uk.ctx.bs.employee.dom.workplace.info.WorkplaceInfo;
 
 /**
  * 
@@ -28,5 +29,11 @@ public class WorkplaceInfoDto {
 
     /** The outside wkp code. */
     private String outsideWkpCode;
+
+	public static WorkplaceInfoDto fromDomain(WorkplaceInfo domain) {
+		return new WorkplaceInfoDto(domain.getWorkplaceId(), domain.getWorkplaceCode().v(),
+				domain.getWorkplaceName().v(), domain.getWkpGenericName().v(), domain.getWkpDisplayName().v(),
+				domain.getOutsideWkpCode().v());
+	}
     
 }

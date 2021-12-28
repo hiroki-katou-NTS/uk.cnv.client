@@ -1,5 +1,8 @@
 package nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import nts.arc.layer.dom.objecttype.DomainObject;
@@ -47,5 +50,29 @@ public class MedicalCareTimeEachTimeSheet implements DomainObject {
 		NIGHT_SHIFT(1);
 		
 		public int value;
+		
+		public static FullTimeNightShiftAttr of(int value) {
+			switch(value) {
+			case 0:
+				return DAY_SHIFT;
+			case 1:
+				return NIGHT_SHIFT;
+			default:
+				return DAY_SHIFT;
+			}
+		}
+	}
+	
+	/**
+	 * 全て0で作成する
+	 * @return 時間帯別勤怠の医療時間(List)
+	 */
+	public static List<MedicalCareTimeEachTimeSheet> createAllZero() {
+		List<MedicalCareTimeEachTimeSheet> medicalCareTime = new ArrayList<MedicalCareTimeEachTimeSheet>();
+		medicalCareTime.add(new MedicalCareTimeEachTimeSheet(
+				FullTimeNightShiftAttr.DAY_SHIFT, AttendanceTime.ZERO, AttendanceTime.ZERO, AttendanceTime.ZERO));
+		medicalCareTime.add(new MedicalCareTimeEachTimeSheet(
+				FullTimeNightShiftAttr.NIGHT_SHIFT, AttendanceTime.ZERO, AttendanceTime.ZERO, AttendanceTime.ZERO));
+		return medicalCareTime;
 	}
 }

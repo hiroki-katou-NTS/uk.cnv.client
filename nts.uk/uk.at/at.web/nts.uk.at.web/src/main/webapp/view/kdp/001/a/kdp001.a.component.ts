@@ -578,7 +578,11 @@ module nts.uk.ui.kdp001.a {
                         const { backgroundColor, textColor } = settingDateTimeColor || {};
 
                         // set time for request update server time
-                        vm.$date.interval((serverCorrectionInterval || 1) * 60000);
+                        let self = this;
+                        vm.$date.interval(100);
+                        setTimeout(() => {
+                            vm.$date.interval((serverCorrectionInterval || 1) * 60000);
+                        }, 1000);
 
                         vm.time.displayTime(resultDisplayTime || 0);
 
@@ -670,7 +674,7 @@ module nts.uk.ui.kdp001.a {
                         }),
                         vm.$window.shared('screenB', { screen: "KDP001" }),
                     )
-                    .then(() => vm.$window.modal('at', '/view/kdp/002/b/index.xhtml', {stampTime: moment(new Date()).format("HH:mm")}));
+                    .then(() => vm.$window.modal('at', '/view/kdp/002/b/index.xhtml', {stampTime: moment(vm.$date.now()).format("HH:mm")}));
             };
             const openDialogC = (stampDate: string, error: any) => {
                 return $
@@ -861,7 +865,6 @@ module nts.uk.ui.kdp001.a {
                                 })
                             }
                         }
-                        console.log(result);
 
                         vm.stamps(result);
 

@@ -5,6 +5,8 @@ import java.util.Optional;
 import lombok.Getter;
 import nts.arc.layer.dom.objecttype.DomainObject;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkTimeInformation;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailycalprocess.calculation.TimeSpanForDailyCalc;
+import nts.uk.shr.com.time.TimeWithDayAttr;
 import nts.uk.ctx.at.shared.dom.worktime.predset.WorkNo;
 
 @Getter
@@ -44,5 +46,41 @@ public class TimeSheetOfAttendanceEachOuenSheet implements DomainObject {
 
 	public void setWorkNo(WorkNo workNo) {
 		this.workNo = workNo;
+	}
+	
+	/**
+	 * 開始終了を取得する
+	 * @return 開始～終了
+	 */
+	public Optional<TimeSpanForDailyCalc> getStartAndEnd() {
+		if(!this.getStartTimeWithDayAttr().isPresent())
+			return Optional.empty();
+		
+		if(!this.getEndTimeWithDayAttr().isPresent())
+			return Optional.empty();
+		
+		return Optional.of(new TimeSpanForDailyCalc(this.start.get().getTimeWithDay().get(), this.end.get().getTimeWithDay().get()));
+	}
+	
+	/**
+	 * 開始時刻を取得する
+	 * @return 開始時刻
+	 */
+	public Optional<TimeWithDayAttr> getStartTimeWithDayAttr() {
+		if(!this.start.isPresent())
+			return Optional.empty();
+		
+		return this.start.get().getTimeWithDay();
+	}
+	
+	/**
+	 * 終了時刻を取得する
+	 * @return 終了時刻
+	 */
+	public Optional<TimeWithDayAttr> getEndTimeWithDayAttr() {
+		if(!this.end.isPresent())
+			return Optional.empty();
+		
+		return this.end.get().getTimeWithDay();
 	}
 }

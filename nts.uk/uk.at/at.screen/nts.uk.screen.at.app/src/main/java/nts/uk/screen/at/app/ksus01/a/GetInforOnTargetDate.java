@@ -151,7 +151,7 @@ public class GetInforOnTargetDate {
     		List<EmployeeInformation> listEmployeeInformation = employeeInformationRepository.find(params);
     		Comparator<EmployeeInformation> compareByCodes =
     				(EmployeeInformation emp1, EmployeeInformation emp2)
-    				-> Integer.valueOf(emp1.getEmployeeCode()).compareTo(Integer.valueOf(emp2.getEmployeeCode()));
+    				-> emp1.getEmployeeCode().compareTo(emp2.getEmployeeCode());
     		Collections.sort(listEmployeeInformation, compareByCodes);
 
     		listBusinessName = listEmployeeInformation.stream().map(e -> e.getBusinessName()).collect(Collectors.toList());

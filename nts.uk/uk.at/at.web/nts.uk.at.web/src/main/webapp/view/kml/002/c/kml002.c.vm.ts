@@ -144,7 +144,7 @@ module nts.uk.at.view.kml002.c {
         //月間想定給与額
         vm.estimatedMonthlySalary(data[0].use ? Usage.Use : Usage.NotUse);
         //年間想定給与額
-        vm.estimatedAnnualSalary(data[1].use ? Usage.Use : Usage.NotUse);
+        vm.estimatedAnnualSalary(Usage.NotUse);
         //基準労働時間比較
         // vm.comparisonStandardWorkingHours(data[2].use ? Usage.Use : Usage.NotUse);
         vm.comparisonStandardWorkingHours(Usage.NotUse);

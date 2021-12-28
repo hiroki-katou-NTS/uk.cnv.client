@@ -28,16 +28,9 @@ public class TopPageSettings extends DomainObject {
 	 **/
 	protected MenuLogin menuLogin;
 	
-	/** 
-	 * The switching date. 
-	 * 	切換日
-	 **/
-	protected SwitchingDate switchingDate;
-	
 	public TopPageSettings getTopPageSettings() {
 		return new TopPageSettings(
 				this.getTopMenuCode(), 
-				this.getMenuLogin(), 
-				this.getSwitchingDate());
+				this.getMenuLogin());
 	}
 }

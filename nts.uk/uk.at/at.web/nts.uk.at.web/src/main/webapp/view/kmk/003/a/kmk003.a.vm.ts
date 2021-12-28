@@ -1448,8 +1448,8 @@ module nts.uk.at.view.kmk003.a {
 					
 					_.forEach(command.fixedWorkSetting.lstHalfDayWorkTimezone[0].restTimezone.timezones, (z : any) => {
 						let checkAdd = 0;
-						if (_.inRange(z.start, workTimes.morning[0].timezone.start, workTimes.morning[0].timezone.end) &&
-						_.inRange(z.end, workTimes.morning[0].timezone.start, workTimes.morning[0].timezone.end)){
+						if (_.inRange(z.start, workTimes.morning[0].timezone.start - 0.1, workTimes.morning[0].timezone.end + 0.1) &&
+						_.inRange(z.end, workTimes.morning[0].timezone.start - 0.1, workTimes.morning[0].timezone.end + 0.1)){
 							checkAdd = 1;
 							amTimes.push({
 								start: z.start, 
@@ -1457,8 +1457,8 @@ module nts.uk.at.view.kmk003.a {
 							})
 						}
 						
-						if (_.inRange(z.start, workTimes.afternoon[0].timezone.start, workTimes.afternoon[0].timezone.end) &&
-						_.inRange(z.end, workTimes.afternoon[0].timezone.start, workTimes.afternoon[0].timezone.end)){
+						if (_.inRange(z.start, workTimes.afternoon[0].timezone.start - 0.1, workTimes.afternoon[0].timezone.end + 0.1) &&
+						_.inRange(z.end, workTimes.afternoon[0].timezone.start - 0.1, workTimes.afternoon[0].timezone.end + 0.1)){
 							checkAdd = 2;
 							pmTimes.push({
 								start: z.start, 
@@ -1539,50 +1539,121 @@ module nts.uk.at.view.kmk003.a {
                     command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.flowRestTimezone.flowRestSets = restTimeFlex.morning;
                     command.flexWorkSetting.lstHalfDayWorkTimezone[2].restTimezone.flowRestTimezone.flowRestSets = restTimeFlex.afternoon;*/
                 }
-
+				// ver24.2 start
+				// A22_23 休憩時間を固定にする (休憩時間帯を固定にする)
+				let fixRestTime = command.flexWorkSetting.lstHalfDayWorkTimezone[0].restTimezone.fixRestTime;
+				// A19_3_2 半日勤務の時間帯の設定＝するの場合
+				if (self.useHalfDayBreak()) {
+					if (fixRestTime == false) {
+						command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.fixedRestTimezone.timezones = [];
+						command.flexWorkSetting.lstHalfDayWorkTimezone[2].restTimezone.fixedRestTimezone.timezones = [];
+					}
+				}
+				// A19_3_2 半日勤務の時間帯の設定＝しないの場合
 				if (!self.useHalfDayBreak()) {
 					let amTimes : any = [], pmTimes : any = [];
 					let workTimes = self.autoCreateHalfDayWT(self.flexWorkSetting.getHDWtzOneday().workTimezone.lstWorkingTimezone());
 					let useHereAfterRestSet = command.flexWorkSetting.lstHalfDayWorkTimezone[0].restTimezone.flowRestTimezone.useHereAfterRestSet;
-					_.forEach(command.flexWorkSetting.lstHalfDayWorkTimezone[0].restTimezone.flowRestTimezone.flowRestSets, (z : service.model.common.FlowRestSettingDto) => {
-						if (_.inRange(z.flowPassageTime, workTimes.morning[0].timezone.start, workTimes.morning[0].timezone.end) &&
-						_.inRange(z.flowRestTime, workTimes.morning[0].timezone.start, workTimes.morning[0].timezone.end)){
-							amTimes.push({
-								flowPassageTime: z.flowPassageTime, 
-								flowRestTime: z.flowRestTime
-							})
-						}
+					if (fixRestTime == false) {
+						_.forEach(command.flexWorkSetting.lstHalfDayWorkTimezone[0].restTimezone.flowRestTimezone.flowRestSets, (z : any) => {
+							let checkAdd = 0;
+							if (_.inRange(z.flowPassageTime, workTimes.morning[0].timezone.start - 0.1, workTimes.morning[0].timezone.end + 0.1) &&
+							_.inRange(z.flowRestTime, workTimes.morning[0].timezone.start - 0.1, workTimes.morning[0].timezone.end + 0.1)){
+								checkAdd = 1;
+								amTimes.push({
+									flowPassageTime: z.flowPassageTime, 
+									flowRestTime: z.flowRestTime
+								})
+							}
+							
+							if (_.inRange(z.flowPassageTime, workTimes.afternoon[0].timezone.start - 0.1, workTimes.afternoon[0].timezone.end + 0.1) &&
+							_.inRange(z.flowRestTime, workTimes.afternoon[0].timezone.start - 0.1, workTimes.afternoon[0].timezone.end + 0.1)){
+								checkAdd = 2;
+								pmTimes.push({
+									flowPassageTime: z.flowPassageTime, 
+									flowRestTime: z.flowRestTime
+								})
+							}
+							
+							if (checkAdd == 0){
+								amTimes.push({
+									flowPassageTime: z.flowPassageTime, 
+									flowRestTime: z.flowRestTime
+								})
+								
+								pmTimes.push({
+									flowPassageTime: z.flowPassageTime, 
+									flowRestTime: z.flowRestTime
+								})
+							}
+						});
+						command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.flowRestTimezone.flowRestSets = amTimes;
+						command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.flowRestTimezone.useHereAfterRestSet = useHereAfterRestSet;
 						
-						if (_.inRange(z.flowPassageTime, workTimes.afternoon[0].timezone.start, workTimes.afternoon[0].timezone.end) &&
-						_.inRange(z.flowRestTime, workTimes.afternoon[0].timezone.start, workTimes.afternoon[0].timezone.end)){
-							pmTimes.push({
-								flowPassageTime: z.flowPassageTime, 
-								flowRestTime: z.flowRestTime
-							})
-						}
-					});
-					command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.flowRestTimezone.flowRestSets = amTimes;
-					command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.flowRestTimezone.useHereAfterRestSet = useHereAfterRestSet;
-					
-					command.flexWorkSetting.lstHalfDayWorkTimezone[2].restTimezone.flowRestTimezone.flowRestSets = pmTimes;
-					command.flexWorkSetting.lstHalfDayWorkTimezone[2].restTimezone.flowRestTimezone.useHereAfterRestSet = useHereAfterRestSet;
-					
-					if (useHereAfterRestSet == true) {
-						let z = command.flexWorkSetting.lstHalfDayWorkTimezone[0].restTimezone.flowRestTimezone.hereAfterRestSet
-						if (_.inRange(z.flowPassageTime, workTimes.morning[0].timezone.start, workTimes.morning[0].timezone.end) &&
-						_.inRange(z.flowRestTime, workTimes.morning[0].timezone.start, workTimes.morning[0].timezone.end)){
-							command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.flowRestTimezone.hereAfterRestSet = z;
-						}
+						command.flexWorkSetting.lstHalfDayWorkTimezone[2].restTimezone.flowRestTimezone.flowRestSets = pmTimes;
+						command.flexWorkSetting.lstHalfDayWorkTimezone[2].restTimezone.flowRestTimezone.useHereAfterRestSet = useHereAfterRestSet;
 						
-						if (_.inRange(z.flowPassageTime, workTimes.afternoon[0].timezone.start, workTimes.afternoon[0].timezone.end) &&
-						_.inRange(z.flowRestTime, workTimes.afternoon[0].timezone.start, workTimes.afternoon[0].timezone.end)){
-							command.flexWorkSetting.lstHalfDayWorkTimezone[2].restTimezone.flowRestTimezone.hereAfterRestSet = z;
+						if (useHereAfterRestSet == true) {
+							let z = command.flexWorkSetting.lstHalfDayWorkTimezone[0].restTimezone.flowRestTimezone.hereAfterRestSet
+							
+							if (_.inRange(z.flowPassageTime, workTimes.morning[0].timezone.start - 0.1, workTimes.morning[0].timezone.end + 0.1) &&
+							_.inRange(z.flowRestTime, workTimes.morning[0].timezone.start - 0.1, workTimes.morning[0].timezone.end + 0.1)){
+								command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.flowRestTimezone.hereAfterRestSet = z;
+							} else {
+								command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.flowRestTimezone.useHereAfterRestSet = false;
+								command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.flowRestTimezone.hereAfterRestSet = { flowPassageTime: 0 ,flowRestTime: 0}
+							}
+							
+							if (_.inRange(z.flowPassageTime, workTimes.afternoon[0].timezone.start - 0.1, workTimes.afternoon[0].timezone.end + 0.1) &&
+							_.inRange(z.flowRestTime, workTimes.afternoon[0].timezone.start - 0.1, workTimes.afternoon[0].timezone.end + 0.1)){
+								command.flexWorkSetting.lstHalfDayWorkTimezone[2].restTimezone.flowRestTimezone.hereAfterRestSet = z;
+							} else {
+								command.flexWorkSetting.lstHalfDayWorkTimezone[2].restTimezone.flowRestTimezone.useHereAfterRestSet = false;
+								command.flexWorkSetting.lstHalfDayWorkTimezone[2].restTimezone.flowRestTimezone.hereAfterRestSet = { flowPassageTime: 0 ,flowRestTime: 0}
+							}
+						} else {
+							command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.flowRestTimezone.hereAfterRestSet = { flowPassageTime: 0 ,flowRestTime: 0}
+							command.flexWorkSetting.lstHalfDayWorkTimezone[2].restTimezone.flowRestTimezone.hereAfterRestSet = { flowPassageTime: 0 ,flowRestTime: 0}
 						}
+						command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.fixedRestTimezone.timezones = [];
+						command.flexWorkSetting.lstHalfDayWorkTimezone[2].restTimezone.fixedRestTimezone.timezones = [];
 					} else {
-						command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.flowRestTimezone.hereAfterRestSet.flowPassageTime = 0;
-						command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.flowRestTimezone.hereAfterRestSet.flowRestTime = 0;
+						_.forEach(command.flexWorkSetting.lstHalfDayWorkTimezone[0].restTimezone.fixedRestTimezone.timezones, (z : any) => {
+							let checkAdd = 0;
+							if (_.inRange(z.start, workTimes.morning[0].timezone.start - 0.1, workTimes.morning[0].timezone.end + 0.1) &&
+							_.inRange(z.end, workTimes.morning[0].timezone.start - 0.1, workTimes.morning[0].timezone.end + 0.1)){
+								checkAdd = 1;
+								amTimes.push({
+									start: z.start, 
+									end: z.end
+								})
+							}
+							
+							if (_.inRange(z.start, workTimes.afternoon[0].timezone.start - 0.1, workTimes.afternoon[0].timezone.end + 0.1) &&
+							_.inRange(z.end, workTimes.afternoon[0].timezone.start - 0.1, workTimes.afternoon[0].timezone.end + 0.1)){
+								checkAdd = 2;
+								pmTimes.push({
+									start: z.start, 
+									end: z.end
+								})
+							}
+							
+							if (checkAdd == 0) {
+								amTimes.push({
+									start: z.start, 
+									end: z.end
+								})
+								
+								pmTimes.push({
+									start: z.start, 
+									end: z.end
+								})
+							}
+						})
+						
+						command.flexWorkSetting.lstHalfDayWorkTimezone[1].restTimezone.fixedRestTimezone.timezones = amTimes;
+						command.flexWorkSetting.lstHalfDayWorkTimezone[2].restTimezone.fixedRestTimezone.timezones = pmTimes;
 					}
-					
 				}
 
                 return command;
@@ -1854,7 +1925,7 @@ module nts.uk.at.view.kmk003.a {
               const vm = this;
               if (vm.addMode()) {
                 const model = vm.fixedWorkSetting.offdayWorkTimezone.lstWorkTimezone();
-                if (model.length > 1) return;
+                if (model.length < 1) return;
                 const timezone = model[0].timezone;
                 timezone.start(startDateClock);
                 timezone.end(startDateClock + rangeTimeDay);

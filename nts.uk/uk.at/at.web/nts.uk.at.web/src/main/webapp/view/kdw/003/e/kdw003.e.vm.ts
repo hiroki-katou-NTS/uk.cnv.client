@@ -20,6 +20,7 @@ module nts.uk.at.view.kdw003.e.viewmodel {
             var self = this;
             var dfd = $.Deferred();
             let dataShare = nts.uk.ui.windows.getShared("shareToKdw003e");
+           // dataShare.listValue.push({value: 14, fieldName:"申請一覧"});
             var temp = [];
             for (var i = 0; i < dataShare.listValue.length; i++) {
                 temp.push(new ItemModel(dataShare.listValue[i].value, dataShare.listValue[i].fieldName, ""));

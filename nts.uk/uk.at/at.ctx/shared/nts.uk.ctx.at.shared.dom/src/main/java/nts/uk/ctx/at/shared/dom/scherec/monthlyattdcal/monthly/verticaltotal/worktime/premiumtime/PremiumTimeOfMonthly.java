@@ -49,7 +49,7 @@ public class PremiumTimeOfMonthly implements Serializable{
 		
 		val domain = new PremiumTimeOfMonthly();
 		for (val premiumTime : premiumTimes){
-			val premiumTimeItemNo = Integer.valueOf(premiumTime.getPremiumTimeItemNo());
+			val premiumTimeItemNo = Integer.valueOf(premiumTime.getPremiumTimeItemNo().value);
 			domain.premiumTime.putIfAbsent(premiumTimeItemNo, premiumTime);
 		}
 		domain.premiumAmountTotal = premiumAmountTotal;
@@ -69,14 +69,14 @@ public class PremiumTimeOfMonthly implements Serializable{
 		if (premiumTimeOfDaily.getPremiumTimes() == null) return;
 		for (val premiumTime : premiumTimeOfDaily.getPremiumTimes()){
 			val premiumTimeNo = premiumTime.getPremiumTimeNo();
-			this.premiumTime.putIfAbsent(premiumTimeNo, new AggregatePremiumTime(premiumTimeNo));
-			val targetPremiumTime = this.premiumTime.get(premiumTimeNo);
+			this.premiumTime.putIfAbsent(premiumTimeNo.value, new AggregatePremiumTime(premiumTimeNo));
+			val targetPremiumTime = this.premiumTime.get(premiumTimeNo.value);
 			targetPremiumTime.addMinutesToTime(premiumTime.getPremitumTime().v());
 			targetPremiumTime.addAmount(premiumTime.getPremiumAmount().v());
 		}
 		
 		/** 割増金額合計を求める */
-		val total = this.premiumTime.entrySet().stream().mapToInt(c -> c.getValue().getAmount().v()).sum();
+		val total = this.premiumTime.entrySet().stream().mapToLong(c -> c.getValue().getAmount().v()).sum();
 		this.premiumAmountTotal = new AttendanceAmountMonth(total);
 	}
 
@@ -88,14 +88,14 @@ public class PremiumTimeOfMonthly implements Serializable{
 		
 		for (val premiumValue : this.premiumTime.values()){
 			val itemNo = premiumValue.getPremiumTimeItemNo();
-			if (target.premiumTime.containsKey(itemNo)){
-				premiumValue.addMinutesToTime(target.premiumTime.get(itemNo).getTime().v());
-				premiumValue.addAmount(target.premiumTime.get(itemNo).getAmount().v());
+			if (target.premiumTime.containsKey(itemNo.value)){
+				premiumValue.addMinutesToTime(target.premiumTime.get(itemNo.value).getTime().v());
+				premiumValue.addAmount(target.premiumTime.get(itemNo.value).getAmount().v());
 			}
 		}
 		for (val targetPremiumValue : target.premiumTime.values()){
 			val itemNo = targetPremiumValue.getPremiumTimeItemNo();
-			this.premiumTime.putIfAbsent(itemNo, targetPremiumValue);
+			this.premiumTime.putIfAbsent(itemNo.value, targetPremiumValue);
 		}
 		this.premiumAmountTotal = this.premiumAmountTotal.addAmount(target.premiumAmountTotal.v());
 	}

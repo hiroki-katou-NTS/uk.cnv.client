@@ -34,6 +34,7 @@ public class AttItemFinder {
 	@Inject
 	private OptionalItemRepository optionalRepo;
 
+	// to ver7
 	public List<AttItemName> getDailyAttItemByIdAndAtr(AttItemParam param) {
 		Optional<String> authorityId = Optional.empty();
 		List<Integer> attendanceItemIds = Collections.emptyList();
@@ -46,6 +47,7 @@ public class AttItemFinder {
 					: param.getItemAtrs().stream().map(x -> EnumAdaptor.valueOf(x, DailyAttendanceAtr.class))
 							.collect(Collectors.toList());
 		}
+		// to ver7
 		return this.companyDailyItemService.getDailyItems(AppContexts.user().companyId(), authorityId,
 				attendanceItemIds, itemAtrs);
 	}
@@ -55,7 +57,7 @@ public class AttItemFinder {
 			return this.companyDailyItemService.getDailyItemsNew(companyId, Optional.ofNullable(authorityId));
 		}
 
-	
+	// to ver7
 	public List<AttItemName> getMonthlyAttItemByIdAndAtr(AttItemParam param) {
 		Optional<String> authorityId = Optional.empty();
 		List<Integer> attendanceItemIds = Collections.emptyList();
@@ -68,6 +70,7 @@ public class AttItemFinder {
 					: param.getItemAtrs().stream().map(x -> EnumAdaptor.valueOf(x, MonthlyAttendanceItemAtr.class))
 							.collect(Collectors.toList());
 		}
+		// to ver7
 		return this.companyMonthlyItemService.getMonthlyItems(AppContexts.user().companyId(), authorityId,
 				attendanceItemIds, itemAtrs);
 	}

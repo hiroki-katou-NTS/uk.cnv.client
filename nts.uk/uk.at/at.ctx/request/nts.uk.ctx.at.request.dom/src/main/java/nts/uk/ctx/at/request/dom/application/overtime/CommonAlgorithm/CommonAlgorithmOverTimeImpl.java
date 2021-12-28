@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import nts.uk.ctx.at.request.dom.application.overtime.*;
 import org.apache.commons.lang3.StringUtils;
 
 import nts.arc.enums.EnumAdaptor;
@@ -34,13 +35,6 @@ import nts.uk.ctx.at.request.dom.application.common.service.setting.CommonAlgori
 import nts.uk.ctx.at.request.dom.application.common.service.setting.output.AppDispInfoStartupOutput;
 import nts.uk.ctx.at.request.dom.application.common.service.setting.output.InitWkTypeWkTimeOutput;
 import nts.uk.ctx.at.request.dom.application.holidayworktime.service.dto.CalculatedFlag;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOverTime;
-import nts.uk.ctx.at.request.dom.application.overtime.ApplicationTime;
-import nts.uk.ctx.at.request.dom.application.overtime.AttendanceType_Update;
-import nts.uk.ctx.at.request.dom.application.overtime.ExcessState;
-import nts.uk.ctx.at.request.dom.application.overtime.OutDateApplication;
-import nts.uk.ctx.at.request.dom.application.overtime.OverStateOutput;
-import nts.uk.ctx.at.request.dom.application.overtime.OvertimeAppAtr;
 import nts.uk.ctx.at.request.dom.application.overtime.service.DisplayInfoOverTime;
 import nts.uk.ctx.at.request.dom.application.overtime.service.OverTimeContent;
 import nts.uk.ctx.at.request.dom.application.overtime.service.OvertimeService;
@@ -1163,9 +1157,5 @@ public class CommonAlgorithmOverTimeImpl implements ICommonAlgorithmOverTime {
 		
 		return displayInfoOverTime;
 	}
-	
-
-
-	
 
 }

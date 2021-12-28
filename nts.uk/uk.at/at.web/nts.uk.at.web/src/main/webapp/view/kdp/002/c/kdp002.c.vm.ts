@@ -13,9 +13,9 @@ module nts.uk.at.view.kdp002.c {
 		displayTime: KnockoutObservable<number>;
 	}
 
-	const initTime = (): TimeClock => ({
+	const initTime = (date: any): TimeClock => ({
 		tick: -1,
-		now: ko.observable(new Date()),
+		now: ko.observable(date),
 		style: ko.observable(''),
 		displayTime: ko.observable(10)
 	});
@@ -57,7 +57,7 @@ module nts.uk.at.view.kdp002.c {
 
 			timeName2: KnockoutObservable<string> = ko.observable("");
 
-			time: TimeClock = initTime();
+			time: TimeClock = initTime(this.$date.now());
 
 			items: KnockoutObservableArray<model.ItemModels> = ko.observableArray([]);
 			columns2: KnockoutObservableArray<NtsGridListColumn>;
@@ -65,6 +65,7 @@ module nts.uk.at.view.kdp002.c {
 			currentCodeList: KnockoutObservableArray<any>;
 			permissionCheck: KnockoutObservable<boolean> = ko.observable(false);
 			displayButton: KnockoutObservable<boolean> = ko.observable(true);
+			timeView: KnockoutObservable<Date> = ko.observable();
 
 			notificationStamp: KnockoutObservableArray<IMsgNotices> = ko.observableArray([]);
 			modeShowPointNoti: KnockoutObservable<boolean | null> = ko.observable(null);
@@ -89,6 +90,7 @@ module nts.uk.at.view.kdp002.c {
 				super();
 
 				let self = this;
+				const vm = new ko.ViewModel();
 
 				self.columns2 = ko.observableArray([
 					{ headerText: nts.uk.resource.getText("KDP002_59"), key: 'itemId', width: 200, hidden: true },
@@ -102,9 +104,14 @@ module nts.uk.at.view.kdp002.c {
 					self.setSizeDialog();
 				});
 				self.$ajax(kDP002RequestUrl.FINGER_STAMP_SETTING)
-				.then((data: any) => {
-					self.noticeSetting(data.noticeSetDto);
-				});
+					.then((data: any) => {
+						self.noticeSetting(data.noticeSetDto);
+					});
+
+				vm.$ajax("at", "server/time/now").then((output: any) => {
+					let data: Date = moment(output).utc();
+					self.timeView(data)
+				})
 			}
 
 			setSizeDialog() {
@@ -149,8 +156,6 @@ module nts.uk.at.view.kdp002.c {
 					dfd = $.Deferred();
 				let itemIds: DISPLAY_ITEM_IDS = nts.uk.ui.windows.getShared("KDP010_2C");
 				self.infoEmpFromScreenA = nts.uk.ui.windows.getShared("infoEmpToScreenC");
-
-				console.log(self.infoEmpFromScreenA);
 
 				self.getWorkPlacwName(self.infoEmpFromScreenA.workPlaceId);
 
@@ -242,7 +247,7 @@ module nts.uk.at.view.kdp002.c {
 						if (res.setting == 2) {
 							if (self.infoEmpFromScreenA.error && self.infoEmpFromScreenA.error.dailyAttdErrorInfos && self.infoEmpFromScreenA.error.dailyAttdErrorInfos.length > 0) {
 								self.permissionCheck(false);
-							}else {
+							} else {
 								self.permissionCheck(true);
 							}
 						}
@@ -355,7 +360,7 @@ module nts.uk.at.view.kdp002.c {
 			 */
 			public registerDailyIdentify(): void {
 				const vm = this;
-				const param = {sid: vm.infoEmpFromScreenA.employeeId};
+				const param = { sid: vm.infoEmpFromScreenA.employeeId };
 
 				service.registerDailyIdentify(param).done(() => {
 					nts.uk.ui.dialog.info({ messageId: "Msg_15" })

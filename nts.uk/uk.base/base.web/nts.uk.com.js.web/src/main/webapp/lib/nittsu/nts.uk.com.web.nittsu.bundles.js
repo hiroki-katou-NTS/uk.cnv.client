@@ -25880,6 +25880,7 @@ var nts;
                     v_1.FACON_DESC = "facon-desc";
                     v_1.ALIGN_LEFT = "halign-left";
                     v_1.ALIGN_RIGHT = "halign-right";
+                    v_1.ALIGN_CENTER = "halign-center";
                     v_1.DefaultRowConfig = { css: { height: BODY_ROW_HEIGHT } };
                     v_1._voilerRows = {};
                     v_1._encarRows = [];
@@ -27661,7 +27662,7 @@ var nts;
                                 tdStyle += "; display: none;";
                             else if (!_.isNil(col[0].columnCssClass)) {
                                 col[0].columnCssClass.split(' ').forEach(function (clz) {
-                                    if (clz === hpl.CURRENCY_CLS || clz === "halign-right") {
+                                    if (clz === hpl.CURRENCY_CLS || clz === v.ALIGN_RIGHT || clz === v.ALIGN_CENTER) {
                                         td.classList.add(clz);
                                     }
                                 });
@@ -28001,7 +28002,7 @@ var nts;
                                 tdStyle += "; display: none;";
                             else if (!_.isNil(col[0].columnCssClass)) {
                                 col[0].columnCssClass.split(' ').forEach(function (clz) {
-                                    if (clz === hpl.CURRENCY_CLS || clz === "halign-right") {
+                                    if (clz === hpl.CURRENCY_CLS || clz === v.ALIGN_RIGHT || clz === v.ALIGN_CENTER) {
                                         td.classList.add(clz);
                                     }
                                 });
@@ -32115,7 +32116,7 @@ var nts;
                                     after = parseFloat(cellValue);
                                     before = parseFloat($.data(calcCell, v.DATA));
                                     total = sum[currentPage] + ((isNaN(after) ? 0 : after) - (isNaN(before) ? 0 : before));
-                                    sum[currentPage] = total;
+                                    sum[currentPage] = parseFloat(total).toFixed(5).toDecimal();
                                     sumDone = true;
                                 }
                                 sum[sheet].textContent = sum.formatter === "Currency" ? ti.asCurrency(sum[currentPage]) : sum[currentPage];
@@ -32252,6 +32253,31 @@ var nts;
                                     if (control === dkn.LINK_LABEL) {
                                         var link = t.c.querySelector("a");
                                         link.innerHTML = cellValue;
+                                    }
+                                    else if (control === dkn.CHECKBOX) {
+                                        var check = t.c.querySelector("input[type='checkbox']");
+                                        if (!check)
+                                            return;
+                                        if (cellValue) {
+                                            check.setAttribute("checked", "checked");
+                                            check.checked = true;
+                                            var evt = document.createEvent("HTMLEvents");
+                                            evt.initEvent("change", false, true);
+                                            evt.resetValue = reset;
+                                            evt.checked = cellValue;
+                                            evt.stopUpdate = true;
+                                            check.dispatchEvent(evt);
+                                        }
+                                        else if (!cellValue) {
+                                            check.removeAttribute("checked");
+                                            check.checked = false;
+                                            var evt = document.createEvent("HTMLEvents");
+                                            evt.initEvent("change", false, true);
+                                            evt.resetValue = reset;
+                                            evt.checked = cellValue;
+                                            evt.stopUpdate = true;
+                                            check.dispatchEvent(evt);
+                                        }
                                     }
                                     else if (_.isObject(control) && control.type === dkn.COMBOBOX) {
                                         var sel = _.find(control.options, function (o) { return o.code === cellValue; });
@@ -33716,7 +33742,7 @@ var nts;
                                 }
                             }
                             var r = ti.closest($checkBox, "tr");
-                            if (r) {
+                            if (r && !evt.stopUpdate) {
                                 setChecked(checked, parseFloat($.data(r, lo.VIEW)), evt.resetValue, evt.pg);
                             }
                         });

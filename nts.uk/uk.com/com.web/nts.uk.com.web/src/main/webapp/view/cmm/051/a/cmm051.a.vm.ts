@@ -246,7 +246,7 @@ module nts.uk.com.view.cmm051.a {
                 for (let i = 0; i < listHist.length; i++) {
                     let wpl = listHist[i];
                     let id = wpl.workplaceManagerId;
-                    let display = wpl.startDate + " ~ " + wpl.endDate;
+                    let display = wpl.startDate + nts.uk.resource.getText("CMM051_62") + wpl.endDate;
                     listDatePeriod.push({
                         id: id,
                         sid: wpl.employeeId,
@@ -788,7 +788,7 @@ module nts.uk.com.view.cmm051.a {
                     vm.isUpdateModeHist(true);
                     vm.isDeleteModeHist(false);
 
-                    let display = prams.startDate + " ~ " + prams.endDate;
+                    let display = prams.startDate + nts.uk.resource.getText("CMM051_62") + prams.endDate;
                     vm.startDate(prams.startDate);
                     vm.endDate(prams.endDate);
                     let idNew = "idNew";
@@ -843,7 +843,7 @@ module nts.uk.com.view.cmm051.a {
                         let hists: any[] = vm.dateHistoryList();
                         let index = _.findIndex(hists, (e) => e.id == id);
                         if (index >= 0) {
-                            let display = prams.startDate + " ~ " + prams.endDate;
+                            let display = prams.startDate + nts.uk.resource.getText("CMM051_62") + prams.endDate;
                             vm.startDate(prams.startDate);
                             vm.endDate(prams.endDate);
                             let hist = {

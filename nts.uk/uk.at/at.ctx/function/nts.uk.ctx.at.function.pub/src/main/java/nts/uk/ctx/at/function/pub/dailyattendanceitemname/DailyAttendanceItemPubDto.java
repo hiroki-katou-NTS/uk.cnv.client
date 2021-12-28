@@ -15,5 +15,5 @@ public class DailyAttendanceItemPubDto {
 	
 	private Integer frameCategory;
 
-	
+	private String displayName;
 }

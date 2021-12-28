@@ -45,7 +45,7 @@
         <div id="tabpanel-com" role="tabpanel" data-bind="with: viewmodelZ">
             <div class="sidebar-content-header">
                 <span class="title">#{i18n.getText('Com_Company')}</span>
-                <a style="height: 25px" data-bind="ntsLinkButton: { jump: '../a/index.xhtml' }">#{i18n.getText('KAF022_706')}</a>
+                <a class="goback" style="height: 25px" data-bind="ntsLinkButton: { jump: '../a/index.xhtml' }">#{i18n.getText('KAF022_706')}</a>
                 <button class="button proceed" data-bind="enable: $root.errors.isEmpty(), click: register">#{i18n.getText('KAF022_1')}</button>
             </div>
             <div class="contents-area">
@@ -55,7 +55,7 @@
         <div id="tabpanel-wkp" role="tabpanel" data-bind="with: viewmodelM">
             <div class="sidebar-content-header">
                 <span class="title">#{i18n.getText('Com_Workplace')}</span>
-                <a data-bind="ntsLinkButton: { jump: '../a/index.xhtml' }">#{i18n.getText('KAF022_706')}</a>
+                <a class="goback" data-bind="ntsLinkButton: { jump: '../a/index.xhtml' }">#{i18n.getText('KAF022_706')}</a>
                 <button class="button proceed" data-bind="enable: allowRegister() &amp;&amp; $root.errors.isEmpty(), click: registerSetting">#{i18n.getText('KAF022_1')}</button>
                 <button data-bind="enable: isUpdate, click: copySetting">#{i18n.getText('KAF022_274')}</button>
                 <button class="button danger" data-bind="enable: isUpdate, click: deleteSetting">#{i18n.getText('KAF022_275')}</button>

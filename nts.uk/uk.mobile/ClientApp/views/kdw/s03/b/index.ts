@@ -1,3 +1,4 @@
+
 import { Vue, _, moment } from '@app/provider';
 import { component, Prop, Watch } from '@app/core/component';
 import { TimeDuration, TimeWithDay } from '@app/utils';
@@ -9,6 +10,7 @@ import { CdlS03AComponent } from 'views/cdl/s03/a';
 import { CdlS04AComponent } from 'views/cdl/s04/a';
 import { CdlS02AComponent } from 'views/cdl/s02/a';
 import { CdlS24AComponent } from 'views/cdl/s24/a';
+import { Kdls12Component } from 'views/kdl/s12';
 
 @component({
     name: 'kdws03b',
@@ -39,7 +41,8 @@ import { CdlS24AComponent } from 'views/cdl/s24/a';
             AnyItemTime: { constraint: 'AnyItemTime' },
             AnyTimeMonth: { constraint: 'AnyTimeMonth' },
             AnyItemTimes: { constraint: 'AnyItemTimes' },
-            AnyTimesMonth: { constraint: 'AnyTimesMonth' }
+            AnyTimesMonth: { constraint: 'AnyTimesMonth' },
+            SuppNumValue: { constraint: 'SuppNumValue' }
         }
     },
     constraints: [
@@ -65,7 +68,8 @@ import { CdlS24AComponent } from 'views/cdl/s24/a';
         'nts.uk.ctx.at.shared.dom.common.anyitem.AnyTimeMonth',
         'nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.optionalitemvalue.AnyItemTimes',
         'nts.uk.ctx.at.shared.dom.common.anyitem.AnyTimesMonth',
-        'nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.deviationtime.DiverdenceReasonCode'
+        'nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.deviationtime.DiverdenceReasonCode',
+        'nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.SuppNumValue'
     ],
     components: {
         'kdws03d': KdwS03DComponent,
@@ -75,7 +79,8 @@ import { CdlS24AComponent } from 'views/cdl/s24/a';
         'cdls03a': CdlS03AComponent,
         'cdls04a': CdlS04AComponent,
         'cdls02a': CdlS02AComponent,
-        'cdls24a': CdlS24AComponent 
+        'cdls24a': CdlS24AComponent,
+        'kdls12a': Kdls12Component
     },
 })
 export class KdwS03BComponent extends Vue {
@@ -111,6 +116,7 @@ export class KdwS03BComponent extends Vue {
         lstTimeLimit: []
     };
     private masterDialogParam: Array<number> = [];
+    private masterItemIdParam: Array<number> = [];
     private oldData: any = [];
     private oldCheckBox: Array<number> = [];
     private listAutoCalc: any = [];
@@ -127,7 +133,7 @@ export class KdwS03BComponent extends Vue {
         let self = this;
 
         return self.params.paramData.lstControlDisplayItem.lstHeader;
-    }
+    }    
 
     get itemValues() {
         let self = this;
@@ -160,13 +166,17 @@ export class KdwS03BComponent extends Vue {
         self.addCustomValid();
         self.oldData = self.toJS(self.screenData[0]);
         self.createMasterComboBox();
+        self.getListTaskSup(self.masterItemIdParam);
         self.$http.post('at', API.masterDialogData, {
             types: self.masterDialogParam,
-            date: new Date(),
+            date: moment(self.params.date).utc().toDate(),
             employeeID: self.params.employeeID,
             workTypeCD: self.screenData1.A28
-        }).then((masterData: any) => {
-            self.createMasterData(masterData.data);
+        }).then(async (masterData: any) => {
+            await new Promise((next) => {
+                self.createMasterData(masterData.data);
+                next();
+            });           
             self.$mask('hide');
         }).catch((res: any) => {
             self.$mask('hide');
@@ -176,6 +186,40 @@ export class KdwS03BComponent extends Vue {
                 });
         });
         self.screenDataWatch();
+    }
+
+    public getListTaskSup(keys: number[])  {
+        let self = this;        
+        self.$http.post('at', API.masterTaskSupOpt, {            
+            itemIds: self.masterItemIdParam,
+            date: moment(self.params.date).utc().toDate(),
+        }).then((dataAll: any) => {
+            _.forEach(keys, (key) => {
+                self.masterData[key] = [];
+                _.forEach(dataAll.data[key], (o) => {
+                    self.masterData[key].push({ code: o.code, name: o.name });                    
+                }); 
+                self.masterData[key].push({ code: '', name: 'なし' });
+            }); 
+            _.forEach(self.screenData1, (value, key) => {
+                let idKey = key.replace('A', '');
+                if (!(self.getItemType(key) == ItemType.InputStringCode || self.getItemType(key) == ItemType.ButtonDialog)) {
+                    return;
+                }
+                if (!_.find(self.masterData[idKey], (item) => item.code == value)) {
+                    self.masterData[idKey].push({ code: value, name: 'マスタ未登録' });
+                }
+                  
+                self.getRowComboBox(key);
+            });            
+            self.$mask('hide');
+        }).catch((res: any) => {
+            self.$mask('hide');
+            self.$modal.error(res.messageId)
+                .then(() => {
+                    self.$close();
+                });
+        });
     }
 
     public beforeUpdate() {
@@ -287,20 +331,23 @@ export class KdwS03BComponent extends Vue {
         self.masterData[MasterType.CDLS04_Possition] = data[MasterType.CDLS04_Possition];
         self.masterData[MasterType.CDLS02_Employment] = data[MasterType.CDLS02_Employment];
         self.masterData[MasterType.CDLS24_BusinessType] = data[MasterType.CDLS24_BusinessType];
+        self.masterData[MasterType.KDLS12_TaskSelection] = data[MasterType.KDLS12_TaskSelection];
+
         // tạo dữ liệu conbo box tạm thời cho các dialog chưa dc làm
         _.forEach(data[MasterType.KDLS10_ServicePlace], (o) => {
             self.masterData.servicePlace.push({ code: o.code, name: o.name });
-        });
+        }); 
         if (!_.find(self.masterData.servicePlace, (item) => item.code == '')) {
             self.masterData.servicePlace.push({ code: '', name: 'なし' });
         }
         _.forEach(data[MasterType.KDLS32_Reason], (o) => {
             self.masterData.reason.push({ code: o.code, name: o.name });
         });
+
         if (!_.find(self.masterData.reason, (item) => item.code == '')) {
             self.masterData.reason.push({ code: '', name: 'なし' });
-        }
-        _.forEach(self.screenData1, (value, key) => {
+        }        
+        _.forEach(self.screenData1, (value, key) => {            
             let attendanceItem = self.getAttendanceItem(key);
             if (!(self.getItemType(key) == ItemType.InputStringCode || self.getItemType(key) == ItemType.ButtonDialog)) {
                 return;
@@ -319,8 +366,10 @@ export class KdwS03BComponent extends Vue {
                         rowData.comboLst.push({ code: value, name: 'マスタ未登録' });
                     }
                     break;
+
                 default: break;
             }
+            self.getRowComboBox(key);
         });
     }
 
@@ -333,11 +382,13 @@ export class KdwS03BComponent extends Vue {
                 self.getItemMasterType(key) == MasterType.CDLS03_Classification ||
                 self.getItemMasterType(key) == MasterType.CDLS04_Possition ||
                 self.getItemMasterType(key) == MasterType.CDLS02_Employment ||
-                self.getItemMasterType(key) == MasterType.CDLS24_BusinessType;
+                self.getItemMasterType(key) == MasterType.CDLS24_BusinessType ||
+                self.getItemMasterType(key) == MasterType.KDLS12_TaskSelection;
     }
 
     public getRowComboBox(key: string) {
         let self = this;
+        let idKey = key.replace('A', '');
         let masterType = self.getItemMasterType(key);
         switch (masterType) {
             case MasterType.DoWork:
@@ -352,7 +403,9 @@ export class KdwS03BComponent extends Vue {
                 return self.masterData.lstReasonGoOut;
             case MasterType.TimeLimit:
                 return self.masterData.lstTimeLimit;
-            default: 
+            case MasterType.KDL013_TaskSupOption:    
+                return !_.isUndefined(self.masterData[idKey]) ? self.masterData[idKey] : null ;
+            default:             
                 return _.find(self.params.rowData.rowData, (rowData: RowData) => rowData.key == key).comboLst;
         }
     }
@@ -364,6 +417,9 @@ export class KdwS03BComponent extends Vue {
             case ItemType.InputNumber:
                 rowData.value = _.isEmpty(rowData.value) ? null : _.toNumber(rowData.value);
                 break;
+            case ItemType.InputNumericValue:
+                    rowData.value = _.isEmpty(rowData.value) ? null : _.toNumber(rowData.value);
+                    break;
             case ItemType.InputMoney:
                 rowData.value = _.isEmpty(rowData.value) ? null : _.toNumber(rowData.value);
                 break;
@@ -376,6 +432,13 @@ export class KdwS03BComponent extends Vue {
             default:
                 break;
         }
+    }
+
+    public getCheckboxType(key: string) {
+        let self = this;
+        let contentType = _.find(self.contentType, (item: ItemHeader) => item.key == key);
+
+        return contentType.ntsControl;
     }
 
     public getItemType(key: string) {
@@ -442,11 +505,11 @@ export class KdwS03BComponent extends Vue {
     private addCustomValid() {
         let self = this;
         let screenDataValid: any = {};
-        _.forEach(self.params.rowData.rowData, (rowData: RowData, index) => {
+        _.forEach(self.params.rowData.rowData, (rowData: any, index) => {
             self.formatData(rowData);
             self.addMasterDialogParam(rowData);
             let attendanceItem = self.getAttendanceItem(rowData.key);
-            let contraint = _.find(self.contentType, (item: ItemHeader) => item.key == rowData.key).constraint;
+            let contraint = _.find(self.contentType, (item: ItemHeader) => item.key == rowData.key).constraint;            
             switch (attendanceItem.attendanceAtr) {
                 case ItemType.InputStringCode:
                     self.$set(self.screenData1, rowData.key, rowData.value0);
@@ -455,21 +518,31 @@ export class KdwS03BComponent extends Vue {
                     self.$set(self.screenData1, rowData.key, rowData.value0);
                     break;
                 case ItemType.InputNumber:
-                    self.$set(self.screenData1, rowData.key, rowData.value);
-                    if (contraint.cdisplayType == 'Primitive') {
-                        screenDataValid[rowData.key] = {
-                            loop: true,
-                            required: contraint.required
-                        };
+                    if (rowData.displayvalue) {
+                        self.$set(self.screenData1, rowData.key, 1);
+                    } else if (!rowData.displayvalue) {   
+                        self.$set(self.screenData1, rowData.key, 0);
                     } else {
-                        screenDataValid[rowData.key] = {
-                            loop: true,
-                            required: contraint.required,
-                            min: _.toNumber(contraint.min),
-                            max: _.toNumber(contraint.max)
-                        };
+                        self.$set(self.screenData1, rowData.key, rowData.value);
                     }
+                    
+                    if (!_.isNull(contraint)) {
+                        if (contraint.cdisplayType == 'Primitive') {
+                            screenDataValid[rowData.key] = {
+                                loop: true,
+                                required: contraint.required
+                            };
+                        } else {
+                            screenDataValid[rowData.key] = {
+                                loop: true,
+                                required: contraint.required,
+                                min: _.toNumber(contraint.min),
+                                max: _.toNumber(contraint.max)
+                            };
+                        }
+                    }                        
                     break;
+                
                 case ItemType.InputMoney:
                     self.$set(self.screenData1, rowData.key, rowData.value);
                     if (contraint.cdisplayType == 'Primitive') {
@@ -521,6 +594,32 @@ export class KdwS03BComponent extends Vue {
                         };
                     }
                     break;
+
+                case  ItemType.InputNumericValue:
+                    if (rowData.value) {
+                        self.$set(self.screenData1, rowData.key, rowData.value);
+                    } else if (!rowData.value) {   
+                        self.$set(self.screenData1, rowData.key, 0);
+                    } else {
+                        self.$set(self.screenData1, rowData.key, rowData.value);
+                    }
+                    
+                    if (!_.isNull(contraint)) {
+                        if (contraint.cdisplayType == 'Primitive') {
+                            screenDataValid[rowData.key] = {
+                                loop: true,
+                                required: contraint.required
+                            };
+                        } else {
+                            screenDataValid[rowData.key] = {
+                                loop: true,
+                                required: contraint.required,
+                                min: _.toNumber(contraint.min),
+                                max: _.toNumber(contraint.max)
+                            };
+                        }
+                    }                        
+                    break;
                 default:
                     self.$set(self.screenData1, rowData.key, rowData.value);
                     break;
@@ -539,7 +638,7 @@ export class KdwS03BComponent extends Vue {
             let constraintObj: any = {};
             switch (attendanceItem.attendanceAtr) {
                 case ItemType.InputNumber:
-                    if (contraint.cdisplayType == 'Primitive') {
+                    if ( !_.isNull(contraint) && contraint.cdisplayType == 'Primitive') {
                         constraintObj = _.get(self.validations.fixedConstraint, PrimitiveAll['No' + attendanceItem.primitive]);
                         constraintObj.loop = true;
                         constraintObj.required = contraint.required;
@@ -571,6 +670,14 @@ export class KdwS03BComponent extends Vue {
                         // self.$updateValidator( {screenData : { [rowData.key] : constraintObj}});
                     }
                     break;
+                case ItemType.InputNumericValue:
+                    if ( !_.isNull(contraint) && contraint.cdisplayType == 'Primitive') {
+                        constraintObj = _.get(self.validations.fixedConstraint, PrimitiveAll['No' + attendanceItem.primitive]);
+                        constraintObj.loop = true;
+                        constraintObj.required = contraint.required;
+                        self.$updateValidator(`screenData.${rowData.key}`, constraintObj);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -585,8 +692,12 @@ export class KdwS03BComponent extends Vue {
         switch (attendanceItem.attendanceAtr) {
             case ItemType.InputStringCode:
                 if (!_.includes(self.masterDialogParam, attendanceItem.typeGroup)) {
-                    self.masterDialogParam.push(attendanceItem.typeGroup);
+                    self.masterDialogParam.push(attendanceItem.typeGroup);                    
                 }
+
+                if (attendanceItem.typeGroup == 19) {
+                    self.masterItemIdParam.push(attendanceItem.id);
+                }                        
                 break;
             case ItemType.ButtonDialog:
                 if (!_.includes(self.masterDialogParam, attendanceItem.typeGroup)) {
@@ -628,6 +739,7 @@ export class KdwS03BComponent extends Vue {
             case MasterType.CDLS04_Possition: self.openCDLS04(key); break;
             case MasterType.CDLS02_Employment: self.openCDLS02(key); break;
             case MasterType.CDLS24_BusinessType: self.openCDLS24(key); break;
+            case MasterType.KDLS12_TaskSelection: self.openKDLS12(key); break;
             default: break;
         }
     }
@@ -689,6 +801,42 @@ export class KdwS03BComponent extends Vue {
             }
         });
     }
+
+    private openKDLS12(key: string) {
+        let self = this;
+        let rowData = _.find(self.params.rowData.rowData, (o) => o.key == key);
+        let selectedCD = self.screenData[0][key];
+        let keyList = _.keys(WORK_FRAME_MAP);
+        let dateParam15: any = null, taskFrameNo: any = null;
+       
+        dateParam15 =  moment(self.params.date).format('YYYY/MM/DD');       
+        for (let itemTaskKey in keyList) {
+            if (_.includes(_.get(WORK_FRAME_MAP, keyList[itemTaskKey]), parseInt(self.getAttendanceItem(key).id))) {
+                taskFrameNo = parseInt(keyList[itemTaskKey]);
+                break;	
+            }
+        }
+        self.$modal(
+            'kdls12a',
+            {
+                isAddNone: true,
+                isMultiple: false,
+                showExpireDate: false,
+                baseDate: dateParam15,
+                taskFrameNo,
+                selectionCodeList: [selectedCD],
+                sid: self.params.employeeID,
+                taskCode: selectedCD == '' ? null : selectedCD
+            }
+        ).then((data: any) => {
+            if (data) {
+                self.screenData[0][key] = data.selectedTask.code;
+                rowData.value0 = data.selectedTask.code;
+                rowData.value = data.selectedTask.taskName;
+            }
+        });
+    }
+
 
     private openCDLS08(key: string) {
         let self = this;
@@ -803,7 +951,7 @@ export class KdwS03BComponent extends Vue {
             }
         });
     }
-
+    
     private isChangeDataRegister() {
         let self = this;
         let isChangeCheckBox = JSON.stringify(self.oldCheckBox).localeCompare(JSON.stringify(self.checked1s)) != 0;
@@ -1076,11 +1224,12 @@ export class KdwS03BComponent extends Vue {
 const API = {
     getPrimitiveAll: 'screen/at/correctionofdailyperformance/getPrimitiveAll',
     masterDialogData: 'screen/at/correctionofdailyperformance/getMasterDialogMob',
+    masterTaskSupOpt: 'screen/at/correctionofdailyperformance/getMasterTaskSupMob',
     register: 'screen/at/correctionofdailyperformance/addUpMobile',
     linkItemCalc: 'screen/at/correctionofdailyperformance/calcTime'
 };
 
-const watchItem = ['28', '29', '31', '34', '41', '44'];
+const watchItem = ['28', '29', '31', '34', '41', '44', '859', '860', '623', '625', '924'];
 
 const CHECK_INPUT = {
     '759': '760', '760': '759', '761': '762',
@@ -1101,6 +1250,14 @@ const CHECK_INPUT = {
     '20': '19', '21': '22', '22': '21',
     '23': '24', '24': '23', '25': '26',
     '26': '25'
+};
+
+const WORK_FRAME_MAP = {
+    1: [924,934,944,954,964,974,984,994,1004,1014,1024,1034,1044,1054,1064,1074,1084,1094,1104,1114],
+    2: [925,935,945,955,965,975,985,995,1005,1015,1025,1035,1045,1055,1065,1075,1085,1095,1105,1115],
+    3: [926,936,946,956,966,976,986,996,1006,1016,1026,1036,1046,1056,1066,1076,1086,1096,1106,1116],
+    4: [927,937,947,957,967,977,987,997,1007,1017,1027,1037,1047,1057,1067,1077,1087,1097,1107,1117],
+    5: [928,938,948,958,968,978,988,998,1008,1018,1028,1038,1048,1058,1068,1078,1088,1098,1108,1118]
 };
 
 export enum PrimitiveAll {
@@ -1127,6 +1284,7 @@ export enum PrimitiveAll {
     No58 = 'AnyItemTimes',
     No59 = 'AnyTimesMonth',
     No60 = 'DiverdenceReasonCode',
+    No73 = 'SuppNumValue',
 }
 
 export enum ItemType {
@@ -1137,7 +1295,8 @@ export enum ItemType {
     ComboBox = 4,
     Time = 5,
     TimeWithDay = 6,
-    InputStringChar = 7
+    InputStringChar = 7,
+    InputNumericValue = 9
 }
 
 export enum MasterType {
@@ -1154,7 +1313,9 @@ export enum MasterType {
     ReasonGoOut = 11,
     Remasks = 12,
     TimeLimit = 13,
-    CDLS24_BusinessType = 14
+    CDLS24_BusinessType = 14,
+    KDLS12_TaskSelection = 15,
+    KDL013_TaskSupOption = 19
 }
 
 interface RowData {

@@ -12,28 +12,50 @@ module nts.uk.at.view.kdl014.a {
         selectedItem = ko.observable( '' );
         listComponentOption: any;
         employeeInputList = ko.observableArray([]);
-        dataServer = [];
+        employeeInfoList = ko.observableArray([]);
+        dataServer: any[] = [];
         paramFromParent: ParamFromParent;
         display: boolean;
         height: number;
+		empInfoCode = ko.observable();
+		empInfoName = ko.observable();
+		locationAdd : any = null;
+		lstDataBase  = ko.observableArray([]);
+		checkMobile : boolean = false;
         
         constructor(){
             let self = this;
+            let tg: any[] = [];
             self.paramFromParent = getShared('KDL014-PARAM');
-            
-            let tg = [];
-            _.forEach(self.paramFromParent.listEmp, function(item) {
-                tg.push({ id: item.employeeId, code: item.employeeCode, businessName: item.employeeName, workplaceName: item.affiliationName, depName: '' });
-            });
-            
-            self.employeeInputList(_.orderBy(tg, ['code'], ['asc']));
+            if (self.paramFromParent.mode == 0 && self.paramFromParent.listEmp.length > 0) {
+                let param = {
+                    start: new Date(self.paramFromParent.startDate), 
+                    end: new Date(self.paramFromParent.endDate), 
+                    mode: self.paramFromParent.mode, 
+                    listEmp: self.paramFromParent.listEmp.length > 0 ? [self.paramFromParent.listEmp[0]] : []
+                };
+                service.getEmployeeData(param).done(function(data) {
+                    if (data) {
+                        _.forEach(data, function(item) {
+                            tg.push({ id: item.employeeId, code: item.employeeCode, businessName: item.businessName, workplaceName: item.affiliationName, depName: '' });
+                        });
+                        self.employeeInfoList(_.orderBy(tg, ['code'], ['asc']));
+						if (self.employeeInfoList().length > 0){
+							self.empInfoCode(self.employeeInfoList()[0].code);
+							self.empInfoName(self.employeeInfoList()[0].businessName);
+						}
+                    }
+                });
+            }
             
             self.selectedItem.subscribe((newValue) => {
                 $(document).ready(function() {
                     $('#btnClose').focus();
                 });
-                self.filterGrid(newValue);
-           
+               	self.filterGrid(newValue).done(() => {
+					self.empInfomationList(_.orderBy(self.lstDataBase(), ['code', 'dateShow', 'time'], ['asc']));
+					block.clear();
+				});
             });
         }
         
@@ -56,19 +78,16 @@ module nts.uk.at.view.kdl014.a {
                     console.log(data);
                     self.dataServer = data.listEmps;
                     self.display = data.display;
-            
+					if (data != null && !_.isNil(data.checkMobile) && data.checkMobile){
+						self.checkMobile = true;
+					}
+
                     if (self.paramFromParent.mode == 0) {
-                        self.selectedItem(self.employeeInputList()[0].id);
-                        self.bindComponent();
+                        self.selectedItem(self.employeeInfoList()[0].id);
                     } else {
-                        let tg = [];
-                        _.forEach(self.dataServer, function(item) {
-                            if (self.display == false) {
-                                item.locationInfo = null;
-                            }
-                            tg.push(new EmpInfomation(item));
-                        });
-                        self.empInfomationList(tg);
+                        self.filterGrid("").done(() => {
+							self.empInfomationList(_.orderBy(self.lstDataBase(), ['code', 'dateShow', 'time'], ['asc']));
+						});
                     }
                     self.bindingGrid();
                     $(document).ready(function() {
@@ -78,9 +97,9 @@ module nts.uk.at.view.kdl014.a {
                     error({ messageId: res.messageId }).then(() => {
                         self.cancel_Dialog();
                     });
+					block.clear();
                 }).always(function() {
                     self.bindingGrid();
-                    block.clear();
                     dfd.resolve();
                 });
             } else {
@@ -90,58 +109,132 @@ module nts.uk.at.view.kdl014.a {
             return dfd.promise();
         }
         
-        bindComponent(){
-            let self = this;
-            $('#emp-component').ntsLoadListComponent({
-                systemReference: SystemType.EMPLOYMENT,
-                isDisplayOrganizationName: false,
-                employeeInputList: self.employeeInputList,
-                targetBtnText: getText('KCP009_3'),
-                selectedItem: self.selectedItem,
-                tabIndex: 1
-            });
-        }
-        
         bindingGrid(){
             let self = this;
+			let locationInfoHidden = true;
+			if (self.display && self.checkMobile) {
+				locationInfoHidden = false
+			}
+			
+			
+			let p = 0, q = 0, r = 0;
             if (self.paramFromParent.mode == 1) {
+				
+				if (locationInfoHidden == true && self.checkMobile) {
+					r = 10;
+					q = 15;
+				}
+				
+				if (self.checkMobile == false) {
+					q = 120;
+					p = 18;
+				}
+				
+				if (locationInfoHidden == false && self.checkMobile) {
+					r = -25;
+					q = -5
+				}
                 self.columns = ko.observableArray([
                     { headerText: getText("KDL014_11"), key: 'code', hidden: true },
-                    { headerText: "<div style='text-align: center;'>"+getText("KDL014_12")+ "</div>" , key: 'name', width: 150},
-                    { headerText: "<div style='text-align: center;'>"+getText("KDL014_13")+ "</div>" , key: 'dateShow', width: 115},
-                    { headerText: "<div style='text-align: center;'>"+getText("KDL014_14")+ "</div>" , key: 'time', width: 80},
-                    { headerText: "<div style='text-align: center;'>"+getText("KDL014_15")+ "</div>" , key: 'stampAtr', width: 90},
-                    { headerText: "<div style='text-align: center;'>"+getText("KDL014_16")+ "</div>" , key: 'workLocationName', width: 180 },
-                    { headerText: "<div style='text-align: center;'>"+getText("KDL014_17")+ "</div>" , key: 'locationInfo', width: 50, hidden: !self.display }
+                    { headerText: "<div style='text-align: center;'>"+getText("KDL014_12")+ "</div>" , key: 'name', width: 150 + p},
+                    { headerText: "<div style='text-align: center;'>"+getText("KDL014_13")+ "</div>" , key: 'dateShow', width: 115 + p},
+                    { headerText: "<div style='text-align: center;'>"+getText("KDL014_14")+ "</div>" , key: 'time', width: 80 + p},
+                    { headerText: "<div style='text-align: center;'>"+getText("KDL014_15")+ "</div>" , key: 'stampAtr', width: 90 + p},
+                    { headerText: "<div style='text-align: center;'>"+getText("KDL014_16")+ "</div>" , key: 'workLocationName', width: 130 + q },
+					{ headerText: "<div style='text-align: center;'>"+getText("KDL014_26")+ "</div>" , key: 'locationAdd', width: 170 + r, hidden: !self.checkMobile},
+                    { headerText: "<div style='text-align: center;'>"+getText("KDL014_17")+ "</div>" , key: 'locationInfo', width: 50, hidden: locationInfoHidden }
                 ]);
             } else if (self.paramFromParent.mode == 0) {
+				
+				if (locationInfoHidden == true && self.checkMobile) {
+					r = -20;
+					q = 20;
+					p = 10;
+				}
+				
+				if (self.checkMobile == false) {
+					p = 25;
+					q = 200;
+				}
+				
+				if (locationInfoHidden == false && self.checkMobile) {
+					r = -20;
+				}
                 self.columns = ko.observableArray([
                     { headerText: getText("KDL014_11"), key: 'code', hidden: true },
                     { headerText: getText("KDL014_12"), key: 'name', hidden: true },
-                    { headerText: "<div style='text-align: center;'>" + getText("KDL014_13") + "</div>", key: 'dateShow', width: 115 },
-                    { headerText: "<div style='text-align: center;'>" + getText("KDL014_14") + "</div>", key: 'time', width: 80 },
-                    { headerText: "<div style='text-align: center;'>" + getText("KDL014_15") + "</div>", key: 'stampAtr', width: 90 },
-                    { headerText: "<div style='text-align: center;'>" + getText("KDL014_16") + "</div>", key: 'workLocationName', width: 283},
-                    { headerText: "<div style='text-align: center;'>" + getText("KDL014_17") + "</div>", key: 'locationInfo', width: 50, hidden: !self.display }
+                    { headerText: "<div style='text-align: center;'>" + getText("KDL014_13") + "</div>", key: 'dateShow', width: 130 + p},
+                    { headerText: "<div style='text-align: center;'>" + getText("KDL014_14") + "</div>", key: 'time', width: 90  + p},
+                    { headerText: "<div style='text-align: center;'>" + getText("KDL014_15") + "</div>", key: 'stampAtr', width: 100  + p},
+                    { headerText: "<div style='text-align: center;'>" + getText("KDL014_16") + "</div>", key: 'workLocationName', width: 155 + q},
+					{ headerText: "<div style='text-align: center;'>" + getText("KDL014_26") + "</div>" , key: 'locationAdd', width: 250 + r , hidden: !self.checkMobile},
+                    { headerText: "<div style='text-align: center;'>" + getText("KDL014_17") + "</div>", key: 'locationInfo', width: 50, hidden: locationInfoHidden }
                 ]);
             }
             
         }
-        
-        filterGrid(id:string){
-            let self = this;
-            let tg = [];
+
+        filterGrid(id:string): JQueryPromise<any> {
+            let self = this, tg : any = [], dfd = $.Deferred();
             self.empInfomationList([]);
-            _.forEach(self.dataServer, function(item) {
-                if (item.employeeId === id) {
-                    if (self.display == false) {
-                        item.locationInfo = null;
-                    }
-                    tg.push(new EmpInfomation(item));
-                }
-            });
-            
-            self.empInfomationList(_.orderBy(tg, ['code', 'dateShow', 'time'], ['asc']));
+			self.lstDataBase([]);
+			
+            for(let i = 0; i < self.dataServer.length; i++){
+				let x = 0, y = 0;
+	 			if (self.dataServer[i].locationInfo != null){
+					x = self.dataServer[i].locationInfo.longitude;
+					y = self.dataServer[i].locationInfo.latitude;
+				}
+				
+				if (x == 0 && y == 0){
+					self.dataServer[i].locationAdd = "";
+	               	self.lstDataBase.push(new EmpInfomation(self.dataServer[i]));
+				} else {
+					self.getLocationAdd(self.dataServer[i], tg).done((a : any) => {
+						self.lstDataBase.push(a);
+						
+						if (self.lstDataBase().length == self.dataServer.length){
+						dfd.resolve();
+				}
+					});
+					
+				}
+				
+				if (self.lstDataBase().length == self.dataServer.length){
+					//setTimeout(() => {
+						dfd.resolve();
+					//},self.dataServer.length * 100);
+				}
+					
+            };
+            return dfd.promise();
+        }
+
+		getLocationAdd(item : any, tg : any,): JQueryPromise<any>{
+            let self = this,  dfd = $.Deferred();
+			let x = 0, y = 0;
+ 			if (item.locationInfo != null){
+				x = item.locationInfo.longitude;
+				y = item.locationInfo.latitude;
+			}
+				$.ajax({
+	                url: 'http://geoapi.heartrails.com/api/json',
+	                data: { method: 'searchByGeoLocation', x: x, y : y}
+	            }).done(function (data) {
+	                if (data != null && !_.isNil(data.response.location) && data.response.location.length > 0) {
+						self.locationAdd = data.response.location[0].prefecture + " " + data.response.location[0].city + " " + data.response.location[0].town; 
+	                }
+					
+					if (data == null || (data != null && _.isNil(data.response.location)) || (data != null && !_.isNil(data.response.location) && data.response.location.length == 0)) {
+						if (x == 0 && y == 0)
+							self.locationAdd = "";
+						else
+							self.locationAdd = x + "、" + y;
+					}
+					item.locationAdd = self.locationAdd;
+					dfd.resolve(new EmpInfomation(item));
+	            });
+			return dfd.promise();
         }
         
         cancel_Dialog(): any {
@@ -162,6 +255,7 @@ module nts.uk.at.view.kdl014.a {
         date: string;
         color: number;
         dateShow: string;
+		locationAdd : string;
         
         constructor(param: any) {
             let self = this;
@@ -175,10 +269,10 @@ module nts.uk.at.view.kdl014.a {
             if (param.stampAtr === '出勤' || param.stampAtr === '入門' || param.stampAtr === '応援開始' || param.stampAtr === '直行' || param.stampAtr === '早出'
                 || param.stampAtr === '応援休出' || param.stampAtr === '応援早出' || param.stampAtr === '休出' || param.stampAtr === '応援出勤' || param.stampAtr === '臨時出勤') {
 
-                self.stampAtr = `<div style="text-align: left">` + param.stampAtr + '</div>';
+                self.stampAtr = `<div style="text-align: left; margin-left: 5px;">` + param.stampAtr + '</div>';
 
             } else if (param.stampAtr === '退勤' || param.stampAtr === '退門' || param.stampAtr === '応援終了' || param.stampAtr === '臨時退勤' || param.stampAtr === '直帰' || param.stampAtr === '退勤+残業') {
-                self.stampAtr = `<div style="text-align: right">` + param.stampAtr + '</div>';
+                self.stampAtr = `<div style="text-align: right; margin-right: 5px;">` + param.stampAtr + '</div>';
 
             } else {
                 self.stampAtr = `<div style="text-align: center">` + param.stampAtr + '</div>';
@@ -212,10 +306,12 @@ module nts.uk.at.view.kdl014.a {
             } else {
                 self.dateShow = "<span>"+ nts.uk.time.applyFormat("Short_YMDW", date) + "</span>"            
             }
-            
+
             if (param.locationInfo !== null) {
                 self.locationInfo = '<a onClick = "gotoMap(' + param.locationInfo.latitude + ',' + param.locationInfo.longitude + ')"><img src="../img/Mapアイコン画像.png" height="20" width="20"/></a>';
             }
+
+			self.locationAdd = param.locationAdd;
         }
         
     }
@@ -232,7 +328,7 @@ module nts.uk.at.view.kdl014.a {
         startDate: string; //YYYY/MM/DD
         endDate: string; ////YYYY/MM/DD
         mode: number; //mode = 0 => Person, mode = 1 => Date
-        listEmp: EmployeeInfor[];//{employeeId: 'ae7fe82e-a7bd-4ce3-adeb-5cd403a9d570', employeeCode: '', employeeName: '', affiliationName: ''}
+        listEmp: string[];//employeeId: 'ae7fe82e-a7bd-4ce3-adeb-5cd403a9d570'
     }
 
     interface EmployeeInfor {

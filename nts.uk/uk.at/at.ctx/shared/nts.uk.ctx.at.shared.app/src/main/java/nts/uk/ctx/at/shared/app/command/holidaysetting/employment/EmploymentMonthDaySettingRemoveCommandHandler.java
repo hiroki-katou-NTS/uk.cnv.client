@@ -32,7 +32,8 @@ public class EmploymentMonthDaySettingRemoveCommandHandler extends CommandHandle
 		EmploymentMonthDaySettingRemoveCommand command = context.getCommand();
 		
 		// Remove
-		this.repository.remove(new CompanyId(companyId), command.getEmpCd(), new Year(command.getYear()));
+		this.repository.remove(new CompanyId(companyId), command.getEmpCd(), new Year(command.getYear()),
+				command.getStartMonth());
 	}
 
 }

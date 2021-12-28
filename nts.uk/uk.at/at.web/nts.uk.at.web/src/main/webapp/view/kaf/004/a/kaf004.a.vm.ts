@@ -52,7 +52,11 @@ module nts.uk.at.view.kaf004_ref.a.viewmodel {
             vm.managementMultipleWorkCycles = ko.observable(false);
             vm.isSendMail = ko.observable(false);
 
+			let screenCode: number = null;
 			if (!_.isEmpty(params)) {
+				if (!nts.uk.util.isNullOrUndefined(params.screenCode)) {
+					screenCode = params.screenCode;
+				}
 				if (!_.isEmpty(params.employeeIds)) {
 					empLst = params.employeeIds;
 				}
@@ -72,7 +76,13 @@ module nts.uk.at.view.kaf004_ref.a.viewmodel {
             if (ko.toJS(vm.application().appDate)) {
                 dates.push(ko.toJS(vm.application().appDate));
             }
-            vm.loadData(empLst, dateLst, vm.appType())
+			let paramKAF000 = {
+				empLst, 
+				dateLst, 
+				appType: vm.appType(),
+				screenCode
+			};
+            vm.loadData(paramKAF000)
                 .then((loadDataFlag: any) => {
                     if (loadDataFlag) {
                         vm.application().employeeIDLst(empLst);

@@ -10,6 +10,7 @@ import nts.arc.enums.EnumAdaptor;
 import nts.arc.enums.EnumConstant;
 import nts.arc.layer.ws.WebService;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
+import nts.uk.query.pub.employee.EmployeeInformationExport;
 import nts.uk.screen.at.app.query.kdl.kdl014.a.ReferToTheStampingResultsFinder;
 import nts.uk.screen.at.app.query.kdl.kdl014.a.dto.Kdl014EmpParamDto;
 import nts.uk.screen.at.app.query.kdl.kdl014.a.dto.ReferToTheStampingResultsDto;
@@ -26,6 +27,12 @@ public class Kdl014EmpWebService extends WebService {
 	@Path("get")
 	public ReferToTheStampingResultsDto get(Kdl014EmpParamDto input) {
 		return stampResultSQ.get(input);
+	}
+	
+	@POST
+	@Path("getEmployeeData")
+	public List<EmployeeInformationExport> getEmployeeData(Kdl014EmpParamDto param) {
+	    return stampResultSQ.getEmployeeData(param);
 	}
 	
 	@POST

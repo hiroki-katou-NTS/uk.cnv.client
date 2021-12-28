@@ -25,7 +25,7 @@ import nts.uk.shr.com.time.TimeWithDayAttr;
  * 遅刻早退時間帯
  * @author ken_takasu
  */
-public class LateLeaveEarlyTimeSheet extends TimeVacationOffSetItem{
+public class LateLeaveEarlyTimeSheet extends TimeVacationOffSetItem implements Cloneable {
 
 	public LateLeaveEarlyTimeSheet(TimeSpanForDailyCalc timeSheet, TimeRoundingSetting rounding) {
 		super(timeSheet, rounding);
@@ -286,5 +286,48 @@ public class LateLeaveEarlyTimeSheet extends TimeVacationOffSetItem{
 				this.grantRoundingDeductionOrAppropriate(ActualWorkTimeSheetAtr.WithinWorkTime, dedAtr, commonSet);
 			}
 		});
+	}
+	
+	/**
+	 * 重複する時間帯で作り直す
+	 * @param timeSpan 時間帯
+	 * @param deductionTimeSheet 控除時間帯
+	 * @param actualAtr 実働時間帯区分
+	 * @param commonSet 就業時間帯の共通設定
+	 * @return 遅刻早退時間帯
+	 */
+	public Optional<LateLeaveEarlyTimeSheet> recreateWithDuplicate(TimeSpanForDailyCalc timeSpan, ActualWorkTimeSheetAtrForLate actualAtr,
+			DeductionTimeSheet deductionTimeSheet, WorkTimezoneCommonSet commonSet) {
+		Optional<TimeSpanForDailyCalc> duplicate = this.timeSheet.getDuplicatedWith(timeSpan);
+		if(!duplicate.isPresent()) {
+			return Optional.empty();
+		}
+		LateLeaveEarlyTimeSheet clone = this.clone();
+		clone.timeSheet = duplicate.get();
+		//控除時間帯の登録
+		clone.registDeductionList(actualAtr, deductionTimeSheet, commonSet);
+		//控除相殺時間を削除する
+		clone.deductionOffSetTime = Optional.empty();
+		return Optional.of(clone);
+	}
+	
+	public LateLeaveEarlyTimeSheet clone() {
+		LateLeaveEarlyTimeSheet clone = new LateLeaveEarlyTimeSheet(
+				this.timeSheet,
+				this.rounding,
+				this.recordedTimeSheet,
+				this.deductionTimeSheet,
+				this.deductionOffSetTime);
+		try {
+			clone.timeSheet = this.timeSheet.clone();
+			clone.rounding = this.rounding.clone();
+			clone.recordedTimeSheet = this.recordedTimeSheet.stream().map(r -> r.clone()).collect(Collectors.toList());
+			clone.deductionTimeSheet = this.deductionTimeSheet.stream().map(r -> r.clone()).collect(Collectors.toList());
+			clone.deductionOffSetTime = this.deductionOffSetTime.map(d -> d.clone());
+		}
+		catch (Exception e) {
+			throw new RuntimeException("LateLeaveEarlyTimeSheet clone error.");
+		}
+		return clone;
 	}
 }

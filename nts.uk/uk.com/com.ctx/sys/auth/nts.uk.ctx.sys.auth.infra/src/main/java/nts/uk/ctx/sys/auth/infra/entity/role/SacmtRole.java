@@ -46,7 +46,7 @@ public class SacmtRole extends ContractUkJpaEntity implements Serializable {
 	private int assignAtr;
 
 	@Column(name = "APPROVAL_AUTHORITY")
-	private Integer approvalAuthority;
+	private Boolean approvalAuthority;
 
 	public SacmtRole() {
 	}
