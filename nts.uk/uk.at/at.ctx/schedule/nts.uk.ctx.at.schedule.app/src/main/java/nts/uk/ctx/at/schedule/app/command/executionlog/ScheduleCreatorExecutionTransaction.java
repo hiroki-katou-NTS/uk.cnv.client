@@ -1191,25 +1191,10 @@ public class ScheduleCreatorExecutionTransaction {
 					.equals(monthlySetting.get().getWorkInformation().getWorkTypeCode().v())).findFirst();
 
 			// 「就業時間帯コード」を取得する
-<<<<<<< HEAD
-			Pair<WorkingCode, SingleDayWorkTime> workTimeCode = this.getWorkingCode(employeesTempo, command, masterCache, itemDto,
-=======
 			Pair<String, WorkingCode> workTimeCode = this.getWorkingCode(employeesTempo, command, masterCache, itemDto,
->>>>>>> pj/at/release_ver4
 					monthlySetting.get().getWorkInformation().getWorkTimeCode() != null
 							? new WorkingCode(monthlySetting.get().getWorkInformation().getWorkTimeCode().v()) 	: null,
 					workType.isPresent() ? workType.get() : null, dateInPeriod, creator);
-<<<<<<< HEAD
-			
-			if (workTimeCode.getRight() == SingleDayWorkTime.ERROR) {
-				ScheduleErrorLog scheduleErrorLog = ScheduleErrorLog.createErrorLog(internationalization, command.getExecutionId()
-						, creator.getEmployeeId(), dateInPeriod, "Msg_594");
-				return new PrepareWorkOutput(null, null, null, Optional.of(scheduleErrorLog));
-			}
-
-			WorkInformation workInformation = new WorkInformation(workType.map(m -> m.getWorkTypeCode().v()).orElse(""),
-					workTimeCode.getRight() == SingleDayWorkTime.EXIST ? workTimeCode.getLeft().v() : null);
-=======
 			if (workTimeCode.getKey() != null) {
 				ScheduleErrorLog scheduleErrorLog = ScheduleErrorLog.createErrorLog(internationalization, command.getExecutionId(), 
 						creator.getEmployeeId(), dateInPeriod, workTimeCode.getKey());
@@ -1218,7 +1203,6 @@ public class ScheduleCreatorExecutionTransaction {
 			
 			WorkInformation workInformation = new WorkInformation(workType.map(m -> m.getWorkTypeCode().v()).orElse(""),
 					workTimeCode.getValue() != null ? workTimeCode.getValue().v() : null);
->>>>>>> pj/at/release_ver4
 			return new PrepareWorkOutput(workInformation, null, null, Optional.empty());
 		}
 		// Null の場合 - if !itemDto.get().getMonthlyPattern().isPresent()
@@ -1273,22 +1257,6 @@ public class ScheduleCreatorExecutionTransaction {
 				.findFirst();
 
 		// 「就業時間帯コード」を取得する
-<<<<<<< HEAD
-		Pair<WorkingCode, SingleDayWorkTime> workTimeCode = this.getWorkingCode(employeesTempo, command, masterCache, itemDto,
-				basicWorkSetting.getBasicSet().isPresent() ? basicWorkSetting.getBasicSet().get().getWorkingCode()
-						: null,
-				workType.isPresent() ? workType.get() : null, dateInPeriod, creator);
-		
-		if (workTimeCode.getRight() == SingleDayWorkTime.ERROR) {
-			ScheduleErrorLog scheduleErrorLog = ScheduleErrorLog.createErrorLog(internationalization, command.getExecutionId()
-					, creator.getEmployeeId(), dateInPeriod, "Msg_594");
-			return new PrepareWorkOutput(null, null, null, Optional.of(scheduleErrorLog));
-		}
-
-		// 「勤務種類コード」、「就業時間帯コード」を返す
-		WorkInformation workInformation = new WorkInformation(workType.map(m -> m.getWorkTypeCode().v()).orElse(""),
-				workTimeCode.getRight() == SingleDayWorkTime.EXIST ? workTimeCode.getLeft().v() : null);
-=======
 		Pair<String, WorkingCode> workTimeCode = this.getWorkingCode(employeesTempo, command, masterCache, itemDto,
 				basicWorkSetting.getBasicSet().isPresent() ? basicWorkSetting.getBasicSet().get().getWorkingCode() : null,
 				workType.isPresent() ? workType.get() : null, dateInPeriod, creator);
@@ -1301,7 +1269,6 @@ public class ScheduleCreatorExecutionTransaction {
 		// 「勤務種類コード」、「就業時間帯コード」を返す
 		WorkInformation workInformation = new WorkInformation(workType.map(m -> m.getWorkTypeCode().v()).orElse(""),
 				workTimeCode.getValue() == null ? null : workTimeCode.getValue().v());
->>>>>>> pj/at/release_ver4
 
 		return new PrepareWorkOutput(workInformation, null, null, basicWorkSetting.getScheduleErrorLog());
 
@@ -1344,11 +1311,7 @@ public class ScheduleCreatorExecutionTransaction {
 	/**
 	 * 在職状態に対応する「就業時間帯コード」を取得する
 	 */
-<<<<<<< HEAD
-	private Pair<WorkingCode, SingleDayWorkTime> getWorkingCode(ParamEmployeesTempo employeesTempo, ScheduleCreatorExecutionCommand command,
-=======
 	private Pair<String, WorkingCode> getWorkingCode(ParamEmployeesTempo employeesTempo, ScheduleCreatorExecutionCommand command,
->>>>>>> pj/at/release_ver4
 			CreateScheduleMasterCache masterCache, WorkCondItemDto itemDto, WorkingCode workingCode,
 			WorkType workType, GeneralDate dateInPeriod, ScheduleCreator creator) {
 		WorkingCode workTimeCode = null;
@@ -1362,11 +1325,7 @@ public class ScheduleCreatorExecutionTransaction {
 			SetupType setupType = basicScheduleService.checkNeededOfWorkTimeSetting(workType.getWorkTypeCode().v());
 
 			if (setupType == SetupType.NOT_REQUIRED) {
-<<<<<<< HEAD
-				return Pair.of(null, SingleDayWorkTime.EMPTY);
-=======
 				return Pair.of(null, null);
->>>>>>> pj/at/release_ver4
 			}
 			String worktime =itemDto.getWorkCategory().getWorkTime().getWeekdayTime().getWorkTimeCode().isPresent()
 							? itemDto.getWorkCategory().getWorkTime().getWeekdayTime().getWorkTimeCode().get().v()
@@ -1374,30 +1333,12 @@ public class ScheduleCreatorExecutionTransaction {
 			if (worktime != null) {
 				workTimeCode = new WorkingCode(worktime);
 			}
-<<<<<<< HEAD
-			return Pair.of(workTimeCode, SingleDayWorkTime.EXIST);
-=======
 			return Pair.of(null, workTimeCode);
->>>>>>> pj/at/release_ver4
 		}
 
 		// if 個人曜日別
 		else if (workplaceHistItem.value == TimeZoneScheduledMasterAtr.PERSONAL_DAY_OF_WEEK.value) {
 			// 個人曜日別をもとに就業時間帯コードを変換する
-<<<<<<< HEAD
-			Pair<String, SingleDayWorkTime> worktime = this.getWorkTimeByWeekdays(command.toBaseCommand(dateInPeriod), creator.getEmployeeId(),
-					dateInPeriod, workType.getWorkTypeCode().v(), itemDto);
-			if (worktime.getRight() == SingleDayWorkTime.EXIST) {
-				workTimeCode = new WorkingCode(worktime.getLeft());
-				return Pair.of(workTimeCode, SingleDayWorkTime.EXIST);
-			}
-			
-			if (worktime.getRight() == SingleDayWorkTime.ERROR) {
-				return Pair.of(null, SingleDayWorkTime.ERROR);
-			}
-			
-			return Pair.of(null, SingleDayWorkTime.EMPTY);
-=======
 			Pair<String, String> worktime = this.getWorkTimeByWeekdays(command.toBaseCommand(dateInPeriod), creator.getEmployeeId(),
 					dateInPeriod, workType.getWorkTypeCode().v(), itemDto);
 			if (worktime.getKey() != null) return Pair.of(worktime.getKey(), null);
@@ -1405,55 +1346,33 @@ public class ScheduleCreatorExecutionTransaction {
 				workTimeCode = new WorkingCode(worktime.getValue());
 			}
 			return  Pair.of(null, workTimeCode);
->>>>>>> pj/at/release_ver4
 		}
 
 		// if マスタ参照区分に従う
 		// 入力パラメータ.就業時間帯コードを使う
-<<<<<<< HEAD
-		workTimeCode = workingCode;
-		return Pair.of(workTimeCode, SingleDayWorkTime.EXIST);
-=======
 		return  Pair.of(null, workingCode);
->>>>>>> pj/at/release_ver4
 	}
 
 	/**
 	 * 在職の「就業時間帯コード」を返す（曜日別）
 	 */
-<<<<<<< HEAD
-	public Pair<String, SingleDayWorkTime> getWorkTimeByWeekdays(ScheduleErrorLogGeterCommand scheduleErrorLogGeterCommand, String employeeID,
-=======
 	private Pair<String, String> getWorkTimeByWeekdays(ScheduleErrorLogGeterCommand scheduleErrorLogGeterCommand, String employeeID,
->>>>>>> pj/at/release_ver4
 			GeneralDate ymd, String workTypeCode, WorkCondItemDto workingConItem) {
 		// 就業時間帯の必須チェック
 		SetupType setupType = basicScheduleService.checkNeededOfWorkTimeSetting(workTypeCode);
 		if (setupType == SetupType.NOT_REQUIRED) {
-<<<<<<< HEAD
-			return Pair.of(null, SingleDayWorkTime.EMPTY);
-=======
 			return Pair.of(null, null);
->>>>>>> pj/at/release_ver4
 		}
 		
 		Optional<SingleDaySchedule> optSingleDaySchedule = workingConItem.getWorkCategory().getWorkTime()
 				.getDayOfWeek().getSingleDaySchedule(ymd);
 		// 入力パラメータ「年月日」の曜日に対応する「単一日勤務時間」から、就業時間帯コードを取得する
 		if (optSingleDaySchedule.isPresent() && optSingleDaySchedule.get().getWorkTimeCode().isPresent()) {
-<<<<<<< HEAD
-			return Pair.of(optSingleDaySchedule.get().getWorkTimeCode().get().v(), SingleDayWorkTime.EXIST);
-		}
-		// エラーログを作成する
-		// this.scheCreExeErrorLogHandler.addError(scheduleErrorLogGeterCommand, employeeID, "Msg_594");
-		return Pair.of(null, SingleDayWorkTime.ERROR);
-=======
 			return Pair.of(null, optSingleDaySchedule.get().getWorkTimeCode().get().v());
 		}
 		// エラーログを作成する
 //		this.scheCreExeErrorLogHandler.addError(scheduleErrorLogGeterCommand, employeeID, "Msg_594");
 		return Pair.of("Msg_594", null);
->>>>>>> pj/at/release_ver4
 	}
 
 	/**
@@ -1551,22 +1470,11 @@ public class ScheduleCreatorExecutionTransaction {
 								dateInPeriod, creator, workdayDivision, workplaceHistItem,
 								workdayDivisions.getWorkplaceIds(),
 								optWorkplaceHistItem.getWorkplaceItems().get(0).getWorkplaceId(), null);
-<<<<<<< HEAD
-						
-						if (!basicWorkSettings.isPresent()) {
-							ScheduleErrorLog scheduleErrorLog = ScheduleErrorLog.createErrorLog(internationalization, command.getExecutionId()
-									, creator.getEmployeeId(), dateInPeriod, "Msg_589");
-							settingDto.setScheduleErrorLog(Optional.of(scheduleErrorLog));
-							return settingDto;
-						}
-
-=======
 						if (basicWorkSettings.isPresent()) {
 							ScheduleErrorLog scheduleErrorLog = ScheduleErrorLog.createErrorLog(internationalization, command.getExecutionId()
 									, creator.getEmployeeId(), dateInPeriod, "Msg_589");
 							settingDto.setScheduleErrorLog(Optional.of(scheduleErrorLog));
 						}
->>>>>>> pj/at/release_ver4
 						// 取得した「基本勤務設定」を返す
 						settingDto.setBasicSet(basicWorkSettings);
 						return settingDto;
@@ -1663,10 +1571,6 @@ public class ScheduleCreatorExecutionTransaction {
 					|| optionalClassificationBasicWork.get().getBasicWorkSetting().isEmpty()) {
 
 				// if 取得できない
-<<<<<<< HEAD
-				// this.scheCreExeErrorLogHandler.addError(geterCommand, creator.getEmployeeId(), "Msg_589");
-=======
->>>>>>> pj/at/release_ver4
 				return Optional.empty();
 			}
 
