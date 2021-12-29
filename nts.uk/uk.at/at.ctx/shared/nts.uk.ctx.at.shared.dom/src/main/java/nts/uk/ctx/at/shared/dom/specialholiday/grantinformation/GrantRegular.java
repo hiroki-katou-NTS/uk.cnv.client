@@ -160,7 +160,7 @@ public class GrantRegular extends DomainObject {
 			SpecialLeaveRestriction specialLeaveRestriction) {
 
 		//付与基準日を求める
-		Optional<GeneralDate> grantDateOpt = getgrantDate(require, cacheCarrier, parameter);
+		Optional<GeneralDate> grantDateOpt = getGrantDate(require, cacheCarrier, parameter);
 		
 		// 付与基準日がOptional.empty()かどうかチェックする
 		if ( !grantDateOpt.isPresent()){ 
@@ -196,7 +196,7 @@ public class GrantRegular extends DomainObject {
 					UseCondition = true;
 				}else{
 				// 利用条件をチェックする
-					UseCondition = specialLeaveRestriction.checkUseCondition(
+					UseCondition = specialLeaveRestriction.canUseCondition(
 						require, cacheCarrier, parameter.getCompanyId(), 
 						parameter.getEmployeeId().get(), parameter.getSpecialHolidayCode().v(), grantDate);
 				}
@@ -240,7 +240,7 @@ public class GrantRegular extends DomainObject {
 			break;
 		case GRANT_PERIOD: /**期間で付与する*/
 			if(this.getPeriodGrantDate().isPresent()){
-				return this.periodGrantDate.get().calcDeadLine(grantDate);
+				return this.periodGrantDate.get().getDeadLine(grantDate);
 			}
 			break;
 		case REFER_GRANT_DATE_TBL: /** 付与テーブルを参照して付与する*/
@@ -261,14 +261,14 @@ public class GrantRegular extends DomainObject {
 	 * @param parameter
 	 * @return
 	 */
-	private Optional<GeneralDate> getgrantDate(			
+	private Optional<GeneralDate> getGrantDate(			
 			Require require,
 			CacheCarrier cacheCarrier,
 			NextSpecialHolidayGrantParameter parameter){
 		
 		if (typeTime.equals(TypeTime.GRANT_SPECIFY_DATE)){ // 付与するタイミングの種類 = 指定日で付与する
 			if(this.fixGrantDate.isPresent()){
-				return this.fixGrantDate.get().getgrantDate(require, cacheCarrier, parameter, this.getGrantDate());
+				return this.fixGrantDate.get().getGrantDate(require, cacheCarrier, parameter, this.getGrantDate());
 			}
 			
 		}else if(typeTime.equals(TypeTime.GRANT_PERIOD)){//付与するタイミングの種類 = 期間で付与する
@@ -339,7 +339,7 @@ public class GrantRegular extends DomainObject {
 		}
 
 		// 次回特別休暇付与を求める
-		return this.getGrantPeriodic().get().askGrantdaysFromtable(
+		return this.getGrantPeriodic().get().getNextSpecialLeaveGrant(
 					require,
 					cacheCarrier,
 					parameter,
@@ -361,7 +361,7 @@ public class GrantRegular extends DomainObject {
 			NextSpecialHolidayGrantParameter parameter){
 		
 
-		if(this.decideShifiPerriod(require, cacheCarrier, parameter)){
+		if(this.determineWhetherShiftPeriod(require, cacheCarrier, parameter)){
 			return this.createCorrectedPeriod(parameter.getPeriod(), 1);
 		}else{
 			return this.createCorrectedPeriod(parameter.getPeriod(), 0);
@@ -377,7 +377,7 @@ public class GrantRegular extends DomainObject {
 	 * @param period
 	 * @return
 	 */
-	private boolean decideShifiPerriod(Require require, CacheCarrier cacheCarrier,
+	private boolean determineWhetherShiftPeriod(Require require, CacheCarrier cacheCarrier,
 			NextSpecialHolidayGrantParameter parameter){
 		
 		if (!this.getTypeTime().equals(TypeTime.GRANT_PERIOD)){ // 期間で付与する以外

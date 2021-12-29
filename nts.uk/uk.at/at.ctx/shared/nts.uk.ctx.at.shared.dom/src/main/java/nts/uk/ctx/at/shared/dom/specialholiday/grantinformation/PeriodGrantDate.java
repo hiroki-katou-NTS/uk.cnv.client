@@ -79,7 +79,7 @@ public class PeriodGrantDate {
 			CacheCarrier cacheCarrier,
 			NextSpecialHolidayGrantParameter parameter) {
 
-		DatePeriod grantPeriod = nextGrantPerood(parameter, cacheCarrier, require);
+		DatePeriod grantPeriod = getNextGrantPerood(parameter, cacheCarrier, require);
 
 		
 
@@ -107,7 +107,7 @@ public class PeriodGrantDate {
 	 * @param grantDate
 	 * @return
 	 */
-	public GeneralDate calcDeadLine(GeneralDate grantDate) {
+	public GeneralDate getDeadLine(GeneralDate grantDate) {
 		return this.findClosestDateAfterSpecifiedDate(grantDate, new MonthDay(this.period.end().month(),this.period.end().day()));
 	}
 	
@@ -119,7 +119,7 @@ public class PeriodGrantDate {
 	 * @param require
 	 * @return
 	 */
-	public DatePeriod nextGrantPerood(NextSpecialHolidayGrantParameter parameter, CacheCarrier cacheCarrier, Require require){
+	public DatePeriod getNextGrantPerood(NextSpecialHolidayGrantParameter parameter, CacheCarrier cacheCarrier, Require require){
 		DatePeriod specifiedGrantPeriod = getSpecifiedGrantPeriod(parameter.getPeriod().start());
 		
 		if(isPeriodContainsClosureDay(cacheCarrier, require, parameter, specifiedGrantPeriod)){

@@ -42,7 +42,7 @@ public class GrantDateTblReferenceGrant {
 	 * @param specialLeaveRestriction
 	 * @return
 	 */
-	public List<NextSpecialLeaveGrant> askGrantdaysFromtable(
+	public List<NextSpecialLeaveGrant> getNextSpecialLeaveGrant(
 			Require require,
 			CacheCarrier cacheCarrier,
 			NextSpecialHolidayGrantParameter parameter,
@@ -99,7 +99,7 @@ public class GrantDateTblReferenceGrant {
 					checkUser = true;
 				}else{
 					// 利用条件をチェックする
-					checkUser = specialLeaveRestriction.checkUseCondition(require, cacheCarrier,
+					checkUser = specialLeaveRestriction.canUseCondition(require, cacheCarrier,
 							parameter.getCompanyId(), parameter.getEmployeeId().get(), parameter.getSpecialHolidayCode().v(),
 							grantDate);
 				}
@@ -149,7 +149,7 @@ public class GrantDateTblReferenceGrant {
 	 */
 	public GeneralDate calcDeadLine(GeneralDate grantDate, Optional<GeneralDate> grantReferenceDate,
 			Optional<Integer> elapseNo, Optional<ElapseYear> elapseYear) {
-		return this.grantDeadline.calcDeadLine(grantDate, grantReferenceDate, elapseNo, elapseYear);
+		return this.grantDeadline.getDeadLine(grantDate, grantReferenceDate, elapseNo, elapseYear);
 	}
 	
 	/**

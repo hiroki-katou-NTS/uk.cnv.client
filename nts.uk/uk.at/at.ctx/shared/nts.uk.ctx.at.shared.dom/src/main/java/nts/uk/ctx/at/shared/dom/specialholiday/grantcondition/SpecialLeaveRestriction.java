@@ -172,7 +172,7 @@ public class SpecialLeaveRestriction extends DomainObject {
 	 * @param 基準日
 	 * @return true：利用可能、false：利用不可
 	 */
-	public boolean checkUseCondition(
+	public boolean canUseCondition(
 			Require require,
 			CacheCarrier cacheCarrier,
 			String companyId,

@@ -70,7 +70,7 @@ public class FixGrantDate {
 	 * @param grantDate
 	 * @return
 	 */
-	public Optional<GeneralDate> getgrantDate(			
+	public Optional<GeneralDate> getGrantDate(			
 			Require require,
 			CacheCarrier cacheCarrier,
 			NextSpecialHolidayGrantParameter parameter,
@@ -119,7 +119,7 @@ public class FixGrantDate {
 	 */
 	public GeneralDate getDeadLine(GeneralDate grantDate, Optional<GeneralDate> grantReferenceDate,
 			Optional<Integer> elapseNo, Optional<ElapseYear> elapseYear) {
-		return this.grantPeriodic.calcDeadLine(grantDate, grantReferenceDate, elapseNo, elapseYear);
+		return this.grantPeriodic.getDeadLine(grantDate, grantReferenceDate, elapseNo, elapseYear);
 	}
 	
 	/**

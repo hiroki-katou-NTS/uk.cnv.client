@@ -90,7 +90,7 @@ public class GrantDeadline extends DomainObject {
 	 * @param elapseYear
 	 * @return
 	 */
-	public GeneralDate calcDeadLine(GeneralDate grantDate, Optional<GeneralDate> grantReferenceDate,
+	public GeneralDate getDeadLine(GeneralDate grantDate, Optional<GeneralDate> grantReferenceDate,
 			Optional<Integer> elapseNo, Optional<ElapseYear> elapseYear) {
 
 		// 無期限
