@@ -14,7 +14,7 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdat
 import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveUsedNumber;
 import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdata.daynumber.LeaveUsedPercent;
 import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.empinfo.grantremainingdata.SpecialLeaveGrantRemainingData;
-import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.service.ErrorFlg;
+import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.service.ConditionFlg;
 import nts.uk.ctx.at.shared.dom.yearholidaygrant.GrantNum;
 
 /**
@@ -39,7 +39,7 @@ public class NextSpecialLeaveGrant {
 	/**
 	 * エラーフラグ
 	 */
-	private Optional<ErrorFlg> errorFlg;
+	private Optional<ConditionFlg> errorFlg;
 	
 	/**
 	 * コンストラクタ

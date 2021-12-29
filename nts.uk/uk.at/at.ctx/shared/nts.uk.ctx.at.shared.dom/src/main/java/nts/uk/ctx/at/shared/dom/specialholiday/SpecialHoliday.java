@@ -139,7 +139,7 @@ public class SpecialHoliday extends AggregateRoot {
 	 * @param period 期間
 	 * @return 次回特休付与リスト
 	 */
-	public List<NextSpecialLeaveGrant> getSpecialLeaveGrantInfo(
+	public List<NextSpecialLeaveGrant> calcSpecialLeaveGrantInfo(
 			Require require,
 			CacheCarrier cacheCarrier,
 			NextSpecialHolidayGrantParameter parameter) {
@@ -170,7 +170,7 @@ public class SpecialHoliday extends AggregateRoot {
 	 * @param cacheCarrier
 	 * @return
 	 */
-	public List<SpecialHolidayInfor> getNotDepentInfoGrantInfo(String cid,
+	public List<SpecialHolidayInfor> createNotDepentInfoGrantInfo(String cid,
 			DatePeriod period,
 			SpecialHolidayCode specialLeaveCode,
 			GeneralDate speGrantDate,
@@ -192,7 +192,7 @@ public class SpecialHoliday extends AggregateRoot {
 		NextSpecialHolidayGrantParameter parameter = new NextSpecialHolidayGrantParameter(cid, Optional.empty(),
 				specialLeaveCode, period, basicInfo, Optional.of(grantDate));
 		
-		List<NextSpecialLeaveGrant> nextSpecialLeaveGrant = getSpecialLeaveGrantInfo(require, cacheCarrier, parameter);
+		List<NextSpecialLeaveGrant> nextSpecialLeaveGrant = calcSpecialLeaveGrantInfo(require, cacheCarrier, parameter);
 		
 		
 		return nextSpecialLeaveGrant

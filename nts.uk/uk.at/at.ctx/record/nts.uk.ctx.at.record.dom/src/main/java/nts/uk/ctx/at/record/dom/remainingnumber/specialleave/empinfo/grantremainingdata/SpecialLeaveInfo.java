@@ -80,6 +80,7 @@ public class SpecialLeaveInfo implements Cloneable {
 		domain.ymd = ymd;
 		domain.remainingNumber = remainingNumber;
 		domain.grantRemainingDataList = grantRemainingDataList;
+		domain.grantDaysInfo = Optional.empty();
 		return domain;
 	}
 
@@ -95,7 +96,7 @@ public class SpecialLeaveInfo implements Cloneable {
 			cloned.grantRemainingDataList.add(grantRemainingData.clone());
 
 		}
-		cloned.grantDaysInfo = this.grantDaysInfo;
+		cloned.grantDaysInfo = this.grantDaysInfo.map(x -> new SpecialLeaveGrantUseDay(x.v()));
 		return cloned;
 	}
 

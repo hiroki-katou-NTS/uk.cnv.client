@@ -235,7 +235,7 @@ public class GrantRegular extends DomainObject {
 		switch(this.typeTime) {
 		case GRANT_SPECIFY_DATE:/** 指定日付与 */
 			if (this.getFixGrantDate().isPresent()){
-				return this.getFixGrantDate().get().calcDeadLine(grantDate, grantReferenceDate, elapseNo, elapseYear);
+				return this.getFixGrantDate().get().getDeadLine(grantDate, grantReferenceDate, elapseNo, elapseYear);
 			}
 			break;
 		case GRANT_PERIOD: /**期間で付与する*/
@@ -309,7 +309,7 @@ public class GrantRegular extends DomainObject {
 	}
 	
 	/**
-	 * 付与テーブルの付与日一覧を求める
+	 * テーブルに基づいた次回特別休暇付与を求める
 	 * @param companyId 会社ID
 	 * @param employeeId 社員ID
 	 * @param int spLeaveCD 特別休暇コード
@@ -338,7 +338,7 @@ public class GrantRegular extends DomainObject {
 			return new ArrayList<>();
 		}
 
-		// テーブルに基づいた付与日数一覧を求める
+		// 次回特別休暇付与を求める
 		return this.getGrantPeriodic().get().askGrantdaysFromtable(
 					require,
 					cacheCarrier,

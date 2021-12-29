@@ -2527,12 +2527,6 @@ public class RecordDomRequireService {
 			return this.specialHolidayRepo.findBySingleCD(companyID, specialHolidayCD);
 		}
 
-		@Override
-		public List<AffCompanyHistSharedImport> employeeAffiliatedCompanyHistories(CacheCarrier cacheCarrier,
-				List<String> sids, DatePeriod datePeriod) {
-
-			return this.empEmployeeAdapter.getAffCompanyHistByEmployee(cacheCarrier, sids, datePeriod);
-		}
 
 		@Override
 		public Optional<ElapseYear> elapseYear(String companyId, int specialHolidayCode) {

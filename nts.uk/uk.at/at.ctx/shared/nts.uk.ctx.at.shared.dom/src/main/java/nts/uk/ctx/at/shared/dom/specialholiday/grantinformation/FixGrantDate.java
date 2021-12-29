@@ -117,7 +117,7 @@ public class FixGrantDate {
 	 * @param elapseYear
 	 * @return
 	 */
-	public GeneralDate calcDeadLine(GeneralDate grantDate, Optional<GeneralDate> grantReferenceDate,
+	public GeneralDate getDeadLine(GeneralDate grantDate, Optional<GeneralDate> grantReferenceDate,
 			Optional<Integer> elapseNo, Optional<ElapseYear> elapseYear) {
 		return this.grantPeriodic.calcDeadLine(grantDate, grantReferenceDate, elapseNo, elapseYear);
 	}

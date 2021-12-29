@@ -1,6 +1,5 @@
 package nts.uk.ctx.at.shared.dom.specialholiday;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import lombok.AllArgsConstructor;
@@ -58,8 +57,6 @@ public class NextSpecialHolidayGrantParameter {
 			return Optional.of(this.getGrantDate().get().getEntryDate());
 		}
 		
-		ArrayList<String> sids = new ArrayList<String>();
-		sids.add(this.getEmployeeId().get());
 
 		Optional<EmpEnrollPeriodImport> empEnrollPeriod = require.getLatestEnrollmentPeriod(employeeId.get(), period);
 

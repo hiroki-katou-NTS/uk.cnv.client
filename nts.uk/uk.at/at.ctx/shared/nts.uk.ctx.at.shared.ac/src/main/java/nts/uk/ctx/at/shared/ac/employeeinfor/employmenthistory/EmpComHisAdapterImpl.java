@@ -1,12 +1,14 @@
 package nts.uk.ctx.at.shared.ac.employeeinfor.employmenthistory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+
 
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.employeeinfor.employmenthistory.imported.EmpComHisAdapter;
@@ -38,10 +40,8 @@ public class EmpComHisAdapterImpl implements EmpComHisAdapter {
 
 	@Override
 	public Optional<EmpEnrollPeriodImport> getLatestEnrollmentPeriod(String lstEmpId, DatePeriod datePeriod) {
-		ArrayList<String> sids = new ArrayList<String>();
-		sids.add(lstEmpId);
 		
-		List<EmpEnrollPeriodImport> empEnrollPeriodImport = getEnrollmentPeriod(sids, datePeriod);
+		List<EmpEnrollPeriodImport> empEnrollPeriodImport = getEnrollmentPeriod(Arrays.asList(lstEmpId), datePeriod);
 		
 		return empEnrollPeriodImport.stream()
 				.sorted((a,b)->b.getDatePeriod().start().compareTo(a.getDatePeriod().start()))

@@ -1,10 +1,10 @@
 package nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -17,7 +17,6 @@ import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHoliday;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHolidayCode;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHolidayRepository;
 import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.LimitCarryoverDays;
-import nts.uk.shr.com.context.AppContexts;
 
 @Stateless
 public class NotDepentSpecialLeaveOfEmployeeImpl implements NotDepentSpecialLeaveOfEmployee{
@@ -48,23 +47,10 @@ public class NotDepentSpecialLeaveOfEmployeeImpl implements NotDepentSpecialLeav
 	@Override
 	public Map<String, InforSpecialLeaveOfEmployee> getNotDepentInfoSpecialLeave(
 			List<NotDepentSpecialLeaveOfEmployeeInputExtend> paramList) {
-		Map<String, InforSpecialLeaveOfEmployee> result = new HashMap<>();
-
-		RemainNumberTempRequireService.Require require = RemainNumberTempRequireService.createRequire();
-		CacheCarrier cacheCarrier =new CacheCarrier();
 		
-		String cid = AppContexts.user().companyId();
-		int specialLeaveCodde = paramList.get(0).getSpecialLeaveCode();
-		// ドメインモデル「特別休暇」を取得する
-		Optional<SpecialHoliday> optSpeHolidayInfor = speHolidayRepos.findBySingleCD(cid, specialLeaveCodde);
-		if (!optSpeHolidayInfor.isPresent()) {
-			return new HashMap<>();
-		}
+		return	paramList.stream().filter(x->x.getSid().isPresent())
+				.collect(Collectors.toMap(x -> x.getSid().get(), x -> getNotDepentInfoSpecialLeave(x)));
 
-		for (NotDepentSpecialLeaveOfEmployeeInputExtend param : paramList) {
-			result.put(param.getSid(), getInforSpecialLeaveOfEmployee(optSpeHolidayInfor.get(), param, require, cacheCarrier));
-		}
-		return result;
 	}
 	
 	/**
@@ -79,7 +65,7 @@ public class NotDepentSpecialLeaveOfEmployeeImpl implements NotDepentSpecialLeav
 			NotDepentSpecialLeaveOfEmployeeInputExtend param, RemainNumberTempRequireService.Require require,
 			CacheCarrier cacheCarrier) {
 	
-			List<SpecialHolidayInfor> specialHolidayInfor = specialHoliday.getNotDepentInfoGrantInfo(
+			List<SpecialHolidayInfor> specialHolidayInfor = specialHoliday.createNotDepentInfoGrantInfo(
 					param.getCid(), param.getDatePeriod(), new SpecialHolidayCode(param.getSpecialLeaveCode()),
 					param.getSpeGrantDate(), param.getAnnGrantDate(), param.getInputDate(), param.getSpecialSetting(),
 					param.getGrantDays().isPresent()

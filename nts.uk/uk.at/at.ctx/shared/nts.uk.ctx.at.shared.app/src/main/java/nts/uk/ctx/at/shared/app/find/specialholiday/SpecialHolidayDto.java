@@ -1,11 +1,11 @@
 package nts.uk.ctx.at.shared.app.find.specialholiday;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import lombok.Value;
 import nts.uk.ctx.at.shared.app.find.specialholiday.grantcondition.SpecialLeaveRestrictionDto;
 import nts.uk.ctx.at.shared.app.find.specialholiday.grantinformation.GrantRegularDto;
-import nts.uk.ctx.at.shared.app.find.specialholiday.periodinformation.GrantPeriodicDto;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHoliday;
 
 @Value

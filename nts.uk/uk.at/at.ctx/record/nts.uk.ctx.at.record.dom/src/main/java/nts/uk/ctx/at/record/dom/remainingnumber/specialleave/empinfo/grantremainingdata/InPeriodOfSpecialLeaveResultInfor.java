@@ -182,7 +182,7 @@ public class InPeriodOfSpecialLeaveResultInfor {
 
 			domain.setGrantDays(Optional.of(new SpecialLeaveGrantUseDay(specialLeavResult.getAsOfStartNextDayOfPeriodEnd().getGrantDaysInfo().get().v())));
 		}else {
-			//付与区分 ← （特別休暇情報（期間終了日の翌日開始時点）．残数．付与情報が存在する場合が存在しない場合）false
+			//付与区分 ← （特別休暇情報（期間終了日の翌日開始時点）．残数．付与情報が存在しない場合）false
 			domain.setGrantAtr(false);
 			//存在しない場合 optional.empty
 			domain.setGrantDays(Optional.empty());

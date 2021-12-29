@@ -34,7 +34,7 @@ public class GrantDateTblReferenceGrant {
 
 	
 	/**
-	 * テーブルに基づいた付与日数一覧を求める
+	 * 次回特別休暇付与を求める
 	 * @param require
 	 * @param cacheCarrier
 	 * @param parameter

@@ -78,14 +78,6 @@ public class SpecialLeaveBasicInfo extends AggregateRoot {
 		this.grantSetting = new SpecialLeaveGrantSetting(grantDate, grantDay, grantTbl);
 	}
 
-	/**
-	 * 個人の条件を適用するか
-	 * @return
-	 */
-	public boolean isPersonalSetting(){
-		return this.getApplicationSet() == SpecialLeaveAppSetting.PERSONAL
-				&& this.getGrantSetting().getGrantTable().isPresent();
-	}
 	
 	/**
 	 * 付与日数を取得する
@@ -123,6 +115,11 @@ public class SpecialLeaveBasicInfo extends AggregateRoot {
 		return grantDateTblList.stream()
 				.filter(c->c.isSpecified()) // 規定のテーブルとする
 				.findFirst();
+	}
+	
+	
+	public boolean isUsed(){
+		return this.getUsed().isUse();
 	}
 	
 	public static interface Require{

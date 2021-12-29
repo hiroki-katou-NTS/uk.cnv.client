@@ -120,7 +120,7 @@ public class PeriodGrantDate {
 	public DatePeriod nextGrantPerood(NextSpecialHolidayGrantParameter parameter, CacheCarrier cacheCarrier, Require require){
 		DatePeriod specifiedGrantPeriod = getSpecifiedGrantPeriod(parameter.getPeriod().start());
 		
-		if(isClosureDayWithinThePeriod(cacheCarrier, require, parameter, specifiedGrantPeriod)){
+		if(isPeriodContainsClosureDay(cacheCarrier, require, parameter, specifiedGrantPeriod)){
 			return getSpecifiedGrantPeriod(parameter.getPeriod().start().addYears(1));
 		}
 		
@@ -153,7 +153,7 @@ public class PeriodGrantDate {
 	 * @param grantPeriod
 	 * @return
 	 */
-	public boolean isClosureDayWithinThePeriod(CacheCarrier cacheCarrier, Require require,
+	public boolean isPeriodContainsClosureDay(CacheCarrier cacheCarrier, Require require,
 			NextSpecialHolidayGrantParameter parameter, DatePeriod grantPeriod){
 		
 		if(!parameter.getEmployeeId().isPresent()){

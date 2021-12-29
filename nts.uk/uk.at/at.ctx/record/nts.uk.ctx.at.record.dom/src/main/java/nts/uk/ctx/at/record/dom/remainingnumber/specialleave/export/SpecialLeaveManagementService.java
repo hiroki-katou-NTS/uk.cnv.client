@@ -27,7 +27,6 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.common.empinfo.grantremainingdat
 import nts.uk.ctx.at.shared.dom.remainingnumber.specialholidaymng.interim.InterimSpecialHolidayMng;
 import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.empinfo.basicinfo.SpecialLeaveBasicInfo;
 import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.empinfo.grantremainingdata.SpecialLeaveGrantRemainingData;
-import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.service.InforSpecialLeaveOfEmployeeSevice;
 import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.service.SpecialHolidayInterimMngData;
 import nts.uk.ctx.at.shared.dom.scherec.closurestatus.ClosureStatusManagement;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.bonuspay.enums.UseAtr;
@@ -89,7 +88,7 @@ public class SpecialLeaveManagementService {
 
 		// 次回特別休暇付与日を計算
 		List<NextSpecialLeaveGrant> nextSpecialLeaveGrantList
-			= getNextSpecialLeaveGrant(
+			= calcNextSpecialLeaveGrant(
 				require,
 				cacheCarrier,
 				param.getCid(),
@@ -803,7 +802,7 @@ public class SpecialLeaveManagementService {
 	 * @param period 期間
 	 * @return 次回特休付与リスト
 	 */
-	public static List<NextSpecialLeaveGrant> getNextSpecialLeaveGrant(
+	public static List<NextSpecialLeaveGrant> calcNextSpecialLeaveGrant(
 			SpecialLeaveManagementService.RequireM5 require,
 			CacheCarrier cacheCarrier,
 			String companyId,
@@ -820,7 +819,7 @@ public class SpecialLeaveManagementService {
 	
 			// 特別休暇使用区分をチェックする
 			if ( specialLeaveBasicInfoOpt.isPresent() ){
-				if ( specialLeaveBasicInfoOpt.get().getUsed().isUse() ){ // 使用するとき
+				if ( specialLeaveBasicInfoOpt.get().isUsed() ){ // 使用するとき
 	
 					NextSpecialHolidayGrantParameter parameter = new NextSpecialHolidayGrantParameter(
 							companyId,
@@ -830,7 +829,7 @@ public class SpecialLeaveManagementService {
 							specialLeaveBasicInfoOpt.get(),
 							Optional.empty());
 					// 次回特別休暇付与を計算
-					return specialHolidays.get().getSpecialLeaveGrantInfo(require, cacheCarrier,parameter);
+					return specialHolidays.get().calcSpecialLeaveGrantInfo(require, cacheCarrier,parameter);
 
 				} else { // 使用しないとき
 					// List「次回特別休暇付与」を空で作成
@@ -853,7 +852,7 @@ public class SpecialLeaveManagementService {
 		List<InterimSpecialHolidayMng> interimSpecialHolidayMng(String mngId, DatePeriod datePeriod);
 	}
 
-	public static interface RequireM3 extends LeaveRemainingNumber.RequireM3, InforSpecialLeaveOfEmployeeSevice.RequireM4 {
+	public static interface RequireM3 extends LeaveRemainingNumber.RequireM3 {
 
 		/** 特別休暇付与残数データ */
 		List<SpecialLeaveGrantRemainingData> specialLeaveGrantRemainingData(String sid, int specialLeaveCode,
@@ -865,7 +864,7 @@ public class SpecialLeaveManagementService {
 				DatePeriod datePriod, LeaveExpirationStatus expirationStatus);
 	}
 
-	public static interface RequireM4 extends InforSpecialLeaveOfEmployeeSevice.RequireM4, RequireM1 {
+	public static interface RequireM4 extends  RequireM1 {
 
 	}
 
@@ -874,6 +873,8 @@ public class SpecialLeaveManagementService {
 		SpecialHoliday.Require
 		{
 
+		Optional<SpecialHoliday> specialHoliday(String companyID, int specialHolidayCD);
+		
 		/** 特別休暇基本情報 */
 		Optional<SpecialLeaveBasicInfo> specialLeaveBasicInfo(String sid, int spLeaveCD, UseAtr use);
 

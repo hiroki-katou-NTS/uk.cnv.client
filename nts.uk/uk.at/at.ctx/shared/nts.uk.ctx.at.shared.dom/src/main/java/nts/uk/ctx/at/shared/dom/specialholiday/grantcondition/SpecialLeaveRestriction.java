@@ -1,8 +1,10 @@
 package nts.uk.ctx.at.shared.dom.specialholiday.grantcondition;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
 
 import lombok.AllArgsConstructor;
 //import lombok.Data;
@@ -19,7 +21,7 @@ import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.shared.dom.adapter.employee.EmployeeRecordImport;
 import nts.uk.ctx.at.shared.dom.adapter.employee.SClsHistImport;
 import nts.uk.ctx.at.shared.dom.adapter.employment.BsEmploymentHistoryImport;
-import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.service.ErrorFlg;
+import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.service.ConditionFlg;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHolidayCode;
 
 /**
@@ -110,8 +112,8 @@ public class SpecialLeaveRestriction extends DomainObject {
 
 		// 年齢条件を使用する場合は、年齢範囲を登録する事。
 		if (this.ageLimit == UseAtr.USE) {
-			Integer lower = this.ageRange != null ? this.ageRange.getAgeLowerLimit().v() : 0;
-			Integer higer = this.ageRange != null ? this.ageRange.getAgeHigherLimit().v() : 0;
+            Integer lower = this.ageRange != null ? this.ageRange.getAgeLowerLimit().v() : 0;
+            Integer higer = this.ageRange != null ? this.ageRange.getAgeHigherLimit().v() : 0;
 			
 			// 年齢下限 <= 年齢上限
 			if (lower > higer) {
@@ -181,54 +183,51 @@ public class SpecialLeaveRestriction extends DomainObject {
 		// Imported(就業)「社員」を取得する
 		EmployeeRecordImport empInfor = require.employeeFullInfo(cacheCarrier, employeeId);
 
-		boolean genderError = false;
+		boolean genderFlg = true;
 		
-		// 取得しているドメインモデル「定期付与．特別休暇利用条件．性別条件」をチェックする
+		//「特別休暇利用条件．性別条件」をチェックする
 		if(this.isGenderRest()){ // 利用するとき
-			genderError = isGenderSetting(empInfor);
+			genderFlg = canUseByGenderCondition(empInfor);
 		}
 
-		boolean EmploymentError = false;
+		boolean employmentFlg = true;
 		
-		// 取得しているドメインモデル「定期付与．特別休暇利用条件．雇用条件」をチェックする
+		//「特別休暇利用条件．雇用条件」をチェックする
 		if(this.isRestEmp()){ // 利用するとき
-			EmploymentError = isRestEmp(require, cacheCarrier,companyId, employeeId, ymd);
+			employmentFlg = canUseByEmploymentCondition(require, cacheCarrier,companyId, empInfor, ymd);
 		}
 		
-		boolean classError = false;
+		boolean classFlg = true;
 
-		// ドメインモデル「特別休暇利用条件」．分類条件をチェックする
+		//「特別休暇利用条件.分類条件」をチェックする
 		if(this.isRestrictionCls()){ // 利用するとき
-			classError = isRestrictionCls(require, cacheCarrier,companyId, employeeId, ymd);
+			classFlg = canUseByClsCondition(require, cacheCarrier,companyId, empInfor, ymd);
 		}
 
-		boolean AgeError = false;
+		boolean ageFlg = true;
 		
-		// ドメインモデル「特別休暇利用条件」．年齢条件をチェックする
+		//「特別休暇利用条件．年齢条件」をチェックする
 		if(this.isAgeLimit()){ // 利用するとき
 
-			AgeError = isageLimit(empInfor,ymd);
+			ageFlg = canUseByAgeCondition(empInfor,ymd);
 		}
-		return new ErrorFlg(EmploymentError, genderError, AgeError, classError).canUse();
+		return new ConditionFlg(employmentFlg, genderFlg, ageFlg, classFlg).canUse();
 	}
 
 	/**
-	 * 性別条件設定と一致するかチェックする
+	 * 性別条件から利用可能か判断する
 	 * @param empInfor
 	 * @return
 	 */
-	private boolean isGenderSetting(EmployeeRecordImport empInfor){
+	private boolean canUseByGenderCondition(EmployeeRecordImport empInfor){
+		
 		// 性別設定と一致するかチェックする
-		if(empInfor.getGender() == this.getGender().value) {
-			return false;
-		} else {
-			return true;
-		}
+		return (empInfor.getGender() == this.getGender().value);
 	}
 	
 	
 	/**
-	 * 雇用条件設定と一致するかチェックする
+	 * 雇用条件から利用可能か判断する
 	 * @param require
 	 * @param cacheCarrier
 	 * @param companyId
@@ -236,33 +235,26 @@ public class SpecialLeaveRestriction extends DomainObject {
 	 * @param ymd
 	 * @return
 	 */
-	private boolean isRestEmp(Require require, CacheCarrier cacheCarrier, String companyId, String employeeId,
-			GeneralDate ymd) {
+	private boolean canUseByEmploymentCondition(Require require, CacheCarrier cacheCarrier, String companyId,
+			EmployeeRecordImport empInfor,GeneralDate ymd) {
 		// アルゴリズム「社員所属雇用履歴を取得」を実行する
 		Optional<BsEmploymentHistoryImport> employmentHistory = require.employmentHistory(cacheCarrier, companyId,
-				employeeId, ymd);
+				empInfor.getEmployeeId(), ymd);
 
 		if (!employmentHistory.isPresent()) {
-			// パラメータ「エラーフラグ．雇用条件に一致しない」にTRUEをセットする
-			return true;
+			return false;
 		} else {
 			if (this.getListEmp() == null && this.getListEmp().isEmpty()) {
-				return true;
+				return false;
 			}
 			
-			// 取得した雇用コードが取得しているドメインモデル「定期付与．特別休暇利用条件．雇用一覧」に存在するかチェックする
-			if (this.getListEmp().contains(employmentHistory.get().getEmploymentCode())) {
-				// パラメータ「エラーフラグ．雇用条件に一致しない」にFALSEをセットする
-				return false;
-			} else {
-				// パラメータ「エラーフラグ．雇用条件に一致しない」にTRUEをセットする
-				return true;
-			}
+			// 取得した雇用コードが「特別休暇利用条件．雇用一覧」に存在するかチェックする
+			return (this.getListEmp().contains(employmentHistory.get().getEmploymentCode())) ;
 		}
 	}
 	
 	/**
-	 * 分類条件設定と一致するかチェックする
+	 * 分類条件から利用可能か判断する
 	 * @param require
 	 * @param cacheCarrier
 	 * @param companyId
@@ -270,65 +262,54 @@ public class SpecialLeaveRestriction extends DomainObject {
 	 * @param ymd
 	 * @return
 	 */
-	private boolean isRestrictionCls(Require require, CacheCarrier cacheCarrier, String companyId, String employeeId,
+	private boolean canUseByClsCondition(Require require, CacheCarrier cacheCarrier, String companyId, EmployeeRecordImport empInfor,
 			GeneralDate ymd){
 		
 		// アルゴリズム「社員所属分類履歴を取得」を実行する
-		List<String> emploeeIdList = new ArrayList<>();
-		emploeeIdList.add(employeeId);
 		List<SClsHistImport> clsHistList = require.employeeClassificationHistoires(
-				cacheCarrier, companyId, emploeeIdList, new DatePeriod(ymd, ymd));
+				cacheCarrier, companyId, Arrays.asList(empInfor.getEmployeeId()), new DatePeriod(ymd, ymd));
 		
-		if(clsHistList.isEmpty()) {
-			return true;
-		}
+		Optional<SClsHistImport> clsHist = clsHistList.stream()
+				.filter(x->x.getEmployeeId().equals(empInfor.getEmployeeId()))
+				.findFirst();
 		
-		// 取得した分類コードが取得しているドメインモデル「定期付与．特別休暇利用条件．分類一覧」に存在するかチェックする
-		if(this.getListCls() == null && this.getListCls().isEmpty()) {
-			return true;
-		}
-		
-		boolean isExit = false;
-		for (SClsHistImport classData : clsHistList) {
-			if(this.getListCls().contains(classData.getClassificationCode())) {
-				isExit = true;
-				break;
-			}
-		}
-		if(isExit) { // 存在するとき
-			// パラメータ「エラーフラグ．分類条件に一致しない」にFALSEをセットする
+		if(!clsHist.isPresent()) {
 			return false;
-		} else {
-			// パラメータ「エラーフラグ．分類条件に一致しない」にTRUEをセットする
-			return true;
 		}
-
+		
+		
+        if(this.getListCls() == null && this.getListCls().isEmpty()) {
+			return false;
+		}
+		
+		// 取得した分類コードが「特別休暇利用条件．分類一覧」に存在するかチェックする
+		return (this.getListCls().contains(clsHist.get().getClassificationCode()));
 	}
 	
 	/**
-	 * 年齢条件設定と一致するかチェックする
+	 * 年齢条件から利用可能か判断する
 	 * @param empInfor
 	 * @param ymd
 	 * @return
 	 */
-	private boolean isageLimit(EmployeeRecordImport empInfor, GeneralDate ymd){
+	private boolean canUseByAgeCondition(EmployeeRecordImport empInfor, GeneralDate ymd){
 		GeneralDate ageBase = ymd;
-
+		
 		// 年齢基準日を求める
 		nts.uk.shr.com.time.calendar.MonthDay ageBaseDate
 			= this.getAgeStandard().getAgeBaseDate();
 
 		int year = 0;
 
-		// 取得しているドメインモデル「定期付与．特別休暇利用条件．年齢基準．年齢基準年区分」＝　「当年」の場合
+		// 「特別休暇利用条件．年齢基準．年齢基準年区分」＝　「当年」の場合
 		if(this.getAgeStandard().getAgeCriteriaCls() == AgeBaseYear.THIS_YEAR) {
-			// 年齢基準日 = パラメータ「基準日．年」 + ドメインモデル「定期付与．特別休暇利用条件．年齢基準．年齢基準日」
-			year = ageBaseDate != null ? ageBase.year() : 0;
+			// 年齢基準日 = パラメータ「基準日．年」 + 「特別休暇利用条件．年齢基準．年齢基準日」
+            year = ageBaseDate != null ? ageBase.year() : 0;
 		} else
-		// 取得しているドメインモデル「定期付与．特別休暇利用条件．年齢基準．年齢基準年区分」＝　「翌年」の場合
+		// 「特別休暇利用条件．年齢基準．年齢基準年区分」＝　「翌年」の場合
 		if(this.getAgeStandard().getAgeCriteriaCls() == AgeBaseYear.NEXT_YEAR) {
-			// 年齢基準日 = パラメータ「基準日．年」 の翌年 + ドメインモデル「定期付与．特別休暇利用条件．年齢基準．年齢基準日」
-			year = ageBaseDate != null ? ageBase.year() + 1 : 0;
+			// 年齢基準日 = パラメータ「基準日．年」 の翌年 + 「特別休暇利用条件．年齢基準．年齢基準日」
+            year = ageBaseDate != null ? ageBase.year() + 1 : 0;
 		}
 
 		if(year != 0
@@ -341,14 +322,9 @@ public class SpecialLeaveRestriction extends DomainObject {
 		Difference difYMD = ageBase.differenceFrom(empInfor.getBirthDay());
 
 		//求めた「年齢」が年齢条件に一致するかチェックする
-		if(this.getAgeRange().getAgeLowerLimit().v() > difYMD.years()
-				|| this.getAgeRange().getAgeHigherLimit().v() < difYMD.years()) {
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return(this.getAgeRange().getAgeLowerLimit().v() <= difYMD.years()
+				&& this.getAgeRange().getAgeHigherLimit().v() >= difYMD.years());
+
 	}
 	
 	
