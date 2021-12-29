@@ -62,16 +62,7 @@ public class PeriodGrantDate {
 
 		return new DatePeriod(grantDate, expireDate);
 	}
-	
-	
-	/**
-	 * 期限日を取得する
-	 * @param grantDate
-	 * @return
-	 */
-	public GeneralDate calcDeadLine(GeneralDate grantDate) {
-		return this.findClosestDateAfterSpecifiedDate(grantDate, new MonthDay(this.period.end().month(),this.period.end().day()));
-	}
+
 
 	/**
 	 * 付与基準日を求める
@@ -109,6 +100,17 @@ public class PeriodGrantDate {
 		}
 
 	}
+	
+	
+	/**
+	 * 期限日を取得する
+	 * @param grantDate
+	 * @return
+	 */
+	public GeneralDate calcDeadLine(GeneralDate grantDate) {
+		return this.findClosestDateAfterSpecifiedDate(grantDate, new MonthDay(this.period.end().month(),this.period.end().day()));
+	}
+	
 	
 	/**
 	 * 次回付与期間を求める

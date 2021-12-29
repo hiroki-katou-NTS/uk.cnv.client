@@ -165,7 +165,7 @@ public class SpecialLeaveRestriction extends DomainObject {
 	
 	
 	/**
-	 * 利用条件をチェックする
+	 * 利用可能か判断する
 	 * @param companyId 会社ID
 	 * @param employeeId 社員ID
 	 * @param spLeaveCD 特別休暇コード

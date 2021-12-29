@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 /**
- * エラーフラグ
+ * 条件フラグ
  * @author do_dt
  *
  */

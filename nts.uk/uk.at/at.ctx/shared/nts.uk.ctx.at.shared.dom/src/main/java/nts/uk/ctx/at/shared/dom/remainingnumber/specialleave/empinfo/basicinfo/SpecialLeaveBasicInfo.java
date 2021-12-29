@@ -117,7 +117,10 @@ public class SpecialLeaveBasicInfo extends AggregateRoot {
 				.findFirst();
 	}
 	
-	
+	/**
+	 * 使用するか判断する
+	 * @return
+	 */
 	public boolean isUsed(){
 		return this.getUsed().isUse();
 	}

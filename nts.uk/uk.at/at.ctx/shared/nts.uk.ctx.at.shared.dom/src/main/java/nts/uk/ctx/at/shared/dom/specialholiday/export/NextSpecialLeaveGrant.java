@@ -18,7 +18,7 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.service.ConditionFl
 import nts.uk.ctx.at.shared.dom.yearholidaygrant.GrantNum;
 
 /**
- * 次回特休付与
+ * 次回特別休暇付与
  * @author masaaki_jinno
  *
  */

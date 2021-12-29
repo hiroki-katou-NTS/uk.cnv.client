@@ -811,33 +811,36 @@ public class SpecialLeaveManagementService {
 			DatePeriod period) {
 		
 		Optional<SpecialHoliday> specialHolidays = require.specialHoliday(companyId, spLeaveCD);
-		if ( specialHolidays.isPresent() ){
-
-			// ドメインモデル「特別休暇社員基本情報」を取得
-			Optional<SpecialLeaveBasicInfo> specialLeaveBasicInfoOpt
-				= require.specialLeaveBasicInfo(employeeId, spLeaveCD, UseAtr.USE);
-	
-			// 特別休暇使用区分をチェックする
-			if ( specialLeaveBasicInfoOpt.isPresent() ){
-				if ( specialLeaveBasicInfoOpt.get().isUsed() ){ // 使用するとき
-	
-					NextSpecialHolidayGrantParameter parameter = new NextSpecialHolidayGrantParameter(
-							companyId,
-							Optional.of(employeeId),
-							new SpecialHolidayCode(spLeaveCD),
-							period,
-							specialLeaveBasicInfoOpt.get(),
-							Optional.empty());
-					// 次回特別休暇付与を計算
-					return specialHolidays.get().calcSpecialLeaveGrantInfo(require, cacheCarrier,parameter);
-
-				} else { // 使用しないとき
-					// List「次回特別休暇付与」を空で作成
-				}
-			}
+		if ( !specialHolidays.isPresent() ){
+			return new ArrayList<>();
 		}
 
-		return new ArrayList<>();
+		// ドメインモデル「特別休暇社員基本情報」を取得
+		Optional<SpecialLeaveBasicInfo> specialLeaveBasicInfoOpt
+			= require.specialLeaveBasicInfo(employeeId, spLeaveCD, UseAtr.USE);
+
+		
+		if ( !specialLeaveBasicInfoOpt.isPresent() ){
+			return new ArrayList<>();
+		}
+		
+		// 特別休暇使用区分をチェックする
+		if ( specialLeaveBasicInfoOpt.get().isUsed() ){ // 使用するとき
+
+			NextSpecialHolidayGrantParameter parameter = new NextSpecialHolidayGrantParameter(
+					companyId,
+					Optional.of(employeeId),
+					new SpecialHolidayCode(spLeaveCD),
+					period,
+					specialLeaveBasicInfoOpt.get(),
+					Optional.empty());
+			// 次回特別休暇付与を計算
+			return specialHolidays.get().calcSpecialLeaveGrantInfo(require, cacheCarrier,parameter);
+
+		} else { // 使用しないとき
+			// List「次回特別休暇付与」を空で作成
+			return new ArrayList<>();
+		}
 	}
 
 
