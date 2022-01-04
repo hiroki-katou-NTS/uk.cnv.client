@@ -29,6 +29,11 @@ public class JpaEmploymentConfirmedRepository extends JpaRepository implements E
 			+ "and r.pk.closureId = :closureId " 
 			+ "and r.pk.processYM = :processYM ";
 	
+	private static final String SELECT_LIST_WORK_FIXED_BY_COMPANY = "SELECT r FROM KrcdtWorkFixed r WHERE r.pk.companyId = :companyId "
+			+ "and r.pk.workplaceId in :workplaceId " 
+			+ "and r.pk.closureId = :closureId " 
+			+ "and r.pk.processYM = :processYM ";
+	
 	@Override
 	public void insert(EmploymentConfirmed domain) {
 		this.commandProxy().insert(toEntity(domain));
@@ -89,6 +94,12 @@ public class JpaEmploymentConfirmedRepository extends JpaRepository implements E
 				entity.confirm_date_time);
 		
 		return domain;
+	}
+
+	@Override
+	public List<EmploymentConfirmed> getListByCompany(String companyId) {
+		return this.queryProxy().query(SELECT_LIST_WORK_FIXED_BY_COMPANY, KrcdtWorkFixed.class)
+				.setParameter("companyId", companyId).getList(x ->toDomain(x));
 	}
 
 }

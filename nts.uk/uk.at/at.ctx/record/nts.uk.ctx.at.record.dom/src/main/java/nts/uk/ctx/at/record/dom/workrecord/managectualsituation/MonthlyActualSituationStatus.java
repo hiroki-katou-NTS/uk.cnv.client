@@ -15,7 +15,13 @@ import nts.uk.ctx.at.record.dom.workrecord.identificationstatus.Identification;
 import nts.uk.ctx.at.record.dom.workrecord.manageactualsituation.approval.monthly.MonthlyApprovalProcess;
 import nts.uk.ctx.at.record.dom.workrecord.manageactualsituation.identity.monthly.IdentityConfirmProcess;
 import nts.uk.ctx.at.record.dom.workrecord.operationsetting.ApprovalProcess;
+import nts.uk.ctx.at.record.dom.workrecord.workrecord.EmploymentConfirmed;
+import nts.uk.ctx.at.record.dom.workrecord.workrecord.EmploymentConfirmedRepository;
 import nts.uk.ctx.at.shared.dom.adapter.jobtitle.SharedAffJobTitleHisImport;
+import nts.uk.ctx.at.shared.dom.workrule.closure.Closure;
+import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureId;
+import nts.uk.ctx.at.shared.dom.workrule.closure.ClosurePeriod;
+import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureRepository;
 
 /**
  * 月の実績の状況を取得する
@@ -31,6 +37,12 @@ public class MonthlyActualSituationStatus {
 	
 	@Inject
 	private IdentityConfirmProcess indentityStatus;
+	
+	@Inject
+	private ClosureRepository closureRepository;
+
+	@Inject
+	private EmploymentConfirmedRepository employmentConfirmedRepository;
 	
 //	@Inject
 //	private CreateEmployeeDailyPerError dailyRecordError;
@@ -50,7 +62,8 @@ public class MonthlyActualSituationStatus {
 		monthlyResult.setMonthlyLockStatus(lockStatus);
 		//対象の職場が就業確定されているかチェックする
 		//TODO 就業確定が対象外のため「未確定」で固定にしてください
-		monthlyResult.setEmploymentFixedStatus(EmploymentFixedStatus.PENDING);
+		boolean checkWkp = this.checkWkpConfirmedToWork(param.getCompanyId(), param.getClosureDate(), param.getWorkplaceId(), param.getClosureId());
+		monthlyResult.setEmploymentFixedStatus(checkWkp ? EmploymentFixedStatus.CONFIRM : EmploymentFixedStatus.PENDING);
 		//対象月の月の承認が済んでいるかチェックする
 		monthlyResult.setApprovalStatus(monthlyApprovalProcess.monthlyApprovalCheck(param.getCompanyId(), param.getEmployeeId(), param.getProcessDateYM(), param.getClosureId(), param.getClosureDate(),approvalProcOp,listShareAff));		
 		DailyActualSituation dailyActualSituation = new DailyActualSituation();
@@ -79,5 +92,24 @@ public class MonthlyActualSituationStatus {
 
 		return daysBetween;
 	}*/
+	
+	public boolean checkWkpConfirmedToWork(String companyId, GeneralDate baseDate, String workplaceId, int closureId) {
+		//ドメインモデル「締め」を取得する
+		Optional<Closure> closure = closureRepository.findById(companyId, closureId);
+		if (!closure.isPresent())
+			return false;
+
+		// 指定した年月日時点の締め期間を取得する
+		Optional<ClosurePeriod> closurePeriodOpt = closure.get().getClosurePeriodByYmd(baseDate);
+		if (!closurePeriodOpt.isPresent())
+			return false;
+		
+		//ドメインモデル「就業確定」を取得する
+		Optional<EmploymentConfirmed> data = employmentConfirmedRepository.get(companyId, workplaceId,ClosureId.valueOf(closureId), closurePeriodOpt.get().getYearMonth());
+		if(data.isPresent()) {
+			return true;
+		}
+		return false;
+	}
 	
 }

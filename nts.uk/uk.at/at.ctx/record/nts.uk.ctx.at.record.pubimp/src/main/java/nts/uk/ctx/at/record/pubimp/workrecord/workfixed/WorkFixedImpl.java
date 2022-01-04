@@ -6,11 +6,11 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import nts.arc.time.GeneralDate;
-import nts.uk.ctx.at.record.dom.workrecord.workfixed.ConfirmClsStatus;
-import nts.uk.ctx.at.record.dom.workrecord.workfixed.WorkFixed;
-import nts.uk.ctx.at.record.dom.workrecord.workfixed.WorkfixedRepository;
+import nts.uk.ctx.at.record.dom.workrecord.workrecord.EmploymentConfirmed;
+import nts.uk.ctx.at.record.dom.workrecord.workrecord.EmploymentConfirmedRepository;
 import nts.uk.ctx.at.record.pub.workrecord.workfixed.WorkFixedPub;
 import nts.uk.ctx.at.shared.dom.workrule.closure.Closure;
+import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureId;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosurePeriod;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureRepository;
 
@@ -19,7 +19,8 @@ public class WorkFixedImpl implements WorkFixedPub{
 	@Inject
 	private ClosureRepository closureRepository;
 	@Inject
-	private WorkfixedRepository workfixedRepository;
+	private EmploymentConfirmedRepository workfixedRepository;
+	
 	@Override
 	public boolean getEmploymentFixedStatus(String companyID, GeneralDate date, String workPlaceID, int closureID) {
 		// ドメインモデル「締め」を取得する
@@ -32,14 +33,14 @@ public class WorkFixedImpl implements WorkFixedPub{
 		if(!optionalClosurePeriod.isPresent()){
 			return false;
 		}
-		Optional<WorkFixed> workFixed = this.workfixedRepository.find(companyID, workPlaceID, closureID, optionalClosurePeriod.get().getYearMonth());
+		Optional<EmploymentConfirmed> workFixed = this.workfixedRepository.get(companyID, workPlaceID, ClosureId.valueOf(closureID), optionalClosurePeriod.get().getYearMonth());
 		if(!workFixed.isPresent()){
 			return false;
 		}
-		if(workFixed.get().getConfirmClsStatus().equals(ConfirmClsStatus.Confirm)){
-			return true;
-		}
-		return false;
+//		if(workFixed.get().getConfirmClsStatus().equals(ConfirmClsStatus.Confirm)){
+//			return true;
+//		}
+		return true;
 	}
 
 }

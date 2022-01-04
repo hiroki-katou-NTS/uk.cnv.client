@@ -5,19 +5,18 @@
 package nts.uk.ctx.at.record.app.find.workrecord.workfixed;
 
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import nts.arc.time.GeneralDate;
-import nts.arc.time.YearMonth;
-import nts.uk.ctx.at.record.dom.workrecord.workfixed.ConfirmClsStatus;
-import nts.uk.ctx.at.record.dom.workrecord.workfixed.WorkFixedSetMemento;
 
 /**
  * The Class WorkFixedFinderDto.
  */
-@Builder
-@Getter
-public class WorkFixedFinderDto implements WorkFixedSetMemento {
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class WorkFixedFinderDto  {
 	
 	/** The closure id. */
 	// 締めID
@@ -50,12 +49,6 @@ public class WorkFixedFinderDto implements WorkFixedSetMemento {
     /** The employee name. */
     private String employeeName;
 	
-	/**
-	 * Instantiates a new work fixed finder dto.
-	 */
-	public WorkFixedFinderDto() {
-		super();
-	}
 
 	/**
 	 * Instantiates a new work fixed finder dto.
@@ -69,82 +62,5 @@ public class WorkFixedFinderDto implements WorkFixedSetMemento {
 	 * @param cid the cid
 	 * @param employeeName the employee name
 	 */
-	public WorkFixedFinderDto(Integer closureId, String confirmPid, String wkpId, Integer confirmClsStatus,
-			GeneralDate fixedDate, Integer processDate, String cid, String employeeName) {
-		super();
-		this.closureId = closureId;
-		this.confirmPid = confirmPid;
-		this.wkpId = wkpId;
-		this.confirmClsStatus = confirmClsStatus;
-		this.fixedDate = fixedDate;
-		this.processDate = processDate;
-		this.cid = cid;
-	}
-
-	/* (non-Javadoc)
-	 * @see nts.uk.ctx.at.record.dom.workrecord.workfixed.WorkFixedSetMemento#setClosureId(java.lang.Integer)
-	 */
-	@Override
-	public void setClosureId(Integer closureId) {
-		this.closureId = closureId;
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see nts.uk.ctx.at.record.dom.workrecord.workfixed.WorkFixedSetMemento#setConfirmPId(java.lang.String)
-	 */
-	@Override
-	public void setConfirmPId(String confirmPid) {
-		this.confirmPid = confirmPid;
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see nts.uk.ctx.at.record.dom.workrecord.workfixed.WorkFixedSetMemento#setWorkplaceId(java.lang.String)
-	 */
-	@Override
-	public void setWorkplaceId(String wkpId) {
-		this.wkpId = wkpId;
-	}
-
-	/* (non-Javadoc)
-	 * @see nts.uk.ctx.at.record.dom.workrecord.workfixed.WorkFixedSetMemento#setConfirmClsStatus(nts.uk.ctx.at.record.dom.workrecord.workfixed.ConfirmClsStatus)
-	 */
-	@Override
-	public void setConfirmClsStatus(ConfirmClsStatus confirmClsStatus) {
-		this.confirmClsStatus = confirmClsStatus.value;
-	}
-
-	/* (non-Javadoc)
-	 * @see nts.uk.ctx.at.record.dom.workrecord.workfixed.WorkFixedSetMemento#setFixedDate(nts.arc.time.GeneralDate)
-	 */
-	@Override
-	public void setFixedDate(GeneralDate fixedDate) {
-		this.fixedDate = fixedDate;
-	}
-
-	/* (non-Javadoc)
-	 * @see nts.uk.ctx.at.record.dom.workrecord.workfixed.WorkFixedSetMemento#setProcessDate(java.lang.Integer)
-	 */
-	@Override
-	public void setProcessYm(YearMonth processDate) {
-		this.processDate = processDate.v();
-	}
-
-	/* (non-Javadoc)
-	 * @see nts.uk.ctx.at.record.dom.workrecord.workfixed.WorkFixedSetMemento#setCid(java.lang.String)
-	 */
-	@Override
-	public void setCid(String cid) {
-		this.cid = cid;
-	}
 	
-	/**
-	 * Sets the employee name.
-	 *
-	 * @param employeeName the new employee name
-	 */
-	public void setEmployeeName(String employeeName) {
-		this.employeeName = employeeName;
-	}	
 }
