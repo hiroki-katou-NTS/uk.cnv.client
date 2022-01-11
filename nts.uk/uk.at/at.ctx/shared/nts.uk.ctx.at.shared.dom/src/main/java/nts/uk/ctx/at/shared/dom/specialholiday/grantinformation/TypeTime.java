@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.shared.dom.specialholiday.grantinformation;
 
 import nts.arc.enums.EnumAdaptor;
+import nts.uk.ctx.at.shared.dom.specialholiday.NextSpecialHolidayGrantParameter;
 
 /**
  * 付与するタイミングの種類

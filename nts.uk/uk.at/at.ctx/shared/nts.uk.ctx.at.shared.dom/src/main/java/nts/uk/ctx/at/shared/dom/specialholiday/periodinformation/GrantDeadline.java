@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.layer.dom.DomainObject;
+import nts.arc.time.GeneralDate;
+import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.ElapseYear;
 
 /**
  * 期限情報
@@ -79,4 +81,81 @@ public class GrantDeadline extends DomainObject {
 				accumulationDays);
 
 	}
+	
+	/**
+	 * 期限日を取得する
+	 * @param grantDate
+	 * @param grantReferenceDate
+	 * @param elapseNo
+	 * @param elapseYear
+	 * @return
+	 */
+	public GeneralDate getDeadLine(GeneralDate grantDate, Optional<GeneralDate> grantReferenceDate,
+			Optional<Integer> elapseNo, Optional<ElapseYear> elapseYear) {
+
+		// 無期限
+		if (this.getTimeSpecifyMethod().equals(TimeLimitSpecification.INDEFINITE_PERIOD)) {
+
+			// パラメータ「次回特別休暇付与」の期限を求める
+			// ・期限日 ← 9999/12/31
+			return (GeneralDate.ymd(9999, 12, 31));
+		}
+		// 有効期限を指定する
+		else if (this.getTimeSpecifyMethod().equals(TimeLimitSpecification.AVAILABLE_GRANT_DATE_DESIGNATE)) {
+
+			if(this.getExpirationDate().isPresent()){
+				return this.getExpirationDate().get().calcDeadline(grantDate);
+			}else {
+				throw new RuntimeException();
+			}
+
+		}
+		// 次回付与日まで使用可能
+		else if (this.getTimeSpecifyMethod().equals(TimeLimitSpecification.AVAILABLE_UNTIL_NEXT_GRANT_DATE)) {
+
+			// パラメータ「次回特別休暇付与」の期限を求める
+			// ・期限日 ← パラメータ「次回付与年月日」の前日
+
+			return this.calcDeadLineNextGrantDate(grantDate, grantReferenceDate, elapseNo, elapseYear);
+		} else {
+			throw new RuntimeException();
+		}
+	}
+	
+	
+	/**
+	 * 次回付与日まで使用可能の場合の期限日を求める
+	 * @param grantDate
+	 * @param grantReferenceDate
+	 * @param elapseNo
+	 * @param elapseYear
+	 * @return
+	 */
+	public GeneralDate calcDeadLineNextGrantDate(GeneralDate grantDate, Optional<GeneralDate> grantReferenceDate,
+			Optional<Integer> elapseNo, Optional<ElapseYear> elapseYear) {
+		
+		GeneralDate nextGrantDate = grantDate.addYears(1);
+		
+		if(grantReferenceDate.isPresent() && elapseNo.isPresent() && elapseYear.isPresent()){
+			Optional<GeneralDate> nextGrantDateOp = elapseYear.get().getGrantDate(grantReferenceDate.get(), elapseNo.get());
+			
+			if(nextGrantDateOp.isPresent()){
+				nextGrantDate = nextGrantDateOp.get();
+			}	
+		}
+		
+		return nextGrantDate.addDays(-1);
+	}
+	
+	/**
+	 * 蓄積上限日数を取得する
+	 * @return
+	 */
+	public Optional<LimitCarryoverDays> getLimitCarryoverDays(){
+		if(this.limitAccumulationDays.isPresent()){
+			return this.limitAccumulationDays.get().getCarryoverDays();
+		}
+		return Optional.empty();
+	}
 }
+	

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.SpecialVacationMonths;
 
 /**
  * 経過年数
@@ -35,4 +34,13 @@ public class ElapseYearMonth {
 			int year, int month) {
 		return new ElapseYearMonth(year, month);
 	}
+    
+    /**
+     * 付与周期を加算する
+     * @param addElapseYearMonth
+     * @return
+     */
+    public ElapseYearMonth addElapseYearMonth(ElapseYearMonth addElapseYearMonth){
+    	return new ElapseYearMonth(this.getYear() + addElapseYearMonth.getYear(), this.getMonth() + addElapseYearMonth.getMonth());
+    }
 }

@@ -175,18 +175,14 @@ public class InPeriodOfSpecialLeaveResultInfor {
 								x.getMinutes().map(y -> new SpecialLeavaRemainTime(y.v()))))
 						.orElse(new SpecialLeaveUnDigestion(new SpecialLeaveRemainDay(0.0) , Optional.empty())));
 
-		if(specialLeavResult.getAsOfStartNextDayOfPeriodEnd().getRemainingNumber()
-				.getSpecialLeaveWithMinus().getRemainingNumberInfo().getRemainingNumberAfterGrantOpt().isPresent()) {
-			// 付与区分 ← （特別休暇情報（期間終了日の翌日開始時点）．残数．特別休暇（マイナスあり）残数．付与後）が存在する場合）true
+		if(specialLeavResult.getAsOfStartNextDayOfPeriodEnd().getGrantDaysInfo().isPresent()) {
+			// 付与区分 ← （特別休暇情報（期間終了日の翌日開始時点）．残数．付与情報が存在する場合）が存在する場合）true
 			domain.setGrantAtr(true);
-			// 特別休暇情報（期間終了日の翌日開始時点）．付与残数データ．付与日がINPUT．期間．開始＋１日～INPUT．期間．終了日＋１の付与残数データ．明細．付与数．日数
-			DatePeriod periodTemp = new DatePeriod(period.start().addDays(1), period.end().addDays(1));
-			double grantUseDay = specialLeavResult.getAsOfStartNextDayOfPeriodEnd().getGrantRemainingDataList().stream()
-					.filter(x -> x.getGrantDate().beforeOrEquals(periodTemp.end())
-							&& x.getGrantDate().afterOrEquals(periodTemp.start())).mapToDouble(x -> x.getDetails().getGrantNumber().getDays().v()).sum();
-			domain.setGrantDays(Optional.of(new SpecialLeaveGrantUseDay(grantUseDay)));
+			// 特別休暇情報（期間終了日の翌日開始時点）．残数．付与情報
+
+			domain.setGrantDays(Optional.of(new SpecialLeaveGrantUseDay(specialLeavResult.getAsOfStartNextDayOfPeriodEnd().getGrantDaysInfo().get().v())));
 		}else {
-			//付与区分 ← （特別休暇情報（期間終了日の翌日開始時点）．残数．特別休暇（マイナスあり）残数．付与後）が存在しない場合）false
+			//付与区分 ← （特別休暇情報（期間終了日の翌日開始時点）．残数．付与情報が存在しない場合）false
 			domain.setGrantAtr(false);
 			//存在しない場合 optional.empty
 			domain.setGrantDays(Optional.empty());

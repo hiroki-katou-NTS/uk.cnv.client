@@ -7,7 +7,6 @@ import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.shared.app.command.specialholiday.grantcondition.SpecialLeaveRestrictionCommand;
 import nts.uk.ctx.at.shared.app.command.specialholiday.grantinformation.GrantRegularCommand;
-import nts.uk.ctx.at.shared.app.command.specialholiday.periodinformation.GrantPeriodicCommand;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHoliday;
 import nts.uk.ctx.at.shared.dom.specialholiday.TargetItem;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantcondition.AgeRange;
@@ -15,16 +14,13 @@ import nts.uk.ctx.at.shared.dom.specialholiday.grantcondition.AgeStandard;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantcondition.SpecialLeaveRestriction;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.FixGrantDate;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.GrantDate;
+import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.GrantDateTblReferenceGrant;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.GrantRegular;
-import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.GrantTime;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.PeriodGrantDate;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.RegularGrantDays;
 import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.TypeTime;
-import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.AvailabilityPeriod;
 import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.GrantDeadline;
 import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.SpecialVacationDeadline;
-import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.SpecialVacationMonths;
-import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.SpecialVacationYears;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 import nts.uk.shr.com.time.calendar.MonthDay;
 
@@ -122,7 +118,7 @@ public class SpecialHolidayCommand {
 		return GrantRegular.of(TypeTime.toEnum(this.regularCommand.getTypeTime()),
 				Optional.ofNullable(GrantDate.toEnum(this.regularCommand.getGrantDate())),
 				toDomainFixGrantDate(),
-				toDomainGrantDeadline(),
+				toDomainGrantDateTblReferenceGrant(),
 				toDomainPeriodGrantDate());
 	}
 	
@@ -172,7 +168,7 @@ public class SpecialHolidayCommand {
 		return Optional.ofNullable(PeriodGrantDate.of(period, RegularGrantDays.createFromJavaType(this.regularCommand.getPeriodGrantDate().getGrantDays()))); 
 	}
 	
-	private Optional<GrantDeadline> toDomainGrantDeadline() {
+	private Optional<GrantDateTblReferenceGrant> toDomainGrantDateTblReferenceGrant() {
 		
 		if (this.regularCommand.getGrantPeriodic() == null) {
 			return Optional.empty();
@@ -186,7 +182,7 @@ public class SpecialHolidayCommand {
 				Optional.ofNullable(SpecialVacationDeadline.createFromJavaType(months, years)),
 				this.regularCommand.getGrantPeriodic().getLimitAccumulationDays().getLimitCarryoverDays());
 		
-		return Optional.ofNullable(grantDeadline);
+		return Optional.ofNullable(new GrantDateTblReferenceGrant(grantDeadline));
 	}
 	
 	

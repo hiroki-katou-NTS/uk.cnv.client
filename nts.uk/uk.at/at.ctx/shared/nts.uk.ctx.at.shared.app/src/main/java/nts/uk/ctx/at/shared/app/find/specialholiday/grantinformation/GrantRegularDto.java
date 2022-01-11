@@ -31,7 +31,7 @@ public class GrantRegularDto {
 				domain.getTypeTime().value,
 				domain.getGrantDate().isPresent() ? domain.getGrantDate().get().value : null,
 				domain.getFixGrantDate().isPresent() ? FixGrantDateDto.fromDomain(domain.getFixGrantDate().get()) : null,
-				domain.getGrantPeriodic().isPresent() ? GrantDeadlineDto.fromDomain(domain.getGrantPeriodic().get()) : null,
+				domain.getGrantPeriodic().isPresent() ? GrantDeadlineDto.fromDomain(domain.getGrantPeriodic().get().getGrantDeadline()) : null,
 				domain.getPeriodGrantDate().isPresent() ? PeriodGrantDateDto.fromDomain(domain.getPeriodGrantDate().get()) : null);
 	}
 	

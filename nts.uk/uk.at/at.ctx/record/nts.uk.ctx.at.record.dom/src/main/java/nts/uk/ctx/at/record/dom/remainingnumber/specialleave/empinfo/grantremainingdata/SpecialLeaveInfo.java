@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.val;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.GrantBeforeAfterAtr;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.specialholiday.SpecialLeaveGrantUseDay;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.vacation.specialholiday.SpecialLeaveUseNumber;
 import nts.uk.ctx.at.record.dom.remainingnumber.specialleave.export.SpecialLeaveManagementService;
 import nts.uk.ctx.at.shared.dom.remainingnumber.base.LeaveExpirationStatus;
@@ -28,8 +29,11 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.empinfo.grantremain
 import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.service.SpecialHolidayInterimMngData;
 import nts.uk.ctx.at.shared.dom.remainingnumber.specialleave.service.SpecialLeaveError;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHoliday;
+import nts.uk.ctx.at.shared.dom.specialholiday.export.NextSpecialLeaveGrant;
+import nts.uk.ctx.at.shared.dom.specialholiday.grantinformation.GrantDateTblReferenceGrant;
 import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.GrantDeadline;
 import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.LimitAccumulationDays;
+import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.LimitCarryoverDays;
 
 /**
  * 特別休暇情報
@@ -45,6 +49,8 @@ public class SpecialLeaveInfo implements Cloneable {
 	private SpecialLeaveRemaining remainingNumber;
 	/** 付与残数データ */
 	private List<SpecialLeaveGrantRemainingData> grantRemainingDataList;
+	/** 付与情報 */
+	private Optional<SpecialLeaveGrantUseDay> grantDaysInfo;
 
 	/**
 	 * コンストラクタ
@@ -54,8 +60,7 @@ public class SpecialLeaveInfo implements Cloneable {
 		this.ymd = GeneralDate.min();
 		this.remainingNumber = new SpecialLeaveRemaining();
 		this.grantRemainingDataList = new ArrayList<>();
-
-
+		this.grantDaysInfo = Optional.empty();
 	}
 
 	/**
@@ -75,6 +80,7 @@ public class SpecialLeaveInfo implements Cloneable {
 		domain.ymd = ymd;
 		domain.remainingNumber = remainingNumber;
 		domain.grantRemainingDataList = grantRemainingDataList;
+		domain.grantDaysInfo = Optional.empty();
 		return domain;
 	}
 
@@ -90,6 +96,7 @@ public class SpecialLeaveInfo implements Cloneable {
 			cloned.grantRemainingDataList.add(grantRemainingData.clone());
 
 		}
+		cloned.grantDaysInfo = this.grantDaysInfo.map(x -> new SpecialLeaveGrantUseDay(x.v()));
 		return cloned;
 	}
 
@@ -315,6 +322,9 @@ public class SpecialLeaveInfo implements Cloneable {
 
 		/** 特別休暇を付与する */
 		grantSpecialHoliday(require, companyId, employeeId, aggregatePeriodWork, specialLeaveCode, baseDate);
+		
+		/** 付与情報を更新 */
+		this.grantDaysInfo = updateGrantDaysInfo(aggregatePeriodWork.getGrantWork().getSpecialLeaveGrant());
 
 		/** 付与前付与後を判断する */
 		GrantBeforeAfterAtr grantPeriodAtr = aggregatePeriodWork.judgeGrantPeriodAtr(entryDate);
@@ -365,13 +375,9 @@ public class SpecialLeaveInfo implements Cloneable {
 
 			// 繰越上限日数
 			int limitCarryoverDays = 0;
-			Optional<LimitAccumulationDays> limitAccumulationDays = specialHolidayOpt.get().getGrantRegular().getLimitAccumulationDays();
-			if ( limitAccumulationDays.isPresent() ) {
-				if(limitAccumulationDays.get().isLimit()){
-					if (limitAccumulationDays.get().getLimitCarryoverDays().isPresent()) {
-						limitCarryoverDays = limitAccumulationDays.get().getLimitCarryoverDays().get().v();
-					}
-				}
+			Optional<LimitCarryoverDays> LimitCarryoverDaysOp = specialHolidayOpt.get().getGrantRegular().getLimitCarryoverDays();
+			if ( LimitCarryoverDaysOp.isPresent() ) {
+				limitCarryoverDays = LimitCarryoverDaysOp.get().v();
 			}
 
 			if ( limitCarryoverDays > 0 ){
@@ -429,6 +435,26 @@ public class SpecialLeaveInfo implements Cloneable {
 		}
 		return this;
 	}
+	
+	/**
+	 * 付与情報を更新
+	 * @param nextGrant
+	 * @return
+	 */
+	private Optional<SpecialLeaveGrantUseDay> updateGrantDaysInfo(Optional<NextSpecialLeaveGrant> nextGrant){
+		if(!nextGrant.isPresent()){
+			return this.grantDaysInfo;
+		}
+		
+		double grantDay = nextGrant.get().getGrantDays().v();
+		if(this.grantDaysInfo.isPresent()){
+			grantDay += this.grantDaysInfo.get().v();
+		}
+		return Optional.of(new SpecialLeaveGrantUseDay(grantDay));
+		
+	}
+	
+	
 
 	/**
 	 * 消化処理

@@ -1,11 +1,8 @@
 package nts.uk.ctx.at.shared.infra.repository.specialholiday;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -128,7 +125,6 @@ public class JpaGrantDateTblRepository extends JpaRepository implements GrantDat
 
 		return e;
 	}
-
 
 
 	/**

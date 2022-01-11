@@ -4,20 +4,32 @@ import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nts.arc.time.GeneralDate;
+import nts.uk.ctx.at.shared.dom.specialholiday.export.NextSpecialLeaveGrant;
 @AllArgsConstructor
-@NoArgsConstructor
 @Setter
 @Getter
+/**
+ * 特別休暇情報
+ * @author hayata_maekawa
+ *
+ */
 public class SpecialHolidayInfor {
 	/**
-	 * ・特別休暇情報一覧
+	 * 付与日数
 	 */
 	private GrantDaysInfor grantDaysInfor;
 	/**
 	 * 期限日
 	 */
 	private Optional<GeneralDate> deadlineDate;
+	
+	
+	//次回特休付与から作成
+	public SpecialHolidayInfor(NextSpecialLeaveGrant nextGrant){
+		this.grantDaysInfor = new GrantDaysInfor(nextGrant.getGrantDate(),nextGrant.getGrantDays().v());
+		this.deadlineDate = Optional.of(nextGrant.getDeadLine());
+	}
+	
 }

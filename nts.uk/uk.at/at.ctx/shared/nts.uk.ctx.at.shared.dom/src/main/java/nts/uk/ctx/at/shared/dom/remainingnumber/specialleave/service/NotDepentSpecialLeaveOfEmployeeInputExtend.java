@@ -15,7 +15,7 @@ import nts.arc.time.calendar.period.DatePeriod;
 @Setter
 @NoArgsConstructor
 public class NotDepentSpecialLeaveOfEmployeeInputExtend{
-	private String sid;
+	private Optional<String> sid;
 	/**	会社ID */
 	private String cid;
 	/**	期間 */

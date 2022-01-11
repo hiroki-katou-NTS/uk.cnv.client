@@ -54,7 +54,9 @@ public class SpecialLeaveGrantNextDateServiceImpl implements SpecialLeaveGrantNe
 	@Override
 	public Optional<GrantDaysInfor> getGrantDataOfNextDay(SpeGrantNextDateByGetInput param) {
 		//社員に依存しない特別休暇情報を取得する
-		NotDepentSpecialLeaveOfEmployeeInput inputData = new NotDepentSpecialLeaveOfEmployeeInput(param.getCid(), 
+		NotDepentSpecialLeaveOfEmployeeInputExtend inputData = new NotDepentSpecialLeaveOfEmployeeInputExtend(
+				Optional.empty(),
+				param.getCid(), 
 				param.getDatePeriod(), 
 				param.getSpecialCode(), 
 				param.getSpecialDate(),
@@ -102,7 +104,7 @@ public class SpecialLeaveGrantNextDateServiceImpl implements SpecialLeaveGrantNe
 		Map<String, GrantDaysInfor> result = new HashMap<>();
 		//社員に依存しない特別休暇情報を取得する
 		List<NotDepentSpecialLeaveOfEmployeeInputExtend> inputDatas = params.stream().map(param -> new NotDepentSpecialLeaveOfEmployeeInputExtend(
-				param.getSid(),
+				Optional.of(param.getSid()),
 				param.getCid(), 
 				param.getDatePeriod(), 
 				param.getSpecialCode(), 

@@ -56,7 +56,6 @@ public interface GrantDateTblRepository {
 	 */
 	List<GrantDateTbl> findBySphdCd(String companyId, int specialHolidayCode);
 
-
 ////	/**
 ////	 * đối ứng cho màn cps003
 ////	 * Find Grant Date by Code

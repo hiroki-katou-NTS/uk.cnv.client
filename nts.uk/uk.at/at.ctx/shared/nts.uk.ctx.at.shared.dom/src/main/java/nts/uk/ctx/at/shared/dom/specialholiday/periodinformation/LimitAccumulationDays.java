@@ -23,5 +23,17 @@ public class LimitAccumulationDays {
 
 	/** 繰越上限日数 */
 	private Optional<LimitCarryoverDays> limitCarryoverDays;
-
+	
+	
+	/**
+	 * 蓄積上限日数を取得する
+	 * @return
+	 */
+	public Optional<LimitCarryoverDays> getCarryoverDays(){
+		if(this.isLimit()){
+			return this.getLimitCarryoverDays();
+		}
+		return Optional.empty();
+	}
+	
 }

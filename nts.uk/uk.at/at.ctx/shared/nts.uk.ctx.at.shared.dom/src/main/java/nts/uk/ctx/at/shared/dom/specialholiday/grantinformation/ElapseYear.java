@@ -1,18 +1,19 @@
 package nts.uk.ctx.at.shared.dom.specialholiday.grantinformation;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nts.arc.layer.dom.AggregateRoot;
-import nts.arc.layer.dom.DomainObject;
+import nts.arc.time.GeneralDate;
 import nts.arc.time.YearMonth;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHolidayCode;
-import nts.uk.ctx.at.shared.dom.specialholiday.periodinformation.SpecialVacationMonths;
 
 /**
  * 特別休暇付与経過年数テーブル
@@ -94,6 +95,54 @@ public class ElapseYear extends AggregateRoot {
 						: Optional.of(GrantCycleAfterTbl.createFromJavaType(years, months)));
 	}
 	
+	/**
+	 * 付与日を取得する
+	 * @param baseDate
+	 * @param elapseNo
+	 * @return
+	 */
+	public Optional<GeneralDate> getGrantDate(GeneralDate baseDate, int elapseNo){
+		
+		List<ElapseYearMonthTbl> yearMonthTbl = this.getElapseYearMonthTbl(elapseNo);
+		
+		Optional<ElapseYearMonth> yearMonth = yearMonthTbl.stream()
+				.filter(x->x.getGrantCnt() == elapseNo)
+				.map(x -> x.getElapseYearMonth())
+				.findFirst();
+			
+		if (yearMonth.isPresent()) {
+			return Optional.of(baseDate.addYears(yearMonth.get().getYear())
+					.addMonths(yearMonth.get().getMonth()));
+		}
+		return Optional.empty();
+	}
 	
+	/**
+	 * 指定した付与回数までの経過年数テーブルを取得する
+	 * @param elapseNo
+	 * @return
+	 */
+	private List<ElapseYearMonthTbl> getElapseYearMonthTbl(int elapseNo){
+		if(this.getElapseYearMonthTblList().size() <= 0){
+			return new ArrayList<>();
+		}
+		
+		List<ElapseYearMonthTbl> tblList = this.getElapseYearMonthTblList().stream()
+				.filter(x -> x.getGrantCnt() <= elapseNo).collect(Collectors.toList());
+		
+		if(tblList.isEmpty()){
+			return new ArrayList<>();
+		}
+		
+		ElapseYearMonthTbl lastTbl = tblList.stream()
+				.sorted(Comparator.comparing(ElapseYearMonthTbl::getGrantCnt).reversed())
+				.findFirst().get();		
+		
+		if(lastTbl.getGrantCnt() < elapseNo && this.getGrantCycleAfterTbl().isPresent()){
+			tblList.addAll(this.getGrantCycleAfterTbl().get().getElapseYearMonthTbltheGrantCnt(lastTbl, elapseNo));
+		}
+		
+		return tblList;
+	}
 	
 }
