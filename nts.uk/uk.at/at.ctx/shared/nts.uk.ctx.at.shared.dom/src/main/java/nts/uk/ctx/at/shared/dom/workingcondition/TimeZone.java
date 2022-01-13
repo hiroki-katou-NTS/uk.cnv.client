@@ -4,6 +4,7 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.dom.workingcondition;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import nts.arc.layer.dom.DomainObject;
 import nts.uk.shr.com.time.TimeWithDayAttr;
@@ -13,6 +14,7 @@ import nts.uk.shr.com.time.TimeWithDayAttr;
  */
 // 時間帯
 @Getter
+@AllArgsConstructor
 public class TimeZone extends DomainObject {
 
 	
