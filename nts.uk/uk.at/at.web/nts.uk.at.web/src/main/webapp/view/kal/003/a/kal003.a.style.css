@@ -111,21 +111,24 @@ label.label4w4d {
 	height: 386px ! important;
 }
 .tab-content-4 .nts-fixed-body-wrapper{
-	overflow-x: hidden;
+	/*overflow-x: hidden;*/
 	border-bottom: hidden;
 }
 .tab-content-4 .nts-fixed-body-container{
 	overflow-x: hidden;
-	border-bottom: hidden;
+	/*border-bottom: hidden;*/
 }
 .tab-content-11 .nts-fixed-body-wrapper{
-	overflow-x: hidden;
+	/*overflow-x: hidden;*/
 	border-bottom: hidden;
 }
 .tab-content-11 .nts-fixed-body-container{
 	overflow-x: hidden;
-	border-bottom: hidden;
+	/*border-bottom: hidden;*/
 }
+.tab-content-15 .nts-fixed-table .nts-fixed-body-container,
+.tab-content-12 .nts-fixed-table .nts-fixed-body-container {overflow-x: hidden !important;}
+
 #div-fixed-table .nts-fixed-table.cf .nts-fixed-body-container.ui-iggrid .nts-fixed-body-wrapper{
 	height: 256px ! important ;
 }

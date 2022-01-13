@@ -100,7 +100,7 @@ public class ScheCreExeBasicWorkSettingHandler {
 		}
 
 		// add error messageId Msg_588
-		this.scheCreExeErrorLogHandler.addError(command.getBaseGetter(), command.getEmployeeId(), "Msg_588");
+//		this.scheCreExeErrorLogHandler.addError(command.getBaseGetter(), command.getEmployeeId(), "Msg_588");
 		return Optional.empty();
 	}
 
@@ -141,7 +141,6 @@ public class ScheCreExeBasicWorkSettingHandler {
 			}
 		} 
 
-		this.scheCreExeErrorLogHandler.addError(command.getBaseGetter(), command.getEmployeeId(), "Msg_589");
 		return Optional.empty();
 	}
 
@@ -281,7 +280,7 @@ public class ScheCreExeBasicWorkSettingHandler {
 			return Optional.ofNullable(optionalCalendarClass.get().getWorkDayDivision().value);
 		} 
 	// add error messageId Msg_588
-	this.scheCreExeErrorLogHandler.addError(command.getBaseGetter(), command.getEmployeeId(), "Msg_588");
+//	this.scheCreExeErrorLogHandler.addError(command.getBaseGetter(), command.getEmployeeId(), "Msg_588");
 	return Optional.empty();
 	}
 
@@ -428,7 +427,7 @@ public class ScheCreExeBasicWorkSettingHandler {
 			} else {
 
 				// add error message 589
-				this.scheCreExeErrorLogHandler.addError(command.getBaseGetter(), command.getEmployeeId(), "Msg_589");
+//				this.scheCreExeErrorLogHandler.addError(command.getBaseGetter(), command.getEmployeeId(), "Msg_589");
 			}
 		}
 		return Optional.empty();

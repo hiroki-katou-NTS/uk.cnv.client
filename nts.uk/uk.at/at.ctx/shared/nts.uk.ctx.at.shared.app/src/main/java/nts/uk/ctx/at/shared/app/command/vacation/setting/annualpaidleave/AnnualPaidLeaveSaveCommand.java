@@ -239,17 +239,6 @@ public class AnnualPaidLeaveSaveCommand {
          * (non-Javadoc)
          *
          * @see nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.
-         * ManageAnnualSettingGetMemento#getIsWorkDayCalculate()
-         */
-        @Override
-        public boolean getIsWorkDayCalculate() {
-            return this.command.addAttendanceDay == 1 ? true : false;
-        }
-
-        /*
-         * (non-Javadoc)
-         *
-         * @see nts.uk.ctx.at.shared.dom.vacation.setting.annualpaidleave.
          * ManageAnnualSettingGetMemento#getRemainingNumberSetting()
          */
         @Override

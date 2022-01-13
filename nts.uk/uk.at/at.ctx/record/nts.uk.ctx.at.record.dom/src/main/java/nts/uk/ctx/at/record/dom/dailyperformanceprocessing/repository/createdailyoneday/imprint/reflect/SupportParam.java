@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkLocationCD;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkTimeInformation;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.work.WorkGroup;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,4 +23,6 @@ public class SupportParam {
 	private Optional<WorkLocationCD> locationCode;
 	// 職場ID＜Optional＞
 	private Optional<String> workplaceId;
+	/** 作業グループ＜Optional＞ */
+	private Optional<WorkGroup> workGroup;
 }

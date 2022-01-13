@@ -17,4 +17,6 @@ public class EmployeeMonthDaySettingRemoveCommand {
 	
 	/** The employee id. */
 	private String employeeId;
+	
+	private int startMonth;
 }

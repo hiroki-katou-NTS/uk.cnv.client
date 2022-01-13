@@ -30,8 +30,8 @@ public class EmpLicenseClassificationTest {
 	
 	@Test
 	public void  getClassification(){
-		EmpLicenseClassification classification = EmpLicenseClassification.get("sid", LicenseClassification.valueOf(1));
+		EmpLicenseClassification classification = EmpLicenseClassification.get("sid", LicenseClassification.NURSE_ASSOCIATE);
 		assertEquals(classification.getEmpID(),"sid");
-		assertEquals(classification.getOptLicenseClassification().get().name, "准看護師");
+		assertEquals(classification.getOptLicenseClassification().get(), LicenseClassification.NURSE_ASSOCIATE);
 	}
 }

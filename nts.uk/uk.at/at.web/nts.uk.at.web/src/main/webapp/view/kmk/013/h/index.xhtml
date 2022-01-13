@@ -9,7 +9,12 @@
 		<ui:define name="htmlHead">
 			<com:ValidatorScript>
 				nts.uk.ctx.at.record.dom.workrecord.goout.MaxGoOut
+        nts.uk.ctx.at.record.dom.workrecord.temporarywork.MaxUsage
+				nts.uk.ctx.at.shared.dom.common.time.AttendanceTime
 			</com:ValidatorScript>
+      <com:EnumScript>
+				nts.uk.ctx.at.shared.dom.workrule.goingout.GoingOutReason
+			</com:EnumScript>
 		
 			<com:scriptfile set="IGNITE" />
 			<com:scriptfile path="kmk013.h.start.js" />
@@ -32,14 +37,14 @@
 					<!-- H3_2 -->
 					<!-- H3_3 -->
 					<!-- H3_4 -->
-					<div class="style-radio" id="h3_2"
+					<div class="style-radio control-setting" id="h3_2"
 						 data-bind="ntsRadioBoxGroup: {
 						 					name: '#{i18n.getText('KMK013_278')}',
 											options: itemListH3_2,
 											optionsValue: 'id',
 											optionsText: 'name',
 											value: selectedIdH3_2,
-											enable: true}"/>
+											enable: true}" tabindex="3" />
 				</div>
 				<div class="control-group">
 					<!-- H8_1 -->
@@ -47,29 +52,40 @@
 					<!-- H8_2 -->
 					<!-- H8_3 -->
 					<!-- H8_4 -->
-					<div class="style-radio"
+					<div class="style-radio control-setting"
 						 data-bind="ntsRadioBoxGroup: {
 						 					name: '#{i18n.getText('KMK013_299')}',
 											options: itemListH8_2,
 											optionsValue: 'id',
 											optionsText: 'name',
 											value: selectedIdH8_2,
-											enable: true}"/>
+											enable: true}" tabindex="4" />
 				</div>
+        <div class="control-group">
+          <div id="H4_5" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('KMK013_575')}</div> 
+          <div id="H4_6" class="style-radio control-setting" data-bind="ntsRadioBoxGroup: {
+            name: '#[KMK013_575]',
+            options: itemListH4_6,
+            optionsValue: 'id',
+            optionsText: 'name',
+            value: selectedIdH4_6,
+            enable: true
+          }" tabindex="5"></div>
+        </div>
 				<div class="control-group">
 					<!-- H4_1 -->
 					<div data-bind="ntsFormLabel: { required: true }">#{i18n.getText('KMK013_281')}</div>
 					<!-- H4_2 -->
 					<!-- H4_3 -->
 					<!-- H4_4 -->
-					<div class="style-radio"
+					<div class="style-radio control-setting"
 						 data-bind="ntsRadioBoxGroup: {
 						 					name: '#{i18n.getText('KMK013_282')}',
 											options: itemListH4_2,
 											optionsValue: 'id',
 											optionsText: 'name',
 											value: selectedIdH4_2,
-											enable: true}"/>
+											enable: true}" tabindex="6"/>
 				</div>
 				<div class="control-group">
 					<!-- H7_1 -->
@@ -77,7 +93,7 @@
 					<!-- H7_2 -->
 					<!-- H7_3 -->
 					<!-- H7_4 -->
-					<div data-bind="ntsCheckBox: { checked: selectedIdH7_2 }">#{i18n.getText('KMK013_507')}</div>
+					<div class="control-setting" data-bind="ntsCheckBox: { checked: selectedIdH7_2 }" tabindex="7">#{i18n.getText('KMK013_507')}</div>
 				</div>
 				<div class="control-group">
 					<!-- H5_1 -->
@@ -85,23 +101,75 @@
 					<!-- H5_2 -->
 					<!-- H5_3 -->
 					<!-- H5_4 -->
-					<div data-bind="ntsCheckBox: { checked: selectedIdH5_2 }">#{i18n.getText('KMK013_509')}</div>
+					<div class="control-setting" data-bind="ntsCheckBox: { checked: selectedIdH5_2 }" tabindex="8">#{i18n.getText('KMK013_509')}</div>
 				</div>
 				<div class="control-group">
 					<!-- H9_1 -->
 					<div data-bind="ntsFormLabel: { required: true }">#{i18n.getText('KMK013_302')}</div>
+          <label id="H9_5" class="description-label">#{i18n.getText('KMK013_566')}</label>
 					<!-- H9_2 -->
 					<!-- H9_3 -->
 					<!-- H9_4 -->
-					<div class="style-radio"
+					<div class="style-radio control-setting"
 						 data-bind="ntsRadioBoxGroup: {
 						 					name: '#{i18n.getText('KMK013_303')}',
 											options: itemListH9_2,
 											optionsValue: 'id',
 											optionsText: 'name',
 											value: selectedIdH9_2,
-											enable: true}"/>
+											enable: true}" tabindex="9"/>
 				</div>
+        <div class="control-group">
+          <div id="H10_1" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('KMK013_289')}</div>
+          <div class="flex valign-center usage-settings">
+            <label id="H10_2">#{i18n.getText('KMK013_290')}</label>
+            <input id="H10_3" data-bind="ntsNumberEditor: {
+              name: '#[KMK013_291]',
+              value: goOutMaxUsage,
+              constraint: 'MaxGoOut',
+              option: { unitID: 'TIMES' },
+              enable: true,
+              required: true
+            }" tabindex="10" />
+            <label id="H10_4">#{i18n.getText('KMK013_292')}</label>
+            <div id="H10_5" data-bind="ntsComboBox: {
+              name: '#[KMK013_293]',
+              options: goOutReasonOptions,
+              optionsValue: 'value',
+              optionsText: 'name',
+              value: selectedReasonGoOut,
+              visibleItemsCount: 4,
+              enable: true,
+              columns: [
+                { prop: 'name', length: '2' }
+              ]
+            }" tabindex="11"></div>
+          </div>
+        </div>
+        <div class="control-group">
+          <div id="H11_1" data-bind="ntsFormLabel: { required: true }">#{i18n.getText('KMK013_220')}</div>
+          <div class="flex valign-center usage-settings ">
+            <label id="H11_2">#{i18n.getText('KMK013_348')}</label>
+            <input id="H11_3" data-bind="ntsNumberEditor: {
+              name: '#[KMK013_423]',
+              value: tempMaxUsage,
+              constraint: 'MaxUsage',
+              option: { unitID: 'TIMES' },
+              enable: isEnabledTempMaxUsage,
+              required: isEnabledTempMaxUsage
+            }" tabindex="12" />
+            <label id="H11_4">#{i18n.getText('KMK013_349')}</label>
+            <input id="H11_5" data-bind="ntsTimeEditor: {
+              name: '#[KMK013_350]',
+              constraint: 'AttendanceTime',
+              value: timeTreatTemporarySame,
+              inputFormat: 'time',
+              mode: 'time',
+              enable: isEnabledTempMaxUsage,
+              required: isEnabledTempMaxUsage
+            }" tabindex="13" />
+          </div>
+        </div>
 			</div>
 		</ui:define>
 	</ui:composition>

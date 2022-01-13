@@ -32,9 +32,9 @@ public class Cmf001bWebService {
 	private Cmf001bSaveCommandHandler saveCmd;
 	
 	@POST
-	@Path("get/setting/all")
+	@Path("get/settings/domainbase")
 	public List<ExternalImportSettingListItemDto> getAll() {
-		List<ExternalImportSettingListItemDto> result = setting.getAll();
+		List<ExternalImportSettingListItemDto> result = setting.getDomainBase();
 		return result;
 	}
 	

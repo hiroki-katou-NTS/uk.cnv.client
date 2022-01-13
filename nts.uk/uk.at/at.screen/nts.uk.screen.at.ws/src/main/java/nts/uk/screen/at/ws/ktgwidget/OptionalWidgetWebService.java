@@ -9,9 +9,8 @@ import javax.ws.rs.Produces;
 
 import nts.arc.layer.ws.WebService;
 import nts.uk.screen.at.app.ktgwidget.find.OptionalWidgetKtgFinder;
-import nts.uk.screen.at.app.ktgwidget.find.dto.DatePeriodParam;
 import nts.uk.screen.at.app.ktgwidget.find.dto.OptionalWidgetDisplay;
-import nts.uk.screen.at.app.ktgwidget.find.dto.OptionalWidgetInfoDto;
+import nts.uk.screen.at.app.ktgwidget.find.dto.WidgetInitialDisplayMonthDto;
 
 @Path("screen/at/OptionalWidget")
 @Produces("application/json")
@@ -33,5 +32,9 @@ public class OptionalWidgetWebService extends WebService {
 		return OptionalWidgetFinder.getOptionalWidgetDisplay(topPagePartCode);
 	}
 	
-	
+	@POST
+	@Path("getWidgetInitialDisplayMonth")
+	public WidgetInitialDisplayMonthDto getWidgetInitialDisplayMonth() {
+		return this.OptionalWidgetFinder.getWidgetInitialDisplayMonth();
+	}
 }

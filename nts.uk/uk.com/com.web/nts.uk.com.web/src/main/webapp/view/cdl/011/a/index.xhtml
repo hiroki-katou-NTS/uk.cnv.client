@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+	<ui:composition template="../../../../master/dialog.xhtml">
+		<ui:define name="htmlHead">
+      <script>
+        var dialogSize = { width: 500, height: 300 };
+			</script>
+			<com:scriptfile set="IGNITE" />
+			<com:stylefile path="cdl011.a.style.css" />
+			<com:scriptfile path="cdl011.a.vm.js" />
+		</ui:define>
+
+		<ui:define name="content">
+			<div id="contents-area">
+        <div class="flex valign-center">
+          <div id="A1" class="setting-label" data-bind="ntsFormLabel: {}">#{i18n.getText('CDL011_5')}</div>
+          <label id="A1_1" data-bind="text: mailFunctionName"></label>
+        </div>
+        <div class="flex valign-top">
+          <div id="A2" class="setting-label" data-bind="ntsFormLabel: {}">#{i18n.getText('CDL011_6')}</div>
+          <div class="setting-checkbox">
+            <div id="A2_1" data-bind="ntsCheckBox: { checked: isCompany }" tabindex="1">#{i18n.getText('CDL011_7')}</div>
+            <div id="A2_2" data-bind="ntsCheckBox: { checked: isCompanyMobile }" tabindex="2">#{i18n.getText('CDL011_8')}</div>
+            <div id="A2_3" data-bind="ntsCheckBox: { checked: isPersonal }" tabindex="3">#{i18n.getText('CDL011_9')}</div>
+            <div id="A2_4" data-bind="ntsCheckBox: { checked: isPersonalMobile }" tabindex="4">#{i18n.getText('CDL011_10')}</div>
+          </div>
+        </div>
+      </div>
+      <div id="functions-area-bottom">
+        <button id="A20_1" class="proceed" data-bind="click: processRegister" tabindex="5">#{i18n.getText('CDL011_11')}</button>
+        <button id="A20_2" data-bind="click: closeDialog" tabindex="6">#{i18n.getText('CDL011_12')}</button>
+      </div>
+    </ui:define>
+  </ui:composition>
+</body>
+</html>

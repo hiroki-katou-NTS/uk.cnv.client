@@ -42,6 +42,8 @@ public class ExecutionResultNumberOfApplicationDto {
 	
 	// 勤怠担当者である
 	boolean employeeCharge = false;
+	
+	DatePeriodDto period = new DatePeriodDto();
 
 	public void setNumberOfApp(NumberOfAppDto number) {
 		this.numberApprovals = number.getNumberApprovals();

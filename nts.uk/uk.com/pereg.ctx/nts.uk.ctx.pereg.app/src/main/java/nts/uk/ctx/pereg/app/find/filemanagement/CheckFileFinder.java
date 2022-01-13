@@ -1817,6 +1817,8 @@ public class CheckFileFinder {
 		aMap.put("CS00082", new Periods(Arrays.asList(new Period("IS00841", null), new Period("IS00842", null))));
 		
 		aMap.put("CS00092", new Periods(Arrays.asList(new Period("IS01016", null), new Period("IS01017", null))));
+		
+		aMap.put("CS00097", new Periods(Arrays.asList(new Period("IS01078", null), new Period("IS01079", null))));
 		return aMap;
 	}
 	

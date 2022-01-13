@@ -629,7 +629,11 @@ module nts.uk.at.view.kdw001.b {
                         self.dScreenmodel.monthCountVisible(false);
                     }
 
-
+                    if (!self.dailyCreatedCheck() && !self.dailyCalCheck() && !self.approvalResultCheck() && self.monthCountCheck()) {
+                      self.dScreenmodel.isCreatingFutureDay(true);
+                    } else {
+                      self.isCreatingFutureDay().then(result => self.dScreenmodel.isCreatingFutureDay(result));
+                    }
     
                     $("#wizard").ntsWizard("next");
                      $('#button113').focus();
@@ -638,6 +642,14 @@ module nts.uk.at.view.kdw001.b {
                     self.params.endMonthResult = self.monthResoult.endMonth;
                 });
 
+            }
+
+            private isCreatingFutureDay(): JQueryPromise<any> {
+              const vm = this;
+              const param = {
+                endDate: moment.utc(vm.params.periodEndDate, "YYYY/MM/DD")
+              };
+              return service.isCreatingFutureDay(param);
             }
 
             opendScreenC() {

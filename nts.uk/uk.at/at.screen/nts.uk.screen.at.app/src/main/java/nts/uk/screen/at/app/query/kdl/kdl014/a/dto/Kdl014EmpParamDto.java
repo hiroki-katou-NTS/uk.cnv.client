@@ -18,5 +18,5 @@ public class Kdl014EmpParamDto {
 	//1: mode date
 	private Integer mode;
 	
-	private List<Kdl014EmpDto> listEmp;
+	private List<String> listEmp;
 }

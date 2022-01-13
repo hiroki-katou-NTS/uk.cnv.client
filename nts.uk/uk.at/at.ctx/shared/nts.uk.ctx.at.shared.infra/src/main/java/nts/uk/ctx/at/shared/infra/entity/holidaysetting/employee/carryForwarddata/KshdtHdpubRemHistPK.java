@@ -40,10 +40,5 @@ public class KshdtHdpubRemHistPK implements Serializable{
 	/** 締め日.末日とする */
 	@Column(name = "IS_LAST_DAY")
 	@Basic(optional = false)
-	public int isLastDay;
-
-	/** 対象月 */
-	@Column(name = "TAGETMONTH")
-	@Basic(optional = false)
-	public int tagetmonth;
+	public boolean isLastDay;
 }

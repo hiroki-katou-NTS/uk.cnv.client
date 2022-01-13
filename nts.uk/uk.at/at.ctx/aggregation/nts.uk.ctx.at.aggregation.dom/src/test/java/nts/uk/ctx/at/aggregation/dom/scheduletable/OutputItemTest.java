@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 
+import lombok.val;
 import nts.arc.testing.assertion.NtsAssert;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 
@@ -27,7 +28,7 @@ public class OutputItemTest {
 	}
 	
 	@Test
-	public void testCreate_exception_details_isEmpty() {
+	public void testCreate_exception_Msg_1975_empty() {
 		
 		NtsAssert.businessException("Msg_1975", 
 				() -> OutputItem.create( NotUseAtr.USE, NotUseAtr.USE , NotUseAtr.USE, Collections.emptyList())
@@ -35,7 +36,7 @@ public class OutputItemTest {
 	}
 	
 	@Test
-	public void testCreate_exception_details_size_more_than_10() {
+	public void testCreate_Msg_1975_greater_than_10() {
 		
 		// Size == 11 >> exception_Msg_1975
 		NtsAssert.businessException("Msg_1975", 
@@ -78,28 +79,27 @@ public class OutputItemTest {
 										Optional.empty(), 
 										Optional.of(ScheduleTableAttendanceItem.SHIFT)),
 								// 1
-								OneRowOutputItem.create(Optional.empty(), Optional.empty(), Optional.of(ScheduleTableAttendanceItem.WORK_TYPE)),
-								// 2
-								OneRowOutputItem.create(Optional.empty(), Optional.empty(), Optional.of(ScheduleTableAttendanceItem.WORK_TIME)),
-								// 3
 								OneRowOutputItem.create(Optional.empty(), Optional.empty(), Optional.of(ScheduleTableAttendanceItem.START_TIME)),
-								// 4
+								// 2
 								OneRowOutputItem.create(Optional.empty(), Optional.empty(), Optional.of(ScheduleTableAttendanceItem.END_TIME)),
-								// 5
+								// 3
 								OneRowOutputItem.create(Optional.empty(), Optional.empty(), Optional.of(ScheduleTableAttendanceItem.START_TIME_2)),
-								// 6
+								// 4
 								OneRowOutputItem.create(Optional.empty(), Optional.empty(), Optional.of(ScheduleTableAttendanceItem.END_TIME_2)),
-								// 7
+								// 5
 								OneRowOutputItem.create(Optional.empty(), Optional.empty(), Optional.of(ScheduleTableAttendanceItem.TOTAL_WORKING_HOURS)),
-								// 8
+								// 6
 								OneRowOutputItem.create(Optional.empty(), Optional.empty(), Optional.of(ScheduleTableAttendanceItem.WORKING_HOURS)),
+								// 7
+								OneRowOutputItem.create(Optional.empty(), Optional.empty(), Optional.of(ScheduleTableAttendanceItem.ACTUAL_WORKING_HOURS)),
+								// 8
+								OneRowOutputItem.create(Optional.empty(), Optional.empty(), Optional.of(ScheduleTableAttendanceItem.DAY_WORKING_HOURS)),
 								// 9
-								OneRowOutputItem.create(Optional.empty(), Optional.empty(), Optional.of(ScheduleTableAttendanceItem.ACTUAL_WORKING_HOURS))
-								));	
+								OneRowOutputItem.create(Optional.empty(), Optional.empty(), Optional.of(ScheduleTableAttendanceItem.NIGHT_WORKING_HOURS))));	
 	}
 	
 	@Test
-	public void testCreate_exception_perInfos_isEmpty() {
+	public void testCreate_exception_Msg_2006() {
 		
 		NtsAssert.businessException("Msg_2006", 
 				() -> OutputItem.create( NotUseAtr.USE, NotUseAtr.USE , NotUseAtr.USE, 
@@ -113,7 +113,7 @@ public class OutputItemTest {
 	
 	
 	@Test
-	public void testCreate_exception_perInfos_duplicate_on_single_row() {
+	public void testCreate_exception_Msg_1972_perInfos_duplicate_on_single_row() {
 		
 		NtsAssert.businessException("Msg_1972", 
 				() -> OutputItem.create( NotUseAtr.USE, NotUseAtr.USE , NotUseAtr.USE, 
@@ -141,7 +141,7 @@ public class OutputItemTest {
 	}
 	
 	@Test
-	public void testCreate_exception_perInfos_duplicate_on_multiple_rows() {
+	public void testCreate_exception_Msg_1972_perInfos_duplicate_on_multiple_rows() {
 		
 		NtsAssert.businessException("Msg_1972", 
 				() -> OutputItem.create( NotUseAtr.USE, NotUseAtr.USE , NotUseAtr.USE, 
@@ -179,7 +179,7 @@ public class OutputItemTest {
 	}
 	
 	@Test
-	public void testCreate_exception_attendanceItems_isEmpty() {
+	public void testCreate_exception_Msg_2007() {
 		
 		NtsAssert.businessException("Msg_2007", 
 				() -> OutputItem.create( NotUseAtr.USE, NotUseAtr.USE , NotUseAtr.USE, 
@@ -195,7 +195,7 @@ public class OutputItemTest {
 	}
 	
 	@Test
-	public void testCreate_exception_attendanceItems_duplicate() {
+	public void testCreate_exception_Msg_1973() {
 		
 		NtsAssert.businessException("Msg_1973", 
 				() -> OutputItem.create( NotUseAtr.USE, NotUseAtr.USE , NotUseAtr.USE, 
@@ -210,6 +210,27 @@ public class OutputItemTest {
 										Optional.empty(),
 										Optional.empty(),
 										Optional.of(ScheduleTableAttendanceItem.SHIFT))
+								))
+		); 
+		
+	}
+	
+	@Test
+	public void testCreate_exception_Msg_2209() {
+		
+		NtsAssert.businessException("Msg_2209", 
+				() -> OutputItem.create( NotUseAtr.USE, NotUseAtr.USE , NotUseAtr.USE, 
+						Arrays.asList(
+								// 0
+								OneRowOutputItem.create(
+										Optional.of(ScheduleTablePersonalInfoItem.EMPLOYEE_NAME), 
+										Optional.empty(),  
+										Optional.of(ScheduleTableAttendanceItem.SHIFT)),
+								// 1
+								OneRowOutputItem.create(
+										Optional.empty(),
+										Optional.empty(),
+										Optional.of(ScheduleTableAttendanceItem.WORK_TIME))
 								))
 		); 
 		
@@ -256,6 +277,110 @@ public class OutputItemTest {
 		
 		assertThat( target != result ).isTrue();
 		assertThat( target.getDetails() != result.getDetails() ).isTrue();
+	}
+	
+	@Test
+	public void testGetDisplayPersonalInfoItems_additionalColumn_notUse() {
+		
+		val target = OutputItem.create( 
+				NotUseAtr.NOT_USE, // 追加列情報の利用区分
+				NotUseAtr.USE , 
+				NotUseAtr.USE, 
+				Arrays.asList(
+					// 0
+					OneRowOutputItem.create(
+							Optional.of(ScheduleTablePersonalInfoItem.EMPLOYEE_NAME), 
+							Optional.of(ScheduleTablePersonalInfoItem.CLASSIFICATION),  
+							Optional.of(ScheduleTableAttendanceItem.SHIFT)),
+					// 1
+					OneRowOutputItem.create(
+							Optional.of(ScheduleTablePersonalInfoItem.EMPLOYMENT), 
+							Optional.empty(),  
+							Optional.empty()),
+					// 2
+					OneRowOutputItem.create(
+							Optional.empty(),
+							Optional.of(ScheduleTablePersonalInfoItem.JOBTITLE), 
+							Optional.empty())
+					));
+		
+		val result = target.getDisplayPersonalInfoItems();
+		
+		assertThat(result).containsExactlyInAnyOrder(
+				ScheduleTablePersonalInfoItem.EMPLOYEE_NAME,
+				ScheduleTablePersonalInfoItem.EMPLOYMENT
+				);
+		
+	}
+	
+	@Test
+	public void testGetDisplayPersonalInfoItems_additionalColumn_Use() {
+		
+		val target = OutputItem.create( 
+				NotUseAtr.USE, // 追加列情報の利用区分
+				NotUseAtr.USE , 
+				NotUseAtr.USE, 
+				Arrays.asList(
+					// 0
+					OneRowOutputItem.create(
+							Optional.of(ScheduleTablePersonalInfoItem.EMPLOYEE_NAME), 
+							Optional.of(ScheduleTablePersonalInfoItem.CLASSIFICATION),  
+							Optional.of(ScheduleTableAttendanceItem.SHIFT)),
+					// 1
+					OneRowOutputItem.create(
+							Optional.of(ScheduleTablePersonalInfoItem.EMPLOYMENT), 
+							Optional.empty(),  
+							Optional.empty()),
+					// 2
+					OneRowOutputItem.create(
+							Optional.empty(),
+							Optional.of(ScheduleTablePersonalInfoItem.JOBTITLE), 
+							Optional.empty())
+					));
+		
+		val result = target.getDisplayPersonalInfoItems();
+		
+		assertThat(result).containsExactlyInAnyOrder(
+				ScheduleTablePersonalInfoItem.EMPLOYEE_NAME,
+				ScheduleTablePersonalInfoItem.CLASSIFICATION,
+				ScheduleTablePersonalInfoItem.EMPLOYMENT,
+				ScheduleTablePersonalInfoItem.JOBTITLE
+				);
+		
+	}
+	
+	@Test
+	public void testGetDisplayAttendanceItems() {
+		
+		val target = OutputItem.create( 
+				NotUseAtr.USE,
+				NotUseAtr.USE , 
+				NotUseAtr.USE, 
+				Arrays.asList(
+					// 0
+					OneRowOutputItem.create(
+							Optional.of(ScheduleTablePersonalInfoItem.EMPLOYEE_NAME), 
+							Optional.of(ScheduleTablePersonalInfoItem.CLASSIFICATION),  
+							Optional.of(ScheduleTableAttendanceItem.SHIFT)),
+					// 1
+					OneRowOutputItem.create(
+							Optional.of(ScheduleTablePersonalInfoItem.EMPLOYMENT), 
+							Optional.empty(),  
+							Optional.empty()),
+					// 2
+					OneRowOutputItem.create(
+							Optional.empty(),
+							Optional.of(ScheduleTablePersonalInfoItem.JOBTITLE), 
+							Optional.of(ScheduleTableAttendanceItem.ACTUAL_WORKING_HOURS))
+					));
+		
+		val result = target.getDisplayAttendanceItems();
+		
+		assertThat(result).containsExactlyInAnyOrder(
+					ScheduleTableAttendanceItem.SHIFT,
+					ScheduleTableAttendanceItem.ACTUAL_WORKING_HOURS
+				);
+		
 	}
 
 }

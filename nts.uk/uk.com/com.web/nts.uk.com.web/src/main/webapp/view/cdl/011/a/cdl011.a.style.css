@@ -1,0 +1,11 @@
+.flex.valign-center {
+  margin-bottom: 10px;
+}
+
+.setting-label {
+  width: 200px;
+}
+
+.setting-checkbox {
+  display: inline-grid;
+}

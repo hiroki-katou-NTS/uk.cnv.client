@@ -15,6 +15,7 @@ import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSetting;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
 
 public class WorkInfoOfDailyAttendanceHelper {
+	
 	public static WorkInfoOfDailyAttendance getWorkInfoOfDailyAttendanceDefault() {
 		WorkInformation recordInfo1 = new WorkInformation("ty1", "ti1");
 		WorkInfoOfDailyAttendance workInfoOfDailyAttendance = new WorkInfoOfDailyAttendance(recordInfo1, CalculationState.Calculated, NotUseAttribute.Not_use, NotUseAttribute.Not_use,
@@ -22,9 +23,21 @@ public class WorkInfoOfDailyAttendanceHelper {
 		return workInfoOfDailyAttendance;
 	}
 	
-	public static WorkInfoOfDailyAttendance getData(WorkInformation recordInfo) {
-		return new WorkInfoOfDailyAttendance(recordInfo, CalculationState.Calculated, NotUseAttribute.Not_use, NotUseAttribute.Not_use,
-				DayOfWeek.FRIDAY, new ArrayList<>(), Optional.empty());
+	/**
+	 * 勤務情報を指定して日別勤怠の勤務情報を作る
+	 * @param recordInfo 勤務情報
+	 * @return 日別勤怠の勤務情報
+	 */
+	public static WorkInfoOfDailyAttendance createByWorkInformation(WorkInformation recordInfo) {
+		
+		return new WorkInfoOfDailyAttendance(
+				recordInfo, 
+				CalculationState.Calculated, 
+				NotUseAttribute.Not_use, 
+				NotUseAttribute.Not_use,
+				DayOfWeek.FRIDAY, 
+				new ArrayList<>(), 
+				Optional.empty());
 	}
 	
 	public static WorkInfoAndTimeZone createWorkInfoAndTimeZone(List<TimeZone> listTimeZone) {

@@ -17,16 +17,15 @@ public class AffiliationWorkplace {
 	// 職場ID
 	private String  workplaceId;
 	
-	/** The normalWorkplaceCode. */
-	// 通常職場コード
-	private String  normalWorkplaceId;
+//	/** The normalWorkplaceCode. */
+//	// 通常職場コード
+//	private String  normalWorkplaceId;
 
-	public AffiliationWorkplace(String historyId, String employeeId, String workplaceId, String normalWorkplaceId) {
+	public AffiliationWorkplace(String historyId, String employeeId, String workplaceId) {
 		super();
 		this.historyId = historyId;
 		this.employeeId = employeeId;
 		this.workplaceId = workplaceId;
-		this.normalWorkplaceId = normalWorkplaceId;
 	}
 	
 	

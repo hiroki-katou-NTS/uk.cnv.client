@@ -12,11 +12,4 @@ public interface IdentityProcessRepository
     List<IdentityProcess> getAllIdentityProcess();
 
     Optional<IdentityProcess> getIdentityProcessById(String cid);
-
-    void add(IdentityProcess domain);
-
-    void update(IdentityProcess domain);
-
-    void remove(String cid);
-
 }

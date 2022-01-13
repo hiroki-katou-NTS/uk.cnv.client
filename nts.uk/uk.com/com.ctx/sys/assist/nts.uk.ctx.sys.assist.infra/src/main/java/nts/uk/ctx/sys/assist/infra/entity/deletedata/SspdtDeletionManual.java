@@ -49,13 +49,13 @@ public class SspdtDeletionManual extends ContractUkJpaEntity implements Serializ
 	/** 削除前に保存 */
 	@Basic(optional = false)
 	@Column(name = "IS_SAVE_BEFORE_DELETE_FLG")
-	public int isSaveBeforeDeleteFlg;
+	public boolean isSaveBeforeDeleteFlg;
 	
 	/** The existing compress pass flag. */
 	/** パスワード有無 */
 	@Basic(optional = false)
 	@Column(name = "IS_EXIST_COMPRESS_PASS_FLG")
-	public int isExistCompressPassFlg;
+	public boolean isExistCompressPassFlg;
 	
 	/** The password encrypt for compress file. */
 	/** 手動保存の圧縮パスワード */
@@ -67,7 +67,7 @@ public class SspdtDeletionManual extends ContractUkJpaEntity implements Serializ
 	/** 社員指定の有無 */
 	@Basic(optional = false)
 	@Column(name = "HAVE_EMPLOYEE_SPECIFIED_FLG")
-	public int haveEmployeeSpecifiedFlg;
+	public boolean haveEmployeeSpecifiedFlg;
 	
 	/** The employee Id. */
 	/** 実行者 */
@@ -158,9 +158,9 @@ public class SspdtDeletionManual extends ContractUkJpaEntity implements Serializ
 	}
 
 	public ManualSetDeletion toDomain() {
-		boolean isSaveBeforeDeleteFlg = this.isSaveBeforeDeleteFlg == 1;
-		boolean isExistCompressPassFlg = this.isExistCompressPassFlg == 1;
-		boolean haveEmployeeSpecifiedFlg = this.haveEmployeeSpecifiedFlg == 1;
+		boolean isSaveBeforeDeleteFlg = this.isSaveBeforeDeleteFlg;
+		boolean isExistCompressPassFlg = this.isExistCompressPassFlg;
+		boolean haveEmployeeSpecifiedFlg = this.haveEmployeeSpecifiedFlg;
 		return ManualSetDeletion.createFromJavatype(this.sspdtManualSetDeletionPK.delId, this.companyID,
 				this.delName, isSaveBeforeDeleteFlg, isExistCompressPassFlg, this.passwordCompressFileEncrypt,
 				haveEmployeeSpecifiedFlg, this.sId, this.supplementExplanation, this.referenceDate,
@@ -171,17 +171,15 @@ public class SspdtDeletionManual extends ContractUkJpaEntity implements Serializ
 	}
 
 	public static SspdtDeletionManual toEntity(ManualSetDeletion manualSetting) {
-		int isSaveBeforeDeleteFlg = manualSetting.isSaveBeforeDeleteFlg() ? 1 : 0;
-		int isExistCompressPassFlg = manualSetting.isExistCompressPassFlg() ? 1 : 0;
-		int isHaveEmployeeSpecifiedFlg = manualSetting.isHaveEmployeeSpecifiedFlg() ? 1 : 0;
 		Optional<Integer> startMonthly = ManualSetDeletion.convertYearMonthToInt(manualSetting.getStartMonthOfMonthly());
 		Optional<Integer> endMonthly = ManualSetDeletion.convertYearMonthToInt(manualSetting.getEndMonthOfMonthly());
 		
 		return new SspdtDeletionManual(new SspdtManualSetDeletionPK(manualSetting.getDelId()),
-				manualSetting.getCompanyId(), manualSetting.getDelName().v(), isSaveBeforeDeleteFlg,
-				isExistCompressPassFlg, 
+				manualSetting.getCompanyId(), manualSetting.getDelName().v(), 
+				manualSetting.isSaveBeforeDeleteFlg(),
+				manualSetting.isExistCompressPassFlg(), 
 				manualSetting.getPasswordCompressFileEncrypt().isPresent() ? manualSetting.getPasswordCompressFileEncrypt().get().v() : null, 
-				isHaveEmployeeSpecifiedFlg, manualSetting.getSId(), 
+						manualSetting.isHaveEmployeeSpecifiedFlg(), manualSetting.getSId(), 
 				manualSetting.getSupplementExplanation().isPresent() ? manualSetting.getSupplementExplanation().get().v() : null, 
 				manualSetting.getReferenceDate().isPresent() ? manualSetting.getReferenceDate().get() : null, 
 				manualSetting.getExecutionDateTime(), 

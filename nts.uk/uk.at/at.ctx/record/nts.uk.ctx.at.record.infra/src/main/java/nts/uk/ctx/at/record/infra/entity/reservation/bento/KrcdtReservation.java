@@ -42,7 +42,7 @@ public class KrcdtReservation extends ContractUkJpaEntity {
 	public String cardNo;
 	
 	@Column(name = "ORDERED")
-	public int ordered;
+	public boolean ordered;
 
 	@Column(name = "WORK_LOCATION_CD")
 	public String workLocationCode;
@@ -60,7 +60,7 @@ public class KrcdtReservation extends ContractUkJpaEntity {
 		return new BentoReservation(
 				new ReservationRegisterInfo(cardNo), 
 				new ReservationDate(date, EnumAdaptor.valueOf(frameAtr, ReservationClosingTimeFrame.class)), 
-				ordered == 0 ? false : true,
+				ordered,
 				Optional.ofNullable(workLocationCode == null? null: new WorkLocationCode(workLocationCode)),
 				reservationDetails.stream().map(x -> x.toDomain()).collect(Collectors.toList()));
 	}
@@ -74,7 +74,7 @@ public class KrcdtReservation extends ContractUkJpaEntity {
 				bentoReservation.getReservationDate().getDate(), 
 				bentoReservation.getReservationDate().getClosingTimeFrame().value, 
 				bentoReservation.getRegisterInfor().getReservationCardNo(), 
-				bentoReservation.isOrdered() ? 1 : 0 ,
+				bentoReservation.isOrdered(),
 				bentoReservation.getWorkLocationCode().isPresent()?
 						bentoReservation.getWorkLocationCode().get().v(): null ,
 				bentoReservation.getBentoReservationDetails().stream().map(x -> KrcdtReservationDetail.fromDomain(x, reservationId)).collect(Collectors.toList()));
@@ -84,7 +84,7 @@ public class KrcdtReservation extends ContractUkJpaEntity {
 		this.date = bentoReservation.getReservationDate().getDate();
 		this.frameAtr = bentoReservation.getReservationDate().getClosingTimeFrame().value;
 		this.cardNo = bentoReservation.getRegisterInfor().getReservationCardNo();
-		this.ordered = bentoReservation.isOrdered() ? 1 : 0;
+		this.ordered = bentoReservation.isOrdered();
 		this.workLocationCode = bentoReservation.getWorkLocationCode().isPresent()?
 				bentoReservation.getWorkLocationCode().get().v(): null;
 
@@ -95,7 +95,7 @@ public class KrcdtReservation extends ContractUkJpaEntity {
 			if (domainOpt.isPresent()){
 				BentoReservationDetail domain = domainOpt.get();
 				detail.quantity = domain.getBentoCount().v();
-				detail.autoReservation = domain.isAutoReservation() ? 1 : 0;
+				detail.autoReservation = domain.isAutoReservation();
 			}else{
 				reservationDetailRemove.add(detail);
 			}

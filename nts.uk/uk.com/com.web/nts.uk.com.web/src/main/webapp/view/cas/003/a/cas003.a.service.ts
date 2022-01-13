@@ -19,14 +19,18 @@ module nts.uk.com.view.cas003.a {
             return nts.uk.request.ajax(paths.updateAccountPolicy, command);
         }
         //Export common excel
-        export function saveAsExcel(languageId: String): JQueryPromise<any> {
+        export function saveAsExcel(): JQueryPromise<any> {
             let program = nts.uk.ui._viewModel.kiban.programName().split(" ");
             let domainType = "CAS003";
             if (program.length > 1) {
                 program.shift();
                 domainType = domainType + program.join(" ");
             }
-            return nts.uk.request.exportFile('/masterlist/report/print', { domainId: "SecuritySetting", domainType: domainType, languageId: languageId, reportType: 0 });
+            let _params = { domainId: "SecuritySetting", 
+                            domainType: domainType,
+                            languageId: "ja", 
+                            reportType: 0};
+            return nts.uk.request.exportFile('/masterlist/report/print', _params);
         }
         
     }

@@ -126,31 +126,43 @@ export class Ccg007dComponent extends Vue {
 
         self.$http
             .post(API.sendMail, submitData)
-            .then((result: { data: Array<SendMailReturn> }) => {
+            .then((result: { data: any }) => {
                 self.$mask('hide');
-
-                if (!_.isEmpty(result.data)) {
-                    self.$goto
-                        .password
-                        .mail({
-                            companyCode: self.companyCode,
-                            employeeCode: self.employeeCode,
-                            contractCode: self.contractCode
-                        });
+                // Query \n newline of dialog
+                // Send the correct email and return the message
+                const message = result.data.message + '';
+                if ( message.indexOf('\n') > -1 ) {
+                    const content1 = message.split('\n')[0];
+                    const content2 = message.split('\n')[1];
+                    const element1 = document.createElement('div');
+                    element1.appendChild(document.createTextNode(content1));
+                    const element2 = document.createElement('div');
+                    element2.appendChild(document.createTextNode(content2));
+                    self.$modal.info('');
+                    const element = document.getElementsByClassName('text-justify')[0];
+                    element.appendChild(element1);
+                    element.appendChild(element2);
+                } else {
+                    self.$modal.info(result.data.message);  
                 }
             }).catch((res: any) => {
-                // Return Dialog Error
                 self.$mask('hide');
-
-                if (!_.isEqual(res.message, 'can not found message id')) {
-                    /** TODO: wait for dialog error method */
-                    self.$modal.error({
-                        messageId: res.messageId,
-                        messageParams: res.parameterIds
-                    });
-                    // self.$modal.error(res.message);
+                // Query \n newline of dialog
+                // Sending wrong email returns message
+                const message = res.message + '';
+                if ( message.indexOf('\n' ) > -1) {
+                    const content1 = message.split('\n')[0];
+                    const content2 = message.split('\n')[1];
+                    const element1 = document.createElement('div');
+                    element1.appendChild(document.createTextNode(content1));
+                    const element2 = document.createElement('div');
+                    element2.appendChild(document.createTextNode(content2));
+                    self.$modal.error('');
+                    const element = document.getElementsByClassName('text-justify')[0];
+                    element.appendChild(element1);
+                    element.appendChild(element2);
                 } else {
-                    self.$modal.error(res.message);
+                    self.$modal.error(res.message);  
                 }
             });
     }

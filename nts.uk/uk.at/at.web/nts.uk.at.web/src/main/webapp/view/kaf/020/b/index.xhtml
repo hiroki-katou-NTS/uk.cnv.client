@@ -40,9 +40,7 @@
     </ui:define>
     <ui:define name="content">
         <div id="functions-area">
-            <div style="display: inline-block;">
-                <a class="goback link-button" data-bind="click: goBack, text: $i18n('KAF000_53')"></a>
-            </div>
+            <div style="display: inline-block;" data-bind="component: { name: 'kaf000-a-component9', params: isFromOther }"></div>
             <button class="proceed"
                     data-bind="click: register, enable: $root.errors.isEmpty, text: $vm.$i18n('KAF020_16')"></button>
             <div data-bind="component: { name: 'kaf000-a-component7',

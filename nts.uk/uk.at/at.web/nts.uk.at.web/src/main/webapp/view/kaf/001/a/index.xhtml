@@ -66,6 +66,11 @@
                             <button class="button-control caret-right"
                                     data-bind="text: overTimeEarlyDepart, click: function(){$parent.selectApplicationByType(0,2)}"></button>
                         </div>
+                        <!-- A2_17 残業申請③-->
+                        <div class="control-group" data-bind="if: $parent.isVisiableOverTimeMultiple()">
+                            <button class="button-control caret-right"
+                                    data-bind="text: overTimeMultiple, click: function(){$parent.selectApplicationByType(0,3)}"></button>
+                        </div>
                         <!-- A2_6 休暇申請 -->
                         <div class="control-group" data-bind="if: $parent.isVisiableAbsenceApp()">
                             <button class="button-control caret-right"

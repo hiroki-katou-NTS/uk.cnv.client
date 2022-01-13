@@ -13,7 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -26,13 +28,16 @@ import nts.arc.layer.infra.data.jdbc.NtsResultSet;
 import nts.arc.layer.infra.data.jdbc.NtsStatement;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
+import nts.arc.time.calendar.period.DatePeriod;
 import nts.gul.collection.CollectionUtil;
+import nts.uk.ctx.bs.employee.dom.jobtitle.affiliate.AffWorkplaceHistoryItemWPeriod;
 import nts.uk.ctx.bs.employee.dom.workplace.affiliate.AffWorkplaceHistory;
+import nts.uk.ctx.bs.employee.dom.workplace.affiliate.AffWorkplaceHistoryItem;
 import nts.uk.ctx.bs.employee.dom.workplace.affiliate.AffWorkplaceHistoryRepository;
 import nts.uk.ctx.bs.employee.infra.entity.workplace.affiliate.BsymtAffiWorkplaceHist;
+import nts.uk.ctx.bs.employee.infra.entity.workplace.affiliate.BsymtAffiWorkplaceHistItem;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.history.DateHistoryItem;
-import nts.arc.time.calendar.period.DatePeriod;
 
 /**
  * The Class JpaAffWorkplaceHistoryRepository.
@@ -88,6 +93,23 @@ public class JpaAffWorkplaceHistoryRepository extends JpaRepository implements A
 	private static final String SELECT_BY_LISTSID = "SELECT aw FROM BsymtAffiWorkplaceHist aw"
 			+ " INNER JOIN BsymtAffiWorkplaceHistItem awit on aw.hisId = awit.hisId"
 			+ " WHERE aw.sid IN :listSid ";
+	
+	private static final String GET_AFF_WKP_HISTS = "SELECT aw FROM BsymtAffiWorkplaceHist aw"
+			+ " WHERE aw.sid IN :sids"
+			+ " AND aw.strDate <= :endDate"
+			+ " AND aw.endDate >= :startDate";
+	
+	private static final String GET_HIST_ITEMS = "SELECT awit FROM BsymtAffiWorkplaceHistItem awit"
+			+ " WHERE awit.hisId IN :hisIds";
+	
+	private static final String EMP_HAS_CHANGED_WKP_WITH_PERIOD = "SELECT m.sid FROM BsymtAffiWorkplaceHist m"
+			+ " WHERE m.sid IN :sids"
+			+ " AND m.strDate = :generalDate";
+	
+	private static final String EMP_HAS_CHANGED_WKP_WITHIN_PERIOD = "SELECT m.sid FROM BsymtAffiWorkplaceHist m"
+			+ " WHERE m.cid = :cid"
+			+ " AND m.strDate >= :startDate"
+			+ " AND m.strDate <= :endDate";
 	
 	/**
 	 * Convert from domain to entity
@@ -180,6 +202,9 @@ public class JpaAffWorkplaceHistoryRepository extends JpaRepository implements A
 	@Override
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public Optional<AffWorkplaceHistory> getByEmpIdAndStandDate(String employeeId, GeneralDate standDate) {
+		if (standDate == null) {
+			return Optional.empty();
+		}
 		List<BsymtAffiWorkplaceHist> listHist = this.queryProxy()
 				.query(SELECT_BY_EMPID_STANDDATE, BsymtAffiWorkplaceHist.class).setParameter("employeeId", employeeId)
 				.setParameter("standDate", standDate).getList();
@@ -669,6 +694,84 @@ public class JpaAffWorkplaceHistoryRepository extends JpaRepository implements A
 		});
 		int  records = this.getEntityManager().createNativeQuery(sb.toString()).executeUpdate();
 		System.out.println(records);
+	}
+
+	@Override
+	public List<AffWorkplaceHistory> getAffWkpHists(List<String> sids, DatePeriod period) {
+		List<AffWorkplaceHistory> result = new ArrayList<AffWorkplaceHistory>();
+		
+		CollectionUtil.split(sids, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subSids -> {
+			result.addAll(
+				this.queryProxy()
+					.query(GET_AFF_WKP_HISTS, BsymtAffiWorkplaceHist.class)
+					.setParameter("sids", sids)
+					.setParameter("startDate", period.start())
+					.setParameter("endDate", period.end())
+					.getList(e -> this.toDomain(e)));
+		});
+		
+		return result;
+	}
+
+	@Override
+	public List<AffWorkplaceHistoryItem> getHistItems(List<String> histIds) {
+		return this.queryProxy().query(GET_HIST_ITEMS, BsymtAffiWorkplaceHistItem.class)
+			.setParameter("hisIds", histIds)
+			.getList(c -> AffWorkplaceHistoryItem.createFromJavaType(c.getHisId(), c.getSid(), c.getWorkPlaceId()));
+	}
+
+	@Override
+	public List<AffWorkplaceHistoryItemWPeriod> getAllWkpHist(List<String> sids, DatePeriod period) {
+		// $職場履歴リスト = [1] Get(社員リスト,期間)
+		List<AffWorkplaceHistory> wkpHists = this.getAffWkpHists(sids, period);
+		
+		// $汎用履歴リスト = $職場履歴リスト： flatMap　$.履歴項目リスト
+		Supplier<Stream<DateHistoryItem>> genericHists = () -> wkpHists.stream().flatMap(c -> c.getHistoryItems().stream());
+		
+		// $履歴IDリスト = $汎用履歴リスト: map $.履歴ID
+		List<String> histIds = genericHists.get().map(c -> c.identifier()).collect(Collectors.toList());
+		
+		// $履歴項目リスト = [2] Get($履歴IDリスト)
+		List<AffWorkplaceHistoryItem> histItems = new ArrayList<AffWorkplaceHistoryItem>();
+		if (!histIds.isEmpty()) {
+			histItems = this.getHistItems(histIds);
+		}
+		
+		// Return
+		return histItems.stream().map(mapper -> {
+				Optional<DateHistoryItem> genericHist = genericHists.get()
+						.filter(hst -> hst.identifier().equals(mapper.getHistoryId()))
+						.findFirst();
+				
+				if (genericHist.isPresent()) {
+					
+					DatePeriod datePeriod = genericHist.get().span();
+					return new AffWorkplaceHistoryItemWPeriod(datePeriod.start(),
+							datePeriod.end(),
+							mapper.getHistoryId(),
+							mapper.getEmployeeId(),
+							mapper.getWorkplaceId());
+				}
+				
+				return null;
+			}).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<String> empHasChangedWkpWithPeriod(List<String> sids, GeneralDate generalDate) {
+		return this.queryProxy().query(EMP_HAS_CHANGED_WKP_WITH_PERIOD, String.class)
+				.setParameter("sids", sids)
+				.setParameter("generalDate", generalDate)
+				.getList();
+	}
+
+	@Override
+	public List<String> empHasChangedWkpWithinPeriod(String cid, DatePeriod period) {
+		return this.queryProxy().query(EMP_HAS_CHANGED_WKP_WITHIN_PERIOD, String.class)
+				.setParameter("cid", cid)
+				.setParameter("startDate", period.start())
+				.setParameter("endDate", period.end())
+				.getList();
 	}
 
 }

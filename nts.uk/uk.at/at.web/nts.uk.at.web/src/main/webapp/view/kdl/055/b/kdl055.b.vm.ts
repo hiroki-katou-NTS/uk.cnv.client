@@ -146,91 +146,224 @@ module nts.uk.at.view.kdl055.b.viewmodel {
             }
 
             vm.$blockui('grayout');
+
+            // Async
             vm.$ajax(paths.register, command).done((res) => {
-                if (res) {
-                    // reset list data fail
-                    vm.data.mappingErrorList = [];
-                    vm.errorList = [];
-
-                    if (res.length > 0) {
-                        let request: any = {};
-                        request.errorRegistrationList = [];
-                        _.forEach(res, errorItem => {
-                            // bind to list mappingErrorList
-
-                            // let empFilter = _.filter(vm.data.listPersonEmp, {'employeeCode': errorItem.employeeCode});
-                            // let empId = empFilter.length > 0 ? empFilter[0].employeeId : '';
-
-                            let error: MappingErrorOutput = {employeeCode: errorItem.employeeCode, employeeName: errorItem.employeename, date: errorItem.date, errorMessage: errorItem.errorMessage};
-                            vm.data.mappingErrorList.push(error);
-                            error.isErrorGrid = true;
-                            vm.errorList.push(error);
-                            vm.$blockui("hide");
-
-                        });
-
-                        // set error list
-                        let errors: any[] = [];
+                let taskId = res.taskInfor.id;
+                vm.checkStateAsyncTask(taskId);
+                
+            }).fail(function(error) {
+                nts.uk.ui.block.clear();
+                nts.uk.ui.dialog.alertError(error);
+            });
             
-                        _.forEach(res, (errorItem) => {
-                            let err: any = { columnKey: 'nameHeader', id: null, index: null, message: errorItem.errorMessage, isErrorGrid: true };
+            // Async
+
+            // vm.$ajax(paths.register, command).done((res) => {
+            //     if (res) {
+            //         // reset list data fail
+            //         vm.data.mappingErrorList = [];
+            //         vm.errorList = [];
+
+            //         if (res.length > 0) {
+            //             let request: any = {};
+            //             request.errorRegistrationList = [];
+            //             _.forEach(res, errorItem => {
+            //                 // bind to list mappingErrorList
+
+            //                 // let empFilter = _.filter(vm.data.listPersonEmp, {'employeeCode': errorItem.employeeCode});
+            //                 // let empId = empFilter.length > 0 ? empFilter[0].employeeId : '';
+
+            //                 let error: MappingErrorOutput = {employeeCode: errorItem.employeeCode, employeeName: errorItem.employeename, date: errorItem.date, errorMessage: errorItem.errorMessage};
+            //                 vm.data.mappingErrorList.push(error);
+            //                 error.isErrorGrid = true;
+            //                 vm.errorList.push(error);
+            //                 vm.$blockui("hide");
+
+            //             });
+
+            //             // set error list
+            //             let errors: any[] = [];
+            //             let listPersonEmp = vm.sortListEmpInfo(vm.data.listPersonEmp, vm.data.importResult.orderOfEmployees);
+
+            //             for(let j = 0; j < res.length; j++) {
+            //                 let err: any = { columnKey: 'nameHeader', id: null, index: null, message: res[j].errorMessage, isErrorGrid: true };
                             
-                            if (errorItem.employeeCode) {
-                                for (let i = 0; i < vm.data.listPersonEmp.length; i++) {
-                                    if (vm.data.listPersonEmp[i].employeeCode === errorItem.employeeCode) {
-                                        err.id = vm.data.listPersonEmp[i].employeeId;
-                                        err.index = i;
+            //                 if (res[j].employeeCode) {
+            //                     let empFilter = _.filter(listPersonEmp, {'employeeCode': res[j].employeeCode});
+            //                     let empId = empFilter.length > 0 ? empFilter[0].employeeId : '';
+            //                     err.id = empId;
+            //                     for (let i = 0; i < listPersonEmp.length; i++) {
+            //                         if (listPersonEmp[i].employeeCode === res[j].employeeCode) {
+            //                             err.id = listPersonEmp[i].employeeId;
+            //                             err.index = i;
+            //                         }
+            //                     }
+            //                 }
+            //                 if (res[j].date) {
+            //                     err.columnKey = res[j].date;
+            //                 }
+                            
+            //                 if (err.index != null) {
+            //                     errors.push(err);
+            //                 }
+            //             }
+
+            //             $("#grid").mGrid("setErrors", errors);
+
+            //             // open KDL053
+            //             request.employeeIds = _.map(vm.data.listPersonEmp, (item) => item.employeeId);
+            //             let empList = vm.data.listPersonEmp;
+            //             for (let i = 0; i < vm.errorList.length; i++) {
+            //                 let empFilter = _.filter(empList, {'employeeCode': vm.errorList[i].employeeCode});
+            //                 let empId = empFilter.length > 0 ? empFilter[0].employeeId : '';
+
+            //                 let item: any = {id: i, sid: empId, scd: vm.errorList[i].employeeCode == null ? '' : vm.errorList[i].employeeCode, 
+            //                     empName: vm.errorList[i].employeeName == null ? '' : vm.errorList[i].employeeName, 
+            //                     date: vm.errorList[i].date == null ? '' : vm.errorList[i].date, attendanceItemId: null, errorMessage: vm.errorList[i].errorMessage};
+            //                 request.errorRegistrationList.push(item);
+            //                 if (!request.employeeIds.includes(item.sid)) {
+            //                     request.employeeIds.push(item.sid);
+            //                 }
+            //             }
+            //             request.isRegistered = 1;
+            //             request.dispItemCol = true;
+            //             if (!vm.isOpenKDL053) {
+            //                 vm.$window.modeless('at', '/view/kdl/053/a/index.xhtml', request).then(() => {
+            //                     vm.isOpenKDL053 = false;
+            //                 });
+            //                 vm.isOpenKDL053 = true;
+            //             }
+            //         } else {
+            //             vm.$dialog.info({ messageId: "Msg_15"}).then(() => {
+            //                 vm.$blockui("hide");
+            //                 vm.close(true);
+            //             });                        
+            //         }
+            //     }
+            // }).fail((err) => {
+            //     if (err) {
+            //         vm.$dialog.error({ messageId: err.messageId, messageParams: err.parameterIds });
+            //     }
+            // }).always(() => {
+            //     vm.$blockui("hide");
+            // });
+        }
+
+        checkStateAsyncTask(taskId: string) {
+            const vm = this;
+
+            nts.uk.deferred.repeat(conf => conf
+                .task(() => {
+                    return nts.uk.request.asyncTask.getInfo(taskId).done(function(res: any) {
+                        if (res.succeeded || res.failed || res.cancelled) {
+                            let arrayItems: any[] = [];
+                            let dataResult: any = {};
+                            dataResult.listErrorInfo = [];
+                            dataResult.hasError = false;
+                            dataResult.isRegistered = true; 
+    
+                            _.forEach(res.taskDatas, item => {
+                                if (item.key == 'STATUS_REGISTER') {
+                                    dataResult.isRegistered = item.valueAsBoolean;
+                                } else if (item.key == 'STATUS_ERROR') {
+                                    dataResult.hasError = item.valueAsBoolean;
+                                } else {
+                                    arrayItems.push(item);
+                                }
+                            });
+    
+                            if (arrayItems.length > 0) {
+                                let listErrorInfo = _.map(arrayItems, obj2 => {
+                                    return JSON.parse(obj2.valueAsString);
+                                });
+                                dataResult.listErrorInfo = listErrorInfo;
+                            }
+    
+                            if (dataResult.hasError == false) {
+                                vm.$blockui('hide');
+                                nts.uk.ui.dialog.info({ messageId: "Msg_15" }).then(() => {
+                                                    vm.$blockui("hide");
+                                                    vm.close(true);
+                                                });;
+                            } else {
+                                // reset list data fail
+                                vm.data.mappingErrorList = [];
+                                vm.errorList = [];
+                                let request: any = {};
+                                request.errorRegistrationList = [];
+                                _.forEach(dataResult.listErrorInfo, errorItem => {
+                                    // bind to list mappingErrorList
+    
+                                    // let empFilter = _.filter(vm.data.listPersonEmp, {'employeeCode': errorItem.employeeCode});
+                                    // let empId = empFilter.length > 0 ? empFilter[0].employeeId : '';
+    
+                                    let error: MappingErrorOutput = {employeeCode: errorItem.employeeCode, employeeName: errorItem.employeename, date: errorItem.date, errorMessage: errorItem.errorMessage};
+                                    vm.data.mappingErrorList.push(error);
+                                    error.isErrorGrid = true;
+                                    vm.errorList.push(error);
+                                    vm.$blockui("hide");
+    
+                                });
+    
+                                // set error list
+                                let errors: any[] = [];
+                                let listPersonEmp = vm.sortListEmpInfo(vm.data.listPersonEmp, vm.data.importResult.orderOfEmployees);
+    
+                                for(let j = 0; j < dataResult.listErrorInfo.length; j++) {
+                                    let err: any = { columnKey: 'nameHeader', id: null, index: null, message: dataResult.listErrorInfo[j].errorMessage, isErrorGrid: true };
+                                    
+                                    if (dataResult.listErrorInfo[j].employeeCode) {
+                                        let empFilter = _.filter(listPersonEmp, {'employeeCode': dataResult.listErrorInfo[j].employeeCode});
+                                        let empId = empFilter.length > 0 ? empFilter[0].employeeId : '';
+                                        err.id = empId;
+                                        for (let i = 0; i < listPersonEmp.length; i++) {
+                                            if (listPersonEmp[i].employeeCode === dataResult.listErrorInfo[j].employeeCode) {
+                                                err.id = listPersonEmp[i].employeeId;
+                                                err.index = i;
+                                            }
+                                        }
+                                    }
+                                    if (dataResult.listErrorInfo[j].date) {
+                                        err.columnKey = dataResult.listErrorInfo[j].date;
+                                    }
+                                    
+                                    if (err.index != null) {
+                                        errors.push(err);
                                     }
                                 }
-                            }
-                            if (errorItem.date) {
-                                err.columnKey = errorItem.date;
-                            }
-                            
-                            if (err.index != null) {
-                                errors.push(err);
-                            }
-                        });
-
-                        $("#grid").mGrid("setErrors", errors);
-
-                        // open KDL053
-                        request.employeeIds = _.map(vm.data.listPersonEmp, (item) => item.employeeId);
-                        let empList = vm.data.listPersonEmp;
-                        for (let i = 0; i < vm.errorList.length; i++) {
-                            let empFilter = _.filter(empList, {'employeeCode': vm.errorList[i].employeeCode});
-                            let empId = empFilter.length > 0 ? empFilter[0].employeeId : '';
-
-                            let item: any = {id: i, sid: empId, scd: vm.errorList[i].employeeCode == null ? '' : vm.errorList[i].employeeCode, 
-                                empName: vm.errorList[i].employeeName == null ? '' : vm.errorList[i].employeeName, 
-                                date: vm.errorList[i].date == null ? '' : vm.errorList[i].date, attendanceItemId: null, errorMessage: vm.errorList[i].errorMessage};
-                            request.errorRegistrationList.push(item);
-                            if (!request.employeeIds.includes(item.sid)) {
-                                request.employeeIds.push(item.sid);
+    
+                                $("#grid").mGrid("setErrors", errors);
+    
+                                // open KDL053
+                                request.employeeIds = _.map(vm.data.listPersonEmp, (item) => item.employeeId);
+                                let empList = vm.data.listPersonEmp;
+                                for (let i = 0; i < vm.errorList.length; i++) {
+                                    let empFilter = _.filter(empList, {'employeeCode': vm.errorList[i].employeeCode});
+                                    let empId = empFilter.length > 0 ? empFilter[0].employeeId : '';
+    
+                                    let item: any = {id: i, sid: empId, scd: vm.errorList[i].employeeCode == null ? '' : vm.errorList[i].employeeCode, 
+                                        empName: vm.errorList[i].employeeName == null ? '' : vm.errorList[i].employeeName, 
+                                        date: vm.errorList[i].date == null ? '' : vm.errorList[i].date, attendanceItemId: null, errorMessage: vm.errorList[i].errorMessage};
+                                    request.errorRegistrationList.push(item);
+                                    if (!request.employeeIds.includes(item.sid)) {
+                                        request.employeeIds.push(item.sid);
+                                    }
+                                }
+                                request.isRegistered = dataResult.isRegistered;
+                                request.dispItemCol = true;
+                                if (!vm.isOpenKDL053) {
+                                    vm.$window.modeless('at', '/view/kdl/053/a/index.xhtml', request).then(() => {
+                                        vm.isOpenKDL053 = false;
+                                    });
+                                    vm.isOpenKDL053 = true;
+                                }
                             }
                         }
-                        request.isRegistered = 1;
-                        request.dispItemCol = true;
-                        if (!vm.isOpenKDL053) {
-                            vm.$window.modeless('at', '/view/kdl/053/a/index.xhtml', request).then(() => {
-                                vm.isOpenKDL053 = false;
-                            });
-                            vm.isOpenKDL053 = true;
-                        }
-                    } else {
-                        vm.$dialog.info({ messageId: "Msg_15"}).then(() => {
-                            vm.$blockui("hide");
-                            vm.close(true);
-                        });                        
-                    }
-                }
-            }).fail((err) => {
-                if (err) {
-                    vm.$dialog.error({ messageId: err.messageId, messageParams: err.parameterIds });
-                }
-            }).always(() => {
-                vm.$blockui("hide");
-            });
+                    });
+                }).while(infor => {
+                    return infor.pending || infor.running;
+                }).pause(1000));
         }
 
         openKDL053() {

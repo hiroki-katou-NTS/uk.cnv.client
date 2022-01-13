@@ -1,0 +1,45 @@
+.row {
+    margin-bottom: 7px;
+}
+
+.col {
+    width: 65px;
+}
+
+.set-row {
+    margin-left: -20px;
+    margin-top: -8px;
+    /*width: 475px;*/
+}
+
+#B1 {
+    padding-top: 16px;
+}
+
+#B3_2 {
+    padding-top: 15px;
+}
+
+.overwrite {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.btn-function {
+    margin-left: 221px;
+    margin-top: 16px;
+}
+
+.content-ui {
+    padding-left: 18px;
+}
+
+#multi-list_container {
+    height: 144px !important;
+}
+
+/*#copy.btn-function button {*/
+    /*width: 85px;*/
+    /*!*height: 37px;*!*/
+    /*!*font-weight: 500px;*!*/
+/*}*/

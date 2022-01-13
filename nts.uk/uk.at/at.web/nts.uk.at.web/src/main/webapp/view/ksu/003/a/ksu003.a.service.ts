@@ -13,7 +13,12 @@ module nts.uk.at.view.ksu003.a {
 			changeWorkType: "screen/at/schedule/changeWorkType",
 			checkWorkType: "screen/at/schedule/checkWorkType",
             checkTimeIsIncorrect: "ctx/at/shared/workrule/workinghours/checkTimeIsIncorrect",
-        regWorkSchedule: "screen/at/schedule/registerKSU003",
+        	regWorkSchedule: "screen/at/schedule/registerKSU003",
+			getTaskWorkSchedule : "screen/at/schedule/getTaskWorkSchedule",
+			addTaskWorkSchedule : "screen/at/schedule/addTaskWorkSchedule",
+			addScheduleByDisplaySet : "screen/at/schedule/addScheduleByDisplaySet",
+			getTaskInfo : "screen/at/schedule/getTaskInfo"
+			
 		};
 		
 		export function checkTimeIsIncorrect(command : any): JQueryPromise<any> {
@@ -62,12 +67,48 @@ module nts.uk.at.view.ksu003.a {
 			return nts.uk.request.ajax(servicePath.changeWorkType, command);
 		}
 		
+		/**
+         * ①<<ScreenQuery>> 勤務種類を変更する
+         */
 		export function checkWorkType(command: any): JQueryPromise<any> {
 			return nts.uk.request.ajax(servicePath.checkWorkType, command);
 		}
 		
+		/**
+         * ①<<ScreenQuery>> 勤務予定を登録する
+         */
 		export function regWorkSchedule(command: any): JQueryPromise<any> {
         	return nts.uk.request.ajax(servicePath.regWorkSchedule, command);
    		}
+
+		// ver 4
+
+		/**
+         * ①<<ScreenQuery>> 作業予定情報を取得する
+         */
+		export function getTaskWorkSchedule(command: any): JQueryPromise<any> {
+        	return nts.uk.request.ajax(servicePath.getTaskWorkSchedule, command);
+   		}
+
+		/**
+         * ①<<ScreenQuery>> 作業予定を登録する
+         */
+		export function addTaskWorkSchedule(command: any): JQueryPromise<any> {
+        	return nts.uk.request.ajax(servicePath.addTaskWorkSchedule, command);
+   		}
+
+		/**
+         * ①<<ScreenQuery>> 組織別スケジュール修正日付別の表示設定を登録する
+         */
+		export function addScheduleByDisplaySet(command: any): JQueryPromise<any> {
+        	return nts.uk.request.ajax(servicePath.addScheduleByDisplaySet, command);
+   		}
+
+		/**
+         * ①<<ScreenQuery>> 作業選択準備情報を取得する
+         */
+		export function getTaskInfo(command: any): JQueryPromise<any> {
+			return nts.uk.request.ajax(servicePath.getTaskInfo, command);
+		}
 	}
 }

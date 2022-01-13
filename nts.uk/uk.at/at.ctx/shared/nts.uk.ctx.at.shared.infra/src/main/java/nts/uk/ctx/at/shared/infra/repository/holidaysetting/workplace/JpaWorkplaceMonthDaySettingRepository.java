@@ -7,6 +7,7 @@ package nts.uk.ctx.at.shared.infra.repository.holidaysetting.workplace;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,6 +30,7 @@ import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.workplace.Workpl
 //import nts.uk.ctx.at.shared.infra.entity.holidaysetting.company.KshmtComMonthDaySetPK_;
 //import nts.uk.ctx.at.shared.infra.entity.holidaysetting.company.KshmtComMonthDaySet_;
 import nts.uk.ctx.at.shared.infra.entity.holidaysetting.workplace.KshmtHdpubDPerMWkp;
+import nts.uk.ctx.at.shared.infra.entity.holidaysetting.workplace.KshmtWkpMonthDaySetPK;
 import nts.uk.ctx.at.shared.infra.entity.holidaysetting.workplace.KshmtWkpMonthDaySetPK_;
 import nts.uk.ctx.at.shared.infra.entity.holidaysetting.workplace.KshmtWkpMonthDaySet_;
 
@@ -62,8 +64,8 @@ public class JpaWorkplaceMonthDaySettingRepository extends JpaRepository impleme
 		if (result.isEmpty()) {
 			return new ArrayList<>();
 		}
-		Map<Integer, List<KshmtHdpubDPerMWkp>> entityAll = result.stream()
-				.collect(Collectors.groupingBy(x -> x.getKshmtWkpMonthDaySetPK().getManageYear(), Collectors.toList()));
+		Map<String, List<KshmtHdpubDPerMWkp>> entityAll = result.stream()
+				.collect(Collectors.groupingBy(x -> x.getKshmtWkpMonthDaySetPK().getWkpId(), Collectors.toList()));
 		return entityAll.entrySet().stream().map(x -> new WorkplaceMonthDaySetting(new JpaWorkplaceMonthDaySettingGetMemento(x.getValue())))
 				.collect(Collectors.toList());
 	}
@@ -93,9 +95,22 @@ public class JpaWorkplaceMonthDaySettingRepository extends JpaRepository impleme
 	 * @see nts.uk.ctx.bs.employee.dom.holidaysetting.workplace.WorkplaceMonthDaySettingRepository#remove(nts.uk.ctx.bs.employee.dom.common.CompanyId, java.lang.String, nts.uk.ctx.bs.employee.dom.holidaysetting.common.Year)
 	 */
 	@Override
-	public void remove(CompanyId companyId, String workplaceId, Year year) {
-		List<KshmtHdpubDPerMWkp> result = this.findBy(companyId, workplaceId, year, null, null);
-		this.commandProxy().removeAll(result);
+	public void remove(CompanyId companyId, String workplaceId, Year year, Integer startMonth) {
+		Year nextYear = new Year(year.v() + 1);
+		List<Year> years = Arrays.asList(year, nextYear);
+		List<KshmtHdpubDPerMWkp> entities = years.stream()
+				.map(y -> this.findBy(companyId, workplaceId, y, null, null))
+				.flatMap(List::stream)
+				.filter(data -> {
+					if (data.getKshmtWkpMonthDaySetPK().getManageYear() == year.v()) {
+						return data.getKshmtWkpMonthDaySetPK().getMonth() >= startMonth;
+					} else if (data.getKshmtWkpMonthDaySetPK().getManageYear() == nextYear.v()) {
+						return data.getKshmtWkpMonthDaySetPK().getMonth() < startMonth;
+					}
+					return false;
+				})
+				.collect(Collectors.toList());
+		this.commandProxy().removeAll(entities);
 	}
 	
 	/**
@@ -204,5 +219,15 @@ public class JpaWorkplaceMonthDaySettingRepository extends JpaRepository impleme
 			}
 		}
 		return domain;
+	}
+
+	@Override
+	public void remove(WorkplaceMonthDaySetting domain) {
+		List<KshmtWkpMonthDaySetPK> primaryKeys = domain.getPublicHolidayMonthSettings().stream()
+				.map(data -> new KshmtWkpMonthDaySetPK(domain.getCompanyId().v(), domain.getWorkplaceId(),
+						data.getPublicHdManagementYear().v(), data.getMonth()))
+				.collect(Collectors.toList());
+		this.commandProxy().removeAll(KshmtHdpubDPerMWkp.class, primaryKeys);
+		this.getEntityManager().flush();
 	}
 }

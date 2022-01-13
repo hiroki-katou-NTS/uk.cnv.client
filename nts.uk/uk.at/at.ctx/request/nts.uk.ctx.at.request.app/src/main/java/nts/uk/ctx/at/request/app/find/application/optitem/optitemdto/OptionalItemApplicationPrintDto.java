@@ -31,6 +31,8 @@ public class OptionalItemApplicationPrintDto {
                     .times(itemPrint.getTimes())
                     .amount(itemPrint.getAmount())
                     .time(itemPrint.getTime())
+                    .inputCheckbox(itemPrint.isInputCheckbox())
+                    .timesChecked(itemPrint.getTimesChecked())
                     .build();
             optionalItemContents.add(optionalItemContent);
         }

@@ -42,7 +42,7 @@ public class JobInfoImpl extends JpaRepository implements JobInfoRepository {
 			+ " 		  INNER JOIN (SELECT *, ROW_NUMBER() OVER ( PARTITION BY CID, JOB_ID ORDER BY END_DATE DESC ) AS RN FROM BSYMT_JOB_HIST) his " 
 			+ "				ON info.JOB_ID = his.JOB_ID AND info.HIST_ID = his.HIST_ID AND info.CID = his.CID AND his.RN = 1 "		
 			+			" INNER JOIN SACMT_ROLESET s ON info.CID = s.CID "
-			+			" INNER JOIN SACMT_ROLESET_JOB_DETAIL d ON s.ROLE_SET_CD = d.ROLESET_CD AND info.JOB_ID = d.JOB_ID AND s.CID = d.CID "
+			+			" INNER JOIN SACMT_ROLESET_JOB d ON s.ROLE_SET_CD = d.ROLESET_CD AND info.JOB_ID = d.JOB_ID AND s.CID = d.CID "
 			+			" INNER JOIN SACMT_ROLESET_JOB job ON info.CID = job.CID"
 			+	" WHERE info.CID = ? ) TBL ";
 	

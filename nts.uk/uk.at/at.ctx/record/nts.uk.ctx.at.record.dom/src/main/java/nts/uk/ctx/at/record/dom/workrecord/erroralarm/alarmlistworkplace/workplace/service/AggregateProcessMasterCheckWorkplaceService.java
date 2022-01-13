@@ -51,11 +51,6 @@ public class AggregateProcessMasterCheckWorkplaceService {
      */
     public List<AlarmListExtractionInfoWorkplaceDto> process(String cid, YearMonthPeriod ymPeriod, List<String> alarmCheckWkpId,
                                                              List<String> workplaceIds) {
-//        DatePeriod period = new DatePeriod(GeneralDate.ymd(ymPeriod.start().year(), ymPeriod.start().month(), 1),
-//                GeneralDate.ymd(ymPeriod.end().year(), ymPeriod.end().month(), 1).addMonths(1).addDays(-1));
-        // 職場ID一覧から社員情報を取得する。
-//        Map<String, List<EmployeeInfoImported>> empInfosByWpMap = employeeInfoByWorkplaceService.get(workplaceIds, period);
-
         // 空欄のリスト「アラーム抽出結果（職場別）」を作成する。
         List<AlarmListExtractionInfoWorkplaceDto> alarmListResults = new ArrayList<>();
 

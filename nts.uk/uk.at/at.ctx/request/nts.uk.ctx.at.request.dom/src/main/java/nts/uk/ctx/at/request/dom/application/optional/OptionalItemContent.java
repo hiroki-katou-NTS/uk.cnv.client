@@ -34,4 +34,8 @@ public class OptionalItemContent {
      * 任意項目の単位
      */
     private String unit;
+
+    private boolean inputCheckbox;
+
+    private Boolean timesChecked;
 }

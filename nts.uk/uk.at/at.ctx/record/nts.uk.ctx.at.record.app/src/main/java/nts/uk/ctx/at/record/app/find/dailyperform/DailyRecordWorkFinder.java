@@ -47,8 +47,10 @@ import nts.uk.ctx.at.record.app.find.dailyperform.temporarytime.dto.TemporaryTim
 import nts.uk.ctx.at.record.app.find.dailyperform.workinfo.WorkInformationOfDailyFinder;
 import nts.uk.ctx.at.record.app.find.dailyperform.workinfo.dto.WorkInformationOfDailyDto;
 import nts.uk.ctx.at.record.app.find.dailyperform.workrecord.AttendanceTimeByWorkOfDailyFinder;
+import nts.uk.ctx.at.record.app.find.dailyperform.workrecord.OuenWorkTimeFinder;
 import nts.uk.ctx.at.record.app.find.dailyperform.workrecord.TimeLeavingOfDailyPerformanceFinder;
 import nts.uk.ctx.at.record.app.find.dailyperform.workrecord.dto.AttendanceTimeByWorkOfDailyDto;
+import nts.uk.ctx.at.record.app.find.dailyperform.workrecord.dto.OuenWorkTimeOfDailyDto;
 import nts.uk.ctx.at.record.app.find.dailyperform.workrecord.dto.TimeLeavingOfDailyPerformanceDto;
 import nts.uk.ctx.at.record.dom.workinformation.WorkInfoOfDailyPerformance;
 import nts.uk.ctx.at.record.dom.workinformation.repository.WorkInformationRepository;
@@ -109,6 +111,9 @@ public class DailyRecordWorkFinder extends FinderFacade {
 
 	@Inject
 	private RemarksOfDailyFinder remarkFinder;
+	
+	@Inject
+	private OuenWorkTimeFinder ouenWorkTimeFinder;
 
 	@Inject
 	private SnapshotFinder snapshotFinder;
@@ -154,9 +159,11 @@ public class DailyRecordWorkFinder extends FinderFacade {
 			return this.pcLogOnInfoFinder;
 		case DAILY_REMARKS_CODE:
 			return this.remarkFinder;
+		case DAILY_SUPPORT_TIME_CODE:
+			return this.ouenWorkTimeFinder;
 		case DAILY_SNAPSHOT_CODE:
 			return this.snapshotFinder;
-		case DAILY_SUPPORT_TIME_CODE:
+		case DAILY_SUPPORT_TIMESHEET_CODE:
 			return this.supportTimeFinder;	
 		default:
 			return null;
@@ -188,6 +195,7 @@ public class DailyRecordWorkFinder extends FinderFacade {
 				.temporaryTime(temporaryTimeFinder.find(employeeId, baseDate))
 				.pcLogInfo(pcLogOnInfoFinder.find(employeeId, baseDate))
 				.remarks(remarkFinder.find(employeeId, baseDate))
+				.withOuenWorkTime(ouenWorkTimeFinder.find(employeeId, baseDate))
 				.withSnapshot(snapshotFinder.find(employeeId, baseDate))
 				.withOuenSheet(supportTimeFinder.find(employeeId, baseDate))
 				.complete();
@@ -236,6 +244,8 @@ public class DailyRecordWorkFinder extends FinderFacade {
 		Map<String, Map<GeneralDate, OuenWorkTimeSheetOfDailyDto>> supportTimes = toMap(
 				supportTimeFinder.find(employeeId, baseDate));
 		
+		Map<String, Map<GeneralDate, OuenWorkTimeOfDailyDto>> ouenWorkTime = toMap(
+				ouenWorkTimeFinder.find(employeeId, baseDate));
         System.out.print("thoi gian lay data DB: " +(System.currentTimeMillis() - startTime));
 		return (List<T>) employeeId.stream().map(em -> {
 			List<DailyRecordDto> dtoByDates = new ArrayList<>();
@@ -262,6 +272,7 @@ public class DailyRecordWorkFinder extends FinderFacade {
 							.pcLogInfo(getValue(pcLogInfo.get(em), start))
 							.remarks(getValue(remarks.get(em), start))
 							.withOuenSheet(getValue(supportTimes.get(em), start))
+							.withOuenWorkTime(getValue(ouenWorkTime.get(em), start))
 							.complete();
 					dtoByDates.add(current);
 				}
@@ -294,10 +305,12 @@ public class DailyRecordWorkFinder extends FinderFacade {
 		Map<String, Map<GeneralDate, PCLogOnInforOfDailyPerformDto>> pcLogInfo = toMap(pcLogOnInfoFinder.find(param));
 		Map<String, Map<GeneralDate, RemarksOfDailyDto>> remarks = toMap(remarkFinder.find(param));
 		Map<String, Map<GeneralDate, OuenWorkTimeSheetOfDailyDto>> supportTimes = toMap(supportTimeFinder.find(param));
+		Map<String, Map<GeneralDate, OuenWorkTimeOfDailyDto>> ouenWorkTime = toMap(ouenWorkTimeFinder.find(param));
+
 		System.out.print("thoi gian lay data DB: " +(System.currentTimeMillis() - startTime));
 
 		return (List<T>) param.entrySet().stream().map(p -> {
-			return p.getValue().stream().map(d -> {
+			return (List<DailyRecordDto>) p.getValue().stream().map(d -> {
 				return DailyRecordDto.builder().employeeId(p.getKey()).workingDate(d)
 						.withWorkInfo(getValue(workInfos.get(p.getKey()), d))
 						.withCalcAttr(getValue(calcAttrs.get(p.getKey()), d))
@@ -318,6 +331,7 @@ public class DailyRecordWorkFinder extends FinderFacade {
 						.pcLogInfo(getValue(pcLogInfo.get(p.getKey()), d))
 						.remarks(getValue(remarks.get(p.getKey()), d))
 						.withOuenSheet(getValue(supportTimes.get(p.getKey()), d))
+						.withOuenWorkTime(getValue(ouenWorkTime.get(p.getKey()), d))
 						.complete();
 			}).collect(Collectors.toList());
 		}).flatMap(List::stream).filter(x -> x.getWorkInfo() != null).collect(Collectors.toList());

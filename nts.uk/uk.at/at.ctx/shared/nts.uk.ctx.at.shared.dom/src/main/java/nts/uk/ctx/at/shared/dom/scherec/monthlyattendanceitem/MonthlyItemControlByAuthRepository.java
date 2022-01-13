@@ -7,6 +7,8 @@ import java.util.Optional;
 public interface MonthlyItemControlByAuthRepository {
 	List<MonthlyItemControlByAuthority> getListMonthlyAttendanceItemAuthority(String companyId);
 	
+	List<String> getMonthlytRolesByCid(String companyId);
+	
 	Optional<MonthlyItemControlByAuthority> getMonthlyAttdItem(String companyID,String authorityMonthlyId);
 	
 	void updateMonthlyAttdItemAuth(MonthlyItemControlByAuthority monthlyItemControlByAuthority);
@@ -22,4 +24,7 @@ public interface MonthlyItemControlByAuthRepository {
 			List<Integer> attendanceItemIds);
 			
 	Optional<MonthlyItemControlByAuthority> getAllMonthlyAttdItemByUse(String companyID,String authorityMonthlyId, int toUse);
+	
+	// 複写先のドメインモデルを削除する
+	void delete(String companyId, String roleId);
 }

@@ -1,6 +1,6 @@
 package nts.uk.ctx.at.shared.infra.repository.era.name;
 
-import java.math.BigDecimal;
+import org.apache.commons.lang3.BooleanUtils;
 
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.era.name.EraName;
@@ -60,6 +60,6 @@ public class JpaEraNameSetMemento implements EraNameDomSetMemento {
 
 	@Override
 	public void setSystemType(SystemType systemType) {
-		this.entity.setSystemType(BigDecimal.valueOf(systemType.value));
+		this.entity.setSystemType(BooleanUtils.toBoolean(systemType.value));
 	}
 }

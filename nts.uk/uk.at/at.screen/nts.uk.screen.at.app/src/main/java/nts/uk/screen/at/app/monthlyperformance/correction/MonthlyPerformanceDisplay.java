@@ -623,24 +623,24 @@ public class MonthlyPerformanceDisplay {
 			monthlyLockStatus = new MonthlyPerformaceLockStatus(
 					monthlymonthlyActualStatusOutput.getEmployeeClosingInfo().getEmployeeId(),
 					// TODO
-					LockStatus.UNLOCK,
+					LockStatus.UNLOCK.value,
 					// 職場の就業確定状態
 					monthlymonthlyActualStatusOutput.getEmploymentFixedStatus().equals(EmploymentFixedStatus.CONFIRM)
-							? LockStatus.LOCK : LockStatus.UNLOCK,
+							? LockStatus.LOCK.value : LockStatus.UNLOCK.value,
 					// 月の承認状況
 					monthlymonthlyActualStatusOutput.getApprovalStatus().equals(ApprovalStatus.APPROVAL)
-							? LockStatus.LOCK : LockStatus.UNLOCK,
+							? LockStatus.LOCK.value : LockStatus.UNLOCK.value,
 					// 月別実績のロック状態
-					monthlymonthlyActualStatusOutput.getMonthlyLockStatus(),
+					monthlymonthlyActualStatusOutput.getMonthlyLockStatus().value,
 					// 本人確認が完了している
 					monthlymonthlyActualStatusOutput.getDailyActualSituation().isIdentificationCompleted()
-							? LockStatus.UNLOCK : LockStatus.LOCK,
+							? LockStatus.UNLOCK.value : LockStatus.LOCK.value,
 					// 日の実績が存在する
 					monthlymonthlyActualStatusOutput.getDailyActualSituation().isDailyAchievementsExist()
-							? LockStatus.UNLOCK : LockStatus.LOCK,
+							? LockStatus.UNLOCK.value : LockStatus.LOCK.value,
 					// エラーが0件である
-					monthlymonthlyActualStatusOutput.getDailyActualSituation().isDailyRecordError() ? LockStatus.LOCK
-							: LockStatus.UNLOCK);
+					monthlymonthlyActualStatusOutput.getDailyActualSituation().isDailyRecordError() ? LockStatus.LOCK.value
+							: LockStatus.UNLOCK.value);
 			monthlyLockStatusLst.add(monthlyLockStatus);
 		}
 		// 過去実績の修正ロック
@@ -648,7 +648,7 @@ public class MonthlyPerformanceDisplay {
 				new ActualTime(closureTime.start(), closureTime.end()));
 		// Output「ロック状態」を「ロック状態一覧.過去実績のロック」にセットする
 		monthlyLockStatusLst = monthlyLockStatusLst.stream().map(item -> {
-			item.setPastPerformaceLock(pastLockStatus);
+			item.setPastPerformaceLock(pastLockStatus.value);
 			return item;
 		}).collect(Collectors.toList());
 

@@ -14,14 +14,14 @@ public interface CriterionAmountUsageSettingRepository {
 	 * @param cid 会社ID
 	 * @param usageSetting 目安利用区分
 	 */
-	void insert(String cid, CriterionAmountUsageSetting usageSetting);
+	void insert(CriterionAmountUsageSetting usageSetting);
 
 	/**
 	 * update
 	 * @param cid 会社ID
 	 * @param usageSetting 目安利用区分
 	 */
-	void update(String cid, CriterionAmountUsageSetting usageSetting);
+	void update(CriterionAmountUsageSetting usageSetting);
 
 	/**
 	 * exists

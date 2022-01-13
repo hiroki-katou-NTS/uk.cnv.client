@@ -71,7 +71,7 @@ public class OfimtEquipmentDayItem extends ContractUkJpaEntity implements Serial
 	 */
 	@Basic(optional = true)
 	@Column(name = "ITEM_LENGTH")
-	private String itemLength;
+	private Integer itemLength;
 	
 	/**
 	 * 単位

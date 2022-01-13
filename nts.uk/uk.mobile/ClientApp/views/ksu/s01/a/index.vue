@@ -13,6 +13,7 @@
                     v-bind:showTitle="false"
                     v-model="yearMonth"
                     name="対象月"
+                    v-on:input="watchYearMonth"
                 />
                 <!-- A1_1_3 -->
                 <span v-on:click="changeYearMonth(true)">

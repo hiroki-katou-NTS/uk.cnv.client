@@ -11,9 +11,15 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import lombok.val;
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.uk.ctx.exio.dom.input.csvimport.ExternalImportCsvFileInfo;
+import nts.uk.ctx.exio.dom.input.setting.DomainImportSetting;
 import nts.uk.ctx.exio.dom.input.setting.ExternalImportCode;
 import nts.uk.ctx.exio.dom.input.setting.ExternalImportSetting;
 import nts.uk.ctx.exio.dom.input.setting.ExternalImportSettingRepository;
+import nts.uk.ctx.exio.dom.input.setting.FromCsvBaseSettingToDomainRequire;
+import nts.uk.ctx.exio.dom.input.setting.ImportSettingBaseType;
+import nts.uk.ctx.exio.infra.entity.input.setting.XimmtDomainImportSetting;
+import nts.uk.ctx.exio.infra.entity.input.setting.XimmtDomainImportSettingPK;
 import nts.uk.ctx.exio.infra.entity.input.setting.XimmtImportSetting;
 import nts.uk.ctx.exio.infra.entity.input.setting.XimmtImportSettingPK;
 import nts.uk.ctx.exio.infra.entity.input.setting.assembly.XimmtItemMapping;
@@ -25,6 +31,9 @@ public class JpaExternalImportSettingRepository extends JpaRepository implements
 	@Override
 	public void insert(ExternalImportSetting domain) {
 		this.commandProxy().insert(toEntitiy(domain));
+		domain.getDomainSettings().forEach(setting -> {
+			this.commandProxy().insert(toEntitiy(domain.getCompanyId(), domain.getCode().v(), setting));
+		});
 	}
 
 	@Override
@@ -35,10 +44,9 @@ public class JpaExternalImportSettingRepository extends JpaRepository implements
 
 	@Override
 	public void delete(String companyId, ExternalImportCode settingCode) {
-		
-		
 		val tables = Arrays.asList(
 				Pair.of("XIMMT_IMPORT_SETTING", "CODE"),
+				Pair.of("XIMMT_DOMAIN_IMPORT_SETTING", "SETTING_CODE"),
 				Pair.of("XIMMT_ITEM_MAPPING", "SETTING_CODE"));
 		
 		tables.forEach(table -> {
@@ -55,50 +63,145 @@ public class JpaExternalImportSettingRepository extends JpaRepository implements
 	}
 
 	@Override
-	public List<ExternalImportSetting> getAll(String companyId) {
-		String sql 	= " select f "
-				+ " from XimmtImportSetting f "
-				+ " where f.pk.companyId = :companyID ";
-
-		return this.queryProxy().query(sql, XimmtImportSetting.class)
-				.setParameter("companyID", companyId)
-				.getList(rec -> rec.toDomain());
+	public List<ExternalImportSetting> getCsvBase(FromCsvBaseSettingToDomainRequire require, String companyId) {
+		return getByBaseType(Optional.of(require), companyId, ImportSettingBaseType.CSV_BASE);
 	}
 
 	@Override
-	public Optional<ExternalImportSetting> get(String companyId, ExternalImportCode settingCode) {
+	public List<ExternalImportSetting> getDomainBase(String companyId) {
+		return getByBaseType(Optional.empty(), companyId, ImportSettingBaseType.DOMAIN_BASE);
+	}
+
+	private List<ExternalImportSetting> getByBaseType(Optional<FromCsvBaseSettingToDomainRequire> require, String companyId, ImportSettingBaseType baseType) {
+		String sql 	= " select f "
+				+ " from XimmtImportSetting f "
+				+ " where f.pk.companyId = :companyID "
+				+ " and f.baseType = :baseType ";
+
+		List<ExternalImportSetting> domains = this.queryProxy().query(sql, XimmtImportSetting.class)
+				.setParameter("companyID", companyId)
+				.setParameter("baseType", baseType.value)
+				.getList(rec -> rec.toDomain(require));
+		
+		domains.forEach(d -> {
+			List<DomainImportSetting> domainImportSettings = domainImportSettings(
+					companyId, d.getCode(), d.getCsvFileInfo());
+			domainImportSettings.forEach(domainImportSetting ->{
+				d.putDomainSettings(domainImportSetting.getDomainId(), domainImportSetting);
+			});
+		});
+		return domains;
+	}
+	
+	@Override
+	public List<ExternalImportSetting> getAll(String companyId) {
+		String sql 	= " select f "
+				+ " from XimmtImportSetting f "
+				+ " where f.pk.companyId = :companyID";
+
+		List<ExternalImportSetting> domains = this.queryProxy().query(sql, XimmtImportSetting.class)
+				.setParameter("companyID", companyId)
+				.getList(rec -> rec.toDomain(Optional.empty()));
+		
+		domains.forEach(d -> {
+			List<DomainImportSetting> domainImportSettings = domainImportSettings(
+					companyId, d.getCode(), d.getCsvFileInfo());
+			domainImportSettings.forEach(domainImportSetting ->{
+				d.putDomainSettings(domainImportSetting.getDomainId(), domainImportSetting);
+			});
+		});
+		return domains;
+	}
+
+	@Override
+	public Optional<ExternalImportSetting> get(Optional<FromCsvBaseSettingToDomainRequire> require, String companyId, ExternalImportCode settingCode) {
+		
 		String sql 	= " select f "
 					+ " from XimmtImportSetting f "
 					+ " where f.pk.companyId = :companyID "
 					+ " and f.pk.code = :settingCD";
 
-		return this.queryProxy().query(sql, XimmtImportSetting.class)
+		Optional<ExternalImportSetting> domain = this.queryProxy().query(sql, XimmtImportSetting.class)
 				.setParameter("companyID", companyId)
 				.setParameter("settingCD", settingCode.toString())
-				.getSingle(rec -> rec.toDomain());
+				.getSingle(rec -> rec.toDomain(require));
+		
+		if(domain.isPresent()) {
+			List<DomainImportSetting> domainImportSettings = domainImportSettings(companyId, settingCode, domain.get().getCsvFileInfo());
+			domainImportSettings.forEach(domainImportSetting -> {
+				domain.get().putDomainSettings(domainImportSetting.getDomainId(), domainImportSetting);
+			});
+		}
+		return domain;
+	}
+	
+	private List<DomainImportSetting> domainImportSettings(String companyId, ExternalImportCode settingCode, ExternalImportCsvFileInfo csvFileInfo){
+		String sql 	= " select d "
+					+ " from XimmtDomainImportSetting d "
+					+ " where d.pk.companyId = :companyID "
+					+ " and d.pk.code = :settingCD";
+
+		return this.queryProxy().query(sql, XimmtDomainImportSetting.class)
+				.setParameter("companyID", companyId)
+				.setParameter("settingCD", settingCode.toString())
+				.getList(rec -> rec.toDomain(csvFileInfo));
 	}
 
 	private XimmtImportSetting toEntitiy(ExternalImportSetting domain) {
 		return new XimmtImportSetting(
 				new XimmtImportSettingPK(domain.getCompanyId(), domain.getCode().toString()),
+				domain.getBaseType().value,
 				domain.getName().toString(),
-				domain.getExternalImportDomainId().value,
+				domain.getCsvFileInfo().getItemNameRowNumber().v(),
+				domain.getCsvFileInfo().getImportStartRowNumber().v(),
+				domain.getCsvFileInfo().getBaseCsvFileId().orElse(null));
+	}
+
+	private XimmtDomainImportSetting toEntitiy(String cid, String settingCode, DomainImportSetting domain) {
+		List<XimmtItemMapping> mappings = domain.getAssembly().getMapping().getMappings().stream()
+		.map(m -> new XimmtItemMapping(
+				new XimmtItemMappingPK(cid, settingCode, domain.getDomainId().value, m.getItemNo()),
+				m.isFixedValue(),
+				m.getCsvColumnNo().orElse(null),
+				m.getFixedValue().map(fv -> fv.getValue()).orElse(null)
+		))
+		.collect(Collectors.toList());
+		
+		return new XimmtDomainImportSetting(
+				new XimmtDomainImportSettingPK(cid, settingCode, domain.getDomainId().value),
 				domain.getImportingMode().value,
-				domain.getAssembly().getCsvFileInfo().getItemNameRowNumber().v(),
-				domain.getAssembly().getCsvFileInfo().getImportStartRowNumber().v(),
-				domain.getAssembly().getMapping().getMappings().stream()
-				.map(m -> new XimmtItemMapping(
-						new XimmtItemMappingPK(
-								domain.getCompanyId(),
-								domain.getCode().v(),
-								m.getItemNo()),
-						m.getCsvColumnNo().isPresent()? m.getCsvColumnNo().get(): null,
-						m.getFixedValue().isPresent()? m.getFixedValue().get().getValue(): null))
-				.collect(Collectors.toList()));
+				mappings
+			);
 	}
 
 	@Override
 	public boolean exist(String companyId, ExternalImportCode settingCode) {
-		return this.get(companyId, settingCode).isPresent();
+		return this.get(Optional.empty() , companyId, settingCode).isPresent();
+	}
+
+	@Override
+	public void registDomain(ExternalImportSetting setting, DomainImportSetting domain) {
+		setting.putDomainSettings(domain.getDomainId(), domain);
+		update(setting);
+	}
+
+	@Override
+	public void deleteDomain(String companyId, String code, int domainId) {
+		val tables = Arrays.asList(
+				Pair.of("XIMMT_DOMAIN_IMPORT_SETTING", "SETTING_CODE"),
+				Pair.of("XIMMT_ITEM_MAPPING", "SETTING_CODE"));
+		
+		tables.forEach(table -> {
+			String sql = "delete from " + table.getLeft()
+					+ " where CID = @cid"
+					+ " and " + table.getRight() + " = @code"
+					+ " and DOMAIN_ID = @domainId";
+
+			this.jdbcProxy().query(sql)
+				.paramString("cid", companyId)
+				.paramString("code", code)
+				.paramInt("domainId", domainId)
+				.execute();
+		});
 	}
 }

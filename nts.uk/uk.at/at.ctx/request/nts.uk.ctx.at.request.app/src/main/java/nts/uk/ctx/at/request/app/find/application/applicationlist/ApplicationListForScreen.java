@@ -70,6 +70,7 @@ public class ApplicationListForScreen {
 						.appType(application.getAppType().value)
 						.appTypeName(application.getAppType().name)
 						.reflectState(application.getReflectionStatus().getListReflectionStatusOfDay().get(0).getActualReflectStatus().value)
+						.prePostAtr(application.getPrePostAtr().value)
 						.build();
 				
 				applicationExports.add(applicationExport);
@@ -95,7 +96,7 @@ public class ApplicationListForScreen {
 		List<AppGroupExportDto> result = new ArrayList<>();
 		
 		Map<Object, List<AppGroupExportDto>> mapDate =  appExportLst.stream()
-				.map(x -> new AppGroupExportDto(x.getAppDate(),x.getAppType(),x.getEmployeeID(),x.getAppTypeName()))
+				.map(x -> new AppGroupExportDto(x.getAppDate(),x.getAppType(),x.getEmployeeID(),x.getAppTypeName(), x.getPrePostAtr()))
 				.collect(Collectors.groupingBy(x -> Pair.of(x.getAppDate(), x.getEmployeeID())));
 		mapDate.entrySet().stream().forEach(x -> {
 			Map<Object, List<AppGroupExportDto>> mapDateType = x.getValue().stream().collect(Collectors.groupingBy(y -> y.getAppType()));
@@ -103,10 +104,17 @@ public class ApplicationListForScreen {
 				if(Integer.valueOf(y.getKey().toString())==ApplicationType.ABSENCE_APPLICATION.value){
 					Map<Object, List<AppGroupExportDto>> mapDateTypeAbsence = y.getValue().stream().collect(Collectors.groupingBy(z -> z.getAppTypeName()));
 					mapDateTypeAbsence.entrySet().stream().forEach(z -> {
-						result.add(z.getValue().get(0));
+						Map<Object, List<AppGroupExportDto>> mapDateTypeAbsencPrePost = z.getValue().stream().collect(Collectors.groupingBy(t -> t.getPrePostAtr()));
+						mapDateTypeAbsencPrePost.entrySet().stream().forEach(t -> {
+							result.add(t.getValue().get(0));
+						});
+						
 					});
 				} else {
-					result.add(y.getValue().get(0));
+					Map<Object, List<AppGroupExportDto>> mapDateTypePrePost = y.getValue().stream().collect(Collectors.groupingBy(t -> t.getPrePostAtr()));
+					mapDateTypePrePost.entrySet().stream().forEach(z -> {
+						result.add(z.getValue().get(0));
+					});
 				}
 			});
 		});

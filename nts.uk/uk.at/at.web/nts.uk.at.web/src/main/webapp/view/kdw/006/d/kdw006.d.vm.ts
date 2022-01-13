@@ -1,29 +1,30 @@
 module nts.uk.at.view.kdw006.d.viewmodel {
     import getText = nts.uk.resource.getText;
-    export class ScreenModelD {
-        roleItems: KnockoutObservableArray<any>;
+    import ccg = nts.uk.com.view.ccg025.a;
+    import model = nts.uk.com.view.ccg025.a.component.model;
+    export class ScreenModelD extends ko.ViewModel {
         functionalRestriction: KnockoutObservableArray<any>;
-        selectedItem: KnockoutObservable<any>;
-        columns1: KnockoutObservableArray<NtsGridListColumn>;
         columns2: KnockoutObservableArray<NtsGridListColumn>;
-        sideBar: KnockoutObservable<number>;
+
+        componentCcg025: ccg.component.viewmodel.ComponentModel = new ccg.component.viewmodel.ComponentModel({ 
+            tabindex: 4,
+            roleType: 3, //就業
+            multiple: false,
+            showEmptyItem: false,
+            rows: 15,
+            isAlreadySetting: true,
+        });
+        selectedRole: Role = new Role();
+        listRole: KnockoutObservableArray<RoleItem> = ko.observableArray([]);
+        listRoleId: KnockoutObservableArray<IRole> = ko.observableArray([]);
+        
+        mode: KnockoutObservable<MODE>;
         constructor() {
+            super();
+
             var self = this;
-            self.roleItems = ko.observableArray([]);
+            self.mode = ko.observable(MODE.NEW);
             self.functionalRestriction = ko.observableArray([]);
-            self.selectedItem = ko.observable();
-
-            self.sideBar = ko.observable(0);
-            
-            self.columns1 = ko.observableArray([
-                { headerText: 'ID', key: 'roleId', width: 100, hidden: true },
-                { headerText: getText('KDW006_44'), key: 'roleCode', width: 70 },
-                { headerText: getText('KDW006_45'), key: 'roleName', width: 230, formatter: _.escape }
-            ]);
-
-            self.selectedItem.subscribe(function(newValue) {
-                self.getFuncRest(newValue);
-            });
             
             window.onresize = function(evt){
                 $('#grid2_displayContainer').height(window.innerHeight - 235);
@@ -31,6 +32,18 @@ module nts.uk.at.view.kdw006.d.viewmodel {
                 $('#grid2_virtualContainer').height(window.innerHeight - 235);  
                 $('#grid2_scrollContainer').height(window.innerHeight - 235);
             }
+
+            _.extend(self, {
+                listRole: self.componentCcg025.listRole
+            });
+
+            _.extend(self.selectedRole, {
+                roleId: self.componentCcg025.currentRoleId
+            });
+
+            self.selectedRole.roleId.subscribe(rid => {
+                self.getFuncRest(rid);
+            });
         }
 
         initGrid() {
@@ -61,41 +74,58 @@ module nts.uk.at.view.kdw006.d.viewmodel {
 
         saveData() {
             let self = this;
-            nts.uk.ui.block.invisible();
-            service.register(self.selectedItem(), self.functionalRestriction()).done(function(res: Array<RoleItem>) {
-                
-                nts.uk.ui.dialog.info({ messageId: "Msg_15" });
+            self.$blockui("show");
+            self.$validate().then((valid: boolean) => {
+                if (valid) {
+                    self.$blockui("show");
+                    service.register(self.selectedRole.roleId(), self.functionalRestriction()).done(function(res: Array<RoleItem>) { 
+                        self.$dialog.info({ messageId: "Msg_15" });
+                        //self.getFuncRest(self.selectedItem());
+                        service.getRoleIds().done(function(res) { //#119057
+                            self.listRoleId(res);
+                            self.getListRoleCcg025();
+                        });
+                        self.mode(MODE.UPDATE);
+                    }).always(() => {
+                        self.$blockui("hide");
+                    });
+                }
+            }).always(() => {
+                self.$blockui("hide");
             });
-            nts.uk.ui.block.clear();
         }
         
-        jumpTo(sidebar) {
-                let self = this;
-                nts.uk.request.jump("/view/kdw/006/a/index.xhtml", { ShareObject: sidebar() });
-            }
+        jumpTo() {
+            let self = this;
+            nts.uk.request.jump("/view/kdw/006/a/index.xhtml");
+        }
 
 
         start(): JQueryPromise<any> {
             let self = this;
-            nts.uk.ui.block.grayout();
+            self.$blockui("grayout");
             let dfd = $.Deferred();
             service.getRoleList().done(function(res: Array<RoleItem>) {
-                self.roleItems(_.sortBy(res, ['roleCode']));
-                self.selectedItem(self.roleItems()[0].roleId);
-                self.getFuncRest(self.selectedItem()).done(function() {
+                self.listRole(_.sortBy(res, ['roleCode']));
+                self.selectedRole.roleId(self.listRole()[0].roleId);
+                self.getFuncRest(self.selectedRole.roleId()).done(function() {
                     if (self.functionalRestriction().length == 0) {
-                        nts.uk.ui.dialog.alertError({ messageId: "Msg_398" });
+                        self.$dialog.alert({ messageId: "Msg_398" });
                     }
+                    service.getRoleIds().done(function(res) { //#119057
+                        self.listRoleId(res);
+                        self.getListRoleCcg025();
+                    });
                     self.initGrid();
                     $("#grid2").igGrid("option", "dataSource", self.functionalRestriction());
                     dfd.resolve();
                 });
 
             }).fail(function(res) {
-                nts.uk.ui.dialog.alertError(res.message);
+                self.$dialog.alert(res.message);
             }).always(() => {
                 nts.uk.ui.errors.clearAll();
-                nts.uk.ui.block.clear();
+                self.$blockui("hide");
             });
             return dfd.promise();
         }
@@ -103,7 +133,15 @@ module nts.uk.at.view.kdw006.d.viewmodel {
         getFuncRest(roleId: string): JQueryPromise<any> {
             let self = this;
             let dfd = $.Deferred();
+            if(!roleId || roleId.length === 0) return dfd.promise();
+
             service.findFuncRest(roleId).done(function(res: Array<FuncRestItem>) {
+                if (res.every((el: FuncRestItem) => el.availability == null)) {
+                    self.mode(MODE.NEW);
+                    res.map((el: FuncRestItem) => el.availability = false);
+                } else {
+                    self.mode(MODE.UPDATE); 
+                }
                 self.functionalRestriction(res);
                 self.initGrid();
                 dfd.resolve();
@@ -113,6 +151,73 @@ module nts.uk.at.view.kdw006.d.viewmodel {
             return dfd.promise();
         }
 
+        copyData() {
+            let self = this;
+            self.$blockui("show");
+
+            let selectedRoleItem: RoleItem = _.find(self.listRole(), el => el.roleId == self.selectedRole.roleId());
+
+            service.getRoleIds().done(function(res) {
+                let listRoleId: Array<string> = res;
+                let param = {
+                    code: selectedRoleItem.roleCode,
+                    name: selectedRoleItem.roleName,
+                    targetType: 8,// ロール
+                    itemListSetting: listRoleId,
+                    roleType: 3, //就業
+                };
+                console.log(param, 'param');
+
+                nts.uk.ui.windows.setShared("CDL023Input", param);
+                nts.uk.ui.windows.sub.modal("com", "/view/cdl/023/a/index.xhtml").onClosed(() => {
+                    self.$blockui("show");
+                    let data = nts.uk.ui.windows.getShared("CDL023Output");
+                    if (!nts.uk.util.isNullOrUndefined(data)) {
+                        let command = {
+                            selectedRole: selectedRoleItem.roleId,
+                            targetRoleList: data,
+                        }
+                        service.copyDaiPerfAuth(command).done(() => {
+                            self.$dialog.info({ messageId: "Msg_15" }).then(function() {
+                                service.getRoleIds().done(function(res) { //#119057
+                                    self.listRoleId(res);
+                                    self.getListRoleCcg025();
+                                });
+                                // self.start();
+                                self.$blockui("hide");
+                            });
+                            self.mode(MODE.UPDATE);
+                        }).fail(function(res: any) {
+                            self.$dialog.alert({ messageId: res.messageId, messageParams: res.parameterIds }).then(function() {
+                                self.$blockui("hide");
+                            });
+                        }).always(() => {
+                            self.$blockui("hide");
+                        });
+                    }
+                    self.$blockui("hide");
+                });
+            });
+        }
+
+        /**
+         * #119057
+         * truyen listRoleId cho CCG025
+         */
+         getListRoleCcg025(): JQueryPromise<any> {
+            let self = this, dfd = $.Deferred();
+            self.$blockui("grayout");
+            self.componentCcg025.startPage(self.listRoleId(), self.selectedRole.roleId()).done(() => {
+                self.getFuncRest(self.selectedRole.roleId());
+                dfd.resolve();
+            }).fail((error) => {
+                dfd.reject();
+            }).always(() => {
+                self.$blockui("hide");
+            });
+
+            return dfd.promise();
+        }
     }
 
     class RoleItem {
@@ -137,5 +242,28 @@ module nts.uk.at.view.kdw006.d.viewmodel {
             this.availability = availability;
             this.description = description;
         }
+    }
+
+    interface IRole {
+        name: string;
+        roleId: string;
+        roleCode: string;
+    }
+
+    class Role {
+        roleId: KnockoutObservable<string>;
+        roleCode: KnockoutObservable<string>;
+        roleName: KnockoutObservable<string>;
+
+        constructor() {
+            this.roleId = ko.observable("");
+            this.roleCode = ko.observable("");
+            this.roleName = ko.observable("");
+        }
+    }
+
+    export enum MODE {
+        NEW,
+        UPDATE
     }
 }

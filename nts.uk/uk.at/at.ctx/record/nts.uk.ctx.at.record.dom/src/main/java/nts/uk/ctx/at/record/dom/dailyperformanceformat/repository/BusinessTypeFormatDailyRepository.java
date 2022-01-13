@@ -18,6 +18,8 @@ public interface BusinessTypeFormatDailyRepository {
 	
 	void deleteExistDataByCode(String businesstypeCode,String companyId,int sheetNo, List<Integer> attendanceItemIds);
 	
+	void copy(String companyId, String businessTypeCode, List<String> listBusinessTypeCode);
+	
 	void update(BusinessTypeFormatDaily businessTypeFormatDaily);
 	
 	void add(List<BusinessTypeFormatDaily> businessTypeFormatDailies);

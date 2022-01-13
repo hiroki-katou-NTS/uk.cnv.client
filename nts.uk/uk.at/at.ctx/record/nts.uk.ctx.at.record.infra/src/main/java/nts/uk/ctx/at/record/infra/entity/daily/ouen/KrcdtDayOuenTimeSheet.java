@@ -4,18 +4,27 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDaily;
+import nts.uk.ctx.at.record.infra.entity.daily.timezone.KrcdtDayTsSupSupplInfo;
+import nts.uk.ctx.at.record.infra.entity.daily.timezone.KrcdtDayTsSupSupplInfoPk;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.OuenWorkTimeSheetOfDailyAttendance;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.WorkSuppInfo;
 import nts.uk.shr.infra.data.entity.ContractCompanyUkJpaEntity;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "KRCDT_DAY_TS_SUP")
 public class KrcdtDayOuenTimeSheet extends ContractCompanyUkJpaEntity implements Serializable {
 
@@ -80,10 +89,9 @@ public class KrcdtDayOuenTimeSheet extends ContractCompanyUkJpaEntity implements
 	@Column(name = "WORK_CD5")
 	public String workCd5;
 	
-	/** 作業CD5 */
-	@Column(name = "WORK_REMARKS")
-	public String workRemarks;
-
+	@OneToOne(mappedBy = "krcdtDayOuenTimeSheet", cascade = CascadeType.ALL, orphanRemoval = true)
+	public KrcdtDayTsSupSupplInfo krcdtDayTsSupSupplInfo;
+	
 	@Override
 	protected Object getKey() {
 		return pk;
@@ -96,11 +104,10 @@ public class KrcdtDayOuenTimeSheet extends ContractCompanyUkJpaEntity implements
 		for (OuenWorkTimeSheetOfDailyAttendance oTimeSheetAtt : domain.getOuenTimeSheet()) {
 			KrcdtDayOuenTimeSheet entity = new KrcdtDayOuenTimeSheet();
 			
-			entity.pk = new KrcdtDayOuenTimePK(domain.getEmpId(), 
-					domain.getYmd(), oTimeSheetAtt.getWorkNo());
+			entity.pk = new KrcdtDayOuenTimePK(domain.getEmpId(), domain.getYmd(), oTimeSheetAtt.getWorkNo().v());
 			
-			entity.workplaceId = oTimeSheetAtt.getWorkContent().getWorkplace().getWorkplaceId() == null ? null : oTimeSheetAtt.getWorkContent().getWorkplace().getWorkplaceId().v();		
-			entity.workLocationCode = !oTimeSheetAtt.getWorkContent().getWorkplace().getWorkLocationCD().isPresent() ? null 
+			entity.workplaceId = oTimeSheetAtt.getWorkContent().getWorkplace() == null ? "" : oTimeSheetAtt.getWorkContent().getWorkplace().getWorkplaceId().v();		
+			entity.workLocationCode = oTimeSheetAtt.getWorkContent().getWorkplace() == null ? null : !oTimeSheetAtt.getWorkContent().getWorkplace().getWorkLocationCD().isPresent() ? null 
 					: oTimeSheetAtt.getWorkContent().getWorkplace().getWorkLocationCD().get().v();
 			
 			oTimeSheetAtt.getWorkContent().getWork().ifPresent(work -> {
@@ -109,10 +116,6 @@ public class KrcdtDayOuenTimeSheet extends ContractCompanyUkJpaEntity implements
 				entity.workCd3 = work.getWorkCD3().map(w -> w.v()).orElse(null); 
 				entity.workCd4 = work.getWorkCD4().map(w -> w.v()).orElse(null);
 				entity.workCd5 = work.getWorkCD5().map(w -> w.v()).orElse(null);
-			});
-			
-			oTimeSheetAtt.getWorkContent().getWorkRemarks().ifPresent(remarks -> {
-				entity.workRemarks = remarks.v();
 			});
 			
 			entity.workNo = oTimeSheetAtt.getTimeSheet().getWorkNo().v();
@@ -143,9 +146,51 @@ public class KrcdtDayOuenTimeSheet extends ContractCompanyUkJpaEntity implements
 				entity.endTime = end.getTimeWithDay().map(c -> c.v()).orElse(null); 
 			});
 			
+			oTimeSheetAtt.getWorkContent().getWorkSuppInfo().ifPresent(ws -> {
+				entity.krcdtDayTsSupSupplInfo = mappingSupInfo(ws, domain.getEmpId(), domain.getYmd(),oTimeSheetAtt.getWorkNo().v());
+			});
+			
 			rs.add(entity);
 		}
 		
 		return rs;
+	}
+
+	private static KrcdtDayTsSupSupplInfo mappingSupInfo(WorkSuppInfo ws, String sID, GeneralDate YMD, Integer workNo) {
+		KrcdtDayTsSupSupplInfo supInfo = new KrcdtDayTsSupSupplInfo();
+
+		supInfo.pk = new KrcdtDayTsSupSupplInfoPk(sID, YMD, workNo);
+		ws.getSuppInfoTimeItems().forEach(ti -> {
+			if (ti.getSuppInfoNo().v() == 1) { supInfo.supplInfoTime1 =  ti.getAttTime() == null ? null : ti.getAttTime().v();}
+			if (ti.getSuppInfoNo().v() == 2) { supInfo.supplInfoTime2 =  ti.getAttTime() == null ? null : ti.getAttTime().v();}
+			if (ti.getSuppInfoNo().v() == 3) { supInfo.supplInfoTime3 =  ti.getAttTime() == null ? null : ti.getAttTime().v();}
+			if (ti.getSuppInfoNo().v() == 4) { supInfo.supplInfoTime4 =  ti.getAttTime() == null ? null : ti.getAttTime().v();}
+			if (ti.getSuppInfoNo().v() == 5) { supInfo.supplInfoTime5 =  ti.getAttTime() == null ? null : ti.getAttTime().v();}
+		});
+		
+		ws.getSuppInfoNumItems().forEach(ni -> {
+			if (ni.getSuppInfoNo().v() == 1) { supInfo.supplInfoNumber1 =  ni.getSuppNumValue() == null ? null : ni.getSuppNumValue().v();}
+			if (ni.getSuppInfoNo().v() == 2) { supInfo.supplInfoNumber2 =  ni.getSuppNumValue() == null ? null : ni.getSuppNumValue().v();}
+			if (ni.getSuppInfoNo().v() == 3) { supInfo.supplInfoNumber3 =  ni.getSuppNumValue() == null ? null : ni.getSuppNumValue().v();}
+			if (ni.getSuppInfoNo().v() == 4) { supInfo.supplInfoNumber4 =  ni.getSuppNumValue() == null ? null : ni.getSuppNumValue().v();}
+			if (ni.getSuppInfoNo().v() == 5) { supInfo.supplInfoNumber5 =  ni.getSuppNumValue() == null ? null : ni.getSuppNumValue().v();}
+		});
+		
+		ws.getSuppInfoCommentItems().forEach(ci -> {
+			if (ci.getSuppInfoNo().v() == 1) { supInfo.supplInfoComment1 =  ci.getWorkSuppComment() == null ? null : ci.getWorkSuppComment().v();}
+			if (ci.getSuppInfoNo().v() == 2) { supInfo.supplInfoComment2 =  ci.getWorkSuppComment() == null ? null : ci.getWorkSuppComment().v();}
+			if (ci.getSuppInfoNo().v() == 3) { supInfo.supplInfoComment3 =  ci.getWorkSuppComment() == null ? null : ci.getWorkSuppComment().v();}
+			if (ci.getSuppInfoNo().v() == 4) { supInfo.supplInfoComment4 =  ci.getWorkSuppComment() == null ? null : ci.getWorkSuppComment().v();}
+			if (ci.getSuppInfoNo().v() == 5) { supInfo.supplInfoComment5 =  ci.getWorkSuppComment() == null ? null : ci.getWorkSuppComment().v();}
+		});
+		
+		ws.getSuppInfoSelectionItems().forEach(si -> {
+			if (si.getSuppInfoSelectionNo().v() == 1) { supInfo.supplInfoCode1 =  si.getChoiceCode() == null ? null : si.getChoiceCode().v();}
+			if (si.getSuppInfoSelectionNo().v() == 2) { supInfo.supplInfoCode2 =  si.getChoiceCode() == null ? null : si.getChoiceCode().v();}
+			if (si.getSuppInfoSelectionNo().v() == 3) { supInfo.supplInfoCode3 =  si.getChoiceCode() == null ? null : si.getChoiceCode().v();}
+			if (si.getSuppInfoSelectionNo().v() == 4) { supInfo.supplInfoCode4 =  si.getChoiceCode() == null ? null : si.getChoiceCode().v();}
+			if (si.getSuppInfoSelectionNo().v() == 5) { supInfo.supplInfoCode5 =  si.getChoiceCode() == null ? null : si.getChoiceCode().v();}
+		});
+		return supInfo;
 	}
 }

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,10 +14,12 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import lombok.val;
 import nts.arc.task.AsyncTask;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.record.app.command.monthly.MonthlyRecordWorkCommand;
 import nts.uk.ctx.at.record.app.find.monthly.finder.MonthlyRecordWorkFinder;
 import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyRecordWorkDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.common.ClosureDateDto;
@@ -29,10 +32,13 @@ import nts.uk.ctx.at.record.dom.workrecord.identificationstatus.month.algorithm.
 import nts.uk.ctx.at.record.dom.workrecord.identificationstatus.month.algorithm.RegisterConfirmationMonth;
 import nts.uk.ctx.at.record.dom.workrecord.identificationstatus.month.algorithm.SelfConfirm;
 import nts.uk.ctx.at.record.dom.workrecord.identificationstatus.repository.IdentityProcessUseSetRepository;
+import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.AttendanceItemIdContainer;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.AttendanceItemUtil;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.AttendanceItemUtil.AttendanceItemType;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ValueType;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.AggregateMonthlyRecordServiceProc;
+import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.AttendanceTimeOfMonthly;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.IntegrationOfMonthly;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItem;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemRepository;
@@ -47,6 +53,7 @@ import nts.uk.screen.at.app.monthlyperformance.correction.dto.MPItemCheckBox;
 import nts.uk.screen.at.app.monthlyperformance.correction.dto.MPItemDetail;
 import nts.uk.screen.at.app.monthlyperformance.correction.dto.MPItemParent;
 import nts.uk.screen.at.app.monthlyperformance.correction.query.MonthlyModifyQuery;
+import nts.uk.screen.at.app.monthlyperformance.correction.query.MonthlyModifyResult;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.time.calendar.date.ClosureDate;
 /**
@@ -90,7 +97,10 @@ public class MonModifyCommandFacade {
 	@Inject
 	private OptionalItemRepository optionalMasterRepo;
 	
-	public Map<Integer, List<MPItemParent>> insertItemDomain(MPItemParent dataParent) {
+	private final static List<Integer> ITEM_ID_ALL = AttendanceItemIdContainer.getIds(AttendanceItemType.MONTHLY_ITEM)
+			.stream().map(x -> x.getItemId()).collect(Collectors.toList());
+	
+	public List<OutputRegisterKMW003> insertItemDomain(MPItemParent dataParent) {
 		YearMonth ym = new YearMonth(dataParent.getYearMonth());
 		
 //		dataParent.getMPItemDetails().stream().forEach(d -> {
@@ -129,9 +139,58 @@ public class MonModifyCommandFacade {
 			MonthlyRecordWorkDto dto = MonthlyRecordWorkDto.fromDtoWithOptional(integrationOfMonthly, optionalMaster);
 			oldDtosClone.add(dto);
 		});
+		List<MonthlyModifyResult> dataOld = AttendanceItemUtil.toItemValues(oldDtos, ITEM_ID_ALL, AttendanceItemUtil.AttendanceItemType.MONTHLY_ITEM)
+				.entrySet().stream().map(record -> {
+					return MonthlyModifyResult.builder().items(record.getValue())
+							.employeeId(record.getKey().getEmployeeId()).yearMonth(record.getKey().getYearMonth().v())
+							.closureId(record.getKey().getClosureID()).closureDate(record.getKey().getClosureDate())
+							.workDatePeriod(record.getKey().getAttendanceTime().getDatePeriod().toDomain())
+							.version(record.getKey().getAffiliation().getVersion()).completed();
+				}).collect(Collectors.toList());
+		monthModifyCommandFacade.createMultiCommand(listQuery, oldDtosClone);
 		
-		monthModifyCommandFacade.handleUpdate(listQuery, oldDtosClone);
-
+		List<MonthlyRecordWorkDto> dataAfterCal = new ArrayList<>();
+		oldDtosClone.stream().forEach(x -> {
+			IntegrationOfMonthly integrationOfMonthly = x.toDomain(x.getEmployeeId(), x.getYearMonth(), x.getClosureID(), x.getClosureDate());
+			if(integrationOfMonthly.getAttendanceTime().isPresent()) {
+				AttendanceTimeOfMonthly attendanceTimeOfMonthly = AggregateMonthlyRecordServiceProc.recalcAttendanceTime(integrationOfMonthly.getAttendanceTime().get());
+				integrationOfMonthly.setAttendanceTime(Optional.of(attendanceTimeOfMonthly));
+			}
+			MonthlyRecordWorkDto dto = MonthlyRecordWorkDto.fromDtoWithOptional(integrationOfMonthly, optionalMaster);
+			dataAfterCal.add(dto);
+		});
+		
+		List<MonthlyModifyResult> dataNew = AttendanceItemUtil.toItemValues(dataAfterCal, ITEM_ID_ALL, AttendanceItemUtil.AttendanceItemType.MONTHLY_ITEM)
+				.entrySet().stream().map(record -> {
+					return MonthlyModifyResult.builder().items(record.getValue())
+							.employeeId(record.getKey().getEmployeeId()).yearMonth(record.getKey().getYearMonth().v())
+							.closureId(record.getKey().getClosureID()).closureDate(record.getKey().getClosureDate())
+							.workDatePeriod(record.getKey().getAttendanceTime().getDatePeriod().toDomain())
+							.version(record.getKey().getAffiliation().getVersion()).completed();
+				}).collect(Collectors.toList());
+		
+		
+		List<OutputRegisterKMW003> listChange = new ArrayList<>();
+		dataOld.stream().forEach(x ->{
+			List<Integer> listItemEditCell = dataParent.getMPItemDetails().stream().filter(i->i.getEmployeeId().equals(x.getEmployeeId())).map(c->c.getItemId()).collect(Collectors.toList());
+			Optional<MonthlyModifyResult> newItem = dataNew.stream()
+					.filter(c -> x.getEmployeeId().equals(c.getEmployeeId())
+							&& x.getYearMonth().equals(c.getYearMonth()) && x.getClosureId() == c.getClosureId())
+					.findFirst();
+			if (newItem.isPresent()) {
+				List<ItemValue> listItemValue =  getListCal(x.getItems(), newItem.get().getItems(), listItemEditCell);
+				listChange.add(new OutputRegisterKMW003(x.getEmployeeId(), listItemValue));
+			}
+			
+		});
+		
+		
+		List<MonthlyRecordWorkCommand> listCommand =monthModifyCommandFacade.createMultiCommand(listQuery, dataAfterCal);
+		monthModifyCommandFacade.handleUpdate(listCommand);
+		
+		
+		
+		
 		// insert edit state
 		dataParent.getMPItemDetails().forEach(item -> {
 			ClosureDateDto closureDate = dataParent.getClosureDate();
@@ -162,13 +221,37 @@ public class MonModifyCommandFacade {
 		ExecutorService executorService = Executors.newFixedThreadPool(1);
 		AsyncTask task = AsyncTask.builder().withContexts().keepsTrack(false).threadName(this.getClass().getName())
 				.build(() -> {
-					List<MonthlyRecordWorkDto> newDtos = createDtoNews(listQuery, oldDtos);
+					List<MonthlyRecordWorkDto> newDtos = createDtoNews(listQuery, dataAfterCal);
 					//List<MonthlyRecordWorkDto> newDtos = getDtoFromQuery(listQuery); 
 					// lay lai data sau khi update de so sanh voi data truoc khi update
 					handlerLog.handle(new MonthlyCorrectionLogCommand(oldDtos, newDtos, listQuery, dataParent.getEndDate()));
 				});
 		executorService.submit(task);
-		return Collections.emptyMap();
+		return listChange;
+	}
+	
+	private List<ItemValue> getListCal(List<ItemValue> itemOlds,List<ItemValue> itemsNew,List<Integer> itemsEditCell) {
+		List<ItemValue> result = new ArrayList<>();
+		
+		val mapItemNew = itemsNew.stream().collect(Collectors.toMap(x -> x.getItemId(), x -> x));
+		itemOlds.stream().forEach(x -> {
+			val itemNew = mapItemNew.get(x.getItemId());
+			// TimeWithDay
+			if(x.getValueType().isInteger() || x.getValueType().isDouble()) {
+				if ((itemNew.getValue() == null && x.getValue() != null && Double.parseDouble(x.getValue()) == 0)
+						   || (x.getValue() == null && itemNew.getValue() != null && Double.parseDouble(itemNew.getValue()) == 0) 
+						   || (itemNew.getValue() != null && x.getValue() != null && Double.parseDouble(x.getValue()) == 0 && Double.parseDouble(itemNew.getValue()) == 0)) {
+					itemNew.value(0);
+					x.value(0);
+				}
+			}
+            if(x.getValue() != null && itemNew.getValue() != null) {
+            	if(!x.getValue().equals(itemNew.getValue())) result.add(itemNew);
+            }else if (!x.equals(itemNew)) {
+				result.add(itemNew);
+			}
+		});
+		return result.stream().filter(c-> !itemsEditCell.contains(c.getItemId())).collect(Collectors.toList());
 	}
 
 	private void approval(MPItemParent dataParent, YearMonth ym) {

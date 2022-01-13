@@ -1,56 +1,60 @@
 module nts.uk.at.view.ksu001.a {
     let __viewContext: any = window["__viewContext"] || {};
     __viewContext.ready(function() {
-        __viewContext.viewModel = {
-            viewAB: new ksu001.ab.viewmodel.ScreenModel(),
-            viewAC: new ksu001.ac.viewmodel.ScreenModel(),
-            viewA: new ksu001.a.viewmodel.ScreenModel()
-        };
-        
-        nts.uk.ui.block.grayout();
-        __viewContext.viewModel.viewA.startPage().done(() => {
-            
-            document.getElementById("main-area").style.display = '';
-            
-            __viewContext.bind(__viewContext.viewModel);
+        nts.uk.characteristics.restore("ksu001Data").done(function(data: any) {
+            __viewContext.viewModel = {
+                viewAB: new ksu001.ab.viewmodel.ScreenModel(data),
+                viewAC: new ksu001.ac.viewmodel.ScreenModel(data),
+                viewA: new ksu001.a.viewmodel.ScreenModel(data)
+            };
 
-            //__viewContext.viewModel.viewA.setIconEventHeader();
+            nts.uk.ui.block.grayout();
+            __viewContext.viewModel.viewA.startPage().done(() => {
+				document.getElementById("main-area").style.display = '';
+                __viewContext.bind(__viewContext.viewModel);
 
-            if (__viewContext.viewModel.viewAC.listPageComIsEmpty == true) {
-                $('.ntsButtonTableButton').addClass('nowithContent');
-            } 
+                __viewContext.viewModel.viewA.setHeightMainArea();
+                __viewContext.viewModel.viewA.setPositionButonA13A14A15();
+                __viewContext.viewModel.viewA.setExAreaAgency();
+                // fix cho truong hop khởi động ở mode height = fixed.
+                if(data && data.gridHeightSelection == 2){
+                   __viewContext.viewModel.viewA.saveHeightGridToLocal(); 
+                }
 
-            if (__viewContext.viewModel.viewAC.listPageWkpIsEmpty == true) {
-                $('.ntsButtonTableButton').addClass('nowithContent');
-            }
-            
-            let item = uk.localStorage.getItem('nts.uk.characteristics.ksu001Data');
-            let userInfor = JSON.parse(item.get());
-            if (userInfor.updateMode == 'copyPaste') {
-                setTimeout(() => {
-                    __viewContext.viewModel.viewA.setStyler();
-                }, 800);
-            }
-            
-            if (userInfor.disPlayFormat == 'shift') {
-                setTimeout(() => {
-                     __viewContext.viewModel.viewAC.setStyleBtn();
-                     __viewContext.viewModel.viewAC.setLinkSelected(userInfor.shiftPalletUnit == 2 ? (userInfor.shiftPalettePageNumberOrg -1) : (userInfor.shiftPalettePageNumberCom-1));
-                }, 100);
-            }
-            
-            __viewContext.viewModel.viewA.setWidthButtonnInPopupA1_12();
-            
-            $(window).resize(function() {
-                __viewContext.viewModel.viewA.setPositionButonDownAndHeightGrid();
-                __viewContext.viewModel.viewA.setPositionButonToRight();
-                __viewContext.viewModel.viewA.setHeightScreen();
+                if (__viewContext.viewModel.viewAC.listPageWkpIsEmpty == true) {
+                    $('.ntsButtonTableButton').addClass('nowithContent');
+                }
+                
+                if (__viewContext.viewModel.viewAC.listPageWkpIsEmpty == true) {
+                    $('.ntsButtonTableButton').addClass('nowithContent');
+                }
+
+                if (!_.isNil(data)) {
+                    if (data.updateMode == 'copyPaste') {
+                        setTimeout(() => {
+                            __viewContext.viewModel.viewA.setStyler();
+                        }, 800);
+                    }
+
+                    if (data.disPlayFormat == 'shift') {
+                        setTimeout(() => {
+                            __viewContext.viewModel.viewAC.setStyleBtn();
+                            __viewContext.viewModel.viewAC.setLinkSelected(data.shiftPalletUnit == 2 ? (data.shiftPalettePageNumberOrg - 1) : (data.shiftPalettePageNumberCom - 1));
+                        }, 100);
+                    }
+                }
+                
+                $(window).resize(function() {
+                    __viewContext.viewModel.viewA.setHeightMainArea();
+                    __viewContext.viewModel.viewA.setPositionButonA14();
+                    __viewContext.viewModel.viewA.setPositionButonA15();
+                });
+
+                nts.uk.ui.block.clear();
             });
 
-            nts.uk.ui.block.clear();
+            initEvent();
         });
-
-        initEvent();
     });
     
     function initEvent(): void {
@@ -97,7 +101,8 @@ module nts.uk.at.view.ksu001.a {
         
         $(window).on("mousedown.popup", function(e) {
             let control = $('#A4_1_popup');
-            let combo = $('.nts-combo-column-0');
+            //let combo = $('.nts-combo-column-0');
+            let combo = $('div.nts-column.nts-combo-column-0.name');
 
             if ($(e.target).is(combo[1]) || $(e.target).is(combo[2])) {
                 console.log('not hide');

@@ -6,7 +6,10 @@ module cmm045.a.viewmodel {
     import request = nts.uk.request;
     import getShared = nts.uk.ui.windows.getShared;
 	import AppType = nts.uk.at.view.kaf000.shr.viewmodel.model.AppType;
+    import isNullOrUndefined = nts.uk.util.isNullOrUndefined;
+    import isNullOrEmpty = nts.uk.util.isNullOrEmpty;
     export class ScreenModel {
+        menuName: KnockoutObservable<string> = ko.observable("");
         roundingRules: KnockoutObservableArray<vmbase.ApplicationDisplayAtr> = ko.observableArray([]);
         //delete switch button - ver35
 //        selectedRuleCode: KnockoutObservable<any> = ko.observable(0);// switch button
@@ -29,8 +32,12 @@ module cmm045.a.viewmodel {
         mode: KnockoutObservable<number> = ko.observable(1);
         startDateString: KnockoutObservable<string> = ko.observable("");
         endDateString: KnockoutObservable<string> = ko.observable("");
+        useApprovalFunction : KnockoutObservable<number> = ko.observable(0);
+        //UPDATE EA 4134
+		//  USE(1, "Enum_UseClassificationAtr_USE"),
+        //	NOT_USE(0, "Enum_UseClassificationAtr_NOT_USE");
+        //  spr
 
-        //spr
         isSpr: KnockoutObservable<boolean> = ko.observable(false);
         // extractCondition: KnockoutObservable<number> = ko.observable(0);
         //ver33
@@ -141,6 +148,7 @@ module cmm045.a.viewmodel {
             * Define how to use this list employee by yourself in the function's body.
             */
 
+
             returnDataFromCcg001: function(data: any){
                 self.showinfoSelectedEmployee(true);
                 self.selectedEmployee(data.listEmployee);
@@ -167,7 +175,7 @@ module cmm045.a.viewmodel {
                 // self.filter();
              }
             }
-
+            self.getMenu();
             window.onresize = function(event: any) {
 				if(self.mode()==1) {
 					character.restore('TableColumnWidth1' + __viewContext.user.companyId + __viewContext.user.employeeId).then((obj: any) => {
@@ -621,6 +629,10 @@ module cmm045.a.viewmodel {
 				self.updateFromAppListExtractCondition();
 			}
 			self.appListInfo = appListInfo;
+			if(!isNullOrUndefined(appListInfo) && !isNullOrUndefined(appListInfo.displaySet)){
+				let displaySet = appListInfo.displaySet.useApprovalFunction;
+				self.useApprovalFunction(displaySet)
+			};
 			let newItemLst = [];
 			_.each(appListInfo.appLst, item => {
 				newItemLst.push(new vmbase.DataModeApp(item));
@@ -712,7 +724,7 @@ module cmm045.a.viewmodel {
                 checkbox?: { visible: Function, applyToProperty: string },
                 button?: { text: string, click: Function }
             }>
-        }) {
+        },useApprovalFunction: number) {
 
             let $container = $("#app-grid-container");
             $container.hide();
@@ -750,7 +762,7 @@ module cmm045.a.viewmodel {
                                     .attr("id", "batch-check")
                                     .attr("type", "checkbox")
                                     .addClass(column.key))
-                                .append($("<span/>").addClass("box"))
+                                .append($("<span/>").addClass(useApprovalFunction == 1 ? "box" : ""))
                                 .change((e) => {
                                     let checked = $(e.target).prop("checked");
                                     $appGrid.find("input[type=checkbox]." + column.key)
@@ -866,15 +878,28 @@ module cmm045.a.viewmodel {
                             extraClass = "";
                         }
                         if (column.checkbox.visible(item) === true) {
-                            $("<label/>")
-                                .addClass("ntsCheckBox")
-                                .append($("<input/>")
-                                    .attr("type", "checkbox")
-                                    .addClass(column.key))
-                                .append($("<span/>").addClass("box"))
-                                .appendTo($td)
-                                .parent("td")
-                                .addClass(extraClass);
+                        	if(self.useApprovalFunction() == 1){
+                                $("<label/>")
+                                    .addClass("ntsCheckBox")
+                                    .append($("<input/>")
+                                        .attr("type", "checkbox")
+                                        .addClass(column.key))
+                                    .append($("<span/>").addClass("box"))
+                                    .appendTo($td)
+                                    .parent("td")
+                                    .addClass(extraClass);
+							}else {
+                                $("<label/>")
+                                    .addClass("ntsCheckBox")
+                                    .append($("<input/>")
+                                        .attr("type", "checkbox")
+                                        .addClass(column.key))
+                                    .append($("<span/>").addClass(""))
+                                    .appendTo($td)
+                                    .parent("td")
+                                    .addClass(extraClass);
+							}
+
                         }
                     }
                     else if (column.button !== undefined) {
@@ -1190,30 +1215,32 @@ module cmm045.a.viewmodel {
                     }
             }).then(() => {
                 let columns = [
-                    { headerText: getText('CMM045_49'), key: 'check', dataType: 'boolean', width: checkWidth, checkbox: {
-                        visible: item => item.checkAtr === true,
-                        applyToProperty: "check"
-                    } },
-                    { headerText: getText('CMM045_50'), key: 'details', width: detailsWidth, button: {
-                        text: getText('CMM045_50'),
-                        click: (e) => {
-                            let targetAppId = $(e.target).closest("td").data("app-id");
-                            let lstAppId = self.items().map(app => app.appID);
-                            // nts.uk.localStorage.setItem('UKProgramParam', 'a=1');
-                            character.save('AppListExtractCondition', self.appListExtractConditionDto).then(() => {
-								nts.uk.request.jump("/view/kaf/000/b/index.xhtml", { 'listAppMeta': lstAppId, 'currentApp': targetAppId });
-							});
-                        }
-                    } },
-                    { headerText: getText('CMM045_51'), key: 'applicantName', width: applicantNameWidth },
-                    { headerText: getText('CMM045_52'), key: 'appType', width: appTypeWidth},
-                    { headerText: getText('CMM045_53'), key: 'prePostAtr', width: prePostAtrWidth, hidden: isHidden},
-                    { headerText: getText('CMM045_54'), key: 'appDate', width: appDateWidth},
-                    { headerText: getText('CMM045_55'), key: 'appContent', width: contentWidth},
-                    { headerText: getText('CMM045_56'), key: 'inputDate', width: inputDateWidth},
-                    { headerText: getText('CMM045_57'), key: 'reflectionStatus', width: reflectionStatusWidth, extraClassProperty: "appStatusName"},
-                    { headerText: getText('CMM045_58'), key: 'opApprovalStatusInquiry', width: opApprovalStatusInquiryWidth },
-                ]
+                        { headerText: getText('CMM045_49'), key: 'check', dataType: 'boolean', width: checkWidth, checkbox: {
+                                visible: item => item.checkAtr === true,
+                                applyToProperty: "check"
+                            } },
+                        { headerText: getText('CMM045_50'), key: 'details', width: detailsWidth, button: {
+                                text: getText('CMM045_50'),
+                                click: (e) => {
+                                    let targetAppId = $(e.target).closest("td").data("app-id");
+                                    let lstAppId = self.items().map(app => app.appID);
+                                    // nts.uk.localStorage.setItem('UKProgramParam', 'a=1');
+                                    character.save('AppListExtractCondition', self.appListExtractConditionDto).then(() => {
+                                        nts.uk.request.jump("/view/kaf/000/b/index.xhtml", { 'listAppMeta': lstAppId, 'currentApp': targetAppId });
+                                    });
+                                }
+                            } },
+                        { headerText: getText('CMM045_51'), key: 'applicantName', width: applicantNameWidth },
+                        { headerText: getText('CMM045_52'), key: 'appType', width: appTypeWidth},
+                        { headerText: getText('CMM045_53'), key: 'prePostAtr', width: prePostAtrWidth, hidden: isHidden},
+                        { headerText: getText('CMM045_54'), key: 'appDate', width: appDateWidth},
+                        { headerText: getText('CMM045_55'), key: 'appContent', width: contentWidth},
+                        { headerText: getText('CMM045_56'), key: 'inputDate', width: inputDateWidth},
+                        { headerText: getText('CMM045_57'), key: 'reflectionStatus', width: reflectionStatusWidth, extraClassProperty: "appStatusName"},
+                        { headerText: getText('CMM045_58'), key: 'opApprovalStatusInquiry', width: opApprovalStatusInquiryWidth },
+                    ]
+
+
                 let heightAuto = window.innerHeight - 364 > 60 ? window.innerHeight - 364 : 60;
                 // let heightAuto = window.innerHeight - 375 > 292 ? window.innerHeight - 375 : 292;
                 this.setupGrid({
@@ -1221,7 +1248,7 @@ module cmm045.a.viewmodel {
                     width: widthAuto,
                     height: heightAuto,
                     columns: columns.filter(c => c.hidden !== true)
-                });
+                },self.useApprovalFunction());
 
                 $("#app-resize").css("width", widthAuto);
             });
@@ -1475,16 +1502,29 @@ module cmm045.a.viewmodel {
         approveAll() {
             console.log("Approve all");
         }
-
+        getMenu(){
+            let self = this;
+            block.invisible();
+            service.getMenu().done((data)=>{
+                if(!isNullOrEmpty(data)){
+                    let item = _.filter(data, (e)=>e.param.equals(self.mode() == 1 ? "a=1" :"a=0"));
+                    if(!isNullOrEmpty(item)){
+                        self.menuName(item[0].name);
+					}
+                };
+            }).always(()=>{
+                block.clear()
+            });
+        };
         print(params: any) {
             let self = this;
             let lstApp = self.appListInfo,
-            programName = nts.uk.ui._viewModel.kiban.programName().replace('CMM045A ', '');
+                programName = self.menuName().replace('CMM045A ', '');
             lstApp.appLst = ko.toJS(self.items);
             lstApp.displaySet.startDateDisp = self.appListExtractConditionDto.periodStartDate;
             lstApp.displaySet.endDateDisp = self.appListExtractConditionDto.periodEndDate;
 			block.invisible();
-            const command = { appListAtr: self.appListAtr, lstApp: lstApp, programName: programName }
+            const command = { appListAtr: self.appListAtr, lstApp: lstApp, programName: programName };
             service.print(command).always(() => { 
 				block.clear(); 
 				$('#daterangepicker .ntsEndDatePicker').focus();

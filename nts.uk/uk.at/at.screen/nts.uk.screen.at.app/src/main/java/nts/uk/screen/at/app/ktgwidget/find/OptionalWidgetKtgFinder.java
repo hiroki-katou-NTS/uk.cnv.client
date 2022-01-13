@@ -1,6 +1,5 @@
 package nts.uk.screen.at.app.ktgwidget.find;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -10,56 +9,41 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
-import lombok.val;
 import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.auth.app.find.employmentrole.InitDisplayPeriodSwitchSetFinder;
+import nts.uk.ctx.at.auth.app.find.employmentrole.dto.DateProcessed;
+import nts.uk.ctx.at.auth.app.find.employmentrole.dto.InitDisplayPeriodSwitchSetDto;
 import nts.uk.ctx.at.function.dom.adapter.application.ApplicationAdapter;
-import nts.uk.ctx.at.function.dom.adapter.application.importclass.ApplicationDeadlineImport;
 import nts.uk.ctx.at.function.dom.adapter.widgetKtg.AnnualLeaveRemainingNumberImport;
-import nts.uk.ctx.at.function.dom.adapter.widgetKtg.ApplicationTimeImport;
-import nts.uk.ctx.at.function.dom.adapter.widgetKtg.DailyExcessTotalTimeImport;
-import nts.uk.ctx.at.function.dom.adapter.widgetKtg.DailyLateAndLeaveEarlyTimeImport;
-import nts.uk.ctx.at.function.dom.adapter.widgetKtg.EmployeeErrorImport;
-import nts.uk.ctx.at.function.dom.adapter.widgetKtg.KTGRsvLeaveInfoImport;
 import nts.uk.ctx.at.function.dom.adapter.widgetKtg.NextAnnualLeaveGrantImport;
 import nts.uk.ctx.at.function.dom.adapter.widgetKtg.NumAnnLeaReferenceDateImport;
 import nts.uk.ctx.at.function.dom.adapter.widgetKtg.OptionalWidgetAdapter;
 import nts.uk.ctx.at.function.dom.adapter.widgetKtg.OptionalWidgetImport;
-import nts.uk.ctx.at.function.dom.adapter.widgetKtg.WidgetDisplayItemImport;
 import nts.uk.ctx.at.function.dom.employmentfunction.checksdailyerror.ChecksDailyPerformanceErrorRepository;
-import nts.uk.ctx.at.record.dom.remainingnumber.specialleave.empinfo.grantremainingdata.ComplileInPeriodOfSpecialLeaveParam;
-import nts.uk.ctx.at.record.dom.remainingnumber.specialleave.empinfo.grantremainingdata.InPeriodOfSpecialLeaveResultInfor;
-import nts.uk.ctx.at.record.dom.remainingnumber.specialleave.export.SpecialLeaveManagementService;
 import nts.uk.ctx.at.record.dom.require.RecordDomRequireService;
 import nts.uk.ctx.at.request.dom.application.ApplicationRepository;
-import nts.uk.ctx.at.request.dom.application.ReflectedState_New;
 import nts.uk.ctx.at.shared.dom.adapter.employment.BsEmploymentHistoryImport;
 import nts.uk.ctx.at.shared.dom.adapter.employment.ShareEmploymentAdapter;
-import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.AbsenceReruitmentMngInPeriodQuery;
-import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.BreakDayOffMngInPeriodQuery;
-import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHoliday;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHolidayRepository;
 import nts.uk.ctx.at.shared.dom.workrule.closure.Closure;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureEmployment;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureEmploymentRepository;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureRepository;
 import nts.uk.ctx.at.shared.dom.workrule.closure.service.ClosureService;
+import nts.uk.ctx.at.shared.dom.workrule.closure.service.ClosureService.RequireM3;
 //import nts.uk.ctx.at.shared.pub.remainingnumber.nursingcareleavemanagement.interimdata.ChildNursingRemainExport;
 //import nts.uk.ctx.at.shared.pub.remainingnumber.nursingcareleavemanagement.interimdata.NursingMode;
 //import nts.uk.ctx.at.shared.pub.remainingnumber.nursingcareleavemanagement.interimdata.ShNursingLeaveSettingPub;
 import nts.uk.screen.at.app.ktgwidget.find.dto.DatePeriodDto;
-import nts.uk.screen.at.app.ktgwidget.find.dto.DeadlineOfRequest;
 import nts.uk.screen.at.app.ktgwidget.find.dto.OptionalWidgetDisplay;
-import nts.uk.screen.at.app.ktgwidget.find.dto.OptionalWidgetInfoDto;
-import nts.uk.screen.at.app.ktgwidget.find.dto.RemainingNumber;
 import nts.uk.screen.at.app.ktgwidget.find.dto.TimeOT;
-import nts.uk.screen.at.app.ktgwidget.find.dto.WidgetDisplayItemTypeImport;
+import nts.uk.screen.at.app.ktgwidget.find.dto.WidgetInitialDisplayMonthDto;
 import nts.uk.screen.at.app.ktgwidget.find.dto.YearlyHoliday;
 import nts.uk.screen.at.app.ktgwidget.find.dto.YearlyHolidayInfo;
 import nts.uk.shr.com.context.AppContexts;
-import nts.uk.shr.com.enumcommon.NotUseAtr;
 
 @Stateless
 public class OptionalWidgetKtgFinder {
@@ -94,6 +78,9 @@ public class OptionalWidgetKtgFinder {
 
 	@Inject
 	private SpecialHolidayRepository specialHolidayRepository;
+	
+	@Inject
+	private InitDisplayPeriodSwitchSetFinder displayPeriodfinder;
 
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public DatePeriodDto getCurrentMonth() {
@@ -188,5 +175,59 @@ public class OptionalWidgetKtgFinder {
 		yearlyHoliday.setWorkingDays(remainingNumber.getWorkingDays());
 		yearlyHoliday.setCalculationMethod(optionalWidgetAdapter.getGrantHdTblSet(cID, employeeId));*/
 		return yearlyHoliday;
+	}
+
+	/**
+	 * UKDesign.UniversalK.就業.KTG_ウィジェット.共通アルゴリズム.ウィジェット初期表示月の取得.ウィジェット初期表示月の取得
+	 */
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public WidgetInitialDisplayMonthDto getWidgetInitialDisplayMonth() {
+		// [RQ609]ログイン社員のシステム日時点の処理対象年月を取得する
+		InitDisplayPeriodSwitchSetDto rq609 = displayPeriodfinder.targetDateFromLogin();
+		
+		// Get closure
+		RequireM3 require = ClosureService.createRequireM3(closureRepo, closureEmploymentRepo, shareEmploymentAdapter);
+		Closure closure = ClosureService.getClosureDataByEmployee(
+				require,
+				new CacheCarrier(),
+				AppContexts.user().employeeId(),
+				GeneralDate.today());
+		
+		// 締め情報
+		DateProcessed dateProcessed = rq609.getListDateProcessed().stream()
+				.filter(c -> c.getClosureID() == closure.getClosureId().value)
+				.collect(Collectors.toList())
+				.get(0);
+		
+		// 指定した年月の期間を算出する
+		YearMonth processYm = rq609.getCurrentOrNextMonth() == 1
+				? dateProcessed.getTargetDate().addMonths(1)
+				: dateProcessed.getTargetDate().addMonths(-1);
+		// 締め期間
+		DatePeriod datePeriod = ClosureService.getClosurePeriod(require, closure.getClosureId().value, processYm);
+		
+		if (rq609.getCurrentOrNextMonth() == 1) {
+			return WidgetInitialDisplayMonthDto.builder()
+					.currentOrNextMonth(rq609.getCurrentOrNextMonth())
+					.closureId(closure.getClosureId().value)
+					.currentMonth(dateProcessed.getTargetDate().v())
+					.currentMonthStart(dateProcessed.getDatePeriod().start().toString())
+					.currentMonthEnd(dateProcessed.getDatePeriod().end().toString())
+					.nextMonth(dateProcessed.getTargetDate().addMonths(1).v())
+					.nextMonthStart(datePeriod.start().toString())
+					.nextMonthEnd(datePeriod.end().toString())
+					.build();
+		}
+		
+		return WidgetInitialDisplayMonthDto.builder()
+				.currentOrNextMonth(rq609.getCurrentOrNextMonth())
+				.closureId(closure.getClosureId().value)
+				.currentMonth(dateProcessed.getTargetDate().addMonths(-1).v())
+				.currentMonthStart(datePeriod.start().toString())
+				.currentMonthEnd(datePeriod.end().toString())
+				.nextMonth(dateProcessed.getTargetDate().v())
+				.nextMonthStart(dateProcessed.getDatePeriod().start().toString())
+				.nextMonthEnd(dateProcessed.getDatePeriod().end().toString())
+				.build();
 	}
 }

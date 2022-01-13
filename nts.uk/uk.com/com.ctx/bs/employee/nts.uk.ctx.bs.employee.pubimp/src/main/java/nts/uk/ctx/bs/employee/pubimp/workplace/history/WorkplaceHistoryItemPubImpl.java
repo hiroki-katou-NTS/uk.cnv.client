@@ -20,8 +20,7 @@ public class WorkplaceHistoryItemPubImpl implements WorkplaceHistoryItemPub {
 	@Override
 	public List<WorkplaceHistoryItemExport> findByEmpIdsAndDate(List<String> empIds, GeneralDate baseDate) {
 		return workplaceHistoryItemRepo.getAffWrkplaHistItemByListEmpIdAndDateV2(baseDate, empIds).stream()
-				.map(w -> new WorkplaceHistoryItemExport(w.getHistoryId(), w.getEmployeeId(), w.getWorkplaceId(), 
-						w.getNormalWorkplaceId()))
+				.map(w -> new WorkplaceHistoryItemExport(w.getHistoryId(), w.getEmployeeId(), w.getWorkplaceId()))
 				.collect(Collectors.toList());
 	}
 

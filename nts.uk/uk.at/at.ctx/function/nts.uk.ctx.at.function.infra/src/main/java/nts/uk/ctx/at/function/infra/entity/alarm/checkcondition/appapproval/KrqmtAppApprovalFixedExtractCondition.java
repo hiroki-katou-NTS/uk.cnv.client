@@ -5,7 +5,8 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,7 +28,7 @@ public class KrqmtAppApprovalFixedExtractCondition extends UkJpaEntity {
 	private String message;
 	
 	@Column(name = "USE_ATR")
-	private int useAtr;
+	private boolean useAtr;
 	
 	
 	public KrqmtAppApprovalFixedExtractCondition(KrqmtAppApprovalFixedExtractConditionPK pk, String contractCode,
@@ -35,7 +36,7 @@ public class KrqmtAppApprovalFixedExtractCondition extends UkJpaEntity {
 		this.pk = pk;
 		this.contractCode = contractCode;
 		this.message = message;
-		this.useAtr = useAtr;
+		this.useAtr = BooleanUtils.toBoolean(useAtr);
 	}
 	
 	@Override

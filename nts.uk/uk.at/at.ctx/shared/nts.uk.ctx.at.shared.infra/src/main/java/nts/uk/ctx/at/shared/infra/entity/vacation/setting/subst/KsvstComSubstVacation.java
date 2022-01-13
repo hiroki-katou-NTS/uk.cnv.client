@@ -34,10 +34,10 @@ public class KsvstComSubstVacation extends ContractUkJpaEntity implements Serial
     
 	/** 管理区分 **/ 
 	@Column(name = "MANAGE_ATR")
-	private Integer manageAtr;
+	private boolean manageAtr;
 	/** 紐付け管理区分 **/
 	@Column(name = "LINK_MNG_ATR")
-	private Integer linkMngAtr;
+	private boolean linkMngAtr;
 	/** 休暇使用期限**/
 	@Column(name = "EXPIRATION_DATE_SET")
 	private Integer expitationDateSet;

@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import nts.arc.layer.infra.data.jdbc.map.JpaEntityMapper;
 import nts.uk.ctx.exio.dom.input.canonicalize.existing.StringifiedValue;
 import nts.uk.ctx.exio.dom.input.setting.assembly.mapping.ImportingItemMapping;
-import nts.uk.ctx.exio.infra.entity.input.setting.XimmtImportSetting;
+import nts.uk.ctx.exio.infra.entity.input.setting.XimmtDomainImportSetting;
 import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 
 /**
@@ -34,7 +34,11 @@ public class XimmtItemMapping extends ContractUkJpaEntity implements Serializabl
 	
 	@EmbeddedId
 	private XimmtItemMappingPK pk;
-	
+
+	/* CSV列番号 */
+	@Column(name = "IS_FIXED_VALUE")
+	private boolean isFixedValue;
+
 	/* CSV列番号 */
 	@Column(name = "CSV_COLUMN_NO")
 	private Integer csvColumnNo;
@@ -46,15 +50,17 @@ public class XimmtItemMapping extends ContractUkJpaEntity implements Serializabl
 	@ManyToOne
 	@JoinColumns( {
 		@JoinColumn(name = "CID", referencedColumnName = "CID", insertable = false, updatable = false),
-		@JoinColumn(name = "SETTING_CODE", referencedColumnName = "CODE", insertable = false, updatable = false)
+		@JoinColumn(name = "SETTING_CODE", referencedColumnName = "SETTING_CODE", insertable = false, updatable = false),
+		@JoinColumn(name = "DOMAIN_ID", referencedColumnName = "DOMAIN_ID", insertable = false, updatable = false)
 	})
-	public XimmtImportSetting importSetting;
+	public XimmtDomainImportSetting domainSetting;
 	
 	public static final JpaEntityMapper<XimmtItemMapping> MAPPER = new JpaEntityMapper<>(XimmtItemMapping.class);
 	
-	public XimmtItemMapping(XimmtItemMappingPK pk, Integer csvColumnNo, String fixedValue) {
+	public XimmtItemMapping(XimmtItemMappingPK pk, boolean isFixedValue, Integer csvColumnNo, String fixedValue) {
 		super();
 		this.pk = pk;
+		this.isFixedValue = isFixedValue;
 		this.csvColumnNo = csvColumnNo;
 		this.fixedValue = fixedValue;
 	}
@@ -67,6 +73,7 @@ public class XimmtItemMapping extends ContractUkJpaEntity implements Serializabl
 	public ImportingItemMapping toDomain(){
 		return new ImportingItemMapping(
 				pk.getItemNo(),
+				isFixedValue,
 				Optional.ofNullable(csvColumnNo),
 				Optional.ofNullable(fixedValue).map(StringifiedValue::of));
 	}

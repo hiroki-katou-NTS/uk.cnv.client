@@ -27,9 +27,8 @@ public class TopPagePersonSetting extends TopPageSettings implements DomainAggre
 			LoginMenuCode loginMenuCode,
 			TopMenuCode topMenuCode,
 			MenuClassification menuClassification, 
-			System system,
-			SwitchingDate switchingDate) {
-		super(topMenuCode, new MenuLogin(system, menuClassification, loginMenuCode), switchingDate);
+			System system) {
+		super(topMenuCode, new MenuLogin(system, menuClassification, loginMenuCode));
 		this.employeeId = employeeId;
 	}
 	
@@ -41,7 +40,6 @@ public class TopPagePersonSetting extends TopPageSettings implements DomainAggre
 	
 	public void getMemento(MementoGetter memento) {
 		this.employeeId = memento.getEmployeeId();
-		this.switchingDate = new SwitchingDate(memento.getSwitchingDate());
 		this.topMenuCode = new TopMenuCode(memento.getTopMenuCode());
 		this.menuLogin = new MenuLogin(
 				EnumAdaptor.valueOf(memento.getSystem(), System.class),
@@ -51,7 +49,6 @@ public class TopPagePersonSetting extends TopPageSettings implements DomainAggre
 	
 	public void setMemento(MementoSetter memento) {
 		memento.setEmployeeId(employeeId);
-		memento.setSwitchingDate(switchingDate.v());
 		memento.setSystem(menuLogin.getSystem().value);
 		memento.setMenuClassification(menuLogin.getMenuClassification().value);
 		memento.setLoginMenuCode(menuLogin.getLoginMenuCode().v());
@@ -62,7 +59,6 @@ public class TopPagePersonSetting extends TopPageSettings implements DomainAggre
 
 	public static interface MementoSetter {
 		void setEmployeeId(String employeeId);
-		void setSwitchingDate(Integer switchingDate);
 		void setSystem(int system);
 		void setMenuClassification(int menuClassification);
 		void setLoginMenuCode(String loginMenuCode);
@@ -71,7 +67,6 @@ public class TopPagePersonSetting extends TopPageSettings implements DomainAggre
 	
 	public static interface MementoGetter {
 		String getEmployeeId();
-		Integer getSwitchingDate();
 		int getSystem();
 		int getMenuClassification();
 		String getLoginMenuCode();

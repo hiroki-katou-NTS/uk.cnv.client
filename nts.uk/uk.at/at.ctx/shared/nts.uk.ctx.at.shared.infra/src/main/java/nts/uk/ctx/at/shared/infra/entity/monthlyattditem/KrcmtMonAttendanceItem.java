@@ -65,6 +65,10 @@ public class KrcmtMonAttendanceItem extends ContractUkJpaEntity implements Seria
 	@Column(name = "PRIMITIVE_VALUE")
 	public Integer primitiveValue;
 	
+	@Basic(optional = true)
+	@Column(name = "DISPLAY_NAME")
+	public String displayName;
+	
 	public KrcmtMonAttendanceItem() {
 		super();
 	}
@@ -87,6 +91,7 @@ public class KrcmtMonAttendanceItem extends ContractUkJpaEntity implements Seria
 		this.isAllowChange = domain.getUserCanUpdateAtr().value;
 		this.lineBreakPosName = domain.getNameLineFeedPosition();
 		this.primitiveValue = domain.getPrimitiveValue().map(x -> x.value).orElse(null);
+		this.displayName = domain.getDisplayName().isPresent() ? domain.getDisplayName().get().v() : null;
 		this.twoMonthlyDisplay = domain.getTwoMonthlyDisplay().value;
 	}
 

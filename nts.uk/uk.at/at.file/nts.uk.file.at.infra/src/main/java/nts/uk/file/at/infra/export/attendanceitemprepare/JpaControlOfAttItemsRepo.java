@@ -14,7 +14,7 @@ import nts.uk.file.at.app.export.attendanceitemprepare.ControlOfAttendanceItemsD
 @Stateless
 public class JpaControlOfAttItemsRepo extends JpaRepository implements ControlOfAttItemsRepoExcel {
 
-	private static final String GET_ALL = "select a.ITEM_DAILY_ID, a.INPUT_UNIT, a.HEADER_BACKGROUND_COLOR "
+	private static final String GET_ALL = "select a.ITEM_DAILY_ID, a.HEADER_BACKGROUND_COLOR "
 			+ "from KSHMT_DAY_ATD_CTR a where a.CID=?companyId";
 
 	@Override
@@ -32,16 +32,15 @@ public class JpaControlOfAttItemsRepo extends JpaRepository implements ControlOf
 
 	private void putRowToResult(Map<Integer, ControlOfAttendanceItemsDtoExcel> listControl, Object[] x) {
 		Integer id = 0;
-		Integer unitItem = 0;
-		String headerBackground = (String) x[2];
+//		Float unitItem = 0f;
+		String headerBackground = (String) x[1];
 		if(x[0] !=null){
 			id = ((BigDecimal) x[0]).intValue();
 		}
-		if(x[1] !=null){
-			unitItem =((BigDecimal) x[1]).intValue();
-		}
-		ControlOfAttendanceItemsDtoExcel control = 
-				new ControlOfAttendanceItemsDtoExcel(id, headerBackground,unitItem );
+//		if(x[1] !=null){
+//			unitItem =((BigDecimal) x[1]).floatValue();
+//		}
+		ControlOfAttendanceItemsDtoExcel control = new ControlOfAttendanceItemsDtoExcel(id, headerBackground);
 		listControl.put(control.getItemDailyID(), control);
 	}
 

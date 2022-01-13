@@ -16,6 +16,7 @@ import nts.uk.shr.com.i18n.TextResource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,8 +45,7 @@ public class UnRegisterManagerCfmService {
                                           DisplayMessage displayMessage,
                                           YearMonthPeriod ymPeriod,
                                           List<String> workplaceIds) {
-        DatePeriod period = new DatePeriod(GeneralDate.ymd(ymPeriod.start().year(), ymPeriod.start().month(), 1),
-                GeneralDate.ymd(ymPeriod.end().year(), ymPeriod.end().month(), 1).addMonths(1).addDays(-1));
+        DatePeriod period = new DatePeriod(ymPeriod.start().firstGeneralDate(), ymPeriod.end().lastGeneralDate());
         // 空欄のリスト「抽出結果」を作成する。
         List<ExtractResultDto> results = new ArrayList<>();
 
@@ -58,10 +58,16 @@ public class UnRegisterManagerCfmService {
             if (filteredMngs.isEmpty())
                 alarmValueDate = new AlarmValueDate(ymPeriod.start().toString(), Optional.of(ymPeriod.end().toString()));
             else if (filteredMngs.stream().anyMatch(i -> i.getHistoryPeriod().start().after(period.start()))) {
-                WorkplaceManagerImport errorMng = filteredMngs.stream().filter(i -> i.getHistoryPeriod().start().after(period.start())).findFirst().get();
+                WorkplaceManagerImport errorMng = filteredMngs.stream()
+                        .filter(i -> i.getHistoryPeriod().start().yearMonth().greaterThan(ymPeriod.start()))
+                        .min(Comparator.comparing(i -> i.getHistoryPeriod().start().yearMonth()))
+                        .get();
                 alarmValueDate = new AlarmValueDate(ymPeriod.start().toString(), Optional.of(errorMng.getHistoryPeriod().start().yearMonth().toString()));
             } else if (filteredMngs.stream().anyMatch(i -> i.getHistoryPeriod().end().before(period.start()))) {
-                WorkplaceManagerImport errorMng = filteredMngs.stream().filter(i -> i.getHistoryPeriod().end().before(period.start())).findFirst().get();
+                WorkplaceManagerImport errorMng = filteredMngs.stream()
+                        .filter(i -> i.getHistoryPeriod().end().before(period.start()))
+                        .max(Comparator.comparing(i -> i.getHistoryPeriod().end().yearMonth()))
+                        .get();
                 alarmValueDate = new AlarmValueDate(errorMng.getHistoryPeriod().end().yearMonth().toString(), Optional.of(ymPeriod.start().toString()));
             }
             if (alarmValueDate != null) {

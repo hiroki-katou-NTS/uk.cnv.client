@@ -26,4 +26,6 @@ public class OptionalItemAppExport {
     private OptionalItemAtr optionalItemAtr;
 
     private String description;
+
+    private boolean inputCheck;
 }

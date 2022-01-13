@@ -1,10 +1,10 @@
-#functions-area button ~ .ntsControl {
+/* #functions-area button ~ .ntsControl {
 	margin-left: 15px;
-}
+} */
 
-#functions-area button+.ntsControl {
+/* #functions-area button+.ntsControl {
 	margin-left: 475px;
-}
+} */
 
 #functions-area, #contents-area {
 	min-width: 1260px;

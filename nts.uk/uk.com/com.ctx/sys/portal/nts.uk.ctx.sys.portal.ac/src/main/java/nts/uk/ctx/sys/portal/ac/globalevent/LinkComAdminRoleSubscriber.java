@@ -22,8 +22,7 @@ public class LinkComAdminRoleSubscriber implements DomainEventSubscriber<RoleByR
 
 	@Override
 	public void handle(RoleByRoleTiesGlobalEvent domainEvent) {
-		val roleTies = new RoleByRoleTies(domainEvent.getRoleId(), new WebMenuCode("001"),
-				DefaultSettingKeys.COMPANY_ID);
+		val roleTies = new RoleByRoleTies(domainEvent.getRoleId(), DefaultSettingKeys.COMPANY_ID, new WebMenuCode("001"));
 		this.roleTiesRepo.insertRoleByRoleTies(roleTies);
 	}
 }

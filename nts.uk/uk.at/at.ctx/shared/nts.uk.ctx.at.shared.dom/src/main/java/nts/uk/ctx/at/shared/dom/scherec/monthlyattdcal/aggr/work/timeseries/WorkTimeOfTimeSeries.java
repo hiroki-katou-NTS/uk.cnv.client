@@ -5,6 +5,7 @@ import java.io.Serializable;
 import lombok.Getter;
 import lombok.val;
 import nts.arc.time.GeneralDate;
+import nts.uk.ctx.at.shared.dom.common.amount.AttendanceAmountDaily;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.WithinStatutoryMidNightTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.WithinStatutoryTimeOfDaily;
@@ -80,7 +81,8 @@ public class WorkTimeOfTimeSeries implements Serializable{
 				new WithinStatutoryMidNightTime(
 						this.legalTime.getWithinStatutoryMidNightTime().getTime().addMinutes(
 								addTime.getWithinStatutoryMidNightTime().getTime().getTime(),
-								addTime.getWithinStatutoryMidNightTime().getTime().getCalcTime())));
+								addTime.getWithinStatutoryMidNightTime().getTime().getCalcTime())),
+				new AttendanceAmountDaily(Math.addExact(this.legalTime.getWithinWorkTimeAmount().v(), addTime.getWithinWorkTimeAmount().v())));
 	}
 	
 	/**

@@ -152,6 +152,7 @@ module nts.uk.com.view.kal004.e.viewmodel {
                 endCurrentMonth: endCurrentMonth,
                 endMonth: endMonth,
                 endFromStrMonth: endFromStrMonth,
+                processingYm: self.getParam.processingYm
             };
         }
         
@@ -197,10 +198,37 @@ module nts.uk.com.view.kal004.e.viewmodel {
                 return null;
             }
             
-            // (d）開始区分＝「本年月」　AND　終了区分＝「終了月」
-            if (self.strSelected() == share.SpecifyStartMonth.SPECIFY_FIXED_MOON_DEGREE && self.endSelected() == share.SpecifyEndMonth.SPECIFY_CLOSE_END_MONTH) {
-                return null;
+            // (e）開始区分＝「本年」OR 開始区分＝「本年度」AND月＝未来　AND　終了区分＝「当月」
+            if (self.strSelected() == share.SpecifyStartMonth.SPECIFY_FIXED_MOON_DEGREE  && self.endSelected() == share.SpecifyEndMonth.SPECIFY_CLOSE_END_MONTH) {
+                let startMonthly = null;
+                let endMonthly = null;
+                let sysDate = moment();
+                let numberStrMonth = self.strSpecifyMonth() - 1;
+                
+                if (self.strYearSpecifiedType() == share.YearSpecifiedType.FISCAL_YEAR) {
+                   startMonthly = moment().set({'year': sysDate.year(), 'month': numberStrMonth, 'date': 1});
+                } else {
+                   startMonthly = moment(self.getParam.processingYm, "YYYYMM").set({'month': numberStrMonth, 'date': 1});
+                }
+                
+                let numberEndMonth = self.endMonth();
+                endMonthly = moment(self.getParam.processingYm, "YYYYMM").add(numberEndMonth, 'months').set('date', 1);
+                
+                var strYearMonth = startMonthly.format('YYYY-MM-01');
+                var endYearMonth = endMonthly.format('YYYY-MM-01');
+                if (startMonthly.year() > endMonthly.year()) {
+                    return "Msg_812";
+                }
+                
+                if (startMonthly.year() == endMonthly.year() && startMonthly.month() > endMonthly.month()) {
+                    return "Msg_812";
+                }
             }
+            
+            // (d）開始区分＝「本年月」　AND　終了区分＝「終了月」 comment by #ver22
+            //if (self.strSelected() == share.SpecifyStartMonth.SPECIFY_FIXED_MOON_DEGREE && self.endSelected() == share.SpecifyEndMonth.SPECIFY_CLOSE_END_MONTH) {
+            //    return null;
+            //}
             
             return null;
         }

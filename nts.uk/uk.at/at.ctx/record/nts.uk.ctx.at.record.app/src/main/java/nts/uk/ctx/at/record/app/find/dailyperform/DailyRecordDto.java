@@ -34,6 +34,7 @@ import nts.uk.ctx.at.record.app.find.dailyperform.specificdatetttr.dto.SpecificD
 import nts.uk.ctx.at.record.app.find.dailyperform.temporarytime.dto.TemporaryTimeOfDailyPerformanceDto;
 import nts.uk.ctx.at.record.app.find.dailyperform.workinfo.dto.WorkInformationOfDailyDto;
 import nts.uk.ctx.at.record.app.find.dailyperform.workrecord.dto.AttendanceTimeByWorkOfDailyDto;
+import nts.uk.ctx.at.record.app.find.dailyperform.workrecord.dto.OuenWorkTimeOfDailyDto;
 import nts.uk.ctx.at.record.app.find.dailyperform.workrecord.dto.TimeLeavingOfDailyPerformanceDto;
 import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDaily;
 import nts.uk.ctx.at.shared.dom.attendance.util.item.AttendanceItemDataGate;
@@ -147,6 +148,12 @@ public class DailyRecordDto extends AttendanceItemCommon {
 	/** 備考: 日別実績の備考 */
 	@AttendanceItemLayout(layout = DAILY_REMARKS_CODE, jpPropertyName = DAILY_REMARKS_NAME)
 	private RemarksOfDailyDto remarks;
+	
+	/** 日別実績の応援作業別勤怠時間 */
+	@AttendanceItemLayout(layout = DAILY_SUPPORT_TIME_CODE, jpPropertyName = DAILY_SUPPORT_TIME_NAME, isOptional = true)
+	@JsonDeserialize(using = CustomOptionalDeserializer.class)
+	@JsonSerialize(using = CustomOptionalSerializer.class)
+	private Optional<OuenWorkTimeOfDailyDto> ouenWorkTime = Optional.empty();
 
 	/** 臨時出退勤: 日別実績の臨時出退勤 */
 	@AttendanceItemLayout(layout = DAILY_SNAPSHOT_CODE, jpPropertyName = DAILY_SNAPSHOT_NAME, isOptional = true)
@@ -190,6 +197,7 @@ public class DailyRecordDto extends AttendanceItemCommon {
 			dto.setTemporaryTime(domain.getTempTime().map(t -> TemporaryTimeOfDailyPerformanceDto.getDto(employeeId,ymd,t)));
 			dto.setPcLogInfo(domain.getPcLogOnInfo().map(pc -> PCLogOnInforOfDailyPerformDto.from(employeeId,ymd,pc)));
 			dto.setRemarks(RemarksOfDailyDto.getDto(employeeId,ymd,domain.getRemarks()));
+			dto.setOuenWorkTime(domain.getOuenTime().isEmpty() ? Optional.empty() : Optional.of(OuenWorkTimeOfDailyDto.from(employeeId, ymd, domain.getOuenTime())));
 			dto.setSnapshot(domain.getSnapshot().map(c -> SnapshotDto.from(employeeId, ymd, c)));
 			OuenWorkTimeSheetOfDaily ouenSheetOfDaily = OuenWorkTimeSheetOfDaily.create(employeeId, ymd, domain.getOuenTimeSheet()); 
 			dto.setOuenTimeSheet(OuenWorkTimeSheetOfDailyDto.getDto(employeeId, ymd, ouenSheetOfDaily));
@@ -373,6 +381,16 @@ public class DailyRecordDto extends AttendanceItemCommon {
 		this.ouenTimeSheet = ouenTimeSheet;
 		return this;
 	}
+
+	public DailyRecordDto withOuenWorkTime(OuenWorkTimeOfDailyDto ouenWorkTime) {
+		this.ouenWorkTime = Optional.ofNullable(ouenWorkTime);
+		return this;
+	}
+	
+	public DailyRecordDto withOuenWorkTime(Optional<OuenWorkTimeOfDailyDto> ouenWorkTime) {
+		this.ouenWorkTime = ouenWorkTime;
+		return this;
+	}
 	
 	public DailyRecordDto workingDate(GeneralDate workingDate) {
 		this.date = workingDate;
@@ -422,6 +440,8 @@ public class DailyRecordDto extends AttendanceItemCommon {
 				this.editStates.stream().map(editS -> editS.toDomain(employeeId, date)).collect(Collectors.toList()),
 				this.temporaryTime.map(tt -> tt.toDomain(employeeId, date)),
 				this.remarks == null ? new ArrayList<>() : this.remarks.toDomain(employeeId, date),
+				this.ouenWorkTime.isPresent() ? this.ouenWorkTime.get().toDomain(employeeId, date).getOuenTimes() : new ArrayList<>(),
+				new ArrayList<>(),
 				this.snapshot.map(c -> c.toDomain(employeeId, date))
 				);
 		// set support time
@@ -458,6 +478,7 @@ public class DailyRecordDto extends AttendanceItemCommon {
 		dto.setTemporaryTime(temporaryTime.map(t -> t.clone()));
 		dto.setPcLogInfo(pcLogInfo.map(pc -> pc.clone()));
 		dto.setRemarks(remarks == null ? null : remarks.clone());
+		dto.setOuenWorkTime(ouenWorkTime.map(owt -> owt.clone()));
 		dto.setSnapshot(snapshot.map(ss -> ss.clone()));
 		dto.setOuenTimeSheet(ouenTimeSheet == null ? null : ouenTimeSheet.clone());
 		if(isHaveData()){
@@ -499,6 +520,8 @@ public class DailyRecordDto extends AttendanceItemCommon {
 			return Optional.ofNullable(this.pcLogInfo.orElse(null));
 		case DAILY_REMARKS_NAME:
 			return Optional.ofNullable(this.remarks);
+		case DAILY_SUPPORT_TIME_NAME:
+			return Optional.ofNullable(this.ouenWorkTime.orElse(null));
 		case DAILY_SNAPSHOT_NAME:
 			return Optional.ofNullable(this.snapshot.orElse(null));
 		case DAILY_SUPPORT_TIMESHEET_NAME:
@@ -556,6 +579,9 @@ public class DailyRecordDto extends AttendanceItemCommon {
 		case DAILY_ATTENDANCE_TIME_NAME:
 			this.attendanceTime = Optional.ofNullable((AttendanceTimeDailyPerformDto) value);
 			break;
+		case DAILY_SUPPORT_TIME_NAME:
+			this.ouenWorkTime = Optional.ofNullable((OuenWorkTimeOfDailyDto) value);
+			break;
 		case DAILY_SNAPSHOT_NAME:
 			this.snapshot = Optional.ofNullable((SnapshotDto) value);
 			break;
@@ -600,6 +626,8 @@ public class DailyRecordDto extends AttendanceItemCommon {
 			return new PCLogOnInforOfDailyPerformDto();
 		case DAILY_REMARKS_NAME:
 			return new RemarksOfDailyDto();
+		case DAILY_SUPPORT_TIME_NAME:
+			return new OuenWorkTimeOfDailyDto();
 		case DAILY_SNAPSHOT_NAME:
 			return new SnapshotDto();
 		case DAILY_SUPPORT_TIMESHEET_NAME:

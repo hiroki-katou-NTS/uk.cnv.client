@@ -4,12 +4,14 @@ import org.apache.logging.log4j.util.Strings;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.record.dom.workrecord.actuallock.LockStatus;
 
 /**
  * 月の実績のロック状態
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class MonthlyPerformaceLockStatus {
 	public static String LOCK_MONTHLY_PAST = "pastPerformaceLock";
@@ -26,59 +28,59 @@ public class MonthlyPerformaceLockStatus {
 	/**
 	 * 過去実績のロック
 	 */
-	LockStatus pastPerformaceLock;
+	Integer pastPerformaceLock;
 	/**
 	 * 職場の就業確定
 	 */
-	LockStatus employmentConfirmWorkplace;
+	Integer employmentConfirmWorkplace;
 	/**
 	 * 月別実績の承認
 	 */
-	LockStatus monthlyResultApprova;
+	Integer monthlyResultApprova;
 	/**
 	 * 月別実績のロック
 	 */
-	LockStatus monthlyResultLock;
+	Integer monthlyResultLock;
 	/**
 	 * 日別実績の確認
 	 */
-	LockStatus monthlyResultConfirm;
+	Integer monthlyResultConfirm;
 	/**
 	 * 日別実績の不足
 	 */
-	LockStatus monthlyResultLack;
+	Integer monthlyResultLack;
 	/**
-	 * 日別実績のエラー
+	 * 日別Integerのエラー
 	 */
-	LockStatus monthlyResultError;
+	Integer monthlyResultError;
 	
 	public String getLockStatusString(){
 		StringBuilder sb = new StringBuilder();
-		if(pastPerformaceLock == LockStatus.LOCK){
+		if(pastPerformaceLock == LockStatus.LOCK.value){
 			sb.append(LOCK_MONTHLY_PAST);
 			sb.append("|");
 		}
-		if(employmentConfirmWorkplace == LockStatus.LOCK){
+		if(employmentConfirmWorkplace == LockStatus.LOCK.value){
 			sb.append(LOCK_EMPLOYEE_CONFIRM);
 			sb.append("|");
 		}
-		if(monthlyResultApprova == LockStatus.LOCK){
+		if(monthlyResultApprova == LockStatus.LOCK.value){
 			sb.append(LOCK_MONTHLY_APPROVAL);
 			sb.append("|");
 		}
-		if(monthlyResultLock == LockStatus.LOCK){
+		if(monthlyResultLock == LockStatus.LOCK.value){
 			sb.append(LOCK_MONTHLY_RESULT);
 			sb.append("|");
 		}
-		if(monthlyResultConfirm == LockStatus.LOCK){
+		if(monthlyResultConfirm == LockStatus.LOCK.value){
 			sb.append(LOCK_MONTHLY_RESULT_CONFIRM);
 			sb.append("|");
 		}
-		if(monthlyResultLack == LockStatus.LOCK){
+		if(monthlyResultLack == LockStatus.LOCK.value){
 			sb.append(LOCK_MONTHLY_LACK);
 			sb.append("|");
 		}
-		if(monthlyResultError == LockStatus.LOCK){
+		if(monthlyResultError == LockStatus.LOCK.value){
 			sb.append(LOCK_MONTHLY_ERROR);
 			sb.append("|");
 		}
@@ -92,8 +94,8 @@ public class MonthlyPerformaceLockStatus {
 	public boolean disableState(String sid) {
 		// 「過去実績のロック」「月別実績のロック」「職場の就業確定」のいずれかがロックされている場合
 		if (sid.equals(employeeId)) {
-			return pastPerformaceLock == LockStatus.LOCK || monthlyResultLock == LockStatus.LOCK
-					|| employmentConfirmWorkplace == LockStatus.LOCK;
+			return pastPerformaceLock == LockStatus.LOCK.value || monthlyResultLock == LockStatus.LOCK.value
+					|| employmentConfirmWorkplace == LockStatus.LOCK.value;
 		}
 		return false;
 	}

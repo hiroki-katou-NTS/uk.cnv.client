@@ -42,6 +42,13 @@ module nts.uk.at.view.kdp010.a {
 			public goToFScreen(): void {
                 nts.uk.request.jump("/view/kdp/010/f/index.xhtml");
             }
+
+			public openCDL015(): void {
+				let self = this;
+                nts.uk.ui.windows.sub.modal('com', "/view/cdl/015/a/index.xhtml").onClosed(() => {
+                	
+                });
+			}
         }
     }
 

@@ -30,9 +30,9 @@ import nts.uk.ctx.at.shared.infra.entity.worktime.flexset.KshmtFlexWorkSetPK;
 public class JpaFlexWorkSettingRepository extends JpaRepository
 		implements FlexWorkSettingRepository {
 
-	private static final String SEL_1 = "SELECT * FROM KshmtWtFle a WHERE a.kshmtFlexWorkSetPK.cid =:cid AND a.kshmtFlexWorkSetPK.worktimeCd IN :worktimeCd";
+	private static final String SEL_1 = "SELECT a FROM KshmtWtFle a WHERE a.kshmtFlexWorkSetPK.cid =:cid AND a.kshmtFlexWorkSetPK.worktimeCd IN :worktimeCd";
 	
-	private static final String SEL_2 = "SELECT * FROM KshmtWtCom a WHERE a.kshmtWorktimeCommonSetPK.cid =:cid AND a.kshmtWorktimeCommonSetPK.workFormAtr =:workFormAtr AND  a.kshmtWorktimeCommonSetPK.worktimeSetMethod =:worktimeSetMethod AND a.kshmtWorktimeCommonSetPK.worktimeCd IN :worktimeCd";
+	private static final String SEL_2 = "SELECT a FROM KshmtWtCom a WHERE a.kshmtWorktimeCommonSetPK.cid =:cid AND a.kshmtWorktimeCommonSetPK.workFormAtr =:workFormAtr AND  a.kshmtWorktimeCommonSetPK.worktimeSetMethod =:worktimeSetMethod AND a.kshmtWorktimeCommonSetPK.worktimeCd IN :worktimeCd";
 	/*
 	 * (non-Javadoc)
 	 * 

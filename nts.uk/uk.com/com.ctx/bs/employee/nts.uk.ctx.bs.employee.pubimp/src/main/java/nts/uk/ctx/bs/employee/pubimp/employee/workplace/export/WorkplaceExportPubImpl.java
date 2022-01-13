@@ -12,7 +12,9 @@ import nts.uk.ctx.bs.employee.dom.workplace.master.WorkplaceInformationRepositor
 import nts.uk.ctx.bs.employee.pub.employee.workplace.export.WkpExport;
 import nts.uk.ctx.bs.employee.pub.employee.workplace.export.WorkplaceExportPub;
 import nts.uk.ctx.bs.employee.pub.employee.workplace.export.WorkplaceExportPubDto;
+import nts.uk.ctx.bs.employee.pub.workplace.AffWorkplaceHistoryItemExport3;
 import nts.uk.ctx.bs.employee.pub.workplace.master.WorkplaceInforExport;
+import nts.uk.ctx.bs.employee.pub.workplace.master.WorkplacePub;
 
 /**
  * 
@@ -27,6 +29,9 @@ public class WorkplaceExportPubImpl implements WorkplaceExportPub {
 
 	@Inject
 	private WorkplaceInformationRepository workplaceConfigInfoRepository;
+	
+	@Inject
+	private WorkplacePub workplacePub;
 
 	@Override
 	public List<WorkplaceExportPubDto> getAllWkpConfig(String companyId, List<String> listWkpId, GeneralDate baseDate) {
@@ -55,5 +60,21 @@ public class WorkplaceExportPubImpl implements WorkplaceExportPub {
 						x.getWorkplaceCode().v(), x.getWorkplaceName().v(), x.getWorkplaceDisplayName().v(),
 						x.getWorkplaceGeneric().v(), x.getWorkplaceExternalCode().map(a -> a.v()).orElse("")))
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<AffWorkplaceHistoryItemExport3> getByCID(String companyId, GeneralDate baseDate) {
+		//$職場情報一覧 = [No.559]運用している職場の情報をすべて取得する
+		List<WorkplaceInforExport> list = workplacePub.getAllActiveWorkplaceInfor(companyId, baseDate);
+		//	$職場リスト = $職場情報一覧：map $.職場ID
+		List<String> workPlaceIds = list.stream().map(c->c.getWorkplaceId()).collect(Collectors.toList());
+		//		return 職場（List）と基準日から所属職場履歴項目を取得する(職場リスト,基準日)
+		return workplacePub.getWorkHisItemfromWkpIdsAndBaseDate(workPlaceIds, baseDate);
+	}
+
+	@Override
+	public List<AffWorkplaceHistoryItemExport3> getByListId(List<String> workPlaceIds, GeneralDate baseDate) {
+		//return 職場（List）と基準日から所属職場履歴項目を取得する(職場リスト,基準日)
+		return workplacePub.getWorkHisItemfromWkpIdsAndBaseDate(workPlaceIds, baseDate);
 	}
 }

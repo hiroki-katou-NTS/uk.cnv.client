@@ -1,6 +1,7 @@
 package nts.uk.shr.infra.data;
 
 import lombok.val;
+import nts.arc.error.BusinessException;
 import nts.arc.scoped.session.SessionContextProvider;
 import nts.tenantlocator.client.TenantLocatorClient;
 
@@ -9,13 +10,26 @@ public class TenantLocatorService {
 	private static final String SESSION_DATASOURCE = "nts.uk.shr.infra.data,TenantLocatorService,datasource";
 	
 	public static void connect(String tenantCode) {
-		val datasource = TenantLocatorClient.getDataSource(tenantCode);
-		if(datasource.isPresent()) {
-			SessionContextProvider.get().put(SESSION_DATASOURCE, datasource.get().getDatasourceName());
+
+		val datasourceOpt = TenantLocatorClient.getDataSource(tenantCode);
+		if (!datasourceOpt.isPresent()) {
+			disconnect();
+			throw new BusinessException("Msg_314");
 		}
-		else {
-			SessionContextProvider.get().put(SESSION_DATASOURCE, "");
+
+		connectDataSource(datasourceOpt.get().getDatasourceName());
+	}
+
+	public static void connectDataSource(String dataSourceName) {
+
+		if (dataSourceName == null) {
+			throw new NullPointerException("dataSourceName");
 		}
+		if (dataSourceName.isEmpty()) {
+			throw new RuntimeException("dataSourceName is empty");
+		}
+
+		SessionContextProvider.get().put(SESSION_DATASOURCE, dataSourceName);
 	}
 	
 	public static void disconnect() {
@@ -27,7 +41,9 @@ public class TenantLocatorService {
 	}
 	
 	public static String getDataSourceFor(String tenantCode) {
-		return TenantLocatorClient.getDataSource(tenantCode).get().getDatasourceName();
+		return TenantLocatorClient.getDataSource(tenantCode)
+				.orElseThrow(() -> new RuntimeException("テナントのデータソースが見つかりません：" + tenantCode))
+				.getDatasourceName();
 	}
 	
 	public static boolean isConnected() {

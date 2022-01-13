@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+	<ui:composition template="/master/base.xhtml">
+		<ui:define name="htmlHead">
+			<title></title>
+			<com:scriptfile set="IGNITE" />
+
+			<com:stylefile path="../common.error.style.css" />
+			<com:scriptfile path="sessiontimeout.start.js" />
+			<style rel="stylesheet">
+				#contents-area {
+					padding: 10px;
+				}
+			</style>
+		</ui:define>
+
+		<ui:define name="content">
+			<div id="contents-area" class="cf">
+				<div id="error-message">
+					<div>しばらくの間操作がなかったため、サーバとの接続を切断しました。</div>
+					<div>ログインをしなおしてください。</div>
+				</div>
+				<button class="large" data-bind="click: $vm.gotoLogin, timeClick: -1">ログイン画面へ</button>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+
+</html>

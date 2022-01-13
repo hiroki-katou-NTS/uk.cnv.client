@@ -19,7 +19,7 @@ import java.util.List;
 public class JpaScheModifyFuncByPersonRepository extends JpaRepository implements ScheModifyFuncByPersonRepository {
     @Override
     public List<ScheModifyFuncByPerson> getAll() {
-        String sql = "SELECT * FROM KSCMT_FUNC_BYPERSON ORDER BY FUNCTION_NO ASC";
+        String sql = "SELECT * FROM KSCCT_FUNC_BYPERSON ORDER BY FUNCTION_NO ASC";
 
         return new NtsStatement(sql, this.jdbcProxy())
                 .getList(x -> KscmtFuncByperson.MAPPER.toEntity(x).toDomain());

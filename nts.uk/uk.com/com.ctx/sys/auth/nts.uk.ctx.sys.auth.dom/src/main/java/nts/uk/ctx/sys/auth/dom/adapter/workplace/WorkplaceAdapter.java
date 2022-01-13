@@ -5,6 +5,7 @@
 package nts.uk.ctx.sys.auth.dom.adapter.workplace;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import nts.arc.time.GeneralDate;
@@ -79,4 +80,19 @@ public interface WorkplaceAdapter {
 	 * @return
 	 */
 	public List<String> getWorkplaceIdAndChildren(String companyId, GeneralDate baseDate, String workplaceId);
+	/**
+	 * @name 所属職場を取得するAdapter
+	 * @param employeeID 	社員ID
+	 * @param date 年月日
+	 * @return 	Map<社員ID,職場ID> 所属情報
+	 */
+	public Map<String, String> getAWorkplace(String employeeID, GeneralDate date);
+
+	/**
+	 * @name 	所属職場リストを取得するAdapter
+	 * @param employeeID  	List<職場ID>
+	 * @param date 年月日
+	 * @return 	社員一覧	Map<社員ID,職場ID>
+	 */
+	public Map<String, String> getByListIds(List<String> workPlaceIds, GeneralDate baseDate);
 }

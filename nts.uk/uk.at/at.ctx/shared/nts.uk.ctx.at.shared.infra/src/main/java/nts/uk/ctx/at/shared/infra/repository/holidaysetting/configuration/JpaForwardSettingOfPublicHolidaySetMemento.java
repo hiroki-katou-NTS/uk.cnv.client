@@ -10,12 +10,6 @@ import nts.uk.shr.com.context.AppContexts;
  */
 public class JpaForwardSettingOfPublicHolidaySetMemento implements ForwardSettingOfPublicHolidaySetMemento{
 	
-	/** The Constant TRUE_VALUE. */
-	private static final int TRUE_VALUE = 1;
-	
-	/** The Constant FALSE_VALUE. */
-	private static final int FALSE_VALUE = 0;
-	
 	/** The kshmt forward set of public hd. */
 	private KshmtHdpubForwardSet kshmtForwardSetOfPublicHd;
 	
@@ -44,11 +38,7 @@ public class JpaForwardSettingOfPublicHolidaySetMemento implements ForwardSettin
 	 */
 	@Override
 	public void setIsTransferWhenPublicHdIsMinus(boolean isTransferWhenPublicHdIsMinus) {
-		if(isTransferWhenPublicHdIsMinus){
-			this.kshmtForwardSetOfPublicHd.setIsPublicHdMinus(TRUE_VALUE);
-		} else {
-			this.kshmtForwardSetOfPublicHd.setIsPublicHdMinus(FALSE_VALUE);
-		}
+		this.kshmtForwardSetOfPublicHd.setPublicHdMinus(isTransferWhenPublicHdIsMinus);
 	}
 
 	/* (non-Javadoc)

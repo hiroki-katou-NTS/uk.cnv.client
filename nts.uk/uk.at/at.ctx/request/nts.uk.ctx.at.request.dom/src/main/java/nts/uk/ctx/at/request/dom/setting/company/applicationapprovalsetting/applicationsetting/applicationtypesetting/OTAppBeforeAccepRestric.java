@@ -45,27 +45,35 @@ public class OTAppBeforeAccepRestric {
 	 * 時刻（早出残業・通常残業）
 	 */
 	private Optional<AttendanceClock> opEarlyNormalOvertime;
+
+	/**
+	 * 時刻（複数回残業）
+	 */
+	private Optional<AttendanceClock> opMultipleOvertime;
 	
 	public OTAppBeforeAccepRestric(BeforeAddCheckMethod methodCheck, 
 			AppAcceptLimitDay dateBeforehandRestrictions, boolean toUse, Optional<AttendanceClock> opEarlyOvertime,
-			Optional<AttendanceClock> opNormalOvertime, Optional<AttendanceClock> opEarlyNormalOvertime) {
+			Optional<AttendanceClock> opNormalOvertime, Optional<AttendanceClock> opEarlyNormalOvertime, Optional<AttendanceClock> opMultipleOvertime) {
 		this.methodCheck = methodCheck;
 		this.dateBeforehandRestrictions = dateBeforehandRestrictions;
 		this.toUse = toUse;
 		this.opEarlyOvertime = opEarlyOvertime;
 		this.opNormalOvertime = opNormalOvertime;
 		this.opEarlyNormalOvertime = opEarlyNormalOvertime;
+		this.opMultipleOvertime = opMultipleOvertime;
 	}
 	
 	public static OTAppBeforeAccepRestric createNew(int methodCheck, int dateBeforehandRestrictions, boolean toUse, 
-			Integer opEarlyOvertime, Integer opNormalOvertime, Integer opEarlyNormalOvertime) {
+			Integer opEarlyOvertime, Integer opNormalOvertime, Integer opEarlyNormalOvertime, Integer opMultipleOvertime) {
 		return new OTAppBeforeAccepRestric(
 				EnumAdaptor.valueOf(methodCheck, BeforeAddCheckMethod.class), 
 				EnumAdaptor.valueOf(dateBeforehandRestrictions, AppAcceptLimitDay.class), 
 				toUse, 
 				opEarlyOvertime == null ? Optional.empty() : Optional.of(new AttendanceClock(opEarlyOvertime)), 
 				opNormalOvertime == null ? Optional.empty() : Optional.of(new AttendanceClock(opNormalOvertime)), 
-				opEarlyNormalOvertime == null ? Optional.empty() : Optional.of(new AttendanceClock(opEarlyNormalOvertime)));
+				opEarlyNormalOvertime == null ? Optional.empty() : Optional.of(new AttendanceClock(opEarlyNormalOvertime)),
+				opMultipleOvertime == null ? Optional.empty() : Optional.of(new AttendanceClock(opMultipleOvertime))
+			);
 	}
 	
 }

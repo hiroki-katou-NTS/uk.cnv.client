@@ -23,7 +23,13 @@ public class KTG026WebService extends WebService{
 	@Path("startScreen")
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public EmployeesOvertimeDisplayDto startScreenKtg026(Ktg026Parmas ktg026Params) {
-		return processor.startScreenKtg026(ktg026Params.employeeId, ktg026Params.targetDate, ktg026Params.targetYear, ktg026Params.currentOrNextMonth);
+		return processor.startScreenKtg026(
+				ktg026Params.closingId,
+				ktg026Params.employeeId,
+				ktg026Params.targetDate,
+				ktg026Params.targetYear,
+				ktg026Params.currentOrNextMonth,
+				ktg026Params.processingYm);
 	}
 	
 	@POST

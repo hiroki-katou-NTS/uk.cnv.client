@@ -19,9 +19,7 @@ import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.RefectActualRes
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Relieve;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampTypeDisplay;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonType;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampType;
 /**
  * DS : 社員の打刻データを作成する
  * UKDesign.ドメインモデル.NittsuSystem.UniversalK.就業.contexts.勤務実績.勤務実績.打刻管理.打刻.社員の打刻データを作成する
@@ -57,34 +55,31 @@ public class CreateStampDataForEmployeesService {
 	
 	
 	public static TimeStampInputResult create(Require require, String cid, ContractCode contractCode, String employeeId,
-			Optional<StampNumber> stampNumber, GeneralDateTime stampDateTime, Relieve relieve, ButtonType buttonType,
+			Optional<StampNumber> stampNumber, GeneralDateTime stampDateTime, Relieve relieve, StampType stamptype,
 			RefectActualResult refActualResults, Optional<GeoCoordinate> stampLocationInfor) {
 		//	$打刻カード作成結果 = [prv-1] 打刻カード番号を取得する(require, 社員ID, 打刻カード番号, 打刻する方法.打刻手段)	
 		StampCardCreateResult stampResult=	getCardNumber(require, employeeId, stampNumber, relieve.getStampMeans());
-		//	$打刻作成するか = ボタン種類.打刻区分を取得する()
-		boolean stampAtr = buttonType.checkStampType();
-		//	$表示する打刻区分 = ボタン種類.表示する打刻区分を取得する()
-		String stampTypeDisplay = buttonType.getStampTypeDisplay();
+//		//	$打刻作成するか = ボタン種類.打刻区分を取得する()
+//		boolean stampAtr = buttonType.checkStampType();
+//		//	if not $打刻作成するか
+//		if(!stampAtr) {
+//			// $永続化処理 = 打刻データ反映処理#打刻を登録する(require, $打刻記録, $打刻データ)
+//			AtomTask reflectResult = RegisterStampData.registerStamp(require, null).orElse(AtomTask.none());
+//			// $処理結果 = 打刻データ反映処理結果#打刻データ反映処理結果(Optional.Empty,$永続化処理)
+//			StampDataReflectResult stampDataReflectResult = new StampDataReflectResult(Optional.empty(), reflectResult);
+//			//	return 打刻入力結果#打刻入力結果($処理結果, $打刻カード作成結果.永続化処理)	
+//			return new TimeStampInputResult(stampDataReflectResult, stampResult.getAtomTask());
+//			
+//		}
 		
-		//$打刻記録 = 打刻記録#新規作成(契約コード, $打刻カード作成結果.打刻カード番号, 打刻日時, $表示する打刻区分)
-		StampRecord stampRecord = new StampRecord(contractCode, new StampNumber(stampResult.getCardNumber()) , stampDateTime, new StampTypeDisplay(stampTypeDisplay));
-		//	if not $打刻作成するか
-		if(!stampAtr) {
-			// $永続化処理 = 打刻データ反映処理#打刻を登録する(require, $打刻記録, $打刻データ)
-			AtomTask reflectResult = RegisterStampData.registerStamp(require, stampRecord, Optional.empty()).orElse(AtomTask.none());
-			// $処理結果 = 打刻データ反映処理結果#打刻データ反映処理結果(Optional.Empty,$永続化処理)
-			StampDataReflectResult stampDataReflectResult = new StampDataReflectResult(Optional.empty(), reflectResult);
-			//	return 打刻入力結果#打刻入力結果($処理結果, $打刻カード作成結果.永続化処理)	
-			return new TimeStampInputResult(stampDataReflectResult, stampResult.getAtomTask());
-			
-		}
-		//	$打刻データ = 打刻#打刻記録から打刻作成する($打刻記録,打刻する方法,ボタン種類.打刻種類, 実績への反映内容, 打刻場所情報)	
-		Stamp stamp = new Stamp(stampRecord, relieve, buttonType.getStampType().get(), refActualResults, stampLocationInfor);
+		//$打刻データ = 打刻#初回打刻データを作成する(契約コード,$打刻カード作成結果.打刻カード番号,打刻日時,打刻する方法,ボタン種類.打刻種類,実績への反映内容, 打刻場所情報)
+		Stamp stamp = new Stamp(contractCode, new StampNumber(stampResult.getCardNumber()), stampDateTime, relieve,
+				stamptype, refActualResults, stampLocationInfor);
 		
-		// $永続化処理 = 打刻データ反映処理#打刻を登録する(require, $打刻記録, $打刻データ)
-		AtomTask atom = RegisterStampData.registerStamp(require, stampRecord, Optional.of(stamp)).orElse(AtomTask.none());
+		//$打刻の永続化 = 打刻を登録する#打刻を登録する(require, $打刻データ)
+		AtomTask atom = RegisterStampData.registerStamp(require, stamp).orElse(AtomTask.none());
 		
-		// $打刻反映結果 = データタイムレコードを打刻に変換する#日別実績を処理する(require, 会社ID, 社員ID, $永続化処理)
+		//$打刻反映結果 = DS_打刻を日別実績へ反映する.反映する(require, 会社ID, $打刻の永続化)
 //		Optional<StampDataReflectResult> reflectResult = ConvertTimeRecordStampService.createDailyData(require,
 //				Optional.of(cid), Optional.of(employeeId), Optional.of(stamp), atom);
 		Optional<StampDataReflectResult> stampDataResultOpt = ReflectStampInDailyRecord.reflect(require, stamp);

@@ -475,7 +475,7 @@ public class JpaTempAbsItem extends JpaRepository implements TempAbsItemReposito
 	@Override
 	public void updateAll(List<TempAbsenceHisItem> domains) {
 		String SQL = "UPDATE BSYMT_TEMP_ABS_HIST_ITEM SET UPD_DATE = UPD_DATE_VAL, UPD_CCD = UPD_CCD_VAL, UPD_SCD = UPD_SCD_VAL, UPD_PG = UPD_PG_VAL, TEMP_ABS_FRAME_NO = TEMP_ABS_FRAME_NO_VAL, ";
-		String _WHERE =" WHERE HIST_ID = HIST_ID_VAL AND SID = SID_VAL ";
+		String _WHERE =" WHERE HIST_ID = HIST_ID_VAL AND SID = SID_VAL ;";
 		String updCcd = AppContexts.user().companyCode();
 		String updScd = AppContexts.user().employeeCode();
 		String updPg =  AppContexts.programId();

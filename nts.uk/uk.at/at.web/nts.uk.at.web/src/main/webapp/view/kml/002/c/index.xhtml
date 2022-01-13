@@ -28,8 +28,10 @@
             class="proceed"
             data-bind="text: $i18n('KML002_9'), click: registerSchedulePersonalInfor"
           />
+
+          <button tabindex="3" class="normal" data-bind="text: $i18n('KML002_158'), click: openDialogScreenH"/>
           <div class="pull-right" >
-            <div tabindex="3" data-bind="ntsFunctionPanel: {width: 200, headerText: $i18n('KML002_10'), dataSource: functionItems}"></div> 
+            <div tabindex="4" data-bind="ntsFunctionPanel: {width: 200, headerText: $i18n('KML002_10'), dataSource: functionItems}"></div> 
           </div>
         </div>
         <div id="contents-area" class="kml-002-c">
@@ -98,7 +100,8 @@
                       options: switchOptions,
                       optionsValue: 'code',
                       optionsText: 'name',
-                      value: estimatedAnnualSalary
+                      value: estimatedAnnualSalary,
+                      enable: false
                     }"
                     ></div>
                   </td>
@@ -117,7 +120,8 @@
                       options: switchOptions,
                       optionsValue: 'code',
                       optionsText: 'name',
-                      value: comparisonStandardWorkingHours
+                      value: comparisonStandardWorkingHours,
+                      enable: false
                     }"
                     ></div>
                   </td>
@@ -155,7 +159,8 @@
                       options: switchOptions,
                       optionsValue: 'code',
                       optionsText: 'name',
-                      value: nightShiftTime
+                      value: nightShiftTime,
+                      enable: false
                     }"
                     ></div>
                   </td>
@@ -174,7 +179,8 @@
                       options: switchOptions,
                       optionsValue: 'code',
                       optionsText: 'name',
-                      value: weeklyHolidayDays
+                      value: weeklyHolidayDays,
+                      enable: false
                     }"
                     ></div>
                   </td>

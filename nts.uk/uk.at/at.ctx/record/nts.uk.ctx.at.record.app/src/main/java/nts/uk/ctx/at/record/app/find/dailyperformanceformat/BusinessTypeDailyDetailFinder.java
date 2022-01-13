@@ -39,6 +39,18 @@ public class BusinessTypeDailyDetailFinder {
 
 //	@Inject
 //	private CompanyDailyItemService companyDailyItemService;
+	
+	public List<String> getAllBusinessCode() {
+		
+		String companyId = AppContexts.user().companyId();
+		
+		List<String> listBusinessCode = workTypeFormatDailyRepository.getBusinessTypeFormatByCompanyId(companyId).stream()
+							.map(e -> e.getBusinessTypeCode().v())
+							.distinct()
+							.collect(Collectors.toList());
+		
+		return listBusinessCode;
+	}
 
 	public BusinessTypeFormatDailyDto getDetail(String businessTypeCode, BigDecimal sheetNo) {
 		LoginUserContext login = AppContexts.user();
@@ -80,5 +92,17 @@ public class BusinessTypeDailyDetailFinder {
 				businessFormatSheet.isPresent() ? businessFormatSheet.get().getSheetName() : null,
 				businessTypeFormatDetailDtos);
 		return businessTypeFormatDailyDto;
+	}
+	
+	public int checkDailyMode(String businessTypeCode) {
+		
+		String companyId = AppContexts.user().companyId();
+		List<BusinessTypeFormatDaily> listBusinessTypeFormatDaily = workTypeFormatDailyRepository.getBusinessTypeFormatDailyDetail(companyId, businessTypeCode);
+		
+		if (listBusinessTypeFormatDaily.isEmpty()) {
+			return 0;
+		}
+		
+		return 1;
 	}
 }

@@ -1,15 +1,29 @@
-module nts.uk.com.view.cas011.a.viewmodel {
+/// <reference path="../../../../lib/nittsu/viewcontext.d.ts" />
+module nts.uk.com.view.cas011.a {
     import block = nts.uk.ui.block;
     import errors = nts.uk.ui.errors;
     import dialog = nts.uk.ui.dialog;
     import windows = nts.uk.ui.windows;
     import resource = nts.uk.resource;
     import NtsGridListColumn = nts.uk.ui.NtsGridListColumn;
-
-    export class ScreenModel {
+    import isNullOrUndefined = nts.uk.util.isNullOrUndefined;
+    import isNullOrEmpty = nts.uk.util.isNullOrEmpty;
+    var format = nts.uk.text.format;
+    const API = {
+        getDtaInit: "screen/com/cas011/get-data-init",
+        getRoleSetByRoleSetCd: "screen/com/cas011/get-detail-role-set/{0}",
+        getCompanyIdOfLoginUser: "ctx/sys/auth/roleset/companyidofloginuser",
+        addRoleSet: "screen/sys/auth/cas011/addroleset",
+        updateRoleSet: "screen/sys/auth/cas011/updateroleset",
+        removeRoleSet: "screen/sys/auth/cas011/deleteroleset",
+    };
+    @bean()
+    class ViewModel extends ko.ViewModel {
         langId: KnockoutObservable<string> = ko.observable('ja');
-        //list of Role Set
         listRoleSets: KnockoutObservableArray<IRoleSet> = ko.observableArray([]);
+        dataA41: KnockoutObservableArray<any> = ko.observableArray([]);
+        dataA51: KnockoutObservableArray<any> = ko.observableArray([]);
+
         listWebMenus: KnockoutObservableArray<IWebMenu> = ko.observableArray([]);
         listAllWebMenus: Array<IWebMenu> = [];
         listCurrentRoleIds: Array<string> = [];
@@ -17,268 +31,318 @@ module nts.uk.com.view.cas011.a.viewmodel {
             companyId: ''
             , roleSetCd: ''
             , roleSetName: ''
-            , salaryRoleId: ''
-            , myNumberRoleId: ''
             , personInfRoleId: ''
             , employmentRoleId: ''
-            , officeHelperRoleId: ''
-            , approvalAuthority: true
-            , humanResourceRoleId: ''
             , webMenus: []
+            , defaultRoleSet:false
         }));
-
         selectedRoleSetCd: KnockoutObservable<string> = ko.observable('');
-
-        hRRoleName: KnockoutObservable<string>;
-        salaryRoleName: KnockoutObservable<string>;
-        myNumberRoleName: KnockoutObservable<string>;
-        personInfRoleName: KnockoutObservable<string>;
-        employmentRoleName: KnockoutObservable<string>;
-        officeHelperRoleName: KnockoutObservable<string>;
-
         isNewMode: KnockoutObservable<boolean>;
+        enableCheckDefault: KnockoutObservable<boolean> = ko.observable(true);
         roleSetCount: KnockoutObservable<number> = ko.observable(0);
-        swApprovalAuthority: KnockoutObservableArray<any>;
         gridColumns: KnockoutObservableArray<NtsGridListColumn>;
         swapColumns: KnockoutObservableArray<NtsGridListColumn>;
 
-        constructor() {
-            let self = this,
-                currentRoleSet: RoleSet = self.currentRoleSet();
-
-            // A2_003, A2_004, A2_005, A2_006 
-            self.gridColumns = ko.observableArray([
-                { headerText: resource.getText('CAS011_9'), key: 'roleSetCd', formatter: _.escape, width: 65 },
-                { headerText: resource.getText('CAS011_10'), key: 'roleSetName', formatter: _.escape, width: 215 }
-            ]);
-
-            self.swapColumns = ko.observableArray([
-                { headerText: resource.getText('CAS011_9'), key: 'webMenuCode', width: 65 },
-                { headerText: resource.getText('CAS011_34'), key: 'webMenuName', width: 135 }
-            ]);
-
-            // ---A3_024, A3_025 
-            self.swApprovalAuthority = ko.observableArray([
-                { code: true, name: resource.getText('CAS011_22') },
-                { code: false, name: resource.getText('CAS011_23') }
-            ]);
-
-            self.hRRoleName = ko.observable(resource.getText('CAS011_23'));
-            self.salaryRoleName = ko.observable(resource.getText('CAS011_23'));
-            self.myNumberRoleName = ko.observable(resource.getText('CAS011_23'));
-            self.personInfRoleName = ko.observable(resource.getText('CAS011_23'));
-            self.employmentRoleName = ko.observable(resource.getText('CAS011_23'));
-            self.officeHelperRoleName = ko.observable(resource.getText('CAS011_23'));
-
-            self.isNewMode = ko.observable(true);
-            /**
-             *Subscribe: 項目変更→項目 
-             */
-            self.selectedRoleSetCd.subscribe(roleSetCd => {
-                errors.clearAll();
-                let listRoleSet = self.listRoleSets();
-                // do not process anything if it is new mode.
-                //if (roleSetCd) {
-                if (roleSetCd && listRoleSet && listRoleSet.length > 0) {
-
-                    let index: number = 0;
-                    if (roleSetCd) {
-                        index = _.findIndex(listRoleSet, function(x: IRoleSet)
-                        { return x.roleSetCd == roleSetCd });
-                        if (index === -1) index = 0;
-                    }
-                    let _roleSet = listRoleSet[index];
-                    if (_roleSet && _roleSet.roleSetCd) {
-
-                        //service.getRoleSetByRoleSetCd(roleSetCd).done ((_roleSet : IRoleSet) => {
-                        //if (_roleSet && _roleSet.roleSetCd) {
-                        self.createCurrentRoleSet(_roleSet);
-                        self.settingUpdateMode(_roleSet.roleSetCd);
-                    } else {
-                        //self.settingCreateMode();
-                        self.initialScreen(null, '');
-                    }
-                    //});
-                    // }
-                } else {
-                    self.createNewCurrentRoleSet();
-                    self.settingCreateMode();
+        defaultRoleSetCode :KnockoutObservable<string> = ko.observable(null);
+        constructor(params: any) {
+            super();
+            const vm = this;
+            const currentRoleSet: RoleSet = vm.currentRoleSet();
+            // A2_003, A2_004, A2_005, A2_006
+            vm.gridColumns = ko.observableArray([
+                {headerText: resource.getText('CAS011_9'), key: 'roleSetCd',
+                    headerCssClass: 'text-right',columnCssClass: 'text-center',formatter: _.escape, width: 50},
+                {headerText: resource.getText('CAS011_10'), key: 'roleSetName',
+                    headerCssClass: 'text-right',columnCssClass: 'text-center',formatter: _.escape, width: 230},
+                {
+                    headerText: resource.getText('CAS011_44'), key: 'check', width: 25,
+                    template: '{{if ${check} == 1 }}<div class="cssDiv"><i  class="icon icon icon-78 cssI"></i></div>{{/if}}'
                 }
-            });
-        }
+            ]);
+            vm.swapColumns = ko.observableArray([
+                {headerText: resource.getText('CAS011_9'), key: 'webMenuCode', width: 65},
+                {headerText: resource.getText('CAS011_34'), key: 'webMenuName', width: 135}
+            ]);
+            vm.isNewMode = ko.observable(true);
 
-        /**
-         * 開始
-         **/
-        start(): JQueryPromise<any> {
-            let self = this,
-                dfd = $.Deferred(),
-                listRoleSets = self.listRoleSets,
-                currentRoleSet: RoleSet = self.currentRoleSet();
-
-            /**
-             *実行時情報をチェックする- check runtime
-             */
-            service.getCompanyIdOfLoginUser().done((companyId: any) => {
+            let dfd = $.Deferred(),
+                listRoleSets = vm.listRoleSets;
+            vm.$ajax('com', API.getCompanyIdOfLoginUser).done((companyId: any) => {
                 if (!companyId) {
-                    self.backToTopPage();
+                    vm.backToTopPage();
                     dfd.resolve();
                 } else {
                     // initial screen
-                    self.initialScreen(dfd, '');
+                    vm.initialScreen(dfd, '');
                 }
             }).fail(error => {
-                self.backToTopPage();
+                vm.backToTopPage();
                 dfd.resolve();
             });
-
-            return dfd.promise();
         }
+        getDetail(roleSetCd: string){
+            let vm = this,
+                dfd = $.Deferred();
+                errors.clearAll();
+                let listRoleSet = vm.listRoleSets();
+                block.invisible();
+                if (roleSetCd && listRoleSet && listRoleSet.length > 0) {
+                    var _path = format(API.getRoleSetByRoleSetCd, roleSetCd);
+                    vm.$ajax('com',_path).done((data)=>{
+                        if(!isNullOrUndefined(data)){
+                            vm.enableCheckDefault(true);
+                            let roleSetDtos :IRoleSet = data.roleSetDtos;
+                            let defaultRoleSet = data.defaultRoleSet;
+                            let linkWebMenuImportList: any[] = data.linkWebMenuImportList;
+                            let listWebMenuValue : IWebMenu[] = [];
+                            let _roleSet = roleSetDtos;
+                            if (_roleSet && _roleSet.roleSetCd) {
+                                vm.settingUpdateMode(_roleSet.roleSetCd);
+                                if(!isNullOrUndefined(defaultRoleSet) &&_roleSet.roleSetCd == defaultRoleSet.roleSetCd){
+                                    _roleSet.defaultRoleSet = true;
+                                    _roleSet.check = 1;
+                                    vm.defaultRoleSetCode(defaultRoleSet.roleSetCd);
+                                }else {
+                                    _roleSet.defaultRoleSet = false;
+                                }
+                                vm.createCurrentRoleSet(_roleSet);
+                                if(linkWebMenuImportList && linkWebMenuImportList.length>=0){
+                                    for (let i =0; i< linkWebMenuImportList.length; i++ ){
+                                        let item = linkWebMenuImportList[i];
+                                        let code = item.webMenuCd;
+                                        let itemName =  _.find(vm.listAllWebMenus,(e)=>(e.webMenuCode ==code));
+                                        if(!isNullOrUndefined(itemName)){
+                                            listWebMenuValue.push({
+                                                webMenuCode: code,
+                                                webMenuName: itemName.webMenuName
+                                            })
+                                        }
+                                    }
+                                }
+                                vm.currentRoleSet().webMenus(listWebMenuValue);
+                            } else {
+                                vm.initialScreen(null, '');
+                            }
+                        }
+                    }).fail(error => {
+                        vm.backToTopPage();
+                        dfd.resolve();
+                    }).always(()=>{
+                        block.clear();
+                    });
 
-        /**
-         * back to top page - トップページに戻る
-         */
-        backToTopPage() {
-            windows.sub.modeless("/view/ccg/008/a/index.xhtml");
+                } else {
+                    vm.settingCreateMode();
+                }
         }
+        created(params: any) {
+            let vm = this;
 
-        /**
-         * Initial screen
-         * - アルゴリズム「ロールセットをすべて取得する」を実行する - Execute the algorithm Get all Roll Set
-         * - 先頭のロールセットを選択する - Select the first roll set
-         * - 画面を新規モードで起動する - Start screen in new mode
-         */
+        }
+        mounted() {
+            const vm = this;
+            vm.selectedRoleSetCd.subscribe((roleSetCd) => {
+                vm.getDetail(roleSetCd)
+            });
+
+        }
         initialScreen(deferred: any, roleSetCd: string) {
-            let self = this,
-                currentRoleSet: RoleSet = self.currentRoleSet(),
-                listRoleSets = self.listRoleSets;
-
+            let vm = this,
+                currentRoleSet: RoleSet = vm.currentRoleSet(),
+                listRoleSets = vm.listRoleSets,
+                dataA41 : any[]= [],
+                dataA51 : any[]= []
+            ;
             listRoleSets.removeAll();
             errors.clearAll();
             // initial screen
-            self.getAllWebMenus();
+            block.invisible();
+            vm.$ajax('com', API.getDtaInit).done((data)=>{
+                if(data){
+                    let itemList : IRoleSet[] = data.roleDefaultDto.roleSetDtos;
+                    let listWebMenu = data.webMenuSimpleDtos;
+                    let defaultRoleSet = data.roleDefaultDto.defaultRoleSet;
 
-            service.getAllRoleSet().done((itemList: Array<IRoleSet>) => {
-                // in case number of RoleSet is greater then 0
-                if (itemList && itemList.length > 0) {
-                    listRoleSets(itemList);
-                    /**
-                     * 先頭のロールセットを選択する
-                     */
-                    self.roleSetCount(itemList.length);
-                    let index: number = 0;
-                    if (roleSetCd) {
-                        index = _.findIndex(listRoleSets(), function(x: IRoleSet)
-                        { return x.roleSetCd == roleSetCd });
-                        if (index === -1) index = 0;
+                    let employmentRole  = data.rolesEmployment;
+                    let personRole  = data.rolesPersonalInfo;
+                    if(!isNullOrUndefined(employmentRole)){
+                        dataA41.push({id : null, code : null, display : ''});
+                        for (let i = 0; i< employmentRole.length; i ++){
+                            let item = employmentRole[i];
+                            let display = item.roleCode + " " + item.name;
+                            dataA41.push({id : item.roleId, code : item.roleCode, display : display})
+                        }
+                        vm.dataA41(dataA41);
                     }
-                    let _roleSet = listRoleSets()[index];
-                    self.createCurrentRoleSet(_roleSet);
-                    self.settingUpdateMode(_roleSet.roleSetCd);
-                } else { //in case number of RoleSet is zero
-                    /**
-                     * 画面を新規モードで起動する
-                     */
-                    self.createNewCurrentRoleSet();
-                    self.settingCreateMode();
+                    if(!isNullOrUndefined(personRole)){
+                        dataA51.push({id : null, code : null, display : ''});
+                        for (let i = 0; i< personRole.length; i ++){
+                            let item = personRole[i];
+                            let display = item.roleCode + " " + item.name;
+                            dataA51.push({id : item.roleId, code : item.roleCode, display : display})
+                        }
+                        vm.dataA51(dataA51);
+                    }
+                    if (listWebMenu && listWebMenu.length > 0) {
+                        vm.listAllWebMenus = listWebMenu;
+                    }
+                    if (itemList && itemList.length > 0) {
+                        if(!isNullOrUndefined(defaultRoleSet)){
+                            vm.defaultRoleSetCode(defaultRoleSet.roleSetCd);
+                            for (let i = 0; i< itemList.length; i ++){
+                                let item = itemList[i];
+                                if(item.roleSetCd == defaultRoleSet.roleSetCd){
+                                    item.defaultRoleSet = true;
+                                    item.check = 1;
+                                }else {
+                                    item.defaultRoleSet = false;
+                                }
+                            }
+                        }
+                        vm.listRoleSets(itemList);
+                        vm.roleSetCount(itemList.length);
+                        let index: number = 0;
+                        if (roleSetCd) {
+                            index = _.findIndex(listRoleSets(), function (x: IRoleSet) {
+
+                                return x.roleSetCd == roleSetCd
+                            });
+                            if (index === -1) index = 0;
+                        }
+                        let _roleSet = listRoleSets()[index];
+                        //vm.createCurrentRoleSet(_roleSet);
+                        vm.settingUpdateMode(_roleSet.roleSetCd);
+                    } else { //in case number of RoleSet is zero
+
+                        vm.createMode();
+                    }
+                }else {
+
+                    vm.createMode();
                 }
-            }).fail(error => {
-                /**
-                 * 画面を新規モードで起動する
-                 */
-                self.createNewCurrentRoleSet();
-                self.settingCreateMode();
-            }).always(() => {
-                self.roleSetCount(self.listRoleSets().length);
                 if (deferred) {
                     deferred.resolve();
                 }
+            }).fail((error) => {
+                dialog.alertError({messageId: error.messageId}).then(()=>{
+                vm.backToTopPage();
+                });
+                deferred.reject();
+            }).always(() => {
+                vm.roleSetCount(vm.listRoleSets().length);
+                vm.setFocus();
+                block.clear();
             });
         }
-
-        /**
-         * Save
-         */
+        backToTopPage() {
+            nts.uk.request.jump("/view/ccg/008/a/index.xhtml");
+        }
         saveRoleSet() {
-            let self = this,
-                currentRoleSet: RoleSet = self.currentRoleSet();
+            let vm = this,
+                currentRoleSet: RoleSet = vm.currentRoleSet();
             $('.nts-input').trigger("validate");
+
+            if(currentRoleSet.employmentRoleId() == null ||currentRoleSet.employmentRoleId() == ""){
+                $('#employmentRoleId').ntsError('set', { messageId: "Msg_218", messageParams:[resource.getText('CAS011_14')]});
+                $('#employmentRoleId').focus();
+            }
+
+            if(currentRoleSet.personInfRoleId() == null || currentRoleSet.personInfRoleId() == ""){
+                $('#personInfRoleId').ntsError('set', { messageId: "Msg_218", messageParams:[resource.getText('CAS011_18')]});
+                $('#personInfRoleId').focus();
+            }
             if (errors.hasError() === false) {
                 block.invisible();
-                if (self.isNewMode()) {
+                if (vm.isNewMode()) {
                     // create new role set
-                    service.addRoleSet(ko.toJS(currentRoleSet)).done((roleSetCd) => {
-                        dialog.info({ messageId: "Msg_15" });
-                        // refresh - initial screen
-                        self.initialScreen(null, currentRoleSet.roleSetCd());
-                    }).fail(function(error) {
+                    vm.$ajax('com', API.addRoleSet, ko.toJS(currentRoleSet)).done((roleSetCd) => {
+                        dialog.info({messageId: "Msg_15"}).then(()=>
+                            {
+                                vm.initialScreen(null, currentRoleSet.roleSetCd());
+                            }
+                        );
+                    }).fail(function (error) {
 
                         if (error.messageId == 'Msg_583') {
-                            dialog.alertError({ messageId: error.messageId, messageParams: ["メニュー"] });
+                            dialog.alertError({messageId: error.messageId, messageParams: ["メニュー"]});
                         } else {
                             if (error.messageId == 'Msg_3') {
                                 $('#inpRoleSetCd').ntsError('set', error);
                                 $('#inpRoleSetCd').focus();
                             }
-                            dialog.alertError({ messageId: error.messageId });
+                            dialog.alertError({messageId: error.messageId});
                         }
-                    }).always(function() {
+                    }).always(function () {
                         block.clear();
                     });
                 } else {
                     // update
-                    service.updateRoleSet(ko.toJS(currentRoleSet)).done((roleSetCd) => {
-                        dialog.info({ messageId: "Msg_15" });
-                        // refresh - initial screen
-                        self.initialScreen(null, currentRoleSet.roleSetCd());
-
-                    }).fail(function(error) {
-                        if (error.messageId == 'Msg_583') {
-                            dialog.alertError({ messageId: error.messageId, messageParams: ["メニュー"] });
-                        } else {
-                            dialog.alertError({ messageId: error.messageId });
+                    if(vm.defaultRoleSetCode() == currentRoleSet.roleSetCd() ){
+                        if(currentRoleSet.defaultRoleSet() == false){
+                            dialog.alertError({messageId: "Msg_2200"}).then(()=>{
+                                $('#defaultRoleSet').focus();
+                                block.clear();
+                            });
+                        }else {
+                            vm.update(currentRoleSet)
                         }
-                    }).always(function() {
-                        block.clear();
-                    });
+                    }else {
+                        vm.update(currentRoleSet)
+                    }
                 }
             }
         }
+        update(currentRoleSet:any){
+            let vm = this;
+            vm.$ajax('com', API.updateRoleSet, ko.toJS(currentRoleSet)).done((roleSetCd) => {
+                dialog.info({messageId: "Msg_15"}).then(()=>{
+                    if(currentRoleSet.defaultRoleSet() == true){
+                        vm.defaultRoleSetCode(currentRoleSet.roleSetCd)
+                    }
+                    // refresh - initial screen
+                    vm.initialScreen(null, currentRoleSet.roleSetCd());
 
-        /**
-         * delete the role set
-         */
+                });
+
+            }).fail(function (error) {
+                if (error.messageId == 'Msg_583') {
+                    dialog.alertError({messageId: error.messageId, messageParams: ["メニュー"]});
+                } else {
+                    dialog.alertError({messageId: error.messageId});
+                }
+            }).always(function () {
+                block.clear();
+            });
+        }
         deleteRoleSet() {
-            let self = this,
-                listRoleSets = self.listRoleSets,
-                currentRoleSet: RoleSet = self.currentRoleSet();
+            let vm = this,
+                listRoleSets = vm.listRoleSets,
+                currentRoleSet: RoleSet = vm.currentRoleSet();
             block.invisible();
-            /**
-             * 確認メッセージ（Msg_18）を表示する
-             */
-            dialog.confirmDanger({ messageId: "Msg_18" }).ifYes(() => {
+            dialog.confirmDanger({messageId: "Msg_18"}).ifYes(() => {
                 if (currentRoleSet.roleSetCd()) {
-                    var object: any = { roleSetCd: currentRoleSet.roleSetCd() };
-                    service.removeRoleSet(ko.toJS(object)).done(function() {
-                        dialog.info({ messageId: "Msg_16" });
+                    var object: any = {roleSetCd: currentRoleSet.roleSetCd()};
+                    vm.$ajax('com', API.removeRoleSet, ko.toJS(object)).done(function () {
+                        dialog.info({messageId: "Msg_16"});
                         //select next Role Set
-                        let index: number = _.findIndex(listRoleSets(), function(x: IRoleSet)
-                        { return x.roleSetCd == currentRoleSet.roleSetCd() });
+                        let index: number = _.findIndex(listRoleSets(), function (x: IRoleSet) {
+                            return x.roleSetCd == currentRoleSet.roleSetCd()
+                        });
                         // remove the deleted item out of list
                         if (index > -1) {
-                            self.listRoleSets.splice(index, 1);
+                            vm.listRoleSets.splice(index, 1);
                             if (index >= listRoleSets().length) {
                                 index = listRoleSets().length - 1;
                             }
                             if (listRoleSets().length > 0) {
-                                self.settingUpdateMode(listRoleSets()[index].roleSetCd);
+                                vm.settingUpdateMode(listRoleSets()[index].roleSetCd);
                             } else {
-                                self.settingCreateMode();
+                                vm.settingCreateMode();
                             }
                         }
-                    }).fail(function(error) {
-                        dialog.alertError({ messageId: error.messageId });
-                    }).always(function() {
+                    }).fail(function (error) {
+                        dialog.alertError({messageId: error.messageId});
+                    }).always(function () {
                         block.clear();
                     });
                 } else {
@@ -286,388 +350,155 @@ module nts.uk.com.view.cas011.a.viewmodel {
                 }
             }).then(() => {
                 block.clear();
-            });;
+            });
+            ;
         }
-
-        /**
-         * setting focus base on screen mode
-         */
         setFocus() {
-            let self = this;
-            if (self.isNewMode()) {
+            let vm = this;
+            if (vm.isNewMode()) {
                 $('#inpRoleSetCd').focus();
             } else {
                 $('#inpRoleSetName').focus();
             }
             errors.clearAll();
         }
-
-        /** ダイアログ
-          * Open dialog CLD025 
-         */
-        openDialogCLD025(roleType: number, roleId: String) {
-            let self = this,
-                currentRoleSet: RoleSet = self.currentRoleSet();
-            if (!roleType && roleType < 0) {
-                return;
-            }
-            block.invisible();
-            let param = {
-                roleType: roleType,
-                multiple: false,
-                currentCode: roleId,
-                roleAtr: 1
-            };
-            windows.setShared('paramCdl025', param);
-            windows.sub.modal('/view/cdl/025/index.xhtml', { title: '' }).onClosed(function(): any {
-                //get data from share window
-                var roleId = windows.getShared('dataCdl025');
-                if (roleId != undefined) {
-                    self.setRoleId(roleType, roleId);
-                }
-                self.setFocusAfterSelectRole(roleType);
-                block.clear();
-            });
-        }
-
-        /**
-         * ダイアログ - Open dialog C
-         * 「設定」ボタンをクリック - Click "Setting" button
-        */
-        openDialogSettingC() {
-            let self = this;
-            block.invisible();
-            let dialogTile = resource.getText('CAS011_3');
-            windows.sub.modal('/view/cas/011/c/index.xhtml',
-                { title: dialogTile }).onClosed(function(): any {
-                    block.clear();
-                    $('#inpRoleSetCd').focus();
-                });
-        }
-
-        /**
-         * create a new Role Set
-         * 画面を新規モードで起動する
-         */
         settingCreateMode() {
-            let self = this,
-                currentRoleSet: RoleSet = self.currentRoleSet();
+            block.invisible();
+            let vm = this,
+
+                currentRoleSet: RoleSet = vm.currentRoleSet();
             // clear selected role set
-            self.selectedRoleSetCd('');
+            vm.createNewCurrentRoleSet();
+            vm.selectedRoleSetCd('');
             // Set new mode
-            self.isNewMode(true);
-
+            vm.isNewMode(true);
             //focus
-            self.setFocus();
+            vm.setFocus();
+            block.clear();
         }
-
-        /**
-         * Setting selected role set.
-        */
-        settingUpdateMode(selectedRoleSetCd) {
-            let self = this,
-                currentRoleSet: RoleSet = self.currentRoleSet();
-            self.selectedRoleSetCd(selectedRoleSetCd);
+        createMode() {
+            let vm = this,
+                currentRoleSet: RoleSet = vm.currentRoleSet();
+            // clear selected role set
+            vm.createNewRoleSet();
+            vm.selectedRoleSetCd('');
+            // Set new mode
+            vm.isNewMode(true);
+            vm.enableCheckDefault(false);
+            //focus
+            vm.setFocus();
+        }
+        settingUpdateMode(selectedRoleSetCd: any) {
+            let vm = this;
+            vm.selectedRoleSetCd(selectedRoleSetCd);
             if (selectedRoleSetCd) {
                 //Setting update mode
-                self.isNewMode(false);
+                vm.isNewMode(false);
                 //focus
-                self.setFocus();
+                vm.setFocus();
             }
         }
-
-        /**
-         * BindNoData to currentRoleSet
-         */
         createNewCurrentRoleSet() {
-            let self = this,
-                currentRoleSet: RoleSet = self.currentRoleSet();
+            let vm = this,
+                currentRoleSet: RoleSet = vm.currentRoleSet();
             if (currentRoleSet.roleSetCd() === '') {
                 return;
             }
-            currentRoleSet.roleSetCd('');
-            currentRoleSet.roleSetName('');
-            currentRoleSet.salaryRoleId('');
-            currentRoleSet.myNumberRoleId('');
-            currentRoleSet.personInfRoleId('');
-            currentRoleSet.employmentRoleId('');
-            currentRoleSet.approvalAuthority(true);
-            currentRoleSet.officeHelperRoleId('');
-            currentRoleSet.humanResourceRoleId('');
+            if(!isNullOrEmpty(vm.dataA51()) && vm.dataA51().length >2 ){
+                currentRoleSet.personInfRoleId(vm.dataA51()[1].id);
+            }else {
+                currentRoleSet.personInfRoleId(null);
+            }
+            if(!isNullOrEmpty(vm.dataA41()) && vm.dataA41().length>2 ){
+                currentRoleSet.employmentRoleId(vm.dataA41()[1].id);
 
+            }else {
+                currentRoleSet.employmentRoleId(null);
+            }
+            currentRoleSet.roleSetCd(null);
+            currentRoleSet.roleSetName(null);
+            currentRoleSet.defaultRoleSet(false);
             currentRoleSet.webMenus([]);
             // build swap web menu
-            self.buildSwapWebMenu();
+            vm.buildSwapWebMenu();
+            vm.listCurrentRoleIds = [];
 
-            //build role Name
-            self.listCurrentRoleIds = [];
-            self.buildRoleName();
         }
-        /**
-         * BindData to currentRoleSet
-         * @param _roleSet
-         */
+        createNewRoleSet() {
+
+            let vm = this,
+                currentRoleSet: RoleSet = vm.currentRoleSet();
+            if(!isNullOrEmpty(vm.dataA51()) && vm.dataA51().length >2){
+
+                currentRoleSet.personInfRoleId(vm.dataA51()[1].id);
+            }else {
+                currentRoleSet.personInfRoleId(null);
+            }
+            if(!isNullOrEmpty(vm.dataA41()) && vm.dataA41().length >2){
+
+                currentRoleSet.employmentRoleId(vm.dataA41()[1].id);
+            }else {
+                currentRoleSet.employmentRoleId(null);
+            }
+            currentRoleSet.roleSetCd(null);
+            currentRoleSet.roleSetName(null);
+
+            currentRoleSet.defaultRoleSet(true);
+            currentRoleSet.webMenus([]);
+            // build swap web menu
+            vm.buildSwapWebMenu();
+            vm.listCurrentRoleIds = [];
+            block.clear();
+
+        }
         createCurrentRoleSet(_roleSet: IRoleSet) {
-            let self = this,
-                currentRoleSet: RoleSet = self.currentRoleSet();
+            let vm = this,
+                currentRoleSet: RoleSet = vm.currentRoleSet();
             if (currentRoleSet.roleSetCd() === _roleSet.roleSetCd) {
                 return;
             }
             currentRoleSet.companyId(_roleSet.companyId);
             currentRoleSet.roleSetCd(_roleSet.roleSetCd);
             currentRoleSet.roleSetName(_roleSet.roleSetName);
-            currentRoleSet.salaryRoleId(_roleSet.salaryRoleId);
-            currentRoleSet.myNumberRoleId(_roleSet.myNumberRoleId);
             currentRoleSet.personInfRoleId(_roleSet.personInfRoleId);
             currentRoleSet.employmentRoleId(_roleSet.employmentRoleId);
-            currentRoleSet.approvalAuthority(_roleSet.approvalAuthority);
-            currentRoleSet.officeHelperRoleId(_roleSet.officeHelperRoleId);
-            currentRoleSet.humanResourceRoleId(_roleSet.humanResourceRoleId);
+            currentRoleSet.defaultRoleSet(_roleSet.defaultRoleSet);
             currentRoleSet.webMenus(_roleSet.webMenus || []);
 
-            // build swap web menu
-            self.buildSwapWebMenu();
-
-            //build role Name
-            self.listCurrentRoleIds = [];
-            self.listCurrentRoleIds.push(_roleSet.salaryRoleId);
-            self.listCurrentRoleIds.push(_roleSet.myNumberRoleId);
-            self.listCurrentRoleIds.push(_roleSet.personInfRoleId);
-            self.listCurrentRoleIds.push(_roleSet.employmentRoleId);
-            self.listCurrentRoleIds.push(_roleSet.officeHelperRoleId);
-            self.listCurrentRoleIds.push(_roleSet.humanResourceRoleId);
-            self.listCurrentRoleIds = self.listCurrentRoleIds.filter(function(roleid) {
-                return roleid ? true : false;
-            });
-            self.buildRoleName();
+            vm.buildSwapWebMenu();
         }
 
-        /**
-         * build swap web menu
-         */
         buildSwapWebMenu() {
-            let self = this,
-                currentRoleSet: RoleSet = self.currentRoleSet();
+            let vm = this,
+                currentRoleSet: RoleSet = vm.currentRoleSet();
 
-            self.listWebMenus.removeAll();
-            if (self.listAllWebMenus && self.listAllWebMenus.length > 0) {
-                self.listWebMenus(self.listAllWebMenus.filter(item1 => !self.isSelectedWebMenu(item1.webMenuCode)));
+            vm.listWebMenus.removeAll();
+            if (vm.listAllWebMenus && vm.listAllWebMenus.length > 0) {
+                vm.listWebMenus(vm.listAllWebMenus.filter(item1 => !vm.isSelectedWebMenu(item1.webMenuCode)));
                 // get Web Menu Name for Web menu
-                let listWebMenuRight = self.listAllWebMenus.filter(item1 => self.isSelectedWebMenu(item1.webMenuCode));
+                let listWebMenuRight = vm.listAllWebMenus.filter(item1 => vm.isSelectedWebMenu(item1.webMenuCode));
                 //currentRoleSet.webMenus.removeAll();
                 currentRoleSet.webMenus(listWebMenuRight);
             }
         }
-
-        /**
-         * build Role name base on list Role id
-         */
-        buildRoleName() {
-            let self = this;
-            self.clearRoleName();
-            if (self.listCurrentRoleIds && self.listCurrentRoleIds.length > 0) {
-                service.getRoleNameByListId(self.listCurrentRoleIds).done((itemList) => {
-                    if (itemList && itemList.length > 0) {
-                        for (var i = 0; i < itemList.length; i++) {
-                            self.setRoleName(itemList[i].roleType, itemList[i].name);
-                        }
-                    }
-                });
-            }
-        }
-
-        clearRoleName() {
-            let self = this;
-            let emName = resource.getText('CAS011_23');
-            self.employmentRoleName(emName);
-            self.hRRoleName(emName);
-            self.salaryRoleName(emName);
-            self.personInfRoleName(emName);
-            self.myNumberRoleName(emName);
-            self.officeHelperRoleName(emName);
-        }
-        /**
-         * Execute get all web menu.
-         */
-        getAllWebMenus() {
-            let self = this;
-            service.getAllWebMenu().done((itemList: Array<IWebMenu>) => {
-                if (itemList && itemList.length > 0) {
-                    self.listAllWebMenus = itemList;
-                }
-            }).fail(function(error) {
-            });
-        }
-        /**
-         * Check and return true if the Web menu code existed in current selected web menu list.
-         * 
-         */
-        isSelectedWebMenu = function(_webMenuCode: string): boolean {
-            let self = this,
+        isSelectedWebMenu = function (_webMenuCode: string): boolean {
+            let vm = this,
                 currentRoleSet: RoleSet = this.currentRoleSet();
 
             if (!_webMenuCode || !currentRoleSet
                 || !currentRoleSet.webMenus() || currentRoleSet.webMenus().length === 0) {
                 return false;
             }
-            let index: number = _.findIndex(currentRoleSet.webMenus(), function(x: IWebMenu) { return x.webMenuCode === _webMenuCode });
+            let index: number = _.findIndex(currentRoleSet.webMenus(), function (x: IWebMenu) {
+                return x.webMenuCode === _webMenuCode
+            });
             return (index > -1);
         }
 
-        /**
-         * Build RoleName by Role Id
-         * @param roleId
-         */
-        settingRoleNameByRoleId(roleType: number, roleId: string): JQueryPromise<any> {
-            let self = this,
-                dfd = $.Deferred();
-            if (!roleId) {
-                //self.setRoleName(roleType, resource.getText('CAS011_23'));
-                dfd.resolve(resource.getText('CAS011_23'));
-                return dfd.promise();
-            }
-
-            service.getRoleById(roleId).done((item) => {
-                if (item) {
-                    //self.setRoleName(roleType, item.name);
-                    dfd.resolve(item.name);
-                } else {
-                    //reset
-                    //self.setRoleId(roleType, '');
-                    dfd.resolve(resource.getText('CAS011_23'));
-                }
-
-            }).fail(function(error) {
-                //reset
-                //self.setRoleId(roleType, '');
-                dfd.resolve(resource.getText('CAS011_23'));
-            });
-
-            return dfd.promise();
-        }
-
-        /**
-         * Set role type data
-         */
-        setRoleId(roleType: number, roleId: string) {
-            let self = this,
-                currentRoleSet: RoleSet = self.currentRoleSet();
-            switch (roleType) {
-                case ROLE_TYPE.EMPLOYMENT: // A3_6
-                    currentRoleSet.employmentRoleId(roleId);
-                    self.settingRoleNameByRoleId(ROLE_TYPE.EMPLOYMENT, roleId).done((name) => {
-                        self.setRoleName(ROLE_TYPE.EMPLOYMENT, name);
-                    });
-                    break;
-                case ROLE_TYPE.HR: // A3-9
-                    currentRoleSet.humanResourceRoleId(roleId);
-                    self.settingRoleNameByRoleId(ROLE_TYPE.HR, roleId).done((name) => {
-                        self.setRoleName(ROLE_TYPE.HR, name);
-                    });
-                    break;
-                case ROLE_TYPE.SALARY: //A3-12
-                    currentRoleSet.salaryRoleId(roleId);
-                    self.settingRoleNameByRoleId(ROLE_TYPE.SALARY, roleId).done((name) => {
-                        self.setRoleName(ROLE_TYPE.SALARY, name);
-                    });
-                    break;
-                case ROLE_TYPE.PERSON_INF: //A3-15
-                    currentRoleSet.personInfRoleId(roleId);
-                    self.settingRoleNameByRoleId(ROLE_TYPE.PERSON_INF, roleId).done((name) => {
-                        self.setRoleName(ROLE_TYPE.PERSON_INF, name);
-                    });
-                    break;
-                case ROLE_TYPE.MY_NUMBER: //A3-18
-                    currentRoleSet.myNumberRoleId(roleId);
-                    self.settingRoleNameByRoleId(ROLE_TYPE.MY_NUMBER, roleId).done((name) => {
-                        self.setRoleName(ROLE_TYPE.MY_NUMBER, name);
-                    });
-                    break;
-                case ROLE_TYPE.OFFICE_HELPER: //A3-21
-                    currentRoleSet.officeHelperRoleId(roleId);
-                    self.settingRoleNameByRoleId(ROLE_TYPE.OFFICE_HELPER, roleId).done((name) => {
-                        self.setRoleName(ROLE_TYPE.OFFICE_HELPER, name);
-                    });
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        /**
-         * setFocusAfterSelectRole
-         */
-        setFocusAfterSelectRole(roleType: number) {
-            switch (roleType) {
-                case ROLE_TYPE.EMPLOYMENT: // A3_6
-                    $('#A3_009').focus();
-                    break;
-                case ROLE_TYPE.HR: // A3-9
-                    $('#A3_012').focus();
-                    break;
-                case ROLE_TYPE.SALARY: //A3-12
-                    $('#A3_015').focus();
-                    break;
-                case ROLE_TYPE.PERSON_INF: //A3-15
-                    $('#A3_018').focus();
-                    break;
-                case ROLE_TYPE.MY_NUMBER: //A3-18
-                    $('#A3_021').focus();
-                    break;
-                case ROLE_TYPE.OFFICE_HELPER: //A3-21
-                    $('#swApprovalAuthority').focus();
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        /**
-         * setRoleName
-         */
-        setRoleName(roleType: number, roleName: string) {
-            let self = this;
-            switch (roleType) {
-                case ROLE_TYPE.EMPLOYMENT: // A3_6
-                    self.employmentRoleName(roleName);
-                    break;
-                case ROLE_TYPE.HR: // A3-9
-                    self.hRRoleName(roleName);
-                    break;
-                case ROLE_TYPE.SALARY: //A3-12
-                    self.salaryRoleName(roleName);
-                    break;
-                case ROLE_TYPE.PERSON_INF: //A3-15
-                    self.personInfRoleName(roleName);
-                    break;
-                case ROLE_TYPE.MY_NUMBER: //A3-18
-                    self.myNumberRoleName(roleName);
-                    break;
-                case ROLE_TYPE.OFFICE_HELPER: //A3-21
-                    self.officeHelperRoleName(roleName);
-                    break;
-                default:
-                    break;
-            }
-        }
-        
-        
-         private exportExcel(): void { 
-            var self = this;
-            nts.uk.ui.block.grayout();
-            let langId = self.langId();
-            service.saveAsExcel(langId).done(function() {
-            }).fail(function(error) {
-                nts.uk.ui.dialog.alertError({ messageId: error.messageId });
-            }).always(function() {
-                nts.uk.ui.block.clear();
-            });
-        }
-        
     }
 
     /**
-     * The enum of ROLE TYPE 
+     * The enum of ROLE TYPE
      */
     export enum ROLE_TYPE {
         EMPLOYMENT = 3,
@@ -689,9 +520,9 @@ module nts.uk.com.view.cas011.a.viewmodel {
         webMenuName: KnockoutObservable<string> = ko.observable('');
 
         constructor(param: IWebMenu) {
-            let self = this;
-            self.webMenuCode(param.webMenuCode || '');
-            self.webMenuName(param.webMenuName || '');
+            let vm = this;
+            vm.webMenuCode(param.webMenuCode || '');
+            vm.webMenuName(param.webMenuName || '');
         }
     }
 
@@ -700,43 +531,36 @@ module nts.uk.com.view.cas011.a.viewmodel {
         companyId: string;
         roleSetCd: string;
         roleSetName: string;
-        salaryRoleId: string;
-        myNumberRoleId: string;
         personInfRoleId: string;
         employmentRoleId: string;
-        approvalAuthority: boolean;
-        officeHelperRoleId: string;
-        humanResourceRoleId: string;
         webMenus: Array<IWebMenu>;
+        defaultRoleSet: boolean;
+        check?: number
+    }
+
+    export interface IRoleSetDto {
+        companyId: string;
+        roleSetCd: string;
+        roleSetName: string;
     }
 
     export class RoleSet {
-        companyId: KnockoutObservable<string> = ko.observable('');
-        roleSetCd: KnockoutObservable<string> = ko.observable('');
-        roleSetName: KnockoutObservable<string> = ko.observable('');
-        salaryRoleId: KnockoutObservable<string> = ko.observable('');
-        myNumberRoleId: KnockoutObservable<string> = ko.observable('');
-        personInfRoleId: KnockoutObservable<string> = ko.observable('');
-        employmentRoleId: KnockoutObservable<string> = ko.observable('');
-        approvalAuthority: KnockoutObservable<boolean> = ko.observable(true);
-        officeHelperRoleId: KnockoutObservable<string> = ko.observable('');
-        humanResourceRoleId: KnockoutObservable<string> = ko.observable('');
+        companyId: KnockoutObservable<string> = ko.observable(null);
+        roleSetCd: KnockoutObservable<string> = ko.observable(null);
+        roleSetName: KnockoutObservable<string> = ko.observable(null);
+        personInfRoleId: KnockoutObservable<string> = ko.observable(null);
+        employmentRoleId: KnockoutObservable<string> = ko.observable(null);
+        defaultRoleSet: KnockoutObservable<boolean> = ko.observable(false);
         webMenus: KnockoutObservableArray<IWebMenu> = ko.observableArray([]);
-
         constructor(param: IRoleSet) {
-            let self = this;
-            self.companyId(param.companyId);
-            self.roleSetCd(param.roleSetCd || '');
-            self.roleSetName(param.roleSetName || '');
-            self.salaryRoleId(param.salaryRoleId || '');
-            self.webMenus(param.webMenus || []);
-            self.myNumberRoleId(param.myNumberRoleId || '');
-            self.personInfRoleId(param.personInfRoleId || '');
-            self.employmentRoleId(param.employmentRoleId || '');
-            self.officeHelperRoleId(param.officeHelperRoleId || '');
-            self.approvalAuthority(param.approvalAuthority || true);
-            self.humanResourceRoleId(param.humanResourceRoleId || '');
+            let vm = this;
+            vm.companyId(param.companyId);
+            vm.roleSetCd(param.roleSetCd || null);
+            vm.roleSetName(param.roleSetName || null);
+            vm.webMenus(param.webMenus || []);
+            vm.personInfRoleId(param.personInfRoleId || null);
+            vm.employmentRoleId(param.employmentRoleId || null);
+            vm.defaultRoleSet(param.defaultRoleSet);
         }
     }
 }
-

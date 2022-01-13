@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import nts.uk.shr.infra.file.storage.stream.FileStoragePath;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,8 +74,6 @@ public class ProcessRecoverTable {
 	public static final String SETTING_EXCEPTION = "5";
 	
 	public static final String GET_TABLE_EXCEPTION = "9";
-	
-	private static final String DATA_STORE_PATH = ServerSystemProperties.fileStoragePath();
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessRecoverOneEmpHandle.class);
 	
@@ -789,6 +788,6 @@ public class ProcessRecoverTable {
 	
 	
 	public static String getExtractDataStoragePath(String fileId) {
-		return DATA_STORE_PATH + "//packs//" + fileId;
+		return new FileStoragePath().getPathOfCurrentTenant().toString() + "//packs//" + fileId;
 	}
 }

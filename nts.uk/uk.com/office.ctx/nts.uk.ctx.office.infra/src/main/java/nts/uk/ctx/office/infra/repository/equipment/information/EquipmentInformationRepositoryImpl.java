@@ -29,6 +29,9 @@ public class EquipmentInformationRepositoryImpl extends JpaRepository
 	private static final String FIND_BY_CID_AND_CLS_CODE_AND_DATE = FIND_BY_CID_AND_CLS_CODE
 			+ "AND t.effectiveStartDate <= :date AND t.effectiveEndDate >= :date";
 	
+	private static final String FIND_BY_CLS_CODE = "SELECT t FROM OfidtEquipment t "
+			+ "WHERE t.equipmentClsCode = :clsCode";
+	
 	public OfidtEquipment toEntity(EquipmentInformation domain) {
 		OfidtEquipment entity = new OfidtEquipment();
 		domain.setMemento(entity);
@@ -84,6 +87,12 @@ public class EquipmentInformationRepositoryImpl extends JpaRepository
 				.setParameter("cid", cid).setParameter("clsCode", equipmentClsCode)
 				.setParameter("date", date)
 				.getList(EquipmentInformation::createFromMemento);
+	}
+
+	@Override
+	public List<EquipmentInformation> findByCode(String equipmentClsCode) {
+		return this.queryProxy().query(FIND_BY_CLS_CODE, OfidtEquipment.class)
+				.setParameter("clsCode", equipmentClsCode).getList(EquipmentInformation::createFromMemento);
 	}
 
 }

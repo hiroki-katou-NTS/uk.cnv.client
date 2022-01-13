@@ -1,47 +1,47 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-	  xmlns:ui="http://java.sun.com/jsf/facelets"
-	  xmlns:com="http://xmlns.jcp.org/jsf/component"
-	  xmlns:h="http://xmlns.jcp.org/jsf/html">
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
 <body>
 <ui:composition>
-	<!-- P 出力設定選択 -->
-	<div class="contentP">
+    <!-- P 出力設定選択 -->
+    <div class="contentP">
 
-		<!--P3 情報を選んでください-->
-		<div class="label" style="margin-bottom: 5px;">#{i18n.getText('CMF002_219')}</div>
-		<table style="margin-bottom: 15px; margin-left: 20px">
-			<tr>
-				<td style="padding-right: 20px;">
-					<!--P4 設定する情報(ラベル)-->
-					<div data-bind="ntsFormLabel: {required: true}">#{i18n.getText('CMF002_222')}</div>
-				</td>
-				<td>
-					<!--P4_1 設定タイプ-->
-					<div class="label"><span data-bind="text: valueItemFixedForm"></span></div>
-				</td>
-			</tr>
-		</table>
-		<table style="height: 300px;">
-			<tr>
-				<td rowspan="2" style="width: 415px;">
-					<div class="" style="width: 360px; float: left;">
-						<!--P5 条件設定選択(パネル)-->
-						<div
-								data-bind="ntsPanel:{
+        <!--P3 情報を選んでください-->
+        <div class="label" style="margin-bottom: 5px;">#{i18n.getText('CMF002_219')}</div>
+        <table style="margin-bottom: 15px; margin-left: 20px">
+            <tr>
+                <td style="padding-right: 20px;">
+                    <!--P4 設定する情報(ラベル)-->
+                    <div data-bind="ntsFormLabel: {required: true}">#{i18n.getText('CMF002_222')}</div>
+                </td>
+                <td>
+                    <!--P4_1 設定タイプ-->
+                    <div class="label"><span data-bind="text: valueItemFixedForm"></span></div>
+                </td>
+            </tr>
+        </table>
+        <table style="height: 300px;">
+            <tr>
+                <td rowspan="2" style="width: 415px;">
+                    <div class="" style="width: 360px; float: left;">
+                        <!--P5 条件設定選択(パネル)-->
+                        <div
+                                data-bind="ntsPanel:{
 									width: '355px',
 									 height: '350px',
 									  direction: 'none',
 									   showIcon: true,
 									    visible: true
 									    }">
-							<div class="flex">
-								<!--P5_1 コード/名称-->
-								<div data-bind="ntsFormLabel: { }">#{i18n.getText('CMF002_36')}</div>
-								<!--P5_2 絞り込み検索-->
-								<div tabindex="2" style="width: 210px"
-									 data-bind="ntsSearchBox: {
+                            <div class="flex">
+                                <!--P5_1 コード/名称-->
+                                <div data-bind="ntsFormLabel: { }">#{i18n.getText('CMF002_36')}</div>
+                                <!--P5_2 絞り込み検索-->
+                                <div tabindex="2" style="width: 210px"
+                                     data-bind="ntsSearchBox: {
 										searchMode: 'filter',
 										targetKey: 'code',
 										comId: 'grd_Condition',
@@ -51,11 +51,11 @@
 										enable : mode() != 2,
 										width: 118,
 										fields: ['code', 'name'],
-										mode: 'igGrid'}" />
-							</div>
-							<!--P5_3 条件設定一覧-->
-							<table id="grd_Condition"
-								   data-bind="ntsGridList: {
+										mode: 'igGrid'}"/>
+                            </div>
+                            <!--P5_3 条件設定一覧-->
+                            <table id="grd_Condition"
+                                   data-bind="ntsGridList: {
 										rows: 12,
 										name: '#[CMF002_345]',
 				 						dataSource: listCondition,
@@ -67,62 +67,215 @@
 										],
 										multiple: false,
 										value: selectedConditionCd}">
-							</table>
-						</div>
-					</div>
-				</td>
-				<td style="vertical-align: top">
-					<div class="panel panel-frame"
-						 style="margin-left: 20px; height: 90px">
-						<table>
-							<colgroup>
-								<col width="130px" />
-								<col width="310px" />
-							</colgroup>
-							<tr>
-								<td style="padding: 5px 0px">
-									<!--P6 処理する年月日(ラベル)-->
-									<div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_223')}</div>
-								</td>
-								<td>
-									<!--P6_1 実行期間-->
-									<div id="P6_1" tabindex="3"
-										 data-bind="ntsDateRangePicker: {
+                            </table>
+                        </div>
+                    </div>
+                </td>
+                <td style="vertical-align: top">
+                    <div class="panel panel-frame"
+                         style="margin-left: 20px;">
+                        <table>
+                            <colgroup>
+                                <col width="130px"/>
+                                <col width="310px"/>
+                            </colgroup>
+
+                            <tr>
+                                <td style="padding: 5px 0px">
+                                    <!--P7 条件コード/名称-->
+                                    <div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_78')}</div>
+                                </td>
+                                <td>
+                                    <!--P7_1 条件設定名-->
+                                    <div class="label">
+                                        <span data-bind="text: selectedConditionCd"></span>　
+                                        <span data-bind="text: selectedConditionName"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr data-bind="if: isNoData ">
+                                <td style="padding: 5px 0px">
+                                    <!--P6 処理する年月日(ラベル)-->
+                                    <div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_223')}</div>
+                                </td>
+                                <td>
+                                    <!--P6_1 実行期間-->
+                                    <div tabindex="3"
+                                         data-bind="ntsDateRangePicker: {
+												required: true,
+												value: periodDateValue,
+												showNextPrevious: true,
+												maxRange: 'none',
+												enable : false }"/>
+                                </td>
+                            </tr>
+
+                            <tr data-bind="if: show81DatePeriod ">
+                                <td style="padding: 5px 0px">
+                                    <!--P8 処理する年月日(ラベル)-->
+                                    <div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_553')}</div>
+                                </td>
+                                <td>
+                                    <div
+                                            tabindex="6"
+                                            id="CMF002_553"
+                                            data-bind="ntsComboBox: {
+											 name: '#[CMF002_5533]' ,
+											  options: closureLists,
+											  optionsValue: 'closureId',
+											  visibleItemsCount: 5,
+											  value: closureId,
+											  optionsText: 'closureName',
+											  editable: false,
+											  required: true,
+											  selectFirstIfNull: true,
+											  columns: [
+												{ prop: 'closureName', length: 10 }
+											  ]}">
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr data-bind="if: show81YmPeriod  ">
+                                <td style="padding: 5px 0px">
+                                    <!--P8 処理する年月日(ラベル)-->
+                                    <div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_553')}</div>
+                                </td>
+                                <td>
+                                    <div tabindex="6"
+                                         data-bind="ntsComboBox: {
+											 name: '#[CMF002_553]' ,
+											  options: closureLists,
+											  optionsValue: 'closureId',
+											  visibleItemsCount: 5,
+											  value: closureId,
+											  optionsText: 'closureName',
+											  editable: false,
+											  required: true,
+											  selectFirstIfNull: true,
+											  columns: [
+												{ prop: 'closureName', length: 10 }
+											  ]}">
+                                    </div>
+                                </td>
+                            </tr>
+                            <!--1-->
+                            <tr data-bind="if: show61DatePeriod ">
+                                <td style="padding: 5px 0px">
+                                    <!--P6 処理する年月日(ラベル)-->
+                                    <div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_223')}</div>
+                                </td>
+                                <!--NOT_USE-->
+                                <td data-bind="if: show61DatePeriod">
+                                    <!--P6_1 実行期間-->
+                                    <div id="P6_1_DatePeriod" tabindex="3"
+                                         data-bind="ntsDateRangePicker: {
 												required: true,
 												enable : mode() != 2,
 												value: periodDateValue,
-												name: '#[CMF002_224]' }" />
-								</td>
-							</tr>
-							<tr>
-								<td style="padding: 5px 0px">
-									<!--P7 条件コード/名称-->
-									<div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_78')}</div>
-								</td>
-								<td>
-									<!--P7_1 条件設定名-->
-									<div class="label">
-										<span data-bind="text: selectedConditionCd"></span>　<span
-											data-bind="text: selectedConditionName"></span>
-									</div>
-								</td>
-							</tr>
-						</table>
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td style="vertical-align: bottom; padding-left: 15px;">
-					<!--P20_1 ←処理を選びなおす-->
-					<!-- ver62: remove O screen -->
-					<!-- <button tabindex="4" class="large" data-bind="click: previous">#{i18n.getText('CMF002_225')}</button> -->
-					<!--P20_2 次へ→-->
-					<button tabindex="5" class="proceed x-large" style="margin-left: 10px"
-							data-bind="click: todoScreenQ, disable : mode() == 2,enable: $root.errors.isEmpty">#{i18n.getText('CMF002_226')}</button>
-				</td>
-			</tr>
-		</table>
-	</div>
+												showNextPrevious: true,
+												maxRange: 'none',
+												name: '#[CMF002_224]' }"/>
+                                </td>
+                            </tr>
+                            <!--2-->
+                            <tr data-bind="if: show61YmPeriod ">
+                                <td style="padding: 5px 0px">
+                                    <!--P6 処理する年月日(ラベル)-->
+                                    <div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_552')}</div>
+                                </td>
+                                <!--NOT_USE-->
+
+                                <td data-bind="if: show61YmPeriod">
+                                    <div tabindex="3"
+                                         data-bind="ntsDateRangePicker: {
+													required: true,
+													showNextPrevious: true,
+													value: periodDateValue,
+													showNextPrevious: true,
+													maxRange: 'none',
+													type: 'yearmonth',
+													name: '#[CMF002_224]'}">
+                                    </div>
+                                </td>
+                            </tr>
+                            <!--3-->
+                            <tr data-bind="if: show61Date">
+                                <td style="padding: 5px 0px">
+                                    <!--P6 処理する年月日(ラベル)-->
+                                    <div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_223')}</div>
+                                </td>
+                                <!--NOT_USE-->
+                                <td data-bind="if: show61Date">
+                                    <div id="P6_1_YmPeriod" tabindex="3"
+                                         data-bind="ntsDatePicker: {
+												    required: true,
+													value: date61,
+													dateFormat: 'date',
+													valueFormat: 'YYYY/MM/DD',
+													enable : mode() != 2,
+													name: '#[CMF002_224]' }">
+                                    </div>
+                                </td>
+                            </tr>
+                            <!--4-->
+                            <tr data-bind="if: show81DatePeriod ">
+                                <td style="padding: 5px 0px">
+                                    <!--P6 処理する年月日(ラベル)-->
+                                    <div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_223')}</div>
+                                </td>
+                                <!--USE-->
+                                <td data-bind="if: show81DatePeriod">
+                                    <!--P6_1 実行期間-->
+                                    <div id="P8_1_DatePeriod" tabindex="3"
+                                         data-bind="ntsDateRangePicker: {
+												required: true,
+												enable : mode() != 2,
+												value: periodDateValue,
+												maxRange: 'none',
+												showNextPrevious: true,
+												name: '#[CMF002_224]' }"/>
+                                </td>
+                            </tr>
+                            <!--5-->
+                            <tr data-bind="if: show81YmPeriod">
+                                <td style="padding: 5px 0px">
+                                    <!--P6 処理する年月日(ラベル)-->
+                                    <div data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CMF002_552')}</div>
+                                </td>
+                                <!--NOT_USE-->
+                                <td data-bind="if: show81YmPeriod">
+                                    <div tabindex="3"
+                                         data-bind="ntsDateRangePicker: {
+													required: true,
+													showNextPrevious: true,
+													value: periodDateValue,
+													type: 'yearmonth',
+													maxRange: 'none',
+													showNextPrevious: true,
+													name: '#[CMF002_224]'}">
+                                    </div>
+                                </td>
+                            </tr>
+                            <!--6-->
+                            <tr data-bind="if: show81Date">
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align: bottom; padding-left: 15px;">
+                    <!--P20_1 ←処理を選びなおす-->
+                    <!-- ver62: remove O screen -->
+                    <!-- <button tabindex="4" class="large" data-bind="click: previous">#{i18n.getText('CMF002_225')}</button> -->
+                    <!--P20_2 次へ→-->
+                    <button tabindex="5" class="proceed x-large" style="margin-left: 10px"
+                            data-bind="click: todoScreenQ, disable : mode() == 2,enable: $root.errors.isEmpty">#{i18n.getText('CMF002_226')}</button>
+                </td>
+            </tr>
+        </table>
+    </div>
 </ui:composition>
 </body>
 </html>

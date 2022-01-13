@@ -8,6 +8,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import lombok.val;
+import nts.uk.ctx.sys.auth.app.query.role.DtoRole;
+import nts.uk.ctx.sys.auth.app.query.role.GetRoleListQuery;
+import nts.uk.ctx.sys.auth.app.query.role.RolesParam;
 import org.apache.logging.log4j.util.Strings;
 
 import nts.arc.enums.EnumAdaptor;
@@ -46,6 +50,8 @@ public class RoleWebservice extends WebService {
 	private I18NResourcesForUK i18n;
 	@Inject
 	private PermissionSettingMenuAdapter permissionSettingMenuAdapter;
+	@Inject
+	private GetRoleListQuery getRoleListQuery;
 	
 	@POST
 	@Path("getlistrolebytype/{roleType}")
@@ -62,7 +68,12 @@ public class RoleWebservice extends WebService {
 	@POST
 	@Path("getrolebyroleid/{roleid}")
 	public RoleDto getRoleByRoleId(@PathParam("roleid") String roleId) {
-		return this.personInforRoleFinder.getRoleByRoleId(roleId);
+		val optRoleDto = this.personInforRoleFinder.getRoleByRoleId(roleId);
+		if(optRoleDto.isPresent()){
+			return optRoleDto.get();
+		}else{
+			return null;
+		}
 	}
 
 	@POST
@@ -76,8 +87,13 @@ public class RoleWebservice extends WebService {
 		if (Strings.isBlank(roleId)) {
 			return EmployeeReferenceRange.ONLY_MYSELF.value;
 		}
-		
-		return this.personInforRoleFinder.getRoleByRoleId(roleId).getEmployeeReferenceRange();
+		val optRoleDto = this.personInforRoleFinder.getRoleByRoleId(roleId);
+		if(optRoleDto.isPresent()){
+			return optRoleDto.get().getEmployeeReferenceRange();
+		}else{
+			// システム管理者、会社管理者のケース
+			return 0;
+		}
 	}
 	
 	@POST
@@ -133,6 +149,11 @@ public class RoleWebservice extends WebService {
 	@Path("getListWorkplaceId")
 	public List<String> findListWorkplaceId(WorkplaceParam param){
 		return roleWorkplaceIDFinder.findListWorkplaceId(param);
+	}
+	@POST
+	@Path("get-list-role-new")
+	public List<DtoRole> getListRoles(RolesParam param) {
+		return this.getRoleListQuery.getListRole(param);
 	}
 	
 }

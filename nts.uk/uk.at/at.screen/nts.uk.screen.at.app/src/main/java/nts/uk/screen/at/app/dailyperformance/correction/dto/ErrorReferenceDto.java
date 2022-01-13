@@ -22,6 +22,8 @@ public class ErrorReferenceDto {
 	private String messageColor;
 	private String submitedName;
 	private Boolean itemMonth = false;
+	private Integer errorAlarmAtr;
+	
 	
 	public ErrorReferenceDto(String id, String employeeId, GeneralDate date, String errorCode, String message, Boolean itemMonth){
 		this.id = id;
@@ -32,7 +34,7 @@ public class ErrorReferenceDto {
 		this.itemMonth = itemMonth;
 	}
 	
-	public ErrorReferenceDto(String id, String employeeId, GeneralDate date, String errorCode, String message, boolean boldAtr, String messageColor, String submitedName){
+	public ErrorReferenceDto(String id, String employeeId, GeneralDate date, String errorCode, String message, boolean boldAtr, String messageColor, String submitedName, Integer errorAlarmAtr){
 		this.id = id;
 		this.employeeId = employeeId;
 		this.date = date;
@@ -41,5 +43,6 @@ public class ErrorReferenceDto {
 		this.boldAtr = boldAtr;
 		this.messageColor = messageColor;
 		this.submitedName = submitedName;
+		this.errorAlarmAtr = errorAlarmAtr;
 	}
 }

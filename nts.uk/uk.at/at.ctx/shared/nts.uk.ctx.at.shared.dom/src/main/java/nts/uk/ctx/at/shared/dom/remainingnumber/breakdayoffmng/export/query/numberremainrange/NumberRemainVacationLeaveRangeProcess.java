@@ -220,6 +220,6 @@ public class NumberRemainVacationLeaveRangeProcess {
 			}
 
 		}
-		
+
 	}
 }

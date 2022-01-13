@@ -12,4 +12,6 @@ public class AuthorityFormatInitialDisplayDto {
 	private String companyId;
 
 	private String dailyPerformanceFormatCode;
+	
+	private Integer pcSpAtr;
 }

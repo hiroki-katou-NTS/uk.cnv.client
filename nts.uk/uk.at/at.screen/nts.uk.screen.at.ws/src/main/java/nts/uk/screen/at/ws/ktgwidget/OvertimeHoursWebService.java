@@ -41,9 +41,13 @@ public class OvertimeHoursWebService extends WebService{
 	}
 	
 	@POST
-	@Path("getOvertimedDisplayForSuperiorsDto/{currentOrNextMonth}")
-	public OvertimedDisplayForSuperiorsDto getOvertimeDisplayForSuperiorsDto(@PathParam("currentOrNextMonth") int currentOrNextMonth) {
-		return finder.getOvertimeDisplayForSuperiorsDto(currentOrNextMonth);
+	@Path("getOvertimedDisplayForSuperiorsDto")
+	public OvertimedDisplayForSuperiorsDto getOvertimeDisplayForSuperiorsDto(ToppageParams toppageParams) {
+		return finder.getOvertimeDisplayForSuperiorsDto(toppageParams.currentOrNextMonth,
+				toppageParams.closingId,
+				toppageParams.startDate,
+				toppageParams.endDate,
+				toppageParams.processingYm);
 	}
 	
 	@POST

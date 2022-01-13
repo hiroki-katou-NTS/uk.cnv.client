@@ -13,15 +13,15 @@ import nts.gul.security.hash.password.PasswordHash;
 import nts.gul.text.IdentifierUtil;
 import nts.uk.ctx.bs.employee.dom.employee.mgndata.EmployeeDataMngInfo;
 import nts.uk.ctx.exio.dom.input.ExecutionContext;
-import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalItem;
-import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalItemList;
 import nts.uk.ctx.exio.dom.input.canonicalize.ImportingMode;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.DomainCanonicalization;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.ItemNoMap;
 import nts.uk.ctx.exio.dom.input.canonicalize.existing.AnyRecordToChange;
 import nts.uk.ctx.exio.dom.input.canonicalize.existing.AnyRecordToDelete;
 import nts.uk.ctx.exio.dom.input.canonicalize.existing.StringifiedValue;
-import nts.uk.ctx.exio.dom.input.canonicalize.methods.IntermediateResult;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalItem;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalItemList;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.IntermediateResult;
 import nts.uk.ctx.exio.dom.input.errors.ExternalImportError;
 import nts.uk.ctx.exio.dom.input.meta.ImportingDataMeta;
 import nts.uk.ctx.sys.shared.dom.user.User;
@@ -57,15 +57,15 @@ public class EmployeeBasicCanonicalization implements DomainCanonicalization {
 		// 個人基本情報は1社員につき1レコード
 		// 2レコード目以降はエラーとする
 		revisedRecords.stream().skip(1).forEach(record -> {
-			require.add(context, ExternalImportError.record(
-					record.getRowNo(), "受入データに同じ社員のレコードが存在しています。1社員につき1レコードのみにしてください。"));
+			require.add(ExternalImportError.record(
+					record.getRowNo(), context.getDomainId(),"受入データに同じ社員のレコードが存在しています。1社員につき1レコードのみにしてください。"));
 		});
 		
 		// ここまで来たら必ず1レコードあるはず
 		val revised = revisedRecords.get(0);
 		
 		// 一旦中間オブジェクトに変換
-		IntermediateResult interm = IntermediateResult.noChange(revised);
+		IntermediateResult interm = IntermediateResult.create(revised);
 		
 		if (context.getMode() == ImportingMode.INSERT_ONLY) {
 			
@@ -109,7 +109,7 @@ public class EmployeeBasicCanonicalization implements DomainCanonicalization {
 		
 		// ログインIDの重複チェック
 		if (Items.User.isDuplicatedLoginId(require, interm)) {
-			require.add(context, ExternalImportError.record(interm.getRowNo(), "ログインIDが重複しています。"));
+			require.add(ExternalImportError.record(interm.getRowNo(), context.getDomainId(),"ログインIDが重複しています。"));
 			
 			return;
 		}

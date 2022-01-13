@@ -75,5 +75,7 @@ public interface EmployeeMonthDaySettingRepository {
 	 * @param employee the employee
 	 * @param year the year
 	 */
-	void remove(CompanyId companyId, String employee, Year year);
+	void remove(CompanyId companyId, String employee, Year year, Integer startMonth);
+	
+	void remove(EmployeeMonthDaySetting domain);
 }

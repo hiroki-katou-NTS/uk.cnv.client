@@ -40,6 +40,7 @@ public interface WorkScheduleRepository {
 	 */
 	List<WorkSchedule> getListBySid(String sid, DatePeriod period);
 
+	void updateConfirmedState(WorkSchedule workSchedule);
 
 	/**
 	 * Exists
@@ -109,7 +110,6 @@ public interface WorkScheduleRepository {
 	Optional<GeneralDate> getMaxDateWorkSche(List<String> listEmp);
 
 	//Optional<GeneralDate> getMaxDate(List<String> employeeIDs, GeneralDate ymd);
-
 
 	/**
 	 * 所属情報を取得する

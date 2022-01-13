@@ -8,6 +8,7 @@ import nts.uk.ctx.at.request.dom.applicationreflect.object.ReflectStatusResult;
 
 public interface ReflectApplicationWorkScheduleAdapter {
 	
-	public Pair<ReflectStatusResult, AtomTask> process(Object application, GeneralDate date, ReflectStatusResult reflectStatus, int preAppWorkScheReflectAttr);
-	
+	public Pair<ReflectStatusResult, AtomTask> process(Object application, GeneralDate date,
+			ReflectStatusResult reflectStatus, int preAppWorkScheReflectAttr, String execId);
+
 }

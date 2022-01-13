@@ -26,13 +26,6 @@ public interface RetentionYearlySettingSetMemento {
 	void setUpperLimitSetting(UpperLimitSetting upperLimitSetting);
 	
 	/**
-	 * Sets the leave as work days.
-	 *
-	 * @param leaveAsWorkDays the new leave as work days
-	 */
-	void setLeaveAsWorkDays(Boolean leaveAsWorkDays);
-	
-	/**
 	 * Sets the management category.
 	 *
 	 * @param managementCategory the new management category

@@ -14,6 +14,8 @@ import javax.ws.rs.Produces;
 
 import lombok.val;
 import nts.arc.web.session.HttpSubSession;
+import nts.uk.ctx.at.function.app.find.dailyperformanceformat.DailyPerformanceMobileCodeFinder;
+import nts.uk.ctx.at.function.app.find.dailyperformanceformat.dto.DailyPerformanceCodeDto;
 import nts.uk.ctx.at.record.app.find.dailyperform.DailyRecordDto;
 import nts.uk.ctx.at.record.app.find.monthly.root.MonthlyRecordWorkDto;
 import nts.uk.screen.at.app.dailymodify.mobile.DailyModifyMobileCommandFacade;
@@ -43,6 +45,9 @@ public class DailyPerformanceMobileWebService {
 	
 	@Inject
 	private UpdateConfirmAllMob updateConfirmAllMob;
+	
+	@Inject
+	private DailyPerformanceMobileCodeFinder dailyPerformanceMobileCodeFinder;
 
 	@POST
 	@Path("addUpMobile")
@@ -124,6 +129,12 @@ public class DailyPerformanceMobileWebService {
 	private void removeSession() {
 		session.setAttribute("lstSidDateErrorCalc", Collections.emptyList());
 		session.setAttribute("errorAllCalc", false);
+	}
+	
+	@POST
+	@Path("getFormatList")
+	public List<DailyPerformanceCodeDto> getAuthorityDailyFormat() {
+		return this.dailyPerformanceMobileCodeFinder.findAll();
 	}
 
 }

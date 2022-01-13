@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.shared.dom.holidaymanagement.treatmentholiday;
 
 import lombok.Value;
+import lombok.val;
 import nts.arc.layer.dom.objecttype.DomainValue;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
@@ -23,22 +24,27 @@ public class HolidayAcqManageByYMD implements FourWeekHolidayAcqMana, DomainValu
 	 * 4週間の休日日数
 	 */
 	private FourWeekDays  fourWeekHoliday;
-	
-	/**
-	 * [1] 管理期間の単位を取得する
-	 */
-//	@Override
-//	public HolidayCheckUnit getUnitManagementPeriod() {
-//		return HolidayCheckUnit.FOUR_WEEK;
-//	}
 
 	/**
 	 * [2] 管理期間を取得する
 	 */
 	@Override
-	public HolidayAcqManaPeriod getManagementPeriod(Require require, GeneralDate ymd) {
-		DatePeriod period = this.make4Weeks(this.startingDate, ymd);
-		return new HolidayAcqManaPeriod(period, this.fourWeekHoliday);
+	public HolidayAcqManaPeriod getManagementPeriod(Require require, GeneralDate baseDate) {
+		int cycleDays = 7*4;
+		
+		if( baseDate.before( this.startingDate ) ) {
+			
+			return new HolidayAcqManaPeriod( new DatePeriod( this.startingDate, this.startingDate.addDays( cycleDays - 1 ) ), this.fourWeekHoliday );
+			
+		}
+		
+		val numberOfCycles = ( new DatePeriod(startingDate, baseDate).datesBetween().size() - 1 ) /cycleDays; 
+		
+		val startDate = this.startingDate.addDays( numberOfCycles * cycleDays );
+		val endDate = startDate.addDays( cycleDays - 1 );
+		
+		return new HolidayAcqManaPeriod( new DatePeriod( startDate, endDate ), this.fourWeekHoliday );
+		
 	}
 
 	/**
@@ -48,13 +54,5 @@ public class HolidayAcqManageByYMD implements FourWeekHolidayAcqMana, DomainValu
 	public StartDateClassification getStartDateType() {
 		return StartDateClassification.SPECIFY_YMD;
 	}
-
-	/**
-	 * [4] 28日間を取得する
-	 */
-	@Override
-	public DatePeriod get28Days(Require require, GeneralDate ymd) {
-		return this.getManagementPeriod(require, ymd).getPeriod();
-	}
-
+	
 }

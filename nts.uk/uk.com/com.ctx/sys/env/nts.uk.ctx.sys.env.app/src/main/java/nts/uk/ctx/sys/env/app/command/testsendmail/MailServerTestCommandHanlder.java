@@ -36,7 +36,7 @@ public class MailServerTestCommandHanlder  extends CommandHandler<MailServerTest
 		try {
 			this.mailSender.send(command.getMailFrom(), command.getMailTo(), contents);
 		} catch (Exception e) {
-			throw new BusinessException("Msg_535");
+			throw new BusinessException("Msg_1057");
 		}
 		
 	}

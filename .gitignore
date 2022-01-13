@@ -1,6 +1,6 @@
 #ignore project build folders
-**/build/*
-**/bin*
+build/
+bin/
 
 #ignore node_modules
 **/node_modules*
@@ -52,9 +52,9 @@ nts.uk/uk.repo/*
 uk.repo/
 
 *.log
-<<<<<<< HEAD
-nts.uk/uk.at/at.ctx/record/nts.uk.ctx.at.record.dom/src/main/java/nts/uk/ctx/at/record/dom/monthlyclosureupdateprocess/remainnumberprocess/compensatoryholiday/calculateremainnum/RemainCompensatoryHolidayCalculation.java~Stashed changes
-nts.uk/uk.at/at.ctx/record/nts.uk.ctx.at.record.dom/src/main/java/nts/uk/ctx/at/record/dom/monthlyclosureupdateprocess/remainnumberprocess/substitutionholiday/calculateremainnum/RemainSubstitutionHolidayCalculation.java~Stashed changes
-=======
 **/.sass-cache/*
->>>>>>> pj/at/jp_dev/nabe_team/develop
+
+**/obj/*
+**/.vs/*
+
+!binary/

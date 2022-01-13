@@ -1,20 +1,33 @@
 module nts.uk.at.view.kdw007.a.service {
 
     var paths: any = {
+    	//  ErrorAlarmWrWebservice
         getAll: "ctx/at/record/workrecord/erroralarm/getall",
         update: "ctx/at/record/workrecord/erroralarm/update",
         remove: "ctx/at/record/workrecord/erroralarm/remove",
+        //  EmploymentWebService
         getEmploymentByCode: "bs/employee/employment/findByCode/",
+        //  ClassificationWs
         getClassificationByCode: "bs/employee/classification/find/",
+        //  JobTitleWebService
         findAllJobTitle: "bs/employee/jobtitle/findAll",
+        //  BusinessTypeWebService
         getBusinessTypeByCode: "at/record/businesstype/findByCode",
+        //  WorkTypeWebService
         getAllWorkType: "at/share/worktype/findAll",
+        //  WorkTypeWebService
         getWorkTypeByListCode: "at/share/worktype/getpossibleworktype",
+        //  WorkTimeSettingWS
         getAllWorkTime: "at/shared/worktimeset/findAll",
+        //  not use
         getWorkTimeByListCode: "at/shared/worktime/findByCodes",
+        //  DivergenceTimeWebService
         getAttendanceItemByCodes: "at/record/divergencetime/setting/AttendanceDivergenceName",
+        // not use
         getMonthlyAttendanceItemByCodes: "at/record/divergencetime/setting/getMonthlyAttendanceDivergenceName",
+        // not use
         getAllAttendanceItem: "at/record/businesstype/attendanceItem/getAttendanceItems",
+        // MonthlyCorrectConditionWs
         getAllMonthlyCondition: "ctx/at/record/workrecord/erroralarm/monthly/getall",
         updateMonthlyCondition: "ctx/at/record/workrecord/erroralarm/monthly/update",
         findMonthlyCondition: "ctx/at/record/workrecord/erroralarm/monthly/findbycheckid/",

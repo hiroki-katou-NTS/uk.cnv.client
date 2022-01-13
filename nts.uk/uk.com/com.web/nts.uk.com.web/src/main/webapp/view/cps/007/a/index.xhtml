@@ -19,11 +19,13 @@
 
 		<ui:define name="content">
 			<div id="functions-area">
+				<a tabindex="1" class="goback" 
+					data-bind="ntsLinkButton: { jump: '/view/cps/018/a/index.xhtml' }, visible: $vm.isFromCPS018">#{i18n.getText('CPS007_27')}</a>
 				<button type="button" class="proceed" id="A_BTN_REGISTER"
 					data-bind="click: saveData">#{i18n.getText('CPS007_3')}</button>
 				<button id="print-button" data-bind="click: exportExcel">#{i18n.getText('KMK007_4')}</button> 
 				<a class="goout"
-					data-bind="ntsLinkButton: { jump: '../../008/a/index.xhtml' }">#{i18n.getText('CPS007_4')}</a>
+					data-bind="ntsLinkButton: { jump: '../../008/a/index.xhtml' }, style: { marginLeft: $vm.isFromCPS018() ? '648px' : '770px' }">#{i18n.getText('CPS007_4')}</a>
 			</div>
 			<div id="contents-area" class="cf" data-bind="with: layout">
 				<div

@@ -1,9 +1,11 @@
 package nts.uk.ctx.at.aggregation.dom.schedulecounter.aggregationprocess.workplacecounter;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +15,7 @@ import java.util.function.Function;
 import org.junit.Test;
 
 import lombok.val;
+import mockit.Expectations;
 import mockit.Injectable;
 import nts.arc.testing.assertion.NtsAssert;
 import nts.arc.time.GeneralDate;
@@ -23,6 +26,10 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattend
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.WorkInfoOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.TargetOrgIdenInfor;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
+import nts.uk.ctx.at.shared.dom.worktype.WorkType;
+import nts.uk.ctx.at.shared.dom.worktype.WorkTypeAbbreviationName;
+import nts.uk.ctx.at.shared.dom.worktype.WorkTypeCode;
+import nts.uk.ctx.at.shared.dom.worktype.WorkTypeName;
 
 public class CountNumberOfPeopleByEachWorkMethodServiceTest {
 
@@ -228,9 +235,75 @@ public class CountNumberOfPeopleByEachWorkMethodServiceTest {
 				tuple( "003", 0, 0, 3)
 				);
 	}
+	
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testGetOnlyWorkingDay() {
+		
+		val workType_1 = Helper.createWorkType("wtp001");
+		val workType_2 = Helper.createWorkType("wtp003");
+		val workType_3 = Helper.createWorkType("wtp004");
+		val workType_4 = Helper.createWorkType("wtp005");
+		
+		val dailyWork1 = Helper.createIntegrationOfDaily("wtp001", "dummy");
+		val dailyWork2 = Helper.createIntegrationOfDaily("wtp002", "");//filter
+		val dailyWork3 = Helper.createIntegrationOfDaily("wtp003", "dummy" );
+		val dailyWork4 = Helper.createIntegrationOfDaily("wtp004", "dummy");
+		val dailyWork5 = Helper.createIntegrationOfDaily("wtp005", "dummy" );//duplicate
+		val dailyWork6 = Helper.createIntegrationOfDaily("wtp005", "dummy" );//duplicate
+		val dailyWork7 = Helper.createIntegrationOfDaily("wtp006", "dummy" );//master not existed
+		
+		val dailyWorks = Arrays.asList( dailyWork1, dailyWork2, dailyWork3, dailyWork4, dailyWork5, dailyWork6, dailyWork7 );
+		
+		val workTypes = Arrays.asList( workType_1, workType_2, workType_3, workType_4 );
+		
+		new Expectations( workType_1, workType_2, workType_3, workType_4 ) {
+			{
+				require.getWorkTypes( (List<WorkTypeCode>) any);
+				result = workTypes;
+				
+				workType_1.isWorkingDay();
+				result = true;
+				
+				workType_2.isWorkingDay();
+				result = false;
+				
+				workType_3.isWorkingDay();
+				result = true;
+				
+				workType_4.isWorkingDay();
+				result = false;
+			}
+		};
+		
+		//Act
+		List<IntegrationOfDaily> result = NtsAssert.Invoke.staticMethod(
+				CountNumberOfPeopleByEachWorkMethodService.class,
+				"getOnlyWorkingDay",
+				require,
+				dailyWorks
+				);
+		
+		//Assert
+		assertThat( result ).containsExactly( dailyWork1, dailyWork4 );
+		
+	}
 
 
 	public static class Helper {
+		
+		/**
+		 * 日別勤怠(Work)を作る
+		 * @param workTypeCode 勤務種類コード(String)
+		 * @param workTimeCode 就業時間帯コード(String)
+		 * @return
+		 */
+		public static IntegrationOfDaily createIntegrationOfDaily( String workTypeCode, String workTimeCode ) {
+			
+			return IntegrationOfDailyHelperInAggregation
+					.createWithWorkInfo("dummy", GeneralDate.today(), createWorkInfo( workTypeCode, workTimeCode));
+		}
 
 		/**
 		 * 日別勤怠の勤務情報を作成する
@@ -242,7 +315,20 @@ public class CountNumberOfPeopleByEachWorkMethodServiceTest {
 			return IntegrationOfDailyHelperInAggregation
 					.WorkInfoHelper.createWithCode(workTypeCode, Optional.ofNullable(workTimeCode));
 		}
-
+		
+		/**
+		 * 勤務種類を作る
+		 * @param workTypeCode 勤務種類コード(String)
+		 * @return
+		 */
+		public static WorkType createWorkType( String workTypeCode ) {
+			
+			return new WorkType( "cid"
+					, new WorkTypeCode( workTypeCode )
+					, new WorkTypeName("dummy")
+					, new WorkTypeAbbreviationName("dummy"));
+		}
+		
 	}
 
 }

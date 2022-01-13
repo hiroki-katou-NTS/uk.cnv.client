@@ -47,35 +47,53 @@ public class ExOutCtgDto {
 	private int payrollSysAtr;
 
 	/**
-	* 
+	*
 	*/
 	private int functionNo;
 
 	/**
-	* 
+	*
 	*/
 	private String functionName;
 
 	/**
-	* 
+	*
 	*/
 	private String explanation;
 
 	/**
-	* 
+	*
 	*/
 	private int displayOrder;
 
 	/**
-	* 
+	*
 	*/
 	private boolean defaultValue;
 
+
+    private int outingPeriodClassific;
+
+
+	private int classificationToUse;
+
+
 	public static ExOutCtgDto fromDomain(ExOutCtg domain) {
-		return new ExOutCtgDto(domain.getCategoryId().v(), domain.getOfficeHelperSysAtr().value,
-				domain.getCategoryName().v(), domain.getCategorySet().value, domain.getPersonSysAtr().value,
-				domain.getAttendanceSysAtr().value, domain.getPayrollSysAtr().value, domain.getFunctionNo(),
-				domain.getName(), domain.getExplanation(), domain.getDisplayOrder(), domain.getDefaultValue());
+		return new ExOutCtgDto(
+		        domain.getCategoryId().v(),
+                domain.getOfficeHelperSysAtr().value,
+				domain.getCategoryName().v(),
+                domain.getCategorySet().value,
+                domain.getPersonSysAtr().value,
+				domain.getAttendanceSysAtr().value,
+                domain.getPayrollSysAtr().value,
+                domain.getFunctionNo(),
+				domain.getName(),
+                domain.getExplanation(),
+                domain.getDisplayOrder(),
+                domain.getDefaultValue(),
+                domain.getOutingPeriodClassific().value,
+                domain.getClassificationToUse().value);
 	}
 
 }

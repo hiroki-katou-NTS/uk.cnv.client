@@ -185,3 +185,7 @@ div[dropdown-for="pk-amount"] .nts-column {
   padding: 5px 10px 5px 30px;
   margin: 5px 5px 0px 3px;
 }
+
+#contents-area .radio-wrappers > .radio-wrapper.without-text:nth-child(2) {
+	margin-top: 45px !important;
+}

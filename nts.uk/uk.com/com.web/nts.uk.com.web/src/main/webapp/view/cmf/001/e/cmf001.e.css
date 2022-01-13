@@ -1,0 +1,41 @@
+.form-label {
+  width: 250px;
+}
+
+#contents-area .domain {
+  margin-buttom: 25px;
+}
+
+#settingName{
+ width:300px;
+}
+
+#itemNameRow{
+ width:27px;
+}
+
+#importStartRow{
+ width:27px;
+}
+
+#file-upload{
+ width:250px;
+}
+
+#bntOpenDetail{
+	margin-top: 20px;
+}
+
+.table .divi {
+  margin-top: 20px;
+}
+
+.row > div {
+	display: inline-block;
+}
+
+.caret-bottom {
+	display: block;
+	width: 250px;
+	text-align: center;
+}

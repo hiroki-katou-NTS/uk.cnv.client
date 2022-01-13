@@ -16,6 +16,7 @@ module nts.uk.at.view.kmf002.b {
             enableSave: KnockoutObservable<boolean>;
             enableDelete: KnockoutObservable<boolean>;
             isContinueRecurFindName: KnockoutObservable<boolean>;
+            startMonth: number;
 
             constructor(){
                 let self = this;
@@ -180,7 +181,7 @@ module nts.uk.at.view.kmf002.b {
                 let self = this;
                 nts.uk.ui.dialog.confirm({ messageId: "Msg_18" }).ifYes(() => {
                     service.remove(self.commonTableMonthDaySet().fiscalYear(), 
-                                        self.multiSelectedWorkplaceId()).done(() => {
+                      self.startMonth, self.multiSelectedWorkplaceId()).done(() => {
                         self.getDataFromService();     
                         self.alreadySettingList.remove(function(s) { return s.workplaceId == self.multiSelectedWorkplaceId() });           
                         nts.uk.ui.dialog.info({ messageId: "Msg_16" });
@@ -202,34 +203,42 @@ module nts.uk.at.view.kmf002.b {
                     if (_.isEmpty(self.commonTableMonthDaySet().fiscalYear())) {
                         self.commonTableMonthDaySet().fiscalYear(moment().format('YYYY'));
                     }
-                    $.when(service.find(self.commonTableMonthDaySet().fiscalYear(),self.multiSelectedWorkplaceId()), 
-                            service.findFirstMonth()).done(function(data: any, data2: any) {
-                        if (typeof data === "undefined") {
-                            /** 
-                             *   create value null for prepare create new 
-                            **/
-                            self.commonTableMonthDaySet().arrMonth.removeAll();
-                            for (let i=data2.startMonth-1; i<12; i++) {
-                                self.commonTableMonthDaySet().arrMonth.push({'month': ko.observable(i+1), 'day': ko.observable(0),'enable': ko.observable(true)});    
-                            }
-                            for (let i=0; i<data2.startMonth-1; i++) {
-                                self.commonTableMonthDaySet().arrMonth.push({'month': ko.observable(i+1), 'day': ko.observable(0), 'enable': ko.observable(true)});    
-                            } 
-                            self.enableDelete(false);
-                        } else {
-                            self.commonTableMonthDaySet().arrMonth.removeAll();
-                            for (let i=data2.startMonth-1; i<12; i++) {
-                                self.commonTableMonthDaySet().arrMonth.push({'month': ko.observable(data.publicHolidayMonthSettings[i].month), 
-                                                                              'day': ko.observable(data.publicHolidayMonthSettings[i].inLegalHoliday), 
-                                                                              'enable': ko.observable(true)});    
-                            }
-                            for (let i=0; i<data2.startMonth-1; i++) {
-                                self.commonTableMonthDaySet().arrMonth.push({'month': ko.observable(data.publicHolidayMonthSettings[i].month), 
-                                                                              'day': ko.observable(data.publicHolidayMonthSettings[i].inLegalHoliday), 
-                                                                              'enable': ko.observable(true)});    
-                            } 
-                            self.enableDelete(true);
-                        }         
+                    const currentYear = self.commonTableMonthDaySet().fiscalYear();
+                const nextYear = moment.utc(currentYear, "YYYY").add(1, 'year').format("YYYY");
+                    $.when(service.find(currentYear, self.multiSelectedWorkplaceId()), 
+                            service.find(nextYear, self.multiSelectedWorkplaceId()),
+                            service.findFirstMonth()).done(function(data: any, data1: any, data2: any) {
+                      self.startMonth = data2.startMonth;
+                      // Get current year data
+                      let currentYearData: model.PublicHolidayMonthSettingDto[] = _.filter(data?.publicHolidayMonthSettings || [], item => item.month >= data2.startMonth);
+                      const hasCurrentData = !_.isEmpty(currentYearData);
+                      // Add default values if not exists
+                      for (let i = data2.startMonth; i <= 12; i++) {
+                        if (!_.find(currentYearData, item => item.month === i)) {
+                          currentYearData.push(new model.PublicHolidayMonthSettingDto(currentYear, i, 0));
+                        }
+                      }
+                      currentYearData = _.orderBy(currentYearData, "month");
+                      // Get next year data
+                      let nextYearData: model.PublicHolidayMonthSettingDto[] = _.filter(data1?.publicHolidayMonthSettings || [], item => item.month < data2.startMonth);
+                      const hasNextData = !_.isEmpty(nextYearData);
+                      // Add default values if not exists
+                      for (let i = 1; i < data2.startMonth; i++) {
+                        if (!_.find(nextYearData, item => item.month === i)) {
+                          nextYearData.push(new model.PublicHolidayMonthSettingDto(nextYear, i, 0));
+                        }
+                      }
+                      nextYearData = _.orderBy(nextYearData, "month");
+                      const arr = _.chain(currentYearData).concat(nextYearData)
+                      .map(item => {
+                        return {
+                          'month': ko.observable(item.month),
+                          'day': ko.observable(item.inLegalHoliday),
+                          'enable': ko.observable(true)
+                        };
+                      }).value();
+                      self.commonTableMonthDaySet().arrMonth(arr);  
+                      self.enableDelete(hasCurrentData || hasNextData);
                     });
                     
                 } else {

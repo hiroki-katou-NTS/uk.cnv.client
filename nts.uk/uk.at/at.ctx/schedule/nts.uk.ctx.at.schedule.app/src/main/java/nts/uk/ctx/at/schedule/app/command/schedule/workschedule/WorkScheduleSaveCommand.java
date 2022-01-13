@@ -15,7 +15,8 @@ import nts.uk.ctx.at.shared.dom.common.time.TimeSpanForCalc;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WorkScheduleSaveCommand<T> {
-
+	
+	public String executeId;
 	// 社員ID
 	public String sid;
 	// 年月日
@@ -48,5 +49,20 @@ public class WorkScheduleSaveCommand<T> {
 		this.breakTimeList = breakTimeList;
 		this.isBreakByHand = isBreakByHand;
 	}
+
+	public WorkScheduleSaveCommand(String sid, GeneralDate ymd, WorkInformationDto workInfor,
+			Map<Integer, T> mapAttendIdWithTime, List<TimeSpanForCalc> breakTimeList, String shiftCode,
+			boolean isBreakByHand) {
+		super();
+		this.sid = sid;
+		this.ymd = ymd;
+		this.workInfor = workInfor;
+		this.mapAttendIdWithTime = mapAttendIdWithTime;
+		this.breakTimeList = breakTimeList;
+		this.shiftCode = shiftCode;
+		this.isBreakByHand = isBreakByHand;
+	}
+	
+	
 	
 }

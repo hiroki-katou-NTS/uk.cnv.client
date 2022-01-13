@@ -21,10 +21,6 @@
 	width: 60px;
 }
 
-.overtimeListQ5_1 tr > td:nth-child(3){
-	background-color: #F2F2F2;
-}
-
 .overtimeListQ5_1 tr > td:nth-child(3) > div > label:nth-child(1){
 	width: 140px;
 }
@@ -252,4 +248,8 @@
 
 .tabs-panel.has-content {
 	overflow: visible;
+}
+
+.nts-help-button-image {
+  width: 370px !important;
 }

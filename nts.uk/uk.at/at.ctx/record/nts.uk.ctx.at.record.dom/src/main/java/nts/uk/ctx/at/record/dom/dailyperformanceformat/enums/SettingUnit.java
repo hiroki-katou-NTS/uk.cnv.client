@@ -9,7 +9,7 @@ public enum SettingUnit {
 	AUTHORITY(0),
 	// 1: 勤務種別
 	BUSINESSTYPE(1);
-
+	
 	public final int value;
 	
 	private SettingUnit(int type) {

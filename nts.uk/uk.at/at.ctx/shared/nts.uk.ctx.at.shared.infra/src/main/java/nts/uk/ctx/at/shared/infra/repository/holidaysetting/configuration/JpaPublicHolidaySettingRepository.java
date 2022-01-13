@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.configuration.PublicHolidayCarryOverDeadline;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.configuration.PublicHolidayPeriod;
@@ -48,7 +50,7 @@ public class JpaPublicHolidaySettingRepository extends JpaRepository implements 
 		entity.setMgtAtr(domain.getIsManagePublicHoliday());
 		entity.setMgtPeriodAtr(domain.getPublicHolidayPeriod().value);
 		entity.setCarryOverDeadline(domain.getPublicHolidayCarryOverDeadline().value);
-		entity.setCarryFwdMinusArt(domain.getCarryOverNumberOfPublicHolidayIsNegative());
+		entity.setCarryFwdMinusArt(BooleanUtils.toBoolean(domain.getCarryOverNumberOfPublicHolidayIsNegative()));
 		return entity;
 	}	
 	
@@ -58,7 +60,7 @@ public class JpaPublicHolidaySettingRepository extends JpaRepository implements 
 				entity.getMgtAtr(), 
 				PublicHolidayPeriod.valueOf(entity.getMgtPeriodAtr()),
 				PublicHolidayCarryOverDeadline.valueOf(entity.getCarryOverDeadline()),
-				entity.getCarryFwdMinusArt());
+				BooleanUtils.toInteger(entity.isCarryFwdMinusArt()));
 		return domain;
 	}
 }

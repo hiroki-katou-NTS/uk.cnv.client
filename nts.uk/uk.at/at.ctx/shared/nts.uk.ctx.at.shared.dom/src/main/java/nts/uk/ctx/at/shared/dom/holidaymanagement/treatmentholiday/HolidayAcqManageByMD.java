@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.shared.dom.holidaymanagement.treatmentholiday;
 
 import lombok.Value;
+import lombok.val;
 import nts.arc.layer.dom.objecttype.DomainValue;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
@@ -41,30 +42,57 @@ public class HolidayAcqManageByMD implements FourWeekHolidayAcqMana, DomainValue
 	 * [2] 管理期間を取得する
 	 */
 	@Override
-	public HolidayAcqManaPeriod getManagementPeriod(Require require, GeneralDate ymd) {
-		//$起算年月日 = 年月日#年月日を指定(基準日.年,@起算月日.月,@起算月日.日)																
-		GeneralDate startingDate = GeneralDate.ymd(ymd.year(), this.startingMonthDay.getMonth(), this.startingMonthDay.getDay());
-		//$対象月日 = 月日#(基準日.月,基準日.日)
-		MonthDay targetMonthDay = new MonthDay(ymd.month(), ymd.day());
-		if (targetMonthDay.getMonth() < (this.startingMonthDay.getMonth())
-				|| (targetMonthDay.getMonth() == this.startingMonthDay.getMonth()
-						&& targetMonthDay.getDay() < this.startingMonthDay.getDay())) {
-			startingDate = GeneralDate.ymd(ymd.addYears(-1).year(), this.startingMonthDay.getMonth(), this.startingMonthDay.getDay());
-		}
-		//$期間 = [prv-1] 4週間を作る($起算年月日,基準日)
-		DatePeriod period = this.make4Weeks(startingDate, ymd);
-		//$週間数 = (切り捨て(($期間.終了日 - $起算年月日) / (7 * 4)) ) + 1
-		int numberOfWeeks = (new DatePeriod(startingDate,period.end()).datesBetween().size()-1)/(7*4) + 1; 
+	public HolidayAcqManaPeriod getManagementPeriod(Require require, GeneralDate baseDate) {
 		
-		if(numberOfWeeks<13) {
-			//return 休日取得の管理期間#($期間,@4週間の休日日数)
-			return new HolidayAcqManaPeriod(period,this.fourWeekHoliday);
+		GeneralDate startingDate = this.startingMonthDay.toDate( baseDate.year() );
+		
+		if( startingDate.after( baseDate ) ) {
+			
+			startingDate = startingDate.addYears( -1 );
+			
 		}
-		//$期間.終了日 = $起算年月日.年を足す(1).日を足す(-1)  
-		period = new DatePeriod(period.start(), startingDate.addYears(1).addDays(-1));
-
-		//return 休日取得の管理期間#($期間,@4週間の休日日数 + 最終週の休日日数)
-		return new HolidayAcqManaPeriod(period, new FourWeekDays(this.fourWeekHoliday.v() + this.numberHolidayLastweek.v()));
+		
+		val cycleDays = 7*4;
+		val numberOfCycles = ( new DatePeriod(startingDate, baseDate).datesBetween().size() - 1) /cycleDays; 
+		
+		GeneralDate startDate, endDate;
+		switch( numberOfCycles ) {
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+		case 10:
+		case 11:
+			startDate = startingDate.addDays( numberOfCycles * cycleDays );
+			endDate = startDate.addDays( cycleDays - 1);
+			
+			return new HolidayAcqManaPeriod( new DatePeriod( startDate, endDate )
+					, new FourWeekDays( this.fourWeekHoliday.v() ) );
+		
+		case 12:
+			startDate = startingDate.addDays( numberOfCycles * cycleDays );
+			endDate = startingDate.addYears( 1 ).addDays( -1 );
+			
+			return new HolidayAcqManaPeriod( new DatePeriod( startDate, endDate )
+					, new FourWeekDays( this.fourWeekHoliday.v() + this.numberHolidayLastweek.v() ) );
+		
+		case 13:
+			startDate = startingDate.addDays( ( numberOfCycles -1 ) * cycleDays );
+			endDate = startingDate.addYears( 1 ).addDays( -1 );
+			
+			return new HolidayAcqManaPeriod( new DatePeriod( startDate, endDate )
+					, new FourWeekDays( this.fourWeekHoliday.v() + this.numberHolidayLastweek.v() ) );
+		
+		default:
+			throw new RuntimeException( " this value not existed!!! ");
+		}
+		
 	}
 
 	/**
@@ -74,12 +102,5 @@ public class HolidayAcqManageByMD implements FourWeekHolidayAcqMana, DomainValue
 	public StartDateClassification getStartDateType() {
 		return StartDateClassification.SPECIFY_MD;
 	}
-
-	/**
-	 * [4] 28日間を取得する
-	 */
-	@Override
-	public DatePeriod get28Days(Require require, GeneralDate ymd) {
-		return this.getManagementPeriod(require, ymd).getPeriod();
-	}
+	
 }

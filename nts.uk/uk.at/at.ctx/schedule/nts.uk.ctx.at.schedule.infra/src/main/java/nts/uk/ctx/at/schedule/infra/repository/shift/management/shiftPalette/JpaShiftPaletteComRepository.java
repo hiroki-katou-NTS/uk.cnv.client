@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.arc.layer.infra.data.database.DatabaseProduct;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPaletteCombinations;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPaletteCom;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPaletteComRepository;
@@ -71,6 +72,11 @@ public class JpaShiftPaletteComRepository extends JpaRepository implements Shift
 			+ " FROM KSCMT_PALETTE_CMP a JOIN KSCMT_PALETTE_CMP_COMBI b ON a.CID = b.CID AND a.PAGE = b.PAGE"
 			+ " JOIN KSCMT_PALETTE_CMP_COMBI_DTL c ON b.CID = c.CID AND b.PAGE = c.PAGE AND b.POSITION = c.POSITION"
 			+ " WHERE a.CID = 'companyId' AND a.USE_ATR = 1 ";
+	private static final String FIND_BY_COMPANY_USE_POSTGRES = "SELECT a.CID, a.PAGE, a.PAGE_NAME, a.USE_ATR, a.NOTE,"
+			+ " b.POSITION, b.POSITION_NAME," + " c.POSITION_ORDER, c.SHIFT_MASTER_CD"
+			+ " FROM KSCMT_PALETTE_CMP a JOIN KSCMT_PALETTE_CMP_COMBI b ON a.CID = b.CID AND a.PAGE = b.PAGE"
+			+ " JOIN KSCMT_PALETTE_CMP_COMBI_DTL c ON b.CID = c.CID AND b.PAGE = c.PAGE AND b.POSITION = c.POSITION"
+			+ " WHERE a.CID = 'companyId' AND a.USE_ATR = true ";
 	
 	@AllArgsConstructor
 	@Getter
@@ -92,7 +98,7 @@ public class JpaShiftPaletteComRepository extends JpaRepository implements Shift
 		while (rs.next()) {
 			listFullData
 					.add(new FullShiftPallets(rs.getString("CID"), Integer.valueOf(rs.getString("PAGE")),
-							rs.getString("PAGE_NAME"), Integer.valueOf(rs.getString("USE_ATR")) == 1 ? true : false,
+							rs.getString("PAGE_NAME"), rs.getBoolean("USE_ATR"),
 							rs.getString("NOTE"),
 							rs.getString("POSITION") != null ? Integer.valueOf(rs.getString("POSITION")) : null,
 							rs.getString("POSITION_NAME"), rs.getString("POSITION_ORDER") != null
@@ -129,7 +135,7 @@ public class JpaShiftPaletteComRepository extends JpaRepository implements Shift
 										}).collect(Collectors.toList());
 								return new KscmtPaletteCmpCombi(combiPk, positionName, null, cmpCombiDtls);
 							}).collect(Collectors.toList());
-					return new KscmtPaletteCmp(pk, pageName, useAtr ? 1 : 0, note, cmpCombis);
+					return new KscmtPaletteCmp(pk, pageName, useAtr, note, cmpCombis);
 				}).collect(Collectors.toList());
 	}
 
@@ -291,6 +297,9 @@ public class JpaShiftPaletteComRepository extends JpaRepository implements Shift
 	@Override
 	public List<ShiftPaletteCom> findShiftPalletUse(String companyId) {
 		String query = FIND_BY_COMPANY_USE;
+		if (this.database().is(DatabaseProduct.POSTGRESQL)) {
+			query = FIND_BY_COMPANY_USE_POSTGRES;
+		}
 		query = query.replaceFirst("companyId", companyId);
 		try (PreparedStatement stmt = this.connection().prepareStatement(query)) {
 			ResultSet rs = stmt.executeQuery();

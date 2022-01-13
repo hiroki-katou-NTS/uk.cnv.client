@@ -5,6 +5,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +29,16 @@ public abstract class ContractCompanyUkJpaEntity extends UkJpaEntity {
     private void setInsertingContractInfo() {
 		this.contractCd = AppContexts.user().contractCode();
 		this.companyId = AppContexts.user().companyId();
+	}
+	
+	@PreUpdate
+	private void setUpdatingContractInfo() {
+		if (this.contractCd == null) {
+			this.contractCd = AppContexts.user().contractCode();
+		}
+		if (this.companyId == null) {
+			this.companyId = AppContexts.user().companyId();
+		}
 	}
 
 }

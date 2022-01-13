@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+>
+<body>
+<ui:composition template="../../../../master/base.xhtml">
+    <ui:define name="htmlHead">
+        <script>var dialogSize = {width: 300, height: 200};</script>
+        <com:stylefile path="kha003.d.style.css"/>
+        <com:scriptfile path="kha003.d.vm.js"/>
+        <com:scriptfile set="IGNITE"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div id="functions-area">
+            <!--D1_4-->
+            <a tabindex="1" class="goback"
+               data-bind="ntsLinkButton: { }, click:backToAScreen">#{i18n.getText('KHA003_73')}</a>
+            <!--D1_1-->
+            <button id="D1_1" tabindex="2" class="proceed"
+                    data-bind="click:exportExcell">#{i18n.getText('KHA003_70')}</button>
+            <!--D1_2-->
+            <button tabindex="3" class="proceed" data-bind="click:exportCsv">#{i18n.getText('KHA003_71')}</button>
+            <!--D1_3-->
+            <button tabindex="4" data-bind="click:displayKha003CScreen">#{i18n.getText('KHA003_72')}</button>
+        </div>
+        <div id="contents-area">
+            <div id="grid1"></div>
+        </div>
+    </ui:define>
+</ui:composition>
+</body>
+</html>

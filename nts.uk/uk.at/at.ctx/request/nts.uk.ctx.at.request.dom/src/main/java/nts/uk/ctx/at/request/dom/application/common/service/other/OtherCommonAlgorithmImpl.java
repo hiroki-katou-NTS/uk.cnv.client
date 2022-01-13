@@ -209,21 +209,25 @@ public class OtherCommonAlgorithmImpl implements OtherCommonAlgorithm {
 			return PrePostAtr.POSTERIOR;
 		}
 		AttendanceClock compareTime = null;
-		switch(overtimeAppAtr){
-		case EARLY_OVERTIME:
-			// 受付制限日時＝　INPUT.「残業申請事前の受付制限」．時刻（早出残業）
-			compareTime = otAppBeforeAccepRestric.getOpEarlyOvertime().get();
-			break;
-		case NORMAL_OVERTIME:
-			// 受付制限日時＝　INPUT.「残業申請事前の受付制限」．時刻（通常残業）
-			compareTime = otAppBeforeAccepRestric.getOpNormalOvertime().get();
-			break;
-		case EARLY_NORMAL_OVERTIME:
-			// 受付制限日時＝　INPUT.「残業申請事前の受付制限」．時刻（早出残業・通常残業）
-			compareTime = otAppBeforeAccepRestric.getOpEarlyNormalOvertime().get();
-			break;
-		default:
-			break;
+		switch (overtimeAppAtr) {
+			case EARLY_OVERTIME:
+				// 受付制限日時＝　INPUT.「残業申請事前の受付制限」．時刻（早出残業）
+				compareTime = otAppBeforeAccepRestric.getOpEarlyOvertime().get();
+				break;
+			case NORMAL_OVERTIME:
+				// 受付制限日時＝　INPUT.「残業申請事前の受付制限」．時刻（通常残業）
+				compareTime = otAppBeforeAccepRestric.getOpNormalOvertime().get();
+				break;
+			case EARLY_NORMAL_OVERTIME:
+				// 受付制限日時＝　INPUT.「残業申請事前の受付制限」．時刻（早出残業・通常残業）
+				compareTime = otAppBeforeAccepRestric.getOpEarlyNormalOvertime().get();
+				break;
+			case MULTIPLE_OVERTIME:
+				// 受付制限日時＝　INPUT.「残業申請事前の受付制限」．時刻（複数回残業）
+				compareTime = otAppBeforeAccepRestric.getOpMultipleOvertime().get();
+				break;
+			default:
+				break;
 		}
 		// システム日時と受付制限日時と比較する
 		ClockHourMinute systemTime = ClockHourMinute.now();

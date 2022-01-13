@@ -21,10 +21,10 @@ module nts.uk.com.view.cmm050.a {
             
             //common info
             emailAuth: KnockoutObservable<string>;
-            useAuth: KnockoutObservable<number>;
             authMethod: KnockoutObservable<number>;
             password: KnockoutObservable<string>;
             encryptionMethod: KnockoutObservable<number>;
+            useSmtpAuthen: KnockoutObservable<boolean>
             
             //smtp info
             smtpPort: KnockoutObservable<number>;
@@ -59,18 +59,8 @@ module nts.uk.com.view.cmm050.a {
                     { value: 1, name: nts.uk.resource.getText("CMM050_7") },
                     { value: 0, name: nts.uk.resource.getText("CMM050_8") }
                 ]);
-                _self.authMethodArray = ko.observable([
-                    { value: 0, text: 'POP BEFORE SMTP' },
-                    { value: 1, text: 'IMAP BEFORE SMTP' },
-                    { value: 2, text: 'SMTP AUTH LOGIN' },
-                    { value: 3, text: 'SMTP AUTH PLAIN' },
-                    { value: 4, text: 'SMTP AUTH CRAM MD5'}
-                ]);
-                 _self.encryptionMethodArray = ko.observableArray([
-                    { value: 0, text: 'なし' },
-                    { value: 1, text: 'SSL' },
-                    { value: 2, text: 'TSL' }
-                ]);
+                _self.authMethodArray = ko.observable(__viewContext.enums.AuthenticationMethod);
+                 _self.encryptionMethodArray = ko.observableArray(__viewContext.enums.EncryptionMethod);
                 
                 _self.authMethodEnable = ko.observable(false);
                 
@@ -79,12 +69,12 @@ module nts.uk.com.view.cmm050.a {
                 _self.haveEncryptMethod = ko.observable(false);
                 
                 _self.emailAuth = ko.observable("");
-                _self.useAuth = ko.observable(0);
                 _self.authMethod = ko.observable(0);
                 _self.password = ko.observable("");
                 _self.encryptionMethod = ko.observable(0);
+                _self.useSmtpAuthen = ko.observable(false);
                 
-                _self.smtpPort = ko.observable(587);
+                _self.smtpPort = ko.observable(null);
                 _self.smtpServer = ko.observable("");
                 
                 _self.imapPort = ko.observable(143);
@@ -99,7 +89,7 @@ module nts.uk.com.view.cmm050.a {
                 _self.popServerEnable = ko.observable(false);
                 
                 _self.computedText = ko.computed(function() {
-                    if(_self.useAuth() == UseServer.USE){
+                    if(_self.useSmtpAuthen()){
                        return nts.uk.resource.getText("CMM050_13", [587]);
                     }else{
                        return nts.uk.resource.getText("CMM050_13", [25]);
@@ -107,8 +97,9 @@ module nts.uk.com.view.cmm050.a {
                 });
                 
                 //handle when value have been changed
-                _self.useAuth.subscribe(function(useAuthChanged){
-                    if(useAuthChanged == UseServer.USE){
+                _self.useSmtpAuthen.subscribe(value => {
+                    _self.hasError();
+                    if(value){
                         _self.authMethodEnable(true);
 //                        _self.smtpPort(25);
                         _self.fillUI(_self.authMethod());
@@ -129,6 +120,7 @@ module nts.uk.com.view.cmm050.a {
                 
                 //handle when value have been changed
                 _self.imapUseServer.subscribe(function(imapUseServerChanged){
+                    errors.clearAll();
                     if(imapUseServerChanged == ImapUseServer.USE){
                        _self.imapServerEnable(true);
                     }else{
@@ -138,6 +130,7 @@ module nts.uk.com.view.cmm050.a {
                 
                 //handle when value have been changed
                 _self.popUseServer.subscribe(function(popUseServerChanged){
+                    errors.clearAll();
                     if(popUseServerChanged == PopUseServer.USE){
                        _self.popServerEnable(true);
                     }else{
@@ -181,35 +174,18 @@ module nts.uk.com.view.cmm050.a {
             /**
              * Register Mail server setting
              */
-            public registerMailSetting() {
+            public registerMailSetting(): JQueryPromise<any> {
                 blockUI.invisible();
                 let _self = this;
-
+                
+                $(".nts-input").ntsError("validate");
                 if (nts.uk.ui.errors.hasError()) {
                     blockUI.clear();
                     return;
                 }
                 // Validate
                 if (_self.hasError()) {
-                    // validate input pop info
-                    if(_self.useAuth() == UseServer.USE && _self.authMethod() == AuthenticationMethod.POP_BEFORE_SMTP){
-                        if(nts.uk.text.isNullOrEmpty(_self.popPort())){
-                            nts.uk.ui.dialog.alertError({ messageId: "Msg_542" });
-                        }
-                         if(_self.popUseServer() == UseServer.USE && nts.uk.text.isNullOrEmpty(_self.popServer())){
-                            nts.uk.ui.dialog.alertError({ messageId: "Msg_543" });
-                        }
-                    }
-                    
-                    // validate input imap info
-                    if(_self.useAuth() == UseServer.USE && _self.authMethod() == AuthenticationMethod.IMAP_BEFORE_SMTP){
-                        if(nts.uk.text.isNullOrEmpty(_self.imapPort())){
-                            nts.uk.ui.dialog.alertError({ messageId: "Msg_544" });
-                        }
-                        if(_self.imapUseServer() == UseServer.USE && nts.uk.text.isNullOrEmpty(_self.imapServer())){
-                            nts.uk.ui.dialog.alertError({ messageId: "Msg_545" });
-                        }
-                    }
+                    _self.validateDomain();
                     blockUI.clear();
                     return;
                 }
@@ -225,7 +201,7 @@ module nts.uk.com.view.cmm050.a {
                 }
                 
                 var params = new model.MailServerDto(
-                        _self.useAuth(),
+                        _self.useSmtpAuthen() ? 1 : 0,
                         _self.encryptionMethod(),
                         _self.authMethod(),
                         _self.emailAuth(),
@@ -240,7 +216,7 @@ module nts.uk.com.view.cmm050.a {
                     dfd.resolve();
                     nts.uk.ui.dialog.info({ messageId: "Msg_15" }).then(() => { 
                         _self.startPage().done(function(){});
-                        $('#email_auth').focus();
+                        $('#A8_6').focus();
                     });
                 }).fail(function(){
                     alert('error');    
@@ -251,6 +227,29 @@ module nts.uk.com.view.cmm050.a {
             
             private checkToUseOlDataOrNewData() {
                 
+            }
+
+            private validateDomain() {
+              const _self = this;
+              // validate input pop info
+              if (_self.useSmtpAuthen() && _self.authMethod() == AuthenticationMethod.POP_BEFORE_SMTP) {
+                if (nts.uk.text.isNullOrEmpty(_self.popPort())) {
+                  nts.uk.ui.dialog.alertError({ messageId: "Msg_542" });
+                }
+                if (_self.popUseServer() == UseServer.USE && nts.uk.text.isNullOrEmpty(_self.popServer())) {
+                  nts.uk.ui.dialog.alertError({ messageId: "Msg_543" });
+                }
+              }
+
+              // validate input imap info
+              if (_self.useSmtpAuthen() && _self.authMethod() == AuthenticationMethod.IMAP_BEFORE_SMTP) {
+                if (nts.uk.text.isNullOrEmpty(_self.imapPort())) {
+                  nts.uk.ui.dialog.alertError({ messageId: "Msg_544" });
+                }
+                if (_self.imapUseServer() == UseServer.USE && nts.uk.text.isNullOrEmpty(_self.imapServer())) {
+                  nts.uk.ui.dialog.alertError({ messageId: "Msg_545" });
+                }
+              }
             }
             
             /**
@@ -268,13 +267,58 @@ module nts.uk.com.view.cmm050.a {
                 if (_self.hasError()) {
                     return;
                 }
-                
-                setShared('CMM050Params', {
-                    emailAuth: _self.emailAuth(),
-                }, true);
-                nts.uk.ui.windows.sub.modal("/view/cmm/050/b/index.xhtml").onClosed(function() {
-                    
-                });
+
+                //prepare data
+                if(!_.isNumber(_self.imapPort())){
+                  _self.imapPort(_self.mailServerData.imapDto.imapPort)
+                }
+                if(!_.isNumber(_self.popPort())){
+                    _self.popPort(_self.mailServerData.popDto.popPort)
+                }
+
+                // テスト送信前チェック
+                const param = new model.MailServerDto(
+                  _self.useSmtpAuthen() ? 1 : 0,
+                  _self.encryptionMethod(),
+                  _self.authMethod(),
+                  _self.emailAuth(),
+                  _self.password(),
+                  new model.SmtpInfoDto( _self.smtpServer(), _self.smtpPort()),
+                  new model.PopInfoDto(_self.popServer(), _self.popUseServer(), _self.popPort()),
+                  new model.ImapInfoDto(_self.imapServer(), _self.imapUseServer(), _self.imapPort())
+                );
+                service.checkDataChanged(param).then(result => {
+                  // 変更された項目はない
+                  if (!result) {
+                    // 終了状態：処理実行
+                    _self.proceedOpenDialogB();
+                  } else {
+                    // 確認メッセージ（ID：#Msg_2325）を表示
+                    nts.uk.ui.dialog.confirm({ messageId: "Msg_2325" })
+                    // 終了状態：処理中断
+                    .ifNo(() => {})
+                    .ifYes(() => {
+                      // 「A：登録時チェック処理」を実行
+                      _self.validateDomain();
+                      if (!nts.uk.ui.errors.hasError()) {
+                        // ドメインモデル「メールサーバ」を登録する
+                        _self.saveMailServerSetting(param).then(() => {
+                          nts.uk.ui.dialog.info({ messageId: "Msg_15" }).then(() => _self.proceedOpenDialogB());
+                        });
+                      }
+                    });
+                  }
+                })
+            }
+
+            private proceedOpenDialogB() {
+              const _self = this;
+              setShared('CMM050Params', {
+                emailAuth: _self.emailAuth(),
+              }, true);
+              nts.uk.ui.windows.sub.modal("/view/cmm/050/b/index.xhtml").onClosed(function() {
+                  
+              });
             }
             
             /**
@@ -351,26 +395,26 @@ module nts.uk.com.view.cmm050.a {
             private hasError(): boolean {
                 let _self = this;
                 _self.clearErrors();
-                $('#email_auth').ntsEditor("validate");
-                if (_self.useAuth() == UseServer.USE){
-                    $('#password').ntsEditor("validate");
+                $('#A2_2').ntsEditor("validate");
+                if (_self.useSmtpAuthen()){
+                    $('#A5_2').ntsEditor("validate");
                 }
-                $('#smtp_port').ntsEditor("validate");
-                $('#smtp_server').ntsEditor("validate");
+                $('#A8_3').ntsEditor("validate");
+                $('#A8_6').ntsEditor("validate");
                  // validate input pop info
-                if(_self.useAuth() == UseServer.USE && _self.authMethod() == AuthenticationMethod.POP_BEFORE_SMTP){
-                     $('#pop_port').ntsEditor("validate");
+                if(_self.useSmtpAuthen() && _self.authMethod() == AuthenticationMethod.POP_BEFORE_SMTP){
+                     $('#A9_3').ntsEditor("validate");
                    
                     if(_self.popUseServer() == UseServer.USE && nts.uk.text.isNullOrEmpty(_self.popServer())){
-                         $('#pop_server').ntsEditor("validate");
+                         $('#A9_10').ntsEditor("validate");
                     }
                 }
                 
                 // validate input imap info
-                if(_self.useAuth() == UseServer.USE && _self.authMethod() == AuthenticationMethod.IMAP_BEFORE_SMTP){
-                    $('#imap_port').ntsEditor("validate");
+                if(_self.useSmtpAuthen() && _self.authMethod() == AuthenticationMethod.IMAP_BEFORE_SMTP){
+                    $('#A10_3').ntsEditor("validate");
                     if(_self.imapUseServer() == UseServer.USE && nts.uk.text.isNullOrEmpty(_self.imapServer())){
-                        $('#imap_server').ntsEditor("validate");
+                        $('#A10_10').ntsEditor("validate");
                     }
                 }
                 if ($('.nts-input').ntsError('hasError')) {
@@ -408,7 +452,7 @@ module nts.uk.com.view.cmm050.a {
                     if (data === undefined){
                          _self.isEnableButtonTest(false);
                          let data = new model.MailServerDto(
-                                        _self.useAuth(),
+                                        _self.useSmtpAuthen() ? 1 : 0,
                                         _self.encryptionMethod(),
                                         _self.authMethod(),
                                         _self.emailAuth(),
@@ -422,7 +466,7 @@ module nts.uk.com.view.cmm050.a {
                         //set common mail server setting data
                         _self.isEnableButtonTest(true);
                         _self.emailAuth(data.emailAuthencation);
-                        _self.useAuth(data.useAuth);
+                        _self.useSmtpAuthen(data.useAuth === 1);
                         _self.authMethod(data.authMethod);
                         _self.password(data.password);
                         _self.encryptionMethod(data.encryptionMethod);
@@ -506,7 +550,7 @@ module nts.uk.com.view.cmm050.a {
         enum EncryptMethod {
             None = 0,
             SSL = 1,
-            TSL = 2
+            TLS = 2
         }
     }
 }

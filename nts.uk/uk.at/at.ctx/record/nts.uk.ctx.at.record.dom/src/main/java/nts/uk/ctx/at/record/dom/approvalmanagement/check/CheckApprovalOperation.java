@@ -14,12 +14,16 @@ public class CheckApprovalOperation {
 		if (approvalSetting.getUseDayApproverConfirm() && approvalSetting.getSupervisorConfirmErrorAtr() != null) {
 			if (approvalSetting.getSupervisorConfirmErrorAtr().value == ConfirmationOfManagerOrYouself.CAN_CHECK.value) {
 				return Optional.of(ConfirmationOfManagerOrYouself.CAN_CHECK);
-			} else {
-				return Optional.of(ConfirmationOfManagerOrYouself.CAN_NOT_REGISTER);
 			}
-		} else {
-			return Optional.empty();
+			return Optional.of(ConfirmationOfManagerOrYouself.CAN_NOT_CHECK);
 		}
+		return Optional.empty();
+//			} else {
+//				return Optional.of(ConfirmationOfManagerOrYouself.CAN_NOT_REGISTER);
+//			}
+//		} else {
+//			return Optional.empty();
+//		}
 	}
 	
 //	public Optional<ConfirmOfManagerOrYouself> checkOld(FunctionalRestriction identityProcessUseSet) {

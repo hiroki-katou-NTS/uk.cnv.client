@@ -1,7 +1,5 @@
 package nts.uk.ctx.sys.portal.app.command.webmenu.webmenulinking;
 
-import java.util.Optional;
-
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -11,6 +9,8 @@ import nts.uk.ctx.sys.portal.dom.webmenu.WebMenuCode;
 import nts.uk.ctx.sys.portal.dom.webmenu.webmenulinking.RoleByRoleTies;
 import nts.uk.ctx.sys.portal.dom.webmenu.webmenulinking.RoleByRoleTiesRepository;
 import nts.uk.shr.com.context.AppContexts;
+
+import java.util.Optional;
 
 @Stateless
 public class UpdateRoleByRoleTiesCommandHandler extends CommandHandler<RoleByRoleTiesCommand> {
@@ -22,15 +22,16 @@ public class UpdateRoleByRoleTiesCommandHandler extends CommandHandler<RoleByRol
 	protected void handle(CommandHandlerContext<RoleByRoleTiesCommand> context) {
 		RoleByRoleTiesCommand role = context.getCommand();
 		
-		RoleByRoleTies newRole = new RoleByRoleTies(role.getRoleId(),new WebMenuCode( role.getWebMenuCd()), AppContexts.user().companyId());
-		Optional<RoleByRoleTies> checkData = repo.getRoleByRoleTiesById(newRole.getRoleId());
-		
+		RoleByRoleTies newRole = new RoleByRoleTies(role.getRoleId(), AppContexts.user().companyId(), new WebMenuCode( role.getWebMenuCd()));
+
+		Optional<RoleByRoleTies> checkData = repo.getByRoleIdAndCompanyId(newRole.getRoleId(),AppContexts.user().companyId());
+
 		if(checkData.isPresent()) {
 			repo.updateRoleByRoleTies(newRole);
 			
 		} else {
 			repo.insertRoleByRoleTies(newRole);;
 		}
-		
+
 	}
 }

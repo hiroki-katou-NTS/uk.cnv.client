@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import lombok.val;
 import nts.uk.ctx.bs.employee.dom.employee.history.AffCompanyHist;
 import nts.uk.ctx.bs.employee.dom.employee.history.AffCompanyHistByEmployee;
 import nts.uk.ctx.bs.employee.dom.employee.history.AffCompanyHistRepository;
@@ -135,11 +136,16 @@ public class PersonEmpBasicInfoPubImpl implements PersonEmpBasicInfoPub {
 							person.getBirthDate(), emp.getEmployeeCode().v(), period.start(), period.end());
 				}).collect(Collectors.toList());
 	}
-	
+
 	public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
 
 		Map<Object, Boolean> seen = new ConcurrentHashMap<>();
 		return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
 	}
-
+	
+	// Pub get all Sid
+	@Override
+	public List<String> getAllSidByCid (String cid) {
+		return empDataRepo.getAllSidByCid(cid);
+	}
 }

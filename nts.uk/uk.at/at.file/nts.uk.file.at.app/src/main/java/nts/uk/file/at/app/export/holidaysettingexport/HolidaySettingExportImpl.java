@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -13,6 +14,12 @@ import javax.inject.Inject;
 
 import nts.arc.time.GeneralDate;
 import nts.gul.collection.CollectionUtil;
+import nts.gul.text.StringUtil;
+import nts.uk.ctx.at.schedule.dom.shift.basicworkregister.WorkdayDivision;
+import nts.uk.ctx.at.schedule.dom.shift.businesscalendar.holiday.PublicHoliday;
+import nts.uk.ctx.at.schedule.dom.shift.businesscalendar.holiday.PublicHolidayRepository;
+import nts.uk.ctx.at.schedule.dom.shift.pattern.work.WeeklyWorkSettingRepository;
+import nts.uk.ctx.at.schedule.dom.shift.weeklywrkday.WeeklyWorkDayPattern;
 import nts.uk.ctx.at.shared.app.find.holidaysetting.configuration.PublicHolidayManagementUsageUnitFindDto;
 import nts.uk.ctx.at.shared.app.find.holidaysetting.configuration.PublicHolidayManagementUsageUnitFinder;
 import nts.uk.ctx.at.shared.app.find.holidaysetting.configuration.PublicHolidaySettingDto;
@@ -93,6 +100,12 @@ public class HolidaySettingExportImpl implements MasterListData{
 	@Inject
     private HolidayRepository holidayRepository;
 	
+	@Inject
+	private WeeklyWorkSettingRepository weeklyWorkSettingRepository;
+	
+	@Inject
+	private PublicHolidayRepository publicHolidayRepository;
+	
 	//設定 
 	public static String value1= "項目";
 	public static String value2= "column2";
@@ -127,6 +140,11 @@ public class HolidaySettingExportImpl implements MasterListData{
     public static final String KMF001_B02 = "Level_2";
     public static final String KMF001_167 = "値";
 
+    private static final String KMF002_121 = "KMF002_121";
+    private static final String KMF002_129 = "KMF002_129";
+    private static final String KMF002_137 = "KMF002_137";
+    private static final String KMF002_138 = "KMF002_138";
+    private static final String KMF002_139 = "KMF002_139";
 
 	/** The Constant TIME_DAY_START. */
 	public static final String TIME_DAY_START = " 00:00:00";
@@ -627,7 +645,68 @@ public class HolidaySettingExportImpl implements MasterListData{
 
 		return columns;
 	}
+	
+	private List<MasterData> getMasterDataWeeklyHolidaySetting() {
+		String cid = AppContexts.user().companyId();
+		WeeklyWorkDayPattern domain = this.weeklyWorkSettingRepository.getWeeklyWorkDayPatternByCompanyId(cid);
+		return domain.getListWorkdayPatternItem().stream()
+				.sorted(Comparator.comparing(data -> data.getDayOfWeek().value))
+				.map(data -> {
+					Map<String, Object> datas = new HashMap<>();
+					datas.put(KMF002_121, TextResource.localize(data.getDayOfWeek().nameId));
+					datas.put(KMF002_129, this.getWorkdayDivistionText(data.getWorkdayDivision()));
+					MasterData masterData = new MasterData(datas, null, null);
+					masterData.cellAt(KMF002_121).setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+					masterData.cellAt(KMF002_129).setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+					return masterData;
+				}).collect(Collectors.toList());
+	}
 
+	private List<MasterHeaderColumn> getHeaderColumnsWeeklyHolidaySetting() {
+		List<MasterHeaderColumn> columns = new ArrayList<>();
+        columns.add(new MasterHeaderColumn(KMF002_121, TextResource.localize(KMF002_121),
+                ColumnTextAlign.LEFT, "", true));
+        columns.add(new MasterHeaderColumn(KMF002_129, TextResource.localize(KMF002_129),
+                ColumnTextAlign.LEFT, "", true));
+        return columns;
+	}
+	
+	private List<MasterData> getMasterDataHolidaySetting() {
+		String cid = AppContexts.user().companyId();
+		List<PublicHoliday> domains = this.publicHolidayRepository.getAllHolidays(cid);
+		Map<Integer, List<PublicHoliday>> mapByYear = domains.stream()
+				.sorted(Comparator.comparing(PublicHoliday::getDate))
+				.collect(Collectors.groupingBy(data -> data.getDate().year()));
+		return mapByYear.entrySet().stream()
+				.map(entry -> {
+					AtomicBoolean isFirstLine = new AtomicBoolean(true);
+					return entry.getValue().stream()
+							.map(data -> {
+								Map<String, Object> datas = new HashMap<>();
+								datas.put(KMF002_137, isFirstLine.getAndSet(false) ? entry.getKey() : "");
+								datas.put(KMF002_138, this.formatHolidayDate(data.getDate()));
+								datas.put(KMF002_139, data.getHolidayName().v());
+								MasterData masterData = new MasterData(datas, null, null);
+								masterData.cellAt(KMF002_137).setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+								masterData.cellAt(KMF002_138).setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+								masterData.cellAt(KMF002_139).setStyle(MasterCellStyle.build().horizontalAlign(ColumnTextAlign.LEFT));
+								return masterData;
+							}).collect(Collectors.toList());
+				}).flatMap(List::stream).collect(Collectors.toList());
+	}
+	
+	private List<MasterHeaderColumn> getHeaderColumnsHolidaySetting() {
+		List<MasterHeaderColumn> columns = new ArrayList<>();
+        columns.add(new MasterHeaderColumn(KMF002_137, TextResource.localize(KMF002_137),
+                ColumnTextAlign.LEFT, "", true));
+        columns.add(new MasterHeaderColumn(KMF002_138, TextResource.localize(KMF002_138),
+                ColumnTextAlign.LEFT, "", true));
+        columns.add(new MasterHeaderColumn(KMF002_139, TextResource.localize(KMF002_139),
+                ColumnTextAlign.LEFT, "", true));
+        
+        return columns;
+	}
+	
 	public List<MasterHeaderColumn> getHeaderColumnsHoliday() {
         List<MasterHeaderColumn> columns = new ArrayList<>();
         columns.add(new MasterHeaderColumn(KMF001_166, TextResource.localize("KMF001_166"),
@@ -686,6 +765,20 @@ public class HolidaySettingExportImpl implements MasterListData{
 	@Override
 	public List<SheetData> extraSheets(MasterListExportQuery query){
 		List<SheetData> listSheetData = new ArrayList<>();
+		
+		SheetData sheetWeeklyHoliday = SheetData.builder()
+				.mainData(this.getMasterDataWeeklyHolidaySetting())
+				.mainDataColumns(this.getHeaderColumnsWeeklyHolidaySetting())
+				.mode(MasterListMode.NONE)
+				.sheetName(TextResource.localize("KMF002_135")).build();
+		listSheetData.add(sheetWeeklyHoliday);
+		
+		SheetData sheetHoliday = SheetData.builder()
+				.mainData(this.getMasterDataHolidaySetting())
+				.mainDataColumns(this.getHeaderColumnsHolidaySetting())
+				.mode(MasterListMode.NONE)
+				.sheetName(TextResource.localize("KMF002_136")).build();
+		listSheetData.add(sheetHoliday);
 		
 //		HolidaySettingConfigDto optPubHDSet = finder.findHolidaySettingConfigData();	
 		PublicHolidaySettingDto optPubHdSetting = pubHdSettingFinder.findPubHdSetting();
@@ -920,4 +1013,21 @@ public class HolidaySettingExportImpl implements MasterListData{
 		return lististRegulationInfoEmployee;
 	}
 
+	private String getWorkdayDivistionText(WorkdayDivision value) {
+		switch (value) {
+		case WORKINGDAYS:
+			return TextResource.localize("KMF002_130");
+		case NON_WORKINGDAY_INLAW:
+			return TextResource.localize("KMF002_131");
+		case NON_WORKINGDAY_EXTRALEGAL:
+			return TextResource.localize("KMF002_132");
+		}
+		return "";
+	}
+	
+	private String formatHolidayDate(GeneralDate date) {
+		String month = StringUtil.padLeft(String.valueOf(date.month()), 2, '0');
+		String day = StringUtil.padLeft(String.valueOf(date.day()), 2, '0');
+		return String.format("%s月%s日", month, day);
+	}
 }

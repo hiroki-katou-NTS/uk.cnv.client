@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import lombok.val;
+import nts.arc.time.GeneralDate;
+import nts.uk.ctx.at.request.dom.application.overtime.OvertimeAppAtr;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.util.Strings;
 
@@ -468,19 +471,41 @@ public class AppContentDetailImplCMM045 implements AppContentDetailCMM045 {
 		String content = Strings.EMPTY;
 		// ドメインモデル「出張申請」を取得する
 		BusinessTrip businessTrip = businessTripRepository.findByAppId(companyID, application.getAppID()).get();
+		// 日数＝申請.申請終了日-申請.申請開始日＋１日
+		int numOfDate = 0;
+		GeneralDate appEndDate = null;
+		GeneralDate appStarDate = null;
+		if(application.getOpAppEndDate().isPresent() && application.getOpAppStartDate().isPresent()){
+			 appEndDate = application.getOpAppEndDate().get().getApplicationDate();
+			 appStarDate = application.getOpAppStartDate().get().getApplicationDate();
+			numOfDate = this.getDaysBetween(appStarDate,appEndDate);
+			//申請内容＝#CMM045_257({0}＝上記取得日数）＋”　”
+			content += I18NText.getText("CMM045_257",(String.valueOf(numOfDate))) + "　";
+		}
+		//$出発＝申請開始日
+		String startDate = "";
+		//$戻り＝申請終了日をセット
+		String endDate = "";
+		if(appEndDate!=null  && appEndDate.compareTo(appStarDate) != 0){
+			  startDate =  appStarDate.toString("MM/dd");
+			  endDate = appEndDate.toString("MM/dd");
+
+		}
 		// @＝''
 		String paramString = "";
 		// 出張申請.出発時刻が入力されている場合
 		if(businessTrip.getDepartureTime().isPresent()) {
 			// 申請内容＝#CMM045_290＋"　"＋出張申請.出発時刻＋”　”
-			content += I18NText.getText("CMM045_290") + " " + new TimeWithDayAttr(businessTrip.getDepartureTime().get().v()).getFullText() + " ";
+			//申請内容＋＝#CMM045_290＋"　"＋$出発＋出張申請.出発時刻
+			content += I18NText.getText("CMM045_290") + "　" +startDate + new TimeWithDayAttr(businessTrip.getDepartureTime().get().v()).getFullText();
 			// @＝'　'
-			paramString = " ";
+			paramString = "　";
 		}
 		// 出張申請.帰着時刻が入力されている場合
 		if(businessTrip.getReturnTime().isPresent()) {
 			// 申請内容＋＝@＋#CMM045_291＋"　"＋出張申請.帰着時刻
-			content += paramString + I18NText.getText("CMM045_291") + " " + new TimeWithDayAttr(businessTrip.getReturnTime().get().v()).getFullText();
+			//申請内容＋＝$SP＋#CMM045_291＋"　"＋$戻り＋出張申請.帰着時刻
+			content += paramString + I18NText.getText("CMM045_291") + "　"+ endDate+ new TimeWithDayAttr(businessTrip.getReturnTime().get().v()).getFullText();
 		}
 		// アルゴリズム「申請内容の申請理由」を実行する
 		String appReasonContent = appContentService.getAppReasonContent(
@@ -576,8 +601,8 @@ public class AppContentDetailImplCMM045 implements AppContentDetailCMM045 {
 		AppOverTimeData appOverTimeData = new AppOverTimeData(
 				appOverTime.getWorkHoursOp().map(x -> x.stream().filter(y -> y.getWorkNo().v()==1).findAny().map(y -> y.getTimeZone().getStartTime().v()).orElse(null)).orElse(null), 
 				appOverTime.getOverTimeClf().value, 
-				appOverTime.getWorkHoursOp().map(x -> x.stream().filter(y -> y.getWorkNo().v()==1).findAny().map(y -> y.getTimeZone().getEndTime().v()).orElse(null)).orElse(null), 
-				appOverTime.getAppID(),
+				appOverTime.getWorkHoursOp().map(x -> x.stream().filter(y -> y.getWorkNo().v()==1).findAny().map(y -> y.getTimeZone().getEndTime().v()).orElse(null)).orElse(null),
+				application.getAppID(),
 				excessTimeNumber,
 				excessTime,
 				appOverTime.getApplicationTime().getFlexOverTime().map(x -> x.v()), 
@@ -609,15 +634,18 @@ public class AppContentDetailImplCMM045 implements AppContentDetailCMM045 {
 				overtimeHolidayWorkActual==null ? false : overtimeHolidayWorkActual.isActualStatus(),
 				application);
 		Optional<ApplicationTypeDisplay> opAppTypeDisplay = Optional.empty();
-		switch (appOverTime.getOverTimeClf()) {
-		case EARLY_OVERTIME:
+		switch (appOverTime.getOverTimeClf().value) {
+		case 0:
 			opAppTypeDisplay = Optional.of(ApplicationTypeDisplay.EARLY_OVERTIME);
 			break;
-		case NORMAL_OVERTIME:
+		case 1:
 			opAppTypeDisplay = Optional.of(ApplicationTypeDisplay.NORMAL_OVERTIME);
 			break;
-		case EARLY_NORMAL_OVERTIME:
+		case 2:
 			opAppTypeDisplay = Optional.of(ApplicationTypeDisplay.EARLY_NORMAL_OVERTIME);
+			break;
+		case 3:
+			opAppTypeDisplay = Optional.of(ApplicationTypeDisplay.OVERTIME_MULTIPLE_TIME);
 			break;
 		default:
 			break;
@@ -839,6 +867,16 @@ public class AppContentDetailImplCMM045 implements AppContentDetailCMM045 {
 				screenAtr, 
 				leaveApplicationDetails, 
 				application.getOpAppStandardReasonCD().orElse(null));
+	}
+	private int  getDaysBetween(GeneralDate startDate, GeneralDate endDate) {
+		int date = 0;
+		while (startDate.beforeOrEquals(endDate)) {
+			date+=1;
+			GeneralDate temp = startDate.addDays(1);
+			startDate = temp;
+		}
+
+		return date;
 	}
 	
 }

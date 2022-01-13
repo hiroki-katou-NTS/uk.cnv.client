@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html	xmlns="http://www.w3.org/1999/xhtml"
+			xmlns:ui="http://java.sun.com/jsf/facelets"
+			xmlns:com="http://xmlns.jcp.org/jsf/component"
+			xmlns:h="http://xmlns.jcp.org/jsf/html">
+	<body>
+		<ui:composition template="../../../../master/base.xhtml">
+			<ui:define name="htmlHead">
+				<com:scriptfile set="IGNITE" />
+				<com:stylefile path="cmf001.e.css" />
+				<com:scriptfile path="cmf001.e.vm.js" />
+				<com:ValidatorScript>
+					nts.uk.ctx.exio.dom.input.setting.ExternalImportCode
+					nts.uk.ctx.exio.dom.input.setting.ExternalImportName
+					nts.uk.ctx.exio.dom.input.csvimport.ExternalImportRowNumber
+				</com:ValidatorScript>
+				<com:EnumScript>
+					nts.uk.ctx.exio.dom.input.domain.ImportingDomainId
+					nts.uk.ctx.exio.dom.input.canonicalize.ImportingMode 
+				</com:EnumScript>
+			</ui:define>
+
+			<ui:define name="content">
+				<div id="functions-area">
+					<a
+						class="goback"
+						tabindex="1"
+						data-bind="ntsLinkButton: { jump: '/view/cmf/001/a/index.xhtml' }, text: '戻る'"
+					></a>
+					<button  
+						class="normal"
+						tabindex="2"
+						data-bind="click: newMode, text: '新規'"
+					></button>
+					<button
+						class="proceed"
+						tabindex="3"
+						data-bind="enable: canSave, click: save, text: '登録'"
+					></button>
+					<button
+						class="danger"
+						tabindex="4"
+						data-bind="enable: canRemove, click: remove, text: '削除'"
+					></button>
+				</div>
+
+				<div id="contents-area" class="fixed-flex-layout">
+					<div class="fixed-flex-layout-left" style="padding-top: 20px; padding-left: 20px">
+						<div class="settings">
+							<table id="setting-list" data-bind="ntsGridList: {
+								height: '400px',
+								dataSource: settingList,
+								primaryKey: 'code',
+								columns: settingListColumns,
+								value: selectedCode}">
+							</table>
+						</div>
+					</div>
+					
+					<div class="fixed-flex-layout-right" style="padding-top: 20px;">
+						<div class="domain">
+							<div class="code">
+								<div class="formLabel" data-bind="ntsFormLabel: { required: true , constraint: ['ExternalImportCode'] }">コード</div>
+								<input class="check-target" id="settingCode" data-bind="ntsTextEditor: { 
+									name: 'コード',
+									value: settingCode,
+									enable: isNewMode,
+									required: true, 
+									constraint: ['ExternalImportCode']}" />
+							</div>
+							<div class="name">
+								<div class="formLabel" data-bind="ntsFormLabel: { required: true , constraint: ['ExternalImportName'] }">名称</div>
+								<input class="check-target" id="settingName" data-bind="ntsTextEditor: { 
+									name: '名称',
+									value: settingName,  
+									required: true, 
+									constraint: ['ExternalImportName']}" />
+							</div>
+							<div class="item-name-row">
+								<div class="formLabel" data-bind="ntsFormLabel: { required: true , constraint: ['ExternalImportRowNumber']　}">CSVファイルの項目名の行</div>
+								<input class="check-target" id="itemNameRow" data-bind="ntsNumberEditor: {
+									name: '項目名の行', 
+									value: itemNameRow,  
+									required: true, 
+									constraint: ['ExternalImportRowNumber']}" />
+							</div>
+							<div class="import-start-row">
+								<div class="formLabel" data-bind="ntsFormLabel: { required: true , constraint: ['ExternalImportRowNumber']　}">CSVファイルの受入開始行</div>
+								<input class="check-target" id="importStartRow" data-bind="ntsNumberEditor: {
+									name: '受入開始行', 
+									value: importStartRow,  
+									required: true, 
+									constraint: ['ExternalImportRowNumber']}" />
+							</div>
+							<div class="row">
+									<div class="formLabel" data-bind="ntsFormLabel: {required: true}">サンプルCSVファイル</div>
+									<div class="detail">
+										<div id="file-upload" data-bind="ntsFileUpload:{
+											filename: csvFileName,
+											accept: ['csv'],
+											text: '取込',
+											aslink: false,
+											immediateUpload: true,
+											uploadFinished: csvFileUploaded
+										}"></div>
+									</div>
+							</div>
+						</div>
+						<span class="caret-bottom"></span>
+						<button class="x-large" id="bntOpenDetail" data-bind="text: '受入レイアウトの設定', click: gotoDetailSetting, enable: canEditDetail"></button>
+					</div>
+				</div>
+			</ui:define>
+		</ui:composition>
+	</body>
+</html>

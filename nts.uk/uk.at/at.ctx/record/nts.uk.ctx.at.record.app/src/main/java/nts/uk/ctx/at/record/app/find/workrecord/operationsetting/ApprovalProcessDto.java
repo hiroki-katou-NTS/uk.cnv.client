@@ -17,10 +17,10 @@ public class ApprovalProcessDto
     */
     private String cid;
     
-    /**
-     * 職位ID
-     */
-     private String jobTitleId;
+//    /**
+//     * 職位ID
+//     */
+//     private String jobTitleId;
      
     /**
     * 日の承認者確認を利用する
@@ -39,7 +39,7 @@ public class ApprovalProcessDto
     
     
     public static ApprovalProcessDto fromDomain(ApprovalProcess domain){
-        return new ApprovalProcessDto(domain.getCid(), domain.getJobTitleId(), 
+        return new ApprovalProcessDto(domain.getCid(), 
 						        		domain.getUseDailyBossChk(), domain.getUseMonthBossChk(), 
 						        		domain.getSupervisorConfirmError() == null ? null : domain.getSupervisorConfirmError().value);
     }

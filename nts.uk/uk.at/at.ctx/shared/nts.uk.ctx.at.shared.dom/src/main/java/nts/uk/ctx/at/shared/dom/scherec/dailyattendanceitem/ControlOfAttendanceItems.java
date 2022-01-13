@@ -25,15 +25,11 @@ public class ControlOfAttendanceItems extends AggregateRoot {
 	/**日別実績のヘッダ背景色*/
 	private Optional<HeaderBackgroundColor> headerBgColorOfDailyPer;
 
-	/**時間項目の入力単位*/
-	private Optional<BigDecimal> inputUnitOfTimeItem;
-
-	public ControlOfAttendanceItems(String companyID, int itemDailyID, HeaderBackgroundColor headerBgColorOfDailyPer, BigDecimal inputUnitOfTimeItem) {
+	public ControlOfAttendanceItems(String companyID, int itemDailyID, HeaderBackgroundColor headerBgColorOfDailyPer) {
 		super();
 		this.companyID = companyID;
 		this.itemDailyID = itemDailyID;
 		this.headerBgColorOfDailyPer = Optional.ofNullable(headerBgColorOfDailyPer);
-		this.inputUnitOfTimeItem =  Optional.ofNullable(inputUnitOfTimeItem);
 	}
 	
 	

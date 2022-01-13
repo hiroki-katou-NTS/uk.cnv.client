@@ -15,6 +15,7 @@ import nts.arc.layer.infra.data.jdbc.NtsStatement;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
+import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.AppReflectExecInfo;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.ApplicationReflectHistory;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.ApplicationReflectHistoryRepo;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.AttendanceBeforeApplicationReflect;
@@ -33,6 +34,8 @@ public class JpaApplicationReflectHistoryRepo extends JpaRepository implements A
 	private final static String FIND_AFTER_MAX;
 	private final static String FIND_APP_NOT_REF;
 	private final static String FIND_APP_REF;
+	private final static String FIND_OTHER_ID_REMOVED;
+	private final static String FIND_SID_DATE;
 	static {
 		StringBuilder builder = new StringBuilder();
 		builder.append("UPDATE KsrdtReflectAppHist hist ");
@@ -45,7 +48,7 @@ public class JpaApplicationReflectHistoryRepo extends JpaRepository implements A
 
 		builder = new StringBuilder();
 		builder.append(
-				"SELECT hist.SID, hist.YMD, hist.APP_ID, hist.ATR, hist.REFLECT_TIME, hist.DELETE_ATR,  rest.ATTENDANCE_ID,  rest.VALUE, rest.STATUS ");
+				"SELECT hist.SID, hist.YMD, hist.APP_ID, hist.ATR, hist.REFLECT_TIME, hist.DELETE_ATR, hist.RE_REFLECT_ATR, hist.EXECUTION_ID, rest.ATTENDANCE_ID,  rest.VALUE, rest.STATUS ");
 		builder.append("FROM KSRDT_REFLECT_APP_HIST hist ");
 		builder.append("JOIN KSRDT_REFLECT_APP_HIST_RESTORE rest ON  hist.SID =  rest.SID AND  hist.YMD =  rest.YMD ");
 		builder.append(
@@ -73,7 +76,23 @@ public class JpaApplicationReflectHistoryRepo extends JpaRepository implements A
 		builder.append(
 				"ORDER BY hist.REFLECT_TIME DESC ");
 		FIND_APP_REF = builder.toString();
-
+		
+		builder = new StringBuilder();
+		builder.append(FIND);
+		builder.append(" LEFT JOIN KRQDT_APPLICATION app ON app.APP_ID = hist.APP_ID");
+		builder.append(
+				" WHERE hist.APP_ID <> @APPID AND  hist.SID =  @SID AND hist.YMD = @YMD AND hist.DELETE_ATR =  1 AND hist.REFLECT_TIME < @REFLECT_TIME AND hist.ATR =  @ATR");
+		builder.append(
+				" ORDER BY hist.REFLECT_TIME DESC,  app.INPUT_DATE DESC");
+		FIND_OTHER_ID_REMOVED = builder.toString();
+		
+		builder = new StringBuilder();
+		builder.append(FIND);
+		builder.append(
+				" WHERE hist.SID =  @SID AND hist.YMD =  @YMD AND hist.ATR =  @ATR");
+		builder.append(
+				" ORDER BY hist.REFLECT_TIME ASC ");
+		FIND_SID_DATE = builder.toString();
 	}
 
 	@Override
@@ -81,7 +100,7 @@ public class JpaApplicationReflectHistoryRepo extends JpaRepository implements A
 			ScheduleRecordClassifi classification, boolean flgRemove, GeneralDateTime reflectionTime) {
 		List<ApplicationReflectHistory> lstResult = new NtsStatement(FIND_AFTER_MAX, this.jdbcProxy())
 				.paramString("SID", sid).paramDate("YMD", baseDate).paramInt("ATR", classification.value)
-				.paramInt("DELETE_ATR", flgRemove ? 1 : 0).paramString("REFLECT_TIME", reflectionTime.toString())
+				.paramInt("DELETE_ATR", flgRemove ? 1 : 0).paramDateTime("REFLECT_TIME", reflectionTime)
 				.getList(x -> toDomain(x));
 		return lstResult.stream().collect(Collectors.toMap(x -> getKey(x), x -> x, (x, y) -> {
 			x.getLstAttBeforeAppReflect().addAll(y.getLstAttBeforeAppReflect());
@@ -92,7 +111,7 @@ public class JpaApplicationReflectHistoryRepo extends JpaRepository implements A
 	@Override
 	public void insertAppReflectHist(String cid, ApplicationReflectHistory hist) {
 		Optional<KsrdtReflectAppHist> findData = this.queryProxy().find(new KsrdtReflectAppHistPK(hist.getEmployeeId(), hist.getDate(), hist.getApplicationId(),
-				hist.getClassification().value, hist.getReflectionTime()), KsrdtReflectAppHist.class);
+				hist.getClassification().value, hist.getAppExecInfo().getReflectionTime()), KsrdtReflectAppHist.class);
 		if (!findData.isPresent()) {
 			this.commandProxy().insert(toEntityHist(cid, hist));
 			this.commandProxy().insertAll(toEntityRestore(cid, hist));
@@ -122,10 +141,7 @@ public class JpaApplicationReflectHistoryRepo extends JpaRepository implements A
 		List<ApplicationReflectHistory> lstResult = new NtsStatement(FIND_APP_NOT_REF, this.jdbcProxy())
 				.paramString("SID", sid).paramDate("YMD", baseDate).paramInt("ATR", classification.value)
 				.paramInt("DELETE_ATR", flgRemove ? 1 : 0).paramString("APP_ID", appId).getList(x -> toDomain(x));
-		return lstResult.stream().collect(Collectors.toMap(x -> getKey(x), x -> x, (x, y) -> {
-			x.getLstAttBeforeAppReflect().addAll(y.getLstAttBeforeAppReflect());
-			return x;
-		})).values().stream().collect(Collectors.toList());
+		return groupSameKey(lstResult, true);
 	}
 
 	@Override
@@ -133,25 +149,22 @@ public class JpaApplicationReflectHistoryRepo extends JpaRepository implements A
 			ScheduleRecordClassifi classification, boolean flgRemove, GeneralDateTime reflectionTime) {
 		List<ApplicationReflectHistory> lstResult = new NtsStatement(FIND_APP_REF, this.jdbcProxy())
 				.paramString("SID", sid).paramDate("YMD", baseDate).paramInt("ATR", classification.value)
-				.paramInt("DELETE_ATR", flgRemove ? 1 : 0).paramString("REFLECT_TIME", reflectionTime.toString())
+				.paramInt("DELETE_ATR", flgRemove ? 1 : 0).paramDateTime("REFLECT_TIME", reflectionTime)
 				.getList(x -> toDomain(x));
-		return lstResult.stream().collect(Collectors.toMap(x -> getKey(x), x -> x, (x, y) -> {
-			x.getLstAttBeforeAppReflect().addAll(y.getLstAttBeforeAppReflect());
-			return x;
-		})).values().stream().collect(Collectors.toList());
+		return groupSameKey(lstResult, true);
 	}
 
 	private KsrdtReflectAppHist toEntityHist(String cid, ApplicationReflectHistory dom) {
 		return new KsrdtReflectAppHist(new KsrdtReflectAppHistPK(dom.getEmployeeId(), dom.getDate(),
-				dom.getApplicationId(), dom.getClassification().value, dom.getReflectionTime()), cid, 
-				dom.isCancellationCate() ? 1 : 0);
+				dom.getApplicationId(), dom.getClassification().value, dom.getAppExecInfo().getReflectionTime()), cid, 
+				dom.isCancellationCate() ? 1 : 0, dom.getAppExecInfo().isReReflect(), dom.getAppExecInfo().getExecId());
 	}
 
 	private List<KsrdtReflectAppHistRestore> toEntityRestore(String cid, ApplicationReflectHistory dom) {
 		return dom.getLstAttBeforeAppReflect().stream().map(x -> {
 			return new KsrdtReflectAppHistRestore(
 					new KsrdtReflectAppHistRestorePK(dom.getEmployeeId(), dom.getDate(), dom.getApplicationId(),
-							dom.getClassification().value, dom.getReflectionTime(), x.getAttendanceId()), cid, 
+							dom.getClassification().value, dom.getAppExecInfo().getReflectionTime(), x.getAttendanceId()), cid, 
 					x.getValue().orElse(null), x.getEditState().map(y -> y.getEditStateSetting().value).orElse(null));
 		}).collect(Collectors.toList());
 	}
@@ -165,14 +178,44 @@ public class JpaApplicationReflectHistoryRepo extends JpaRepository implements A
 		List<AttendanceBeforeApplicationReflect> lstRestore = new ArrayList<>();
 		lstRestore.add(restore);
 		return new ApplicationReflectHistory(rec.getString("SID"), rec.getGeneralDate("YMD"), rec.getString("APP_ID"),
-				rec.getGeneralDateTime("REFLECT_TIME"),
 				EnumAdaptor.valueOf(rec.getInt("ATR"), ScheduleRecordClassifi.class), rec.getInt("DELETE_ATR") == 1,
-				lstRestore);
+				lstRestore, new AppReflectExecInfo(rec.getBoolean("RE_REFLECT_ATR"), rec.getString("EXECUTION_ID"), rec.getGeneralDateTime("REFLECT_TIME")));
 
 	}
 
 	private String getKey(ApplicationReflectHistory x) {
 		return x.getEmployeeId().toString() + "-" + x.getApplicationId() + "-" + x.getClassification().value + "-"
-				+ x.getReflectionTime().toString();
+				+ x.getAppExecInfo().getReflectionTime().toString();
+	}
+
+	@Override
+	public List<ApplicationReflectHistory> getCancelHistOtherId(String sid, GeneralDate date, String appId, GeneralDateTime createTime,
+			ScheduleRecordClassifi classification) {
+		List<ApplicationReflectHistory> lstResult = new NtsStatement(FIND_OTHER_ID_REMOVED, this.jdbcProxy())
+				.paramString("SID", sid).paramDateTime("REFLECT_TIME", createTime).paramInt("ATR", classification.value)
+				.paramDate("YMD", date)
+				.paramString("APPID", appId).getList(x -> toDomain(x));
+		return groupSameKey(lstResult, true);
+	}
+
+	@Override
+	public List<ApplicationReflectHistory> getHistWithSidDate(String sid, GeneralDate date,
+			ScheduleRecordClassifi classification) {
+
+		List<ApplicationReflectHistory> lstResult = new NtsStatement(FIND_SID_DATE, this.jdbcProxy())
+				.paramString("SID", sid).paramInt("ATR", classification.value).paramDate("YMD", date)
+				.getList(x -> toDomain(x));
+		return groupSameKey(lstResult, false);
+	}
+	
+	private List<ApplicationReflectHistory> groupSameKey(List<ApplicationReflectHistory> lstResult, boolean sortDESC) {
+		return lstResult.stream().collect(Collectors.toMap(x -> getKey(x), x -> x, (x, y) -> {
+			x.getLstAttBeforeAppReflect().addAll(y.getLstAttBeforeAppReflect());
+			return x;
+		})).values().stream()
+				.sorted((x, y) -> sortDESC
+						? y.getAppExecInfo().getReflectionTime().compareTo(x.getAppExecInfo().getReflectionTime())
+						: x.getAppExecInfo().getReflectionTime().compareTo(y.getAppExecInfo().getReflectionTime()))
+				.collect(Collectors.toList());
 	}
 }

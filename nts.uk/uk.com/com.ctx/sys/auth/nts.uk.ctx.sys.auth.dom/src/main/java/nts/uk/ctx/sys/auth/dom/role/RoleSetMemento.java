@@ -4,6 +4,8 @@
  *****************************************************************/
 package nts.uk.ctx.sys.auth.dom.role;
 
+import java.util.Optional;
+
 /**
  * The Interface RoleSetMemento.
  */
@@ -64,4 +66,6 @@ public interface RoleSetMemento {
 	 * @param companyId the new company id
 	 */
 	void setCompanyId(String companyId);
+
+	void setApprovalAuthority(Optional<Boolean> bpprovalAuthority);
 }

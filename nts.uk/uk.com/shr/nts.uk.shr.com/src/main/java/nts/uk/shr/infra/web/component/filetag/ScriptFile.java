@@ -44,11 +44,19 @@ public class ScriptFile extends UIComponentBase {
             "/lib/generic/igniteui/js/extensions/infragistics.ui.tree.knockout-extensions.js",
     }));
     
+    public static Set<String> FILES_FULLCALENDAR = new  LinkedHashSet<String>(Arrays.asList(new String[] {
+    	"/lib/generic/fullcalendar/main.min.js",
+    	"/lib/generic/fullcalendar/locales/ja.js",
+    	"/lib/generic/fullcalendar/locales/vi.js",
+    	"/lib/generic/fullcalendar/datepicker/fc-datepicker.js"
+    }));
+    
     @SuppressWarnings("serial")
     private static Map<String, Set<String>> FILE_SETS = new HashMap<String, Set<String>>() {
         {
             this.put("BASIC", FILES_BASIC);
             this.put("IGNITE", FILES_IGNITE);
+            this.put("FULLCALENDAR", FILES_FULLCALENDAR);
         }
     };
 

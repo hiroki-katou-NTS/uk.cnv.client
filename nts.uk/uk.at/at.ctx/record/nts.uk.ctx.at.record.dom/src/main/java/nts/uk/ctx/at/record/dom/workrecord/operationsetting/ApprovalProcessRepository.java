@@ -13,10 +13,4 @@ public interface ApprovalProcessRepository
 
     Optional<ApprovalProcess> getApprovalProcessById(String cid);
 
-    void add(ApprovalProcess domain);
-
-    void update(ApprovalProcess domain);
-
-    void remove(String cid);
-
 }

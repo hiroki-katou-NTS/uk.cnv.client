@@ -1,5 +1,6 @@
 package nts.uk.ctx.sys.portal.dom.webmenu.webmenulinking;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import nts.arc.layer.dom.AggregateRoot;
 import nts.uk.ctx.sys.portal.dom.webmenu.WebMenuCode;
@@ -9,18 +10,16 @@ import nts.uk.ctx.sys.portal.dom.webmenu.WebMenuCode;
  *
  */
 @Getter
+@AllArgsConstructor
 public class RoleByRoleTies extends AggregateRoot  {
-    /**ロールID */
-    private String roleId;
+	
+	/** ロールID	*/
+	private String roleId;
+	
+	/** 会社ID	*/
+	private String companyId;
+	
 	/** メニューコードリスト */
-    private WebMenuCode webMenuCd;
-    
-    private String companyId;
-
-	public RoleByRoleTies(String roleId,WebMenuCode webMenuCd, String companyId) {
-		super();
-		this.roleId = roleId;
-		this.webMenuCd = webMenuCd;
-		this.companyId = companyId;
-	}
+	private WebMenuCode webMenuCd;
+	
 }

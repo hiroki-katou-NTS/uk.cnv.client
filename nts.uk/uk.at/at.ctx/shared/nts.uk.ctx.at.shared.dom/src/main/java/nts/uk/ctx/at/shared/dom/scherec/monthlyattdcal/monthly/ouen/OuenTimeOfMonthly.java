@@ -67,9 +67,11 @@ public class OuenTimeOfMonthly implements DomainObject {
 		ouenTimes.stream().forEach(ot -> {
 			
 			val ouenTimeSheet = ouenTimeSheets.stream()
-					.filter(ots -> ots.getWorkNo() == ot.getWorkNo()).findFirst().get();
+					.filter(ots -> ots.getWorkNo() == ot.getWorkNo()).findFirst();
 			
-			aggregateOneOuen(require, ot, ouenTimeSheet, aggreFrameSet);
+			if(ouenTimeSheet.isPresent()) {
+				aggregateOneOuen(require, ot, ouenTimeSheet.get(), aggreFrameSet);
+			}
 		});
 	}
 	

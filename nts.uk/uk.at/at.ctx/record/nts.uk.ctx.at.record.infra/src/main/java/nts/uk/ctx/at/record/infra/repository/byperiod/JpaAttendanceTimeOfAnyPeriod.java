@@ -302,7 +302,7 @@ public class JpaAttendanceTimeOfAnyPeriod extends JpaRepository implements Atten
 		for (val premiumTime : premiumTimeMap.values()){
 			KrcdtAnpAggrPremTime entityAggrPremTime = new KrcdtAnpAggrPremTime();
 			val entityAggrPremTimeOpt = entityAggrPremTimeList.stream()
-					.filter(c -> c.PK.premiumTimeItemNo == premiumTime.getPremiumTimeItemNo()).findFirst();
+					.filter(c -> c.PK.premiumTimeItemNo == premiumTime.getPremiumTimeItemNo().value).findFirst();
 			if (entityAggrPremTimeOpt.isPresent()){
 				entityAggrPremTime = entityAggrPremTimeOpt.get();
 				entityAggrPremTime.fromDomainForUpdate(premiumTime);

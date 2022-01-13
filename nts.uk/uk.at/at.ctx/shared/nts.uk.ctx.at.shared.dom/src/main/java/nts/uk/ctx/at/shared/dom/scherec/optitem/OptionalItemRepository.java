@@ -6,6 +6,7 @@ package nts.uk.ctx.at.shared.dom.scherec.optitem;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import nts.uk.ctx.at.shared.dom.scherec.optitem.export.CalFormulasItemExportData;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.export.CalFormulasItemTableExportData;
@@ -36,6 +37,17 @@ public interface OptionalItemRepository {
 	 * @return the optional item
 	 */
 	OptionalItem find(String companyId, Integer optionalItemNo);
+	
+	/**
+	 * Find.
+	 *
+	 * @param companyId
+	 *            the company id
+	 * @param optionalItemNo
+	 *            the optional item no
+	 * @return the optional item
+	 */
+	Optional<OptionalItem> findByItemNo(String companyId, Integer optionalItemNo);
 
 	/**
 	 * Find all.

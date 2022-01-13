@@ -22,8 +22,11 @@ public class CopyEmploymentCommandHandler extends CommandHandler<CopyEmploymentC
 	protected void handle(CommandHandlerContext<CopyEmploymentCommand> context) {
 		String companyId = AppContexts.user().companyId();
 		CopyEmploymentCommand copyCommand = context.getCommand();
+		
+		//複写元のドメインモデル「雇用別の変更可能な勤務種類」を取得する
 		WorkingTypeChangedByEmployment sourceData = workRep.get(new CompanyId(companyId), new EmploymentCode(copyCommand.getEmploymentCode()));
-		workRep.copyEmployment(companyId, sourceData, copyCommand.getTargetEmploymentCodes(), copyCommand.isOveride());
+		
+		workRep.copyEmployment(companyId, sourceData, copyCommand.getTargetEmploymentCodes());
 	}
 
 }

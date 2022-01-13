@@ -7,10 +7,14 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import nts.uk.ctx.at.function.app.find.dailyperformanceformat.dto.AuthorityDailyFormatDto;
 import nts.uk.ctx.at.function.app.find.dailyperformanceformat.dto.DailyAttendanceAuthorityDailyDto;
 import nts.uk.ctx.at.function.app.find.dailyperformanceformat.dto.DailyAttendanceAuthorityDetailDto;
+import nts.uk.ctx.at.function.dom.dailyperformanceformat.AuthorityDailyPerformanceFormat;
 import nts.uk.ctx.at.function.dom.dailyperformanceformat.AuthorityFomatDaily;
+import nts.uk.ctx.at.function.dom.dailyperformanceformat.AuthorityFormatSheet;
 import nts.uk.ctx.at.function.dom.dailyperformanceformat.primitivevalue.DailyPerformanceFormatCode;
+import nts.uk.ctx.at.function.dom.dailyperformanceformat.repository.AuthorityDailyPerformanceFormatRepository;
 import nts.uk.ctx.at.function.dom.dailyperformanceformat.repository.AuthorityFormatDailyRepository;
 import nts.uk.ctx.at.function.dom.dailyperformanceformat.repository.AuthorityFormatMonthlyRepository;
 import nts.uk.ctx.at.function.dom.dailyperformanceformat.repository.AuthorityFormatSheetRepository;
@@ -21,7 +25,13 @@ import nts.uk.shr.com.context.LoginUserContext;
 public class DailyPerformanceAuthorityFinder {
 
 	@Inject
+	private AuthorityDailyPerformanceFormatRepository authorityDailyPerformanceFormatRepository;
+	
+	@Inject
 	private AuthorityFormatSheetRepository authorityFormatSheetRepository;
+	
+	@Inject
+	private AuthorityFormatDailyRepository authorityFormatDailyItemRepository;
 
 	@Inject
 	private AuthorityFormatMonthlyRepository authorityFormatMonthlyRepository;
@@ -61,5 +71,13 @@ public class DailyPerformanceAuthorityFinder {
 							f.getColumnWidth());
 				}).collect(Collectors.toList());
 		return dailyAttendanceAuthorityMonthlyDto;
+	}
+
+	public AuthorityDailyFormatDto findAllByCompanyId(String formatCode) {
+		String companyId = AppContexts.user().companyId();
+		List<AuthorityFormatSheet> listAuthorityFormatSheet = authorityFormatSheetRepository.findByCode(companyId, formatCode);
+		List<AuthorityFomatDaily> listAuthorityFomatDaily = authorityFormatDailyItemRepository.getAuthorityFormatDailyDetail(companyId, new DailyPerformanceFormatCode(formatCode));
+		
+		return AuthorityDailyFormatDto.toDto(listAuthorityFormatSheet, listAuthorityFomatDaily);
 	}
 }

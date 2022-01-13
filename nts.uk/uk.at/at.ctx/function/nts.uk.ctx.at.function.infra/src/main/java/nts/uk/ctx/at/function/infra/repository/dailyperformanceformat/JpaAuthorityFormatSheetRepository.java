@@ -3,6 +3,7 @@ package nts.uk.ctx.at.function.infra.repository.dailyperformanceformat;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -89,6 +90,14 @@ public class JpaAuthorityFormatSheetRepository extends JpaRepository implements 
 	@Override
 	public void add(AuthorityFormatSheet authorityFormatSheet) {
 		this.commandProxy().insert(toEntity(authorityFormatSheet));
+	}
+	
+	@Override
+	public void add(List<AuthorityFormatSheet> listAuthorityFormatSheet) {
+		List<KfnmtAuthorityFormSheet> listEntity = listAuthorityFormatSheet.stream()
+				.map(e -> toEntity(e))
+				.collect(Collectors.toList());
+		this.commandProxy().insertAll(listEntity);	
 	}
 
 	@Override

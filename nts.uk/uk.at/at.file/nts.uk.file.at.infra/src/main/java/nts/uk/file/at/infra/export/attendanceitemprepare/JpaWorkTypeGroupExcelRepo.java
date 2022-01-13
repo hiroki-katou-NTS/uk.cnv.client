@@ -16,15 +16,17 @@ import nts.uk.shr.com.context.AppContexts;
 @Stateless
 public class JpaWorkTypeGroupExcelRepo extends JpaRepository implements WorkTypeGroupExcel{
 
-	private static final String SELECT_ALL_WORKTYPE_EXCEL = "SELECT a.EMP_CODE, b.NAME, a.WORKTYPE_GROUP_NO, a.WORKTYPE_GROUP_NAME, c.NAME,a.WORKTYPE_CODE "
-			+ "FROM KRCMT_WORKTYPE_CHANGEABLE  a "
-			+ "left join BSYMT_EMPLOYMENT b on b.CODE = a.EMP_CODE and a.CID=b.CID "
-			+ "left join KSHMT_WKTP c on a.WORKTYPE_CODE = c.CD and b.CID=c.CID "
+	private static final String SELECT_ALL_WORKTYPE_EXCEL = "SELECT a.EMP_CD, b.NAME, a.WORKTYPE_GROUP_NO, d.WORKTYPE_GROUP_NAME, c.NAME, a.WORKTYPE_CD "
+			+ "from KRCMT_CHANGEABLE_WKTP_GRP d "
+			+ "join KRCMT_CHANGEABLE_WKTP_GRP_DETAIL a on d.CID = a.CID and d.EMP_CD = a.EMP_CD and d.WORKTYPE_GROUP_NO = a.WORKTYPE_GROUP_NO "
+			+ "left join BSYMT_EMPLOYMENT b on b.CODE = a.EMP_CD and a.CID=b.CID "
+			+ "left join KSHMT_WKTP c on a.WORKTYPE_CD = c.CD and b.CID=c.CID "
 			+ "where a.CID=?companyId ";
-	private static final String SELECT_ALL_DEFAULT_WORKTPYE = "select a.WORKTYPE_GROUP_NO, a.WORKTYPE_GROUP_NAME, b.NAME,b.CD "
-			+ "from KRCMT_WORKTYPE_CHANGEABLE a "
-			+ "left join KSHMT_WKTP b on a.WORKTYPE_CODE = b.CD and b.CID=?companyId "
-			+ "where a.CID='000000000000-0000' and a.EMP_CODE='0'  ";
+	private static final String SELECT_ALL_DEFAULT_WORKTPYE = "select a.WORKTYPE_GROUP_NO, d.WORKTYPE_GROUP_NAME, b.NAME,b.CD "
+			+ "from KRCMT_CHANGEABLE_WKTP_GRP d "
+			+ "join KRCMT_CHANGEABLE_WKTP_GRP_DETAIL a on d.CID = a.CID and d.EMP_CD = a.EMP_CD and d.WORKTYPE_GROUP_NO = a.WORKTYPE_GROUP_NO "
+			+ "left join KSHMT_WKTP b on a.WORKTYPE_CD = b.CD and b.CID=?companyId "
+			+ "where a.CID='000000000000-0000' and a.EMP_CD='0'  ";
 	
 	@Override
 	public Map<String, Map<Integer, List<WorkTypeDtoExcel>>> getAllWorkType() {

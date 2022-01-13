@@ -37,6 +37,7 @@ public class ErrorAlarmWorkRecord extends AggregateRoot {
 	private Boolean fixedAtr;
 
 	/* 使用する */
+	@Setter
 	private Boolean useAtr;
 	
 	/* 備考入力でエラーを解除する */
@@ -49,6 +50,7 @@ public class ErrorAlarmWorkRecord extends AggregateRoot {
 	private ErrorAlarmClassification typeAtr;
 
 	/* メッセージ */
+	@Setter
 	private ErrorAlarmMessage message;
 
 	/* エラーアラームを解除できる */

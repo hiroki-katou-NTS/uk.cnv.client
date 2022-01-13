@@ -62,6 +62,11 @@ public class KrcmtDailyAttendanceItem extends ContractUkJpaEntity implements Ser
 	@Basic(optional = true)
 	@Column(name = "PRIMITIVE_VALUE")
 	public Integer primitiveValue;
+	
+	@Basic(optional = true)
+	@Column(name = "DISPLAY_NAME")
+	public String displayName;
+	
 
 	@Override
 	protected Object getKey() {
@@ -74,6 +79,7 @@ public class KrcmtDailyAttendanceItem extends ContractUkJpaEntity implements Ser
 				domain.getAttendanceName().v(), domain.getDisplayNumber(), domain.getUserCanUpdateAtr().value,
 				domain.getNameLineFeedPosition(), domain.getDailyAttendanceAtr().value,
 				domain.getMasterType().map(x -> x.value).orElse(null),
-				domain.getPrimitiveValue().map(x -> x.value).orElse(null));
+				domain.getPrimitiveValue().map(x -> x.value).orElse(null),
+				domain.getDisplayName().isPresent() ? domain.getDisplayName().get().v() : null);
 	}
 }

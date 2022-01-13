@@ -144,7 +144,7 @@ public class DailyStatutoryLaborTime {
 		// 変形労働勤務 の場合
 		else if (workingSystem.isVariableWorkingTimeWork()) {
 			for (String workPlaceId : workPlaceIdList) {
-				Optional<WorkingTimeSetting> result = require.deforLaborTimeByWorkplace(employeeId, workPlaceId).map(t -> t);
+				Optional<WorkingTimeSetting> result = require.deforLaborTimeByWorkplace(companyId, workPlaceId).map(t -> t);
 				if (result.isPresent()) {
 					return result;
 				}

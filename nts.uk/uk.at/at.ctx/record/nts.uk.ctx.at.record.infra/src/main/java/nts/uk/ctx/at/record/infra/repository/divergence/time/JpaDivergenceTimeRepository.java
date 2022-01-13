@@ -426,6 +426,8 @@ public class JpaDivergenceTimeRepository extends JpaRepository implements Diverg
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	@Override
 	public List<DivergenceTimeRoot> getUsedDivTimeListByNoV2(String companyId, List<Integer> divTimeNo) {
+    	
+		divTimeNo = divTimeNo.stream().filter(no -> no != null).distinct().collect(Collectors.toList());
 
 		// Get entity manager
 		EntityManager em = this.getEntityManager();

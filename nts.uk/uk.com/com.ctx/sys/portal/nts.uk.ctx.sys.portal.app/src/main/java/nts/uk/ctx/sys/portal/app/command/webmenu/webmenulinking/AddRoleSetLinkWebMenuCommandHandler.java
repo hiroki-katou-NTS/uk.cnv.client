@@ -25,7 +25,7 @@ public class AddRoleSetLinkWebMenuCommandHandler extends CommandHandlerWithResul
     protected String handle(CommandHandlerContext<RoleSetLinkWebMenuCommand> context) {
         RoleSetLinkWebMenuCommand command = context.getCommand();
 
-        this.roleSetLinkWebMenuService.executeRegister(
+        this.roleSetLinkWebMenuService.executeUpdate(
                 command.getCompanyId()
                 , command.getRoleSetCd()
                 , command.getWebMenuCds());

@@ -17,6 +17,8 @@ public class ErAlWorkRecordShortDto {
 	
 	private String name;
 	
+	private String type;
+	
 	private List<Integer> attendanceItemList;
 	
 }

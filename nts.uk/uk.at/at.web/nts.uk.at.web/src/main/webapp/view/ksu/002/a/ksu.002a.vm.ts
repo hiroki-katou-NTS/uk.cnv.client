@@ -11,10 +11,10 @@ module nts.uk.ui.at.ksu002.a {
 	type DayDataSave2Memento = DayData | DayDataRawObsv | DayDataMementoObsv;
 
 	const API = {
-		UNAME: '/sys/portal/webmenu/username',
 		GSCHE: '/screen/ksu/ksu002/displayInWorkInformation',
 		GSCHER: '/screen/ksu/ksu002/getDataDaily',
 		SAVE_DATA: '/screen/ksu/ksu002/regisWorkSchedule',
+		GET_START_DAY_OF_WEEK: '/ctx/at/shared/workrule/weekmanage/find'
 	};
 
 	const memento: m.Options = {
@@ -149,178 +149,81 @@ module nts.uk.ui.at.ksu002.a {
 		showC: KnockoutObservable<boolean> = ko.observable(true);
 
 		mode: KnockoutObservable<EDIT_MODE> = ko.observable('copy');
+		yearMonth: KnockoutObservable<string> = ko.observable(moment().format('YYYYMM'));
 		baseDate: KnockoutObservable<c.DateRange | null> = ko.observable(null);
+		baseDateKCP015: KnockoutObservable<Date> = ko.observable(null);
 		schedules: m.MementoObservableArray<DayDataRawObsv> = ko.observableArray([]).extend({ memento }) as any;
 
-		workplaceId: KnockoutObservable<string> = ko.observable('');
+		workplaceId: KnockoutObservable<string> = ko.observable(null);
 		achievement: KnockoutObservable<ACHIEVEMENT> = ko.observable(ACHIEVEMENT.NO);
 		workData: KnockoutObservable<null | WorkData> = ko.observable(null);
 		kdl053Open: any = null;
-		created() {
-			const vm = this;
-			const dr: c.DateRange = {
+		
+		employeeId: KnockoutObservableArray<string>;
+		
+		data: WorkSchedule<moment.Moment>[] = [];
+		dataDaily: Achievement[] = [];
+		
+		dayStartWeek: KnockoutObservable<number> = ko.observable(null);
+		
+		isSelectedStartWeek: KnockoutObservable<boolean> = ko.observable(false);
+		
+		storageDataStartWeek: KnockoutObservable<any> = ko.observable(null);
+		
+		readyLoadData: boolean = false;
+		
+		// Data result from 予定・実績を取得する
+		plansResultsData: KnockoutObservable<any> = ko.observable(null);
+		
+		legalworkinghours: KnockoutObservable<any> = ko.observable(null);
+		
+		startupProcessingInformation: KnockoutObservable<any> = ko.observable(null); 
+		
+		listOfPeriodsClose: KnockoutObservable<any> = ko.observable(null);
+		
+		visibleA1_1: KnockoutObservable<boolean> = ko.observable(false);
+		visibleA1_2: KnockoutObservable<boolean> = ko.observable(false);
+		visibleA1_3: KnockoutObservable<boolean> = ko.observable(false);
+		visibleA1_4: KnockoutObservable<boolean> = ko.observable(false);
+    
+        taskId = null;
+		
+		dr: c.DateRange = {
 				begin: null,
 				finish: null
 			};
-
-			const loadData = () => {
-				const command = {
-					listSid: [vm.$user.employeeId],
-					startDate: moment(dr.begin).toISOString(),
-					endDate: moment(dr.finish).toISOString(),
-					actualData: vm.achievement() === ACHIEVEMENT.YES
-				};
-
-				vm.$errors('clear')
-					.then(() => vm.$blockui('show'))
-					.then(() => vm.$ajax('at', API.GSCHE, command))
-					.then((response: WorkSchedule<string>[]) => _.chain(response)
-						.orderBy(['date'])
-						.map(m => ({
-							...m,
-							date: moment(m.date, 'YYYY/MM/DD')
-						}))
-						.value()
-					)
-					.then((response: WorkSchedule<moment.Moment>[]) => {
-						if (response && response.length) {
-							const { NO } = ACHIEVEMENT;
-							const arch = ko.unwrap(vm.achievement);
-							const clones: DayDataMementoObsv[] = ko.unwrap(vm.schedules);
-
-							_.each(response, ($raw) => {
-								const exits = _.find(clones, c => $raw.date.isSame(c.date, 'date'));
-
-								if (exits) {
-									const { IMPRINT } = EDIT_STATE;
-									const {
-										date,
-										endTimeEditState,
-										startTimeEditState,
-										workTimeEditStatus,
-										workTypeEditStatus,
-										workHolidayCls,
-										confirmed,
-										achievements,
-										needToWork,
-										dateInfoDuringThePeriod
-									} = $raw;
-
-									const {
-										workTypeName,
-										workTimeName,
-										workTypeCode,
-										workTimeCode,
-										startTime,
-										endTime
-									} = arch === NO ? $raw : (achievements || $raw);
-
-									// hack i18n
-									_.extend(names, { [workTypeName]: workTypeName });
-									_.extend(names, { [workTimeName]: workTimeName });
-
-									exits.data = {
-										$raw: {
-											...$raw,
-											date: date.toDate()
-										},
-										wtype: {
-											code: ko.observable(workTypeCode),
-											name: ko.observable(workTypeName)
-										},
-										wtime: {
-											code: ko.observable(workTimeCode),
-											name: ko.observable(workTimeName)
-										},
-										value: {
-											begin: ko.observable(startTime),
-											finish: ko.observable(endTime),
-											validate: ko.observable(true),
-											required: ko.observable(needToWork ? WORKTIME_SETTING.REQUIRED : WORKTIME_SETTING.OPTIONAL)
-										},
-										holiday: ko.observable(null),
-										event: ko.observable(null),
-										specialDay: ko.observable(false),
-										confirmed: ko.observable(confirmed),
-										achievement: ko.observable(arch === NO ? null : !!achievements),
-										classification: ko.observable(workHolidayCls),
-										need2Work: ko.observable(needToWork),
-										state: {
-											value: {
-												begin: ko.observable(startTimeEditState ? startTimeEditState.editStateSetting : IMPRINT),
-												finish: ko.observable(endTimeEditState ? endTimeEditState.editStateSetting : IMPRINT),
-											},
-											wtime: ko.observable(workTimeEditStatus ? workTimeEditStatus.editStateSetting : IMPRINT),
-											wtype: ko.observable(workTypeEditStatus ? workTypeEditStatus.editStateSetting : IMPRINT)
-										}
-									};
-
-									if (dateInfoDuringThePeriod) {
-										const {
-											holidayName,
-											specificDay,
-											listSpecDayNameCompany,
-											listSpecDayNameWorkplace,
-											optCompanyEventName,
-											optWorkplaceEventName
-										} = dateInfoDuringThePeriod;
-
-										// What is this???
-										if (holidayName) {
-											exits.data.holiday(holidayName);
-										}
-
-										if (specificDay) {
-											exits.data.specialDay(specificDay);
-										}
-
-										if (specificDay || !!optCompanyEventName || !!optWorkplaceEventName) {
-											const events: string[] = [];
-											events.push('<table><colgroup><col width="90"></col><col width="10"></col></colgroup><tbody>');
-
-											events.push(`<tr class="cen"><td>${vm.$i18n('KSU001_4014')}</td><td>${vm.$i18n('KSU001_4018')}</td><td>${!!optCompanyEventName ? _.escape(optCompanyEventName) : vm.$i18n('KSU001_4019')}</td></tr>`);
-
-											events.push(`<tr class="wen"><td>${vm.$i18n('KSU001_4015')}</td><td>${vm.$i18n('KSU001_4018')}</td><td>${!!optWorkplaceEventName ? _.escape(optWorkplaceEventName) : vm.$i18n('KSU001_4019')}</td></tr>`);
-
-											events.push(`<tr class="sdc"><td rowspan="${listSpecDayNameCompany.length || 1}">${vm.$i18n('KSU001_4016')}</td><td>${vm.$i18n('KSU001_4018')}</td><td>${!!listSpecDayNameCompany.length ? _.escape(_.head(listSpecDayNameCompany) || '') : vm.$i18n('KSU001_4019')}</td></tr>`);
-
-											if (!!listSpecDayNameCompany.length) {
-												_.each(listSpecDayNameCompany, (v, i) => {
-													if (!!i) {
-														events.push(`<tr class="sdc"><td></td><td>${_.escape(v)}</td></tr>`)
-													}
-												});
-											}
-
-											events.push(`<tr class="swc"><td rowspan="${listSpecDayNameWorkplace.length || 1}">${vm.$i18n('KSU001_4017')}</td><td>${vm.$i18n('KSU001_4018')}</td><td>${!!listSpecDayNameWorkplace.length ? _.escape(_.head(listSpecDayNameWorkplace) || '') : vm.$i18n('KSU001_4019')}</td></tr>`);
-
-											if (!!listSpecDayNameWorkplace.length) {
-												_.each(listSpecDayNameWorkplace, (v, i) => {
-													if (!!i) {
-														events.push(`<tr class="swc"><td></td><td>${_.escape(v)}</td></tr>`)
-													}
-												});
-											}
-
-											events.push('</tbody></table>');
-											exits.data.event(events.join(''));
-										}
-									}
-								}
-							});
-
-							vm.schedules(clones);
-							vm.schedules.reset();
-
-							vm.$nextTick(() => {
-								$(vm.$el).find('[data-bind]').removeAttr('data-bind');
-							});
-						}
-					})
-					.always(() => vm.$blockui('hide'));
-			};
-
-			const bussinesName: KnockoutObservable<string> = ko.observable('');
+		
+		constructor(){
+			super();
+			let self = this;
+			self.startupProcessingInformation.subscribe((v:any)=>{
+				_.each(v.scheModifyAuthCtrlByPerson, (e:any) => {
+					if(e.functionNo == 1){
+						self.visibleA1_1(e.isAvailable);
+					}
+					if(e.functionNo == 2){
+						self.visibleA1_4(e.isAvailable);
+					}
+				});
+				_.each(v.scheModifyAuthCtrlCommon, (e:any) => {
+					if(e.functionNo == 1){
+						self.visibleA1_3(e.isAvailable);
+					}
+					if(e.functionNo == 2){
+						self.visibleA1_2(e.isAvailable);
+					}
+				});
+			});
+		}
+		
+		created() {
+			const vm = this;
+			
+			vm.getfirst();
+			
+			vm.employeeId = ko.observableArray([vm.$user.employeeId]);
+			
+			initEvent();
 
 			vm.enable = ko.computed({
 				read: () => {
@@ -333,23 +236,21 @@ module nts.uk.ui.at.ksu002.a {
 
 			vm.currentUser = ko.computed({
 				read: () => {
-					const bName = ko.unwrap(bussinesName);
+					const bName = ko.unwrap(vm.startupProcessingInformation);
 
-					return `${vm.$i18n('KSU002_20')}&nbsp;&nbsp;&nbsp;&nbsp;${vm.$user.employeeCode}&nbsp;&nbsp;${bName}`;
+					return `${vm.$i18n('KSU002_20')}&nbsp;&nbsp;&nbsp;&nbsp;${bName ? bName.employeeCode : ''}&nbsp;&nbsp;${bName ? bName.businessName : ''}`;
 				},
 				owner: vm
 			});
-
-			vm.$ajax('com', API.UNAME)
-				.then((name: string) => bussinesName(name));
 
 			// call to api and get data
 			vm.baseDate
 				.subscribe((d: c.DateRange) => {
 					if (!d) {
-						dr.begin = null;
-						dr.finish = null;
-
+						vm.baseDateKCP015(null);
+						vm.dr.begin = null;
+						vm.dr.finish = null;
+						vm.getPlansResultsData(false);	
 						// reset memento
 						vm.schedules.reset();
 
@@ -359,133 +260,283 @@ module nts.uk.ui.at.ksu002.a {
 					const { begin, finish } = d;
 
 					if (!begin || !finish) {
-						dr.begin = null;
-						dr.finish = null;
-
+						vm.baseDateKCP015(null);
+						vm.dr.begin = null;
+						vm.dr.finish = null;
+						vm.getPlansResultsData(false);
 						// reset memento
 						vm.schedules.reset();
 
 						return;
 					}
 
-					if (moment(begin).isSame(dr.begin, 'date') && moment(finish).isSame(dr.finish, 'date')) {
+					if (moment(begin).isSame(vm.dr.begin, 'date') && moment(finish).isSame(vm.dr.finish, 'date')) {
+						vm.baseDateKCP015(null);
 						return;
 					}
 
-					dr.begin = begin;
-					dr.finish = finish;
-
-					loadData();
+					vm.dr.begin = begin;
+					vm.dr.finish = finish;
+					vm.baseDateKCP015(vm.dr.finish);
+					if(vm.readyLoadData){
+						vm.loadData();
+					}else{
+						vm.readyLoadData = true;
+					}
 				});
 
 			// UI-4
 			vm.achievement
 				.subscribe((arch) => {
-					const { NO } = ACHIEVEMENT;
 					const { IMPRINT } = EDIT_STATE;
-					const { begin, finish } = vm.baseDate();
-
-					const command = {
-						listSid: [vm.$user.employeeId],
-						startDate: moment(begin).toISOString(),
-						endDate: moment(finish).toISOString()
-					};
-
 					const schedules: DayDataMementoObsv[] = ko.unwrap(vm.schedules);
 
-					if (arch === ACHIEVEMENT.NO) {
-						loadData();
+						vm.loadData();
 						return;
-					}
-
-					$.Deferred()
-						.resolve(true)
-						.then(() => vm.$blockui('show'))
-						// fc
-						.then(() => vm.$ajax('at', API.GSCHER, command))
-						.then((response: Achievement[]) => {
-							if (response.length === 0) {
-								return;
-							}
-
-							_.each(schedules, (sc) => {
-								const { data } = sc;
-								const { $raw } = data;
-								const exist = _.find(response, (d: Achievement & { date: string; }) => moment(d.date, 'YYYY/MM/DD').isSame(sc.date, 'date'));
-
-								if (!exist) {
-									$raw.achievements = null;
-								} else {
-									const { endTime, startTime, workTimeCode, workTimeName, workTypeCode, workTypeName } = exist;
-
-									$raw.achievements = {
-										endTime,
-										startTime,
-										workTimeCode,
-										workTimeName,
-										workTypeCode,
-										workTypeName
-									};
-								}
-							});
-						})
-						.then(() => {
-							// reset data
-							_.each(schedules, (sc) => {
-								const { data } = sc;
-								const { $raw, wtype, wtime, value } = data;
-								const { endTimeEditState, startTimeEditState, workTimeEditStatus, workTypeEditStatus } = $raw;
-
-								// UI-4-1 実績表示を「する」に選択する
-								// UI-4-2 実績表示を「しない」に選択する
-								if (!!$raw.achievements) {
-									const {
-										workTypeCode,
-										workTypeName,
-										workTimeCode,
-										workTimeName,
-										startTime,
-										endTime
-									} = $raw.achievements;
-
-									wtype.code(workTypeCode || null);
-									wtype.name(workTypeName || null);
-
-									wtime.code(workTimeCode || null);
-									wtime.name(workTimeName || null);
-
-									value.begin(startTime);
-									value.finish(endTime);
-
-									data.confirmed($raw.confirmed);
-									data.achievement(null);
-									data.classification($raw.workHolidayCls);
-									data.need2Work($raw.needToWork);
-
-									data.state.wtype(workTypeEditStatus ? workTypeEditStatus.editStateSetting : IMPRINT);
-									data.state.wtime(workTimeEditStatus ? workTimeEditStatus.editStateSetting : IMPRINT);
-
-									data.state.value.begin(startTimeEditState ? startTimeEditState.editStateSetting : IMPRINT);
-									data.state.value.finish(endTimeEditState ? endTimeEditState.editStateSetting : IMPRINT);
-								}
-
-								// state of achievement (both data & switch select)
-								data.achievement(!!$raw.achievements);
-							});
-
-							// reset state of memento
-							vm.schedules.reset();
-						})
-						.always(() => vm.$blockui('clear'));
 				});
 		}
-
-		mounted() {
-			const vm = this;
-
-			$(vm.$el).find('[data-bind]').removeAttr('data-bind');
+		
+		rebidingData(){
+			let vm = this;
+			if(vm.achievement() === ACHIEVEMENT.NO){
+//				vm.bidingData();
+			}else{
+//				vm.bidingDataDaily();
+			}
 		}
+		
+		loadData(){
+			let vm = this;	
+			
+			vm.$errors('clear')
+				.then(() => vm.$blockui('grayout'))
+				.then(() => vm.getPlansResultsData(false))
+				.then((response: WorkSchedule<string>[]) => _.chain(response)
+					.orderBy(['date'])
+					.map(m => ({
+						...m,
+						date: moment(m.date, 'YYYY/MM/DD')
+					}))
+					.value()
+				)
+				.then((response: WorkSchedule<moment.Moment>[]) => {
+					if (response && response.length) {
+						const { NO } = ACHIEVEMENT;
+						const arch = ko.unwrap(vm.achievement);
+						const clones: DayDataMementoObsv[] = ko.unwrap(vm.schedules);
 
+						_.each(response, ($raw) => {
+							const exits = _.find(clones, c => $raw.date.isSame(c.date, 'date'));
+
+							if (exits) {
+								const { IMPRINT } = EDIT_STATE;
+								const {
+									date,
+									endTimeEditState,
+									startTimeEditState,
+									workTimeEditStatus,
+									workTypeEditStatus,
+									workHolidayCls,
+									confirmed,
+									achievements,
+									needToWork,
+									dateInfoDuringThePeriod,
+									workTimeForm
+								} = $raw;
+
+								const {
+									workTypeName,
+									workTimeName,
+									workTypeCode,
+									workTimeCode,
+									startTime,
+									endTime
+								} = arch === NO ? $raw : (achievements || $raw);
+
+								// hack i18n
+								_.extend(names, { [workTypeName]: workTypeName });
+								_.extend(names, { [workTimeName]: workTimeName });
+
+								exits.data = {
+									$raw: {
+										...$raw,
+										date: date.toDate()
+									},
+									wtype: {
+										code: ko.observable(workTypeCode),
+										name: ko.observable(workTypeName)
+									},
+									wtime: {
+										code: ko.observable(workTimeCode),
+										name: ko.observable(workTimeName)
+									},
+									value: {
+										begin: ko.observable(startTime),
+										finish: ko.observable(endTime),
+										validate: ko.observable(true),
+										required: ko.observable(needToWork ? WORKTIME_SETTING.REQUIRED : WORKTIME_SETTING.OPTIONAL)
+									},
+									workTimeForm: ko.observable(workTimeForm),
+									holiday: ko.observable(null),
+									event: ko.observable(null),
+									specialDay: ko.observable(false),
+									confirmed: ko.observable(confirmed),
+									achievement: ko.observable(arch === NO ? null : !!achievements),
+									classification: ko.observable(workHolidayCls),
+									need2Work: ko.observable(needToWork),
+									state: {
+										value: {
+											begin: ko.observable(startTimeEditState ? startTimeEditState.editStateSetting : IMPRINT),
+											finish: ko.observable(endTimeEditState ? endTimeEditState.editStateSetting : IMPRINT),
+										},
+										wtime: ko.observable(workTimeEditStatus ? workTimeEditStatus.editStateSetting : IMPRINT),
+										wtype: ko.observable(workTypeEditStatus ? workTypeEditStatus.editStateSetting : IMPRINT)
+									}
+								};
+								//exits.data.holiday(workTimeForm);
+								if (dateInfoDuringThePeriod) {
+									const {
+										holidayName,
+										specificDay,
+										listSpecDayNameCompany,
+										listSpecDayNameWorkplace,
+										optCompanyEventName,
+										optWorkplaceEventName
+									} = dateInfoDuringThePeriod;
+
+									// What is this???
+									if (holidayName) {
+										exits.data.holiday(holidayName);
+									}
+
+									if (specificDay) {
+										exits.data.specialDay(specificDay);
+									}
+
+									if (specificDay || !!optCompanyEventName || !!optWorkplaceEventName) {
+										const events: string[] = [];
+										events.push('<table><colgroup><col width="90"></col><col width="10"></col></colgroup><tbody>');
+
+										events.push(`<tr class="cen"><td>${vm.$i18n('KSU001_4014')}</td><td>${vm.$i18n('KSU001_4018')}</td><td>${!!optCompanyEventName ? _.escape(optCompanyEventName) : vm.$i18n('KSU001_4019')}</td></tr>`);
+
+										events.push(`<tr class="wen"><td>${vm.$i18n('KSU001_4015')}</td><td>${vm.$i18n('KSU001_4018')}</td><td>${!!optWorkplaceEventName ? _.escape(optWorkplaceEventName) : vm.$i18n('KSU001_4019')}</td></tr>`);
+
+										events.push(`<tr class="sdc"><td rowspan="${listSpecDayNameCompany.length || 1}">${vm.$i18n('KSU001_4016')}</td><td>${vm.$i18n('KSU001_4018')}</td><td>${!!listSpecDayNameCompany.length ? _.escape(_.head(listSpecDayNameCompany) || '') : vm.$i18n('KSU001_4019')}</td></tr>`);
+
+										if (!!listSpecDayNameCompany.length) {
+											_.each(listSpecDayNameCompany, (v, i) => {
+												if (!!i) {
+													events.push(`<tr class="sdc"><td></td><td>${_.escape(v)}</td></tr>`)
+												}
+											});
+										}
+
+										events.push(`<tr class="swc"><td rowspan="${listSpecDayNameWorkplace.length || 1}">${vm.$i18n('KSU001_4017')}</td><td>${vm.$i18n('KSU001_4018')}</td><td>${!!listSpecDayNameWorkplace.length ? _.escape(_.head(listSpecDayNameWorkplace) || '') : vm.$i18n('KSU001_4019')}</td></tr>`);
+
+										if (!!listSpecDayNameWorkplace.length) {
+											_.each(listSpecDayNameWorkplace, (v, i) => {
+												if (!!i) {
+													events.push(`<tr class="swc"><td></td><td>${_.escape(v)}</td></tr>`)
+												}
+											});
+										}
+
+										events.push('</tbody></table>');
+										exits.data.event(events.join(''));
+									}
+								}
+							}
+						});
+						vm.schedules(clones);
+						vm.schedules.reset();
+					}
+				}).always(() => vm.$blockui('hide'));
+			};
+		
+		getfirst(){
+			let self = this;
+			let sv = self.$ajax('at','screen/ksu/ksu002/getStartupProcessingInformation');
+			//<<Query>> 週の管理を取得する
+			let sv1 = self.$ajax('at', API.GET_START_DAY_OF_WEEK);
+			let sv2 = self.$ajax('at', '/screen/ksu/ksu002/getListOfPeriodsClose')
+				.fail((error:any)=>{
+					self.$dialog.error(error);
+				});
+			let sv3 = self.$window.storage("KSU002.USER_DATA");
+			
+			$.when(sv, sv1, sv2, sv3).done((data: any, data1: any, data2: any, data3: any)=>{
+				self.startupProcessingInformation(data);
+				if(data3){
+					self.storageDataStartWeek(data3.fdate);
+				}
+				self.dayStartWeek(data1.dayOfWeek);	
+				if(self.readyLoadData){
+					self.loadData();
+				}else{
+					self.readyLoadData = true;					
+				}
+				if(data2){
+					self.listOfPeriodsClose(data2);
+				}
+			});
+		}
+		
+		getPlansResultsData(getDaily: boolean): JQueryPromise<any>{
+			let vm = this;
+			let dfd = $.Deferred<void>();
+			const { begin, finish } = vm.baseDate();
+			vm.legalworkinghours(null);
+			vm.plansResultsData(null);
+			if(!begin || !finish){
+				return;
+			}
+			const command = {
+				listSid: [vm.$user.employeeId],
+				startDate: moment(begin).format('YYYY/MM/DD'),
+				endDate: moment(finish).format('YYYY/MM/DD'),
+				actualData: vm.achievement() === ACHIEVEMENT.YES
+			};
+			
+			let sv1 = vm.$ajax('at','screen/ksu/ksu002/getPlansResults', command).done((data:any) => {
+				if(getDaily){
+					dfd.resolve(data.workScheduleWorkDaily);
+				}else{
+					dfd.resolve(data.workScheduleWorkInfor2);					
+				}
+			});
+			let sv2 = vm.$ajax('at','screen/ksu/ksu002/getlegalworkinghours', command);
+			$.when(sv1, sv2).done((data1: any, data2: any) => {
+				vm.legalworkinghours(data2);
+				vm.plansResultsData(data1);
+				vm.plansResultsData.valueHasMutated();
+			});
+			return dfd.promise();
+		}
+		
+		
+		mounted() {
+		}
+		
+		openB() {
+			let vm = this;
+			const { begin, finish } = vm.baseDate();
+			let shareData = {
+                startDate: moment(begin).format('YYYY/MM/DD'),//対象期間開始日
+                endDate: moment(finish).format('YYYY/MM/DD'),//対象期間終了日
+                employeeCode: vm.startupProcessingInformation().employeeCode,//社員コード
+                employeeName: vm.startupProcessingInformation().businessName,//社員名
+                targetDate: moment(vm.yearMonth(), 'YYYYMMDD').format('YYYY/MM/DD'),//対象年月
+                startDay: 0, //起算曜日
+                isStartingDayOfWeek: false
+            }
+			vm.$window.storage("KSU002.USER_DATA").done(data => {
+				shareData.startDay = data.fdate;
+				shareData.isStartingDayOfWeek = vm.dayStartWeek() === data.fdate;
+				vm.$window.storage("ksu002B_params", shareData).then(() => {
+		            nts.uk.ui.windows.sub.modal('/view/ksu/002/b/index.xhtml');
+		        });				
+			});
+		}
 		// UI-8: Undo-Redoの処理
 		undoOrRedo(action: 'undo' | 'redo') {
 			const vm = this;
@@ -617,8 +668,16 @@ module nts.uk.ui.at.ksu002.a {
 						const registerDates: StorageData[] = [];
 						const command = { sid, registerDates };
 						const schedules = ko.unwrap(vm.schedules);
-
-						_.each(schedules, ({ date, data }) => {
+						let schedulesFilter = schedules;
+						if(!vm.isSelectedStartWeek()){
+							schedulesFilter = _.filter(schedulesFilter, function(n:any) {
+								let date: Date = new Date(moment(n.date).format("YYYY/MM/DD"));
+							  	return date >= new Date(moment(vm.dr.begin).format("YYYY/MM/DD")) && 
+									date <= new Date(moment(vm.dr.finish).format("YYYY/MM/DD"));
+							});
+						}
+						
+						_.each(schedulesFilter, ({ date, data }) => {
 							const {
 								$raw,
 								wtime,
@@ -638,39 +697,82 @@ module nts.uk.ui.at.ksu002.a {
 							const workTypeCd = ko.unwrap(wtype.code);
 
 							if (workTypeCd !== workTypeCode || workTimeCd !== workTimeCode || start !== startTime || end !== endTime) {
+								
 								registerDates.push({ date, end, start, workTimeCode: workTimeCd, workTypeCode: workTypeCd });
 							}
 						});
 
 						vm.$blockui('show')
 							.then(() => vm.$ajax('at', API.SAVE_DATA, command))
-							.then((info: HandlerResult) => {
-								if (!info.listErrorInfo.length) {
-									return vm.$dialog.info({ messageId: 'Msg_15' }).then(() => vm.schedules.reset(true));
-								} else {
-									const { listErrorInfo, registered } = info;
-									const params = {
-										errorRegistrationList: listErrorInfo,
-										employeeIds: [sid],
-										isRegistered: Number(registered)
-									};
-									setShared('dataShareDialogKDL053', params);
-									// call KDL053
-									try {
-									  vm.kdl053Open.close();
-									}
-									catch (exception_var) {}
-									
-									vm.kdl053Open =  nts.uk.ui.windows.sub.modeless('at', '/view/kdl/053/a/index.xhtml');
-									return vm.kdl053Open;
-								}
-							})
+                            .then((rs: any) => {
+                                vm.taskId = rs.taskInfor.id;
+                                vm.checkStateAsyncTask();
+                            });
 							// reload data
 							// .then(() => vm.achievement.valueHasMutated())
-							.always(() => vm.$blockui('clear'));
+							//.always(() => vm.$blockui('clear'));
 					}
 				});
-		}
+        }
+
+        checkStateAsyncTask() {
+            let vm = this;
+
+            nts.uk.deferred.repeat(conf => conf
+                .task(() => {
+                    return nts.uk.request.asyncTask.getInfo(vm.taskId).done(function(res: any) {
+                        // finish task
+                        if (res.succeeded || res.failed || res.cancelled) {
+                            vm.$blockui('clear');
+                            let arrayItems = [];
+                            let dataResult: any = {};
+                            dataResult.listErrorInfo = [];
+                            dataResult.hasError = false;
+                            dataResult.isRegistered = true;
+                            _.forEach(res.taskDatas, item => {
+                                if (item.key == 'STATUS_REGISTER') {
+                                    dataResult.isRegistered = item.valueAsBoolean;
+                                } else if (item.key == 'STATUS_ERROR') {
+                                    dataResult.hasError = item.valueAsBoolean;
+                                } else {
+                                    arrayItems.push(item);
+                                }
+                            });
+
+                            if (arrayItems.length > 0) {
+                                let listErrorInfo = _.map(arrayItems, obj2 => {
+                                    return new InforError(JSON.parse(obj2.valueAsString));
+                                });
+                                dataResult.listErrorInfo = listErrorInfo;
+                            }
+
+                            vm.achievement(vm.achievement());
+                            vm.achievement.valueHasMutated();
+                            if (!dataResult.listErrorInfo.length) {
+                                return vm.$dialog.info({ messageId: 'Msg_15' }).then(() => { vm.schedules.reset(true); });
+                            } else {
+                                const { listErrorInfo, registered } = dataResult;
+                                const params = {
+                                    errorRegistrationList: listErrorInfo,
+                                    employeeIds: [vm.$user.employeeId],
+                                    isRegistered: Number(registered)
+                                };
+                                setShared('dataShareDialogKDL053', params);
+                                // call KDL053
+                                try {
+                                    vm.kdl053Open.close();
+                                }
+                                catch (exception_var) { }
+
+                                vm.kdl053Open = nts.uk.ui.windows.sub.modeless('at', '/view/kdl/053/a/index.xhtml');
+                                return vm.kdl053Open;
+                            }
+                        }
+                    });
+                }).while(infor => {
+                    return infor.pending || infor.running;
+                }).pause(1000));
+        }
 
 		// check state & memento data
 		private memento(current: DayDataSave2Memento, preview: DayDataSave2Memento) {
@@ -716,6 +818,21 @@ module nts.uk.ui.at.ksu002.a {
 			}
 		}
 	}
+	
+	function initEvent(): void {
+        //click btnA5
+        $('#A5_1').ntsPopup({
+            position: {
+                my: 'left top',
+                at: 'left bottom+3',
+                of: $('#A5')
+            }
+        });
+
+        $('#A5').click(function() {
+            $('#A5_1').ntsPopup("toggle");
+        });
+    }
 
 	interface StorageData {
 		date: string | Date;
@@ -794,6 +911,7 @@ module nts.uk.ui.at.ksu002.a {
 		endTimeEditState: null | EditStateOfDailyAttd;
 		// Data info for event daisy (sakura)
 		dateInfoDuringThePeriod: DateInfoDuringThePeriod;
+		workTimeForm: null | number;
 	}
 
 	interface DateInfoDuringThePeriod {
@@ -811,10 +929,65 @@ module nts.uk.ui.at.ksu002.a {
 		optWorkplaceEventName: string | null;
 	}
 
-	interface EditStateOfDailyAttd {
-		// 勤怠項目ID
-		attendanceItemId: number;
-		// 編集状態: 日別実績の編集状態
-		editStateSetting: EDIT_STATE;
+    interface EditStateOfDailyAttd {
+        // 勤怠項目ID
+        attendanceItemId: number;
+        // 編集状態: 日別実績の編集状態
+        editStateSetting: EDIT_STATE;
+    }
+
+    interface IError {
+        sid: string,
+        scd: string,
+        empName: string,
+        date: string,
+        attendanceItemId: string,
+        errorMessage: string,
+    }
+
+    export class InforError {
+        sid: string;
+        scd: string;
+        empName: string;
+        date: string;
+        attendanceItemId: string;
+        errorMessage: string;
+        constructor(param: IError) {
+            let self = this;
+            self.sid = param.sid;
+            self.scd = param.scd;
+            self.empName = param.empName;
+            self.date = param.date;
+            self.attendanceItemId = param.attendanceItemId;
+            self.errorMessage = param.errorMessage;
+        }
+    }
+}
+function calculateDaysStartEndWeek(start: Date, end: Date, settingDayStart: number, isSelectedSettingDayStart: boolean): ({start: Date, end: Date}){
+	if(isSelectedSettingDayStart){
+		const locale = moment.locale();
+		moment.updateLocale(locale, {
+			week: {
+				dow: settingDayStart == 7 ? 0: settingDayStart,
+				doy: 0
+			}
+		});
+		let nStart = moment(start).startOf('week')
+		let nEnd = moment(end).endOf('week')
+		moment.updateLocale(locale, {
+			week: {
+				dow: 0,
+				doy: 0
+			}
+		});
+		return {start: nStart.toDate(), end: nEnd.toDate()};
+	}else{
+		return {start: start, end: end};
 	}
+}
+function converNumberToTime(number: number): string{
+	if (-60 < number &&  number < 0) {
+		return ('-' + Math.ceil(number/60).toString() +':'+ (Math.abs(number%60) == 0 ? '00': (Math.abs(number%60)).toString())); 
+	}
+	return (number < 0 ? Math.ceil(number/60).toString():Math.floor(number/60).toString()) +':'+ (Math.abs(number%60) == 0 ? '00': (Math.abs(number%60)).toString()); 
 }

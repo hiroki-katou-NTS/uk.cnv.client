@@ -11,9 +11,9 @@ import nts.uk.ctx.at.schedule.app.find.budget.premium.dto.HistAndPersonCostLastD
 import nts.uk.ctx.at.schedule.app.find.budget.premium.dto.PersonCostCalDto;
 import nts.uk.ctx.at.schedule.app.find.budget.premium.dto.PersonCostCalculationSettingDto;
 import nts.uk.ctx.at.schedule.app.find.budget.premium.dto.PremiumItemDto;
-import nts.uk.ctx.at.schedule.dom.budget.premium.service.AttendanceNamePriniumDto;
-import nts.uk.ctx.at.schedule.dom.budget.premium.service.AttendanceTypePriServiceDto;
 import nts.uk.ctx.at.schedule.ws.budget.premium.language.HistoryDto;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.service.AttendanceNamePriniumDto;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.service.AttendanceTypePriServiceDto;
 
 import javax.inject.Inject;
 import javax.ws.rs.POST;

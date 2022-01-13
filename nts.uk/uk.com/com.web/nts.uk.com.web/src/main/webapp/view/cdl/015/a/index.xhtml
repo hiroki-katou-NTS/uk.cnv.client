@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="../../../../master/dialog.xhtml">
+		<ui:define name="htmlHead">
+			<script>var dialogSize = { width: 430, height: 200 };</script>
+			<com:scriptfile set="IGNITE" />
+			<com:stylefile path="cdl015.a.main.css" />
+			<com:scriptfile path="cdl015.a.vm.js" />
+		</ui:define>
+
+		<ui:define name="content">
+			<div id="contents-area">		
+				<div class="contents-area contents-A1">
+				<!-- A1_4 -->
+				<div id ="label_A1_4" class="label">#{i18n.getText('CDL015_13')}</div>
+				
+				<table>
+					<tr>
+						<td>
+							<!-- A1 -->
+							<div class="label_A1" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('CDL015_10')}</div>
+						</td>
+						<td id="A1_1">
+							<!-- A1_1 -->
+							<div tabindex="1" data-bind="ntsSwitchButton: {
+										name: '#[CDL015_10]',
+										options: roundingRules,
+										optionsValue: 'code',
+										optionsText: 'name',
+										value: selectedRuleCode,
+										enable: true }"></div>
+						</td>
+					</tr>
+				</table>
+				</div>
+			</div>
+			<div id="functions-area-bottom">
+				<!-- A10_1 -->
+				<button tabindex="2" class="proceed" data-bind="click: register">#{i18n.getText('CDL015_14')}</button>
+				<!-- A10_2 -->
+				<button tabindex="3" data-bind="click: closeDialog">#{i18n.getText('CDL015_15')}</button>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

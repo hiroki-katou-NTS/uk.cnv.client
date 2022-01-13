@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.declare.DeclareHolidayWorkFrame;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.declare.DeclareOvertimeFrame;
@@ -37,7 +39,7 @@ public class JpaDeclareSetRepository extends JpaRepository implements DeclareSet
 			entity.companyId = declareSet.getCompanyId();
 		}
 		
-		entity.usageAtr = declareSet.getUsageAtr().value;
+		entity.usageAtr = BooleanUtils.toBoolean(declareSet.getUsageAtr().value);
 		entity.frameSet = declareSet.getFrameSet().value;
 		entity.mnAutoCalc = declareSet.getMidnightAutoCalc().value;
 		DeclareOvertimeFrame overtimeFrame = declareSet.getOvertimeFrame();
@@ -90,7 +92,7 @@ public class JpaDeclareSetRepository extends JpaRepository implements DeclareSet
 		
 		return DeclareSet.createFromJavaType(
 				entity.companyId,
-				entity.usageAtr,
+				BooleanUtils.toInteger(entity.usageAtr),
 				entity.frameSet,
 				entity.mnAutoCalc,
 				DeclareOvertimeFrame.createFromJavaType(

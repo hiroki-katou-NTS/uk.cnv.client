@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.aggregation.dom.schedulecounter.aggregationprocess.workplacecounter;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import nts.uk.ctx.at.shared.dom.scherec.aggregation.perdaily.AggregationUnitOfLaborCosts;
 
@@ -12,6 +13,7 @@ import nts.uk.ctx.at.shared.dom.scherec.aggregation.perdaily.AggregationUnitOfLa
  */
 @Getter
 @AllArgsConstructor
+@EqualsAndHashCode
 public class LaborCostAggregationUnit {
 	
 	/** 集計単位  **/

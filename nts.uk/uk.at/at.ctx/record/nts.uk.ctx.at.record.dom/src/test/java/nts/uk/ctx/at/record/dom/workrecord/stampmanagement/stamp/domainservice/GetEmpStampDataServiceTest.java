@@ -15,7 +15,6 @@ import mockit.integration.junit4.JMockit;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampHelper;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordHelper;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.GetEmpStampDataService.Require;
 
 /**
@@ -48,27 +47,26 @@ public class GetEmpStampDataServiceTest {
 		assertThat(GetEmpStampDataService.get(require, employeeId, date)).isNotPresent();
 	}
 	
-	/**
-	 * require.getListStampCard(employeeId) not empty()
-	 * require.getStampRecord(listCard, date) is empty()
-	 */
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testGetEmpStampDataService_2() {
-		String employeeId = "employeeId";
-		GeneralDate date = GeneralDate.today();
-		new Expectations() {
-			{
-				require.getListStampCard(anyString);
-				result = Arrays.asList(
-						StampHelper.getStampCardByInput("stampCardId1", "stampNumber1", GeneralDate.today()));
-				require.getStampRecord((List<StampNumber>) any, (GeneralDate) any);
-				result = new ArrayList<>();
-			}
-		};
-		
-		assertThat(GetEmpStampDataService.get(require, employeeId, date)).isNotPresent();
-	}
+//	/**
+//	 * require.getListStampCard(employeeId) not empty()
+//	 * require.getStampRecord(listCard, date) is empty()
+//	 */
+//	@SuppressWarnings("unchecked")
+//	@Test
+//	public void testGetEmpStampDataService_2() {
+//		String employeeId = "employeeId";
+//		GeneralDate date = GeneralDate.today();
+//		new Expectations() {
+//			{
+//				require.getListStampCard(anyString);
+//				result = Arrays.asList(
+//						StampHelper.getStampCardByInput("stampCardId1", "stampNumber1", GeneralDate.today()));
+//				result = new ArrayList<>();
+//			}
+//		};
+//		
+//		assertThat(GetEmpStampDataService.get(require, employeeId, date)).isNotPresent();
+//	}
 	
 	/**
 	 * require.getListStampCard(employeeId) not empty()
@@ -89,8 +87,6 @@ public class GetEmpStampDataServiceTest {
 								GeneralDate.today().addDays(-10)),
 						StampHelper.getStampCardByInput("stampCardId3", "stampNumber3",
 								GeneralDate.today().addDays(-3)));
-				require.getStampRecord((List<StampNumber>) any, (GeneralDate) any);
-				result = Arrays.asList(StampRecordHelper.getStampRecord());
 				
 				require.getStamp((List<StampNumber>) any, (GeneralDate) any);
 				result = new ArrayList<>();
@@ -119,8 +115,6 @@ public class GetEmpStampDataServiceTest {
 								GeneralDate.today().addDays(-10)),
 						StampHelper.getStampCardByInput("stampCardId3", "stampNumber3",
 								GeneralDate.today().addDays(-3)));
-				require.getStampRecord((List<StampNumber>) any, (GeneralDate) any);
-				result = Arrays.asList(StampRecordHelper.getStampRecord());
 				
 				require.getStamp((List<StampNumber>) any, (GeneralDate) any);
 				result = Arrays.asList(StampHelper.getStampDefault());

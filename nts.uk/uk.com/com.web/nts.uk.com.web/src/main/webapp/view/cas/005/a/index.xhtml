@@ -11,265 +11,137 @@
 			<com:stylefile path="../../../ccg/025/component/component.css" />
 			<com:scriptfile path="../../../ccg/025/component/component.service.js" />
 			<com:scriptfile path="../../../ccg/025/component/component.vm.js" />
-			<!-- ccg026 -->
-			<com:stylefile path="../../../ccg/026/component/component.css" />
-			<com:scriptfile path="../../../ccg/026/component/component.service.js" />
-			<com:scriptfile path="../../../ccg/026/component/component.vm.js" />
 
 			<com:stylefile path="cas005.a.main.css" />
-			<com:scriptfile path="cas005.a.start.js" />
 			<com:scriptfile path="cas005.a.vm.js" />
-			<com:scriptfile path="cas005.a.service.js" />
+
 			<com:ValidatorScript>
 				nts.uk.ctx.sys.auth.dom.role.RoleCode
 				nts.uk.ctx.sys.auth.dom.role.RoleName
 			</com:ValidatorScript>
-			<com:EnumScript>
-				nts.uk.ctx.sys.auth.dom.role.RoleType
-				nts.uk.ctx.sys.auth.dom.role.EmployeeReferenceRange
-				nts.uk.ctx.at.auth.dom.employmentrole.EmployeeRefRange
-				nts.uk.ctx.at.auth.dom.employmentrole.ScheduleEmployeeRef 
-			</com:EnumScript>
-			<!--EmployeeReferenceRange 6,EmployeeRefRange 2 8,ScheduleEmployeeRef 4 -->
 		</ui:define>
 
 		<ui:define name="content">
 			<div id="functions-area">
 				<div class="container">
-					<!-- A1_001 -->
-					<button tabindex="1" data-bind="click :createButton ">#{i18n.getText('CAS005_10')}</button>
-					<!-- A1_002 -->
-					<button tabindex="2" class="proceed"
-						data-bind="click : registerButton ,enable : isRegister">#{i18n.getText('CAS005_11')}</button>
-
-					<!-- A1_003 -->
-					<button tabindex="3" class="danger"
-						data-bind="click : deleteButton , enable : isDelete">#{i18n.getText('CAS005_12')}</button>
-					<!-- A1_004 -->
-					<button tabindex="4" data-bind="click : openDialogC , visible : canOpenDialogC ">#{i18n.getText('CAS005_13')}</button>
-					<!-- A1_005 -->
-					<button tabindex="5"
-						data-bind="click : openDialogB , enable : isCopy	 ">#{i18n.getText('CAS005_14')}</button>
-					<!--Export Excel-->
-					<button tabindex="5"
-							data-bind="click : exportExcel">#{i18n.getText('CAS005_130')}</button>
+					<!-- A1_1 -->
+					<button data-bind="click: createNew">#{i18n.getText('CAS005_2')}</button>
+					<!-- A1_2 -->
+					<button class="proceed" data-bind="click: save, enable : $root.errors.isEmpty">#{i18n.getText('CAS005_3')}</button>
+					<!-- A1_3 -->
+					<button class="danger" data-bind="click: remove, enable: !!ko.toJS($vm.selectedRole.roleId)">#{i18n.getText('CAS005_4')}</button>
 				</div>
 			</div>
 			<div id="contents-area" class="fixed-flex-layout">
-				<!-- body left  -->
-				<div class="fixed-flex-layout-left" data-bind="with: component">
-					<div style="margin-bottom: 10px; margin-left: 15px;">#{i18n.getText('CAS005_20')}</div>
-					<div style="margin-left: 15px;" id="pannel-top"
-						data-bind="ntsPanel:{width: '290px', height: '320px', direction: '', showIcon: false, visible: true}">
-						<ui:include src="../../../ccg/025/component/index.xhtml" />
+				<div class="container cf">
+					<div id="left-content" class="fixed-flex-layout-left"
+						 data-bind="with: $vm.component025">
+						<div id='list_role'>
+							<ui:include src="/view/ccg/025/component/index.xhtml" />
+						</div>
+					</div>
+
+					<div id="right-content"
+						 class="fixed-flex-layout-right"
+						 data-bind="with: $vm.selectedRole">
+						<div class="control-group valign-center">
+							<div data-bind="ntsFormLabel: {
+										required: true,
+										constraint: ['RoleCode' , 'RoleName']
+									}">#{i18n.getText('CAS005_5')}</div>
+							<input data-bind="
+									attr: {
+										id: 'roleCode'
+									},
+									ntsTextEditor: {
+										 name: '#[CAS005_6]',
+										 constraint: 'RoleCode',
+										 value: roleCode,
+										 required: true,
+										 enable: !!_.isEmpty(ko.toJS(roleId)),
+										 immediate: true
+									 },
+									 hasFocus: roleCodeFocus" />
+							<input data-bind="
+									attr: {
+										id: 'roleName'
+									},
+									ntsTextEditor: {
+										 name: '#[CAS005_7]',
+										 value: roleName,
+										 constraint: 'RoleName',
+										 required: true,
+										 immediate: true
+									 },
+									 hasFocus: roleNameFocus" />
+						</div>
+						<div class="control-group valign-center">
+							<div data-bind="ntsFormLabel: {required: true}">#{i18n.getText('CAS005_8')}</div>
+							<span data-bind="if: assignAtr() == 0">#{i18n.getText('CAS005_9')}</span>
+							<com:ko-if bind="assignAtr() == 1">
+								<div style="width: 215px"
+										data-bind="attr: {
+												id: 'A4_3'
+											},
+											ntsComboBox: {
+												name: '#[CAS005_10]',
+												options: $vm.enumRange,
+												optionsValue: 'value',
+												visibleItemsCount: 20,
+												value: employeeReferenceRange,
+												optionsText: 'localizedName',
+												editable: false,
+												enable: true,
+												columns: [
+													{ prop: 'localizedName', length: 12 },
+												]
+											}">
+								</div>
+							</com:ko-if>
+						</div>
+						<div class="control-group valign-center">
+							<com:ko-if bind="assignAtr() == 0">
+								<div data-bind="ntsFormLabel: {required: true}">#{i18n.getText('CAS005_14')}</div>
+								<div data-bind="attr: {
+												id: 'A5_2'
+											},
+											ntsComboBox: {
+												name: '#[CAS005_10]',
+												options: $vm.webMenuList,
+												optionsValue: 'webMenuCode',
+												visibleItemsCount: 5,
+												value: webMenuCd,
+												optionsText: 'webMenuName',
+												editable: false,
+												enable: true,
+												columns: [
+													{ prop: 'webMenuCode', length: 4 },
+													{ prop: 'webMenuName', length: 12 }
+												]
+											}">
+								</div>
+							</com:ko-if>
+							<com:ko-if bind="assignAtr() == 1">
+								<div data-bind="ntsFormLabel: {}">#{i18n.getText('CAS005_16')}</div>
+								<div id="A6_2" style="display: inline-block;"
+									 data-bind="ntsSwitchButton: {
+													name: '#[CAS005_10]',
+													options: [
+														{code: 1, name: '#{i18n.getText('CAS005_18')}'},
+														{code: 0, name: '#{i18n.getText('CAS005_19')}'}
+													],
+													optionsValue: 'code',
+													optionsText: 'name',
+													value: approvalAuthority,
+													required: true,
+													enable: true
+												}"/>
+							</com:ko-if>
+						</div>
 					</div>
 				</div>
-				<!-- body right -->
-				<div class="fixed-flex-layout-right">
-					<table class="layout-table">
-            <colgroup>
-              <col width="180px" />
-              <col width="*" />
-            </colgroup>
-						<!-- row 1 -->
-						<tr>
-							<td>
-								<div style="padding-right: 20px; padding-bottom: 5px;"
-
-									 data-bind="ntsFormLabel: {required: true,constraint:['RoleCode', 'RoleName'] }">#{i18n.getText('CAS005_30')}</div>
-							</td>
-							<td><input id="roleTypeCd" tabindex="7" style="width: 70px;"
-								data-bind="ntsTextEditor: {value: roleCode, name:'#{i18n.getText('CAS005_31')}', constraint: 'RoleCode',required: true, enable : enableRoleCode }" />
-								<input tabindex="8" id="roleNameFocus"
-								style="margin-left: 11px;"
-								data-bind="ntsTextEditor:  {value: roleName, name:'#{i18n.getText('CAS005_32')}', constraint: 'RoleName',required: true, option: { width: '200px' }}" /></td>
-						</tr>
-						<!-- row 2 -->
-						<tr>
-							<td>
-								<div style="padding-right: 20px;"
-									data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CAS005_33')}</div>
-							</td>
-							<td>
-								<div class="cf" tabindex="9"
-									data-bind="ntsSwitchButton: {
-														options: categoryAssign,
-														optionsValue: 'code',
-														optionsText: 'name',
-														value: assignAtr,
-														enable: isCategoryAssign }">
-								</div>
-							</td>
-						</tr>
-						<!-- row 3 -->
-						<tr>
-							<td>
-								<div style="padding-right: 20px;"
-									data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CAS005_37')}</div>
-							</td>
-							<td>
-								<div id="combo-box" tabindex="10"
-									data-bind="ntsComboBox: {
-														options: listEmployeeReferenceRange,
-														optionsValue: 'value',
-														value: employeeReferenceRange,
-														optionsText: 'name',
-														editable: false,
-														enable: isEnable,
-														columns: [
-															{ prop: 'name', length: 10 },
-														]}">
-								</div>
-							</td>
-						</tr>
-						<!-- row 4 -->
-						<tr>
-							<td>
-								<div style="padding-right: 20px;"
-									data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CAS005_39')}</div>
-							</td>
-							<td>
-								<div class="cf" tabindex="11"
-									data-bind="ntsSwitchButton: {
-														options: referenceAuthority,
-														optionsValue: 'code',
-														optionsText: 'name',
-														value: selectReferenceAuthority ,
-														enable: true }">
-								</div>
-							</td>
-						</tr>
-						<!-- row 5 -->
-						<tr data-bind="css: {disappear: !visibleWebmenu()}">
-							<td>
-								<div style="padding-right: 20px;"
-									data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CAS005_50')}</div>
-							</td>
-							<td>
-								<div id="combo-box" tabindex="12"
-									data-bind="ntsComboBox: {
-														options: listWebMenu,
-														optionsValue: 'webMenuCode',
-														value: selectWebMenu,
-														optionsText: 'webMenuName',
-														editable: false,
-														enable: isEnable,
-														columns: [
-															{ prop: 'webMenuName', length: 10 },
-														]}">
-								</div>
-							</td>
-						</tr>
-						<!-- row 6 -->
-						<!-- Hide for Version 4 -->
-						<tr style="display:none;">
-							<td>
-								<div style="padding-right: 20px;"
-									data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CAS005_52')}</div>
-							</td>
-							<td>
-								<div id="combo-box" tabindex="13"
-									data-bind="ntsComboBox: {
-														options: listEmployeeRefRange,
-														optionsValue: 'value',
-														value: bookingScreen,
-														optionsText: 'name',
-														editable: false,
-														enable: enumEmployment,
-														columns: [
-															{ prop: 'name', length: 10 },
-														]}">
-								</div>
-							</td>
-						</tr>
-						<!-- row 7 -->
-						<tr>
-							<td>
-								<div style="padding-right: 20px;"
-									data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CAS005_54')}</div>
-							</td>
-							<td>
-								<div id="combo-box" tabindex="14"
-									data-bind="ntsComboBox: {
-														options: listScheduleEmployeeRef ,
-														optionsValue: 'value',
-														value: scheduleScreen,
-														optionsText: 'name',
-														editable: false,
-														enable: enumEmployment,
-														columns: [
-															{ prop: 'name', length: 12 },
-														]}">
-								</div>
-							</td>
-						</tr>
-						<!-- row 8 -->
-						<!-- Hide for Version 4 -->
-						<tr style="display: none;">
-							<td>
-								<div style="padding-right: 20px;"
-									data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CAS005_56')}</div>
-							</td>
-							<td>
-								<div id="combo-box" tabindex="15"
-									data-bind="ntsComboBox: {
-														options: listEmployeeReferenceRange,
-														optionsValue: 'value',
-														value: registeredInquiries,
-														optionsText: 'name',
-														editable: false,
-														enable: enumEmployment,
-														columns: [
-															{ prop: 'name', length: 10 },
-														]}">
-								</div>
-							</td>
-						</tr>
-						<!-- row 9 -->
-						<!-- Hide for Version 4 -->
-						<tr>
-							<td>
-								<div style="padding-right: 20px;"
-									data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CAS005_58')}</div>
-							</td>
-							<td>
-								<div id="combo-box" tabindex="16"
-									data-bind="ntsComboBox: {
-														name: '#{i18n.getText('CAS005_59')}',
-														options: listEmployeeRefRange,
-														optionsValue: 'value',
-														value: specifyingAgent,
-														optionsText: 'name',
-														editable: false,
-														enable: enumEmployment,
-														columns: [
-															{ prop: 'name', length: 10 },
-														]}">
-								</div>
-							</td>
-						</tr>
-						<!-- row 10 -->
-						<tr>
-							<td colspan="2">
-								<div style="padding-right: 20px;"
-									data-bind="ntsFormLabel: {required: true }">#{i18n.getText('CAS005_70')}</div>
-							</td>
-						</tr>
-						<!-- row 11 -->
-						<tr>
-							<td colspan="2">
-								<div data-bind="with: componentCcg026">
-                  <ui:include src="/view/ccg/026/component/index.xhtml" />
-                </div>
-							</td>
-						</tr>
-
-					</table>
-				</div>
 			</div>
-			<!--  end content area -->
 		</ui:define>
-
 	</ui:composition>
 </body>
 </html>

@@ -8,7 +8,9 @@ module nts.uk.at.view.kal003.d.viewmodel {
         constructor() {
             var self = this;
             self.itemList = ko.observableArray(model.getListCategory());
-            self.selectedCode = ko.observable(0);
+            
+            var selectedCode = nts.uk.ui.windows.getShared("inputKAL003d");
+            self.selectedCode = ko.observable(selectedCode ? selectedCode : 0);
         }
 
         private selectCategory(): void {

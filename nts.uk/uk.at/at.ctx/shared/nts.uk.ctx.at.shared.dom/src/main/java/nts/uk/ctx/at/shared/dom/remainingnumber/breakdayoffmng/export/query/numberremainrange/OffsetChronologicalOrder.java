@@ -9,6 +9,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.OccurrenceDigClass;
 import nts.uk.ctx.at.shared.dom.remainingnumber.absencerecruitment.export.query.algorithm.param.UnbalanceCompensation;
+import nts.uk.ctx.at.shared.dom.remainingnumber.base.ManagementDataRemainUnit;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.DayOffError;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.AccumulationAbsenceDetail;
 import nts.uk.ctx.at.shared.dom.remainingnumber.breakdayoffmng.export.query.numberremainrange.param.LeaveOccurrDetail;
@@ -112,7 +113,8 @@ public class OffsetChronologicalOrder {
 		// 紐づけ登録処理
 		seqVacation = TypeRegistrationProcess.process(
 				occur.getDateOccur().getDayoffDate().get(), accdigest.getDateOccur().getDayoffDate().get(),
-				accdigest.getUnbalanceNumber().getDay(), typeJudgment);
+				new ManagementDataRemainUnit(Math.min(accdigest.getUnbalanceNumber().getDay().v(), occur.getUnbalanceNumber().getDay().v()))
+				, typeJudgment);
 		
 		}
 

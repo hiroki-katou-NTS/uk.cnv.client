@@ -33,6 +33,7 @@ import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.function.dom.adapter.person.EmployeeInfoFunAdapterDto;
+import nts.uk.ctx.at.function.dom.dailyperformanceformat.repository.AuthorityFormatInitialDisplayRepository;
 import nts.uk.ctx.at.record.dom.adapter.employment.EmploymentHisOfEmployeeImport;
 import nts.uk.ctx.at.record.dom.adapter.initswitchsetting.DateProcessedRecord;
 import nts.uk.ctx.at.record.dom.adapter.initswitchsetting.InitSwitchSetAdapter;
@@ -122,6 +123,7 @@ import nts.uk.screen.at.app.dailyperformance.correction.dto.cache.DPCorrectionSt
 import nts.uk.screen.at.app.dailyperformance.correction.dto.checkapproval.ApproveRootStatusForEmpDto;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.checkshowbutton.DailyPerformanceAuthorityDto;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.companyhist.AffComHistItemAtScreen;
+import nts.uk.screen.at.app.dailyperformance.correction.dto.type.TypeLink;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.workplacehist.WorkPlaceHistTemp;
 import nts.uk.screen.at.app.dailyperformance.correction.error.DCErrorInfomation;
 import nts.uk.screen.at.app.dailyperformance.correction.lock.ClosureSidDto;
@@ -465,9 +467,10 @@ public class DPCorrectionProcessorMob {
 						screenDto.setCellSate(data.getId(), DPText.LOCK_SIGN, DPText.STATE_DISABLE);
 					}
 					// thieu check khi co data
-				} else if (selfConfirmError == YourselfConfirmError.CANNOT_REGISTER_WHEN_ERROR.value) {
-					// co the dang ky data nhưng ko đăng ký được check box
-				}
+				} 
+//				else if (selfConfirmError == YourselfConfirmError.CANNOT_REGISTER_WHEN_ERROR.value) {
+//					// co the dang ky data nhưng ko đăng ký được check box
+//				}
 			}
 		}
 
@@ -485,9 +488,10 @@ public class DPCorrectionProcessorMob {
 					screenDto.setCellSate(data.getId(), DPText.LOCK_APPROVAL, DPText.STATE_DISABLE);
 				}
 				// thieu check khi co data
-			} else if (supervisorConfirmError == YourselfConfirmError.CANNOT_REGISTER_WHEN_ERROR.value) {
-				// co the dang ky data nhưng ko đăng ký được check box
-			}
+			} 
+//			else if (supervisorConfirmError == YourselfConfirmError.CANNOT_REGISTER_WHEN_ERROR.value) {
+//				// co the dang ky data nhưng ko đăng ký được check box
+//			}
 
 			// disable, enable checkbox with approveRootStatus
 //			if (approveRootStatus == null)
@@ -711,7 +715,7 @@ public class DPCorrectionProcessorMob {
 				if (correct == null) {
 					if (formatCodeSelects.isEmpty()) {
 						List<AuthorityFormatInitialDisplayDto> initialDisplayDtos = repo
-								.findAuthorityFormatInitialDisplay(companyId);
+								.findAuthorityFormatInitialDisplay(companyId).stream().filter(item -> item.getPcSpAtr() == 1).collect(Collectors.toList());
 						if (!initialDisplayDtos.isEmpty()) {
 							List<String> formatCodes = initialDisplayDtos.stream()
 									.map(x -> x.getDailyPerformanceFormatCode()).collect(Collectors.toList());
@@ -890,7 +894,13 @@ public class DPCorrectionProcessorMob {
 					 */
 					DPAttendanceItem dPItem = mapDP
 							.get(Integer.parseInt(key.getKey().substring(1, key.getKey().length()).trim()));
+					
 					columnSetting.setTypeFormat(dPItem.getAttendanceAtr());
+					
+					if (dPItem.getAttendanceAtr() != null && dPItem.getAttendanceAtr().intValue() == DailyAttendanceAtr.NumberOfTime.value) {
+						if (dPItem.getTypeGroup() != null && dPItem.getTypeGroup().intValue() == TypeLink.DOWORK.value)
+							columnSetting = new ColumnSetting(key.getKey().isEmpty() ? "" : key.getKey(), false);
+					}
 				}
 			}
 			result.getColumnSettings().add(columnSetting);
@@ -1359,8 +1369,8 @@ public class DPCorrectionProcessorMob {
 					.filter(x -> x.getCode().equals(employeeDailyPerError.getErrorAlarmWorkRecordCode())).findAny()
 					.ifPresent((item) -> {
 						result.add(new ErAlWorkRecordShortDto(employeeDailyPerError.getDate().toString("yyyy/MM/dd"),
-								employeeDailyPerError.getEmployeeID(), item.getCode().v(), item.getName().v(),
-								employeeDailyPerError.getAttendanceItemList()));
+								employeeDailyPerError.getEmployeeID(), item.getCode().v(), item.getName().v(), 
+								item.getTypeAtr().nameId, employeeDailyPerError.getAttendanceItemList()));
 					});
 		}
 		return result;

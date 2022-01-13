@@ -9,7 +9,7 @@
     <!-- head -->
     <ui:define name="htmlHead">
       <script>
-        var dialogSize = { width: 500, height: 695 };
+        var dialogSize = { width: 500, height: 710 };
       </script>
       <com:ValidatorScript>
         nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.DisplayName
@@ -24,10 +24,6 @@
     <!-- content -->
     <ui:define name="content">
       <div id="contents-area">
-        <div class="div-line">
-          <!-- F1_1 ラベルの内容(ラベル) -->
-          <div id="F1_1" data-bind="ntsFormLabel: {}">#{i18n.getText('CCG034_68')}</div>
-        </div>
         <div class="system-list flex valign-center">
           <!-- F2_1 システム選択(ラベル) -->
           <label id="F2_1">#{i18n.getText('CCG034_69')}</label>
@@ -62,7 +58,7 @@
          }" tabindex="2"></div>
           <!-- F4 メニュー一覧 -->
           <table id="F4" data-bind="ntsGridList: {
-           rows: 6,
+           rows: 4,
            options: filteredMenuList,
            optionsValue: 'id',
            columns: menuColumns,
@@ -75,7 +71,7 @@
           <div id="F5_1" class="column-label" data-bind="ntsFormLabel: { required: true }">${i18n.getText('CCG034_74')}
           </div>
           <!-- F5_2 選択メニュー -->
-          <label id="F5_2" data-bind="text: displayMenuName"></label>
+          <label id="F5_2" class="limited-label" data-bind="text: displayMenuName"></label>
         </div>
         <div class="div-line flex valign-center">
           <!-- F6_1 メニュー表示名称(ラベル) -->
@@ -91,23 +87,99 @@
            option: { width: '200px' }
          }" tabindex="4"></input>
         </div>
+        <div class="div-line flex">
+          <!-- F9_1 アイコン表示(ラベル) -->
+          <div id="F9_1" class="column-label" data-bind="ntsFormLabel: { required: true }">${i18n.getText('CCG034_130')}</div>
+          <div class="image-type-setting">
+            <div class="flex valign-center">
+              <!-- F9_2_1 なし -->
+              <div id="F9_2_1" data-bind="ntsRadioButton: {
+                checked: imageType,
+                option: $vm.imageOption[0],
+                optionValue: 'code',
+                optionText: 'name',
+                enable: true,
+                group: 'F9_2'
+              }" tabindex="5"></div>
+            </div>
+            <div class="flex valign-center">
+              <!-- F9_2_2 既定の画像 -->
+              <div id="F9_2_2" data-bind="ntsRadioButton: {
+                checked: imageType,
+                option: $vm.imageOption[1],
+                optionValue: 'code',
+                optionText: 'name',
+                enable: true,
+                group: 'F9_2'
+              }" tabindex="5"></div>
+              <!-- F9_3_2 既定画像選択 -->
+              <button id="F9_3_2" class="choose-button"
+                data-bind="enable: imageType() === 0" tabindex="6">${i18n.getText('CCG034_134')}</button>
+              <!-- F9_10 既定の画像リスト -->
+              <div id="F9_10"></div>
+            </div>
+            <div class="flex valign-center">
+              <!-- F9_2_3 任意の画像 -->
+              <div id="F9_2_3" data-bind="ntsRadioButton: {
+                checked: imageType,
+                option: $vm.imageOption[2],
+                optionValue: 'code',
+                optionText: 'name',
+                enable: true,
+                group: 'F9_2'
+              }" tabindex="5"></div>
+              <!-- F9_3_3 画像のアップロード -->
+              <div id="F9_3_3" data-bind="ntsFileUpload: {
+                name: '#{i18n.getText('CCG034_135')}',
+                filename: uploadedFileName,
+                accept: ['.png','.gif', '.jpeg', '.jpg', '.tiff', '.bmp'],
+                text: '#{i18n.getText('CCG034_135')}',
+                enable: imageType() === 1,
+                asLink: true,
+                immediateUpload: true,
+                uploadFinished: uploadFinished,
+                stereoType: 'avatarfile',
+                maxSize: 1
+              }"></div>
+            </div>
+            <div class="flex valign-center">
+              <!-- F9_5_1 最大ファイルサイズ -->
+              <label id="F9_5_1">${i18n.getText('CCG034_126')}</label>
+              <!-- F9_5_2 ファイルサイズ -->
+              <label id="F9_5_2" class="ml-10" data-bind="text: displayFileSize, visible: isDisplayFileSize"></label>
+            </div>
+          </div>
+          <!-- F9_4_2 選択画像 -->
+          <div class="preview-image" data-bind="visible: imageType() === 0">
+            <img id="F9_4_2" class="pic-preview" data-bind="attr: { src: imageSrc }" />
+          </div>
+          <!-- F9_4_3 アップロード画像 -->
+          <div id="F9_4_3" class="preview-image" data-bind="visible: imageType() === 1"></div>
+        </div>
         <div class="div-line flex valign-center">
           <!-- F7_1 文字サイズ(ラベル) -->
           <div id="F7_1" class="column-label" data-bind="ntsFormLabel: { required: true, constraint: 'FontSize' }">${i18n.getText('CCG034_76')}
           </div>
           <!-- F7_2 文字サイズ -->
-          <div class="column-value">
-            <input id="F7_2" class="column-value" data-bind="ntsNumberEditor: {
-              name: '#[CCG034_76]',
-              value: fontSize,
-              constraint: 'FontSize',
-              required: true,
-              enable: true,
-              option: { width: '20px' }
-            }" tabindex="5"></input>
-          </div>
+          <input id="F7_2" data-bind="ntsNumberEditor: {
+            name: '#[CCG034_76]',
+            value: fontSize,
+            constraint: 'FontSize',
+            required: true,
+            enable: true,
+            option: { width: '20px' }
+          }" tabindex="9"></input>
           <!-- F7_3 太字指定 -->
-          <div id="F7_3" class="column-value" data-bind="ntsCheckBox: { checked: isBold, enable: true, text: $vm.$i18n('CCG034_53')}" tabindex="6"></div>
+          <div id="F7_3" class="ml-10" data-bind="ntsCheckBox: { checked: isBold, enable: true, text: $vm.$i18n('CCG034_53')}" tabindex="10"></div>
+          <!-- F7_4 文字(ラベル) -->
+          <label id="F7_4" class="ml-10">${i18n.getText('CCG034_64')}</label>
+          <!-- F7_5 文字色 -->
+          <div id="F7_5" class="ml-10" data-bind="ntsColorPicker: {
+            name: '#[CCG034_64]',
+            value: textColorValue,
+            required: true,
+            width: 50,
+          }" tabindex="11"></div>
         </div>
         <div class="div-line">
           <!-- F8_1 文字位置(ラベル) -->
@@ -119,8 +191,8 @@
            optionsValue: 'code',
            optionsText: 'name',
            value: horizontalAlign,
-           enable: true
-          }" tabindex="7"></div>
+           enable: ko.computed(function() { return imageType() &lt; 0; })
+          }" tabindex="12"></div>
           <!-- F8_3 左右位置 -->
           <div id="F8_3" class="column-value" data-bind="ntsRadioBoxGroup: {
             name: '#[CCG034_82]',
@@ -128,15 +200,15 @@
             optionsValue: 'code',
             optionsText: 'name',
             value: verticalAlign,
-            enable: true
-           }" tabindex="8"></div>
+            enable: ko.computed(function() { return imageType() &lt; 0; })
+           }" tabindex="13"></div>
         </div>
       </div>
       <div id="functions-area-bottom">
         <!-- F20_1 決定 -->
-        <button class="large proceed" tabindex="9" data-bind="click: updatePartDataAndCloseDialog">#{i18n.getText('CCG034_86')}</button>
+        <button class="large proceed" tabindex="14" data-bind="click: updatePartDataAndCloseDialog">#{i18n.getText('CCG034_86')}</button>
         <!-- F20_2 閉じる -->
-        <button class="large" tabindex="10" data-bind="click: closeDialog">#{i18n.getText('CCG034_87')}</button>
+        <button class="large" tabindex="15" data-bind="click: closeDialog">#{i18n.getText('CCG034_87')}</button>
       </div>
     </ui:define>
   </ui:composition>

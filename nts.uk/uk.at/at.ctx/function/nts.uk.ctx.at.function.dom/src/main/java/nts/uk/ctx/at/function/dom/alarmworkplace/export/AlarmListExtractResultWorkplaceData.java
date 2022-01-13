@@ -116,14 +116,13 @@ public class AlarmListExtractResultWorkplaceData {
 
     private static String convertAlarmValueDate(String date) {
         switch (date.length()) {
-            case 4:
-                return date;
             case 6:
                 return date.substring(0, 4) + "/" + date.substring(4, 6);
             case 8:
                 return date.substring(0, 4) + "/" + date.substring(4, 6) + "/" + date.substring(6, 8);
+            default:
+                return date;
         }
-        return null;
     }
 
 }

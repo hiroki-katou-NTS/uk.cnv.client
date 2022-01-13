@@ -14,6 +14,7 @@
       <com:scriptfile set="IGNITE" />
 
       <com:stylefile path="ccg008.a.style.css" />
+      <com:scriptfile path="../../034/share/model.js" />
       <com:scriptfile path="./ccg008.a.vm.js" />
 
       <com:scriptfile path="/view/kdp/001/a/kdp001.a.component.js" of="nts.uk.at.web" />
@@ -31,33 +32,6 @@
       <com:scriptfile path="/view/ktg/031/a/ktg031.a.vm.js" of="nts.uk.at.web" />
     </ui:define>
     <ui:define name="content">
-      <div id="functions-area">
-          <div style="display: inline;">
-              <label id="A1_5" data-bind="text: itemLayoutA1_7,
-                css: {
-                  hidden: !$vm.isShowSwitch()
-                }"></label>
-          </div>
-        <div tabindex="3" data-bind="ntsSwitchButton: {
-            name: '#[CCG008_13]',
-            options: dateSwitch,
-            optionsValue: 'code',
-            optionsText: 'name',
-            value: $vm.currentOrNextMonth,
-          }, css: {
-            hidden: !$vm.isShowSwitch()
-          }" style="display: inline;">
-        </div>
-        
-        <button class="btn-refresh" tabindex="4"
-          data-bind="click: function() { $vm.callApiTopPage() }, css: { hidden: !$vm.isShowButtonRefresh() }">
-          <i data-bind="ntsIcon: { no: 194, width: 30, height: 30 }" class="menu-icon"></i>
-        </button>
-        <button class="btn-setting" tabindex="4"
-          data-bind="click: function() { $vm.openScreenE() }, css: { hidden: !$vm.isShowButtonSetting() }">
-          <i data-bind="ntsIcon: { no: 5, width: 30, height: 30 }" class="menu-icon"></i>
-        </button>
-      </div>
       <div id="contents-area">
         <div class="widget-home cf" data-bind="css: $vm.classLayoutName">
           <div class="widget-left" data-bind="widget-group: $vm.widgetLeft"></div>

@@ -109,9 +109,9 @@ module nts.uk.cloud.view.cld001.a {
                     $("#txtTenantCode").trigger("validate");
                 }
 
-                if (self.useCheckDigit_optionCode()) {
-                    $("#txtOptionCode").trigger("validate");
-                }
+                //if (self.useCheckDigit_optionCode()) {
+                //    $("#txtOptionCode").trigger("validate");
+                //}
 
                 if (nts.uk.ui.errors.hasError()) {
                     return;
@@ -125,11 +125,59 @@ module nts.uk.cloud.view.cld001.a {
                 command.administratorPassword = self.tenantManagerPassword();
                 command.optionCode = self.optionCode();
 				command.companyName = self.companyName();
-                service.registTenant(command).done(function() {
-
+                service.registTenant(command)
+                .done(function(res: any) {
+                    nts.uk.ui.dialog.info({
+                        message: nts.uk.resource.getMessage("Msg_1148", []).replace(/Com_Company/g, "会社")
+                    }).then(function() {
+                        self.executionMasterCopyData();
+                    });
+                }).fail(function(rej: any){
+                    nts.uk.ui.dialog.alert(rej.errorMessage);
+                    console.log(rej);
                 });
 
             }
+
+            public executionMasterCopyData(): void {
+                var self = this;
+
+                nts.uk.ui.block.grayout();
+                service.executionMasterCopyData({
+                    tenantCode: self.tenantCode()
+                }).done(function(res: any) {
+                    self.updateState(res.id, self.tenantCode());
+                }).fail(function(res: any) {
+                    console.log(res);
+                    nts.uk.ui.block.clear();
+                });
+            }
+
+            private updateState(id: string, tenantCode: string): void {
+                let self = this;
+                nts.uk.deferred.repeat(conf => conf
+                    .task(() => {
+                        return service.getTaskInfo(id, tenantCode).done(function(res: any) {
+                            if (res.succeeded || res.failed || res.cancelled || res.status == "REQUESTED_CANCEL") {
+                                let numberSuccess = res.taskDatas.find((taskData:TaskData) => taskData.key == 'NUMBER_OF_SUCCESS').valueAsString;
+                                let numberFail = res.taskDatas.find((taskData:TaskData) => taskData.key == 'NUMBER_OF_ERROR').valueAsString;
+                                nts.uk.ui.dialog.info({
+                                    message: nts.uk.text.format("処理が完了しました。正常：{0}件、エラー：{1}件",numberSuccess, numberFail)
+                                });
+                                nts.uk.ui.block.clear();
+                            }
+                        });
+                    }).while(infor => {
+                        return (infor.pending || infor.running) && infor.status != "REQUESTED_CANCEL";
+                    }).pause(1000));
+            }
+        }
+
+        class TaskData {
+            key: string;
+            valueAsBoolean: boolean;
+            valueAsNumber: number;
+            valueAsString: string;
         }
     }
 }

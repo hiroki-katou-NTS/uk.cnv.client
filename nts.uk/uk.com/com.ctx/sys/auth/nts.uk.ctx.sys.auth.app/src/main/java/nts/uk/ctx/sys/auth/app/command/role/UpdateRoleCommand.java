@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nts.arc.enums.EnumAdaptor;
+import nts.gul.text.IdentifierUtil;
 import nts.uk.ctx.sys.auth.dom.role.ContractCode;
 import nts.uk.ctx.sys.auth.dom.role.EmployeeReferenceRange;
 import nts.uk.ctx.sys.auth.dom.role.Role;
@@ -11,6 +12,9 @@ import nts.uk.ctx.sys.auth.dom.role.RoleAtr;
 import nts.uk.ctx.sys.auth.dom.role.RoleCode;
 import nts.uk.ctx.sys.auth.dom.role.RoleName;
 import nts.uk.ctx.sys.auth.dom.role.RoleType;
+import nts.uk.shr.com.context.AppContexts;
+
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -47,9 +51,10 @@ public class UpdateRoleCommand {
 	/** The company id. */
 	// 会社ID
 	private String companyId;
+	private Boolean approvalAuthority;
 
 	public UpdateRoleCommand(String roleId, String roleCode, int roleType, int employeeReferenceRange, String name,
-			String contractCode, int assignAtr, String companyId) {
+			String contractCode, int assignAtr, String companyId,Boolean approvalAuthority) {
 		super();
 		this.roleId = roleId;
 		this.roleCode = roleCode;
@@ -59,20 +64,22 @@ public class UpdateRoleCommand {
 		this.contractCode = contractCode;
 		this.assignAtr = assignAtr;
 		this.companyId = companyId;
+		this.approvalAuthority = approvalAuthority;
 	}
 	
 	public Role toDomain() {
 		
 		return new Role(
 				this.roleId,
+				new ContractCode(AppContexts.user().contractCode()),
+				AppContexts.user().companyId(),
 				new RoleCode(this.roleCode),
-				EnumAdaptor.valueOf(this.roleType,RoleType.class),
-				EnumAdaptor.valueOf(this.employeeReferenceRange,EmployeeReferenceRange.class),
 				new RoleName(this.name),
-				new ContractCode(this.contractCode),
+				EnumAdaptor.valueOf(this.roleType,RoleType.class),
 				EnumAdaptor.valueOf(this.assignAtr,RoleAtr.class),
-				this.companyId
-				);
+				EnumAdaptor.valueOf(this.employeeReferenceRange,EmployeeReferenceRange.class),
+				approvalAuthority == null? Optional.empty():Optional.of(approvalAuthority));
+
 	}
 	
 }

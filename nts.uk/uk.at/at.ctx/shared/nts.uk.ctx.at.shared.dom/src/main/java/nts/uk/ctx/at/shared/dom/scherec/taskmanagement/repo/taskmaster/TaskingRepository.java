@@ -126,6 +126,16 @@ public interface TaskingRepository {
     List<Task> getListTask(String cid, TaskFrameNo taskFrameNo, List<TaskCode> codes);
 
     /**
+     * 作業枠NOと作業コードリストを作業を全て取得する
+     *
+     * @param cid
+     * @param taskFrameNo
+     * @param codes
+     * @return
+     */
+    List<Task> getListTask(String cid, Integer taskFrameNo, List<String> codes);
+
+    /**
      * @param cid
      * @param taskFrameNo
      * @param code

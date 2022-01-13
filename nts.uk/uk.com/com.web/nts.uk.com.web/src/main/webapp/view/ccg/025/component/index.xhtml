@@ -8,21 +8,62 @@
 	<ui:composition>
 		<!-- <div style="width: 350px" data-bind="ntsSearchBox: {searchMode: searchMode, targetKey: 'roleCode', comId: 'multi-list', 
 				items: listRole,  selectedKey: 'roleCode', fields: ['name', 'roleCode'], mode: 'igGrid'}" /> -->
-		<div class="caret-right caret-background">
-			<table id="multi-list"
+		<div id="ccg025-component" style="display: inline-block;"
+			 data-bind="css: {
+					ntsPanel: !setting.onDialog,
+					panel: !setting.onDialog
+			  }">
+			<div class="control-group" data-bind="if: displayRoleClassification()">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div data-bind="ntsFormLabel: {
+									required: false,
+									text: '#{i18n.getText('CCG025_2')}'
+								}"/>
+                    <div id="ccg025-switch" style="display: inline-block"
+                         data-bind="ntsSwitchButton: {
+									name: '#[CCG025_2]',
+									options: [
+										{code: 0, name: '#{i18n.getText('CCG025_3')}'},
+										{code: 1, name: '#{i18n.getText('CCG025_4')}'}
+									],
+									optionsValue: 'code',
+									optionsText: 'name',
+									value: roleClassification,
+									required: true,
+									enable: true
+								},
+								attr: {tabindex: setting.tabindex},
+								hasFocus: switchFocus"/>
+                </div>
+				<hr/>
+			</div>
+			<table id="ccg025-list"
 				data-bind="attr: {tabindex: setting.tabindex}, 
 					   ntsGridList: {
-							height: 320,
 							dataSource: listRole ,
 							primaryKey: 'roleId',
 							columns: columns,
 							multiple: setting.multiple,
-							value: currentCode,
+							value: currentRoleId,
 							rows: setting.rows,
 							columnResize: setting.isResize,
-						}">
+						},
+						hasFocus: listFocus">
 			</table>
 		</div>
+		<style>
+			#ccg025-switch .nts-switch-button {
+				width: 70px;
+			}
+			#ccg025-switch .radio-wrapper {
+				width: 70px;
+				flex-direction: column;
+				text-align: center;
+			}
+            #ccg025-list_displayContainer td {
+                height: 24px;
+            }
+		</style>
 	</ui:composition>
 </body>
 </html>

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,25 +24,23 @@ import nts.uk.ctx.at.shared.dom.WorkInformation;
 import nts.uk.ctx.at.shared.dom.common.time.TimeSpanForCalc;
 import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.configuration.DayOfWeek;
 import nts.uk.ctx.at.shared.dom.remainingnumber.base.TimezoneToUseHourlyHoliday;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.GettingTimeVacactionService;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.TimeVacation;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.affiliationinfor.AffiliationInforOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakgoout.BreakFrameNo;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakgoout.OutingTimeOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.OutingTimeOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.breaking.BreakTimeOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.breaking.BreakTimeSheet;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.calcategory.CalAttrOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.earlyleavetime.LeaveEarlyTimeOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.editstate.EditStateOfDailyAttd;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.latetime.LateTimeOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.shortworktime.ShortTimeOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.CalculationState;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.NotUseAttribute;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.WorkInfoOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime.AttendanceTimeOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.taskmaster.TaskCode;
-import nts.uk.ctx.at.shared.dom.workrule.goingout.GoingOutReason;
 import nts.uk.shr.com.time.TimeWithDayAttr;
 
 /**
@@ -341,127 +338,9 @@ public class WorkSchedule implements DomainAggregate {
 	 * @return
 	 */
 	public Map<TimezoneToUseHourlyHoliday, TimeVacation> getTimeVacation() {
-		
-		/** 日別勤怠の遅刻時間を取得 */
-		val lateTimeMap = this.getLateTimes();
-		
-		/** 日別勤怠の早退時間を取得*/
-		val earlyTimeMap = this.getEarlyTimes();
-		
-		/** 日別勤怠の外出時間を取得 **/
-		val outingTimeMap = this.getOutingTimes();
-		
-		Map<TimezoneToUseHourlyHoliday, TimeVacation> result = new HashMap<>();
-		result.putAll( lateTimeMap );
-		result.putAll( earlyTimeMap );
-		result.putAll( outingTimeMap );
-		
-		return result;
+		return GettingTimeVacactionService.get(this.optTimeLeaving, this.optAttendanceTime,	this.outingTime);
 	}
-	
-	/**
-	 * ［時間休暇を取得する］の［日別勤怠の遅刻時間を取得］
-	 * @return
-	 */
-	private Map<TimezoneToUseHourlyHoliday, TimeVacation> getLateTimes() {
-		
-		// 勤怠時間 or 出退勤 empty
-		if ( !this.optAttendanceTime.isPresent() || !this.optTimeLeaving.isPresent() ) {
-			return Collections.emptyMap();
-		}
-		
-		// 遅刻時間を取得する
-		val lateTimes = this.optAttendanceTime.get().getLateTimeOfDaily();
 
-		Map<TimezoneToUseHourlyHoliday, TimeVacation> result = new HashMap<>();
-		
-		for (LateTimeOfDaily lateTime : lateTimes) {
-			
-			// 出勤の勤務NOを指定
-			val lateType = TimezoneToUseHourlyHoliday.getBeforeWorking(lateTime.getWorkNo());
-
-			// @出退勤.勤務開始の休暇時間帯を取得する
-			Optional<TimeSpanForCalc> leavingTimeSpan = this.optTimeLeaving.get().getStartTimeVacations(lateTime.getWorkNo());
-			if ( !leavingTimeSpan.isPresent() ) {
-				continue;
-			}
-			
-			//時間休暇
-			val timeVacation = new TimeVacation( new ArrayList<>( Arrays.asList(leavingTimeSpan.get()) ), lateTime.getTimePaidUseTime() );
-
-			result.put(lateType, timeVacation);
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * ［時間休暇を取得する］の［日別勤怠の早退時間を取得］
-	 * @return
-	 */
-	private Map<TimezoneToUseHourlyHoliday, TimeVacation> getEarlyTimes() {
-		
-		if ( !this.optAttendanceTime.isPresent() || !this.optTimeLeaving.isPresent() ) {
-			return Collections.emptyMap();
-		}
-		
-		/** 日別勤怠の早退時間を取得*/
-		List<LeaveEarlyTimeOfDaily> earlyTimes = this.optAttendanceTime.get().getLeaveEarlyTimeOfDaily();
-		
-		Map<TimezoneToUseHourlyHoliday, TimeVacation> result = new HashMap<>();
-		
-		for(LeaveEarlyTimeOfDaily earlyTime : earlyTimes) {
-			
-			// 退勤の勤務NOを指定
-			val earlyType = TimezoneToUseHourlyHoliday.getAfterWorking(earlyTime.getWorkNo());
-			
-			// @出退勤.勤務終了の休暇時間帯を取得する ($.勤務NO)
-			Optional<TimeSpanForCalc> leavingTimeSpan = this.optTimeLeaving.get().getEndTimeVacations(earlyTime.getWorkNo());
-			if ( !leavingTimeSpan.isPresent() ) {
-				continue;
-			}
-			
-			//時間休暇
-			val timeVacation = new TimeVacation( new ArrayList<>( Arrays.asList(leavingTimeSpan.get())), earlyTime.getTimePaidUseTime() );
-			
-			result.put(earlyType, timeVacation);
-		}
-		
-		return result;
-		
-	}
-	
-	/**
-	 * ［時間休暇を取得する］の［【日別勤怠の外出時間を取得］
-	 * @return
-	 */
-	private Map<TimezoneToUseHourlyHoliday, TimeVacation> getOutingTimes() {
-		
-		if ( !this.optAttendanceTime.isPresent() || !this.outingTime.isPresent() ) {
-			return Collections.emptyMap();
-		}
-		
-		//$外出時間 = @勤怠時間.外出時間を取得する () : filter $.外出理由 in (私用, 組合)
-		List<OutingTimeOfDaily> outingTimes = this.optAttendanceTime.get().getOutingTimeOfDaily().stream()
-				.filter(c -> c.getReason() == GoingOutReason.PRIVATE || c.getReason() == GoingOutReason.UNION)
-				.collect(Collectors.toList());
-		
-		Map<TimezoneToUseHourlyHoliday, TimeVacation> result = new HashMap<>();
-		
-		for(OutingTimeOfDaily outingTime : outingTimes) {
-			
-			val type = TimezoneToUseHourlyHoliday.getDuringWorking(outingTime.getReason());
-			
-			// 外出理由を指定して時間帯を取得する
-			val timeZones = this.outingTime.get().getTimeZoneByGoOutReason(outingTime.getReason());
-			val timeLeave = new TimeVacation( timeZones, outingTime.getTimeVacationUseOfDaily() );
-			
-			result.put(type, timeLeave);
-		}
-		
-		return result;
-	}
-	
 	/**
 	 * 休憩時間帯を手修正する
 	 * @param require
@@ -523,6 +402,8 @@ public class WorkSchedule implements DomainAggregate {
 				, Optional.empty()
 				, this.lstEditState
 				, Optional.empty()
+				, Collections.emptyList()
+				, Collections.emptyList()
 				, Collections.emptyList()
 				, Optional.empty());
 	}

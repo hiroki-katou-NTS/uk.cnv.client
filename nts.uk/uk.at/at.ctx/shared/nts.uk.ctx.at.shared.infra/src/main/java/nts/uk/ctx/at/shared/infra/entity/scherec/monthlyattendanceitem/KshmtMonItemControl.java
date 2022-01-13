@@ -28,39 +28,33 @@ public class KshmtMonItemControl   extends ContractUkJpaEntity implements Serial
 	@Column(name = "HEADER_BACKGROUND_COLOR")
 	public String headerBgColorOfMonthlyPer;
 	
-	@Column(name = "INPUT_UNIT")
-	public BigDecimal inputUnitOfTimeItem;
-	
 	@Override
 	protected Object getKey() {
 		return krcmtControlOfMonthlyItemsPK;
 	}
 
-	public KshmtMonItemControl(KshmtMonItemControlPK krcmtControlOfMonthlyItemsPK, String headerBgColorOfMonthlyPer, BigDecimal inputUnitOfTimeItem) {
+	public KshmtMonItemControl(KshmtMonItemControlPK krcmtControlOfMonthlyItemsPK, String headerBgColorOfMonthlyPer) {
 		super();
 		this.krcmtControlOfMonthlyItemsPK = krcmtControlOfMonthlyItemsPK;
 		this.headerBgColorOfMonthlyPer = headerBgColorOfMonthlyPer;
-		this.inputUnitOfTimeItem = inputUnitOfTimeItem;
 	}
 	
 	public static KshmtMonItemControl toEntity(ControlOfMonthlyItems domain) {
 		return new KshmtMonItemControl(
 				new KshmtMonItemControlPK(
-					domain.getCompanyId(),
-					domain.getItemMonthlyId()
-						),
-				domain.getHeaderBgColorOfMonthlyPer().isPresent()?domain.getHeaderBgColorOfMonthlyPer().get().v():null,
-				domain.getInputUnitOfTimeItem().isPresent()?domain.getInputUnitOfTimeItem().get() : null
-				);
+						domain.getCompanyId(),
+						domain.getItemMonthlyId()
+				),
+				domain.getHeaderBgColorOfMonthlyPer().isPresent()?domain.getHeaderBgColorOfMonthlyPer().get().v():null
+		);
 	}
 
 	public ControlOfMonthlyItems toDomain() {
-		return new  ControlOfMonthlyItems(
+		return new ControlOfMonthlyItems(
 				this.krcmtControlOfMonthlyItemsPK.companyID,
 				this.krcmtControlOfMonthlyItemsPK.itemMonthlyID,
-				this.headerBgColorOfMonthlyPer!=null ? new HeaderBackgroundColor(this.headerBgColorOfMonthlyPer) : null,
-				this.inputUnitOfTimeItem
-				);
+				this.headerBgColorOfMonthlyPer != null ? new HeaderBackgroundColor(this.headerBgColorOfMonthlyPer) : null
+		);
 	}
 	
 }

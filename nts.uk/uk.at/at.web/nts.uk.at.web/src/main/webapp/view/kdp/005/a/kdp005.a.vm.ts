@@ -23,11 +23,13 @@ module nts.uk.at.view.kdp005.a {
 			R: '/view/kdp/003/r/index.xhtml',
 			F: '/view/kdp/003/f/index.xhtml',
 			M: '/view/kdp/003/m/index.xhtml',
-			P: '/view/kdp/003/p/index.xhtml'
+			P: '/view/kdp/003/p/index.xhtml',
+			KDP002L: '/view/kdp/002/l/index.xhtml'
 		};
 
 		const KDP005_SAVE_DATA = 'loginKDP005';
 		const WORKPLACES_STORAGE = 'WORKPLACES_STORAGE';
+		const IS_RELOAD_VIEW = 'IS_RELOAD_VIEW_005';
 
 		const API = {
 			NOTICE: 'at/record/stamp/notice/getStampInputSetting',
@@ -57,6 +59,8 @@ module nts.uk.at.view.kdp005.a {
 			messageNoti: KnockoutObservable<IMessage> = ko.observable();
 			fingerStampSetting: KnockoutObservable<FingerStampSetting> = ko.observable(DEFAULT_SETTING);
 
+			showMessage: KnockoutObservable<boolean | null> = ko.observable(null);
+
 			//basyo mode
 			modeBasyo: KnockoutObservable<boolean> = ko.observable(false);
 
@@ -70,6 +74,9 @@ module nts.uk.at.view.kdp005.a {
 			supportUse: KnockoutObservable<boolean> = ko.observable(false);
 			pageComment: KnockoutObservable<string> = ko.observable('');
 			commentColor: KnockoutObservable<string> = ko.observable('');
+
+			totalOpenViewR: number = 0;
+			saveDefault: Boolean = false;
 
 			constructor() {
 				let self = this;
@@ -88,6 +95,94 @@ module nts.uk.at.view.kdp005.a {
 				let dfd = $.Deferred<void>();
 				const vm = new ko.ViewModel();
 
+				ko.computed({
+					read: () => {
+						const mes = ko.unwrap(self.errorMessage);
+						const noti = ko.unwrap(self.fingerStampSetting).noticeSetDto;
+
+						var result = null;
+
+						if (mes === null) {
+							result = false;
+						}
+						if (noti) {
+							if (ko.unwrap(self.fingerStampSetting).noticeSetDto.displayAtr == 1) {
+								result = true;
+							} else {
+								result = false;
+							}
+						} else {
+							result = false;
+						}
+
+						if (mes) {
+							result = null;
+						}
+
+						self.showMessage(result);
+					}
+				});
+
+				// Call step1: クラウド/オンプレの判断を行う
+				vm.$ajax("at", "at/record/stamp/finger/get-isCloud")
+					.then((data: boolean) => {
+						// Step2: 契約コードに関するlocalstrageに登録する
+						if (!data) {
+							self.saveDefault = true;
+							vm.$window.storage("contractInfo", {
+								contractCode: "000000000000",
+								contractPassword: null
+							}).then(() => self.startScreen().then(() => dfd.resolve()));
+						} else {
+							// Step3: テナント認証する
+							vm.$window.storage("contractInfo")
+								.then((data: any) => {
+									if (!data) {
+										// Step4: CCG007_ログイン　A：契約認証を実行する
+										self.openDialogCCG007A().then(() => dfd.resolve())
+									} else {
+										vm.$ajax("at", "at/record/stamp/finger/get-authenticate",
+											{ contactCode: data.contractCode, password: data.contractPassword })
+											.then((isSuccess: boolean) => {
+												// Step4: CCG007_ログイン　A：契約認証を実行する
+												if (!isSuccess) {
+													vm.$window.storage(IS_RELOAD_VIEW).then((data: boolean) => {
+														if (data) {
+															vm.$window.storage(IS_RELOAD_VIEW, false).then(() => self.startScreen().then(() => dfd.resolve()));
+														} else {
+															localStorage.removeItem("nts.uk.characteristics." + KDP005_SAVE_DATA)
+															vm.$window.storage(IS_RELOAD_VIEW, false).then(() => self.openDialogCCG007A().then(() => dfd.resolve()));
+														}
+													})
+												} else {
+													self.startScreen().then(() => dfd.resolve());
+												}
+											});
+									}
+								});
+						}
+					})
+
+				return dfd.promise();
+			}
+
+			openDialogCCG007A(): JQueryPromise<void> {
+				let dfd = $.Deferred<void>();
+				const self = this;
+				nts.uk.ui.windows.sub.modal("com", "/view/ccg/007/a/index.xhtml", {
+					height: 320,
+					width: 400,
+					title: nts.uk.resource.getText("CCG007_9"),
+					dialogClass: 'no-close'
+				}).onClosed(() => { self.startScreen().then(() => dfd.resolve()) });
+				return dfd.promise();
+			}
+
+			startScreen(): JQueryPromise<void> {
+				let self = this;
+				let dfd = $.Deferred<void>();
+				const vm = new ko.ViewModel();
+
 				self.getWorkPlacesInfo();
 				self.basyo().done(() => {
 					vm.$window.storage("contractInfo")
@@ -96,9 +191,21 @@ module nts.uk.at.view.kdp005.a {
 								service.getLogginSetting(data.contractCode).done((res) => {
 									self.listCompany = _.filter(res, 'icCardStamp');
 									if (self.listCompany.length == 0) {
-										self.errorMessage(getMessage("Msg_1527"));
-										self.isUsed(false);
-										dfd.resolve();
+
+										if (self.saveDefault) {
+											self.openDialogF({
+												mode: 'admin'
+											}).then(() => {
+												self.errorMessage(getMessage("Msg_1527"));
+												self.isUsed(false);
+												dfd.resolve();
+											})
+										} else {
+											self.errorMessage(getMessage("Msg_1527"));
+											self.isUsed(false);
+											dfd.resolve();
+										}
+
 									} else {
 										self.btnChangeCompany(self.listCompany.length > 0);
 										characteristics.restore("loginKDP005").done(function (loginInfo: ILoginInfo) {
@@ -112,7 +219,7 @@ module nts.uk.at.view.kdp005.a {
 
 												if (__viewContext.user.companyId != loginInfo.companyId || __viewContext.user.employeeCode != loginInfo.employeeCode) {
 													self.login(self.loginInfo).done(() => {
-														location.reload();
+														self.reloadView()
 													}).fail(() => {
 														dfd.resolve();
 													});
@@ -152,6 +259,11 @@ module nts.uk.at.view.kdp005.a {
 			}
 
 			alwaysLoadMessage(param: number) {
+				const vm = new ko.ViewModel();
+				vm.$date.interval(100);
+				setTimeout(() => {
+					vm.$date.interval( param * 60000);
+				}, 1000);
 				if (param > 0) {
 					setInterval(() => {
 						this.loadNotice();
@@ -167,6 +279,11 @@ module nts.uk.at.view.kdp005.a {
 				]
 				let item = _.find(notUseMessage, ['value', errorType]);
 				return item ? getMessage(item.text, [getText('KDP002_4')]) : '';
+			}
+
+			reloadView() {
+				const vm = new ko.ViewModel();
+				vm.$window.storage(IS_RELOAD_VIEW, true).then(() => location.reload())
 			}
 
 			doFirstLoad(): JQueryPromise<any> {
@@ -199,7 +316,7 @@ module nts.uk.at.view.kdp005.a {
 							dfd.resolve();
 							block.clear();
 						});
-						// self.getStampToSuppress();
+
 					} else {
 						self.isUsed(false);
 						self.errorMessage(self.getErrorNotUsed(res.used));
@@ -226,7 +343,7 @@ module nts.uk.at.view.kdp005.a {
 									self.openDialogK().done((result) => {
 										if (!result) {
 											if (__viewContext.user.companyId != loginResult.em.companyId || __viewContext.user.employeeCode != loginResult.em.employeeCode) {
-												location.reload();
+												self.reloadView()
 												dfd.resolve();
 											} else {
 												self.stampSetting({});
@@ -239,7 +356,7 @@ module nts.uk.at.view.kdp005.a {
 											self.saveSuccess = true;
 											characteristics.save("loginKDP005", self.loginInfo).done(() => {
 												if (__viewContext.user.companyId != loginResult.em.companyId || __viewContext.user.employeeCode != loginResult.em.employeeCode) {
-													location.reload();
+													self.reloadView()
 													dfd.resolve();
 												} else {
 													dfd.resolve(self.loginInfo);
@@ -251,7 +368,7 @@ module nts.uk.at.view.kdp005.a {
 									self.loginInfo = loginResult.em;
 									self.loginInfo.selectedWP = self.workplace;
 									nts.uk.characteristics.save(KDP005_SAVE_DATA, self.loginInfo).done(() => {
-										location.reload();
+										self.reloadView()
 									});
 								}
 							});
@@ -322,19 +439,17 @@ module nts.uk.at.view.kdp005.a {
 
 			public clickBtn1(btn: any, layout: any) {
 				const vm = this;
+				const mVm = new ko.ViewModel();
 				vm.getWorkPlacesInfo();
+				let stampTime = moment(mVm.$date.now()).format("HH:mm");
+				let stampDateTime = moment(mVm.$date.now()).format();
 
 				modal('/view/kdp/005/h/index.xhtml').onClosed(function (): any {
 					let ICCard = getShared('ICCard');
 					if (ICCard && ICCard != '') {
 						block.grayout();
 						vm.getEmployeeIdByICCard(ICCard).done((employeeId: string) => {
-							vm.authentic(employeeId).done(() => {
-								vm.registerData(btn, layout, ICCard, employeeId);
-							}).fail((errorMessage: string) => {
-								setShared("errorMessage", errorMessage);
-								vm.openIDialog();
-							});
+							vm.registerData(btn, layout, ICCard, employeeId, stampTime, stampDateTime);
 						}).fail(() => {
 							vm.openIDialog();
 						}).always(() => {
@@ -364,32 +479,6 @@ module nts.uk.at.view.kdp005.a {
 				return dfd.promise();
 			}
 
-			//<<ScreenQuery>> 打刻入力社員の認証のみを行う
-			public authentic(employeeId: string): JQueryPromise<any> {
-				let self = this;
-				let dfd = $.Deferred<any>();
-				let param = {
-					companyId: self.loginInfo.companyId,
-					employeeCode: null,
-					employeeId: employeeId,
-					password: null,
-					passwordInvalid: true,
-					isAdminMode: false,
-					runtimeEnvironmentCreat: false
-				};
-				service.authenticateOnlyStamped(param).done((res) => {
-					if (res.result) {
-						dfd.resolve();
-					} else {
-						dfd.reject(res.errorMessage);
-					}
-				}).fail((res) => {
-					setShared("errorMessage", getMessage(res.messageId));
-					self.openIDialog();
-				});
-				return dfd.promise();
-			}
-
 			playAudio(audioType: number) {
 				const url = {
 					oha: '../../share/voice/0_oha.mp3',
@@ -415,12 +504,7 @@ module nts.uk.at.view.kdp005.a {
 					if (ICCard && ICCard != '') {
 						block.grayout();
 						self.getEmployeeIdByICCard(ICCard).done((employeeId: string) => {
-							self.authentic(employeeId).done(() => {
-								vm.$window.modal('at', '/view/kdp/003/s/index.xhtml', { employeeId: employeeId });
-							}).fail((errorMessage: string) => {
-								setShared("errorMessage", errorMessage);
-								self.openIDialog();
-							});
+							vm.$window.modal('at', '/view/kdp/003/s/index.xhtml', { employeeId: employeeId });
 						}).fail(() => {
 							self.openIDialog();
 						}).always(() => {
@@ -436,7 +520,7 @@ module nts.uk.at.view.kdp005.a {
 					mode: 'admin',
 					companyId: __viewContext.user.companyId
 				}).done((loginResult) => {
-					if (loginResult && loginResult.result) {
+					if (loginResult && loginResult.successMsg == null) {
 						self.basyo()
 							.then(() => {
 								if (!ko.unwrap(self.modeBasyo)) {
@@ -446,44 +530,17 @@ module nts.uk.at.view.kdp005.a {
 											self.loginInfo = loginResult.em;
 											self.loginInfo.selectedWP = result;
 											characteristics.save("loginKDP005", self.loginInfo).done(() => {
-												location.reload();
+												self.reloadView()
 											});
 										} else {
-											location.reload();
-											// if (__viewContext.user.companyId != loginResult.em.companyId || __viewContext.user.employeeCode != loginResult.em.employeeCode) {
-											// 	setTimeout(() => {
-											// 		if (self.saveSuccess) {
-											// 			location.reload();
-											// 		}
-											// 	}, 500);
-											// }
-											// if (self.loginInfo) {
-											// 	self.login(self.loginInfo).done(() => {
-											// 		if (__viewContext.user.companyId != self.loginInfo.companyId || __viewContext.user.employeeCode != self.loginInfo.employeeCode) {
-											// 			setTimeout(() => {
-											// 				if (!self.saveSuccess) {
-
-											// 					location.reload();
-											// 				}
-											// 			}, 500);
-											// 		}
-											// 	});
-											// } else {
-											// 	if (__viewContext.user.companyId != loginResult.em.companyId || __viewContext.user.employeeCode != loginResult.em.employeeCode) {
-											// 		setTimeout(() => {
-											// 			if (!self.saveSuccess) {
-											// 				location.reload();
-											// 			}
-											// 		}, 500);
-											// 	}
-											// }
+											self.reloadView()
 										}
 									});
 								} else {
 									self.loginInfo = loginResult.em;
 									self.loginInfo.selectedWP = self.workplace;
 									characteristics.save("loginKDP005", self.loginInfo).done(() => {
-										location.reload();
+										self.reloadView()
 									});
 								}
 							})
@@ -498,7 +555,7 @@ module nts.uk.at.view.kdp005.a {
 										if (self.listCompany.length == 0) {
 											self.errorMessage(getMessage("Msg_1527"));
 											self.isUsed(false);
-											location.reload();
+											self.reloadView()
 										}
 									});
 								}
@@ -508,159 +565,242 @@ module nts.uk.at.view.kdp005.a {
 			}
 
 			public login(loginInfo: any): JQueryPromise<any> {
+				const vm = new ko.ViewModel();
 				let self = this;
 				let dfd = $.Deferred<any>();
-				let isAdmin = true;
 				block.grayout();
-				loginInfo.isAdminMode = true;
-				loginInfo.passwordInvalid = false;
-				loginInfo.runtimeEnvironmentCreate = true;
-				service.login(isAdmin, loginInfo).done((res) => {
-					dfd.resolve();
-				}).fail((res) => {
-					self.stampSetting({});
-					self.isUsed(false);
-					self.errorMessage(getMessage(res.messageId));
-					dfd.reject();
-				}).always(() => {
-					block.clear();
-				});
+
+				vm.$window.storage('contractInfo')
+					.done((data: any) => {
+						loginInfo.contractPassword = _.escape(data ? data.contractPassword : "");
+						loginInfo.contractCode = _.escape(data ? data.contractCode : "");
+					}).then(() => {
+						service.login(loginInfo).done((res) => {
+							if (res.msgErrorId && res.msgErrorId !== '') {
+								self.errorMessage(getMessage(res.msgErrorId));
+								self.isUsed(false);
+								dfd.reject();
+							}
+							dfd.resolve();
+						}).fail((res) => {
+							self.stampSetting({});
+
+							self.isUsed(false);
+							self.errorMessage(res.errorMessage);
+
+							dfd.reject();
+						}).always(() => {
+							block.clear();
+						});
+					});
 				return dfd.promise();
 			}
 
-			public registerData(button, layout, stampedCardNumber, employeeIdRegister) {
+			public registerData(button, layout, stampedCardNumber, employeeIdRegister, stampTime, stampDateTime) {
 				let self = this;
 				let vm = new ko.ViewModel();
+				var showViewL = false;
 				block.invisible();
-				let registerdata = {
-					stampedCardNumber: stampedCardNumber,
-					datetime: moment(vm.$date.now()).format('YYYY/MM/DD HH:mm:ss'),
-					stampButton: {
-						pageNo: layout.pageNo,
-						buttonPositionNo: button.btnPositionNo
-					},
-					refActualResult: {
-						cardNumberSupport: null,
-						workLocationCD: self.worklocationCode,
-						workTimeCode: null,
-						overtimeDeclaration: null
-					}
-				};
-				const mode: number = 1;
-				const { employeeId, employeeCode } = employeeIdRegister;
+				const employeeId = employeeIdRegister;
 
 				let source = self.playAudio(button.audioType);
-
 				//打刻入力で共通設定を取得する
 				vm.$ajax(API.SETTING_STAMP_COMMON)
 					.done((data: ISettingsStampCommon) => {
 						if (data) {
 							self.supportUse(data.supportUse);
-						}
-					});
-
-				vm.$window.storage(KDP005_SAVE_DATA)
-					.then((dataStorage: any) => {
-
-						let btnType = checkType(button.changeClockArt, button.changeCalArt, button.setPreClockArt, button.changeHalfDay, button.btnReservationArt);
-						if (dataStorage.selectedWP.length > 1 && button.supportWplset == 1 && self.supportUse() === true && _.includes([14, 15, 16, 17, 18], btnType)) {
-							vm.$window.modal('at', DIALOG.M, { screen: 'KDP005', employeeId: employeeId })
-								.then((result: string) => {
-
-									if (result) {
-										if (result.notification !== null) {
-
-											self.workPlaceId = result;
-
-											let registerdata = {
-												stampedCardNumber: stampedCardNumber,
-												datetime: moment(vm.$date.now()).format('YYYY/MM/DD HH:mm:ss'),
-												stampButton: {
-													pageNo: layout.pageNo,
-													buttonPositionNo: button.btnPositionNo
-												},
-												refActualResult: {
-													cardNumberSupport: null,
-													workPlaceId: self.workPlaceId,
-													workLocationCD: self.worklocationCode,
-													workTimeCode: null,
-													overtimeDeclaration: null
-												}
-											};
-											service.addCheckCard(registerdata).done((res) => {
-
-												//phat nhac
-												if (source) {
-													let audio = new Audio(source);
-													audio.play();
-												}
-
-												if (self.stampResultDisplay().notUseAttr == 1 && button.changeClockArt == 1) {
-													self.openScreenC(button, layout, employeeIdRegister);
-												} else {
-													self.openScreenB(button, layout, employeeIdRegister);
-												}
-											}).fail((res) => {
-												dialog.alertError({ messageId: res.messageId });
-											}).always(() => {
-												//					self.getStampToSuppress();
-												block.clear();
-											});
-										}
-									}
-
-								});
-						} else {
-
-							if (dataStorage.selectedWP.length = 1) {
-								if (self.workPlaceId !== '') {
-									self.workPlaceId = dataStorage.selectedWP[0];
+							if (data.workUse) {
+								if (button.taskChoiceArt) {
+									showViewL = true;
 								}
 							}
-
-							let registerdata = {
-								stampedCardNumber: stampedCardNumber,
-								datetime: moment(vm.$date.now()).format('YYYY/MM/DD HH:mm:ss'),
-								stampButton: {
-									pageNo: layout.pageNo,
-									buttonPositionNo: button.btnPositionNo
-								},
-								refActualResult: {
-									cardNumberSupport: null,
-									workPlaceId: self.workPlaceId,
-									workLocationCD: self.worklocationCode,
-									workTimeCode: null,
-									overtimeDeclaration: null
-								}
-							};
-
-							service.addCheckCard(registerdata).done((res) => {
-
-								//phat nhac
-								if (source) {
-									let audio = new Audio(source);
-									audio.play();
-								}
-
-								if (self.stampResultDisplay().notUseAttr == 1 && button.changeClockArt == 1) {
-									self.openScreenC(button, layout, employeeIdRegister);
-								} else {
-									self.openScreenB(button, layout, employeeIdRegister);
-								}
-							}).fail((res) => {
-								dialog.alertError({ messageId: res.messageId });
-							}).always(() => {
-								//					self.getStampToSuppress();
-								block.clear();
-							});
 						}
+
+						vm.$window.storage(KDP005_SAVE_DATA)
+							.then((dataStorage: any) => {
+
+								service.getEmployeeWorkByStamping({ sid: employeeId, workFrameNo: 1, upperFrameWorkCode: '' })
+									.then((data: any) => {
+										if (data.task.length === 0) {
+											if (showViewL) {
+												showViewL = false;
+											}
+										}
+										let btnType = checkType(button.changeClockArt, button.changeCalArt, button.setPreClockArt, button.changeHalfDay, button.btnReservationArt);
+										if (dataStorage.selectedWP.length > 1 && button.supportWplset == 1 && self.supportUse() === true && _.includes([14, 15, 16, 17, 18], btnType)) {
+											vm.$window.modal('at', DIALOG.M, { screen: 'KDP005', employeeId: employeeId })
+												.then((result: string) => {
+
+													if (result) {
+														if (result.notification !== null) {
+															self.workPlaceId = result;
+
+															if (showViewL) {
+																vm.$window.modal('at', DIALOG.KDP002L, { employeeId: employeeId })
+																	.then((data: any) => {
+																		let registerdata = {
+																			stampedCardNumber: stampedCardNumber,
+																			datetime: stampDateTime,
+																			stampButton: {
+																				pageNo: layout.pageNo,
+																				buttonPositionNo: button.btnPositionNo
+																			},
+																			refActualResult: {
+																				cardNumberSupport: null,
+																				workPlaceId: self.workPlaceId,
+																				workLocationCD: self.worklocationCode,
+																				workTimeCode: null,
+																				overtimeDeclaration: null,
+																				workGroup: data
+																			}
+																		};
+																		service.addCheckCard(registerdata).done((res) => {
+
+																			//phat nhac
+																			if (source) {
+																				let audio = new Audio(source);
+																				audio.play();
+																			}
+
+																			if (self.stampResultDisplay().notUseAttr == 1 && button.changeClockArt == 1) {
+																				self.openScreenC(button, layout, employeeIdRegister);
+																			} else {
+																				self.openScreenB(button, layout, employeeIdRegister, stampTime);
+																			}
+																		}).fail((res) => {
+																			dialog.alertError({ messageId: res.messageId });
+																		}).always(() => {
+																			//					self.getStampToSuppress();
+																			block.clear();
+																		});
+																	})
+															} else {
+																let registerdata = {
+																	stampedCardNumber: stampedCardNumber,
+																	datetime: stampDateTime,
+																	stampButton: {
+																		pageNo: layout.pageNo,
+																		buttonPositionNo: button.btnPositionNo
+																	},
+																	refActualResult: {
+																		cardNumberSupport: null,
+																		workPlaceId: self.workPlaceId,
+																		workLocationCD: self.worklocationCode,
+																		workTimeCode: null,
+																		overtimeDeclaration: null
+																	}
+																};
+																service.addCheckCard(registerdata).done((res) => {
+
+																	//phat nhac
+																	if (source) {
+																		let audio = new Audio(source);
+																		audio.play();
+																	}
+
+																	if (self.stampResultDisplay().notUseAttr == 1 && button.changeClockArt == 1) {
+																		self.openScreenC(button, layout, employeeIdRegister);
+																	} else {
+																		self.openScreenB(button, layout, employeeIdRegister, stampTime);
+																	}
+																}).fail((res) => {
+																	dialog.alertError({ messageId: res.messageId });
+																}).always(() => {
+																	block.clear();
+																});
+															}
+														}
+													}
+
+												});
+										} else {
+											if (dataStorage.selectedWP.length = 1) {
+												if (self.workPlaceId !== '') {
+													self.workPlaceId = dataStorage.selectedWP[0];
+												}
+											}
+
+											if (showViewL) {
+												vm.$window.modal('at', DIALOG.KDP002L, { employeeId: employeeId })
+													.then((data: any) => {
+														let registerdata = {
+															stampedCardNumber: stampedCardNumber,
+															datetime: stampDateTime,
+															stampButton: {
+																pageNo: layout.pageNo,
+																buttonPositionNo: button.btnPositionNo
+															},
+															refActualResult: {
+																cardNumberSupport: null,
+																workPlaceId: self.workPlaceId,
+																workLocationCD: self.worklocationCode,
+																workTimeCode: null,
+																overtimeDeclaration: null,
+																workGroup: data
+															}
+														};
+														service.addCheckCard(registerdata).done((res) => {
+
+															//phat nhac
+															if (source) {
+																let audio = new Audio(source);
+																audio.play();
+															}
+
+															if (self.stampResultDisplay().notUseAttr == 1 && button.changeClockArt == 1) {
+																self.openScreenC(button, layout, employeeIdRegister);
+															} else {
+																self.openScreenB(button, layout, employeeIdRegister, stampTime);
+															}
+														}).fail((res) => {
+															dialog.alertError({ messageId: res.messageId });
+														}).always(() => {
+															block.clear();
+														});
+													})
+											} else {
+												let registerdata = {
+													stampedCardNumber: stampedCardNumber,
+													datetime: stampDateTime,
+													stampButton: {
+														pageNo: layout.pageNo,
+														buttonPositionNo: button.btnPositionNo
+													},
+													refActualResult: {
+														cardNumberSupport: null,
+														workPlaceId: self.workPlaceId,
+														workLocationCD: self.worklocationCode,
+														workTimeCode: null,
+														overtimeDeclaration: null
+													}
+												};
+
+												service.addCheckCard(registerdata).done((res) => {
+
+													//phat nhac
+													if (source) {
+														let audio = new Audio(source);
+														audio.play();
+													}
+
+													if (self.stampResultDisplay().notUseAttr == 1 && button.changeClockArt == 1) {
+														self.openScreenC(button, layout, employeeIdRegister);
+													} else {
+														self.openScreenB(button, layout, employeeIdRegister, stampTime);
+													}
+												}).fail((res) => {
+													dialog.alertError({ messageId: res.messageId });
+												}).always(() => {
+													block.clear();
+												});
+											}
+										}
+									})
+							});
 					});
-
-
-
 			}
 
-			public openScreenB(button, layout, employeeIdRegister) {
+			public openScreenB(button, layout, employeeIdRegister, stampTime) {
 				let self = this;
 				let vm = new ko.ViewModel();
 				setShared("resultDisplayTime", self.stampSetting().resultDisplayTime);
@@ -672,7 +812,7 @@ module nts.uk.at.view.kdp005.a {
 				setShared("screenB", {
 					screen: "KDP005"
 				});
-				modal('/view/kdp/002/b/index.xhtml').onClosed(() => {
+				vm.$window.modal('/view/kdp/002/b/index.xhtml', {stampTime: stampTime}).then(() => {
 					self.openKDP002T(button, layout);
 				});
 			}
@@ -734,7 +874,7 @@ module nts.uk.at.view.kdp005.a {
 										vm.$window.modal('at', DIALOG.P)
 											.then(() => {
 												// self.loadNotice(self.loginInfo);
-												window.location.reload(false);
+												self.reloadView()
 											})
 									}
 								});
@@ -773,6 +913,18 @@ module nts.uk.at.view.kdp005.a {
 								vm.$ajax(API.NOTICE, param)
 									.done((data: IMessage) => {
 										self.messageNoti(data);
+
+										if (data.stopByCompany.systemStatus == 3 || data.stopBySystem.systemStatusType == 3) {
+											if (self.totalOpenViewR === 0) {
+
+												setTimeout(() => {
+													self.totalOpenViewR++;
+													const param = { setting: ko.unwrap(self.fingerStampSetting).noticeSetDto, screen: 'KDP004' };
+
+													vm.$window.modal(DIALOG.R, param);
+												}, 1000);
+											}
+										}
 									});
 							}
 						});
@@ -794,6 +946,18 @@ module nts.uk.at.view.kdp005.a {
 							vm.$ajax(API.NOTICE, param)
 								.done((data: IMessage) => {
 									self.messageNoti(data);
+
+									if (data.stopByCompany.systemStatus == 3 || data.stopBySystem.systemStatusType == 3) {
+										if (self.totalOpenViewR === 0) {
+
+											setTimeout(() => {
+												self.totalOpenViewR++;
+												const param = { setting: ko.unwrap(self.fingerStampSetting).noticeSetDto, screen: 'KDP004' };
+
+												vm.$window.modal(DIALOG.R, param);
+											}, 1000);
+										}
+									}
 								});
 						})
 						.always(() => {

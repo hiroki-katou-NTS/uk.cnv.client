@@ -1,0 +1,53 @@
+.tabs-content {
+  min-height: 380px;
+  overflow: auto;
+}
+
+.setting-zone {
+  margin-left: 20px;
+}
+
+.setting-label {
+  width: 300px;
+}
+
+.setting-label.sub-label {
+  padding-left: 50px;
+  box-sizing: border-box;
+}
+
+.setting-item {
+  width: 200px;
+}
+
+.setting-description, .setting-radio-group {
+  margin-left: 300px;
+}
+
+.flex.valign-center {
+  margin-bottom: 10px;
+}
+
+.hyperlink-header {
+  text-align: right;
+  position: relative;
+  right: 20px;
+  margin-bottom: 20px;
+}
+
+.tab-content-1 .flex.valign-center {
+  margin-bottom: 15px !important;
+}
+
+.mt-42 {
+  margin-top: 42px;
+}
+
+#A1 {
+  margin: 10px 0px 0px 20px;
+  width: 900px;
+}
+
+#A4_214 {
+  margin-left: 60px;
+}

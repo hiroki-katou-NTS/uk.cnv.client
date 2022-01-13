@@ -26,11 +26,23 @@ public class AnnLeaGrantRemDataImpl implements AnnLeaGrantRemDataPub{
 		}
 		for(AnnualLeaveGrantRemainingData annualGrant : annualLeaveGrantRemainingDatas){
 			Double grantDay = null;
+			Double remainDay = null;
+			Double remainTime= null;
+			Integer grantTime = null;
 			if(annualGrant.getDetails() != null && annualGrant.getDetails().getGrantNumber() != null && annualGrant.getDetails().getGrantNumber().getDays() != null){
 				grantDay  = annualGrant.getDetails().getGrantNumber().getDays().v();
+				grantTime  = annualGrant.getDetails().getGrantNumber().getMinutesOrZero().v();
+				remainDay = annualGrant.getDetails().getRemainingNumber().getDays().v();
+				remainTime = annualGrant.getDetails().getRemainingNumber().getMinutes().isPresent()?
+						annualGrant.getDetails().getRemainingNumber().getMinutes().get().v().doubleValue(): null;
 			}
-			AnnualLeaveGrantRemainDataExport annualLeaveGrantRemainDataExport = new AnnualLeaveGrantRemainDataExport(annualGrant.getGrantDate(), 
-					grantDay);
+			AnnualLeaveGrantRemainDataExport annualLeaveGrantRemainDataExport = new AnnualLeaveGrantRemainDataExport(
+
+					annualGrant.getGrantDate(),
+					grantDay,
+					remainDay,
+					remainTime,
+					grantTime);
 			result.add(annualLeaveGrantRemainDataExport);
 		}
 		return result;

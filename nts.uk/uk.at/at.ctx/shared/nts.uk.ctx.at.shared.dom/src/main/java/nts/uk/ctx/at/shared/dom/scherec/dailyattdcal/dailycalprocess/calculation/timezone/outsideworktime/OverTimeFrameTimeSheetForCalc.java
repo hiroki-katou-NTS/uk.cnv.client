@@ -810,4 +810,37 @@ public class OverTimeFrameTimeSheetForCalc extends ActualWorkingTimeSheet {
 				Optional.empty(),
 				Optional.empty());
 	}
+
+	/**
+	 * 重複する時間帯で作り直す
+	 * @param timeSpan 時間帯
+	 * @param commonSet 就業時間帯の共通設定
+	 * @return 残業枠時間帯
+	 */
+	public Optional<OverTimeFrameTimeSheetForCalc> recreateWithDuplicate(TimeSpanForDailyCalc timeSpan, Optional<WorkTimezoneCommonSet> commonSet) {
+		Optional<TimeSpanForDailyCalc> duplicate = this.timeSheet.getDuplicatedWith(timeSpan);
+		if(!duplicate.isPresent()) {
+			return Optional.empty();
+		}
+		OverTimeFrameTimeSheetForCalc recreated = new OverTimeFrameTimeSheetForCalc(
+				duplicate.get(),
+				this.rounding.clone(),
+				this.recordedTimeSheet.stream().map(r -> r.getAfterDeleteOffsetTime()).collect(Collectors.toList()),
+				this.deductionTimeSheet.stream().map(d -> d.getAfterDeleteOffsetTime()).collect(Collectors.toList()),
+				this.getDuplicatedBonusPayNotStatic(this.bonusPayTimeSheet, duplicate.get()),
+				this.getDuplicatedSpecBonusPayzNotStatic(this.specBonusPayTimesheet, duplicate.get()),
+				this.midNightTimeSheet.getDuplicateRangeTimeSheet(duplicate.get()),
+				this.frameTime.clone(),
+				StatutoryAtr.valueOf(this.withinStatutryAtr.toString()),
+				this.goEarly,
+				new EmTimezoneNo(this.overTimeWorkSheetNo.v().intValue()),
+				this.asTreatBindTime,
+				this.payOrder.map(p -> new SettlementOrder(p.v())),
+				this.adjustTime.map(a -> new AttendanceTime(a.valueAsMinutes())));
+		
+		//控除時間帯の登録
+		recreated.registDeductionList(ActualWorkTimeSheetAtr.OverTimeWork, this.getCloneDeductionTimeSheet(), commonSet);
+		
+		return Optional.of(recreated);
+	}
 }

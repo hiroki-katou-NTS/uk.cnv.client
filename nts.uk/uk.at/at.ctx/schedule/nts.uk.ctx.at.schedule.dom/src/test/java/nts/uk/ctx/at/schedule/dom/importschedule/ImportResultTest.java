@@ -180,6 +180,66 @@ public class ImportResultTest {
 
 
 	/**
+	 * Target	: existsUncheckedResults
+	 */
+	@Test
+	public void test_existsUncheckedResults(
+			@Injectable List<GeneralDate> unimportableDates
+		,	@Injectable List<String> unexistsEmployees
+		,	@Injectable List<EmployeeId> orderOfEmployees
+	) {
+
+		/* 取り込み結果 */
+		// チェック済み
+		val checked = Arrays.asList(
+				ImportResultHelper.createDetail( "EmpId#08", GeneralDate.ymd( 2021, 5, 13 ), "ImpCd#5", ImportStatus.IMPORTABLE )
+			,	ImportResultHelper.createDetail( "EmpId#02", GeneralDate.ymd( 2021, 5, 22 ), "ImpCd#0", ImportStatus.SCHEDULE_IS_COMFIRMED )
+		);
+		// 未チェック
+		val unchecked = Arrays.asList(
+				ImportResultHelper.createDetail( "EmpId#05", GeneralDate.ymd( 2021, 5, 15 ), "ImpCd#1", ImportStatus.UNCHECKED )
+			,	ImportResultHelper.createDetail( "EmpId#03", GeneralDate.ymd( 2021, 5, 22 ), "ImpCd#0", ImportStatus.UNCHECKED )
+			,	ImportResultHelper.createDetail( "EmpId#02", GeneralDate.ymd( 2021, 5,  1 ), "ImpCd#1", ImportStatus.UNCHECKED )
+		);
+
+
+		/* 取り込み結果: なし */
+		{
+			// 作成
+			val instance = new ImportResult(
+						Collections.emptyList()
+					,	unimportableDates, unexistsEmployees, orderOfEmployees
+				);
+			// 実行＆検証
+			assertThat( instance.existsUncheckedResults() ).isFalse();
+		}
+
+		/* 取り込み結果: チェック済みのみ(未チェックなし) */
+		{
+			// 作成
+			val instance = new ImportResult(
+					checked
+				,	unimportableDates, unexistsEmployees, orderOfEmployees
+			);
+			// 実行＆検証
+			assertThat( instance.existsUncheckedResults() ).isFalse();
+		}
+
+		/* 取り込み結果: 未チェック＋チェック済み */
+		{
+			// 作成
+			val instance = new ImportResult(
+					Stream.of( checked, unchecked ).flatMap(Collection::stream).collect(Collectors.toList())
+				,	unimportableDates, unexistsEmployees, orderOfEmployees
+			);
+			// 実行＆検証
+			assertThat( instance.existsUncheckedResults() ).isTrue();
+		}
+
+	}
+
+
+	/**
 	 * Target	: getUncheckedResults
 	 */
 	@Test

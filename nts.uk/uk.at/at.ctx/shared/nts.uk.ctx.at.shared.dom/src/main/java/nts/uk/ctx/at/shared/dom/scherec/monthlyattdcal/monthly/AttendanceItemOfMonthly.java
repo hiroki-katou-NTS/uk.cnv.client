@@ -247,8 +247,7 @@ public enum AttendanceItemOfMonthly {
 	/** 法定内振替休出時間10 */
 	LEGAL_HOL_TRANSFER_WORK_TIME_10(184),
 	/** 臨時勤務時間  */
-	/** TODO: 対応されていない */
-	TEMPORARY_TIME(9998),
+	TEMPORARY_TIME(2079),
 	
 	MAX_ID(9999);
 	

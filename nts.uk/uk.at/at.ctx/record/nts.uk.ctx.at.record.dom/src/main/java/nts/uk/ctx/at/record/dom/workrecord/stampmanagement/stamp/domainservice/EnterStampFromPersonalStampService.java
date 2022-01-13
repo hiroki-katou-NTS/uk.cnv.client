@@ -54,7 +54,7 @@ public class EnterStampFromPersonalStampService {
 		
 		// return 社員の打刻データを作成する#作成する(require, 契約コード, 社員ID, empty, 打刻日時, $打刻する方法, $ボタン詳細設定.ボタン種類, 実績への反映内容, empty)	
 		return CreateStampDataForEmployeesService.create(require, cid, new ContractCode(contractCode), employeeId, null, stmapDateTime,
-				relieve, buttonSet.get().getButtonType(), refActualResults, null);
+				relieve, buttonSet.get().getType(), refActualResults, null);
 	}
 
 	public static interface Require extends CreateStampDataForEmployeesService.Require {

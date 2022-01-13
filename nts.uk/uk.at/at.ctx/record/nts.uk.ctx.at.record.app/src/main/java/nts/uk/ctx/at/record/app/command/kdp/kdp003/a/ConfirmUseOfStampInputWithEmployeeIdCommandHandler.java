@@ -34,11 +34,9 @@ import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampDakokuRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.MakeUseJudgmentResults;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.StampFunctionAvailableService;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
 import nts.uk.ctx.at.shared.dom.adapter.holidaymanagement.CompanyAdapter;
 import nts.uk.ctx.at.shared.dom.adapter.holidaymanagement.CompanyImport622;
 import nts.uk.ctx.at.shared.dom.dailyattdcal.converter.DailyRecordShareFinder;
@@ -76,9 +74,6 @@ extends CommandHandlerWithResult<ConfirmUseOfStampInputCommandWithEmployeeId, Co
 	private EmployeeRecordAdapter sysEmpPub;
 
 	@Inject
-	private StampRecordRepository stampRecordRepo;
-
-	@Inject
 	private StampDakokuRepository stampDakokuRepo;
 
 	@Inject
@@ -102,7 +97,7 @@ extends CommandHandlerWithResult<ConfirmUseOfStampInputCommandWithEmployeeId, Co
 		ConfirmUseOfStampInputCommandWithEmployeeId command = context.getCommand();
 
 		StampFunctionAvailableServiceRequireImpl require = new StampFunctionAvailableServiceRequireImpl(stampUsageRepo,
-				stampCardRepo, stampCardEditRepo, companyAdapter, sysEmpPub, stampRecordRepo, stampDakokuRepo,
+				stampCardRepo, stampCardEditRepo, companyAdapter, sysEmpPub, stampDakokuRepo,
 				context.getCommand().getCompanyId(), temporarilyReflectStampDailyAttd, getMngInfoFromEmpIDListAdapter,
 				dailyRecordShareFinder, createDailyResults, timeReflectFromWorkinfo);
 		
@@ -152,9 +147,6 @@ extends CommandHandlerWithResult<ConfirmUseOfStampInputCommandWithEmployeeId, Co
 		private EmployeeRecordAdapter sysEmpPub;
 
 		@Inject
-		private StampRecordRepository stampRecordRepo;
-
-		@Inject
 		private StampDakokuRepository stampDakokuRepo;
 
 		private String compnayId;
@@ -199,10 +191,6 @@ extends CommandHandlerWithResult<ConfirmUseOfStampInputCommandWithEmployeeId, Co
 			return this.stampUsageRepo.get(compnayId);
 		}
 
-		@Override
-		public void insert(StampRecord stampRecord) {
-			this.stampRecordRepo.insert(stampRecord);
-		}
 
 		@Override
 		public void insert(Stamp stamp) {
@@ -212,12 +200,6 @@ extends CommandHandlerWithResult<ConfirmUseOfStampInputCommandWithEmployeeId, Co
 		@Override
 		public Optional<StampCard> getByCardNoAndContractCode(String stampNumber, String contractCode) {
 			return this.stampCardRepo.getByCardNoAndContractCode(stampNumber, contractCode);
-		}
-
-		@Override
-		public boolean existsStamp(ContractCode contractCode, StampNumber stampNumber, GeneralDateTime dateTime,
-				ChangeClockArt changeClockArt) {
-			return stampDakokuRepo.existsStamp(contractCode, stampNumber, dateTime, changeClockArt);
 		}
 
 		@Override
@@ -252,6 +234,12 @@ extends CommandHandlerWithResult<ConfirmUseOfStampInputCommandWithEmployeeId, Co
 				StampReflectRangeOutput stampReflectRangeOutput, IntegrationOfDaily integrationOfDaily,
 				ChangeDailyAttendance changeDailyAtt) {
 			return temporarilyReflectStampDailyAttd.reflectStamp(companyId, stamp, stampReflectRangeOutput, integrationOfDaily, changeDailyAtt);
+		}
+		
+		@Override
+		public boolean existsStamp(ContractCode contractCode, StampNumber stampNumber, GeneralDateTime dateTime,
+				ChangeClockAtr changeClockArt) {
+			return stampDakokuRepo.existsStamp(contractCode, stampNumber, dateTime, changeClockArt);
 		}
 	}
 }

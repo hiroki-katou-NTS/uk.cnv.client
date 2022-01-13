@@ -162,20 +162,20 @@ public class VerticalTotalOfMonthly implements Serializable{
 			}
 			
 			// 平日時就業時間帯を取得
-			PredetemineTimeSetting predTimeSetOnWeekday = null;
-			val workConditionItemOpt = employeeSets.getWorkingConditionItem(procYmd);
-			if (workConditionItemOpt.isPresent()) {
-				val workCategory = workConditionItemOpt.get().getWorkCategory();
-				if (workCategory != null) {
-					val weekdayTime = workCategory.getWorkTime().getWeekdayTime();
-					if (weekdayTime != null) {
-						if (weekdayTime.getWorkTimeCode().isPresent()) {
-							predTimeSetOnWeekday = companySets.getPredetemineTimeSetMap(
-									require, weekdayTime.getWorkTimeCode().get().v());
-						}
-					}
-				}
-			}
+//			PredetemineTimeSetting predTimeSetOnWeekday = null;
+//			val workConditionItemOpt = employeeSets.getWorkingConditionItem(procYmd);
+//			if (workConditionItemOpt.isPresent()) {
+//				val workCategory = workConditionItemOpt.get().getWorkCategory();
+//				if (workCategory != null) {
+//					val weekdayTime = workCategory.getWorkTime().getWeekdayTime();
+//					if (weekdayTime != null) {
+//						if (weekdayTime.getWorkTimeCode().isPresent()) {
+//							predTimeSetOnWeekday = companySets.getPredetemineTimeSetMap(
+//									require, weekdayTime.getWorkTimeCode().get().v());
+//						}
+//					}
+//				}
+//			}
 			
 			// 必要なマスタがない時、その日をスキップする
 			boolean isSkip = false;

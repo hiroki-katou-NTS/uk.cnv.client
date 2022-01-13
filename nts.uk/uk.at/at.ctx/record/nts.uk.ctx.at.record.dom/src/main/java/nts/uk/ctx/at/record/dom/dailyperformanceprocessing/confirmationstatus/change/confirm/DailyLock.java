@@ -52,7 +52,7 @@ public class DailyLock {
 	private StatusLock lockConfirmDay;
 
 	/**
-	 * 日別実績のロック
+	 * 過去実績のロック
 	 */
 	private StatusLock lockPast;
 

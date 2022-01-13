@@ -1,15 +1,14 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-xmlns:ui="http://java.sun.com/jsf/facelets"
-xmlns:com="http://xmlns.jcp.org/jsf/component"
-xmlns:h="http://xmlns.jcp.org/jsf/html">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
 <body>
     <ui:composition template="/master/base.xhtml">
         <ui:define name="htmlHead">
             <com:scriptfile set="IGNITE" />
             <script>var dialogSize = { width: 473, height: 450 };</script>
-            
+
             <com:stylefile path="./kdp003.r.style.css" />
             <com:scriptfile path="./kdp003.r.vm.js" />
         </ui:define>
@@ -26,49 +25,120 @@ xmlns:h="http://xmlns.jcp.org/jsf/html">
                     </com:ko-foreach>
                 </div> -->
                 <!-- R1 本部見内容 -->
-                <div>
-                    <com:ko-foreach bind="headOfficeNoticeList">
-                        <div class= "notice-label headOfficeNotice" data-bind="style: { 'background-color': $parent.noticeSetting.comMsgColor.backGroundColor }">
-                        	<div>
-                                <span data-bind="text: $parent.noticeSetting.companyTitle, style: { 'color': $parent.noticeSetting.comMsgColor.textColor }"></span>
-                                <span data-bind="i18n: 'KDP003_51', style: { 'color': $parent.noticeSetting.comMsgColor.textColor }"></span>
-                                <span data-bind="text: $data.displayMessageNotice.startDate, style: { 'color': $parent.noticeSetting.comMsgColor.textColor }"></span>
-                                <span data-bind="i18n: 'KDP003_67', style: { 'color': $parent.noticeSetting.comMsgColor.textColor }"></span>
-                                <span data-bind="text: $data.displayMessageNotice.endDate, style: { 'color': $parent.noticeSetting.comMsgColor.textColor }"></span>
+                <com:ko-if bind="ko.toJS($vm.notiErrorSystem) == true">
+                    <div>
+                        <div class="system-notice-label errorNotice" style="background-color: #FD4D4D;">
+                            <div>
+                                <span style="color: white; font-size: 18px;" data-bind="i18n: 'KDP003_90'"></span>
+                                <span style="color: white; font-size: 18px;" data-bind="i18n: 'KDP003_92'"></span>
+                                <div>
+                                    <span style="color: white; font-size: 18px;" class="notificationMessage"
+                                        data-bind="i18n: $vm.notiStopByCompany"></span>
+                                </div>
+                                <div>
+                                    <span style="color: white; font-size: 18px;" class="notificationMessage"
+                                        data-bind="i18n: $vm.notiStopBySystem "></span>
+                                </div>
                             </div>
-                        	<div class= "notificationMessage" data-bind="text: $data.displayMessageNotice.notificationMessage, style: { 'color': $parent.noticeSetting.comMsgColor.textColor }"></div>
                         </div>
-                    </com:ko-foreach>
-                </div>
-                <!-- R2 職場メッセージ -->
-                <div>
-                    <com:ko-foreach bind="workplaceNoticeList">
-                        <div class= "notice-label workplaceNotice" data-bind="style: {'background-color': $parent.noticeSetting.wkpMsgColor.backGroundColor }">
-                        	<div>
-                                <span data-bind="text: $parent.noticeSetting.wkpTitle, style: { 'color': $parent.noticeSetting.wkpMsgColor.textColor }"></span>
-                                <span data-bind="i18n: 'KDP003_52', params: [$data.scd + ' ' + $data.bussinessName], style: { 'color': $parent.noticeSetting.wkpMsgColor.textColor }"></span>
-                                <span data-bind="text: $data.displayMessageNotice.startDate, style: { 'color': $parent.noticeSetting.wkpMsgColor.textColor }"></span>
-                                <span data-bind="i18n: 'KDP003_67', style: { 'color': $parent.noticeSetting.wkpMsgColor.textColor }"></span>
-                                <span data-bind="text: $data.displayMessageNotice.endDate, style: { 'color': $parent.noticeSetting.wkpMsgColor.textColor }"></span>
+                    </div>
+                </com:ko-if>
+                <com:ko-if bind="ko.toJS($vm.notiErrorSystem) == false">
+                    <div data-bind="if: ko.toJS($vm.stopBySystem) === true">
+                        <div class="notice-label" style="background-color: #FD4D4D;">
+                            <div>
+                                <span style="color: white;" data-bind="i18n: 'KDP003_91'"></span>
+                                <span style="color: white;" data-bind="i18n: 'KDP003_92'"></span>
+                                <div>
+                                    <span style="color: white;" class="notificationMessage"
+                                        data-bind="i18n: $vm.notiStopBySystem"></span>
+                                </div>
                             </div>
-                            <div class= "notificationMessage" data-bind="text: $data.displayMessageNotice.notificationMessage, style: { 'color': $parent.noticeSetting.wkpMsgColor.textColor }"></div>
                         </div>
-                    </com:ko-foreach>
-                </div>
+                    </div>
+                    <div data-bind="if: ko.toJS($vm.stopByCompany) === true">
+                        <div class="notice-label" style="background-color: #FD4D4D;">
+                            <div>
+                                <span style="color: white;" data-bind="i18n: 'KDP003_91'"></span>
+                                <span style="color: white;" data-bind="i18n: 'KDP003_92'"></span>
+                                <div>
+                                    <span style="color: white;" class="notificationMessage"
+                                        data-bind="i18n: $vm.notiStopByCompany"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <com:ko-foreach bind="headOfficeNoticeList">
+                            <div class="notice-label headOfficeNotice"
+                                data-bind="style: { 'background-color': $parent.noticeSetting.comMsgColor.backGroundColor }">
+                                <div>
+                                    <span
+                                        data-bind="text: $parent.noticeSetting.companyTitle, style: { 'color': $parent.noticeSetting.comMsgColor.textColor }"></span>
+                                    <span
+                                        data-bind="i18n: 'KDP003_51', style: { 'color': $parent.noticeSetting.comMsgColor.textColor }"></span>
+                                    <span
+                                        data-bind="text: $data.displayMessageNotice.startDate, style: { 'color': $parent.noticeSetting.comMsgColor.textColor }"></span>
+                                    <span
+                                        data-bind="i18n: 'KDP003_67', style: { 'color': $parent.noticeSetting.comMsgColor.textColor }"></span>
+                                    <span
+                                        data-bind="text: $data.displayMessageNotice.endDate, style: { 'color': $parent.noticeSetting.comMsgColor.textColor }"></span>
+                                </div>
+                                <div class="notificationMessage"
+                                    data-bind="text: $data.displayMessageNotice.notificationMessage, style: { 'color': $parent.noticeSetting.comMsgColor.textColor }">
+                                </div>
+                            </div>
+                        </com:ko-foreach>
+                    </div>
+                    <!-- R2 職場メッセージ -->
+                    <div>
+                        <com:ko-foreach bind="workplaceNoticeList">
+                            <div class="notice-label workplaceNotice"
+                                data-bind="style: {'background-color': $parent.noticeSetting.wkpMsgColor.backGroundColor }">
+                                <div>
+                                    <span
+                                        data-bind="text: $parent.noticeSetting.wkpTitle, style: { 'color': $parent.noticeSetting.wkpMsgColor.textColor }"></span>
+                                    <span
+                                        data-bind="i18n: 'KDP003_52', params: [$data.scd + ' ' + $data.bussinessName], style: { 'color': $parent.noticeSetting.wkpMsgColor.textColor }"></span>
+                                    <span
+                                        data-bind="text: $data.displayMessageNotice.startDate, style: { 'color': $parent.noticeSetting.wkpMsgColor.textColor }"></span>
+                                    <span
+                                        data-bind="i18n: 'KDP003_67', style: { 'color': $parent.noticeSetting.wkpMsgColor.textColor }"></span>
+                                    <span
+                                        data-bind="text: $data.displayMessageNotice.endDate, style: { 'color': $parent.noticeSetting.wkpMsgColor.textColor }"></span>
+                                </div>
+                                <div class="notificationMessage"
+                                    data-bind="text: $data.displayMessageNotice.notificationMessage, style: { 'color': $parent.noticeSetting.wkpMsgColor.textColor }">
+                                </div>
+                            </div>
+                        </com:ko-foreach>
+                    </div>
+                </com:ko-if>
                 <!-- R6 利用停止中内容 -->
                 <!-- <div class= "stoppingNotice" data-bind="visible: false">
                 	<div>#{i18n.getText('KDP003_90')}</div>
                 	<div data-bind="text: stoppingNotice"></div>
                 </div> -->
-                
+
             </div>
             <div id="functions-area-bottom">
-                <!-- R6_1 停止中コメント -->
-                <!-- <label id="stopComment" data-bind="text: $i18n('KDP003_93'), visible: false"></label> -->
-				<!-- R20/R21 閉じる -->
-				<button tabindex="2" id="closeBtn" data-bind="click: closeDialog, i18n: 'KDP003_53'"></button>
-			</div>
+                <com:ko-if bind="ko.toJS($vm.notiErrorSystem) == true">
+                    <!-- R6_1 停止中コメント -->
+                    <label id="stopComment"
+                        data-bind="i18n: 'KDP003_93', visible: ko.toJS($vm.notiErrorSystem)"></label>
+                    <!-- R20/R21 閉じる -->
+                    <!--
+                    <button style="margin-left: -2px !important; margin-top: -10px;" tabindex="2" id="closeBtn"
+                        data-bind="click: closeDialog, i18n: 'KDP003_53'"></button>
+                        -->
+                </com:ko-if>
+                <com:ko-if bind="ko.toJS($vm.notiErrorSystem) == false">
+                    <!-- R20/R21 閉じる -->
+                    <button tabindex="2" id="closeBtn" data-bind="click: closeDialog, i18n: 'KDP003_53'"></button>
+                </com:ko-if>
+            </div>
         </ui:define>
     </ui:composition>
 </body>
+
 </html>

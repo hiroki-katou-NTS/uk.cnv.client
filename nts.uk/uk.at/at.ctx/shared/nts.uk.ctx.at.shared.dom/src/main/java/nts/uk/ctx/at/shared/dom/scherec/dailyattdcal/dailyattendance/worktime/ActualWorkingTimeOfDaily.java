@@ -1,17 +1,17 @@
 package nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.val;
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTime;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.PersonnelCostSettingImport;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.DailyRecordToAttendanceItemConverter;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.deviationtime.DivergenceTimeOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.erroralarm.EmployeeDailyPerError;
@@ -28,7 +28,6 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.deviationtime.deviationtime
 import nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.CompensatoryOccurrenceSetting;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingConditionItem;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingSystem;
-import nts.uk.ctx.at.shared.dom.worktime.common.CompensatoryOccurrenceDivision;
 import nts.uk.ctx.at.shared.dom.worktime.common.DeductionTime;
 import nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode;
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeDailyAtr;
@@ -43,6 +42,8 @@ import nts.uk.shr.com.context.AppContexts;
  * @author nampt 日別実績の勤務実績時間 (old)
  */
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ActualWorkingTimeOfDaily {
 
 	// 割増時間
@@ -86,14 +87,14 @@ public class ActualWorkingTimeOfDaily {
 		return new ActualWorkingTimeOfDaily(new AttendanceTime(bindDiff),
 				new ConstraintTime(new AttendanceTime(midBind), new AttendanceTime(totalBind)),
 				new AttendanceTime(diffTimeWork), totalWorkTime, new DivergenceTimeOfDaily(),
-				new PremiumTimeOfDailyPerformance());
+				PremiumTimeOfDailyPerformance.createEmpty());
 	}
 
     public static ActualWorkingTimeOfDaily of(TotalWorkingTime totalWorkTime, int midBind, int totalBind, int bindDiff,
             int diffTimeWork, DivergenceTimeOfDaily divTime) {
         return new ActualWorkingTimeOfDaily(new AttendanceTime(bindDiff),
                 new ConstraintTime(new AttendanceTime(midBind), new AttendanceTime(totalBind)),
-                new AttendanceTime(diffTimeWork), totalWorkTime, divTime, new PremiumTimeOfDailyPerformance());
+                new AttendanceTime(diffTimeWork), totalWorkTime, divTime, PremiumTimeOfDailyPerformance.createEmpty());
     }
 
     public static ActualWorkingTimeOfDaily of(TotalWorkingTime totalWorkTime, int midBind, int totalBind, int bindDiff,
@@ -205,7 +206,7 @@ public class ActualWorkingTimeOfDaily {
 		val timeDifferenceWorkingHours = new AttendanceTime(0);
 		
 		/* 割増時間の計算 */
-		val premiumTime = new PremiumTimeOfDailyPerformance(Collections.emptyList());
+		val premiumTime = PremiumTimeOfDailyPerformance.createEmpty();
 		/* 乖離時間の計算 */
 //		val divergenceTimeOfDaily = createDivergenceTimeOfDaily(
 //													   forCalcDivergenceDto,
@@ -226,12 +227,6 @@ public class ActualWorkingTimeOfDaily {
 				premiumTime
 				);
 		
-	}
-	
-	
-	public static PremiumTimeOfDailyPerformance createPremiumTimeOfDailyPerformance(List<PersonnelCostSettingImport> personnelCostSettingImport,
-	 																				Optional<DailyRecordToAttendanceItemConverter> dailyRecordDto) {
-		return PremiumTimeOfDailyPerformance.calcPremiumTime(personnelCostSettingImport, dailyRecordDto);
 	}
 
 	/**
@@ -352,7 +347,7 @@ public class ActualWorkingTimeOfDaily {
 		return new ActualWorkingTimeOfDaily(AttendanceTime.ZERO, ConstraintTime.defaultValue(), AttendanceTime.ZERO, 
 											TotalWorkingTime.createAllZEROInstance(), 
 											new DivergenceTimeOfDaily(new ArrayList<>()), 
-											new PremiumTimeOfDailyPerformance(new ArrayList<>()));
+											PremiumTimeOfDailyPerformance.createEmpty());
 	}
 	
 	public AttendanceTime getWorkHolidayTime() {

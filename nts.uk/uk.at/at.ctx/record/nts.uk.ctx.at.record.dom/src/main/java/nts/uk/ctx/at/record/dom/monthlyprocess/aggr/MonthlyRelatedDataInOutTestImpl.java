@@ -16,6 +16,7 @@ import nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeMonth;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeMonthWithMinus;
 import nts.uk.ctx.at.shared.dom.common.times.AttendanceTimesMonth;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.paytime.SpecificDateItemNo;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.ExtraTimeItemNo;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.AggregateMonthlyRecordValue;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.agreement.AgreementTimeOfManagePeriodRepository;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.AttendanceAmountMonth;
@@ -214,8 +215,8 @@ public class MonthlyRelatedDataInOutTestImpl implements MonthlyRelatedDataInOutT
 		if (randomVal >= 6) vGoOuts.put(GoingOutReason.PUBLIC, aggrGoOut02);
 		val vPremiumTime = vWorkTime.getPremiumTime();
 		val vPremiumTimeMap = vPremiumTime.getPremiumTime();
-		val aggrPremiumTime01 = AggregatePremiumTime.of(1, new AttendanceTimeMonth(3410 + randomVal), new AttendanceAmountMonth(0));
-		val aggrPremiumTime02 = AggregatePremiumTime.of(2, new AttendanceTimeMonth(3420 + randomVal), new AttendanceAmountMonth(0));
+		val aggrPremiumTime01 = AggregatePremiumTime.of(ExtraTimeItemNo.valueOf(1), new AttendanceTimeMonth(3410 + randomVal), new AttendanceAmountMonth(0L));
+		val aggrPremiumTime02 = AggregatePremiumTime.of(ExtraTimeItemNo.valueOf(2), new AttendanceTimeMonth(3420 + randomVal), new AttendanceAmountMonth(0L));
 		vPremiumTimeMap.put(1, aggrPremiumTime01);
 		if (randomVal >= 6) vPremiumTimeMap.put(2, aggrPremiumTime02);
 		val medicalTime = vWorkTime.getMedicalTime();

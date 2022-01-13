@@ -2,6 +2,7 @@ package nts.uk.ctx.at.request.infra.repository.application.optional;
 
 import com.aspose.cells.Cell;
 import com.aspose.cells.Cells;
+import com.aspose.cells.CheckBox;
 import com.aspose.cells.Worksheet;
 import nts.arc.i18n.I18NText;
 import nts.uk.ctx.at.request.dom.application.common.service.print.PrintContentOfApp;
@@ -24,27 +25,48 @@ public class AposeOptionalItem {
         OptionalItemPrintContent optionalItemPrintContent = printContentOfApp.getOptionalItemPrintContent().get();
         cells.get("D8").setValue(optionalItemPrintContent.getName());
         List<OptionalItemContent> printContent = optionalItemPrintContent.getOptionalItemContents();
+        int count = 0;
         for (int i = 0; i < printContent.size(); i++) {
-            Cell cellD = cells.get("D" + (9 + i));
-            cellD.setValue(printContent.get(i).getOptionalItemName());
-            Cell cellH = cells.get("H" + (9 + i));
+            boolean hasValue = false;
+            Cell cellH = cells.get("H" + (9 + count));
             if (printContent.get(i).getOptionalItemAtr() == 0 && printContent.get(i).getTime() != null) {
                 cellH.setValue(timeToString(printContent.get(i).getTime()));
-            } else if (printContent.get(i).getOptionalItemAtr() == 1 && printContent.get(i).getTimes() != null) {
-                cellH.setValue(printContent.get(i).getTimes());
+                hasValue = true;
+            } else if (printContent.get(i).getOptionalItemAtr() == 1) {
+                if (printContent.get(i).isInputCheckbox()) {
+                    if (printContent.get(i).getTimesChecked() != null) {
+                        cellH.setValue("");
+                        int checkBoxIndex = worksheet.getCheckBoxes().add(8 + count, 7, 42, 42);
+                        CheckBox checkBox = worksheet.getCheckBoxes().get(checkBoxIndex);
+                        checkBox.setValue(printContent.get(i).getTimesChecked().booleanValue());
+                        checkBox.setLeft(46);
+                        hasValue = true;
+                    }
+                } else {
+                    if (printContent.get(i).getTimes() != null) {
+                        cellH.setValue(printContent.get(i).getTimes());
+                        hasValue = true;
+                    }
+                }
             } else if (printContent.get(i).getOptionalItemAtr() == 2 && printContent.get(i).getAmount() != null) {
                 cellH.setValue(String.format("%,d", printContent.get(i).getAmount()));
+                hasValue = true;
             }
-            Cell cellI = cells.get("I" + (9 + i));
-            cellI.setValue(printContent.get(i).getUnit());
+            if (hasValue) {
+                Cell cellD = cells.get("D" + (9 + count));
+                cellD.setValue(printContent.get(i).getOptionalItemName());
+                Cell cellI = cells.get("I" + (9 + count));
+                if (!printContent.get(i).isInputCheckbox()) cellI.setValue(printContent.get(i).getUnit());
+                count++;
+            }
         }
     }
 
     public void deleteEmptyRow(Worksheet worksheet) {
         Cells cells = worksheet.getCells();
         for (int i = 10; i > 0; i--) {
-            Cell cell = cells.get("D" + (8 + i));
-            if (cell.getValue() == null || cell.getValue().toString().isEmpty()) {
+            Cell cell = cells.get("H" + (8 + i));
+            if (cell.getValue() == null) {
                 worksheet.getCells().deleteRow(7 + i);
             }
         }

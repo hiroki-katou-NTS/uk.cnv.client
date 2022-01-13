@@ -50,5 +50,7 @@ public interface CompanyMonthDaySettingRepository {
 	 * @param companyId the company id
 	 * @param year the year
 	 */
-	void remove(CompanyId companyId, Year year);
+	void remove(CompanyId companyId, Year year, Integer startMonth);
+	
+	void remove(CompanyMonthDaySetting domain);
 }

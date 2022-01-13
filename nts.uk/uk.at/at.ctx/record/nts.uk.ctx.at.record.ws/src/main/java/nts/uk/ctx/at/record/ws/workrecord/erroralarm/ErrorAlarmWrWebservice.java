@@ -14,6 +14,7 @@ import javax.ws.rs.Produces;
 import nts.uk.ctx.at.record.app.command.workrecord.erroralarm.DeleteErAlCommandHandler;
 import nts.uk.ctx.at.record.app.command.workrecord.erroralarm.UpdateErrorAlarmWrCommand;
 import nts.uk.ctx.at.record.app.command.workrecord.erroralarm.UpdateErrorAlarmWrCommandHandler;
+import nts.uk.ctx.at.record.app.find.workrecord.erroralarm.ErrorAlarmDto;
 import nts.uk.ctx.at.record.app.find.workrecord.erroralarm.ErrorAlarmWorkRecordDto;
 import nts.uk.ctx.at.record.app.find.workrecord.erroralarm.ErrorAlarmWorkRecordFinder;
 
@@ -36,7 +37,7 @@ public class ErrorAlarmWrWebservice {
 
 	@POST
 	@Path("getall/{type}")
-	public List<ErrorAlarmWorkRecordDto> getAll(@PathParam(value = "type") int type) {
+	public ErrorAlarmDto getAll(@PathParam(value = "type") int type) {
 		return this.finder.getListErrorAlarmWorkRecord(type);
 	}
 	

@@ -22,6 +22,7 @@ import lombok.SneakyThrows;
 import lombok.val;
 import nts.arc.layer.infra.data.DbConsts;
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.arc.layer.infra.data.database.DatabaseProduct;
 import nts.arc.layer.infra.data.jdbc.NtsResultSet;
 import nts.arc.layer.infra.data.query.TypedQueryWrapper;
 import nts.arc.time.GeneralDate;
@@ -302,7 +303,7 @@ public class JpaEmployeeDailyPerErrorRepository extends JpaRepository implements
 								rs.getString("SID"),
 								rs.getGeneralDate("PROCESSING_DATE"),
 								new ErrorAlarmWorkRecordCode(rs.getString("ERROR_CODE")),
-								Arrays.asList(rs.getInt("ATTENDANCE_ITEM_ID")),
+								rs.getInt("ATTENDANCE_ITEM_ID") == null? new ArrayList<>(): Arrays.asList(rs.getInt("ATTENDANCE_ITEM_ID")),
 								0,
 								rs.getString("ERROR_MESSAGE")));
 
@@ -395,7 +396,7 @@ public class JpaEmployeeDailyPerErrorRepository extends JpaRepository implements
 	}
 	
 	private void removePramX(Connection con, String sid, GeneralDate date, String type) {
-		String sqlQuery = "Delete From " + checkErType(type) + " Where [SID] = " + "'" + sid + "'" + " and PROCESSING_DATE = " + "'" + date + "'" ;
+		String sqlQuery = "Delete From " + checkErType(type) + " Where SID = " + "'" + sid + "'" + " and PROCESSING_DATE = " + "'" + date + "'" ;
 		try (val st = con.createStatement()) {
 			st.executeUpdate(sqlQuery);
 		} catch (SQLException e) {
@@ -404,7 +405,7 @@ public class JpaEmployeeDailyPerErrorRepository extends JpaRepository implements
 	}
 	
 	private void removePramXC(Connection con, String sid, GeneralDate date, String type) {
-		String sqlQuery = "Delete From " + checkErTypeC(type) + " Where [SID] = " + "'" + sid + "'" + " and PROCESSING_DATE = " + "'" + date + "'" ;
+		String sqlQuery = "Delete From " + checkErTypeC(type) + " Where SID = " + "'" + sid + "'" + " and PROCESSING_DATE = " + "'" + date + "'" ;
 		try (val st = con.createStatement()) {
 			st.executeUpdate(sqlQuery);
 		} catch (SQLException e) {
@@ -433,8 +434,13 @@ public class JpaEmployeeDailyPerErrorRepository extends JpaRepository implements
 	@SneakyThrows
 	public void removeContinuosErrorIn(String sid, DatePeriod date, String code) {
 		String query = new String("DELETE c FROM KRCDT_DAY_ERAL_OTK_ATD c JOIN KRCDT_DAY_OTK_ERAL sb ON c.ID = sb.ID "
-				+ "WHERE sb.ERROR_CODE = ? AND sb.[SID] = ? AND sb.PROCESSING_DATE >= ? AND sb.PROCESSING_DATE <= ?");
-		try (PreparedStatement statement = this.connection().prepareStatement(query)) {
+				+ "WHERE sb.ERROR_CODE = ? AND sb.SID = ? AND sb.PROCESSING_DATE >= ? AND sb.PROCESSING_DATE <= ?");
+		
+		String queryPostQuery =  new String("DELETE FROM KRCDT_DAY_ERAL_OTK_ATD WHERE ID IN (SELECT ID FROM KRCDT_DAY_OTK_ERAL "
+				+ "WHERE ERROR_CODE = ? AND SID = ? AND PROCESSING_DATE >= ? AND PROCESSING_DATE <= ? )");
+		
+		boolean isPostGres = this.database().is(DatabaseProduct.POSTGRESQL);
+		try (PreparedStatement statement = this.connection().prepareStatement(isPostGres ? queryPostQuery : query)) {
 			statement.setString(1, code);
 			statement.setString(2, sid);
 			statement.setDate(3, Date.valueOf(date.start().toLocalDate()));
@@ -442,7 +448,7 @@ public class JpaEmployeeDailyPerErrorRepository extends JpaRepository implements
 			statement.executeUpdate();
 		}
 		
-		String query2 = new String("DELETE FROM KRCDT_DAY_OTK_ERAL WHERE ERROR_CODE = ? AND [SID] = ? AND PROCESSING_DATE >= ? AND PROCESSING_DATE <= ?");
+		String query2 = new String("DELETE FROM KRCDT_DAY_OTK_ERAL WHERE ERROR_CODE = ? AND SID = ? AND PROCESSING_DATE >= ? AND PROCESSING_DATE <= ?");
 		try (PreparedStatement statement = this.connection().prepareStatement(query2)) {
 			statement.setString(1, code);
 			statement.setString(2, sid);
@@ -730,5 +736,21 @@ public class JpaEmployeeDailyPerErrorRepository extends JpaRepository implements
 					.getList(x -> x.toDomainForCcg005()));
 		});
 		return result;
+	}
+
+	@Override
+	public void deleteByErrorCode(String sid, GeneralDate date, String errorCode) {
+		StringBuilder query = new StringBuilder("DELETE FROM KrcdtDaySyaError a ");
+		query.append("WHERE a.processingDate = :processingDate ");
+		query.append("AND a.employeeId = :employeeId ");
+		query.append("AND a.errorCode = :errorCode ");
+		
+		String DELETE_BY_ERRORCODE = query.toString();
+		
+		this.getEntityManager().createQuery(DELETE_BY_ERRORCODE)
+			.setParameter("employeeId", sid)
+			.setParameter("processingDate", date)
+			.setParameter("errorCode", errorCode).executeUpdate();
+		this.getEntityManager().flush();
 	}
 }

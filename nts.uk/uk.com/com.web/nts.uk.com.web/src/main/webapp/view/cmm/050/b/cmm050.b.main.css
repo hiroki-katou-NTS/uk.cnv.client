@@ -1,12 +1,8 @@
-.form-input {
-	padding: 10px 50px;
+.flex.valign-center {
+  margin-top: 15px;
 }
 
-.form-input>.label_style {
-	display: inline-block;
-}
-
-.form-input>.input {
-	display: inline-block;
-	vertical-align: top;
+.setting-label {
+  width: 200px;
+  padding-right: 8px;
 }

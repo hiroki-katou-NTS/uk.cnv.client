@@ -25,9 +25,10 @@ module nts.uk.at.view.kmf002.b {
             return nts.uk.request.ajax("at", path.find + "/" + year + "/" + workplaceId);
         }
         
-        export function remove(year: string, workplaceId: string): JQueryPromise<any> {
+        export function remove(year: string, startMonth: number, workplaceId: string): JQueryPromise<any> {
             let command: any = {};
             command.year = year;
+            command.startMonth = startMonth;
             command.workplaceId = workplaceId;
             return nts.uk.request.ajax("at", path.remove, command);
         }
@@ -86,6 +87,10 @@ module nts.uk.at.view.kmf002.b {
                 let _self = this;
                 _.forEach(data, function(newValue) {
                     _self.publicHolidayMonthSettingDto.push(new PublicHolidayMonthSettingDto(_self.year, newValue.month(), newValue.day()));
+                    // Increment year
+                    if (newValue.month() === 12) {
+                      _self.year = String(Number(_self.year) + 1);
+                    }
                 });
             }
         }

@@ -1,6 +1,7 @@
 package nts.uk.ctx.at.function.dom.monthlycorrection.fixedformatmonthly;
 
 import lombok.Getter;
+import lombok.Setter;
 import nts.arc.layer.dom.AggregateRoot;
 import nts.uk.ctx.at.shared.dom.workrule.businesstype.BusinessTypeCode;
 /**
@@ -15,6 +16,7 @@ public class MonthlyRecordWorkType extends AggregateRoot{
 	/**コード*/
 	private BusinessTypeCode businessTypeCode;
 	/**表示項目*/
+	@Setter
 	private MonthlyActualResults displayItem;
 
 	public MonthlyRecordWorkType(String companyID, BusinessTypeCode businessTypeCode, MonthlyActualResults displayItem) {

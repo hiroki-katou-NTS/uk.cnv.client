@@ -12,7 +12,7 @@ import nts.uk.ctx.at.record.dom.employmentinfoterminal.infoterminal.repo.EmpInfo
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.WorkInformationTemporary;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.support.SupportCardRepository;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkTimeInformation;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.algorithmdailyper.StampReflectRangeOutput;
@@ -61,6 +61,7 @@ public class ReflectStampSupport {
 		param.setLocationCode(workInfoStampTempo == null ? Optional.empty() : workInfoStampTempo.getWorkLocationCD()); // 場所コード＝勤務先情報Temporary。場所コード		
 		param.setWorkplaceId(workInfoStampTempo  == null ? Optional.empty() : workInfoStampTempo.getWorkplaceID()); // 職場ID＝勤務先情報Temporary。職場ID
 		param.setStartAtr(startAtr); // 開始区分＝取得した開始区分
+		param.setWorkGroup(stamp.getRefActualResults().getWorkGroup()); /** 作業グループ＝打刻。実績への反映内容。作業グループ */
 		ReflectionAtr reflectionAtr = supportWorkReflec.supportWorkReflect(cid, param, integrationOfDaily, stampReflectRangeOutput);
 		
 		// 反映状態を確認する
@@ -73,9 +74,9 @@ public class ReflectStampSupport {
 	// 開始区分を確認する -> 開始区分を取得する
 	public StartAtr checkStartIndicator(Stamp stamp){
 		//打刻。打刻種類。時刻変更区分を確認する
-		ChangeClockArt changeClockArt = stamp.getType().getChangeClockArt();
+		ChangeClockAtr changeClockArt = stamp.getType().getChangeClockArt();
 		
-		if(changeClockArt == ChangeClockArt.WORKING_OUT || changeClockArt == ChangeClockArt.END_OF_SUPPORT){
+		if(changeClockArt == ChangeClockAtr.WORKING_OUT || changeClockArt == ChangeClockAtr.END_OF_SUPPORT){
 			// 退勤OR応援終了の場合
 			return StartAtr.END_OF_SUPPORT;
 		} else {

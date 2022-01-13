@@ -5,15 +5,21 @@
 package nts.uk.ctx.sys.auth.ac.role.workplace;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import nts.arc.time.GeneralDate;
+import nts.uk.ctx.bs.employee.pub.employee.workplace.export.WorkplaceExportPub;
 import nts.uk.ctx.bs.employee.pub.workplace.AffAtWorkplaceExport;
+import nts.uk.ctx.bs.employee.pub.workplace.AffWorkplaceHistoryItemExport;
+import nts.uk.ctx.bs.employee.pub.workplace.AffWorkplaceHistoryItemExport3;
 import nts.uk.ctx.bs.employee.pub.workplace.SWkpHistExport;
 import nts.uk.ctx.bs.employee.pub.workplace.master.WorkplacePub;
 import nts.uk.ctx.sys.auth.dom.adapter.workplace.AffWorkplaceHistImport;
@@ -39,6 +45,9 @@ public class WorkplaceAdapterImpl implements WorkplaceAdapter {
 	
 	@Inject
 	private WorkplacePub workplacePub;
+	
+	@Inject
+	private WorkplaceExportPub workplaceExportPub;
 
 	/* (non-Javadoc)
 	 * @see nts.uk.ctx.sys.auth.dom.adapter.workplace.WorkplaceAdapter#findListWkpIdByBaseDate(nts.arc.time.GeneralDate)
@@ -81,7 +90,7 @@ public class WorkplaceAdapterImpl implements WorkplaceAdapter {
 	}
 
 	private AffiliationWorkplace toImport (AffAtWorkplaceExport ex){
-		return new AffiliationWorkplace(ex.getHistoryID(), ex.getEmployeeId(), ex.getWorkplaceId(), ex.getNormalWorkplaceID());
+		return new AffiliationWorkplace(ex.getHistoryID(), ex.getEmployeeId(), ex.getWorkplaceId());
 	}
 	
 	@Override
@@ -137,6 +146,32 @@ public class WorkplaceAdapterImpl implements WorkplaceAdapter {
 	@Override
 	public List<String> getWorkplaceIdAndChildren(String companyId, GeneralDate baseDate, String workplaceId) {
 		return workplacePub.getWorkplaceIdAndChildren(companyId, baseDate, workplaceId);
+	}
+
+	@Override
+	public Map<String, String> getAWorkplace(String employeeID, GeneralDate date) {
+		//$職場ID =  [No.650]社員が所属している職場を取得する(社員ID,基準日)
+		AffWorkplaceHistoryItemExport i =  workplacePub.getAffWkpHistItemByEmpDate(employeeID, date);
+		
+		Map<String, String> result = new HashMap<String, String>();
+		if(i != null) {
+			result.put(employeeID, i.getWorkplaceId());
+		}
+		// return map <社員ID,$職場ID>
+		return result;
+	}
+
+	@Override
+	public Map<String, String> getByListIds(List<String> workPlaceIds, GeneralDate baseDate) {
+		Map<String, String> result = new HashMap<String, String>();
+		//	$所属職場 = 職場に所属する社員Publish.取得する(基準日,職場リスト)
+		List<AffWorkplaceHistoryItemExport3> list =  workplaceExportPub.getByListId(workPlaceIds, baseDate);
+		for (AffWorkplaceHistoryItemExport3 i : list) {
+			result.put(i.getEmployeeId(), i.getWorkplaceId());
+		}
+//		return $所属職場：
+//				map <$.社員ID,$.職場ID>
+		return result;
 	}
 
 }

@@ -1,17 +1,17 @@
 package nts.uk.ctx.at.schedule.infra.entity.displaysetting.authcontrol;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import nts.arc.layer.infra.data.jdbc.map.JpaEntityMapper;
-import nts.uk.ctx.at.schedule.dom.displaysetting.authcontrol.ScheModifyFuncByWorkplace;
-import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
-import nts.uk.shr.infra.data.entity.UkJpaEntity;
+import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import nts.arc.layer.infra.data.jdbc.map.JpaEntityMapper;
+import nts.uk.ctx.at.schedule.dom.displaysetting.authcontrol.ScheModifyFuncByWorkplace;
+import nts.uk.shr.infra.data.entity.UkJpaEntity;
 
 /**
  * KSCMT_FUNC_BYWKP : 	スケジュール修正職場別の機能
@@ -21,7 +21,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "KSCMT_FUNC_BYWKP")
+@Table(name = "KSCCT_FUNC_BYWKP")
 public class KscmtFuncBywkp extends UkJpaEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     public static final JpaEntityMapper<KscmtFuncBywkp> MAPPER = new JpaEntityMapper<>(KscmtFuncBywkp.class);
@@ -48,7 +48,7 @@ public class KscmtFuncBywkp extends UkJpaEntity implements Serializable {
     /**
      * 表示順
      */
-    @Column(name = "DEISPLAY_ORDER")
+    @Column(name = "DISPLAY_ORDER")
     public int deisplayOrder;
 
     /**

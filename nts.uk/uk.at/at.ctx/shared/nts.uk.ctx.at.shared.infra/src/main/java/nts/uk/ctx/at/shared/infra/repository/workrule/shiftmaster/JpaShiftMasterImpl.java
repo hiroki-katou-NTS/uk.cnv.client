@@ -89,6 +89,9 @@ public class JpaShiftMasterImpl extends JpaRepository implements ShiftMasterRepo
 
 	@Override
 	public List<ShiftMaster> getByListShiftMaterCd2(String companyId, List<String> shiftMaterCodes) {
+		if (shiftMaterCodes.isEmpty()) {
+			return Collections.emptyList();
+		}
 		List<ShiftMaster> data = this.queryProxy().query(SELECT_BY_LISTCD_AND_CID, KshmtShiftMater.class)
 				.setParameter("companyId", companyId)
 				.setParameter("shiftMaterCodes", shiftMaterCodes)

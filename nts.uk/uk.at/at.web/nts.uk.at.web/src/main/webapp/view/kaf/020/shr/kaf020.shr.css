@@ -19,7 +19,7 @@
     height: auto !important;
 }
 
-#kaf020-component #kaf020-fixed-table .nts-input {
+#kaf020-component #kaf020-fixed-table .nts-input:not(.checkbox-wrapper) {
     width: 87px;
 }
 

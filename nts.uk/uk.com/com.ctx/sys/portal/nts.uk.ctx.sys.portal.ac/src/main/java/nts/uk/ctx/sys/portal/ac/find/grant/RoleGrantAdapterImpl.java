@@ -96,7 +96,7 @@ public class RoleGrantAdapterImpl implements RoleGrantAdapter {
 	public Optional<RoleSetDto> getRoleSet(String companyId, String roleSetCd) {
 		return roleSetPub.getRoleSet(companyId, roleSetCd).map(r -> 
 			new RoleSetDto(r.getRoleSetCd(), r.getCompanyId(), r.getRoleSetName(), 
-					r.getApprovalAuthority(), r.getOfficeHelperRoleId(), r.getMyNumberRoleId(), 
+					r.getOfficeHelperRoleId(), r.getMyNumberRoleId(), 
 					r.getHRRoleId(), r.getPersonInfRoleId(), r.getEmploymentRoleId(), r.getSalaryRoleId()));
 	}
 	

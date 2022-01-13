@@ -85,6 +85,85 @@ div.nts-column{
   height: 50px;
 }
 
-#A2_6 {
-  width: 135px !important;
+.ml-10 {
+  margin-left: 10px;
+}
+
+.flex.valign-center {
+  margin-bottom: 10px;
+}
+
+.A2_26, .A6_5 {
+  width: 80px !important;
+}
+
+.A2_26 {
+  padding: 0px !important;
+  font-size: 0.9em;
+}
+
+.bottom-keyword-row {
+  margin-top: 10px;
+}
+
+.query-zone {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.query-zone > * {
+  vertical-align: middle;
+}
+
+.query-part {
+  margin-left: 10px;
+  float: left;
+}
+
+.query-execute-part {
+  margin-top: 10px;
+}
+
+.query-other-part {
+  margin-top: 18px;
+  display: grid;
+}
+
+.mr-10 {
+  margin-right: 10px;
+}
+
+button:disabled {
+  background-color: #ccc;
+}
+
+.constraint.below {
+  z-index: 10000;
+}
+
+#A2_25 {
+  width: 417px;
+  float: left;
+}
+
+#A2_2, #A2_4 {
+  width: 50px;
+}
+
+#A2_7 {
+  width: 70px;
+  height: 70px;
+}
+
+#A6_1 {
+  width: 700px;
+}
+
+#A6_3 {
+  position: absolute;
+  right: 10px;
+}
+
+#A6_4 {
+  vertical-align: middle;
 }

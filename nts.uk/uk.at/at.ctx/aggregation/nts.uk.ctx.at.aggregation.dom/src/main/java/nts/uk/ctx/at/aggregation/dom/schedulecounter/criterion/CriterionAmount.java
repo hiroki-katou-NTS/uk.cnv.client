@@ -1,5 +1,6 @@
 package nts.uk.ctx.at.aggregation.dom.schedulecounter.criterion;
 
+import lombok.AllArgsConstructor;
 import lombok.Value;
 import nts.arc.layer.dom.objecttype.DomainValue;
 
@@ -10,6 +11,7 @@ import nts.arc.layer.dom.objecttype.DomainValue;
  *
  */
 @Value
+@AllArgsConstructor
 public class CriterionAmount implements DomainValue {
 
 	/** 年間目安金額 */

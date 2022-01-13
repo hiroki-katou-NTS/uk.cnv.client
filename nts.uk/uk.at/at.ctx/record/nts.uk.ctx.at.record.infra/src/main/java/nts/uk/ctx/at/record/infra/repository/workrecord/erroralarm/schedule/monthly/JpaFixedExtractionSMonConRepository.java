@@ -1,17 +1,16 @@
 package nts.uk.ctx.at.record.infra.repository.workrecord.erroralarm.schedule.monthly;
 
-import nts.arc.layer.infra.data.JpaRepository;
-import nts.uk.ctx.at.record.dom.workrecord.erroralarm.schedule.monthly.FixedExtractionSMonCon;
-import nts.uk.ctx.at.record.dom.workrecord.erroralarm.schedule.monthly.FixedExtractionSMonConRepository;
-import nts.uk.ctx.at.record.infra.entity.workrecord.erroralarm.schedule.daily.KscdtScheFixCondDay;
-import nts.uk.ctx.at.record.infra.entity.workrecord.erroralarm.schedule.monthly.KscdtScheFixCondMonth;
-import nts.uk.ctx.at.record.infra.entity.workrecord.erroralarm.schedule.monthly.KscdtScheFixCondMonthPk;
-
-import javax.ejb.Stateless;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.ejb.Stateless;
+
+import nts.arc.layer.infra.data.JpaRepository;
+import nts.uk.ctx.at.record.dom.workrecord.erroralarm.schedule.monthly.FixedExtractionSMonCon;
+import nts.uk.ctx.at.record.dom.workrecord.erroralarm.schedule.monthly.FixedExtractionSMonConRepository;
+import nts.uk.ctx.at.record.infra.entity.workrecord.erroralarm.schedule.monthly.KscdtScheFixCondMonth;
+import nts.uk.ctx.at.record.infra.entity.workrecord.erroralarm.schedule.monthly.KscdtScheFixCondMonthPk;
 
 @Stateless
 public class JpaFixedExtractionSMonConRepository extends JpaRepository implements FixedExtractionSMonConRepository {
@@ -19,12 +18,6 @@ public class JpaFixedExtractionSMonConRepository extends JpaRepository implement
 	private static final String BY_CONTRACT_COMPANY = " WHERE a.pk.cid = :companyId AND a.contractCd = :contractCode";
 	private static final String BY_ERAL_CHECK_ID = " AND a.pk.cid = :companyId AND a.contractCd = :contractCode AND a.pk.checkId = :eralCheckIds";
 	
-    @Override
-    public List<FixedExtractionSMonCon> getAll() {
-        List<KscdtScheFixCondMonth> entities = new ArrayList<>();
-        return null;
-    }
-
 	@Override
 	public void add(String contractCode, String companyId, FixedExtractionSMonCon domain) {
 		this.commandProxy().insert(toEntity(contractCode, companyId, domain));
@@ -34,11 +27,16 @@ public class JpaFixedExtractionSMonConRepository extends JpaRepository implement
 	public void update(String contractCode, String companyId, FixedExtractionSMonCon domain) {
 		KscdtScheFixCondMonthPk pk = new KscdtScheFixCondMonthPk(companyId, domain.getErrorAlarmWorkplaceId(), domain.getFixedCheckSMonItems().value);
 		Optional<KscdtScheFixCondMonth> entityOpt = this.queryProxy().find(pk, KscdtScheFixCondMonth.class);
-		KscdtScheFixCondMonth entity = entityOpt.get();
-		entity.useAtr = domain.isUseAtr();
-		entity.condMsg = domain.getMessageDisp().get().v();
+		if(entityOpt.isPresent()) {
+			KscdtScheFixCondMonth entity = entityOpt.get();
+			entity.useAtr = domain.isUseAtr();
+			entity.condMsg = domain.getMessageDisp().get().v();
+			
+			this.commandProxy().update(entity);	
+		} else {
+			this.add(contractCode, companyId, domain);
+		}
 		
-		this.commandProxy().update(entity);
 	}
 
 	@Override

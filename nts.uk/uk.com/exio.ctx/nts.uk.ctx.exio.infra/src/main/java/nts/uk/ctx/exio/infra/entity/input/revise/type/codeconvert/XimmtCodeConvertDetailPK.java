@@ -23,6 +23,10 @@ public class XimmtCodeConvertDetailPK implements Serializable {
 	
 	@Column(name = "SETTING_CODE")
 	private String settingCode;
+
+	/* 受入グループID */
+	@Column(name = "DOMAIN_ID")
+	private int domainId;
 	
 	@Column(name = "ITEM_NO")
 	private int itemNo;
@@ -34,6 +38,7 @@ public class XimmtCodeConvertDetailPK implements Serializable {
 		return new XimmtCodeConvertDetailPK(
 				parentPk.getCompanyId(),
 				parentPk.getSettingCode(),
+				parentPk.getDomainId(),
 				parentPk.getItemNo(),
 				targetCode);
 	}

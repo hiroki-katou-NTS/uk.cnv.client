@@ -16,23 +16,19 @@ public class ControlOfMonthlyDto {
 	/**日別実績のヘッダ背景色*/
 	private String headerBgColorOfMonthlyPer;
 
-	/**時間項目の入力単位*/
-	private BigDecimal inputUnitOfTimeItem;
 	
-	public ControlOfMonthlyDto(String companyId, int itemMonthlyId, String headerBgColorOfMonthlyPer, BigDecimal inputUnitOfTimeItem) {
+	public ControlOfMonthlyDto(String companyId, int itemMonthlyId, String headerBgColorOfMonthlyPer) {
 		super();
 		this.companyId = companyId;
 		this.itemMonthlyId = itemMonthlyId;
 		this.headerBgColorOfMonthlyPer = headerBgColorOfMonthlyPer;
-		this.inputUnitOfTimeItem = inputUnitOfTimeItem;
 	}
 	
 	public static ControlOfMonthlyDto fromDomain(ControlOfMonthlyItems domain) {
 		return new ControlOfMonthlyDto(
 				domain.getCompanyId(),
 				domain.getItemMonthlyId(),
-				!domain.getHeaderBgColorOfMonthlyPer().isPresent() ?null:domain.getHeaderBgColorOfMonthlyPer().get().v(),
-				!domain.getInputUnitOfTimeItem().isPresent() ? null: domain.getInputUnitOfTimeItem().get()
-				);
+				!domain.getHeaderBgColorOfMonthlyPer().isPresent() ? null : domain.getHeaderBgColorOfMonthlyPer().get().v()
+		);
 	}
 }

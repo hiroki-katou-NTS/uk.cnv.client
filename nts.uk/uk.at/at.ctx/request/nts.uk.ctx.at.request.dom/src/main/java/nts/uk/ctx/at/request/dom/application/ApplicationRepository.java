@@ -96,6 +96,9 @@ public interface ApplicationRepository {
 	 * @return
 	 */
 	public List<Application> getByListDateReflectType(String sid, List<GeneralDate> dateData, List<Integer> reflect, List<Integer> appType);
+
+	List<Application> getByListDateReflectType2(String sid, List<GeneralDate> dateData, List<Integer> appTypes, List<Integer> reflectStatuses);
+
 	/**
 	 * 
 	 * @param sid
@@ -168,4 +171,16 @@ public interface ApplicationRepository {
 	 */
 	public Map<String, List<Application>> getMapListApplicationNew(List<String> sids, DatePeriod datePeriod,
 			List<Integer> listReflecInfor);
+	
+	// 申請データを取得する
+	/**
+	 * 
+	 * @param employeeID 申請者
+	 * @param appType 申請種類
+	 * @param appDate 申請日
+	 * @param prePostAtr 事前事後区分
+	 * @return
+	 */
+	public List<Application> getAllApplicationByAppTypeAndPrePostAtr(String employeeID, int appType, GeneralDate appDate, int prePostAtr);
+		
 }

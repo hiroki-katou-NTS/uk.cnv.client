@@ -1,0 +1,77 @@
+.kdr-003 {
+    margin-top: 10px;
+}
+.kdr-003 .fixed-flex-layout-left {
+    margin-right: 10px;
+    margin-left: 80px;
+}
+.kdr-003 .fixed-flex-layout-left .employees-list {
+    width: auto;
+}
+.kdr-003 .employees-list .date-time-picker {
+    margin-bottom: 10px;
+    display: flex;
+}
+.kdr-003 .employees-list .date-time-picker-label {
+    margin-right: 32px;
+    line-height: 37px;
+    padding-left: 10px !important;
+}
+.kdr-003 .fixed-flex-layout-right {
+    width: 551px;
+}
+
+.kdr-003 .panel > div {
+    padding: 0 !important;
+}
+.kdr-003 .panel .panel-row {
+    display: flex;
+    margin-bottom: 25px;
+}
+
+.kdr-003 .panel .panel-row .row-left {
+    width: 200px;
+
+}
+.kdr-003 .panel .panel-row .row-left .label {
+    display: flex;
+    align-items: center;
+}
+.kdr-003 .panel .panel-row .row-right {
+    display: flex;
+    width: calc(100% - 140px);
+}
+.kdr-003 .panel .row-right .radios-group {
+    padding-top: 5px;
+    width: 110px;
+}
+.kdr-003 .panel .row-right .radios-group .ntsRadioBox:first-child {
+    margin-bottom: 20px;
+}
+.kdr-003 .panel .row-right .text-box-button {
+    flex: 2;
+}
+.kdr-003 .panel .text-box-button .item {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+.kdr-003 .panel .text-box-button .item .ui-igcombo-wrapper {
+    margin-right: 10px;
+    width: calc(100% - 30px);
+}
+.kdr-003 .panel .switchButton-wrapper button {
+    width: 65px;
+}
+.kdr-003 .panel .switchbox-wrappers .radio-wrapper {
+    flex-direction: column;
+    width: 65px;
+    text-align: center;
+}
+.panel-row .form-label {
+    width: 220px;
+}
+.panel.panel-frame{
+    height: 505px;
+}
+

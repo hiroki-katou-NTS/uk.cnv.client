@@ -41,7 +41,7 @@ public class Kshmt4w4dNumSet extends ContractUkJpaEntity implements Serializable
     
     /** The is one week hd. */
     @Column(name = "IS_ONE_WEEK_HD")
-    private int isOneWeekHd;
+    private boolean isOneWeekHd;
    
     /** The in legel hd fwph. */
     @Column(name = "IN_LEGEL_HD_FWPH")
@@ -61,7 +61,7 @@ public class Kshmt4w4dNumSet extends ContractUkJpaEntity implements Serializable
    
     /** The is four week hd. */
     @Column(name = "IS_FOUR_WEEK_HD")
-    private int isFourWeekHd;
+    private boolean isFourWeekHd;
     
     /** The in legal hd owph. */
     @Column(name = "IN_LEGAL_HD_OWPH")

@@ -80,17 +80,6 @@ public class RetentionYearlyDto {
 		/*
 		 * (non-Javadoc)
 		 * @see nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.
-		 * RetentionYearlySettingGetMemento#
-		 * getCanAddToCumulationYearlyAsNormalWorkDay()
-		 */
-		@Override
-		public Boolean getLeaveAsWorkDays() {
-			return dto.leaveAsWorkDays;
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see nts.uk.ctx.at.shared.dom.vacation.setting.retentionyearly.
 		 * RetentionYearlySettingGetMemento#getManagementCategory()
 		 */
 		@Override

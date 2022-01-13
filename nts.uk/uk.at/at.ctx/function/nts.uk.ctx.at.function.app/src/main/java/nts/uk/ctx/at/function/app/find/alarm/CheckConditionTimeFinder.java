@@ -53,5 +53,24 @@ public class CheckConditionTimeFinder {
 		return extractionRangeService.getPeriodByCategory(alarmCode, companyId, closureId,
 				currentMonth.getProcessingYm().v());
 	}
+	
+	public int getProcessingYm() {
+		String employmentCode = employmentAdapter.getClosure(AppContexts.user().employeeId(), GeneralDate.today());
+
+		Optional<ClosureEmployment> closureEmploymentOpt = closureEmpRepo
+				.findByEmploymentCD(AppContexts.user().companyId(), employmentCode);
+		if (!closureEmploymentOpt.isPresent())
+			throw new RuntimeException(" Clousure not find!");
+		if (closureEmploymentOpt.get().getClosureId() == null)
+			throw new RuntimeException("Closure is null!");
+		Integer closureId = closureEmploymentOpt.get().getClosureId();
+
+		Optional<Closure> closureOpt = closurerepo.findById(AppContexts.user().companyId(), closureId);
+		if (!closureOpt.isPresent())
+			throw new RuntimeException("Have a clousreId but not exist Closure domain!");
+		CurrentMonth currentMonth = closureOpt.get().getClosureMonth();
+		
+		return currentMonth.getProcessingYm().v();		
+	}
 
 }

@@ -5,59 +5,88 @@ module nts.uk.com.view.ccg025.a.component {
     export interface Option {
         roleType?: number;
         multiple?: boolean;
-        currentCode?: any;
+        selectedId?: any;
         showEmptyItem?: boolean;
         tabindex?: number;
         roleAtr?: number;
         isResize?: boolean;
         rows?: number;
         isAlreadySetting?: any;
+        alreadySetList?: any;
+        selectType?: number;
+        onDialog?: boolean;
+        hasFocus?: boolean;
     }
 
     export module viewmodel {
         export class ComponentModel {
             listRole: KnockoutObservableArray<model.Role>;
-            currentCode: any;
+            listAlreadySet: KnockoutObservableArray<any>;
+            currentRoleId: any;
             isAlreadySetting: KnockoutObservable<boolean>;
             private columns: KnockoutObservableArray<any>;
             private defaultOption: Option = {
                 multiple: true,
                 showEmptyItem: false,
-                isResize: false
-            }
+                isResize: false,
+                rows: 15,
+                selectType: 3
+            };
             private setting: Option;
-            private searchMode: string;
+            displayRoleClassification: KnockoutObservable<boolean>;
+            roleClassification: KnockoutObservable<number>;
+            switchFocus: KnockoutObservable<boolean> = ko.observable(false);
+            listFocus: KnockoutObservable<boolean> = ko.observable(false);
+            init: boolean = true;
 
             constructor(option: Option) {
                 let self = this;
                 self.setting = $.extend({}, self.defaultOption, option);
-                //                self.searchMode = (self.setting.multiple) ? "highlight" : "filter";
+                if (isNullOrUndefined(option.selectType) && !isNullOrUndefined(self.setting.selectedId)) self.setting.selectType = 1;
+                if (self.setting.roleAtr != 0 && self.setting.roleAtr != 1) self.setting.roleAtr = undefined;
+                self.displayRoleClassification = ko.observable(self.setting.roleAtr != 0 && self.setting.roleAtr != 1);
+                if (self.setting.hasFocus) {
+                    if (self.displayRoleClassification()) self.switchFocus(true); else self.listFocus(true);
+                }
+                self.roleClassification = ko.observable(self.setting.roleAtr || 0);
                 self.listRole = ko.observableArray([]);
-                self.isAlreadySetting = ko.observable(option.isAlreadySetting);
+                self.isAlreadySetting = ko.observable(self.setting.isAlreadySetting);
+                if (!_.isEmpty(self.setting.alreadySetList)) {
+                    if (ko.isObservable(self.setting.alreadySetList)) self.listAlreadySet = self.setting.alreadySetList;
+                    else self.listAlreadySet = ko.observableArray(self.setting.alreadySetList);
+                } else {
+                    self.listAlreadySet = ko.observableArray([]);
+                }
                 if (self.setting.multiple) {
-                    self.currentCode = ko.observableArray([]);
+                    self.currentRoleId = ko.observableArray([]);
                     self.columns = ko.observableArray([
                         { headerText: '', prop: 'roleId', width: 100, hidden: true },
-                        { headerText: getText("CCG025_3"), prop: 'roleCode', width: 100 },
-                        { headerText: getText("CCG025_4"), prop: 'roleName', width: 180, formatter: _.escape },
+                        { headerText: getText("CCG025_6"), prop: 'roleCode', width: 100 },
+                        { headerText: getText("CCG025_7"), prop: 'roleName', width: 180, formatter: _.escape },
                         {
-                            headerText: getText("CCG025_9"), prop: 'configured', width: 80, hidden: !self.isAlreadySetting(),
+                            headerText: getText("CCG025_8"), prop: 'configured', width: 80, hidden: !self.isAlreadySetting(),
                             template: '{{if ${configured} == 1 }}<div class="cssDiv"><i  class="icon icon icon-78 cssI"></i></div>{{/if}}'
                         }
 
                     ]);
                 } else {
-                    self.currentCode = ko.observable("");
+                    self.currentRoleId = ko.observable("");
                     self.columns = ko.observableArray([
                         { headerText: '', prop: 'roleId', width: 100, hidden: true },
-                        { headerText: getText("CCG025_3"), prop: 'roleCode', width: 60 },
-                        { headerText: getText("CCG025_4"), prop: 'roleName', width: 233, formatter: _.escape },
+                        { headerText: getText("CCG025_6"), prop: 'roleCode', width: 60 },
+                        { headerText: getText("CCG025_7"), prop: 'roleName', width: 233, formatter: _.escape },
                         {
-                            headerText: getText("CCG025_9"), prop: 'configured', width: 80, hidden: !self.isAlreadySetting(),
+                            headerText: getText("CCG025_8"), prop: 'configured', width: 80, hidden: !self.isAlreadySetting(),
                             template: '{{if ${configured} == 1 }}<div class="cssDiv"><i  class="icon icon icon-78 cssI"></i></div>{{/if}}'
                         }
                     ]);
                 }
+                self.roleClassification.subscribe(value => {
+                    nts.uk.ui.block.invisible();
+                    self.getListRoleByRoleType(self.setting.roleType, value).always(() => {
+                        nts.uk.ui.block.clear();
+                    });
+                });
             }
 
             /** 
@@ -66,15 +95,13 @@ module nts.uk.com.view.ccg025.a.component {
             /**
              * truyen them 2 param tu man KSP001 sang
              */
-            startPage(listRoleId?: any, selectedRoleId?: string): JQueryPromise<any> {
+            startPage(selectedRoleId?: string, selectedRoleCode?: string): JQueryPromise<any> {
                 let self = this;
-                return listRoleId ?
-                    self.getListRoleByRoleType(self.setting.roleType, self.setting.roleAtr, listRoleId, selectedRoleId) : 
-                    self.getListRoleByRoleType(self.setting.roleType, self.setting.roleAtr, [], null);
+                return self.getListRoleByRoleType(self.setting.roleType, self.roleClassification(), selectedRoleId, selectedRoleCode);
             }
 
             /** Get list Role by Type */
-            private getListRoleByRoleType(roleType: number, roleAtr: number, listRoleId: any, selectedRoleId: string): JQueryPromise<Array<model.Role>> {
+            private getListRoleByRoleType(roleType: number, roleAtr: number, selectedRoleId?: string, selectedRoleCode?: string): JQueryPromise<Array<model.Role>> {
                 let self = this;
                 let dfd = $.Deferred();
                 service.getListRoleByRoleType(roleType, roleAtr).done((data: Array<model.Role>) => {
@@ -83,17 +110,51 @@ module nts.uk.com.view.ccg025.a.component {
                         return new model.Role(
                             x.roleId, x.roleCode, x.roleType,
                             x.employeeReferenceRange, x.name,
-                            x.contractCode, x.assignAtr, x.companyId, _.includes(listRoleId, x.roleId) ? 1 : 0);
+                            x.contractCode, x.assignAtr, x.companyId, _.includes(self.listAlreadySet(), x.roleId) ? 1 : 0);
                     }));
                     self.addEmptyItem();
 
-                    // Select item base on param code
-                    if (!isNullOrUndefined(self.setting.currentCode)) {
-                        self.currentCode(self.setting.currentCode);
-                    } else if (!!selectedRoleId) {
-                        self.currentCode(selectedRoleId);
+                    if (!!selectedRoleId) {
+                        self.setting.multiple ? self.currentRoleId([selectedRoleId]) : self.currentRoleId(selectedRoleId);
+                    } else if (!!selectedRoleCode) {
+                        const role = _.find(self.listRole(), (r: any) => _.isEqual(r.roleCode, selectedRoleCode));
+                        self.setting.multiple ? self.currentRoleId(role ? [role.roleId] : []) : self.currentRoleId(role ? role.roleId : undefined);
                     } else {
-                        self.selectFirstItem();
+                        switch (self.setting.selectType) {
+                            case 1: // selected list
+                                if (self.setting.multiple) {
+                                    if (self.listRole().filter(r => (self.setting.selectedId || []).indexOf(r.roleId) >= 0).length > 0) {
+                                        self.currentRoleId(self.setting.selectedId || [])
+                                    } else {
+                                        self.selectFirstItem();
+                                    }
+                                } else {
+                                    if (self.listRole().filter(r => self.setting.selectedId == r.roleId).length > 0) {
+                                        self.currentRoleId(self.setting.selectedId)
+                                    } else {
+                                        self.selectFirstItem();
+                                    }
+                                }
+                                break;
+                            case 2: // select all
+                                if (self.setting.multiple) {
+                                    self.currentRoleId(self.listRole().map(r => r.roleId));
+                                }
+                                break;
+                            case 3: // select first
+                                self.selectFirstItem();
+                                break;
+                            case 4: // select none
+                                self.setting.multiple ? self.currentRoleId([]) : self.currentRoleId(undefined);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    if (self.init) {
+                        if (self.listFocus()) $("#ccg025-list_container").focus();
+                        self.init = false;
                     }
                     dfd.resolve(data);
                 }).fail(function(res: any) {
@@ -102,7 +163,7 @@ module nts.uk.com.view.ccg025.a.component {
                         nts.uk.ui.block.clear();
                     });
                 });
-                return dfd.promise();
+                return dfd.promise() as JQueryPromise<Array<model.Role>>;
             }
 
             private addEmptyItem(): void {
@@ -116,7 +177,13 @@ module nts.uk.com.view.ccg025.a.component {
             private selectFirstItem(): void {
                 var self = this;
                 if (self.listRole().length > 0) {
-                    self.currentCode(self.listRole()[0].roleId);
+                    self.setting.multiple
+                        ? self.currentRoleId([self.listRole()[0].roleId])
+                        : self.currentRoleId(self.listRole()[0].roleId);
+                } else {
+                    self.setting.multiple
+                        ? self.currentRoleId([])
+                        : self.currentRoleId(undefined);
                 }
             }
 

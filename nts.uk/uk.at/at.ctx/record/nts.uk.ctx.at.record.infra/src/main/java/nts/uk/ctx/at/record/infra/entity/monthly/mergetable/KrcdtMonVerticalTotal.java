@@ -25,6 +25,7 @@ import nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeMonth;
 import nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeMonthWithMinus;
 import nts.uk.ctx.at.shared.dom.common.times.AttendanceTimesMonth;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.paytime.SpecificDateItemNo;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.ExtraTimeItemNo;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.AttendanceAmountMonth;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.TimeMonthWithCalculation;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.remainmerge.MonthMergeKey;
@@ -117,7 +118,7 @@ public class KrcdtMonVerticalTotal extends ContractUkJpaEntity implements Serial
 
 	/** 就業時間金額 */
 	@Column(name = "WORK_TIME_AMOUNT")
-	public int workTimeAmount;
+	public long workTimeAmount;
 	/** 終業回数 */
 	@Column(name = "ENDWORK_TIMES")
 	public int endWorkTimes;
@@ -841,37 +842,37 @@ public class KrcdtMonVerticalTotal extends ContractUkJpaEntity implements Serial
 	public int premiumTime10;
 	/** 割増金額1 */
 	@Column(name = "PREMIUM_AMOUNT_1")
-	public int premiumAmount1;
+	public long premiumAmount1;
 	/** 割増金額2 */
 	@Column(name = "PREMIUM_AMOUNT_2")
-	public int premiumAmount2;
+	public long premiumAmount2;
 	/** 割増金額3 */
 	@Column(name = "PREMIUM_AMOUNT_3")
-	public int premiumAmount3;
+	public long premiumAmount3;
 	/** 割増金額4 */
 	@Column(name = "PREMIUM_AMOUNT_4")
-	public int premiumAmount4;
+	public long premiumAmount4;
 	/** 割増金額5 */
 	@Column(name = "PREMIUM_AMOUNT_5")
-	public int premiumAmount5;
+	public long premiumAmount5;
 	/** 割増金額6 */
 	@Column(name = "PREMIUM_AMOUNT_6")
-	public int premiumAmount6;
+	public long premiumAmount6;
 	/** 割増金額7 */
 	@Column(name = "PREMIUM_AMOUNT_7")
-	public int premiumAmount7;
+	public long premiumAmount7;
 	/** 割増金額8 */
 	@Column(name = "PREMIUM_AMOUNT_8")
-	public int premiumAmount8;
+	public long premiumAmount8;
 	/** 割増金額9 */
 	@Column(name = "PREMIUM_AMOUNT_9")
-	public int premiumAmount9;
+	public long premiumAmount9;
 	/** 割増金額10 */
 	@Column(name = "PREMIUM_AMOUNT_10")
-	public int premiumAmount10;
+	public long premiumAmount10;
 	/** 割増金額合計 */
 	@Column(name = "PREMIUM_AMOUNT_TOTAL")
-	public int premiumAmountTotal;
+	public long premiumAmountTotal;
 
 	/** 休憩時間 */
 	@Column(name = "BREAK_TIME")
@@ -2345,7 +2346,7 @@ public class KrcdtMonVerticalTotal extends ContractUkJpaEntity implements Serial
 			val time = FieldReflection.getField(this.getClass(), "premiumTime" + i);
 			val amount = FieldReflection.getField(this.getClass(), "premiumAmount" + i);
 			
-			premiumTimes.add(AggregatePremiumTime.of(i, 
+			premiumTimes.add(AggregatePremiumTime.of(ExtraTimeItemNo.valueOf(i), 
 					new AttendanceTimeMonth(ReflectionUtil.getFieldValue(time, this)), 
 					new AttendanceAmountMonth(ReflectionUtil.getFieldValue(amount, this))));
 		}

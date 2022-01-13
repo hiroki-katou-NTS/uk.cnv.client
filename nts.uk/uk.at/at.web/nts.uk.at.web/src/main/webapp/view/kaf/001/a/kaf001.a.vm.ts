@@ -17,11 +17,11 @@ module kaf001.a.viewmodel {
         selectedEmployeeCode : KnockoutObservableArray<string>                  = ko.observableArray([]);
         alreadySettingList   : KnockoutObservableArray<UnitAlreadySettingModel> = ko.observableArray([]);
         employeeList         : KnockoutObservableArray<UnitModel>               = ko.observableArray([]);
-        isVisiableAppWindow           : KnockoutObservable<boolean>                      = ko.observable(false);
+        // isVisiableAppWindow           : KnockoutObservable<boolean>             = ko.observable(false);
         isVisiableOverTimeEarly       : KnockoutObservable<boolean>             = ko.observable(false);
         isVisiableOverTimeNormal      : KnockoutObservable<boolean>             = ko.observable(false);
         isVisiableOverTimeEarlyNormal : KnockoutObservable<boolean>             = ko.observable(false);
-        isVisiableOverTimeApp         : KnockoutObservable<boolean>             = ko.observable(false);
+        isVisiableOverTimeMultiple    : KnockoutObservable<boolean>             = ko.observable(false);
         isVisiableAbsenceApp          : KnockoutObservable<boolean>             = ko.observable(false);
         isVisiableWorkChangeApp       : KnockoutObservable<boolean>             = ko.observable(false);
         isVisiableBusinessTripApp     : KnockoutObservable<boolean>             = ko.observable(false);
@@ -128,19 +128,22 @@ module kaf001.a.viewmodel {
         start(): JQueryPromise<any> {
             let self = this;
             let dfd = $.Deferred();
-            block.invisible();
-            self.getAllProxyApplicationSetting();
-            block.clear();
-            dfd.resolve();
+            self.getAllProxyApplicationSetting().done(() => {
+                dfd.resolve();
+            }).fail(() => {
+                dfd.reject();
+            });
             $("#A4_2").focus();
             return dfd.promise();
         }
 
 
-        getAllProxyApplicationSetting() {
+        getAllProxyApplicationSetting(): JQueryPromise<any> {
             let self = this;
+            let dfd = $.Deferred();
+            block.invisible();
             service.getAppDispName().done((res) => {
-                let obj: ObjNameDis = new ObjNameDis('', '', '',
+                let obj: ObjNameDis = new ObjNameDis('', '', '', '',
                     '', '', '', '',
                     '', '', '', '', '', '','');
                 if(res) {
@@ -158,6 +161,10 @@ module kaf001.a.viewmodel {
                                 if (app.queryString.split("=")[1] == 2) {
                                     self.isVisiableOverTimeEarlyNormal(true);
                                     obj.overTimeEarlyDepart = app.displayName;
+                                }
+                                if (app.queryString.split("=")[1] == 3) {
+                                    self.isVisiableOverTimeMultiple(true);
+                                    obj.overTimeMultiple = app.displayName;
                                 }
                                 break;
                             }
@@ -221,11 +228,16 @@ module kaf001.a.viewmodel {
                     });
                 }
                 self.appNameDis(obj);
+                dfd.resolve();
             }).fail((err) => {
                 dialog.alertError(err).then(function () {
                     nts.uk.request.jump("com", "view/ccg/008/a/index.xhtml");
                 });
+                dfd.reject();
+            }).always(() => {
+                block.clear();
             });
+            return dfd.promise();
         }
 
         /**
@@ -248,7 +260,8 @@ module kaf001.a.viewmodel {
             let employeeParamCheck = {
                 appType: applicationType,
                 baseDate: moment(self.selectedDate()).isValid() ? self.selectedDate() : null,
-                lstEmployeeId: employeeIds
+                lstEmployeeId: employeeIds,
+                overtimeAppAtr: mode
             };
 
             service.checkEmployee(employeeParamCheck).done(() => {
@@ -275,6 +288,10 @@ module kaf001.a.viewmodel {
                                 case 2:
                                     //KAF005-残業申請（早出・通常）
                                     vm.$jump("/view/kaf/005/a/index.xhtml?overworkatr=2", transfer);
+                                    break;
+                                case 3:
+                                    //KAF005-残業申請（multiple）
+                                    vm.$jump("/view/kaf/005/a/index.xhtml?overworkatr=3", transfer);
                                     break;
                             }
                         }
@@ -460,7 +477,7 @@ module kaf001.a.viewmodel {
         overTimeEarly : string;
         overTimeNormal: string;
         overTimeEarlyDepart: string;
-        overTime: string;//A2_2
+        overTimeMultiple: string;//A2_17
         absence: string;//A2_3
         workChange: string;//A2_4
         businessTrip: string;//A2_5
@@ -472,13 +489,14 @@ module kaf001.a.viewmodel {
         stamp: string;//A2_11
         stampOnline: string;
         optionalItem: string;
-        constructor(overTimeEarly: string, overTimeNormal: string, overTimeEarlyDepart: string,
+        constructor(overTimeEarly: string, overTimeNormal: string, overTimeEarlyDepart: string, overtimeMultiple: string,
                     absence: string, workChange: string,
                     businessTrip: string, goBack: string, holiday: string,
                     annualHd: string, earlyLeaveCancel: string, complt: string, stamp: string, stampOnline: string, optionalItem: string) {
             this.overTimeEarly = overTimeEarly;
             this.overTimeNormal = overTimeNormal;
             this.overTimeEarlyDepart = overTimeEarlyDepart;
+            this.overTimeMultiple = overtimeMultiple;
             this.absence = absence;
             this.workChange = workChange;
             this.businessTrip = businessTrip;

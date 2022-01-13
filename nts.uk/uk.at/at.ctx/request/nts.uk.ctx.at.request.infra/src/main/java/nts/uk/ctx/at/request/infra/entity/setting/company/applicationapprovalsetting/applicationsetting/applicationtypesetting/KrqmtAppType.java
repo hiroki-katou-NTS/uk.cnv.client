@@ -62,6 +62,9 @@ public class KrqmtAppType extends ContractUkJpaEntity {
     @Column(name = "REASON_DISP_ATR")
     private Integer reasonDisplayAtr;
 
+    @Column(name = "PRE_OT_MUL_WORK_TIME")
+    private Integer preOTMultipleWorkTime;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CID", insertable = false, updatable = false)
     private KrqmtApplicationSet applicationSetting;
@@ -90,7 +93,8 @@ public class KrqmtAppType extends ContractUkJpaEntity {
                             BooleanUtils.toBoolean(this.useAtr),
                             this.preOTBeforeWorkTime,
                             this.preOTAfterWorkTime,
-                            this.preOTBeforeAfterWorkTime
+                            this.preOTBeforeAfterWorkTime,
+                            this.preOTMultipleWorkTime
                     ),
                     new AfterhandRestriction(BooleanUtils.toBoolean(postFutureAllowAtr)),
                     null,
@@ -128,6 +132,7 @@ public class KrqmtAppType extends ContractUkJpaEntity {
                 .postFutureAllowAtr(BooleanUtils.toInteger(receptionRestrictSetting.getAfterhandRestriction().isAllowFutureDay()))
                 .reasonDisplayAtr(displayReason == null ? null : displayReason.getDisplayAppReason().value)
                 .fixedReasonDisplayAtr(displayReason == null ? null : displayReason.getDisplayFixedReason().value)
+                .preOTMultipleWorkTime(receptionRestrictSetting.getOtAppBeforeAccepRestric().isPresent() ? receptionRestrictSetting.getOtAppBeforeAccepRestric().get().getOpMultipleOvertime().map(PrimitiveValueBase::v).orElse(null) : null)
                 .build();
     }
 }

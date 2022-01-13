@@ -94,6 +94,22 @@
 					</div>
 				</td>
 			</tr>
+			<tr class="inline-radio">
+				<td class="color-header">#{i18n.getText('KAF022_792')}</td>
+				<td class="two-radio">
+					<div data-bind="ntsRadioBoxGroup: {
+									options: [
+										{code: 1, name: nts.uk.resource.getText('KAF022_794')},
+										{code: 0, name: nts.uk.resource.getText('KAF022_795')}
+									],
+									optionsValue: 'code',
+									optionsText: 'name',
+									name: '#[KAF022_793]',
+									value: useApprovalFunction,
+									enable: true}">
+					</div>
+				</td>
+			</tr>
 		</tbody>
 	</table>
 </ui:composition>

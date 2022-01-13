@@ -31,7 +31,8 @@ public class OptionalItemAppFinderAc implements OptionalItemAdapter {
                     item.getOptionalItemUnit(),
                     item.getCalcResultRange(),
                     item.getOptionalItemAtr(),
-                    item.getDescription()
+                    item.getDescription(),
+                    item.isInputCheck()
             );
         }).collect(Collectors.toList());
     }

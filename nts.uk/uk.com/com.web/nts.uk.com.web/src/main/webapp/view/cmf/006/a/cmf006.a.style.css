@@ -1,0 +1,48 @@
+div#contents-area {
+    padding: 25px;
+}
+
+#left-content {
+    padding: 0px 5px 10px 12px;
+    float: left;
+}
+
+#text_list {
+    padding-left: 4px;
+}
+
+#list_role {
+    margin-top: 10px;
+    border-radius: 7px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#right-content {
+    padding: 17px 0 0 30px;
+    float: left;
+    width: calc(100% - 550px);
+}
+
+.control-group td {
+    padding-bottom: 10px;
+}
+
+.left-title {
+    padding-left: 20px;
+    margin-bottom: -14px;
+}
+
+.right-title {
+    margin-bottom: 14px;
+    margin-top: -15px;
+}
+
+#permission-setting {
+    margin-top: -21px;
+}
+
+#multi-list_container {
+    width: 310px !important;
+    /*height: 350px !important;*/
+}

@@ -123,6 +123,18 @@
         </tr>
         </thead>
         <tbody data-bind="with: overtimeLeaveAppCommonSetting">
+            <tr style="height: 45px">
+                <td class="color-header" id="b29">#{i18n.getText('KAF022_431')}</td>
+                <td class="vertical-radio">
+                    <div id="b30" data-bind="ntsRadioBoxGroup: {
+                                    options: $parent.itemListB30,
+                                    optionsValue: 'code',
+                                    optionsText: 'name',
+                                    value: extratimeExcessAtr,
+                                    enable: true}">
+                    </div>
+                </td>
+            </tr>
             <tr class="inline-radio">
                 <td class="color-header">#{i18n.getText('KAF022_433')}</td>
                 <td class="two-radio">
@@ -167,18 +179,6 @@
                                 optionsValue: 'code',
                                 optionsText: 'name',
                                 value: overrideSet,
-                                enable: true}">
-                    </div>
-                </td>
-            </tr>
-            <tr style="height: 45px">
-                <td class="color-header" id="b29">#{i18n.getText('KAF022_431')}</td>
-                <td class="vertical-radio">
-                    <div id="b30" data-bind="ntsRadioBoxGroup: {
-                                options: $parent.itemListB30,
-                                optionsValue: 'code',
-                                optionsText: 'name',
-                                value: extratimeExcessAtr,
                                 enable: true}">
                     </div>
                 </td>

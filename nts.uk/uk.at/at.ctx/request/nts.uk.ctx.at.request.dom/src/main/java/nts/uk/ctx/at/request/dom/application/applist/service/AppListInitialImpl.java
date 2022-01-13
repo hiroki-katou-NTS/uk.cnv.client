@@ -222,7 +222,9 @@ public class AppListInitialImpl implements AppListInitialRepository{
 								return OvertimeAppAtr.EARLY_OVERTIME;
 							} else if(y.getOpApplicationTypeDisplay().get()==ApplicationTypeDisplay.NORMAL_OVERTIME) {
 								return OvertimeAppAtr.NORMAL_OVERTIME;
-							} else {
+							} else if(y.getOpApplicationTypeDisplay().get()==ApplicationTypeDisplay.OVERTIME_MULTIPLE_TIME)
+								return OvertimeAppAtr.MULTIPLE_OVERTIME;
+							else {
 								return OvertimeAppAtr.EARLY_NORMAL_OVERTIME;
 							}
 						}).collect(Collectors.toList());
@@ -477,7 +479,9 @@ public class AppListInitialImpl implements AppListInitialRepository{
 							return OvertimeAppAtr.EARLY_OVERTIME;
 						} else if(y.getOpApplicationTypeDisplay().get()==ApplicationTypeDisplay.NORMAL_OVERTIME) {
 							return OvertimeAppAtr.NORMAL_OVERTIME;
-						} else {
+						}else if(y.getOpApplicationTypeDisplay().get()==ApplicationTypeDisplay.OVERTIME_MULTIPLE_TIME)
+							return OvertimeAppAtr.MULTIPLE_OVERTIME;
+						else {
 							return OvertimeAppAtr.EARLY_NORMAL_OVERTIME;
 						}
 					}).collect(Collectors.toList());

@@ -29,9 +29,11 @@ public class DailyAttendanceItemAdapterDto {
 
 	/* ユーザーが値を変更できる */
 	private int nameLineFeedPosition;
+	
+	private String displayName;
 
 	public DailyAttendanceItemAdapterDto(String companyId, int attendanceItemId, String attendanceName,
-			int displayNumber, int userCanUpdateAtr, int dailyAttendanceAtr, int nameLineFeedPosition) {
+			int displayNumber, int userCanUpdateAtr, int dailyAttendanceAtr, int nameLineFeedPosition, String displayName) {
 		super();
 		this.companyId = companyId;
 		this.attendanceItemId = attendanceItemId;
@@ -40,6 +42,7 @@ public class DailyAttendanceItemAdapterDto {
 		this.userCanUpdateAtr = userCanUpdateAtr;
 		this.dailyAttendanceAtr = dailyAttendanceAtr;
 		this.nameLineFeedPosition = nameLineFeedPosition;
+		this.displayName = displayName;
 	}
 
 }

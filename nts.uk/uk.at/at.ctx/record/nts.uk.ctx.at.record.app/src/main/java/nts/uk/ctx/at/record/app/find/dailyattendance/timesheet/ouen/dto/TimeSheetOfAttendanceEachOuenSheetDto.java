@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.shared.dom.attendance.util.item.AttendanceItemDataGate;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.ItemConst;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.anno.AttendanceItemLayout;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.TimeSheetOfAttendanceEachOuenSheet;
+import nts.uk.ctx.at.shared.dom.worktime.predset.WorkNo;
 
 /**
  * @author laitv
@@ -33,10 +35,17 @@ public class TimeSheetOfAttendanceEachOuenSheetDto implements ItemConst, Attenda
 	@AttendanceItemLayout(layout = LAYOUT_M, jpPropertyName = END)
 	private WorkTimeInformationDto end;
 	
+	public TimeSheetOfAttendanceEachOuenSheet domain( ) {
+		
+		return TimeSheetOfAttendanceEachOuenSheet.create(new WorkNo(1), 
+				Optional.ofNullable(start == null ? null : start.domain()), 
+				Optional.ofNullable(end == null ? null : end.domain()));
+	}
+	
 	@Override
 	public TimeSheetOfAttendanceEachOuenSheetDto clone() {
 		TimeSheetOfAttendanceEachOuenSheetDto result = new TimeSheetOfAttendanceEachOuenSheetDto();
-		result.setNo(no);
+		result.setNo(1);
 		result.setStart(start == null ? null : start.clone());
 		result.setEnd(end == null ? null : end.clone());
 		return result;

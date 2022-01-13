@@ -13,10 +13,6 @@ public class CopyEmploymentCommand {
 	 */
 	private List<String> targetEmploymentCodes;
 	/**
-	 * Overide flag
-	 */
-	private boolean overide;
-	/**
 	 * Selected employment code
 	 */
 	private String employmentCode;

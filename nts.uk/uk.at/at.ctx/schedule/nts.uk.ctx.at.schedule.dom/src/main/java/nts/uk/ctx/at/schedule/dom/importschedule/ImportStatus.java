@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import nts.uk.ctx.at.schedule.dom.schedule.workschedule.ScheManaStatus;
+import nts.uk.ctx.at.shared.dom.employeeworkway.WorkingStatus;
 
 /**
  * 取り込み状態
@@ -65,7 +65,7 @@ public enum ImportStatus {
 	 * @param status 予定管理状態
 	 * @return 取り込み状態
 	 */
-	public static ImportStatus from( ScheManaStatus status ) {
+	public static ImportStatus from( WorkingStatus status ) {
 
 		switch( status ) {
 			case NOT_ENROLLED:

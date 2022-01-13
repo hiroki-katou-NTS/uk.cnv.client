@@ -8,6 +8,7 @@ import java.util.List;
 
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.employeeunitpricehistory.UnitPrice;
 import nts.uk.shr.com.history.DateHistoryItem;
 
 /**
@@ -36,6 +37,8 @@ public class EmployeeUnitPriceHistoryHelper {
 		UnitPricePerNumber unitPrice7 = new UnitPricePerNumber(UnitPrice.Price_7, new WorkingHoursUnitPrice(700));
 		UnitPricePerNumber unitPrice8 = new UnitPricePerNumber(UnitPrice.Price_8, new WorkingHoursUnitPrice(800));
 		UnitPricePerNumber unitPrice9 = new UnitPricePerNumber(UnitPrice.Price_9, new WorkingHoursUnitPrice(900));
+//		UnitPricePerNumber unitPrice10 = new UnitPricePerNumber(UnitPrice.Price_10, new WorkingHoursUnitPrice(1000));
+
 		unitPrices.add(unitPrice1);
 		unitPrices.add(unitPrice2);
 		unitPrices.add(unitPrice3);
@@ -45,6 +48,8 @@ public class EmployeeUnitPriceHistoryHelper {
 		unitPrices.add(unitPrice7);
 		unitPrices.add(unitPrice8);
 		unitPrices.add(unitPrice9);
+//		unitPrices.add(unitPrice10);
+
 		return new EmployeeUnitPriceHistoryItem("sid","hisId", unitPrices);
 	}
 

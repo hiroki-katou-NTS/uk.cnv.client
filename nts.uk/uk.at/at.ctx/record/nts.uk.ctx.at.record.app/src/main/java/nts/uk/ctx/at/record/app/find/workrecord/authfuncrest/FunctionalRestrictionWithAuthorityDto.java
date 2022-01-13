@@ -29,7 +29,7 @@ public class FunctionalRestrictionWithAuthorityDto {
 	/**
 	 * 利用区分
 	 */
-	private boolean availability;
+	private Boolean availability;
 
 	/**
 	 * 日別実績の機能説明文
@@ -40,6 +40,7 @@ public class FunctionalRestrictionWithAuthorityDto {
 			String description) {
 		this.functionNo = functionNo;
 		this.displayName = displayname;
+		this.availability = null;
 		this.description = description;
 	}
 }

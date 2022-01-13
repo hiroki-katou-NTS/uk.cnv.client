@@ -28,7 +28,7 @@ public class KrcdtReservationDetail extends ContractUkJpaEntity {
 	public int quantity;
 	
 	@Column(name = "AUTO_RESERVATION_ATR")
-	public int autoReservation;
+	public boolean autoReservation;
 	
 	@ManyToOne
     @PrimaryKeyJoinColumns({
@@ -46,7 +46,7 @@ public class KrcdtReservationDetail extends ContractUkJpaEntity {
 		return new BentoReservationDetail(
 				pk.frameNo, 
 				pk.registerDate, 
-				autoReservation == 1 ? true : false, 
+				autoReservation, 
 				new BentoReservationCount(quantity));
 	}
 	
@@ -58,7 +58,7 @@ public class KrcdtReservationDetail extends ContractUkJpaEntity {
 						bentoReservationDetail.getFrameNo(), 
 						bentoReservationDetail.getDateTime()), 
 				bentoReservationDetail.getBentoCount().v(), 
-				bentoReservationDetail.isAutoReservation() ? 1 : 0, 
+				bentoReservationDetail.isAutoReservation(), 
 				null);
 	}
 }

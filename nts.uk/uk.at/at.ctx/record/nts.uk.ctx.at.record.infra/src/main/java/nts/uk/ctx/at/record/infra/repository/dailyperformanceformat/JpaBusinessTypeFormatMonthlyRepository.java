@@ -20,6 +20,7 @@ import nts.uk.ctx.at.record.dom.dailyperformanceformat.BusinessTypeFormatMonthly
 import nts.uk.ctx.at.record.dom.dailyperformanceformat.repository.BusinessTypeFormatMonthlyRepository;
 import nts.uk.ctx.at.record.infra.entity.dailyperformanceformat.KrcmtBusinessTypeMonthly;
 import nts.uk.ctx.at.record.infra.entity.dailyperformanceformat.KrcmtBusinessTypeMonthlyPK;
+import nts.uk.ctx.at.shared.dom.workrule.businesstype.BusinessTypeCode;
 
 @Stateless
 public class JpaBusinessTypeFormatMonthlyRepository extends JpaRepository
@@ -179,4 +180,38 @@ public class JpaBusinessTypeFormatMonthlyRepository extends JpaRepository
 		this.commandProxy().updateAll(entities);
 	}
 
+	@Override
+	public void copy(String companyId, String businessTypeCode, List<String> listBusinessTypeCode) {
+		List<BusinessTypeFormatMonthly> listBySelectedCode = this.getMonthlyDetail(companyId, businessTypeCode);
+		
+		List<KrcmtBusinessTypeMonthly> listKrcmtBusinessTypeMonthly = this.getListBusinessTypeFormat(companyId, listBusinessTypeCode)
+				.stream()
+				.map(e -> toEntity(e))
+				.collect(Collectors.toList());
+		
+		if (!listKrcmtBusinessTypeMonthly.isEmpty()) {
+			this.commandProxy().removeAll(KrcmtBusinessTypeMonthly.class, listKrcmtBusinessTypeMonthly.stream().map(e -> e.krcmtBusinessTypeMonthlyPK).collect(Collectors.toList()));
+			this.getEntityManager().flush();
+		}
+		
+		List<KrcmtBusinessTypeMonthly> newListKrcmtBusinessTypeMonthly = new ArrayList<KrcmtBusinessTypeMonthly>();
+		
+		for (String code : listBusinessTypeCode) {
+			newListKrcmtBusinessTypeMonthly.addAll(toListEntity(code, listBySelectedCode));
+		}
+		
+		this.commandProxy().insertAll(newListKrcmtBusinessTypeMonthly);
+	}
+	
+	private List<KrcmtBusinessTypeMonthly> toListEntity(String code, List<BusinessTypeFormatMonthly> listBySelectedCode) {
+		
+		List<KrcmtBusinessTypeMonthly> result = listBySelectedCode.stream()
+				.map(e -> {
+					e.setBusinessTypeCode(new BusinessTypeCode(code));
+					return toEntity(e);
+				})
+				.collect(Collectors.toList());
+		
+		return result;
+	}
 }

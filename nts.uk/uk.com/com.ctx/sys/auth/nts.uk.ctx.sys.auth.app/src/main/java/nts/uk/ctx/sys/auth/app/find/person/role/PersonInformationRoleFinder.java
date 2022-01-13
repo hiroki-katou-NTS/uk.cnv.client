@@ -1,10 +1,6 @@
 package nts.uk.ctx.sys.auth.app.find.person.role;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -95,7 +91,8 @@ public class PersonInformationRoleFinder {
 		}
 		List<RoleDto> data =  roleRepo
 				.findByTypeAtr(companyId, roleType, RoleAtr)
-				.stream().map( c ->RoleDto.fromDomain(c) ).collect(Collectors.toList());
+				.stream().map(RoleDto::fromDomain)
+				.sorted(Comparator.comparing(RoleDto::getRoleCode)).collect(Collectors.toList());
 		if(data.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -120,13 +117,13 @@ public class PersonInformationRoleFinder {
 	 * @param roleId
 	 * @return
 	 */
-	public RoleDto getRoleByRoleId(String roleId ){
+	public Optional<RoleDto> getRoleByRoleId(String roleId ){
 
 		Optional<Role> optRole = roleRepo.findByRoleId(roleId);
 		if (optRole.isPresent()) {
-		 return RoleDto.fromDomain(optRole.get());
+		 return Optional.of(RoleDto.fromDomain(optRole.get()));
 		}
-		return null;
+		return Optional.empty();
 	}
 	
 	public boolean userHasRoleType (int roleType){

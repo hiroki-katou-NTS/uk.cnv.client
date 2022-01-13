@@ -21,3 +21,7 @@
 .rowHelpButton .ntsHelpButton button{
 	top: 0 !important;
 }
+
+.userWork .radio-wrapper, .checkbox-wrapper:nth-child(2) {
+	margin-right: 14.3px;
+}

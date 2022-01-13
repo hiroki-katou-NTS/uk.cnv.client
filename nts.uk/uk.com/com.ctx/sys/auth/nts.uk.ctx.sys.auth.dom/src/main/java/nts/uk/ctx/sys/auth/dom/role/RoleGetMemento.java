@@ -4,6 +4,8 @@
  *****************************************************************/
 package nts.uk.ctx.sys.auth.dom.role;
 
+import java.util.Optional;
+
 /**
  * The Interface RoleGetMemento.
  */
@@ -64,4 +66,11 @@ public interface RoleGetMemento {
 	 * @return the company id
 	 */
 	String getCompanyId();
+
+	/**
+	 * Get ApprovalAuthority
+	 *
+	 * @return ApprovalAuthority
+	 */
+	Optional<Boolean> getApprovalAuthority();
 }

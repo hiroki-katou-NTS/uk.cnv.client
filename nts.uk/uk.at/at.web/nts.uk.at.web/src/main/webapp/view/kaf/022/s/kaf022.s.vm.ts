@@ -275,7 +275,7 @@ module nts.uk.at.view.kaf022.s.viewmodel {
         name: string;
 
         constructor(appType: number, name: string, hdAppType?: number) {
-            if (hdAppType)
+            if (hdAppType != null)
                 this.key = appType + "-" + hdAppType;
             else
                 this.key = appType.toString();

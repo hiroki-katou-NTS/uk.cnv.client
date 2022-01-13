@@ -8,12 +8,12 @@
 	<ui:composition template="../../../../master/dialog.xhtml">
 		<ui:define name="htmlHead">
 			<com:ValidatorScript>
-					nts.uk.ctx.sys.env.dom.mailserver.EmailAuthentication
+        nts.uk.ctx.sys.env.dom.mailserver.MailAddress
 			</com:ValidatorScript>
 			<script>
 				var dialogSize = {
-					width : 710,
-					height : 410
+					width: 710,
+					height: 250
 				};
 			</script>
 			<com:scriptfile set="IGNITE" />
@@ -26,53 +26,25 @@
 
 		<ui:define name="content">
 			<div id="contents-area">
-				<p style="margin: 10px 0 10px 45px"
-					data-bind="text: getLabelPreview().first"></p>
-				<p style="margin: 10px 0 10px 45px"
-					data-bind="text: getLabelPreview().second"></p>
-				<p style="margin: 10px 0 20px 45px"
-					data-bind="text: getLabelPreview().third"></p>
-				<div class="form-input">
-					<div class="label_style">
-						<div
-							data-bind="ntsFormLabel: { 
-								constraint: ['EmailAuthentication'], 
-								required: true }">#{i18n.getText('CMM050_27')}</div>
-					</div>
-					<div class="input">
-						<input id="email1" tabindex="1"
-							data-bind="ntsTextEditor: {
-								name: '#[CMM050_27]',
-								value: emailFrom,
-								option: emailAuthOption,
-                                constraint: 'EmailAuthentication'}" />
-					</div>
-				</div>
-				<div class="form-input">
-					<div class="label_style">
-						<div
-							data-bind="ntsFormLabel: { 
-								constraint: ['EmailAuthentication'], 
-								required: true }">#{i18n.getText('CMM050_28')}</div>
-					</div>
-					<div class="input">
-
-						<input id="email2" tabindex="2"
-							data-bind="ntsTextEditor: {
-								name: '#[CMM050_28]',
-								value: emailTo,
-								option: emailAuthOption,
-                                constraint: 'EmailAuthentication'}" />
-					</div>
-				</div>
-			</div>
-			<div id="ruled-line" style="border: 1px solid;"></div>
-			<div id="functions-area-bottom">
-				<button class="proceed x-large"
-					data-bind="click: testSendMail, enable: testButtonEnable"
-					tabindex="3">#{i18n.getText('CMM050_29')}</button>
-				<button data-bind="click: closeDialog" tabindex="4">#{i18n.getText('CMM050_30')}</button>
-			</div>
+        <div class="flex valign-center">
+          <label id="B1_1" class="setting-label">#{i18n.getText('CMM050_27')}</label>
+          <label id="B1_2" data-bind="text: emailFrom"></label>
+        </div>
+        <div class="flex valign-center">
+          <div id="B3_1" class="setting-label" data-bind="ntsFormLabel: { required: true, constraint: 'MailAddress' }">#{i18n.getText('CMM050_28')}</div>
+          <input id="B3_2" data-bind="ntsTextEditor: {
+            value: emailTo,
+            constraint: 'MailAddress',
+            name: '#[CMM050_28]',
+            required: true,
+            option: { width: '400px' }
+          }" tabindex="1" />
+        </div>
+      </div>
+      <div id="functions-area-bottom">
+        <button id="B4_2" class="large proceed" data-bind="click: proceedTestEmail, enable: $root.errors.isEmpty" tabindex="2">#{i18n.getText('CMM050_29')}</button>
+        <button id="B4_3" class="large" data-bind="click: closeDialog" tabindex="3">#{i18n.getText('CMM050_30')}</button>
+      </div>
 		</ui:define>
 	</ui:composition>
 </body>

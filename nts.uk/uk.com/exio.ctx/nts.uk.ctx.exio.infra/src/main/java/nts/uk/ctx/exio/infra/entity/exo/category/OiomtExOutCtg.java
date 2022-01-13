@@ -72,21 +72,53 @@ public class OiomtExOutCtg extends JpaEntityOfDescriptionOfAvailabilityPermissio
 	@Column(name = "PAYROLL_SYS_ATR")
 	public int payrollSysAtr;
 
+	/**
+	 * 外部出期間区分
+	 */
+	@Basic(optional = false)
+	@Column(name ="OUT_PERIOD_ATR")
+	public int outPeriodAtr;
+
+	/**
+	 * 	締め使う区分
+	 */
+	@Basic(optional = false)
+	@Column(name ="USE_DEADLINE_ATR")
+	public int useDeadlineAtr;
+
 	@Override
 	protected Object getKey() {
 		return this.functionNo;
 	}
 
 	public ExOutCtg toDomain() {
-		return new ExOutCtg(this.categoryId, this.officeHelperSysAtr, this.categoryName, this.categorySet,
-				this.personSysAtr, this.attendanceSysAtr, this.payrollSysAtr, this.functionNo, this.name,
-				this.explanation, this.displayOrder, this.defaultValue);
+		return new ExOutCtg(
+				this.categoryId,
+				this.officeHelperSysAtr,
+				this.categoryName,
+				this.categorySet,
+				this.personSysAtr,
+				this.attendanceSysAtr,
+				this.payrollSysAtr,
+				this.functionNo,
+				this.name,
+				this.explanation,
+				this.displayOrder,
+				this.defaultValue,
+				this.outPeriodAtr,
+				this.useDeadlineAtr);
 	}
 
 	public static OiomtExOutCtg toEntity(ExOutCtg domain) {
-		return new OiomtExOutCtg(domain.getCategoryId().v(), domain.getOfficeHelperSysAtr().value,
-				domain.getCategoryName().v(), domain.getCategorySet().value, domain.getPersonSysAtr().value,
-				domain.getAttendanceSysAtr().value, domain.getPayrollSysAtr().value);
+		return new OiomtExOutCtg(
+				domain.getCategoryId().v(),
+				domain.getOfficeHelperSysAtr().value,
+				domain.getCategoryName().v(),
+				domain.getCategorySet().value,
+				domain.getPersonSysAtr().value,
+				domain.getAttendanceSysAtr().value,
+				domain.getPayrollSysAtr().value,
+				domain.getOutingPeriodClassific().value,
+				domain.getClassificationToUse().value);
 	}
-
 }

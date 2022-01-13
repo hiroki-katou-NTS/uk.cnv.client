@@ -11,7 +11,6 @@ import nts.uk.ctx.at.function.dom.adapter.alarm.IMailDestinationAdapter;
 import nts.uk.ctx.at.function.dom.adapter.alarm.MailDestinationAlarmImport;
 import nts.uk.ctx.at.function.dom.adapter.alarm.OutGoingMailAlarm;
 import nts.uk.ctx.sys.env.pub.maildestination.IMailDestinationPub;
-import nts.uk.ctx.sys.env.pub.maildestination.OutGoingMail;
 
 @Stateless
 public class IMailDestinationAdapterImpl implements IMailDestinationAdapter {
@@ -21,14 +20,15 @@ public class IMailDestinationAdapterImpl implements IMailDestinationAdapter {
 	@Override
 	public MailDestinationAlarmImport getEmpEmailAddress(String cID, String sID, Integer functionID) {
 		List<String> sIDs = Arrays.asList(sID);
-		List<MailDestinationAlarmImport> listEmpMail = iMailDestinationPub.getEmpEmailAddress(cID, sIDs, functionID).stream()
-				.map(x -> new MailDestinationAlarmImport(x.getEmployeeID(), mapGoingMail(x.getOutGoingMails())))
+		List<MailDestinationAlarmImport> listEmpMail = iMailDestinationPub.getEmployeeMails(cID, sIDs, functionID)
+				.getSentMailLists().stream()
+				.map(x -> new MailDestinationAlarmImport(x.getSid(), mapGoingMail(x.getMailAddresses())))
 				.collect(Collectors.toList());
 		return listEmpMail.get(0);
 	}
 	
-	private List<OutGoingMailAlarm> mapGoingMail(List<OutGoingMail> outGoingMails) {
-		return outGoingMails.stream().map(x -> new OutGoingMailAlarm(x.getEmailAddress()))
+	private List<OutGoingMailAlarm> mapGoingMail(List<String> outGoingMails) {
+		return outGoingMails.stream().map(x -> new OutGoingMailAlarm(x))
 				.collect(Collectors.toList());
 	}
 

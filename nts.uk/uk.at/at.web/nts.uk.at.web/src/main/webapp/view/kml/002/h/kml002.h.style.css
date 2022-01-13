@@ -1,0 +1,96 @@
+#contents-area {
+	width: 1200px;
+	overflow: hidden;
+}
+#left-content {
+	padding: 5px 0px 0px 0px;
+	float: left;
+	width: 325px;
+    height: 460px;
+    
+	border-radius: 7px;
+    box-sizing: border-box;
+	overflow: hidden;
+}
+#right-content {
+	margin-left: 0px;
+	float: left;
+	margin-top: 8px;
+	overflow: hidden;
+}
+
+#master-content {
+	height: 100% !important;
+}
+
+.sidebar-html, .sidebar-html body, .sidebar-html #master-wrapper {
+    height: 100%;
+	overflow: hidden;
+}
+.sidebar-content {
+	white-space: nowrap;
+	height: 100%;
+}
+
+.line {
+	margin: 5px 0px;
+	width: 783px;	
+	border:none;
+	height: 1px;
+	background:#9A9A9A;
+	position: absolute !important;
+}
+
+.container-custom-screenk {	
+	display: flex;
+	margin: 30px 10px 20px 10px;
+	width: 700px;
+}
+
+.container-cell{
+	display: flex;
+	margin: 10px 0px 5px 10px;
+}
+.container-custom {	
+	display: flex;
+	margin: 30px 0px 20px 45px;
+	width: 700px;
+}
+
+.ui-widget-header {
+	background: #CFF1A5 !important;
+	border: 1px solid #B4C2A3 !important;
+	padding: 0px;	
+}
+
+.helpButton {
+	margin-right: 15px;
+	margin-left: 15px;
+}
+
+.bg-dark-green {
+	background-color: #C7F391;
+}
+
+.nts-input {
+	width: 70px !important;
+}
+
+.border-all td {
+	border: solid grey 1px;
+	text-align: center;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	padding-right: 5px;
+	padding-left: 5px;
+}
+
+.border-all th {
+	border: solid grey 1px;
+	text-align: center;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	padding-right: 5px;
+	padding-left: 5px;
+}
+

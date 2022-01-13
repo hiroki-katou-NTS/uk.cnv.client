@@ -8,7 +8,7 @@ import nts.arc.layer.dom.objecttype.DomainValue;
 
 /**
  * 1行の出力項目
- * UKDesign.ドメインモデル.NittsuSystem.UniversalK.就業.contexts.就業機能.スケジュール表.1行の出力項目
+ * UKDesign.ドメインモデル.NittsuSystem.UniversalK.就業.contexts.予実集計.スケジュール表.1行の出力項目
  * @author dan_pv
  *
  */
@@ -32,9 +32,9 @@ public class OneRowOutputItem implements DomainValue {
 	
 	/**
 	 * 作る
-	 * @param personalInfo　個人情報
-	 * @param additionalInfo　追加列情報
-	 * @param attendanceItem　勤怠項目
+	 * @param personalInfo 個人情報
+	 * @param additionalInfo 追加列情報
+	 * @param attendanceItem 勤怠項目
 	 * @return
 	 */
 	public static OneRowOutputItem create(

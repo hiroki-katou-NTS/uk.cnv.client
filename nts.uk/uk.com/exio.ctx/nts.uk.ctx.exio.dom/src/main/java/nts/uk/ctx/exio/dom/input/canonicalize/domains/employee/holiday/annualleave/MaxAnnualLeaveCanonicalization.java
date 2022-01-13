@@ -19,8 +19,9 @@ import nts.uk.ctx.exio.dom.input.canonicalize.domains.DomainCanonicalization;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.ItemNoMap;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.generic.IndependentCanonicalization;
 import nts.uk.ctx.exio.dom.input.canonicalize.methods.EmployeeCodeCanonicalization;
-import nts.uk.ctx.exio.dom.input.canonicalize.methods.IntermediateResult;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.IntermediateResult;
 import nts.uk.ctx.exio.dom.input.errors.ExternalImportError;
+import nts.uk.ctx.exio.dom.input.errors.RecordError;
 import nts.uk.ctx.exio.dom.input.meta.ImportingDataMeta;
 import nts.uk.ctx.exio.dom.input.workspace.domain.DomainWorkspace;
 
@@ -76,12 +77,12 @@ public class MaxAnnualLeaveCanonicalization extends IndependentCanonicalization 
 			for(val interm : interms) {
 					val error = FixedItem.getLackItemError(interm);
 					if(error.isPresent()) {
-						require.add(context, error.get());
+						require.add(ExternalImportError.of(context.getDomainId(), error.get()));
 						continue;
 					}
 					val keyValue = getPrimaryKeys(interm);
 					if (importingKeys.contains(keyValue)) {
-						require.add(context, ExternalImportError.record(interm.getRowNo(), "社員コードが重複しています。"));
+						require.add(ExternalImportError.record(interm.getRowNo(), context.getDomainId(), "社員コードが重複しています。"));
 						return; // 次のレコードへ
 					}
 
@@ -121,15 +122,15 @@ public class MaxAnnualLeaveCanonicalization extends IndependentCanonicalization 
 		 * 項目を歯抜けで受入れようとしている
 		 * @param interm 
 		 */
-		public static Optional<ExternalImportError> getLackItemError(IntermediateResult interm) {
+		private static Optional<RecordError> getLackItemError(IntermediateResult interm) {
 			if(!hasTimeAllItemNoOrAllNothing(interm, timesNumbers.keySet())) {
-				return Optional.of(ExternalImportError.record(interm.getRowNo(),
+				return Optional.of(RecordError.record(interm.getRowNo(),
 							timesNumbers.values().stream().collect(Collectors.joining("、")) 
 							+ "は同時に受入れなければなりません。"
 						));
 			}
 			else if(!hasTimeAllItemNoOrAllNothing(interm, timeNumbers.keySet())) {
-				return Optional.of(ExternalImportError.record(interm.getRowNo(),
+				return Optional.of(RecordError.record(interm.getRowNo(),
 						timeNumbers.values().stream().collect(Collectors.joining("、")) 
 						+ "は同時に受入れなければなりません。"
 					));

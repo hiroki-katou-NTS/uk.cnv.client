@@ -5,7 +5,7 @@
 	xmlns:com="http://xmlns.jcp.org/jsf/component"
 	xmlns:h="http://xmlns.jcp.org/jsf/html">
 <body>
-	<ui:composition template="/master/base.xhtml">
+	<ui:composition template="../../../../master/base.xhtml">
 		<ui:define name="htmlHead">
 			<com:ValidatorScript>
 				nts.uk.shr.com.time.TimeWithDayAttr
@@ -19,17 +19,48 @@
 			<com:scriptfile path="component/title-date.js" />
 			<com:scriptfile path="component/action-bar.js" />
 			<com:scriptfile path="component/workhour.js" />
+			
 			<com:scriptfile path="/view/kcp/013/shared/kcp013.vm.js" />
+			
+			<com:scriptfile path="/view/kcp/015/component/kcp015.vm.js" />
+            <com:stylefile  path="/view/kcp/015/component/kcp015.main.css" />
 			
 			<com:scriptfile path="ksu.002a.vm.js" />
 		</ui:define>
 		<ui:define name="content">
 			<div id="functions-area">
 				<div class="ksu-002a cf">
-					<button tabindex="1" class="proceed" data-bind="i18n: 'KSU002_1', click: $vm.saveData, mutable: $vm.enable"></button>
-					<button tabindex="2" class="" data-bind="i18n: 'KSU002_2', enable: $vm.enable"></button>
-					<button tabindex="3" class="" data-bind="i18n: 'KSU002_3', enable: $vm.enable"></button>
-					<button tabindex="4" class="btn-right" data-bind="i18n: 'KSU002_4', enable: $vm.enable"></button>
+					<div style="display: inline-block; width: 65px">
+						<com:ko-if bind="visibleA1_1">
+						<button tabindex="1" class="proceed" data-bind="i18n: 'KSU002_1', click: $vm.saveData, mutable: $vm.enable"></button>
+						</com:ko-if>
+					</div>
+					<div style="display: inline-block; width: 115px">
+						<com:ko-if bind="visibleA1_2">
+						<button tabindex="2" class="" data-bind="i18n: 'KSU002_2', enable: $vm.enable"></button>
+						</com:ko-if>
+					</div>
+					<com:ko-if bind="visibleA1_3">
+					<div id="A1_10" style="display: inline-block;"
+						data-bind="component: {
+								name: 'kcp015-component',
+								params: {
+								enable: enable,
+	                            visibleA31 : ko.observable(true),
+	                            visibleA32 : ko.observable(true),
+	                            visibleA33 : ko.observable(true),
+	                            visibleA34 : ko.observable(true),
+	                            visibleA35 : ko.observable(true),
+	                            visibleA36 : ko.observable(true),
+	                            sids       : employeeId,
+	                            baseDate   : baseDateKCP015
+								}
+							}">
+					</div>
+					</com:ko-if>
+					<com:ko-if bind="visibleA1_4">
+					<button tabindex="4" class="btn-right" data-bind="i18n: 'KSU002_4', click: $vm.openB, enable: $vm.enable"></button>
+					</com:ko-if>
 				</div>
 			</div>
 			<div id="contents-area">
@@ -40,9 +71,96 @@
 								title-date: $vm.baseDate,
 								workplace-id: $vm.workplaceId,
 								achievement: $vm.achievement,
-								has-change: $vm.schedules.hasChange
+								has-change: $vm.schedules.hasChange,
+								yearMonth: $vm.yearMonth,
+								rootVm: $vm
 							"></div>
-						<button tabindex="-1" class="small btn-guide" data-bind="icon: 139"></button>
+						<button id="A5" tabindex="-1" class="small btn-guide" data-bind="icon: 139"></button>
+						<!-- POPUP KHI CLICK BTN A5 color-button-->
+						<div id="A5_1" class="popup-area popup-panel">
+							<span id="A5_2">#{i18n.getText('KSU001_306')}</span>
+							<hr />
+							<div class="ml-2">
+								<div>
+									<div class="popup-div">
+										<div id="" class="square bg-schedule-uncorrectable"></div>
+										<span id="A5_2_2">#{i18n.getText('KSU001_309')}</span>
+									</div>
+									<div class="popup-div">
+										<div id="" class="square bg-daily-alter-self"></div>
+										<span id="A5_2_3">#{i18n.getText('KSU001_310')}</span>
+									</div>
+									<div class="popup-div">
+										<div id="" class="square bg-daily-alter-other"></div>
+										<span id="A5_2_4">#{i18n.getText('KSU001_311')}</span>
+									</div>
+								</div>
+								<div class="div-popup">
+									<div class="popup-div">
+										<div id="" class="square bg-daily-reflect-application"></div>
+										<span id="A5_2_5">#{i18n.getText('KSU001_312')}</span>
+									</div>
+									<div class="popup-div">
+										<div id="" class="square bg-schedule-fixed"></div>
+										<span id="A5_2_6">#{i18n.getText('KSU001_313')}</span>
+									</div>
+									<div class="popup-div">
+										<div id="" class="square bg-schedule-support"></div>
+										<span id="A5_2_7">#{i18n.getText('KSU001_314')}</span>
+									</div>
+								</div>
+							</div>
+		
+							<span id="A5_3">#{i18n.getText('KSU001_307')}</span>
+							<hr />
+							<div class="ml-2">
+								<div>
+									<div class="popup-div">
+										<div id="" class="square background-attendance"></div>
+										<span id="A5_3_2">#{i18n.getText('KSU001_315')}</span>
+									</div>
+									<div class="popup-div">
+										<div id="" class="square background-holiday"></div>
+										<span id="A5_3_3">#{i18n.getText('KSU001_316')}</span>
+									</div>
+									<div class="popup-div">
+										<div id="" class="square background-half-day-work"></div>
+										<span id="A5_3_4">#{i18n.getText('KSU001_317')}</span>
+									</div>
+								</div>
+								<div class="div-popup">
+									<div class="popup-div">
+										<div id="" class="square background-schedule-performance"></div>
+										<span id="A5_3_5">#{i18n.getText('KSU001_318')}</span>
+									</div>
+								</div>
+							</div>
+		
+							<span id="A5_4">#{i18n.getText('KSU001_308')}</span>
+							<hr />
+							<div class="ml-2">
+								<div>
+									<div class="popup-div">
+										<div id="" class="square bg-schedule-saturday"></div>
+										<span id="A5_4_2">#{i18n.getText('KSU001_319')}</span>
+									</div>
+									<div class="popup-div">
+										<div id="" class="square bg-schedule-sunday"></div>
+										<span id="A5_4_3">#{i18n.getText('KSU001_320')}</span>
+									</div>
+									<div class="popup-div">
+										<div id="" class="square bg-schedule-specific-date"></div>
+										<span id="A5_4_4">#{i18n.getText('KSU001_321')}</span>
+									</div>
+								</div>
+								<div class="div-popup">
+									<div class="popup-div">
+										<div id="" class="square bg-schedule-that-day"></div>
+										<span id="A5_4_5">#{i18n.getText('KSU001_322')}</span>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 					<div class="cf">
 						<div tabindex="7" data-bind="
@@ -62,11 +180,12 @@
 								mode: $vm.mode,
 								baseDate: $vm.baseDate,
 								click-cell: $vm.clickDayCell,
-								change-cell: $vm.changeDayCell
+								change-cell: $vm.changeDayCell,
+								rootVm: $vm
 							"></div>
 					</div>
 					<div class="cf">
-						<div data-bind="work-hour: {}"></div>
+						<div data-bind="work-hour: {rootVm: $vm}"></div>
 					</div>
 				</div>
 			</div>

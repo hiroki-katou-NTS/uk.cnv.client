@@ -10,6 +10,8 @@ import java.util.Optional;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import nts.uk.shr.com.context.AppContexts;
+import nts.uk.shr.infra.file.storage.stream.FileStoragePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +64,6 @@ public class ProcessRecoverOneEmpHandle {
 	public static final String SETTING_DATE_EXCEPTION = "8";
 	
 	public static final String GET_TABLE_EXCEPTION = "9";
-	
-	private static final String DATA_STORE_PATH = ServerSystemProperties.fileStoragePath();
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessRecoverOneEmpHandle.class);
 	
@@ -170,6 +170,6 @@ public class ProcessRecoverOneEmpHandle {
 	
 	
 	public static String getExtractDataStoragePath(String fileId) {
-		return DATA_STORE_PATH + "//packs//" + fileId;
+		return new FileStoragePath().getPathOfCurrentTenant().toString() + "//packs//" + fileId;
 	}
 }

@@ -35,7 +35,7 @@ public class ReflectApplicationWorkScheduleTest {
 		val actualResult = ReflectApplicationWorkSchedule.process(require, "1", // CID
 				SCReflectApplicationHelper.createApp(PrePostAtrShare.POSTERIOR), // 申請
 				GeneralDate.today(), // 処理対象日
-				SCReflectApplicationHelper.createReflectStatusResult(), 0);// 勤務予定の反映状態
+				SCReflectApplicationHelper.createReflectStatusResult(), 0, "1");// 勤務予定の反映状態
 
 		assertThat(actualResult.getLeft().getReflectStatus()).isEqualTo(SCReflectedState.NOTREFLECTED);
 

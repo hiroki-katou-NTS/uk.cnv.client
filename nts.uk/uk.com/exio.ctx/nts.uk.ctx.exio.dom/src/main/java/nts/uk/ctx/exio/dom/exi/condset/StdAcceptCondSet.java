@@ -10,6 +10,8 @@ import nts.arc.layer.dom.AggregateRoot;
 import nts.uk.ctx.exio.dom.exi.csvimport.ExiCharset;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 /**
  * UKDesign.ドメインモデル.NittsuSystem.UniversalK.外部入出力.外部受入.受入条件設定.受入条件設定（定型）
  *

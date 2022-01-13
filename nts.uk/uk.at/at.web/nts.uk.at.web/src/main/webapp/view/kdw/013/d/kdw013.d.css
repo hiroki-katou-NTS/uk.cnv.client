@@ -1,0 +1,27 @@
+#contents-area.kdw-013-d td[aria-describedby="kdw-013-ddata_link"] {
+    color: #06c;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+#functions-area-bottom.kdw-013-d {
+	height: 42px;
+}
+
+#contents-area table tr th {
+	background-color: #CFF1A5;
+}
+
+#contents-area table tr th, #contents-area table tr td {
+	color: #4A4A58;
+	text-align: left;
+	position: relative;
+	box-sizing: border-box;
+	border: 1px solid #EAE8F2 !important;
+	padding: 0px 5px;
+}
+
+.link-button {
+	color: #06c;
+	padding: 0px !important;
+}

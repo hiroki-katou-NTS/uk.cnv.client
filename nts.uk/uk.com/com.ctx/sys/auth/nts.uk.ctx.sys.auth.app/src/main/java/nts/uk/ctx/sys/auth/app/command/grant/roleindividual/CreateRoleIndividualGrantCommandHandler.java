@@ -13,11 +13,6 @@ public class CreateRoleIndividualGrantCommandHandler {
 	private RoleIndividualGrantRepository roleIndividualGrantRepository;
 	
 	public String InsertRoleGrant(CreateRoleIndividualGrantCommand roleGrant){
-		String companyId = AppContexts.user().companyId();
-		if (companyId == null)
-			return null;
-		roleGrant.setCompanyID(companyId);
-		
 		if(roleGrant.userID == null)
 			return null;
 			
@@ -25,7 +20,7 @@ public class CreateRoleIndividualGrantCommandHandler {
 			return null;
 		}else{
 			this.roleIndividualGrantRepository.add(roleGrant.toDomain());
-			return roleGrant.getUserID();
+			return  roleGrant.getCompanyID()+"_"+roleGrant.getUserID()+"_"+roleGrant.getRoleType();
 		}
 	}
 }

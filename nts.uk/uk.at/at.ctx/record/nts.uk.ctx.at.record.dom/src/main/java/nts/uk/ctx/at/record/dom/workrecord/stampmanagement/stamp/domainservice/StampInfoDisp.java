@@ -60,5 +60,18 @@ public class StampInfoDisp implements DomainValue {
 		this.stampAtr = stampTypeDisplay;
 		this.stamp = stamp;
 	}
-
+	
+	/**
+	 * [C-1] 新規作成
+	 * 
+	 * @param stamp 打刻
+	 * @return 表示する打刻情報
+	 */
+	public StampInfoDisp(Stamp stamp) {
+		super();
+		this.stampNumber = stamp.getCardNumber();
+		this.stampDatetime = stamp.getStampDateTime();
+		this.stampAtr = stamp.createStampDivisionDisplayed();
+		this.stamp = Optional.of(stamp);
+	}
 }

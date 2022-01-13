@@ -51,7 +51,10 @@ class StampClock {
 
     public addCorrectionInterval(minute: number) {
         let self = this;
-		self.vm.$date.interval(minute * 60000);
+            self.vm.$date.interval(100);
+        setTimeout(() => {
+		    self.vm.$date.interval(minute * 60000);
+        }, 1000);
     }
 }
 
@@ -101,4 +104,28 @@ class StampTab {
         self.selectedTab.valueHasMutated();
     }
     
+}
+
+class WorkGroup {
+    workCode1: string;
+    workCode2: string;
+    workCode3: string;
+    workCode4: string;
+    workCode5: string;
+
+    constructor(w: IWorkGroup) {
+       this.workCode1 = w.workCode1;
+       this.workCode2 = w.workCode2;
+       this.workCode3 = w.workCode3;
+       this.workCode4 = w.workCode4;
+       this.workCode5 = w.workCode5;
+    } 
+}
+
+interface IWorkGroup {
+    workCode1: string;
+    workCode2: string;
+    workCode3: string;
+    workCode4: string;
+    workCode5: string;
 }

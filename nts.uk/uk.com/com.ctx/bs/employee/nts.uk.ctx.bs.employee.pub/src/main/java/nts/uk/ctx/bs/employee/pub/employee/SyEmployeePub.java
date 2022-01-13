@@ -269,4 +269,12 @@ public interface SyEmployeePub {
 	List<ResultRequest596Export> getEmpNotDeletedLstBySids(List<String> sids);
 
 	Optional<EmployeeDataMngInfoExport> findByScdNotDel(String employeeCd, String companyId);
+	
+	/**
+	 * 個人IDから個人社員情報を取得する
+	 * @param personIds 個人IDリスト
+	 * @return List<個人社員情報Exported>
+	 */
+	List<PersonalEmployeeInfoExport> getPersonEmployeeInfosByPersonId(List<String> personIds);
+	
 }

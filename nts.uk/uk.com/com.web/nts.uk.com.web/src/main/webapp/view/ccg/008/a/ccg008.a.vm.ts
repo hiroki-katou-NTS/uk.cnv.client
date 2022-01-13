@@ -14,6 +14,8 @@ module nts.uk.com.view.ccg008.a.screenModel {
 		getLoginUser: "screen/com/ccg008/get-user"
 	};
 
+	const TOPPAGE_STORAGE_KEY = ['KTG001_INITIAL_DATA', 'KTG004_YM_PARAM'];
+
 	const getWidgetName = (type: number) => {
 		switch (type) {
 			case 0:
@@ -115,6 +117,7 @@ module nts.uk.com.view.ccg008.a.screenModel {
   
                       doc.body.innerHTML = res.htmlContent;
 											doc.body.setAttribute('style', 'overflow: auto; position: relative;');
+                      nts.uk.com.view.ccg034.share.model.customload.loadLimitedLabelForIframe();
                     });
                 } else {
                   element.innerHTML = `<iframe src="${ntsFile.liveViewUrl(fileId, 'index.htm')}"></iframe>`;
@@ -133,30 +136,18 @@ module nts.uk.com.view.ccg008.a.screenModel {
 
 	@bean()
 	export class ViewModel extends ko.ViewModel {
-		dateSwitch: KnockoutObservableArray<any> = ko.observableArray([]);
-
 		closureId: KnockoutObservable<number> = ko.observable(1);
-
 		lstClosure: KnockoutObservableArray<ItemCbbModel> = ko.observableArray([]);
 		reloadInterval: KnockoutObservable<number> = ko.observable(0);
 		paramWidgetLayout2: KnockoutObservableArray<WidgetSettingDto> = ko.observableArray([]);
 		paramWidgetLayout3: KnockoutObservableArray<WidgetSettingDto> = ko.observableArray([]);
 		paramIframe1: KnockoutObservable<DisplayInTopPage> = ko.observable();
 		topPageSetting: any;
-
-		isShowSwitch: KnockoutObservable<boolean> = ko.observable(false);
-		isShowButtonRefresh: KnockoutObservable<boolean> = ko.observable(false);
-		isShowButtonSetting: KnockoutObservable<boolean> = ko.observable(false);
-
 		dataToppage: KnockoutObservable<DataTopPage> = ko.observable(null);
-
-		currentOrNextMonth: KnockoutObservable<null | 1 | 2> = ko.observable(null);
 		layoutDisplayType: KnockoutObservable<LAYOUT_DISPLAY_TYPE> = ko.observable(null);
-
 		widgetLeft: KnockoutObservableArray<WIDGET> = ko.observableArray([]);
 		widgetCenter: KnockoutObservable<LAYOUT_DATA> = ko.observable(null);
 		widgetRight: KnockoutObservableArray<WIDGET> = ko.observableArray([]);
-
 		classLayoutName!: KnockoutComputed<string>;
     startDateInClosure: KnockoutObservable<string> = ko.observable(''); 
     startDate : KnockoutObservable<string> = ko.observable('');
@@ -170,13 +161,15 @@ module nts.uk.com.view.ccg008.a.screenModel {
 
 		constructor() {
 			super();
-
 			const vm = this;
 
-			vm.dateSwitch([
-				{ code: 1, name: vm.$i18n("CCG008_14") },
-				{ code: 2, name: vm.$i18n("CCG008_15") }
-			]);
+			const fromScreen = __viewContext.transferred.value;
+			if (fromScreen && fromScreen.screen && fromScreen.screen === 'login') {
+				// Remove all cache of KTG001 AND KTG004 Widget
+				_.forEach(TOPPAGE_STORAGE_KEY, key => vm.$window.storage(key, null));
+				// Clear fromScreen
+				sessionStorage.removeItem('nts.uk.request.STORAGE_KEY_TRANSFER_DATA');
+			}
 
 			vm.classLayoutName = ko.computed({
 				read: () => {
@@ -186,38 +179,25 @@ module nts.uk.com.view.ccg008.a.screenModel {
 				}
 			});
 
-			vm.currentOrNextMonth
-				.subscribe(function (currentOrNextMonth: 1 | 2) {
-					if (currentOrNextMonth) {
-						const closureId = ko.unwrap<number>(vm.closureId);
-
-						vm.$window
-							.storage('cache', {
-								closureId,
-								currentOrNextMonth
-							})
-							.then((cache: any) => vm.$window.shared('cache', cache));
-
-              const dataProcess = currentOrNextMonth && currentOrNextMonth == 1
-								? parseInt(vm.startDateInClosure())
-								: parseInt(moment.utc(vm.startDateInClosure(), 'YYYYMM').add(1, 'M').format('YYYYMM'));
-              const params: any = {
-                closureId:  closureId,
-                processDate : dataProcess
-              };
-              vm.$ajax("com", API.getClosure, params).then((data:any) => {
-                vm.startDate(moment.utc(data.startDate).format('MM/DD'));
-                vm.endDate(moment.utc(data.endDate).format('MM/DD'));
-              })
+			const refreshLayout = () => {
+					const restoreKtg026 = vm.$window.storage('KTG026_INITIAL_DATA').then((rs: {isRefresh: boolean, target: any}) => {
+						if (rs) {
+							rs.isRefresh = true;
+							vm.$window.storage('KTG026_INITIAL_DATA', rs);
+						}
+					});
+					const restoreKtg027 = vm.$window.storage('KTG027_INITIAL_DATA').then((rs: {isRefresh: boolean, target: any}) => {
+						if (rs) {
+							rs.isRefresh = true;
+							vm.$window.storage('KTG027_INITIAL_DATA', rs);
+						}
+					});
+				-
+					$.when(restoreKtg026, restoreKtg027).then(() => {
 						vm.callApiTopPage();
-					}
-				});
-
-			vm.closureId
-				.subscribe(function (value) {
-					vm.currentOrNextMonth.valueHasMutated();
-				});
-
+					})
+				}
+			
 			vm.reloadInterval
 				.subscribe((data: any) => {
 					const minutes = vm.getMinutes(data);
@@ -227,18 +207,17 @@ module nts.uk.com.view.ccg008.a.screenModel {
 
 					if (data !== 0) {
 						vm.reload = setInterval(() => {
-							if (vm.paramWidgetLayout2().length > 0 || vm.paramWidgetLayout3().length > 0) {
-								vm.callApiTopPage();
+							const widgetLeft = vm.widgetLeft();
+							const widgetRight = vm.widgetRight();
+							if (vm.widgetLeft().length > 0) {
+								vm.widgetLeft([]);
+								vm.widgetLeft(widgetLeft);
+							}
+							if (vm.widgetRight().length > 0) {
+								vm.widgetRight([]);
+								vm.widgetRight(widgetRight);
 							}
 						}, miliSeconds);
-					}
-				});
-
-			// fix bug when not show currentOrNextMonth button
-			vm.isShowSwitch
-				.subscribe((s: boolean) => {
-					if (!s) {
-						vm.callApiTopPage();
 					}
 				});
 		}
@@ -261,11 +240,6 @@ module nts.uk.com.view.ccg008.a.screenModel {
 						if (setting.reloadInterval) {
 							vm.reloadInterval(setting.reloadInterval);
 						}
-
-						if (user) {
-							vm.isShowButtonSetting(true);
-						}
-
 						vm.topPageSetting = setting;
 					}
 
@@ -280,33 +254,17 @@ module nts.uk.com.view.ccg008.a.screenModel {
                       .storage('cache')
                       .then((obj: any) => {
                         if (obj) {
-                          const { switchingDate } = vm.topPageSetting;
-                          const endDate = moment.utc(obj.endDate, D_FORMAT).add(switchingDate, 'day').startOf('day');
-    
-                          if (endDate.isBefore(moment().startOf('day'))) {
-                            vm.currentOrNextMonth(2);
-    
-                            obj.currentOrNextMonth = 2;
-                          } else {
-                            vm.currentOrNextMonth(1);
-                          }
-    
                           vm.closureId(obj.closureId);
-    
                           vm.$window.shared('cache', obj);
                         } else {
                           vm.closureId(1);
-                          vm.currentOrNextMonth(null);
                         }
                       });
                       vm.dataToppage(null);
-                      vm.startDateInClosure(cache.startDate);
-                      const dataProcess = vm.currentOrNextMonth() && vm.currentOrNextMonth() == 1
-												? parseInt(vm.startDateInClosure())
-												: parseInt(moment.utc(vm.startDateInClosure(), 'YYYYMM').add(1, 'M').format('YYYYMM'));
+                      vm.startDateInClosure(cache.processDate);
                       const params: any = {
                         closureId:  cache.closureId,
-                        processDate : dataProcess
+                        processDate : parseInt(vm.startDateInClosure())
                       };
                       vm.$ajax("com", API.getClosure, params).then((data:any) => {
                         vm.startDate(moment.utc(data.startDate).format('MM/DD'));
@@ -317,15 +275,11 @@ module nts.uk.com.view.ccg008.a.screenModel {
                     vm.$window.storage("cache").then((obj: any) => {
                       console.log(obj);
                       vm.dataToppage(null);
-                      vm.startDateInClosure(cache.startDate);
+                      vm.startDateInClosure(cache.processDate);
                       vm.closureId(obj.closureId);
-                      vm.currentOrNextMonth(obj.currentOrNextMonth);
-                      const dataProcess = vm.currentOrNextMonth() && vm.currentOrNextMonth() == 1
-												? parseInt(vm.startDateInClosure())
-												: parseInt(moment.utc(vm.startDateInClosure(), 'YYYYMM').add(1, 'M').format('YYYYMM'));
                       const params: any = {
                         closureId:  cache.closureId,
-                        processDate : dataProcess
+                        processDate : parseInt(vm.startDateInClosure())
                       };
                       vm.$ajax("com", API.getClosure, params).then((data:any) => {
                         vm.startDate(moment.utc(data.startDate).format('MM/DD'));
@@ -334,8 +288,6 @@ module nts.uk.com.view.ccg008.a.screenModel {
                  })
             }
           } 
-          
-					
 				})
 				.always(() => vm.$blockui("clear"));
 
@@ -343,6 +295,7 @@ module nts.uk.com.view.ccg008.a.screenModel {
 
 		mounted() {
 			const vm = this;
+			vm.callApiTopPage();
 
 			$(vm.$el)
 				.removeAttr('data-bind')
@@ -362,7 +315,7 @@ module nts.uk.com.view.ccg008.a.screenModel {
 
 			// clear widget data
 			vm.widgetLeft([]);
-			vm.widgetCenter(null);
+			// vm.widgetCenter(null);
 			vm.widgetRight([]);
 
 			vm
@@ -385,7 +338,7 @@ module nts.uk.com.view.ccg008.a.screenModel {
 
 		getToppage(data: DataTopPage, screen: string = 'other') {
 			const vm = this;
-			const { topPageSetting, closureId, currentOrNextMonth } = vm;
+			const { topPageSetting, closureId } = vm;
 			const { displayTopPage, standardMenu } = data;
 
 			const loadWidget = () => {
@@ -403,7 +356,6 @@ module nts.uk.com.view.ccg008.a.screenModel {
 							name: getWidgetName(widgetType),
 							params: {
 								closureId: ko.unwrap<number>(closureId),
-								currentOrNextMonth: ko.unwrap<1 | 2>(currentOrNextMonth) || 1
 							}
 						}))
 						.value();
@@ -464,7 +416,6 @@ module nts.uk.com.view.ccg008.a.screenModel {
 					const showClosure = _.filter(layout3, ({ widgetType }) => widgetType === 1);
 				}
 
-				vm.isShowSwitch(!_.isEmpty(showSwitchLayout2) || !_.isEmpty(showSwitchLayout3));
 				const setScrollTop = setInterval(() => {
 					if ($('.widget-container').length === vm.widgetLeft().length + vm.widgetRight().length){
 						$('.widget-group').scrollTop(0);
@@ -514,44 +465,11 @@ module nts.uk.com.view.ccg008.a.screenModel {
 				const { layout2, layoutDisplayType } = displayTopPage;
 
 				vm.layoutDisplayType(layoutDisplayType);
-				vm.isShowButtonRefresh(layoutDisplayType !== 0 && !!layout2.length);
 			}
-		}
-
-		openScreenE() {
-			const vm = this;
-			const interval = ko.unwrap<number>(vm.reloadInterval);
-
-			vm.$window
-				.shared('DataFromScreenA', interval)
-				.then(() => vm.$window.modal('com', '/view/ccg/008/e/index.xhtml'))
-				.then(() => vm.$window.shared('DataFromScreenE'))
-				.then((value: number) => vm.reloadInterval(value))
-				.then(() => vm.$window.shared('DataFromScreenE', null));
 		}
 
 		getMinutes(value: number) {
 			return [0, 1, 5, 10, 20, 30, 40, 50, 60][value] || 0;
-		}
-
-		refreshLayout() {
-			const vm = this;
-			const restoreKtg026 = vm.$window.storage('KTG026_TARGET').then((rs: {isRefresh: boolean, target: any}) => {
-				if (rs) {
-					rs.isRefresh = true;
-					vm.$window.storage('KTG026_TARGET', rs);
-				}
-			});
-			const restoreKtg027 = vm.$window.storage('KTG027_TARGET').then((rs: {isRefresh: boolean, target: any}) => {
-				if (rs) {
-					rs.isRefresh = true;
-					vm.$window.storage('KTG027_TARGET', rs);
-				}
-			});
-
-			$.when(restoreKtg026, restoreKtg027).then(() => {
-				vm.callApiTopPage();
-			})
 		}
 	}
 

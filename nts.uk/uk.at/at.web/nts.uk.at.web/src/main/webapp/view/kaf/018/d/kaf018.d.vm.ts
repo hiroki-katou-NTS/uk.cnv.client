@@ -208,7 +208,7 @@ module nts.uk.at.view.kaf018.d.viewmodel {
 		
 		cellGridClick(evt: any, ui: any) {
 			const vm = this;
-			if(ui.colKey=="empID") {
+			if(ui.colKey=="empName") {
 				let empInfoLst = vm.dataSource,
 					startDate = vm.startDate,
 					endDate = vm.endDate,

@@ -31,8 +31,7 @@ public class SnapshotFinder extends FinderFacade{
 	@Override
 	public <T extends ConvertibleAttendanceItem> List<T> find(List<String> employeeId, DatePeriod baseDate) {
 		
-		return (List<T>) employeeId.stream().map(c -> this.repo.find(c, baseDate))
-			.flatMap(List::stream)
+		return (List<T>) this.repo.find(employeeId, baseDate).stream()
 			.map(c -> SnapshotDto.from(c.getSid(), c.getYmd(), c.getSnapshot().toDomain()))
 			.filter(d -> d.isHaveData())
 			.collect(Collectors.toList());

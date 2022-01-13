@@ -33,7 +33,7 @@
 				</div>
 				<div class="cf">
 					<div class="valign-center control-group start">
-						<span class="label">#{i18n.getText('KAL004_57')}</span>
+						<div class="flabel" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KAL004_57')}</div>
 						<div class="day">
 							<div tabindex="1"
 								data-bind="ntsRadioButton: {checked: strSelected, enable: enable, option: specifyStartMonth()[1], optionValue: 'value', optionText: '', group: 'strRadio'}"></div>
@@ -70,7 +70,7 @@
 					</div>
 					<div class="centerSys">#{i18n.getText('KAL004_30')}</div>
 					<div class="valign-center control-group end">
-						<span class="label">#{i18n.getText('KAL004_59')}</span>
+						<div class="flabel" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KAL004_59')}</div>
 						<div class="day">
 							<div tabindex="6" 
 								data-bind="ntsRadioButton: {checked: endSelected, enable: enable, option: specifyEndMonth()[0], optionValue: 'value', optionText: 'name', group: 'endRadio'}"></div>

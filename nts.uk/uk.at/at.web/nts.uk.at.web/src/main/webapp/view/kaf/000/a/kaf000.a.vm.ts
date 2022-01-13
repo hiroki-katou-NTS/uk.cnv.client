@@ -7,11 +7,21 @@ module nts.uk.at.view.kaf000.a.viewmodel {
     export abstract class Kaf000AViewModel extends ko.ViewModel {
     	appDispInfoStartupOutput: KnockoutObservable<any> = ko.observable(CommonProcess.initCommonSetting());
     	
-        loadData(empLst: Array<string>, dateLst: Array<string>, appType: AppType, opHolidayAppType?: number, opOvertimeAppAtr?: number) {
+        loadData(param: KAF000Param) {
             const vm = this;
-            let command = { empLst, dateLst, appType, opHolidayAppType, opOvertimeAppAtr };
+            let empLst = param.empLst,
+				dateLst = param.dateLst,
+				appType = param.appType,
+				opHolidayAppType = param.opHolidayAppType,
+				opOvertimeAppAtr = param.opOvertimeAppAtr,
+				command = { empLst, dateLst, appType, opHolidayAppType, opOvertimeAppAtr };
             return vm.$ajax(API.startNew, command)
             .then((data: any) => {
+				if(param.screenCode===0 || param.screenCode===1) {
+					if(data.appDispInfoNoDateOutput.applicationSetting.appDisplaySetting.prePostDisplayAtr == 1) {
+						data.appDispInfoWithDateOutput.prePostAtr = 1;
+					}
+				}
                 vm.appDispInfoStartupOutput(data);
                 return CommonProcess.checkUsage(true, "#kaf000-a-component4-singleDate", vm);
             },(res: any) => {
@@ -93,4 +103,13 @@ module nts.uk.at.view.kaf000.a.viewmodel {
         startNew: "at/request/application/getStartPC",
 		sendMailAfterRegister: ""
     }
+
+	interface KAF000Param {
+		empLst: Array<string>;
+		dateLst: Array<string>;
+		appType: AppType;
+		opHolidayAppType?: number;
+		opOvertimeAppAtr?: number;
+		screenCode?: number;	
+	}
 }

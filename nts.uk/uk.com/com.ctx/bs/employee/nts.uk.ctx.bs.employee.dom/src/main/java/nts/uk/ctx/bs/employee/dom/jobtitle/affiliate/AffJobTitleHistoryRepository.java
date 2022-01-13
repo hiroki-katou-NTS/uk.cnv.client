@@ -12,6 +12,27 @@ import nts.arc.time.calendar.period.DatePeriod;
 public interface AffJobTitleHistoryRepository {
 	
 	/**
+	 * [4] 基準日時点に所属職位履歴変更している社員を取得する
+	 * 
+	 * 基準日時点に所属職位履歴変更している社員を取得する
+	 * 
+	 * @param sids List<社員ID>
+	 * @param baseDate 年月日
+	 * @return 社員リスト List<社員ID>
+	 */
+	List<String> getBySidsAndBaseDate(List<String> sids, GeneralDate baseDate);
+	
+	/**
+	 * [5] 期間内に履歴変更している社員を取得する
+	 * 
+	 * 開始日が期間内にが含む履歴がある社員を取得する
+	 * 
+	 * @param datePeriod 期間
+	 * @return 社員リスト List<社員ID>
+	 */
+	List<String> getByDatePeriod(String cid, DatePeriod datePeriod);
+	
+	/**
 	 * get with primary key
 	 * @param historyId
 	 * @return
@@ -84,10 +105,14 @@ public interface AffJobTitleHistoryRepository {
  	List<AffJobTitleHistory> findAllJobTitleHistory(GeneralDate baseDate, List<String> employeeIds) ;
  	
  	/**
+ 	 * [1] Get*
+ 	 * 
+ 	 * 指定社員リストと期間のすべての所属職位履歴を取得する
+ 	 * 
 	 * request-list 398
-	 * @param employeeIds
-	 * @param period
-	 * @return
+	 * @param employeeIds List<社員ID>
+	 * @param period 期間
+	 * @return List<所属職位履歴> 職位履歴
 	 */
 	List<AffJobTitleHistory> getByEmployeeListPeriod(List<String> employeeIds, DatePeriod period);
 	

@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+<ui:composition template="/master/base.xhtml">
+    <ui:define name="htmlHead">
+        <com:scriptfile set="IGNITE"/>
+
+        <com:stylefile path="/view/ccg/025/component/component.css"/>
+        <com:scriptfile path="/view/ccg/025/component/component.vm.js"/>
+        <com:scriptfile path="/view/ccg/025/component/component.service.js"/>
+        <com:scriptfile path="/view/ccg/026/component.js"/>
+        <com:stylefile path="cmf006.a.style.css"/>
+        <com:scriptfile path="cmf006.a.vm.js"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div id="functions-area">
+            <div class="container">
+                <button id="registration"
+                        data-bind="click: $vm.save, enable : enableSave"
+                        class="proceed" tabindex="1">#{i18n.getText('CMF006_3')}</button>
+                <button id="copy"
+                        data-bind="click: $vm.openScreenB, enable : enableCopy"
+                        class="normal" tabindex="2">#{i18n.getText('CMF006_4')}</button>
+            </div>
+        </div>
+        <div id="contents-area" class="fixed-flex-layout">
+            <div class="container cf">
+                <div id="left-content" class="fixed-flex-layout-left"
+                     data-bind="with: $vm.componentCcg025">
+                    <div class='left-title'>#{i18n.getText('CMF006_5')}</div>
+                    <div id='list_role'>
+                        <ui:include src="/view/ccg/025/component/index.xhtml"/>
+                    </div>
+                </div>
+
+                <div id="right-content" class="fixed-flex-layout-right">
+                    <!--<div class='right-title'>#{i18n.getText('CMF006_6')}</div>-->
+                    <div id="permission-setting" data-bind="component: {
+								    name: 'ccg026-component',
+								    params: {
+								        label: {
+											require: true,
+											text: 'CMF006_6'
+										},
+										tabindex: 4,
+									    roleId: roleId,
+									    roleType: roleType,
+									    changeData: permissionList,
+									    maxRow: 10
+                                    }
+						}"></div>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+</body>
+</html>

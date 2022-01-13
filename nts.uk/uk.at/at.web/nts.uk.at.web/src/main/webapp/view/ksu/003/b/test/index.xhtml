@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="../../../../../master/base.xhtml">
+		<ui:define name="htmlHead">
+			<com:stylefile path="/view/kcp/011/main.css" of="/nts.uk.com.web" />
+			<com:stylefile path="/view/ccg/share/style.css" of="/nts.uk.com.web" />
+			<com:scriptfile path="/view/kcp/share/list.js" of="/nts.uk.com.web" />
+			<com:scriptfile path="/view/kcp/share/tree.js" of="/nts.uk.com.web" />
+			<com:scriptfile path="/view/ccg/share/ccg.service.js"
+				of="/nts.uk.com.web" />
+			<com:scriptfile path="/view/kcp/011/kcp.011.vm.js"
+				of="/nts.uk.com.web" />
+			<com:scriptfile set="IGNITE" />
+		
+			<com:scriptfile path="ksu003.b.test.vm.js" />
+			<com:scriptfile path="ksu003.b.test.start.js" />
+
+		</ui:define>
+		<ui:define name="content">
+			<div id="functions-area">
+				<button data-bind="click: openDialog">Open KSU003B</button>				
+			</div>
+			<div id="content-area">
+				<div style="margin-top: 30px; margin-left: 20px;">					
+					Chosse page:
+							<div style="margin-right: 30px;" id="combo-box" data-bind="ntsComboBox: {
+									name: 'Sample List',
+									options: itemList,
+									optionsValue: 'page',
+									visibleItemsCount: 5,
+									value: selectedPage,
+									optionsText: '',
+									editable: isEditable,
+									enable: isEnable,
+									required: true,
+									selectFirstIfNull: true,
+									columns: [
+										{ prop: 'page', length: 10 }
+										
+									]}"></div>
+						
+					Chosse reference date:
+							<div data-bind="ntsDatePicker: {value: date, dateType:'date', dateFormat:'YYYY/MM/DD' }"></div>	
+					<br />
+					<div style="margin-top:10px" data-bind="ntsCheckBox: { checked: workPlace, enable: isWorkPlace, text: 'WorkPlace' }"></div> |
+					<div style="margin-top:10px" data-bind="ntsCheckBox: { checked: workPlaceGroup, enable: isWorkPlaceGroup, text: 'WorkPlaceGroup,' }"></div>
+				</div>
+
+				<span data-bind="visible: check" style="margin-left: 20px; ">Choose WorkPlace</span>
+				<span data-bind="visible: check1" style="margin-left: 20px;">Choose WorkPlaceGroup</span>
+
+				<table style="margin-top: 5px; margin-left: 20px;">			
+					
+					<tr>
+						<td data-bind="visible: check" style="margin-top: 10px; width: 460px;">
+							<div id="tree-grid" style="width: 460px; margin-bottom: 40px;" />
+						</td>
+						<td style="width: 100px"></td>
+						<td data-bind="visible: check1">
+							<workplace-group params="options: options"> </workplace-group>
+						</td>
+					</tr>
+				</table>
+				<hr/>
+				<div style="display: flex; margin-left: 20px; margin-top: 10px;">
+					Data return from KSU003B: page =   <div style=" margin-top: 1px; margin-left: 5px;" data-bind="text: pageNo()"></div>
+				</div>
+			
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

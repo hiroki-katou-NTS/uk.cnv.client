@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.eclipse.persistence.annotations.Customizer;
 
 import lombok.NoArgsConstructor;
@@ -73,14 +74,14 @@ public class KrcmtSrampPortal extends ContractUkJpaEntity implements Serializabl
 	 */
 	@Basic(optional = false)
 	@Column(name = "BUTTON_EMPHASIS_ART")
-	public int buttonEmphasisArt;
+	public boolean buttonEmphasisArt;
 	
 	/**
 	 * トップメニューリンク利用する
 	 */
 	@Basic(optional = false)
 	@Column(name = "TOPPAGE_LINK_ART")
-	public int toppageLinkArt;
+	public boolean toppageLinkArt;
 	
 	/**
 	 * 外出打刻を利用する
@@ -131,8 +132,8 @@ public class KrcmtSrampPortal extends ContractUkJpaEntity implements Serializabl
 							new ColorCode(this.textColor)),
 						new ResultDisplayTime(this.resultDisplayTime)), 
 				this.krcmtStampLayoutDetail.stream().map(c->c.toDomain()).collect(Collectors.toList()), 
-				this.buttonEmphasisArt == 1, 
-				this.toppageLinkArt == 1,
+				this.buttonEmphasisArt, 
+				this.toppageLinkArt,
 				this.goOutUseAtr == 1, 
 				this.displayStampList == 1);
 	}
@@ -145,8 +146,8 @@ public class KrcmtSrampPortal extends ContractUkJpaEntity implements Serializabl
 		this.correctionInterval = correctionInterval;
 		this.resultDisplayTime = resultDisplayTime;
 		this.textColor = textColor;
-		this.buttonEmphasisArt = buttonEmphasisArt;
-		this.toppageLinkArt = toppageLinkArt;
+		this.buttonEmphasisArt = BooleanUtils.toBoolean(buttonEmphasisArt);
+		this.toppageLinkArt = BooleanUtils.toBoolean(toppageLinkArt);
 		this.goOutUseAtr = goOutUseAtr;
 		this.displayStampList = displayStampList;
 		this.krcmtStampLayoutDetail = krcmtStampLayoutDetail;

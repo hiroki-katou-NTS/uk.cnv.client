@@ -258,7 +258,6 @@ public class CommonAlgorithmImpl implements CommonAlgorithm {
 			opErrorFlag = Optional.of(approvalRootContentImport.getErrorFlag());
 		}
 		// 申請表示情報(申請対象日関係あり)を取得する
-		// TODO: 申請設定 domain has changed!
 		ApplicationSetting applicationSetting = appDispInfoNoDateOutput.getApplicationSetting();
 		Optional<AppTypeSetting> opAppTypeSetting = applicationSetting.getAppTypeSettings().stream().filter(x -> x.getAppType()==appType).findAny();
 		Optional<ReceptionRestrictionSetting> opReceptionRestrictionSetting = applicationSetting.getReceptionRestrictionSettings().stream().filter(x -> x.getAppType()==appType).findAny();
@@ -359,7 +358,7 @@ public class CommonAlgorithmImpl implements CommonAlgorithm {
 		List<ActualContentDisplay> actualContentDisplayLst = collectAchievement.getAchievementContents(companyID, employeeID, dateLst, appType);
 		output.setActualContentDisplayLst(actualContentDisplayLst);
 		// 事前内容の取得
-		List<PreAppContentDisplay> preAppContentDisplayLst = collectAchievement.getPreAppContents(companyID, employeeID, dateLst, appType);
+		List<PreAppContentDisplay> preAppContentDisplayLst = collectAchievement.getPreAppContents(companyID, employeeID, dateLst, appType, opOvertimeAppAtr);
 		output.setPreAppContentDisplayLst(preAppContentDisplayLst);
 		return output;
 	}
@@ -383,7 +382,6 @@ public class CommonAlgorithmImpl implements CommonAlgorithm {
 		// INPUT．「申請表示情報(基準日関係なし) ．申請承認設定．申請設定」．承認ルートの基準日をチェックする
 		if(appDispInfoNoDateOutput.getApplicationSetting().getRecordDate() == RecordDate.SYSTEM_DATE) {
 			// 申請表示情報(申請対象日関係あり)を取得する
-			// TODO: 申請設定 domain has changed!
 			ApplicationSetting applicationSetting = appDispInfoNoDateOutput.getApplicationSetting();
 			Optional<AppTypeSetting> opAppTypeSetting = applicationSetting.getAppTypeSettings().stream().filter(x -> x.getAppType() == appType).findAny();
 			Optional<ReceptionRestrictionSetting> opReceptionRestrictionSetting = applicationSetting.getReceptionRestrictionSettings().stream().filter(x -> x.getAppType()==appType).findAny();

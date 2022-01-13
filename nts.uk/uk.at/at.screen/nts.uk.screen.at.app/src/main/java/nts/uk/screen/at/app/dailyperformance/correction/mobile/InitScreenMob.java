@@ -3,6 +3,7 @@ package nts.uk.screen.at.app.dailyperformance.correction.mobile;
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -19,19 +21,27 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.util.Strings;
 
 import lombok.val;
 import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.gul.collection.CollectionUtil;
+import nts.uk.ctx.at.record.app.find.dailyattendance.timesheet.ouen.dto.OuenWorkTimeSheetOfDailyAttendanceDto;
 import nts.uk.ctx.at.record.app.find.dailyperform.DailyRecordDto;
 import nts.uk.ctx.at.record.app.find.workrecord.operationsetting.DaiPerformanceFunDto;
 import nts.uk.ctx.at.record.app.find.workrecord.operationsetting.DaiPerformanceFunFinder;
+import nts.uk.ctx.at.record.app.query.tasksupinforitemsetting.TaskSupInfoChoiceDetailsQuery;
+import nts.uk.ctx.at.record.app.query.tasksupinforitemsetting.TaskSupInfoItemAndSelectInforQueryDto;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.confirmationstatus.ApprovalStatusActualResult;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.confirmationstatus.ConfirmStatusActualResult;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.confirmationstatus.change.approval.ApprovalStatusActualDayChange;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.confirmationstatus.change.confirm.ConfirmStatusActualDayChange;
 import nts.uk.ctx.at.record.dom.require.RecordDomRequireService;
+import nts.uk.ctx.at.record.dom.workmanagement.workinitselectset.TaskInitialSel;
+import nts.uk.ctx.at.record.dom.workmanagement.workinitselectset.TaskInitialSelHist;
+import nts.uk.ctx.at.record.dom.workmanagement.workinitselectset.TaskItem;
 import nts.uk.ctx.at.request.app.find.application.applicationlist.AppGroupExportDto;
 import nts.uk.ctx.at.request.app.find.application.applicationlist.ApplicationExportDto;
 import nts.uk.ctx.at.request.app.find.application.applicationlist.ApplicationListForScreen;
@@ -127,12 +137,56 @@ public class InitScreenMob {
 	
 	@Inject
 	private RecordDomRequireService requireService;
+	
+	@Inject
+	private TaskSupInfoChoiceDetailsQuery taskSupInfoChoiceDetailsQuery;
 
 	private static final Integer[] DEVIATION_REASON = { 436, 438, 439, 441, 443, 444, 446, 448, 449, 451, 453, 454, 456,
 			458, 459, 799, 801, 802, 804, 806, 807, 809, 811, 812, 814, 816, 817, 819, 821, 822 };
 	private static final Map<Integer, Integer> DEVIATION_REASON_MAP = IntStream.range(0, DEVIATION_REASON.length - 1)
 			.boxed().collect(Collectors.toMap(x -> DEVIATION_REASON[x], x -> x / 3 + 1));
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DPText.DATE_FORMAT);
+	
+	private static final Map<Integer, List<Integer>> WORK_FRAME_MAP = new HashMap<Integer, List<Integer>>()
+	{
+		private static final long serialVersionUID = 1L;
+
+		{
+	        put(1, Arrays.asList(924,934,944,954,964,974,984,994,1004,1014,1024,1034,1044,1054,1064,1074,1084,1094,1104,1114));
+	        put(2, Arrays.asList(925,935,945,955,965,975,985,995,1005,1015,1025,1035,1045,1055,1065,1075,1085,1095,1105,1115));
+	        put(3, Arrays.asList(926,936,946,956,966,976,986,996,1006,1016,1026,1036,1046,1056,1066,1076,1086,1096,1106,1116));
+	        put(4, Arrays.asList(927,937,947,957,967,977,987,997,1007,1017,1027,1037,1047,1057,1067,1077,1087,1097,1107,1117));
+	        put(5, Arrays.asList(928,938,948,958,968,978,988,998,1008,1018,1028,1038,1048,1058,1068,1078,1088,1098,1108,1118));
+	    }
+	};
+	
+	private static final Map<Integer, List<Integer>> SUPPORT_FRAME_MAP = new HashMap<Integer, List<Integer>>()
+	{
+		private static final long serialVersionUID = 1L;
+
+		{
+	        put(1, Arrays.asList(924,925,926,927,928));
+	        put(2, Arrays.asList(934,935,936,937,938));
+	        put(3, Arrays.asList(944,945,946,947,948));
+	        put(4, Arrays.asList(954,955,956,957,958));
+	        put(5, Arrays.asList(964,965,966,967,968));
+	        put(6, Arrays.asList(974,975,976,977,978));
+	        put(7, Arrays.asList(984,985,986,987,988));
+	        put(8, Arrays.asList(994,995,996,997,998));
+	        put(9, Arrays.asList(1004,1005,1006,1007,1008));
+	        put(10, Arrays.asList(1014,1015,1016,1017,1018));
+	        put(11, Arrays.asList(1024,1025,1026,1027,1028));
+	        put(12, Arrays.asList(1034,1035,1036,1037,1038));
+	        put(13, Arrays.asList(1044,1045,1046,1047,1048));
+	        put(14, Arrays.asList(1054,1055,1056,1057,1058));
+	        put(15, Arrays.asList(1064,1065,1066,1067,1068));
+	        put(16, Arrays.asList(1074,1075,1076,1077,1078));
+	        put(17, Arrays.asList(1084,1085,1086,1087,1088));
+	        put(18, Arrays.asList(1094,1095,1096,1097,1098));
+	        put(19, Arrays.asList(1104,1105,1106,1107,1108));
+	        put(20, Arrays.asList(1114,1115,1116,1117,1118));
+	    }
+	};
 
 	public DailyPerformanceCorrectionDto initMOB(DPCorrectionInitParam param) {
 
@@ -237,7 +291,7 @@ public class InitScreenMob {
 
 		// フォーマットの特定（スマホ）
 		// 表示項目を制御する（スマホ）
-		DisplayItem disItem = processor.getDisplayItems(null, new ArrayList<>(), companyId, screenDto, listEmployeeId,
+		DisplayItem disItem = processor.getDisplayItems(null, param.formatCodes != null ? param.formatCodes : new ArrayList<String>() , companyId, screenDto, listEmployeeId,
 				false, dailyPerformanceDto);
 		if (disItem == null || !disItem.getErrors().isEmpty()) {
 			if (disItem != null)
@@ -245,6 +299,7 @@ public class InitScreenMob {
 			setStateParam(screenDto, resultPeriod, displayFormat, false);
 			return screenDto;
 		}
+		screenDto.setDisItem(disItem);
 
 		// 日次項目の取得
 		// 日別実績の取得
@@ -341,6 +396,12 @@ public class InitScreenMob {
 						.collect(Collectors.toMap(x -> mergeString(x.getCode(), "|", x.getId()), x -> x))
 				: Collections.emptyMap();
 
+		CodeNameType codeNameTask = dataDialogWithTypeProcessor.getWork(companyId);
+		Map<String, CodeName> codeNameTaskMap = codeNameTask != null
+				? codeNameTask.getCodeNames().stream()
+						.collect(Collectors.toMap(x -> mergeString(x.getCode(), "|", x.getId()), x -> x))
+				: Collections.emptyMap();			
+		List<TaskInitialSelHist> taskInitialSelHistLst = dataDialogWithTypeProcessor.getTaskInitialSel(companyId);
 		List<GeneralDate> holidayDate = publicHolidayRepository
 				.getpHolidayWhileDate(companyId, dateRange.getStartDate(), dateRange.getEndDate()).stream()
 				.map(x -> x.getDate()).collect(Collectors.toList());
@@ -413,11 +474,14 @@ public class InitScreenMob {
 				if (!textColorSpr) {
 					setTextColorDay(screenDto, data.getDate(), "date", data.getId(), holidayDate);
 				}
+				
 				itemValueMap = resultOfOneRow.getItems().stream()
 						.collect(Collectors.toMap(x -> mergeString(String.valueOf(x.getItemId()), "|",
 								data.getEmployeeId(), "|", data.getDate().toString()), x -> x));
-				processCellData(NAME_EMPTY, NAME_NOT_FOUND, screenDto, dPControlDisplayItem, mapGetName,
-						codeNameReasonMap, itemValueMap, data, lockDaykWpl, dailyRecEditSetsMap, null);
+				Optional<TaskItem> opTaskItem = getTaskItemByEmpDate(taskInitialSelHistLst, data.getEmployeeId(), data.getDate());
+				Optional<DailyRecordDto> opDailyRecordDto = screenDto.getDomainOld().stream().filter(x -> x.getEmployeeId().equals(data.getEmployeeId()) && x.getDate().equals(data.getDate())).findAny();
+				processCellData(NAME_EMPTY, NAME_NOT_FOUND, screenDto, dPControlDisplayItem, mapGetName, codeNameTaskMap,
+						codeNameReasonMap, itemValueMap, data, lockDaykWpl, dailyRecEditSetsMap, null, opTaskItem, opDailyRecordDto);
 				lstData.add(data);
 				Optional<WorkInfoOfDailyPerformanceDto> optWorkInfoOfDailyPerformanceDto = workInfoOfDaily.stream()
 						.filter(w -> w.getEmployeeId().equals(data.getEmployeeId())
@@ -554,9 +618,9 @@ public class InitScreenMob {
 	}
 
 	public void processCellData(String NAME_EMPTY, String NAME_NOT_FOUND, DailyPerformanceCorrectionDto screenDto,
-			DPControlDisplayItem dPControlDisplayItem, Map<Integer, Map<String, CodeName>> mapGetName,
+			DPControlDisplayItem dPControlDisplayItem, Map<Integer, Map<String, CodeName>> mapGetName, Map<String, CodeName> codeNameTaskMap,
 			Map<String, CodeName> mapReasonName, Map<String, ItemValue> itemValueMap, DPDataDto data, boolean lock,
-			Map<String, Integer> dailyRecEditSetsMap, ObjectShare share) {
+			Map<String, Integer> dailyRecEditSetsMap, ObjectShare share, Optional<TaskItem> opTaskItem, Optional<DailyRecordDto> opDomainOldItem) {
 		Set<DPCellDataDto> cellDatas = data.getCellDatas();
 		String typeGroup = "";
 		Integer cellEdit;
@@ -587,9 +651,100 @@ public class InitScreenMob {
 							screenDto.setCellSate(data.getId(), nameColKey, DPText.STATE_DISABLE, true);
 						}
 						if (value.isEmpty() || value.equals("null")) {
-							cellDatas.add(new DPCellDataDto(mergeString(DPText.CODE, itemIdAsString), "",
-									attendanceAtrAsString, DPText.TYPE_LABEL));
-							value = NAME_EMPTY;
+//							cellDatas.add(new DPCellDataDto(mergeString(DPText.CODE, itemIdAsString), "",
+//									attendanceAtrAsString, DPText.TYPE_LABEL));
+//							value = NAME_EMPTY;
+							String initValue = "";
+							if (groupType != null) {
+								if(groupType == TypeLink.WORK.value) {
+									int supportFrameNo = 0;
+									for(Entry<Integer, List<Integer>> entry : SUPPORT_FRAME_MAP.entrySet()) {
+										if(entry.getValue().contains(item.getId())) {
+											supportFrameNo = entry.getKey();
+											break;
+										}
+									}
+									int workFrameNo = 0;
+									for(Entry<Integer, List<Integer>> entry : WORK_FRAME_MAP.entrySet()) {
+										if(entry.getValue().contains(item.getId())) {
+											workFrameNo = entry.getKey();
+											break;
+										}
+									}
+									Optional<OuenWorkTimeSheetOfDailyAttendanceDto> opOuenWorkTimeSheetOfDailyAttendanceDto = Optional.empty();
+									if(opDomainOldItem.isPresent()) {
+										if(opDomainOldItem.get().getOuenTimeSheet()!=null) {
+											if(!CollectionUtil.isEmpty(opDomainOldItem.get().getOuenTimeSheet().getOuenTimeSheet())) {
+												for(OuenWorkTimeSheetOfDailyAttendanceDto subItem : opDomainOldItem.get().getOuenTimeSheet().getOuenTimeSheet()) {
+													if(subItem.getNo()==supportFrameNo) {
+														opOuenWorkTimeSheetOfDailyAttendanceDto = Optional.of(subItem);
+													}
+												}
+											}
+										}
+									}
+									if(opOuenWorkTimeSheetOfDailyAttendanceDto.isPresent() &&
+											opOuenWorkTimeSheetOfDailyAttendanceDto.get().getWorkContent().getWorkOpt().isPresent()) {
+										switch (workFrameNo) {
+											case 1:
+												if (opOuenWorkTimeSheetOfDailyAttendanceDto.get().getWorkContent().getWorkOpt().get().getWorkCD1() != null)
+												initValue = opOuenWorkTimeSheetOfDailyAttendanceDto.get().getWorkContent().getWorkOpt().get().getWorkCD1();
+												break;
+											case 2:
+												if (opOuenWorkTimeSheetOfDailyAttendanceDto.get().getWorkContent().getWorkOpt().get().getWorkCD2() != null)
+												initValue = opOuenWorkTimeSheetOfDailyAttendanceDto.get().getWorkContent().getWorkOpt().get().getWorkCD2();
+												break;
+											case 3:
+												if (opOuenWorkTimeSheetOfDailyAttendanceDto.get().getWorkContent().getWorkOpt().get().getWorkCD3() != null)
+												initValue = opOuenWorkTimeSheetOfDailyAttendanceDto.get().getWorkContent().getWorkOpt().get().getWorkCD3();
+												break;
+											case 4:
+												if (opOuenWorkTimeSheetOfDailyAttendanceDto.get().getWorkContent().getWorkOpt().get().getWorkCD4() != null)
+												initValue = opOuenWorkTimeSheetOfDailyAttendanceDto.get().getWorkContent().getWorkOpt().get().getWorkCD4();
+												break;
+											case 5:
+												if (opOuenWorkTimeSheetOfDailyAttendanceDto.get().getWorkContent().getWorkOpt().get().getWorkCD5() != null)
+												initValue = opOuenWorkTimeSheetOfDailyAttendanceDto.get().getWorkContent().getWorkOpt().get().getWorkCD5();
+												break;
+											default:
+												break;
+										}
+										cellDatas.add(new DPCellDataDto(codeColKey, initValue,attendanceAtrAsString, DPText.TYPE_LABEL));
+										value = codeNameTaskMap.containsKey(initValue+"|"+workFrameNo) ? codeNameTaskMap.get(initValue+"|"+workFrameNo).getName() : NAME_NOT_FOUND;
+									} else {
+										if(opTaskItem.isPresent()) {
+											switch (workFrameNo) {
+												case 1:
+													initValue = opTaskItem.get().getOtpWorkCode1().map(x -> x.v()).orElse("");
+													break;
+												case 2:
+													initValue = opTaskItem.get().getOtpWorkCode2().map(x -> x.v()).orElse("");
+													break;
+												case 3:
+													initValue = opTaskItem.get().getOtpWorkCode3().map(x -> x.v()).orElse("");
+													break;
+												case 4:
+													initValue = opTaskItem.get().getOtpWorkCode4().map(x -> x.v()).orElse("");
+													break;
+												case 5:
+													initValue = opTaskItem.get().getOtpWorkCode5().map(x -> x.v()).orElse("");
+													break;
+												default:
+													break;
+											}
+											if(StringUtils.isNotBlank(initValue)) {
+												cellDatas.add(new DPCellDataDto(codeColKey, initValue,attendanceAtrAsString, DPText.TYPE_LABEL));
+												value = codeNameTaskMap.containsKey(initValue+"|"+workFrameNo) ? codeNameTaskMap.get(initValue+"|"+workFrameNo).getName() : NAME_NOT_FOUND;
+											}
+										}
+									}
+								}
+							}
+							if(StringUtils.isBlank(initValue)) {
+								cellDatas.add(new DPCellDataDto(mergeString(DPText.CODE, itemIdAsString), "",
+										attendanceAtrAsString, DPText.TYPE_LABEL));
+								value = NAME_EMPTY;
+							}
 						} else {
 							if (groupType != null) {
 								if (groupType == TypeLink.WORKPLACE.value || groupType == TypeLink.POSSITION.value) {
@@ -607,6 +762,27 @@ public class InitScreenMob {
 									value = mapReasonName.containsKey(value + "|" + group)
 											? mapReasonName.get(value + "|" + group).getName()
 											: NAME_NOT_FOUND;
+								} else if(groupType == TypeLink.WORK.value) {
+									int frameNo = 0;
+									for(Entry<Integer, List<Integer>> entry : WORK_FRAME_MAP.entrySet()) {
+										if(entry.getValue().contains(item.getId())) {
+											frameNo = entry.getKey();
+											break;
+										}
+									}
+									cellDatas.add(new DPCellDataDto(codeColKey, value,attendanceAtrAsString, DPText.TYPE_LABEL));
+									value = codeNameTaskMap.containsKey(value+"|"+frameNo) ? codeNameTaskMap.get(value+"|"+frameNo).getName() : NAME_NOT_FOUND;
+								} else if(groupType == TypeLink.WORK_SUP_OPTION.value) {
+									List<TaskSupInfoItemAndSelectInforQueryDto> listName = taskSupInfoChoiceDetailsQuery.get(data.getDate(), item.getId());
+									cellDatas.add(new DPCellDataDto(codeColKey, value,attendanceAtrAsString, DPText.TYPE_LABEL));
+									String valueName = NAME_NOT_FOUND;
+									for(TaskSupInfoItemAndSelectInforQueryDto temp : listName) {
+										if(temp.getCode().equals(value)) {
+											valueName = temp.getName();
+											break;
+										}
+									}
+									value = valueName;
 								} else {
 									cellDatas.add(new DPCellDataDto(codeColKey, value, attendanceAtrAsString,
 											DPText.TYPE_LABEL));
@@ -667,11 +843,21 @@ public class InitScreenMob {
 						} else {
 							cellDatas.add(new DPCellDataDto(anyChar, value, attendanceAtrAsString, DPText.TYPE_LABEL));
 						}
+					} else if(attendanceAtr == DailyAttendanceAtr.AmountOfMoney.value){
+						cellDatas.add(new DPCellDataDto(anyChar, value.equals("0.0") ? "0" : value, attendanceAtrAsString, DPText.TYPE_LABEL));
+					} else if(attendanceAtr == DailyAttendanceAtr.NumberOfTime.value){
+						if (groupType != null && groupType == TypeLink.DOWORK.value) {
+							Double valueConvert = Double.parseDouble(value == "" ? "0.0" : value);
+							cellDatas.add(new DPCellDataDto(anyChar, valueConvert.equals(0.0) ? false : true, attendanceAtrAsString, DPText.TYPE_LABEL));
+						} else
+							cellDatas.add(new DPCellDataDto(anyChar, value, attendanceAtrAsString, DPText.TYPE_LABEL));
+					} else if(attendanceAtr == DailyAttendanceAtr.NumbericValue.value){
+						cellDatas.add(new DPCellDataDto(anyChar, value, attendanceAtrAsString, DPText.TYPE_LABEL));
 					} else {
 						cellDatas.add(new DPCellDataDto(anyChar, value, attendanceAtrAsString, DPText.TYPE_LABEL));
 					}
-				}
-			}
+				}			
+			} 
 		}
 		data.setTypeGroup(typeGroup);
 		data.setCellDatas(cellDatas);
@@ -703,5 +889,17 @@ public class InitScreenMob {
 				screenDto.getLstControlDisplayItem(), info, transferDesScreen);
 		screenDto.setStateParam(cacheParam);
 
+	}
+	
+	public Optional<TaskItem> getTaskItemByEmpDate(List<TaskInitialSelHist> taskInitialSelHistLst, String empID, GeneralDate date) {
+		Optional<TaskItem> opTaskItem = Optional.empty();
+		Optional<TaskInitialSelHist> opTaskInitialSelHist = taskInitialSelHistLst.stream().filter(x -> x.getEmpId().equals(empID)).findAny();
+		if(opTaskInitialSelHist.isPresent()) {
+			Optional<TaskInitialSel> opTaskInitialSel = opTaskInitialSelHist.get().getLstHistory().stream().filter(x -> x.getDatePeriod().contains(date)).findAny();
+			if(opTaskInitialSel.isPresent()) {
+				opTaskItem = Optional.of(opTaskInitialSel.get().getTaskItem());
+			}
+		}
+		return opTaskItem;
 	}
 }

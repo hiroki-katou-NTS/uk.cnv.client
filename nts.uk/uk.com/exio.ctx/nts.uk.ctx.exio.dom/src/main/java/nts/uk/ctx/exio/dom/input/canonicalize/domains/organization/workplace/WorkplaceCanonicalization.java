@@ -13,15 +13,16 @@ import nts.gul.text.IdentifierUtil;
 import nts.uk.ctx.bs.employee.dom.workplace.master.WorkplaceConfiguration;
 import nts.uk.ctx.bs.employee.dom.workplace.master.WorkplaceInformation;
 import nts.uk.ctx.exio.dom.input.ExecutionContext;
-import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalItem;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.DomainCanonicalization;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.ItemNoMap;
 import nts.uk.ctx.exio.dom.input.canonicalize.existing.AnyRecordToChange;
 import nts.uk.ctx.exio.dom.input.canonicalize.existing.AnyRecordToDelete;
-import nts.uk.ctx.exio.dom.input.canonicalize.methods.IntermediateResult;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalItem;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.IntermediateResult;
 import nts.uk.ctx.exio.dom.input.errors.ExternalImportError;
+import nts.uk.ctx.exio.dom.input.errors.RecordError;
 import nts.uk.ctx.exio.dom.input.meta.ImportingDataMeta;
-import nts.uk.ctx.exio.dom.input.util.Either;
+import nts.gul.util.Either;
 
 /**
  * 職場マスタの正準化
@@ -75,15 +76,15 @@ public class WorkplaceCanonicalization implements DomainCanonicalization {
 	public void canonicalize(DomainCanonicalization.RequireCanonicalize require, ExecutionContext context) {
 		
 		List<IntermediateResult> revisedRecords = require.getAllRevisedDataRecords(context).stream()
-				.map(r -> IntermediateResult.noChange(r))
+				.map(r -> IntermediateResult.create(r))
 				.collect(toList());
 		
 		if (revisedRecords.isEmpty()) {
 			return;
 		}
 		
-		Consumer<ExternalImportError> saveError = error -> {
-			require.add(context, error);
+		Consumer<RecordError> saveError = error -> {
+			require.add(ExternalImportError.of(context.getDomainId(), error));
 		};
 		
 		// 1. 期間の逆転をチェックし、エラー行を除外する
@@ -156,7 +157,7 @@ public class WorkplaceCanonicalization implements DomainCanonicalization {
 	private List<RecordWithPeriod> putDeleteFlag(List<RecordWithPeriod> records) {
 		
 		return records.stream()
-				.map(r -> r.canonicalize(i -> i.optionalItem(CanonicalItem.of(Items.削除フラグ, 0))))
+				.map(r -> r.canonicalize(i -> i.optionalItem(CanonicalItem.of(Items.削除フラグ, false))))
 				.collect(toList());
 	}
 	

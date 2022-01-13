@@ -19,6 +19,8 @@ public interface BusinessTypeFormatMonthlyRepository {
 	void deleteExistData(String companyId, String businessTypeCode, List<Integer> attendanceItemIds);
 
 	void add(List<BusinessTypeFormatMonthly> businessTypeFormatMonthlyAdds);
+	
+	void copy(String companyId, String businessTypeCode, List<String> listBusinessTypeCode);
 
 	boolean checkExistData(String companyId, String businessTypeCode);
 

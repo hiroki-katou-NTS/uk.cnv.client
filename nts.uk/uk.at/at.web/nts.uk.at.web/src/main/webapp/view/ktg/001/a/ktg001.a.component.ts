@@ -3,6 +3,7 @@ module nts.uk.ui.ktg001.a {
     export const KTG001_API = {
         GET_APPROVED_DATA_EXCECUTION: 'screen/at/ktg001/display',
         UPDATE_APPROVED_DATA_EXCECUTION: 'screen/at/ktg001/setting',
+        GET_INITITAL_DISPLAY_MONTH: 'screen/at/OptionalWidget/getWidgetInitialDisplayMonth',
     };
 
     //承認すべきデータの実行結果
@@ -58,6 +59,17 @@ module nts.uk.ui.ktg001.a {
         useMonthApproverConfirm: Boolean; //月の承認者確認を利用する
     }
 
+    interface WidgetInitialDisplayMonth {
+        currentOrNextMonth: number;
+        closureId: number;
+        currentMonth: number;
+        currentMonthStart: string;
+        currentMonthEnd: string;
+        nextMonth: number;
+        nextMonthStart: string;
+        nextMonthEnd: string;
+    }
+
     @component({
         name: 'ktg-001-a',
         template: `
@@ -94,6 +106,11 @@ module nts.uk.ui.ktg001.a {
                             <col width="99%" />
                         </colgroup>
                         <tbody>
+                            <tr data-bind="visible: $component.appRowVisible() || $component.aggrRowVisible()">
+                                <td colspan="3" style="border-bottom: 1px solid #BFBFBF;">
+                                    <div class="label font-size-sm" data-bind="text: $i18n('KTG001_13')"></div>
+                                </td>
+                            </tr>
                             <tr class='row-header' data-bind="css: $component.appRowVisible() ? 'row-show' : '', visible: $component.appRowVisible">
                                 <td class="text-center" style="position: relative;">
                                     <!-- A2_2 -->
@@ -111,6 +128,57 @@ module nts.uk.ui.ktg001.a {
                                 </td>
                                 <td style="padding-left: 5px;">
                                     <div data-bind="text: ''"></div>
+                                </td>
+                            </tr>
+                            <tr class='row-approval' data-bind="css: $component.aggrRowVisible() ? 'row-show' : '', visible: $component.aggrRowVisible">
+                                <td class="text-center" style="position: relative;">
+                                    <!-- A5_2 -->
+                                    <button class="ktg001-no-border" data-bind="ntsIcon: { no: 200, width: 28, height: 28 },
+                                        click: $component.aggrementApproval,
+                                        enable: $component.aggrIconVisible">
+                                    </button>
+                                    <!-- A5_3 -->
+                                    <i style="position: absolute; bottom: 5px; left: 15px; cursor: pointer;"
+                                        data-bind="visible: $component.aggrIconVisible, ntsIcon: { no: 165, width: 13, height: 13 }, click: $component.aggrementApproval"></i>
+                                </td>
+                                <td style="padding-left: 5px;" colspan="2">
+                                    <!-- A5_1 -->
+                                    <div data-bind="ntsFormLabel: { required: false, text: $i18n('KTG001_4') }"></div>
+                                </td>
+                            </tr>
+                            <tr class='row-approval' data-bind="
+                                css: $component.dayOrMonVisible() ? 'row-show' : '',
+                                visible: $component.dayOrMonVisible"
+                            >
+                                <td class="text-center" style="position: relative;" colspan="3">
+                                    <div class="flex valign-center" style="margin: 5px;">
+                                        <!-- A7_1 -->
+                                        <div class="label font-size-sm fd-2" data-bind="
+                                            text: $i18n('KTG001_14'),
+                                            visible: !$component.isChangingYM()"
+                                            style="text-align: left;">
+                                        </div>
+                                        <!-- A7_2 -->
+                                        <div class="label font-size-sm fd-2" data-bind="
+                                            text: $i18n('KTG001_15'),
+                                            visible: $component.isChangingYM()"
+                                            style="text-align: left; color: #FF0000; background: #BCBCBC;">
+                                        </div>
+                                        <!-- A10_1 -->
+                                        <div class="label font-size-sm flex fd-3 row-reverse" data-bind="
+                                            text: $component.displayDate()"
+                                            style="text-align: right; color: #808080; font-weight: 500;">
+                                        </div>
+                                        <!-- A10_2 -->
+                                        <div class="fd-2 fd-center" data-bind="ntsSwitchButton: {
+                                            name: $i18n('KTG001_16'),
+                                            options: yearMonths,
+                                            optionsValue: 'code',
+                                            optionsText: 'name',
+                                            value: yearMonth,
+                                            enable: true }">
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             <!-- ko foreach: { data: $component.dayDisplayAtrList, as: 'day' } -->
@@ -173,28 +241,30 @@ module nts.uk.ui.ktg001.a {
                                  	</td>
                                 </tr>
                             <!-- /ko -->
-
-                            <tr class='row-approval' data-bind="css: $component.aggrRowVisible() ? 'row-show' : '', visible: $component.aggrRowVisible">
-                                <td class="text-center" style="position: relative;;">
-                                    <!-- A5_2 -->
-                                    <button class="ktg001-no-border" data-bind="ntsIcon: { no: 200, width: 28, height: 28 },
-                                        click: $component.aggrementApproval,
-                                        enable: $component.aggrIconVisible">
-                                    </button>
-                                    <!-- A5_3 -->
-                                    <i style="position: absolute; bottom: 5px; left: 15px; cursor: pointer;"
-                                        data-bind="visible: $component.aggrIconVisible, ntsIcon: { no: 165, width: 13, height: 13 }, click: $component.aggrementApproval"></i>
-                                </td>
-                                <td style="padding-left: 5px;">
-                                    <!-- A5_1 -->
-                                    <div data-bind="ntsFormLabel: { required: false, text: $i18n('KTG001_4') }"></div>
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
             <style rel="stylesheet">
+                .fd-center {
+                    display: flex;
+                    place-content: center;
+                }
+                .row-reverse {
+                    flex-direction: row-reverse;
+                }
+                .fd-1 {
+                    flex: 1;
+                }
+                .fd-2 {
+                    flex: 2;
+                }
+                .fd-3 {
+                    flex: 3;
+                }
+                .font-size-sm {
+                    font-size: smaller;
+                }
                 .ktg-001-a table tr {
                     height: 30px !important;
                 }
@@ -237,6 +307,7 @@ module nts.uk.ui.ktg001.a {
         dayRowVisible: KnockoutObservable<Boolean> = ko.observable(false);
         monRowVisible: KnockoutObservable<Boolean> = ko.observable(false);
         aggrRowVisible: KnockoutObservable<Boolean> = ko.observable(false);
+        dayOrMonVisible: KnockoutComputed<Boolean> = ko.computed(() => this.dayRowVisible() || this.monRowVisible());
 
         appIconVisible: KnockoutObservable<Boolean> = ko.observable(false);
         aggrIconVisible: KnockoutObservable<Boolean> = ko.observable(false);
@@ -244,31 +315,58 @@ module nts.uk.ui.ktg001.a {
         settingIconVisible: KnockoutObservable<Boolean> = ko.observable(false);
 		dayDisplayAtrList: KnockoutObservableArray<IApprovedDataDetail> = ko.observableArray([]);
 		monthDisplayAtrList: KnockoutObservableArray<IApprovedDataDetail> = ko.observableArray([]);
+        
+        yearMonths: KnockoutObservableArray<any> = ko.observableArray([
+            { code: 1, name: this.$i18n('KTG001_17') },
+            { code: 2, name: this.$i18n('KTG001_18') },
+        ]);
+        yearMonth: KnockoutObservable<number> = ko.observable(null);
+        isChangingYM: KnockoutObservable<Boolean> = ko.observable(false);
+        initialData: WidgetInitialDisplayMonth = null;
 
-        constructor(private params: { currentOrNextMonth: 1 | 2; }) {
-            super();
-
-            if (this.params === undefined) {
-                this.params = { currentOrNextMonth: 1 };
+        displayDate: KnockoutComputed<string> = ko.computed(() => {
+            let date = '';
+            if (this.yearMonth() == 1) {
+                date = moment(this.initialData.currentMonth, 'YYYYMM').format('YYYY/MM');
             }
-
-            if (this.params.currentOrNextMonth === undefined) {
-                this.params.currentOrNextMonth = 1;
+            if (this.yearMonth() == 2) {
+                date = moment(this.initialData.nextMonth, 'YYYYMM').format('YYYY/MM');
+                
             }
-
-        }
+            return this.$i18n('KTG001_19', [date]);
+        });
 
         mounted() {
             const vm = this;
 
-            vm.loadData();
+            vm.$window.storage('KTG001_INITIAL_DATA').then((rs: WidgetInitialDisplayMonth) => {
+                if (!rs) {
+                    const { GET_INITITAL_DISPLAY_MONTH } = KTG001_API;
+                    vm.$ajax('at', GET_INITITAL_DISPLAY_MONTH)
+                        .then((data: WidgetInitialDisplayMonth) => {
+                            vm.$window.storage('KTG001_INITIAL_DATA', data);        
+                            vm.initialData = data;
+                            vm.yearMonth(data.currentOrNextMonth);
+                        });
+                }
+                else {
+                    vm.initialData= rs;
+                    vm.yearMonth(rs.currentOrNextMonth);
+                }
+            });
+
+            vm.yearMonth.subscribe(value => {
+                vm.initialData.currentOrNextMonth = value;
+                vm.$window.storage('KTG001_INITIAL_DATA', vm.initialData);
+                vm.loadData();
+            });
 
             vm.$el.removeAttribute('data-bind');
         }
 
         loadData(): void {
             const vm = this;
-            const { params } = vm;
+            vm.isChangingYM(true);
             const query = [
                 'nts.uk.ctx.sys.portal.dom.toppagepart.standardwidget.ApprovedApplicationStatusItem',
                 'nts.uk.ctx.at.schedule.dom.plannedyearholiday.frame.NotUseAtr'
@@ -276,7 +374,7 @@ module nts.uk.ui.ktg001.a {
 
             const { GET_APPROVED_DATA_EXCECUTION } = KTG001_API;
             const enums = vm.$ajax('com', '/enums/map', query);
-            const aprov = vm.$ajax('at', GET_APPROVED_DATA_EXCECUTION, { ...params, ym: params.currentOrNextMonth });
+            const aprov = vm.$ajax('at', GET_APPROVED_DATA_EXCECUTION, { ym: vm.yearMonth() });
 
             vm.$blockui("invisibleView")
                 .then(() => $.when(enums, aprov))
@@ -334,13 +432,20 @@ module nts.uk.ui.ktg001.a {
                             .removeAttr('data-bind');
                         _.forEach($(".row-show td"), element => $(element).removeClass("ktg001-no-border"));    
                         _.forEach($($(".row-show").last().children()), element => $(element).addClass("ktg001-no-border"));
-						$(".row-header").last().children().css('border-bottom', '1px solid #BFBFBF');
+						if (vm.aggrRowVisible()) {
+                            $(".row-header").last().children().css('border-bottom', '1px solid #BFBFBF');
+                        } else {
+                            $(".row-header").last().children().css('border-bottom', 'none');
+                        }
 						$(".row-day").last().children().css('border-bottom', '1px solid #BFBFBF');
 						$(".row-month").last().children().css('border-bottom', '1px solid #BFBFBF');
 						$(".row-approval").last().children().css('border-bottom', '1px solid #BFBFBF');
                     });
                 })
-                .always(() => vm.$blockui("clearView"));
+                .always(() => {
+                    vm.isChangingYM(false);
+                    vm.$blockui("clearView");
+                });
         }
 
         applicationList() {

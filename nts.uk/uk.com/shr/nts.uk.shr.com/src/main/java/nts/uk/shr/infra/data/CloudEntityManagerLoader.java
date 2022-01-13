@@ -3,14 +3,17 @@ package nts.uk.shr.infra.data;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import lombok.val;
 import nts.arc.layer.infra.data.EntityManagerLoader;
+import nts.gul.error.FatalLog;
 import nts.gul.reflection.ReflectionUtil;
 
 @ApplicationScoped
@@ -52,11 +55,7 @@ public class CloudEntityManagerLoader implements EntityManagerLoader{
     @Override
     public EntityManager getEntityManager() {
     	String datasourceName = TenantLocatorService.getConnectedDataSource();
-    	EntityManager em = entityManagersMap.get(datasourceName);
-    	if (em == null) {
-    		throw new RuntimeException("データソースに一致するマネージャが見つかりませんでした。");
-    	}
-    	return em;
+		return getEntityManagerForDataSource(datasourceName, "connected");
     }
 	
 	@Override
@@ -76,9 +75,24 @@ public class CloudEntityManagerLoader implements EntityManagerLoader{
 	@Override
 	public void forTenantDatasource(String tenantCode, Consumer<EntityManager> process) {
 		String datasource = TenantLocatorService.getDataSourceFor(tenantCode);
-//		setSessionVariable();
-		
-		process.accept(entityManagersMap.get(datasource));
+		val em = getEntityManagerForDataSource(datasource, tenantCode);
+		process.accept(em);
+	}
+
+	private EntityManager getEntityManagerForDataSource(String datasource, String tenantCode) {
+
+		val em = entityManagersMap.get(datasource);
+
+		if (em == null) {
+			String message = "データソースが見つかりません" + System.lineSeparator()
+					+ "テナント: " + tenantCode + System.lineSeparator()
+					+ "TenantLocatorに返されたデータソース名: " + datasource + System.lineSeparator()
+					+ "Loaderに実装された全データソース名: " + entityManagersMap.keySet().stream().collect(Collectors.joining(", "));
+			
+			throw FatalLog.writeThenException(CloudEntityManagerLoader.class, message);
+		}
+
+		return em;
 	}
 
 	private void runner(Runnable runnable) {

@@ -359,6 +359,7 @@ module nts.uk.com.view.cmf002.c.viewmodel {
                 else {
                     errors.clearAll();
                     self.listStandardOutputItem([]);
+                    self.listStandardOutputItemTemp([]);
                     self.settingNewMode();
                 }
                 dfd.resolve();

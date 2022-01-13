@@ -9,27 +9,27 @@
 	<ui:composition template="../../../../master/base.xhtml">
 		<ui:define name="htmlHead">
 			<com:ValidatorScript>
-				nts.uk.ctx.at.shared.dom.scherec.monthlyattendanceitem.RoundingUnitPrimitive
+				<!--nts.uk.ctx.at.shared.dom.scherec.monthlyattendanceitem.RoundingUnitPrimitive-->
+				nts.uk.ctx.at.shared.dom.attendance.AttendanceName
 			</com:ValidatorScript>
 			<com:scriptfile set="IGNITE" />
 			<com:stylefile path="kdw002.a.main.css" />
-			<com:scriptfile path="kdw002.a.start.js" />
-			<com:scriptfile path="kdw002.a.vm.js" />
 			<com:scriptfile path="kdw002.a.service.js" />
+			<com:scriptfile path="kdw002.a.vm.js" />
 		</ui:define>
 
 		<ui:define name="content">
 			<div id="functions-area">
-				<!-- <a tabindex="1" class="goback" data-bind="ntsLinkButton: { jump: '/view/kdw/006/a/index.xhtml' }">#{i18n.getText('KDW002_8')}</a> -->
+				<!--A1_1-->
 				<a tabindex="1" id="button1" class="goback"
-					data-bind="ntsLinkButton: { action: jumpToHome.bind($data, sideBar)}">#{i18n.getText('KDW002_21')}</a>
-				<button tabindex="2" data-prevent-click="true" class="proceed" data-bind="click: submitData,enable :isSave">#{i18n.getText('KDW002_2')}</button>
-
+					data-bind="ntsLinkButton: { jump: '/view/kdw/006/a/index.xhtml' }">#{i18n.getText('KDW002_21')}</a>
+				<!--A1_2-->
+				<button tabindex="2" data-prevent-click="true" class="proceed"
+					data-bind="click: submitData, enable: $root.errors.isEmpty, timeClick: 500">#{i18n.getText('KDW002_2')}</button>
 			</div>
 			<div id="contents-area">
 				<div class="leftpanel"
 					data-bind="ntsPanel:{ direction: 'right', visible: true}">
-
 					<!-- <div tabindex="3" style="width: 300px"
 						data-bind="ntsSearchBox: {searchMode: 'filter',placeHolder:'',targetKey: 'attendanceItemId',
 						mode:'igGrid', comId:'gridList', items: attendanceItems,selected: aICurrentCode, 
@@ -40,54 +40,144 @@
 						comId: 'gridList', 
 								items: attendanceItems, selected: aICurrentCode,
 								selectedKey: 'displayNumber', fields: ['attendanceItemName', 'displayNumber'], mode: 'igGrid'}" />
-					<label>#{i18n.getText('KDW002_23')}</label>
+
+					<label id="A2_1">#{i18n.getText('KDW002_23')}</label>
+					<!-- A2_2-->
 					<table tabindex="4" id="gridList"
 						data-bind="ntsGridList:{
 							width: 300,
-							height: 700,
+							height: gridHeight,
 							options: attendanceItems,
 							value: aICurrentCode,
 							columns: attendanceItemColumn,
 							optionsValue: 'displayNumber',
 							multiple: false,
-							enable: true,										
-							showCheckBox: false,
-							rows : 15}">
+							enable: true
+						}">
 					</table>
-
-
-
 				</div>
 				<div class="rightContent"></div>
 				<div class="component-area">
-					<div data-bind="ntsFormLabel:{}">#{i18n.getText('KDW002_23')}</div>
-					<div class="mylabel" data-bind="text: txtItemId"></div>
-					<div class="mylabel2" data-bind="ntsFormLabel:{}">#{i18n.getText('KDW002_4')}</div>
-					<div class="mylabel" data-bind="text: txtItemName"></div>
+					<!-- ver 8 -->
+					<!-- <label>#{i18n.getText('KDW002_23')} </label>  -->
+					<table class="detail-data">
+						<colgroup>
+							<col width="115" />
+							<col width="400" />
+						</colgroup>
+						<tr>
+							<td><div id="A3_1"
+									data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KDW002_3')}</div></td>
+							<td><label id="A3_2" class="detailContent"
+								data-bind="text: txtItemId"></label></td>
+						</tr>
+						<tr>
+							<td><div id="A3_3"
+									data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KDW002_24')}</div></td>
+							<td><label id="A3_4" class="detailContent"
+								data-bind="text: txtItemName"></label></td>
+						</tr>
+						<tr>
+							<td><div id="A7_1"
+									data-bind="ntsFormLabel: {constraint: 'AttendanceName', required: false}">#{i18n.getText('KDW002_65')}</div></td>
+							<td><input id="A7_2" tabindex="5" class="detailContent" style="width: 155px;"
+								data-bind="ntsTextEditor: {
+									value: displayName,
+									constraint: 'AttendanceName',
+									name: '#[KDW002_65]',
+									enable: displayNameEnable }" /></td>
+						</tr>
+						<tr>
+							<td><div id="A8_1"
+									data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KDW002_67')}</div></td>
+							<td><div id="A8_2" tabindex="6" class="detailContent" style="width: 115px;"
+									data-bind="ntsComboBox: {
+										name: '{#KDW002_67}',
+										options: lineBreakPositions,
+										optionsValue: 'code',
+										visibleItemsCount: 5,
+										value: lineBreakPosition,
+										optionsText: 'name',
+										enable: true,
+										required: false}">
+								</div></td>
+						</tr>
+						<tr>
+							<td><div id="A4_1"
+									data-bind="ntsFormLabel: {required: false}">#{i18n.getText('KDW002_25')}</div></td>
+							<!--A4_2-->
+							<td><div id="colorID" tabindex="7" class="detailContent"
+									data-bind="ntsColorPicker: {value: headerColorValue,
+															name:'#[KDW002_26]',
+															width: 50}"></div></td>
+						</tr>
+						<!--<tr data-bind="if: unit() !== null">-->
+							<!--<td><div id="A5_1"-->
+									<!--data-bind="ntsFormLabel: {required: false}">#{i18n.getText('KDW002_27')}</div></td>-->
+							<!--<td>-->
+								<!--&lt;!&ndash; ver 8 A5_4, A5_5 5&ndash;&gt;-->
+								<!--<div id="A5_4" tabindex="8" class="detailContent" style="width: 95px;"-->
+												<!--data-bind="ntsComboBox: {-->
+																	<!--name: '{#KDW002_48}',-->
+																	<!--options: moneyUnits,-->
+																	<!--optionsValue: 'code',-->
+																	<!--visibleItemsCount: 5,-->
+																	<!--value: moneyUnit,-->
+																	<!--optionsText: 'name',-->
+																	<!--enable: true,-->
+																	<!--required: false},-->
+																	<!--visible: unit() === 2">-->
+								<!--</div> &lt;!&ndash; ver 8 A5_6, A5_7 2&ndash;&gt;-->
+								<!--<div id="A5_6" tabindex="9" class="detailContent" style="width: 95px;"-->
+												<!--data-bind="ntsComboBox: {-->
+																	<!--name: '{#KDW002_48}',-->
+																	<!--options: numberOfTimesUnits,-->
+																	<!--optionsValue: 'code',-->
+																	<!--visibleItemsCount: 5,-->
+																	<!--value: numberOfTimesUnit,-->
+																	<!--optionsText: 'name',-->
+																	<!--enable: true,-->
+																	<!--required: false},-->
+																	<!--visible: unit() === 1">-->
+								<!--</div> &lt;!&ndash; ver 8 A5_8, A5_9&ndash;&gt;-->
+								<!--<div id="A5_8" tabindex="10" class="detailContent" style="width: 95px;"-->
+												<!--data-bind="ntsComboBox: {-->
+																	<!--name: '{#KDW002_48}',-->
+																	<!--options: timeUnits,-->
+																	<!--optionsValue: 'code',-->
+																	<!--visibleItemsCount: 5,-->
+																	<!--value: timeUnit,-->
+																	<!--optionsText: 'name',-->
+																	<!--enable: true,-->
+																	<!--required: false},-->
+																	<!--visible: unit() === 0">-->
+								<!--</div>-->
+							<!--</td>-->
+						<!--</tr>-->
+					</table>
+
 				</div>
-				<label data-bind="value: linebreak "></label>
+				<!-- <label data-bind="value: linebreak "></label> -->
 				<div class="component-area">
-					<div data-bind="ntsFormLabel:{}">#{i18n.getText('KDW002_25')}</div>
-					<div id="colorID" tabindex="5" class="headerColor"
-						data-bind="ntsColorPicker: {value: headerColorValue, width: 50}" ></div>
+
 				</div>
 				<div class="component-area">
-					<div data-bind="ntsFormLabel:{}">#{i18n.getText('KDW002_27')}</div> 
 					<!-- <select tabindex="6"
 						class="unitRounding"
 						data-bind="options: unitRoundings , optionsText: 'timeInputName', optionsValue: 'timeInputValue' , value: timeInputCurrentCode, enable: timeInputEnable"></select> -->
-						<input style="width: 50px; margin-right: 10px;" class="unitRounding" data-bind="ntsNumberEditor: {
+					<!-- ver 8: A5_2, A5_3-->
+					<!-- <input style="width: 50px; margin-right: 10px;" class="unitRounding" data-bind="ntsNumberEditor: {
 							constraint: 'RoundingUnitPrimitive',
 							required: false,
 							name: '丸め単位',
 							value: roundingUnitValue,
 							enable: timeInputEnable
-						}" />
-						<span class="label" data-bind="visible: unit() === 0" style="margin-top: 6px">#{i18n.getText('KDW002_45')}</span>
-						<span class="label" data-bind="visible: unit() === 1" style="margin-top: 6px">#{i18n.getText('KDW002_46')}</span>
-						<span class="label" data-bind="visible: unit() === 2" style="margin-top: 6px">#{i18n.getText('KDW002_47')}</span>
-				</div>
+						}" /> -->
 
+					<!-- <span class="label" data-bind="visible: unit() === 0">#{i18n.getText('KDW002_45')}</span>
+						<span class="label" data-bind="visible: unit() === 1">#{i18n.getText('KDW002_46')}</span>
+						<span class="label" data-bind="visible: unit() === 2">#{i18n.getText('KDW002_47')}</span> -->
+				</div>
 			</div>
 		</ui:define>
 

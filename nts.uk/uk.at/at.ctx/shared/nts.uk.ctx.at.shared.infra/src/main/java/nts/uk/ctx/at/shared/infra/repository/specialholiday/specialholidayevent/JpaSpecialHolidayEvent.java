@@ -7,6 +7,8 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.layer.infra.data.DbConsts;
 import nts.arc.layer.infra.data.JpaRepository;
@@ -107,13 +109,14 @@ public class JpaSpecialHolidayEvent extends JpaRepository implements SpecialHoli
 	private SpecialHolidayEvent toDomain(KshstSpecialHolidayEvent entity) {
 		return new SpecialHolidayEvent(entity.pk.companyId, entity.pk.specialHolidayEventNo,
 				EnumAdaptor.valueOf(entity.maxNumberDayType, MaxNumberDayType.class),
-				new FixedDayGrant(entity.fixedDayGrant), EnumAdaptor.valueOf(entity.makeInvitation, UseAtr.class),
-				EnumAdaptor.valueOf(entity.includeHolidays, UseAtr.class),
-				EnumAdaptor.valueOf(entity.ageLimit, UseAtr.class),
-				EnumAdaptor.valueOf(entity.genderRestrict, UseAtr.class),
-				EnumAdaptor.valueOf(entity.restrictEmployment, UseAtr.class),
-				EnumAdaptor.valueOf(entity.restrictClassification, UseAtr.class),
-				EnumAdaptor.valueOf(entity.gender, GenderCls.class),
+				new FixedDayGrant(entity.fixedDayGrant), 
+				EnumAdaptor.valueOf(BooleanUtils.toInteger(entity.makeInvitation), UseAtr.class),
+				EnumAdaptor.valueOf(BooleanUtils.toInteger(entity.includeHolidays), UseAtr.class),
+				EnumAdaptor.valueOf(BooleanUtils.toInteger(entity.ageLimit), UseAtr.class),
+				EnumAdaptor.valueOf(BooleanUtils.toInteger(entity.genderRestrict), UseAtr.class),
+				EnumAdaptor.valueOf(BooleanUtils.toInteger(entity.restrictEmployment), UseAtr.class),
+				EnumAdaptor.valueOf(BooleanUtils.toInteger(entity.restrictClassification), UseAtr.class),
+				EnumAdaptor.valueOf(BooleanUtils.toInteger(entity.gender), GenderCls.class),
 				createAgeRange(entity.ageRangeLowerLimit, entity.ageRangeHigherLimit),
 				EnumAdaptor.valueOf(entity.ageStandard, AgeStandardType.class), entity.ageStandardBaseDate,
 				new Memo(entity.memo), getClsList(entity.pk.companyId, entity.pk.specialHolidayEventNo),
@@ -178,12 +181,23 @@ public class JpaSpecialHolidayEvent extends JpaRepository implements SpecialHoli
 
 	private KshstSpecialHolidayEvent toEntity(SpecialHolidayEvent domain) {
 		return new KshstSpecialHolidayEvent(
-				new KshstSpecialHolidayEventPK(domain.getCompanyId(), domain.getSpecialHolidayEventNo()),
-				domain.getMaxNumberDay().value, domain.getFixedDayGrant().v(), domain.getMakeInvitation().value,
-				domain.getIncludeHolidays().value, domain.getAgeLimit().value, domain.getGenderRestrict().value,
-				domain.getRestrictEmployment().value, domain.getRestrictClassification().value,
-				domain.getGender().value, domain.getAgeLowerLimit(), domain.getAgeRangeHigherLimit(),
-				domain.getAgeStandard().value, domain.getAgeStandardBaseDate(), domain.getMemo().v());
+				new KshstSpecialHolidayEventPK(
+						domain.getCompanyId(), 
+						domain.getSpecialHolidayEventNo()),
+				domain.getMaxNumberDay().value, 
+				domain.getFixedDayGrant().v(), 
+				BooleanUtils.toBoolean(domain.getMakeInvitation().value),
+				BooleanUtils.toBoolean(domain.getIncludeHolidays().value), 
+				BooleanUtils.toBoolean(domain.getAgeLimit().value), 
+				BooleanUtils.toBoolean(domain.getGenderRestrict().value),
+				BooleanUtils.toBoolean(domain.getRestrictEmployment().value), 
+				BooleanUtils.toBoolean(domain.getRestrictClassification().value),
+				BooleanUtils.toBoolean(domain.getGender().value), 
+				domain.getAgeLowerLimit(), 
+				domain.getAgeRangeHigherLimit(),
+				domain.getAgeStandard().value, 
+				domain.getAgeStandardBaseDate(), 
+				domain.getMemo().v());
 	}
 
 	@Override

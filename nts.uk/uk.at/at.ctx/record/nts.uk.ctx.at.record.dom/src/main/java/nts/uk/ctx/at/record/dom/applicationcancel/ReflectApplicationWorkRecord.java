@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.tuple.Pair;
 
 import lombok.val;
+import nts.arc.enums.EnumAdaptor;
 import nts.arc.task.tran.AtomTask;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
@@ -16,6 +17,7 @@ import nts.uk.ctx.at.record.dom.adapter.request.application.state.RCReflectedSta
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.shared.dom.dailyattdcal.dailywork.worktime.empwork.EmployeeWorkDataSetting;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.ApplicationShare;
+import nts.uk.ctx.at.shared.dom.scherec.application.common.ReflectedStateShare;
 import nts.uk.ctx.at.shared.dom.scherec.application.common.StampRequestModeShare;
 import nts.uk.ctx.at.shared.dom.scherec.application.stamp.AppRecordImageShare;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.DailyRecordOfApplication;
@@ -38,9 +40,8 @@ import nts.uk.ctx.at.shared.dom.workrecord.workperfor.dailymonthlyprocessing.enu
  */
 public class ReflectApplicationWorkRecord {
 
-	public static Pair<RCReflectStatusResult, Optional<AtomTask>> process(Require require, String cid, ApplicationShare application,
-			GeneralDate date, RCReflectStatusResult reflectStatus, GeneralDateTime reflectTime) {
-
+	public static Pair<RCReflectStatusResult, Optional<AtomTask>> process(Require require,  String cid, ApplicationShare application,
+			GeneralDate date, RCReflectStatusResult reflectStatus, GeneralDateTime reflectTime, String execId) {
 		// [input.申請.打刻申請モード]をチェック
 		GeneralDate dateTarget = date;
 		Optional<Stamp> stamp = Optional.empty();
@@ -99,6 +100,7 @@ public class ReflectApplicationWorkRecord {
 			dailyRecordApp.setDomain(lstAfterCalc.get(0));
 		}
 
+		ReflectedStateShare before = EnumAdaptor.valueOf(reflectStatus.getReflectStatus().value, ReflectedStateShare.class);
 		AtomTask task = AtomTask.of(() -> {
 			//エラーで本人確認と上司承認を解除する
 			require.removeConfirmApproval(Arrays.asList(dailyRecordApp.getDomain().getDomain()));
@@ -108,7 +110,7 @@ public class ReflectApplicationWorkRecord {
 
 			// 申請反映履歴を作成する
 			CreateApplicationReflectionHist.create(require, application.getAppID(), ScheduleRecordClassifi.RECORD,
-					dailyRecordApp, domainBeforeReflect, reflectTime);
+					dailyRecordApp, domainBeforeReflect, reflectTime, execId, before);
 
 		});
 		// [input.勤務実績の反映状態]を「反映済み」に更新する

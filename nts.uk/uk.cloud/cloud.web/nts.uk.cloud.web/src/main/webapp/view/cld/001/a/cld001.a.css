@@ -5,3 +5,26 @@
 .top-content-tbl td {
 	padding: 5px;
 }
+
+.fixed-flex-layout
+{
+	display: inline-flex;
+}
+
+.fixed-flex-layout-left .fixed-flex-layout-right{
+	width: 700px;
+}
+
+#chkUseCheckDigit_tenantCode,
+#lblTenantManagerId, #txtTenantManagerId,
+#lblTenantManagerPassword, #txtTenantManagerPassword,
+.chkSSO_SAML,
+#lblBillingType, #billingType,
+#lblNumberOfLicence_at, #nmbNumberOfLicence_at,
+#lblNumberOfLicence_hr, #nmbNumberOfLicence_hr,
+#lblNumberOfLicence_pr, #nmbNumberOfLicence_pr,
+.symbol-right,
+#lblOptionCode, #txtOptionCode,
+#chkUseCheckDigit_optionCode {
+	visibility: hidden;
+}

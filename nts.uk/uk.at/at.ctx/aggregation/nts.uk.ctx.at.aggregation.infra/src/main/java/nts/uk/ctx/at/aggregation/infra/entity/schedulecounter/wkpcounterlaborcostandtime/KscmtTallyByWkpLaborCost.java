@@ -32,16 +32,16 @@ public class KscmtTallyByWkpLaborCost extends ContractUkJpaEntity implements Ser
 	public KscmtTallyByWkpLaborCostPk pk;
 
 	@Column(name = "USE_ATR")
-	public int useClassification;
+	public boolean useClassification;
 
 	@Column(name = "TIME_FOR_LABOR_COST")
-	public int time;
+	public boolean time;
 
 	@Column(name = "LABOR_COST")
-	public int laborCost;
+	public boolean laborCost;
 
 	@Column(name = "BADGET_FOR_LABOR_COST")
-	public Integer budget;
+	public Boolean budget;
 
 	@Override
 	protected Object getKey() {
@@ -53,10 +53,12 @@ public class KscmtTallyByWkpLaborCost extends ContractUkJpaEntity implements Ser
 			KscmtTallyByWkpLaborCostPk pk = new KscmtTallyByWkpLaborCostPk(companyId, x.getKey().value);
 			KscmtTallyByWkpLaborCost result = new KscmtTallyByWkpLaborCost(
 				pk,
-				x.getValue().getUseClassification().value,
-				x.getValue().getTime().value,
-				x.getValue().getLaborCost().value,
-				x.getValue().getBudget().isPresent() ? x.getValue().getBudget().get().value : null
+				x.getValue().getUseClassification().isUse(),
+				x.getValue().getTime().isUse(),
+				x.getValue().getLaborCost().isUse(),
+				x.getValue().getBudget()
+						.map(v -> v.value == 1)
+						.orElse(false)
 			);
 
 			result.contractCd = AppContexts.user().contractCode();
@@ -70,10 +72,10 @@ public class KscmtTallyByWkpLaborCost extends ContractUkJpaEntity implements Ser
 		entities.forEach(x -> laborCostAndTimeList.put(
 			EnumAdaptor.valueOf(x.pk.costType, AggregationUnitOfLaborCosts.class),
 			new LaborCostAndTime(
-				NotUseAtr.valueOf(x.useClassification),
-				NotUseAtr.valueOf(x.time),
-				NotUseAtr.valueOf(x.laborCost),
-				x.budget == null ? Optional.empty() : Optional.of(NotUseAtr.valueOf(x.budget)))
+				NotUseAtr.valueOf(x.useClassification ? 1 : 0),
+				NotUseAtr.valueOf(x.time ? 1 : 0),
+				NotUseAtr.valueOf(x.laborCost ? 1 : 0),
+				x.budget == null ? Optional.empty() : Optional.of(NotUseAtr.valueOf(x.budget == true ? 1 : 0)))
 		));
 
 		return WorkplaceCounterLaborCostAndTime.create(laborCostAndTimeList);

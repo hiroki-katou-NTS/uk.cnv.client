@@ -48,17 +48,18 @@ table#table4 {
 table#table6 td {
 	height: 40px;
 	border: 2px solid #ccc;
-	padding-left: 10px;
+	padding-left: 5px;
 }
 
 .button-a88{
     margin-left: 15px;
+	margin-top: 7px;
 }
 
 .block-left-2 {
 	height: 400px;
 	width: 424px;
-/* 	float: left; */
+ 	/* float: left;  */
 	margin-top: 10px;
 }
 
@@ -142,4 +143,18 @@ table#table-3 td{
 #table-3{
 	margin-left: 15px;
    /*  margin-top: 15px; */
+}
+.show-popup-privatetimea867 {
+	padding-top : 5px;
+}
+.show-popup-uniontimea867 {
+	padding-top : 5px;
+}
+
+.width-td-table-popup{
+	width: 110px;
+}
+
+.width-td-table-popup-2{
+	width: 35px;
 }

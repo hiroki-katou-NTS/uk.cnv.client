@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+	<ui:composition template="../../../../master/dialog.xhtml">
+		<ui:define name="htmlHead">
+			<script>
+				var dialogSize = {
+					width: 620,
+					height: 360
+				};
+			</script>
+
+			<com:scriptfile set="IGNITE" />
+			<com:stylefile path="./kdw006.l.main.css" />
+			<com:scriptfile path="./kdw006.l.vm.js" />
+		</ui:define>
+
+		<!-- PAGE CONTENT -->
+		<ui:define name="content">
+			<div id="contents-area" class="fixed-flex-layout">
+				<div class="fixed-flex-layout-left">
+					<div class="valign-center control-group" style="padding-top: 15px">
+						<button tabindex="1"
+							data-bind="enable: screenMode() == 0 || screenMode() == 3, click: addHistory, text: $i18n('KDW006_327')"></button>
+						<button tabindex="2"
+							data-bind="enable: screenMode() == 0 &amp;&amp; isLatestHistory(), click: updateHistory, text: $i18n('KDW006_328')"></button>
+						<button tabindex="3" class="danger"
+							data-bind="enable: (screenMode() == 0 &amp;&amp; isLatestHistory()) || screenMode() == 3, click: deleteHistory, text: $i18n('KDW006_329')"></button>
+					</div>
+					<div class="list-history">
+						<table tabindex="4" id="single-list" data-bind="ntsGridList: {
+							options: $vm.lstWpkHistory,
+							optionsValue: 'historyId',
+							columns: [
+								{ headerText: $i18n('KDW006_330'), prop: 'historyId', width: 0 },
+								{ headerText: $i18n('KDW006_330'), prop: 'displayText', length: 15 }
+							],
+							rows: 5,
+							value: selectedHistoryId
+						}">
+						</table>
+					</div>
+				</div>
+
+				<div class="fixed-flex-layout-right">
+					<div class="valign-center control-group" style="width: 323px; padding-top: 20px">
+						<span class="label" data-bind="text: $vm.textTitle"></span>
+					</div>
+					<div class="valign-center control-group" style="width: 323px;">
+						<div data-bind="ntsFormLabel: {required: true}">#{i18n.getText('KDW006_330')}</div>
+						<div tabindex="5" id="B3_5" data-bind="ntsDatePicker: {
+							name: '#[KDW006_330]', 
+							required: true, 
+							value: selectedStartDateInput, 
+							dateFormat: 'YYYY/MM/DD', 
+							enable: true}, visible: screenMode() == 1 || screenMode() == 2 || screenMode() == 3"></div>
+						<span class="label" data-bind="text: selectedStartDateText, visible: screenMode() == 0"></span>
+						<span class="label">#{i18n.getText('CMM011_125')}</span>
+						<span class="label" data-bind="text: selectedEndDate"></span>
+					</div>
+					<div class="valign-center control-group" data-bind="visible: screenMode() == 2"
+						style="width: 323px;">
+						<div tabindex="6"
+							data-bind="ntsCheckBox: { checked: copyPreviousConfig }, visible: initMode() == 0">
+							#{i18n.getText('KDW006_334')}</div>
+						<div tabindex="6"
+							data-bind="ntsCheckBox: { checked: copyPreviousConfig }, visible: initMode() == 1">
+							#{i18n.getText('KDW006_334')}</div>
+					</div>
+				</div>
+			</div>
+			<div id="functions-area-bottom">
+				<button class="x-large proceed" tabindex="7"
+					data-bind="enable: $root.errors.isEmpty &amp;&amp; !(lstWpkHistory().length > 0 &amp;&amp; !selectedHistoryId()), click: AddOrUpdate">#{i18n.getText('CMM011_127')}</button>
+				<button class="large" tabindex="8" data-bind="click: cancel">#{i18n.getText('CMM011_128')}</button>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+
+</html>

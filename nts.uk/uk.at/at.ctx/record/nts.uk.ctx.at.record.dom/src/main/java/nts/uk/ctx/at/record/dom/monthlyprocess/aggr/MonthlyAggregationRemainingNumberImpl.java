@@ -16,6 +16,7 @@ import nts.arc.diagnose.stopwatch.concurrent.ConcurrentStopwatches;
 import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.YearMonth;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.record.dom.monthly.holidaymanagement.publicholiday.GetAggregationPeriodForPublicHoliday;
 import nts.uk.ctx.at.record.dom.monthlyprocess.vacation.CreateDailyInterimRemainMngs;
 import nts.uk.ctx.at.record.dom.remainingnumber.annualleave.export.GetAnnAndRsvRemNumWithinPeriod;
 import nts.uk.ctx.at.record.dom.remainingnumber.annualleave.export.param.AggrResultOfAnnAndRsvLeave;
@@ -69,10 +70,6 @@ import nts.uk.ctx.at.shared.dom.remainingnumber.nursingcareleavemanagement.child
 import nts.uk.ctx.at.shared.dom.remainingnumber.reserveleave.empinfo.grantremainingdata.daynumber.ReserveLeaveRemainingDayNumber;
 import nts.uk.ctx.at.shared.dom.remainingnumber.reserveleave.interim.TmpResereLeaveMng;
 import nts.uk.ctx.at.shared.dom.remainingnumber.specialholidaymng.interim.InterimSpecialHolidayMng;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.AggregateMonthlyRecordServiceProc.RequireM16;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.AggregateMonthlyRecordServiceProc.RequireM4;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.AggregateMonthlyRecordServiceProc.RequireM5;
-import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.AggregateMonthlyRecordServiceProc.RequireM6;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.AggregateMonthlyRecordValue;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.MonthlyAggregationRemainingNumber;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.export.pererror.CreatePerErrorsFromLeaveErrors;
@@ -102,6 +99,7 @@ import nts.uk.shr.com.time.calendar.date.ClosureDate;
 
 /**
  * 処理：ドメインサービス：月別実績を集計する
+ * 
  * @author masaaki_jinno
  *
  */
@@ -134,24 +132,21 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 	@Setter
 	private MonthlyCalculatingDailys monthlyCalculatingDailys;
 
-	/** 暫定残数データ */
-	private List<DailyInterimRemainMngData> dailyInterimRemainMngs;
 	/** 暫定残数データ上書きフラグ */
 	private boolean isOverWriteRemain;
-
 
 	@Inject
 	private RecordDomRequireService requireService;
 
-	public AggregateMonthlyRecordValue aggregation(CacheCarrier cacheCarrier, DatePeriod period,
-			String companyId, String employeeId, YearMonth yearMonth, ClosureId closureId,   ClosureDate closureDate,
+	public AggregateMonthlyRecordValue aggregation(CacheCarrier cacheCarrier, DatePeriod period, String companyId,
+			String employeeId, YearMonth yearMonth, ClosureId closureId, ClosureDate closureDate,
 			MonAggrCompanySettings companySets, MonAggrEmployeeSettings employeeSets,
-			MonthlyCalculatingDailys monthlyCalculatingDailys,
-			InterimRemainMngMode interimRemainMngMode, boolean isCalcAttendanceRate) {
+			MonthlyCalculatingDailys monthlyCalculatingDailys, InterimRemainMngMode interimRemainMngMode,
+			boolean isCalcAttendanceRate) {
 
 		val require = requireService.createRequire();
 
-		this.companyId  = companyId;
+		this.companyId = companyId;
 		this.employeeId = employeeId;
 		this.yearMonth = yearMonth;
 		this.closureId = closureId;
@@ -165,73 +160,88 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 		ConcurrentStopwatches.start("12405:暫定データ作成：");
 
 		// Workを考慮した月次処理用の暫定残数管理データを作成する
-		this.createDailyInterimRemainMngs(require, cacheCarrier, period);
+		List<DailyInterimRemainMngData> interimDatas = this.createDailyInterimRemainMngs(require, cacheCarrier, period);
 
 		ConcurrentStopwatches.stop("12405:暫定データ作成：");
 		ConcurrentStopwatches.start("12410:年休積休：");
 
 		// 年休、積休
-		this.annualAndReserveLeaveRemain(require, cacheCarrier, period, interimRemainMngMode, isCalcAttendanceRate);
+		this.annualAndReserveLeaveRemain(require, cacheCarrier, period, interimRemainMngMode, isCalcAttendanceRate,
+				interimDatas);
 
 		ConcurrentStopwatches.stop("12410:年休積休：");
 		ConcurrentStopwatches.start("12420:振休：");
 
 		// 振休
-		this.absenceLeaveRemain(require, cacheCarrier, period, interimRemainMngMode);
+		this.absenceLeaveRemain(require, cacheCarrier, period, interimRemainMngMode, interimDatas);
 
 		ConcurrentStopwatches.stop("12420:振休：");
 		ConcurrentStopwatches.start("12430:代休：");
 
 		// 代休
-		this.dayoffRemain(require, cacheCarrier, period, interimRemainMngMode);
+		this.dayoffRemain(require, cacheCarrier, period, interimRemainMngMode, interimDatas);
 
 		ConcurrentStopwatches.stop("12430:代休：");
 		ConcurrentStopwatches.start("12440:特別休暇：");
 
 		// 特別休暇
-		this.specialLeaveRemain(cacheCarrier, period, interimRemainMngMode);
+		this.specialLeaveRemain(cacheCarrier, period, interimRemainMngMode, interimDatas);
 
 		ConcurrentStopwatches.stop("12440:特別休暇：");
 		ConcurrentStopwatches.start("12450:子の看護：");
 
-		//子の看護
-		this.childCareRemain(cacheCarrier, period, interimRemainMngMode);
+		// 子の看護
+		this.childCareRemain(cacheCarrier, period, interimRemainMngMode, interimDatas);
 
 		ConcurrentStopwatches.stop("12450:子の看護：");
 		ConcurrentStopwatches.start("12460:介護：");
 
-		//介護
-		this.careRemain(cacheCarrier, period, interimRemainMngMode);
+		// 介護
+		this.careRemain(cacheCarrier, period, interimRemainMngMode, interimDatas);
 
 		ConcurrentStopwatches.stop("12460:介護：");
 		ConcurrentStopwatches.start("12470:公休：");
-		
-		//公休
-		this.publicHolidayRemain(require, cacheCarrier, period, interimRemainMngMode);
+
+		// 公休
+		Optional<DatePeriod> aggregationPeriodForPublicHoliday = GetAggregationPeriodForPublicHoliday
+				.getAggregationPeriodForPublicHoliday(require, cacheCarrier, companyId, employeeId, yearMonth, period);
+
+		// Workを考慮した月次処理用の暫定残数管理データを作成する
+		List<DailyInterimRemainMngData> interimDatasForPublicHoliday = new ArrayList<>();
+		if (aggregationPeriodForPublicHoliday.isPresent())
+			interimDatasForPublicHoliday = this.createDailyInterimRemainMngs(require, cacheCarrier,
+					aggregationPeriodForPublicHoliday.get());
+
+		this.publicHolidayRemain(require, cacheCarrier, period, aggregationPeriodForPublicHoliday, interimRemainMngMode,
+				interimDatasForPublicHoliday);
 
 		ConcurrentStopwatches.stop("12470:公休：");
-		
+
 		return this.aggregateResult;
 	}
 
 	/**
 	 * 年休、積休
 	 *
-	 * @param period 期間
-	 * @param interimRemainMngMode 暫定残数データ管理モード
-	 * @param isCalcAttendanceRate 出勤率計算フラグ
+	 * @param period
+	 *            期間
+	 * @param interimRemainMngMode
+	 *            暫定残数データ管理モード
+	 * @param isCalcAttendanceRate
+	 *            出勤率計算フラグ
 	 */
-	public void annualAndReserveLeaveRemain(RequireM6 require, CacheCarrier cacheCarrier, DatePeriod period,
-			InterimRemainMngMode interimRemainMngMode, boolean isCalcAttendanceRate) {
+	public void annualAndReserveLeaveRemain(GetDaysForCalcAttdRate.RequireM2 require, CacheCarrier cacheCarrier, 
+			DatePeriod period, InterimRemainMngMode interimRemainMngMode, boolean isCalcAttendanceRate,List<DailyInterimRemainMngData> interimDatas) {
 
 		// 暫定残数データを年休・積立年休に絞り込む
 		List<TempAnnualLeaveMngs> tmpAnnualLeaveMngs = new ArrayList<>();
 		List<TmpResereLeaveMng> tmpReserveLeaveMngs = new ArrayList<>();
-		for (val dailyInterimRemainMng : this.dailyInterimRemainMngs) {
-			if (dailyInterimRemainMng.getRecAbsData().size() <= 0) continue;
+		for (val dailyInterimRemainMng : interimDatas) {
+			if (dailyInterimRemainMng.getRecAbsData().size() <= 0)
+				continue;
 
 			// 年休
-			dailyInterimRemainMng.getAnnualHolidayData().forEach(c->tmpAnnualLeaveMngs.add(c));
+			dailyInterimRemainMng.getAnnualHolidayData().forEach(c -> tmpAnnualLeaveMngs.add(c));
 			// 積立年休
 			if (dailyInterimRemainMng.getResereData().isPresent()) {
 				tmpReserveLeaveMngs.add(dailyInterimRemainMng.getResereData().get());
@@ -240,39 +250,43 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 
 		// 月別実績の計算結果が存在するかチェック
 		boolean isOverWriteAnnual = this.isOverWriteRemain;
-//		if (this.aggregateResult.getAttendanceTime().isPresent()) {
-//
-//			// 年休控除日数分の年休暫定残数データを作成する
-//			val compensFlexWorkOpt = CreateInterimAnnualMngData.ofCompensFlexToWork(
-//					this.aggregateResult.getAttendanceTime().get(), period.end());
-//			if (compensFlexWorkOpt.isPresent()) {
-//				tmpAnnualLeaveMngs.add(compensFlexWorkOpt.get());
-//				isOverWriteAnnual = true;
-//			}
-//		}
+		// if (this.aggregateResult.getAttendanceTime().isPresent()) {
+		//
+		// // 年休控除日数分の年休暫定残数データを作成する
+		// val compensFlexWorkOpt =
+		// CreateInterimAnnualMngData.ofCompensFlexToWork(
+		// this.aggregateResult.getAttendanceTime().get(), period.end());
+		// if (compensFlexWorkOpt.isPresent()) {
+		// tmpAnnualLeaveMngs.add(compensFlexWorkOpt.get());
+		// isOverWriteAnnual = true;
+		// }
+		// }
 
 		// 「モード」をチェック
 		CalYearOffWorkAttendRate daysForCalcAttdRate = new CalYearOffWorkAttendRate();
 		if (interimRemainMngMode == InterimRemainMngMode.MONTHLY) {
 
 			// 日別実績から出勤率計算用日数を取得 （月別集計用）
-			daysForCalcAttdRate = GetDaysForCalcAttdRate.algorithm(require, this.companyId,
-					this.employeeId, period, this.companySets, this.monthlyCalculatingDailys);
+			daysForCalcAttdRate = GetDaysForCalcAttdRate.algorithm(require, this.companyId, this.employeeId, period,
+					this.companySets, this.monthlyCalculatingDailys);
 		}
 
 		// 期間中の年休積休残数を取得
-		AggrResultOfAnnAndRsvLeave aggrResult = GetAnnAndRsvRemNumWithinPeriod.algorithm(requireService.createRequire(), cacheCarrier,
-				this.companyId, this.employeeId, period, interimRemainMngMode,
+		AggrResultOfAnnAndRsvLeave aggrResult = GetAnnAndRsvRemNumWithinPeriod.algorithm(requireService.createRequire(),
+				cacheCarrier, this.companyId, this.employeeId, period, interimRemainMngMode,
 				// period.end(), true, isCalcAttendanceRate,
 				period.end(), false, isCalcAttendanceRate, Optional.of(isOverWriteAnnual),
 				Optional.of(tmpAnnualLeaveMngs), Optional.of(tmpReserveLeaveMngs), Optional.of(false),
-				//あとで前回集計結果も渡せるようにする
-				//Optional.of(this.employeeSets.isNoCheckStartDate()), this.prevAggrResult.getAnnualLeave(),
+				// あとで前回集計結果も渡せるようにする
+				// Optional.of(this.employeeSets.isNoCheckStartDate()),
+				// this.prevAggrResult.getAnnualLeave(),
 				Optional.of(this.employeeSets.isNoCheckStartDate()), Optional.empty(),
-				//あとで前回集計結果も渡せるようにする
-				//this.prevAggrResult.getReserveLeave(), Optional.of(this.companySets), Optional.of(this.employeeSets),
+				// あとで前回集計結果も渡せるようにする
+				// this.prevAggrResult.getReserveLeave(),
+				// Optional.of(this.companySets),
+				// Optional.of(this.employeeSets),
 				Optional.empty(), Optional.of(this.companySets), Optional.of(this.employeeSets),
-				Optional.of(this.monthlyCalculatingDailys),Optional.of(period));
+				Optional.of(this.monthlyCalculatingDailys), Optional.of(period));
 
 		// 2回目の取得以降は、締め開始日を確認させる
 		this.employeeSets.setNoCheckStartDate(false);
@@ -282,17 +296,18 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 			val asOfStartNextDayOfPeriodEnd = aggrResult.getAnnualLeave().get().getAsOfStartNextDayOfPeriodEnd();
 			val remainingNumber = asOfPeriodEnd.getRemainingNumber();
 
-			//未消化数
-			AnnualLeaveUndigestedNumber undigestedNumber= new AnnualLeaveUndigestedNumber();
-			if(asOfStartNextDayOfPeriodEnd.getRemainingNumber().getAnnualLeaveUndigestNumber().isPresent()) {
+			// 未消化数
+			AnnualLeaveUndigestedNumber undigestedNumber = new AnnualLeaveUndigestedNumber();
+			if (asOfStartNextDayOfPeriodEnd.getRemainingNumber().getAnnualLeaveUndigestNumber().isPresent()) {
 
-				LeaveUndigestDayNumber days = asOfStartNextDayOfPeriodEnd.getRemainingNumber().getAnnualLeaveUndigestNumber().get().getDays();
-				Optional<LeaveUndigestTime> minutes = asOfStartNextDayOfPeriodEnd.getRemainingNumber().getAnnualLeaveUndigestNumber().get().getMinutes();
+				LeaveUndigestDayNumber days = asOfStartNextDayOfPeriodEnd.getRemainingNumber()
+						.getAnnualLeaveUndigestNumber().get().getDays();
+				Optional<LeaveUndigestTime> minutes = asOfStartNextDayOfPeriodEnd.getRemainingNumber()
+						.getAnnualLeaveUndigestNumber().get().getMinutes();
 
-				undigestedNumber=AnnualLeaveUndigestedNumber.of(
+				undigestedNumber = AnnualLeaveUndigestedNumber.of(
 						UndigestedAnnualLeaveDays.of(new AnnualLeaveUsedDayNumber(days.v())),
-						Optional.of(UndigestedTimeAnnualLeaveTime.of(new UsedMinutes(minutes.get().v())))
-						);
+						Optional.of(UndigestedTimeAnnualLeaveTime.of(new UsedMinutes(minutes.get().v()))));
 			}
 
 			// 年休月別残数データを更新
@@ -305,7 +320,8 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 					AnnualLeaveAttdRateDays.of(new MonthlyDays(daysForCalcAttdRate.getWorkingDays()),
 							new MonthlyDays(daysForCalcAttdRate.getPrescribedDays()),
 							new MonthlyDays(daysForCalcAttdRate.getDeductedDays())),
-					asOfStartNextDayOfPeriodEnd.getRemainingNumber().getAnnualLeaveWithMinus().getRemainingNumberInfo().getRemainingNumberAfterGrantOpt().isPresent(),
+					asOfStartNextDayOfPeriodEnd.getRemainingNumber().getAnnualLeaveWithMinus().getRemainingNumberInfo()
+							.getRemainingNumberAfterGrantOpt().isPresent(),
 					undigestedNumber);
 			this.aggregateResult.getAnnLeaRemNumEachMonthList().add(annLeaRemNum);
 
@@ -321,15 +337,19 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 			val asOfStartNextDayOfPeriodEnd = aggrResult.getReserveLeave().get().getAsOfStartNextDayOfPeriodEnd();
 			val remainingNumber = asOfPeriodEnd.getRemainingNumber();
 
-			//未消化数
-			//ReserveLeaveUndigestedNumber undigestedNumber= new ReserveLeaveUndigestedNumber();
+			// 未消化数
+			// ReserveLeaveUndigestedNumber undigestedNumber= new
+			// ReserveLeaveUndigestedNumber();
 
-			ReserveLeaveRemainingDayNumber undigested = asOfStartNextDayOfPeriodEnd.getRemainingNumber().getＲeserveLeaveUndigestedNumber().getUndigestedDays();
-			//Optional<LeaveUndigestTime> minutes = asOfStartNextDayOfPeriodEnd.getRemainingNumber().getAnnualLeaveUndigestNumber().get().getMinutes();
+			ReserveLeaveRemainingDayNumber undigested = asOfStartNextDayOfPeriodEnd.getRemainingNumber()
+					.getReserveLeaveUndigestedNumber().getUndigestedDays();
 
-//			undigestedNumber=ReserveLeaveUndigestedNumber.of(
-//					new ReserveLeaveRemainingDayNumber(days.v())
-//					);
+			// Optional<LeaveUndigestTime> minutes =
+			// asOfStartNextDayOfPeriodEnd.getRemainingNumber().getAnnualLeaveUndigestNumber().get().getMinutes();
+
+			// undigestedNumber=ReserveLeaveUndigestedNumber.of(
+			// new ReserveLeaveRemainingDayNumber(days.v())
+			// );
 
 			// 積立年休月別残数データを更新
 			ReserveLeaveGrant reserveLeaveGrant = null;
@@ -337,13 +357,13 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 				reserveLeaveGrant = ReserveLeaveGrant
 						.of(asOfStartNextDayOfPeriodEnd.getGrantInfo().get().getGrantDays());
 			}
-			RsvLeaRemNumEachMonth rsvLeaRemNum = RsvLeaRemNumEachMonth.of(
-					this.employeeId, this.yearMonth,
-					this.closureId, this.closureDate, period, ClosureStatus.UNTREATED,
-					remainingNumber.getReserveLeaveNoMinus(), remainingNumber.getReserveLeaveWithMinus(),
-					Optional.ofNullable(reserveLeaveGrant),
-					asOfStartNextDayOfPeriodEnd.getRemainingNumber().getReserveLeaveWithMinus().getRemainingNumberInfo().getRemainingNumberAfterGrantOpt().isPresent(),
-					undigested.v() );
+			RsvLeaRemNumEachMonth rsvLeaRemNum = RsvLeaRemNumEachMonth
+					.of(this.employeeId, this.yearMonth, this.closureId, this.closureDate, period,
+							ClosureStatus.UNTREATED, remainingNumber.getReserveLeaveNoMinus(),
+							remainingNumber.getReserveLeaveWithMinus(), Optional.ofNullable(reserveLeaveGrant),
+							asOfStartNextDayOfPeriodEnd.getRemainingNumber().getReserveLeaveWithMinus()
+									.getRemainingNumberInfo().getRemainingNumberAfterGrantOpt().isPresent(),
+							undigested.v());
 
 			this.aggregateResult.getRsvLeaRemNumEachMonthList().add(rsvLeaRemNum);
 
@@ -355,23 +375,25 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 		}
 
 		// 集計結果を前回集計結果に引き継ぐ
-		//this.aggregateResult.setAggrResultOfAnnAndRsvLeave(aggrResult);
+		// this.aggregateResult.setAggrResultOfAnnAndRsvLeave(aggrResult);
 	}
 
 	/**
 	 * 振休
 	 *
-	 * @param period 期間
-	 * @param interimRemainMngMode 暫定残数データ管理モード
+	 * @param period
+	 *            期間
+	 * @param interimRemainMngMode
+	 *            暫定残数データ管理モード
 	 */
-	public void absenceLeaveRemain(RequireM5 require, CacheCarrier cacheCarrier, DatePeriod period,
-			InterimRemainMngMode interimRemainMngMode) {
+	public void absenceLeaveRemain(NumberCompensatoryLeavePeriodQuery.Require require, CacheCarrier cacheCarrier, 
+			DatePeriod period, InterimRemainMngMode interimRemainMngMode,List<DailyInterimRemainMngData> interimDatas) {
 
 		// 暫定残数データを振休・振出に絞り込む
 		List<InterimRemain> interimMng = new ArrayList<>();
 		List<InterimAbsMng> useAbsMng = new ArrayList<>();
 		List<InterimRecMng> useRecMng = new ArrayList<>();
-		for (val dailyInterimRemainMng : this.dailyInterimRemainMngs) {
+		for (val dailyInterimRemainMng : interimDatas) {
 			if (dailyInterimRemainMng.getRecAbsData().size() <= 0)
 				continue;
 			interimMng.addAll(dailyInterimRemainMng.getRecAbsData().stream()
@@ -390,15 +412,9 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 		}
 
 		// 期間内の振休振出残数を取得する
-		val inputParam = new AbsRecMngInPeriodRefactParamInput(this.companyId, this.employeeId,
-				period,
-				period.end(), (interimRemainMngMode == InterimRemainMngMode.MONTHLY),
-				this.isOverWriteRemain,
-				useAbsMng, interimMng, useRecMng,
-				Optional.empty(),
-				Optional.empty(),
-				Optional.of(period),
-				new FixedManagementDataMonth());
+		val inputParam = new AbsRecMngInPeriodRefactParamInput(this.companyId, this.employeeId, period, period.end(),
+				(interimRemainMngMode == InterimRemainMngMode.MONTHLY), this.isOverWriteRemain, useAbsMng, interimMng,
+				useRecMng, Optional.empty(), Optional.empty(), Optional.of(period), new FixedManagementDataMonth());
 		val aggrResult = NumberCompensatoryLeavePeriodQuery.process(require, inputParam);
 		if (aggrResult != null) {
 
@@ -418,24 +434,26 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 					this.yearMonth, this.closureId, this.closureDate, aggrResult.getPError()));
 
 			// 集計結果を前回集計結果に引き継ぐ
-			//this.aggregateResult.setAbsRecRemainMngOfInPeriodOpt(Optional.of(aggrResult));
+			// this.aggregateResult.setAbsRecRemainMngOfInPeriodOpt(Optional.of(aggrResult));
 		}
 	}
 
 	/**
 	 * 代休
 	 *
-	 * @param period 期間
-	 * @param interimRemainMngMode 暫定残数データ管理モード
+	 * @param period
+	 *            期間
+	 * @param interimRemainMngMode
+	 *            暫定残数データ管理モード
 	 */
-	public void dayoffRemain(RequireM4 require, CacheCarrier cacheCarrier, DatePeriod period,
-			InterimRemainMngMode interimRemainMngMode) {
+	public void dayoffRemain(NumberRemainVacationLeaveRangeQuery.Require require, CacheCarrier cacheCarrier, 
+			DatePeriod period, InterimRemainMngMode interimRemainMngMode, List<DailyInterimRemainMngData> interimDatas) {
 
 		// 暫定残数データを休出・代休に絞り込む
 		List<InterimRemain> interimMng = new ArrayList<>();
 		List<InterimBreakMng> breakMng = new ArrayList<>();
 		List<InterimDayOffMng> dayOffMng = new ArrayList<>();
-		for (val dailyInterimRemainMng : this.dailyInterimRemainMngs) {
+		for (val dailyInterimRemainMng : interimDatas) {
 			if (dailyInterimRemainMng.getRecAbsData().size() <= 0)
 				continue;
 			interimMng.addAll(dailyInterimRemainMng.getRecAbsData().stream()
@@ -447,23 +465,17 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 				breakMng.add(dailyInterimRemainMng.getBreakData().get());
 			}
 			// 代休
-			dailyInterimRemainMng.getDayOffData().forEach(c->dayOffMng.add(c));
+			dailyInterimRemainMng.getDayOffData().forEach(c -> dayOffMng.add(c));
 		}
 
 		// 期間内の休出代休残数を取得する
 
-		BreakDayOffRemainMngRefactParam inputRefactor = new BreakDayOffRemainMngRefactParam(
-				this.companyId, this.employeeId,
-				period,
-				(interimRemainMngMode == InterimRemainMngMode.MONTHLY),
-				period.end(),
-				this.isOverWriteRemain,
-				interimMng,
-				Optional.empty(),
-				Optional.of(period),
-				Optional.empty(), new FixedManagementDataMonth());
-		//代休残数 ← 残日数　（アルゴリズム「期間内の代休残数を取得する」のoutput）
-		val aggrResult = 	NumberRemainVacationLeaveRangeQuery.getBreakDayOffMngInPeriod(require, inputRefactor);
+		BreakDayOffRemainMngRefactParam inputRefactor = new BreakDayOffRemainMngRefactParam(this.companyId,
+				this.employeeId, period, (interimRemainMngMode == InterimRemainMngMode.MONTHLY), period.end(),
+				this.isOverWriteRemain, interimMng, Optional.empty(), Optional.of(period), Optional.empty(),
+				new FixedManagementDataMonth());
+		// 代休残数 ← 残日数 （アルゴリズム「期間内の代休残数を取得する」のoutput）
+		val aggrResult = NumberRemainVacationLeaveRangeQuery.getBreakDayOffMngInPeriod(require, inputRefactor);
 		if (aggrResult != null) {
 
 			// 代休月別残数データを更新
@@ -482,26 +494,29 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 					this.yearMonth, this.closureId, this.closureDate, aggrResult.getDayOffErrors()));
 
 			// 集計結果を前回集計結果に引き継ぐ
-			//this.aggregateResult.setBreakDayOffRemainMngOfInPeriodOpt(Optional.of(aggrResult));
+			// this.aggregateResult.setBreakDayOffRemainMngOfInPeriodOpt(Optional.of(aggrResult));
 		}
 	}
 
 	/**
 	 * 特別休暇
 	 *
-	 * @param period 期間
-	 * @param interimRemainMngMode 暫定残数データ管理モード
+	 * @param period
+	 *            期間
+	 * @param interimRemainMngMode
+	 *            暫定残数データ管理モード
 	 */
-//	public void specialLeaveRemain(RequireM8 require, CacheCarrier cacheCarrier, DatePeriod period,
+	// public void specialLeaveRemain(RequireM8 require, CacheCarrier
+	// cacheCarrier, DatePeriod period,
 	public void specialLeaveRemain(CacheCarrier cacheCarrier, DatePeriod period,
-							InterimRemainMngMode interimRemainMngMode) {
+			InterimRemainMngMode interimRemainMngMode, List<DailyInterimRemainMngData> interimDatas) {
 
 		val require = requireService.createRequire();
 
 		// 暫定残数データを特別休暇に絞り込む
 		List<InterimRemain> interimMng = new ArrayList<>();
 		List<InterimSpecialHolidayMng> interimSpecialData = new ArrayList<>();
-		for (val dailyInterimRemainMng : this.dailyInterimRemainMngs) {
+		for (val dailyInterimRemainMng : interimDatas) {
 			if (dailyInterimRemainMng.getRecAbsData().size() <= 0)
 				continue;
 			if (dailyInterimRemainMng.getSpecialHolidayData().size() <= 0)
@@ -513,181 +528,139 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 		// 「特別休暇」を取得する
 		List<SpecialHoliday> specialHolidays = require.specialHoliday(this.companyId);
 
-		for (SpecialHoliday specialHoliday : specialHolidays){
+		for (SpecialHoliday specialHoliday : specialHolidays) {
 			Integer specialLeaveCode = specialHoliday.getSpecialHolidayCode().v();
 
 			// 前回集計結果を確認する
-//			Optional<InPeriodOfSpecialLeaveResultInfor> prevSpecialLeaveResult = Optional.empty();
-//			if (this.prevSpecialLeaveResultMap.containsKey(specialLeaveCode)) {
-//				prevSpecialLeaveResult = Optional.of(this.prevSpecialLeaveResultMap.get(specialLeaveCode));
-//			}
+			// Optional<InPeriodOfSpecialLeaveResultInfor>
+			// prevSpecialLeaveResult = Optional.empty();
+			// if (this.prevSpecialLeaveResultMap.containsKey(specialLeaveCode))
+			// {
+			// prevSpecialLeaveResult =
+			// Optional.of(this.prevSpecialLeaveResultMap.get(specialLeaveCode));
+			// }
 
 			// マイナスなしを含めた期間内の特別休暇残を集計する
 			// 期間内の特別休暇残を集計する
-			ComplileInPeriodOfSpecialLeaveParam param = new ComplileInPeriodOfSpecialLeaveParam(
-					this.companyId,
+			ComplileInPeriodOfSpecialLeaveParam param = new ComplileInPeriodOfSpecialLeaveParam(this.companyId,
 					this.employeeId, period,
 					// (interimRemainMngMode == InterimRemainMngMode.MONTHLY),
 					// period.end(), specialLeaveCode, true,
 					(interimRemainMngMode == InterimRemainMngMode.MONTHLY), period.end(), specialLeaveCode, false,
-					this.isOverWriteRemain, interimSpecialData,Optional.of(period));
+					this.isOverWriteRemain, interimSpecialData, Optional.of(period));
 
-			//特別休暇暫定データに、親ドメインの情報を更新する。　※暫定データの作成処理がまだ対応中のため、親ドメインと子ドメインが別々になっているので。			}
+			// 特別休暇暫定データに、親ドメインの情報を更新する。
+			// ※暫定データの作成処理がまだ対応中のため、親ドメインと子ドメインが別々になっているので。 }
 
-			//残数処理
-			InPeriodOfSpecialLeaveResultInfor aggrResult
-				= SpecialLeaveManagementService.complileInPeriodOfSpecialLeave(
-						require, cacheCarrier, param);
+			// 残数処理
+			InPeriodOfSpecialLeaveResultInfor aggrResult = SpecialLeaveManagementService
+					.complileInPeriodOfSpecialLeave(require, cacheCarrier, param);
 
 			// 特別休暇月別残数データを更新
-			SpecialHolidayRemainData speLeaRemNum = aggrResult.createSpecialHolidayRemainData(
-					this.employeeId, this.yearMonth,
-					this.closureId, this.closureDate, period, specialLeaveCode, aggrResult);
+			SpecialHolidayRemainData speLeaRemNum = aggrResult.createSpecialHolidayRemainData(this.employeeId,
+					this.yearMonth, this.closureId, this.closureDate, period, specialLeaveCode, aggrResult);
 
 			this.aggregateResult.getSpecialLeaveRemainList().add(speLeaRemNum);
 
 			// 特別休暇エラーから月別残数エラー一覧を作成する
 			this.aggregateResult.getPerErrors()
-			.addAll(CreatePerErrorsFromLeaveErrors.fromSpecialLeave(this.employeeId, this.yearMonth,
-					this.closureId, this.closureDate, specialLeaveCode, aggrResult.getSpecialLeaveErrors()));
+					.addAll(CreatePerErrorsFromLeaveErrors.fromSpecialLeave(this.employeeId, this.yearMonth,
+							this.closureId, this.closureDate, specialLeaveCode, aggrResult.getSpecialLeaveErrors()));
 
 			// 集計結果を前回集計結果に引き継ぐ
-			//this.aggregateResult.getInPeriodOfSpecialLeaveResultInforMap().put(specialLeaveCode, aggrResult);
+			// this.aggregateResult.getInPeriodOfSpecialLeaveResultInforMap().put(specialLeaveCode,
+			// aggrResult);
 		}
 	}
 
 	@Inject
 	private ChildCareNurseRequireImplFactory childCareNurseRequireImplFactory;
 
-	//子の看護
-	public void childCareRemain(CacheCarrier cacheCarrier, DatePeriod period,
-			InterimRemainMngMode interimRemainMngMode) {
+	// 子の看護
+	public void childCareRemain(CacheCarrier cacheCarrier, DatePeriod period, InterimRemainMngMode interimRemainMngMode,
+			List<DailyInterimRemainMngData> interimDatas) {
 
 		List<TempChildCareManagement> overWriteList = new ArrayList<>();
-		for (val dailyInterimRemainMng : this.dailyInterimRemainMngs) {
-			dailyInterimRemainMng.getChildCareData().forEach(c->overWriteList.add(c));
+		for (val dailyInterimRemainMng : interimDatas) {
+			dailyInterimRemainMng.getChildCareData().forEach(c -> overWriteList.add(c));
 		}
 
 		val require = childCareNurseRequireImplFactory.createRequireImpl();
 
-		//残数処理
-		AggrResultOfChildCareNurse result =
-				GetRemainingNumberChildCareService.getChildCareRemNumWithinPeriod(
-					companyId,
-					employeeId,
-					period,
-					interimRemainMngMode,
-					period.end(),
-					Optional.of(true),
-					overWriteList,
-					Optional.empty(),
-					Optional.of(CreateAtr.RECORD),
-					Optional.of(period),
-					cacheCarrier,
-					require);
+		// 残数処理
+		AggrResultOfChildCareNurse result = GetRemainingNumberChildCareService.getChildCareRemNumWithinPeriod(companyId,
+				employeeId, period, interimRemainMngMode, period.end(), Optional.of(true), overWriteList,
+				Optional.empty(), Optional.of(CreateAtr.RECORD), Optional.of(period), cacheCarrier, require);
 
 		// 月別残数データを更新
-		ChildcareRemNumEachMonth childcareLeaRemNum = result.createChildCareRemainData(
-				this.employeeId, this.yearMonth,
+		ChildcareRemNumEachMonth childcareLeaRemNum = result.createChildCareRemainData(this.employeeId, this.yearMonth,
 				this.closureId, this.closureDate, period);
 
 		this.aggregateResult.getChildHdRemainList().add(childcareLeaRemNum);
 
 		// 月別残数エラー一覧を作成する
-		this.aggregateResult.getPerErrors()
-		.addAll(CreatePerErrorsFromLeaveErrors.fromChildCareLeave(this.employeeId, this.yearMonth,
-				this.closureId, this.closureDate, result.getChildCareNurseErrors()));
+		this.aggregateResult.getPerErrors().addAll(CreatePerErrorsFromLeaveErrors.fromChildCareLeave(this.employeeId,
+				this.yearMonth, this.closureId, this.closureDate, result.getChildCareNurseErrors()));
 
 		// 集計結果を前回集計結果に引き継ぐ
 	}
 
-	//介護
-	public void careRemain(CacheCarrier cacheCarrier, DatePeriod period,
-			InterimRemainMngMode interimRemainMngMode) {
+	// 介護
+	public void careRemain(CacheCarrier cacheCarrier, DatePeriod period, InterimRemainMngMode interimRemainMngMode,
+			List<DailyInterimRemainMngData> interimDatas) {
 
 		List<TempCareManagement> overWriteList = new ArrayList<>();
-		for (val dailyInterimRemainMng : this.dailyInterimRemainMngs) {
-			dailyInterimRemainMng.getCareData().forEach(c->overWriteList.add(c));
+		for (val dailyInterimRemainMng : interimDatas) {
+			dailyInterimRemainMng.getCareData().forEach(c -> overWriteList.add(c));
 		}
 
 		val require = childCareNurseRequireImplFactory.createRequireImpl();
 
-		//残数処理
-		AggrResultOfChildCareNurse result =
-				GetRemainingNumberCareService.getCareRemNumWithinPeriod(
-					companyId,
-					employeeId,
-					period,
-					interimRemainMngMode,
-					period.end(),
-					Optional.of(true),
-					overWriteList,
-					Optional.empty(),
-					Optional.of(CreateAtr.RECORD),
-					Optional.of(period),
-					cacheCarrier,
-					require);
+		// 残数処理
+		AggrResultOfChildCareNurse result = GetRemainingNumberCareService.getCareRemNumWithinPeriod(companyId,
+				employeeId, period, interimRemainMngMode, period.end(), Optional.of(true), overWriteList,
+				Optional.empty(), Optional.of(CreateAtr.RECORD), Optional.of(period), cacheCarrier, require);
 
 		// 月別残数データを更新
-		CareRemNumEachMonth careLeaRemNum = result.createCareRemainData(
-				this.employeeId, this.yearMonth,
-				this.closureId, this.closureDate, period);
+		CareRemNumEachMonth careLeaRemNum = result.createCareRemainData(this.employeeId, this.yearMonth, this.closureId,
+				this.closureDate, period);
 
 		this.aggregateResult.getCareHdRemainList().add(careLeaRemNum);
 
 		// 月別残数エラー一覧を作成する
-		this.aggregateResult.getPerErrors()
-		.addAll(CreatePerErrorsFromLeaveErrors.fromCareLeave(this.employeeId, this.yearMonth,
-				this.closureId, this.closureDate, result.getChildCareNurseErrors()));
+		this.aggregateResult.getPerErrors().addAll(CreatePerErrorsFromLeaveErrors.fromCareLeave(this.employeeId,
+				this.yearMonth, this.closureId, this.closureDate, result.getChildCareNurseErrors()));
 
 		// 集計結果を前回集計結果に引き継ぐ
 	}
 	
 	//公休
-	
-	public void publicHolidayRemain(RequireM16 require, CacheCarrier cacheCarrier, DatePeriod period,
-			InterimRemainMngMode interimRemainMngMode){
+	public void publicHolidayRemain(GetRemainingNumberPublicHolidayService.RequireM1 require, CacheCarrier cacheCarrier, DatePeriod period,
+			Optional<DatePeriod> periodForOverWrite, InterimRemainMngMode interimRemainMngMode,
+			List<DailyInterimRemainMngData> interimDatas) {
 		
 		//暫定残数データを公休に絞り込む
 		List<TempPublicHolidayManagement> overWriteList = new ArrayList<>();
-		for (val dailyInterimRemainMng : this.dailyInterimRemainMngs) {
-			dailyInterimRemainMng.getPublicHolidayData().forEach(c->overWriteList.add(c));
+		for (val dailyInterimRemainMng : interimDatas) {
+			dailyInterimRemainMng.getPublicHolidayData().forEach(c -> overWriteList.add(c));
 		}
 
-			
-		AggrResultOfPublicHoliday result = 
-				GetRemainingNumberPublicHolidayService.getPublicHolidayRemNumWithinPeriod(
-						companyId,
-						employeeId, 
-						Arrays.asList(yearMonth),
-						period.end(),
-						interimRemainMngMode, 
-						Optional.of(true), 
-						overWriteList, 
-						Optional.of(CreateAtr.RECORD),
-						Optional.of(period),
-						cacheCarrier, 
-						require);
-		
+		AggrResultOfPublicHoliday result = GetRemainingNumberPublicHolidayService.getPublicHolidayRemNumWithinPeriod(
+				companyId, employeeId, Arrays.asList(yearMonth), period.end(), interimRemainMngMode, Optional.of(true),
+				overWriteList, Optional.of(CreateAtr.RECORD), periodForOverWrite, cacheCarrier, require);
+
 		// 月別残数データを作成
-		PublicHolidayRemNumEachMonth publicLeaRemNum = result.createPublicHolidayRemainData(
-				this.employeeId, this.yearMonth,
-				this.closureId, this.closureDate);
+		PublicHolidayRemNumEachMonth publicLeaRemNum = result.createPublicHolidayRemainData(this.employeeId,
+				this.yearMonth, this.closureId, this.closureDate);
 		// 月別残数データを更新
 		this.aggregateResult.getPublicRemainList().add(publicLeaRemNum);
-		
+
 		// 月別残数エラー一覧を作成する
-		Optional<EmployeeMonthlyPerError> error = CreatePerErrorsFromLeaveErrors.fromPublicLeave(
-				this.employeeId, 
-				this.yearMonth,
-				this.closureId, 
-				this.closureDate, 
-				result.publicHolidayInformation.stream()
-					.filter(x ->x.getYearMonth().equals(yearMonth))
-					.findFirst()
-					.flatMap(x -> x.getPublicHolidayErrors())
-				);
-		if(error.isPresent()){
+		Optional<EmployeeMonthlyPerError> error = CreatePerErrorsFromLeaveErrors.fromPublicLeave(this.employeeId,
+				this.yearMonth, this.closureId, this.closureDate,
+				result.publicHolidayInformation.stream().filter(x -> x.getYearMonth().equals(yearMonth)).findFirst()
+						.flatMap(x -> x.getPublicHolidayErrors()));
+		if (error.isPresent()) {
 			this.aggregateResult.getPerErrors().add(error.get());
 		}
 	}
@@ -698,32 +671,28 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 	 * @param period
 	 *            期間
 	 */
-	private void createDailyInterimRemainMngs(CreateDailyInterimRemainMngs.Require require, CacheCarrier cacheCarrier, DatePeriod period) {
-
+	private List<DailyInterimRemainMngData> createDailyInterimRemainMngs(CreateDailyInterimRemainMngs.Require require, CacheCarrier cacheCarrier, DatePeriod period) {
 		// 【参考：旧処理】 月次処理用の暫定残数管理データを作成する
 		// this.dailyInterimRemainMngs =
 		// this.interimRemOffMonth.monthInterimRemainData(
 		// this.companyId, this.employeeId, period);
 
-		/** Workを考慮した月次処理用の暫定残数管理データを作成する */
-		this.dailyInterimRemainMngs = CreateDailyInterimRemainMngs.createDailyInterimRemainMngs(require, cacheCarrier,
-				this.companyId, this.employeeId, period, this.monthlyCalculatingDailys.getDailyWorks(this.employeeId),
-				this.companySets.getAbsSettingOpt(), this.companySets.getDayOffSetting(), this.aggregateResult.getAttendanceTime());
-
 		this.isOverWriteRemain = true;
+
+		/** Workを考慮した月次処理用の暫定残数管理データを作成する */
+		return CreateDailyInterimRemainMngs.createDailyInterimRemainMngs(require, cacheCarrier, this.companyId,
+				this.employeeId, period, this.monthlyCalculatingDailys.getDailyWorks(this.employeeId),
+				this.companySets.getAbsSettingOpt(), this.companySets.getDayOffSetting(),
+				this.aggregateResult.getAttendanceTime());
+
 	}
 
-	public List<DailyInterimRemainMngData> createDailyInterimRemainMngs(
-			CacheCarrier cacheCarrier,
-			String companyId,
-			String employeeId,
-			DatePeriod period,
-			MonAggrCompanySettings comSetting,
-			MonthlyCalculatingDailys dailys){
+	public List<DailyInterimRemainMngData> createDailyInterimRemainMngs(CacheCarrier cacheCarrier, String companyId,
+			String employeeId, DatePeriod period, MonAggrCompanySettings comSetting, MonthlyCalculatingDailys dailys) {
 
 		val require = requireService.createRequire();
 
-		MonthlyAggregationRemainingNumberImpl proc= new MonthlyAggregationRemainingNumberImpl();
+		MonthlyAggregationRemainingNumberImpl proc = new MonthlyAggregationRemainingNumberImpl();
 
 		proc.setCompanyId(companyId);
 		proc.setEmployeeId(employeeId);
@@ -732,8 +701,7 @@ public class MonthlyAggregationRemainingNumberImpl implements MonthlyAggregation
 		// Tạm fix bug NullPointerException (a Tín sửa)
 		proc.aggregateResult = new AggregateMonthlyRecordValue();
 		proc.aggregateResult.setAttendanceTime(Optional.empty());
-		proc.createDailyInterimRemainMngs(require, cacheCarrier,period);
-		return proc.getDailyInterimRemainMngs();
+		return proc.createDailyInterimRemainMngs(require, cacheCarrier, period);
 	}
 
 }

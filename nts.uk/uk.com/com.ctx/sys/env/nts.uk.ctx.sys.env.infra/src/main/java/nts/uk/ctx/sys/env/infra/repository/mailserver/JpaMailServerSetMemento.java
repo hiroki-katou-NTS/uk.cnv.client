@@ -5,9 +5,9 @@
 package nts.uk.ctx.sys.env.infra.repository.mailserver;
 
 import nts.uk.ctx.sys.env.dom.mailserver.AuthenticationMethod;
-import nts.uk.ctx.sys.env.dom.mailserver.EmailAuthentication;
 import nts.uk.ctx.sys.env.dom.mailserver.EncryptionMethod;
 import nts.uk.ctx.sys.env.dom.mailserver.ImapInfo;
+import nts.uk.ctx.sys.env.dom.mailserver.MailAddress;
 import nts.uk.ctx.sys.env.dom.mailserver.MailServerSetMemento;
 import nts.uk.ctx.sys.env.dom.mailserver.Password;
 import nts.uk.ctx.sys.env.dom.mailserver.PopInfo;
@@ -87,7 +87,7 @@ public class JpaMailServerSetMemento implements MailServerSetMemento {
 	 * EmailAuthentication)
 	 */
 	@Override
-	public void setEmailAuthentication(EmailAuthentication emailAuthentication) {
+	public void setEmailAuthentication(MailAddress emailAuthentication) {
 		this.sevstMailServer.setEmailAuth(emailAuthentication.v());
 	}
 

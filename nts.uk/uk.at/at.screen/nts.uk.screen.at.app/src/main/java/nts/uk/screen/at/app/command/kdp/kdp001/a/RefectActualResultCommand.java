@@ -48,6 +48,7 @@ public class RefectActualResultCommand {
 				this.cardNumberSupport == null ? Optional.empty() : Optional.of(new SupportCardNumber(Integer.valueOf(this.cardNumberSupport))));
 		return new RefectActualResult(workInformationStamp,
 				workTimeCode != null ? new WorkTimeCode(workTimeCode) : null,
-				overtimeDeclaration != null ? overtimeDeclaration.toDomainValue() : null);
+				overtimeDeclaration != null ? overtimeDeclaration.toDomainValue() : null,
+				null);
 	}
 }

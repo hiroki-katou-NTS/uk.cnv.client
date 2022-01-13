@@ -1,0 +1,42 @@
+.kdr-004 {
+    /*margin-top: 10px;*/
+}
+.kdr-004 .fixed-flex-layout-left {
+    margin-right: 15px;
+    margin-left: 80px;
+}
+.kdr-004 .fixed-flex-layout-left .employees-list {
+    width: auto;
+}
+.kdr-004 .employees-list {
+    margin-bottom: 10px;
+    display: flex;
+}
+.kdr-004 .employees-list {
+    /*margin-right: 32px;*/
+    padding-left: 10px !important;
+}
+.kdr-004 .fixed-flex-layout-right {
+    width: 551px;
+}
+
+.kdr-004 .panel > div {
+    padding: 0 !important;
+}
+.kdr-004 .panel .panel-row {
+    margin-bottom: 25px;
+}
+
+.panel-row .form-label {
+    width: 220px;
+}
+
+.kdr-004 .panel .switchButton-wrapper button {
+    width: 65px;
+}
+
+.kdr-004 .panel .switchbox-wrappers .radio-wrapper {
+    flex-direction: column;
+    width: 65px;
+    text-align: center;
+}

@@ -1,0 +1,45 @@
+.nts-fixed-table{
+	margin-left: 20px;
+	margin-top: 10px;
+}
+
+.nts-fixed-table th{
+	height: 37px;
+}
+
+.tbDay {
+	padding: 3px 0px;
+}
+
+#bottom {
+	margin-top: 7px;
+	margin-left: 209px;
+}
+
+.nts-first-radio>.nts-input:first-child {
+	background-color: #D5FFFF;
+	
+}
+.nts-second-radio>.nts-input:nth-child(2) {
+	background-color: #FDEADA;
+	
+}
+.nts-third-radio>.nts-input:nth-child(3) {
+	background-color: #FDEADA;
+	
+}
+.ntsRadioBox{
+	margin: 3px;
+    padding: 5px;
+}
+.ntsCheckBox-label-bottom{
+  margin: 5px 0 12px 0;
+}
+
+.nts-fixed-table table.fixed-table > tbody > tr:hover > td {
+	background-color: #FFFFFF;
+}
+
+.nts-fixed-table table.fixed-table > tbody > tr > td:nth-child(2):hover {
+	background-color: #c5f1f7;
+}

@@ -34,8 +34,7 @@ public class JpaPublicHolidayCarryForwardHistoryRepo extends JpaRepository imple
 				domain.getHistYearMonth().v(),
 				domain.getClosureId().value,
 				domain.getClosureDate().getClosureDay().v(),
-				domain.getClosureDate().getLastDayOfMonth() ? 1 : 0,
-				domain.getYearMonth().v()
+				domain.getClosureDate().getLastDayOfMonth()
 				);
 		
 		Optional<KshdtHdpubRemHist> entityOpt = this.queryProxy().find(pk, KshdtHdpubRemHist.class);
@@ -48,7 +47,7 @@ public class JpaPublicHolidayCarryForwardHistoryRepo extends JpaRepository imple
 		}
 		
 		KshdtHdpubRemHist entity = new KshdtHdpubRemHist();
-		entity.fromDomainForUpdate(domain);
+		entity.fromDomainForInsert(domain);
 		this.commandProxy().insert(entity);
 		this.getEntityManager().flush();
 	}

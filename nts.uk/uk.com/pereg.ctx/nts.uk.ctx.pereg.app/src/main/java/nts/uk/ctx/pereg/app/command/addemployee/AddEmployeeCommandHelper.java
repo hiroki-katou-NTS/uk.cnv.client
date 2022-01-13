@@ -21,6 +21,7 @@ import nts.uk.ctx.bs.person.dom.person.info.Person;
 import nts.uk.ctx.bs.person.dom.person.info.PersonRepository;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.pereg.app.ItemValue;
+import nts.uk.shr.pereg.app.ItemValueType;
 import nts.uk.shr.pereg.app.command.ItemsByCategory;
 
 @Stateless
@@ -60,7 +61,14 @@ public class AddEmployeeCommandHelper {
 		// add AffCompanyHist
 		GeneralDate entry = null;
 		if(affComHist.isPresent()) {
-			Optional<ItemValue>  entryDate = affComHist.get().getItems().stream().filter( c ->  c.itemCode().equals(IS00021) && c.value() != null).findFirst();
+			Optional<ItemValue>  entryDate = 
+					affComHist
+						.get()
+						.getItems()
+						.stream()
+						.filter(c -> c.logType() == ItemValueType.DATE.value ? !"Invalid date".equals(c.valueAfter()) : true)
+						.filter( c ->  c.itemCode().equals(IS00021) && (c.value() != null))
+						.findFirst();
 			if(entryDate.isPresent()) {
 				entry = entryDate.get().value();
 			}

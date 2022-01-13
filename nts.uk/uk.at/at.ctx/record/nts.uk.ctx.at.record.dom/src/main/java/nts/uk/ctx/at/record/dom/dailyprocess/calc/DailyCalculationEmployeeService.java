@@ -44,7 +44,7 @@ public interface DailyCalculationEmployeeService {
 	 * @param companyCommonSetting 
 	 */
 	@SuppressWarnings("rawtypes")
-	ProcessState calculateForOnePerson(String employeeId,DatePeriod datePeriod, Optional<Consumer<ProcessState>> counter,String executeLogId,boolean isCalWhenLock );
+	ProcessState calculateForOnePerson(String companyId, String employeeId,DatePeriod datePeriod, Optional<Consumer<ProcessState>> counter,String executeLogId,boolean isCalWhenLock );
 	
 	/**
 	 * 計算状態の更新

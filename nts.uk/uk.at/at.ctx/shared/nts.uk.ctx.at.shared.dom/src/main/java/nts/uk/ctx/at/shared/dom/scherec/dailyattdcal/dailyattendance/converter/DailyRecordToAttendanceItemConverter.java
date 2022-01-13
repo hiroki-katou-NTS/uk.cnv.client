@@ -24,6 +24,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.remarks.Rem
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.shortworktime.ShortTimeOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.snapshot.SnapShot;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.OuenWorkTimeSheetOfDailyAttendance;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.OuenWorkTimeOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.WorkInfoOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime.AttendanceTimeOfDailyAttendance;
 //move at record -> at shared
@@ -79,6 +80,8 @@ public interface DailyRecordToAttendanceItemConverter extends AttendanceItemConv
 	
 	DailyRecordToAttendanceItemConverter withRemarks(List<RemarksOfDailyAttd> domain);
 	
+	DailyRecordToAttendanceItemConverter withOuenWorkTime(List<OuenWorkTimeOfDailyAttendance> domain);
+	
 	DailyRecordToAttendanceItemConverter withSnapshot(SnapShot domain);
 	
 	DailyRecordToAttendanceItemConverter withOuenSheet(List<OuenWorkTimeSheetOfDailyAttendance> ouenSheet);
@@ -122,6 +125,8 @@ public interface DailyRecordToAttendanceItemConverter extends AttendanceItemConv
 	Optional<PCLogOnInfoOfDailyAttd> pcLogInfo();
 	
 	List<RemarksOfDailyAttd> remarks();
+	
+	List<OuenWorkTimeOfDailyAttendance> ouenWorkTimes();
 	
 	Optional<SnapShot> snapshot();
 

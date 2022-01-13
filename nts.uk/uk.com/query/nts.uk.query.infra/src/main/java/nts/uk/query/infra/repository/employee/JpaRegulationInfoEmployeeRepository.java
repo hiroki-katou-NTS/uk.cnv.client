@@ -115,7 +115,7 @@ public class JpaRegulationInfoEmployeeRepository extends JpaRepository implement
 		List<String> workplaceCodes = new ArrayList<>(Optional.ofNullable(paramQuery.getWorkplaceCodes()).orElse(Collections.emptyList()));
 		List<String> classificationCodes = new ArrayList<>(Optional.ofNullable(paramQuery.getClassificationCodes()).orElse(Collections.emptyList()));
 		List<String> jobTitleCodes = new ArrayList<>(Optional.ofNullable(paramQuery.getJobTitleCodes()).orElse(Collections.emptyList()));
-		List<String> worktypeCodes = new ArrayList<>(Optional.ofNullable(paramQuery.getWorktypeCodes()).orElse(Collections.emptyList()));
+		//List<String> worktypeCodes = new ArrayList<>(Optional.ofNullable(paramQuery.getWorktypeCodes()).orElse(Collections.emptyList()));
 		List<Integer> closureIds = new ArrayList<>(Optional.ofNullable(paramQuery.getClosureIds()).orElse(Collections.emptyList()));
 		GeneralDateTime baseDate = paramQuery.getBaseDate();
 		
@@ -219,19 +219,19 @@ public class JpaRegulationInfoEmployeeRepository extends JpaRepository implement
 			countParameter += 5;
 		}
 		if (paramQuery.getSystemType() == CCG001SystemType.EMPLOYMENT.value) {
-			if (paramQuery.getFilterByWorktype()) {
-				// return empty list if condition code list is empty
-				if (worktypeCodes.isEmpty()) {
-					return Collections.emptyList();
-				}
-				
-				// update query conditions
-				whereBuilder.append(" AND (WORK_TYPE_CD in ('" + String.join("','", worktypeCodes) + "')");
-				String workDate = GeneralDate.localDate(baseDate.toLocalDate()).toString(DATE_FORMAT) + " 00:00:00";
-				whereBuilder.append(and + "( WORK_TYPE_STR_DATE <= '" + workDate + "' AND WORK_TYPE_END_DATE >= '"+ workDate +"' ) )");
-
-				countParameter += 2 + worktypeCodes.size();
-			}
+//			if (paramQuery.getFilterByWorktype()) {
+//				// return empty list if condition code list is empty
+//				if (worktypeCodes.isEmpty()) {
+//					return Collections.emptyList();
+//				}
+//				
+//				// update query conditions
+//				whereBuilder.append(" AND (WORK_TYPE_CD in ('" + String.join("','", worktypeCodes) + "')");
+//				String workDate = GeneralDate.localDate(baseDate.toLocalDate()).toString(DATE_FORMAT) + " 00:00:00";
+//				whereBuilder.append(and + "( WORK_TYPE_STR_DATE <= '" + workDate + "' AND WORK_TYPE_END_DATE >= '"+ workDate +"' ) )");
+//
+//				countParameter += 2 + worktypeCodes.size();
+//			}
 			if (paramQuery.getFilterByClosure()) {
 				// return empty list if condition code list is empty
 				if (closureIds.isEmpty()) {

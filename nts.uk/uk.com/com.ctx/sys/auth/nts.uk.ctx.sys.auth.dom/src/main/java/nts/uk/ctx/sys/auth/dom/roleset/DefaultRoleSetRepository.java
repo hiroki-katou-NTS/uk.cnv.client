@@ -27,7 +27,7 @@ public interface DefaultRoleSetRepository {
      * @param roleSetCd
      * @return
      */
-    Optional<DefaultRoleSet> find(String companyId, String roleSetCd);
+    Optional<DefaultRoleSet> find(String companyId);
 
     /**
      * Insert a Default Role Set

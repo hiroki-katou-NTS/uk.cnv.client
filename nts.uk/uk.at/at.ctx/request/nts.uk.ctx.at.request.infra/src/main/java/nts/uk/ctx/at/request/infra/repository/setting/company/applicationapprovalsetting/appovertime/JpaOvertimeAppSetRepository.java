@@ -89,28 +89,28 @@ public class JpaOvertimeAppSetRepository extends JpaRepository implements Overti
         if (optEntity.isPresent()) {
             KrqmtAppOvertime entity = optEntity.get();
             entity.getOvertimeFrames().removeIf(e -> e.getPk().overtimeAtr == overtimeQuotaSet.getOvertimeAppAtr().value && e.getPk().flexAtr == overtimeQuotaSet.getFlexWorkAtr().value);
-            if (overtimeQuotaSet.getOvertimeAppAtr() != OvertimeAppAtr.EARLY_NORMAL_OVERTIME) {
-                entity.getOvertimeFrames().removeIf(s -> s.getPk().overtimeAtr == OvertimeAppAtr.EARLY_NORMAL_OVERTIME.value
-                        && s.getPk().flexAtr == overtimeQuotaSet.getFlexWorkAtr().value
-                        && overtimeQuotaSet.getTargetOvertimeLimit().stream().map(OverTimeFrameNo::v).anyMatch(v -> v == s.getTargetFrame())
-                );
-            }
+//            if (overtimeQuotaSet.getOvertimeAppAtr() != OvertimeAppAtr.EARLY_NORMAL_OVERTIME) {
+//                entity.getOvertimeFrames().removeIf(s -> s.getPk().overtimeAtr == OvertimeAppAtr.EARLY_NORMAL_OVERTIME.value
+//                        && s.getPk().flexAtr == overtimeQuotaSet.getFlexWorkAtr().value
+//                        && overtimeQuotaSet.getTargetOvertimeLimit().stream().map(OverTimeFrameNo::v).anyMatch(v -> v == s.getTargetFrame())
+//                );
+//            }
             this.commandProxy().update(entity);
             this.getEntityManager().flush();
         }
         List<KrqmtAppOvertimeFrame> entities = KrqmtAppOvertimeFrame.fromDomains(companyId, Collections.singletonList(overtimeQuotaSet));
-        if (overtimeQuotaSet.getOvertimeAppAtr() != OvertimeAppAtr.EARLY_NORMAL_OVERTIME) {
-            entities.addAll(KrqmtAppOvertimeFrame.fromDomains(
-                    companyId,
-                    Collections.singletonList(
-                            new OvertimeQuotaSetUse(
-                                    OvertimeAppAtr.EARLY_NORMAL_OVERTIME,
-                                    overtimeQuotaSet.getFlexWorkAtr(),
-                                    overtimeQuotaSet.getTargetOvertimeLimit()
-                            )
-                    )
-            ));
-        }
+//        if (overtimeQuotaSet.getOvertimeAppAtr() != OvertimeAppAtr.EARLY_NORMAL_OVERTIME) {
+//            entities.addAll(KrqmtAppOvertimeFrame.fromDomains(
+//                    companyId,
+//                    Collections.singletonList(
+//                            new OvertimeQuotaSetUse(
+//                                    OvertimeAppAtr.EARLY_NORMAL_OVERTIME,
+//                                    overtimeQuotaSet.getFlexWorkAtr(),
+//                                    overtimeQuotaSet.getTargetOvertimeLimit()
+//                            )
+//                    )
+//            ));
+//        }
         this.commandProxy().insertAll(entities);
     }
 }

@@ -22,7 +22,13 @@ public class DailyAttendanceItemPubImpl implements DailyAttendanceItemPub{
 	@Override
 	public List<DailyAttendanceItemPubDto> getDailyAttendanceItemName(List<Integer> dailyAttendanceItemIds) {
 		return this.dailyAttendanceItemNameDomainService.getNameOfDailyAttendanceItem(dailyAttendanceItemIds).stream().map(f -> {
-			return new DailyAttendanceItemPubDto(f.getAttendanceItemId(), f.getAttendanceItemName(), f.getAttendanceItemDisplayNumber(), f.getTypeOfAttendanceItem(), f.getFrameCategory());
+			return new DailyAttendanceItemPubDto(
+					f.getAttendanceItemId(), 
+					f.getAttendanceItemName(), 
+					f.getAttendanceItemDisplayNumber(), 
+					f.getTypeOfAttendanceItem(), 
+					f.getFrameCategory(),
+					f.getDisplayName());
 		}).collect(Collectors.toList());
 	}
 

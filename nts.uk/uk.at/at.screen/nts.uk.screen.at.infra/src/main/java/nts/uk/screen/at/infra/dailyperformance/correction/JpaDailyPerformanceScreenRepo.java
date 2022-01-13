@@ -44,6 +44,7 @@ import nts.uk.ctx.at.function.infra.entity.dailyperformanceformat.KfnmtAuthority
 import nts.uk.ctx.at.function.infra.entity.dailyperformanceformat.KfnmtAuthorityFormSheet;
 import nts.uk.ctx.at.function.infra.entity.dailyperformanceformat.KfnmtDailyPerformanceDisplay;
 import nts.uk.ctx.at.record.dom.workrecord.operationsetting.SettingUnitType;
+import nts.uk.ctx.at.record.dom.workrecord.workrecord.EmploymentConfirmed;
 import nts.uk.ctx.at.record.infra.entity.dailyperformanceformat.KrcmtBusinessFormatSheet;
 import nts.uk.ctx.at.record.infra.entity.dailyperformanceformat.KrcmtBusinessTypeDaily;
 import nts.uk.ctx.at.record.infra.entity.divergence.time.KrcmtDvgcTime;
@@ -62,18 +63,15 @@ import nts.uk.ctx.at.record.infra.entity.workrecord.erroralarm.KrcdtErSuAtd;
 import nts.uk.ctx.at.record.infra.entity.workrecord.erroralarm.KrcdtOtkErAl;
 import nts.uk.ctx.at.record.infra.entity.workrecord.erroralarm.condition.KrcmtEralApplication;
 import nts.uk.ctx.at.record.infra.entity.workrecord.identificationstatus.KrcdtIdentificationStatus;
-import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtApprovalProcess;
-import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtApprovalProcessPk;
 import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtAttendanceAut;
-import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtDaiPerformEdFun;
-import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtDaiPerformEdFunPk;
+import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtChangeableWktpGrpDetail;
+import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtDayFuncControl;
+import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtDayFuncControlPk;
 import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtFormatPerformance;
 import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtFormatPerformancePk;
-import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtIdentityProcess;
-import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtIdentityProcessPk;
-import nts.uk.ctx.at.record.infra.entity.workrecord.operationsetting.KrcmtWorktypeChangeable;
-import nts.uk.ctx.at.record.infra.entity.workrecord.workfixed.KrcstWorkFixed;
-import nts.uk.ctx.at.record.infra.entity.workrecord.workfixed.KrcstWorkFixedPK;
+import nts.uk.ctx.at.record.infra.entity.workrecord.workrecord.KrcdtWorkFixed;
+import nts.uk.ctx.at.shared.dom.common.CompanyId;
+import nts.uk.ctx.at.shared.dom.common.WorkplaceId;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemAtr;
 import nts.uk.ctx.at.shared.dom.workingcondition.WorkingSystem;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureId;
@@ -242,8 +240,8 @@ public class JpaDailyPerformanceScreenRepo extends JpaRepository implements Dail
 
 	private final static String FIND_WORK_TIME_ZONE_JDBC = "SELECT WORKTIME_CD, NAME FROM KSHMT_WT WHERE CID = ?";
 
-	private final static String GET_ALL_WORK_TYPE_CHANGED = "SELECT wtc FROM KrcmtWorktypeChangeable wtc"
-			+ " WHERE wtc.pk.cid = :companyId AND wtc.pk.empCode = :employeeCode";
+	private final static String GET_ALL_WORK_TYPE_CHANGED = "SELECT wtc FROM KrcmtChangeableWktpGrpDetail wtc"
+			+ " WHERE wtc.pk.cid = :companyId AND wtc.pk.empCd = :employeeCode";
 
 //	private final static String SELECT_WORKTYPE = " SELECT c FROM KshmtWorkType c WHERE c.kshmtWorkTypePK.companyId = :companyId";
 
@@ -930,7 +928,7 @@ public class JpaDailyPerformanceScreenRepo extends JpaRepository implements Dail
 				.query(SEL_ATTENDANCE_ITEM, KrcmtDailyAttendanceItem.class).setParameter("companyId", companyId)
 				.setParameter("lstItem", lstAttendanceItem).getList();
 		return entities.stream().map(i -> {
-			return new DPAttendanceItem(i.krcmtDailyAttendanceItemPK.attendanceItemId, i.attendanceItemName,
+			return new DPAttendanceItem(i.krcmtDailyAttendanceItemPK.attendanceItemId, i.attendanceItemName, i.displayName,
 					i.displayNumber, i.userCanSet == 1 ? true : false, i.nameLineFeedPosition, i.dailyAttendanceAtr,
 					i.typeOfMaster != null ? i.typeOfMaster.intValue() : null,
 					i.primitiveValue == null ? null : i.primitiveValue.intValue());
@@ -944,11 +942,12 @@ public class JpaDailyPerformanceScreenRepo extends JpaRepository implements Dail
 			return Collections.emptyList();
 		return this.queryProxy().query(SEL_ATTENDANCE_ITEM_CONTROL, KshmtDayAtdCtr.class)
 				.setParameter("companyId", companyId).setParameter("lstItem", lstAttendanceItem).getList().stream()
-				.map(c -> {
-					return new DPAttendanceItemControl(c.kshmtDayAtdCtrPK.itemDailyID,
-							c.inputUnitOfTimeItem, c.headerBgColorOfDailyPer != null ? c.headerBgColorOfDailyPer : "",
-							null);
-				}).collect(Collectors.toList());
+				.map(c -> new DPAttendanceItemControl(
+						c.kshmtDayAtdCtrPK.itemDailyID,
+						null,
+						c.headerBgColorOfDailyPer != null ? c.headerBgColorOfDailyPer : "",
+						null
+				)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -1141,18 +1140,47 @@ public class JpaDailyPerformanceScreenRepo extends JpaRepository implements Dail
 
 				String errorAlarmCode = rs.getString("ERROR_ALARM_CD");
 				String errorAlarmName = rs.getString("ERROR_ALARM_NAME");
-				int fixedAtr = rs.getInt("FIXED_ATR");
-				int useAtr = rs.getInt("USE_ATR");
+				
+				boolean fixedAtr = false;
+				try {
+					int fixedAtrInt = rs.getInt("FIXED_ATR");
+					fixedAtr = fixedAtrInt == 1 ? true : false;
+				} catch(SQLException e) {
+					fixedAtr = rs.getBoolean("FIXED_ATR");
+				}
+				
+				boolean useAtr = false;
+				try {
+					int useAtrInt = rs.getInt("USE_ATR");
+					useAtr = useAtrInt == 1 ? true : false;
+				} catch(SQLException e) {
+					useAtr = rs.getBoolean("USE_ATR");
+				}
+				
 				int typeAtr = rs.getInt("ERAL_ATR");
-				int boldAtr = rs.getInt("BOLD_ATR");
+				
+				boolean boldAtr = false;
+				try {
+					int boldAtrInt = rs.getInt("BOLD_ATR");
+					boldAtr = boldAtrInt == 1 ? true : false;
+				} catch(SQLException e) {
+					boldAtr = rs.getBoolean("BOLD_ATR");
+				}
 				String messageColor = rs.getString("MESSAGE_COLOR");
-				int cancelableAtr = rs.getInt("CANCELABLE_ATR");
+				
+				boolean cancelableAtr = false;
+				try {
+					int cancelableAtrInt = rs.getInt("CANCELABLE_ATR");
+					cancelableAtr = cancelableAtrInt == 1 ? true : false;
+				} catch(SQLException e) {
+					cancelableAtr = rs.getBoolean("CANCELABLE_ATR");
+				}
 				Integer errorDisplayItem = rs.getInt("ERROR_DISPLAY_ITEM");
 				String messageDisplay = rs.getString("MESSAGE_DISPLAY");
 
-				dtos.add(new DPErrorSettingDto(companyId, errorAlarmCode, errorAlarmName, fixedAtr == 1 ? true : false,
-						useAtr == 1 ? true : false, typeAtr, messageDisplay == null ? "" : messageDisplay,
-						boldAtr == 1 ? true : false, messageColor, cancelableAtr == 1 ? true : false,
+				dtos.add(new DPErrorSettingDto(companyId, errorAlarmCode, errorAlarmName, fixedAtr,
+						useAtr, typeAtr, messageDisplay == null ? "" : messageDisplay,
+						boldAtr, messageColor, cancelableAtr,
 						errorDisplayItem));
 			}
 
@@ -1359,26 +1387,41 @@ public class JpaDailyPerformanceScreenRepo extends JpaRepository implements Dail
 	@SneakyThrows
 	@Override
 	public List<WorkFixedDto> findWorkFixed(int closureId, int yearMonth) {
-		try (val statement = this.connection().prepareStatement(
-				"select * from KRCST_WORK_FIXED where CLOSURE_ID = ? and CID = ? and CONFIRM_CLS = 1")) {
-			statement.setInt(1, closureId);
-			statement.setString(2, AppContexts.user().companyId());
-
-			List<WorkFixedDto> workOp = new NtsResultSet(statement.executeQuery()).getList(rec -> {
-				KrcstWorkFixed w = new KrcstWorkFixed();
-				w.setKrcstWorkFixedPK(
-						new KrcstWorkFixedPK(rec.getString("WKPID"), rec.getInt("CLOSURE_ID"), rec.getString("CID")));
-				w.setConfirmPid(rec.getString("CONFIRM_PID"));
-				w.setConfirmCls(rec.getInt("CONFIRM_CLS"));
-				w.setFixedDate(rec.getDate("FIXED_DATE"));
-				w.setProcessYm(rec.getInt("PROCESS_YM"));
-
-				return new WorkFixedDto(closureId, w.getConfirmPid(), w.getKrcstWorkFixedPK().getWkpid(),
-						w.getConfirmCls(), w.getFixedDate(), yearMonth, w.getKrcstWorkFixedPK().getCid());
-			});
+		
+		String SELECT_LIST_WORK_FIXED = "SELECT r FROM KrcdtWorkFixed r WHERE r.pk.companyId = :companyId "
+				+ "and r.pk.closureId = :closureId " 
+				+ "and r.pk.processYM = :processYM ";
+		
+		List<EmploymentConfirmed> employmentConfirmeds = this.queryProxy().query(SELECT_LIST_WORK_FIXED, KrcdtWorkFixed.class)
+				.setParameter("companyId", AppContexts.user().companyId())
+				.setParameter("closureId", closureId)
+				.setParameter("processYM", yearMonth).getList(x ->toDomainEmploymentConfirmed(x));
+			
+			List<WorkFixedDto> workOp = new ArrayList<>();
+			
+			workOp = employmentConfirmeds.stream().map(m -> {
+				return new WorkFixedDto(
+						m.getClosureId().value,
+						"",
+						m.getWorkplaceId().v(),
+						null,
+						m.getDate().date(),
+						m.getProcessYM().v(),
+						m.getCompanyId().v()
+						);
+			}).collect(Collectors.toList());
 
 			return workOp;
-		}
+			
+	}
+	
+	public EmploymentConfirmed toDomainEmploymentConfirmed(KrcdtWorkFixed entity) {
+
+		EmploymentConfirmed domain = new EmploymentConfirmed(new CompanyId(entity.pk.companyId),
+				new WorkplaceId(entity.pk.workplaceId), ClosureId.valueOf(entity.pk.closureId),
+				new YearMonth(entity.pk.processYM), entity.employeeId, entity.confirm_date_time);
+
+		return domain;
 	}
 
 	@Override
@@ -1387,12 +1430,12 @@ public class JpaDailyPerformanceScreenRepo extends JpaRepository implements Dail
 		OperationOfDailyPerformanceDto dto = new OperationOfDailyPerformanceDto();
 		Optional<KrcmtFormatPerformance> format = this.queryProxy().find(new KrcmtFormatPerformancePk(companyId),
 				KrcmtFormatPerformance.class);
-		Optional<KrcmtDaiPerformEdFun> edFunc = this.queryProxy().find(new KrcmtDaiPerformEdFunPk(companyId),
-				KrcmtDaiPerformEdFun.class);
-		dto.setComment(edFunc.isPresent() ? edFunc.get().comment : "");
+		Optional<KrcmtDayFuncControl> dayFunc = this.queryProxy().find(new KrcmtDayFuncControlPk(companyId),
+				KrcmtDayFuncControl.class);
+		dto.setComment(dayFunc.isPresent() ? dayFunc.get().comment : "");
 		dto.setSettingUnit(
 				EnumAdaptor.valueOf(format.isPresent() ? format.get().settingUnitType : 1, SettingUnitType.class));
-		dto.setShowError(edFunc.isPresent() ? edFunc.get().checkErrRefDisp == 1 : false);
+		dto.setShowError(dayFunc.isPresent() ? dayFunc.get().checkErrRefDisp == 1 : false);
 		return dto;
 	}
 
@@ -1400,7 +1443,7 @@ public class JpaDailyPerformanceScreenRepo extends JpaRepository implements Dail
 	public List<AuthorityFormatInitialDisplayDto> findAuthorityFormatInitialDisplay(String companyId) {
 		return this.queryProxy().query(SEL_DAILY_PERFORMACE_DISPLAY, KfnmtDailyPerformanceDisplay.class)
 				.setParameter("companyId", companyId).getList(k -> new AuthorityFormatInitialDisplayDto(companyId,
-						k.kfnmtDailyPerformanceDisplayPK.dailyPerformanceFormatCode));
+						k.kfnmtDailyPerformanceDisplayPK.dailyPerformanceFormatCode, k.kfnmtDailyPerformanceDisplayPK.pcSpAtr));
 	}
 
 	@Override
@@ -1514,9 +1557,9 @@ public class JpaDailyPerformanceScreenRepo extends JpaRepository implements Dail
 	@Override
 	public List<WorkTypeChangedDto> findWorkTypeChanged(String employmentCode, String typeCode, String companyId) {
 		List<WorkTypeChangedDto> dtos = this.queryProxy()
-				.query(GET_ALL_WORK_TYPE_CHANGED, KrcmtWorktypeChangeable.class).setParameter("companyId", companyId)
+				.query(GET_ALL_WORK_TYPE_CHANGED, KrcmtChangeableWktpGrpDetail.class).setParameter("companyId", companyId)
 				.setParameter("employeeCode", employmentCode)
-				.getList(x -> new WorkTypeChangedDto(String.valueOf(x.pk.workTypeGroupNo), x.pk.workTypeCode));
+				.getList(x -> new WorkTypeChangedDto(String.valueOf(x.pk.workTypeGroupNo), x.pk.workTypeCd));
 		if (!dtos.isEmpty()) {
 			Map<String, List<WorkTypeChangedDto>> mapGroupNo = dtos.stream().filter(x -> x.getTypeCode() != "")
 					.collect(Collectors.groupingBy(WorkTypeChangedDto::getGroupNo));
@@ -1636,10 +1679,10 @@ public class JpaDailyPerformanceScreenRepo extends JpaRepository implements Dail
 
 	@Override
 	public Optional<IdentityProcessUseSetDto> findIdentityProcessUseSet(String comapnyId) {
-		return this.queryProxy().find(new KrcmtIdentityProcessPk(comapnyId), KrcmtIdentityProcess.class)
-				.map(x -> new IdentityProcessUseSetDto(x.useDailySelfCk == 1 ? true : false,
-						x.useMonthSelfCK == 1 ? true : false,
-						x.yourselfConfirmError != null ? x.yourselfConfirmError : null));
+		return this.queryProxy().find(new KrcmtDayFuncControlPk(comapnyId), KrcmtDayFuncControl.class)
+				.map(x -> new IdentityProcessUseSetDto(x.daySelfChk == 1 ? true : false,
+						x.monSelfChk == 1 ? true : false,
+						x.daySelfChkError != null ? x.daySelfChkError : null));
 	}
 
 	@Override
@@ -1662,10 +1705,10 @@ public class JpaDailyPerformanceScreenRepo extends JpaRepository implements Dail
 
 	@Override
 	public Optional<ApprovalUseSettingDto> findApprovalUseSettingDto(String comapnyId) {
-		return this.queryProxy().find(new KrcmtApprovalProcessPk(comapnyId), KrcmtApprovalProcess.class)
-				.map(x -> new ApprovalUseSettingDto(x.useDailyBossChk == 1 ? true : false,
-						x.useMonthBossChk == 1 ? true : false,
-						x.supervisorConfirmError != null ? x.supervisorConfirmError : null));
+		return this.queryProxy().find(new KrcmtDayFuncControlPk(comapnyId), KrcmtDayFuncControl.class)
+				.map(x -> new ApprovalUseSettingDto(x.dayBossChk == 1 ? true : false,
+						x.monBossChk == 1 ? true : false,
+						x.dayBossChkError != null ? x.dayBossChkError : null));
 	}
 
 	@Override
@@ -1777,7 +1820,7 @@ public class JpaDailyPerformanceScreenRepo extends JpaRepository implements Dail
 		List<ErrorFlexMonthDto> errorFlex = this.queryProxy().query(GET_MONTH_ERROR, KrcdtEmployeeMonthlyPerError.class)
 				.setParameter("errorType", errorType).setParameter("yearMonth", yearMonth)
 				.setParameter("employeeId", employeeId).setParameter("closureId", closureId)
-				.setParameter("closeDay", closeDay).setParameter("isLastDay", isLastDay)
+				.setParameter("closeDay", closeDay).setParameter("isLastDay", isLastDay == 1)
 				.getList(x -> new ErrorFlexMonthDto(x.flex, x.annualHoliday, x.yearlyReserved));
 		return errorFlex;
 	}

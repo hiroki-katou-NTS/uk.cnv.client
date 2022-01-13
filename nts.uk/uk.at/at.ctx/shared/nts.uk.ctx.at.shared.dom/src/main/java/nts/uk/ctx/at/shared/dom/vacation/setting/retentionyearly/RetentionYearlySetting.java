@@ -21,9 +21,6 @@ public class RetentionYearlySetting extends AggregateRoot {
 	/** The upper limit setting. */
 	private UpperLimitSetting upperLimitSetting;
 	
-	/** The leave as work days. */
-	private Boolean leaveAsWorkDays;
-	
 	/** The management category. */
 	private ManageDistinct managementCategory;
 	
@@ -35,8 +32,6 @@ public class RetentionYearlySetting extends AggregateRoot {
 	public RetentionYearlySetting(RetentionYearlySettingGetMemento memento) {
 		this.companyId = memento.getCompanyId();
 		this.upperLimitSetting = memento.getUpperLimitSetting();
-		this.leaveAsWorkDays = memento
-				.getLeaveAsWorkDays();
 		this.managementCategory = memento
 				.getManagementCategory();
 	}
@@ -47,7 +42,6 @@ public class RetentionYearlySetting extends AggregateRoot {
 	 * @param memento the memento
 	 */
 	public void saveToMemento(RetentionYearlySettingSetMemento memento){
-		memento.setLeaveAsWorkDays(this.leaveAsWorkDays);
 		memento.setCompanyId(this.companyId);
 		memento.setUpperLimitSetting(this.upperLimitSetting);
 		memento.setManagementCategory(this.managementCategory);

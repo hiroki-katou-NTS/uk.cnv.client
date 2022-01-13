@@ -98,7 +98,7 @@ public class ExtractAlarmListService {
 		// 条件を満たしていない
 		if (listEmployee.isEmpty()) {
 			// エラーメッセージ(#Msg_834)を表示する
-			throw new BusinessException("Msg_834");	
+			return  new ExtractedAlarmDto(new ArrayList<>(), false, true, null, new ArrayList<>());
 		}
 		
 		// ドメインモデル「アラームリスト抽出処理状況」を作成する

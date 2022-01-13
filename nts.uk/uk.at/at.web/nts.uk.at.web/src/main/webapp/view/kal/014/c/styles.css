@@ -2,12 +2,12 @@
     padding: 10px 0 0px 30px;
 }
 
-.cf {
-    padding: 15px;
+.ml-30 {
+    margin-left: 30px;
 }
 
-.date-selecttion-table {
-    padding: 15px 0px 0px 30px;
+.ml-33 {
+    margin-left: 33px;
 }
 
 #contents-area .month .combo-box {
@@ -28,14 +28,10 @@ div#combo-box {
 
 .item-inputbox {
     width: 27px;
-    margin-left: 10px;
-    margin-right: 10px;
+    /*margin-left: 10px;*/
+    /*margin-right: 10px;*/
 }
 
-.radio-wrapper, .checkbox-wrapper {
-    padding: 5px 1px 5px 32px;
-}
-
-.radio-wrapper.no-text, .radio-wrapper.without-text, .checkbox-wrapper.no-text, .checkbox-wrapper.without-text {
-    margin: 0 10px 0 3px;
+.strComboMonth, .endComboMonth {
+    margin-left: 5px;
 }

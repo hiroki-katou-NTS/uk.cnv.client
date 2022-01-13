@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+<ui:composition template="../../../../master/dialog.xhtml">
+    <ui:define name="htmlHead">
+        <script>
+            var dialogSize = {
+                width : 800,
+                height : 280
+            };
+        </script>
+        <com:ValidatorScript>
+            nts.uk.ctx.at.record.dom.workrecord.workmanagement.manhoursummarytable.ManHourSummaryTableCode
+            nts.uk.ctx.at.record.dom.workrecord.workmanagement.manhoursummarytable.ManHourSummaryTableName
+        </com:ValidatorScript>
+        <com:stylefile path="kha003.e.style.css"/>
+        <com:scriptfile path="kha003.e.vm.js"/>
+        <com:scriptfile set="IGNITE"/>
+    </ui:define>
+    <ui:define name="content">
+        <div id="contents-area" style="display: none" data-bind="visible: true" >
+            <div class="table" style="width: 100%">
+                <!-- E1_1 -->
+                <div class="cell valign-center" style="width: 95px">
+                    <div class="label">#{i18n.getText('KHA003_80')}:</div>
+                </div>
+                <!-- E1_2 -->
+                <div class="cell valign-center" style="width: 30%">
+                    <div data-bind="ntsFormLabel: {}">#{i18n.getText('KHA003_81')}</div>
+                </div>
+                <!-- E1_3 -->
+                <div class="cell valign-center" style="">
+                    <div class="label" data-bind="text:manHour.code"></div>
+                </div>
+                <!-- E1_4 -->
+                <div class="cell valign-center" style="">
+                    <div class="label" data-bind="text:manHour.name"></div>
+                </div>
+            </div>
+            <div class="table" style="width: 100%">
+                <!-- E1_5 -->
+                <div class="cell valign-center" style="width: 95px">
+                    <div class="label">#{i18n.getText('KHA003_82')}:</div>
+                </div>
+                <!-- E1_6 -->
+                <div class="cell valign-center" style="width: 30%">
+                    <div data-bind="ntsFormLabel: {constraint: ['ManHourSummaryTableCode','ManHourSummaryTableName'], inline: true, required: true, enable: true}">#{i18n.getText('KHA003_83')}</div>
+                </div>
+                <!-- E1_7 -->
+                <div class="cell valign-center" style="">
+                    <input tabindex="1" class="width-common" id="E1_7"
+                           data-bind="ntsTextEditor: {constraint: 'ManHourSummaryTableCode', value: e1718ManHour.code,enable: true,required: true, name: '#[KHA003_84]'}, style: {marginRight: '5px'}"/>
+                </div>
+                <!-- E1_8 -->
+                <div class="cell valign-center" style="">
+                    <input tabindex="2" id="E1_8"
+                           data-bind="ntsTextEditor: {constraint: 'ManHourSummaryTableName', value: e1718ManHour.name, required: true, name: '#[KHA003_85]'},  style: {width: '300px'}"/>
+                </div>
+            </div>
+        </div>
+        <div id="functions-area-bottom">
+            <div class="table" id="table_e1_9">
+                <div class="cell valign-center" style="">
+                    <!-- E2_9 -->
+                    <div tabindex="3" id="e1_9" style="background-color: #fcd8dd;" data-bind="ntsCheckBox: { checked: vm.overwrite, style: 'warnpanel'}">#{i18n.getText('KHA003_86')}</div>
+                </div>
+            </div>
+            <!-- E20_1 -->
+                <button id="btn-f-close" tabindex="4" class="large proceed"
+                        data-bind="click:decide,enable: $root.errors.isEmpty">#{i18n.getText('KHA003_87')}</button>
+            <!-- E20_2 -->
+                <button id="btn-f-stop" tabindex="5" class="large"
+                        data-bind="click:cancel">#{i18n.getText('KHA003_88')}</button>
+        </div>
+    </ui:define>
+</ui:composition>
+</body>
+</html>

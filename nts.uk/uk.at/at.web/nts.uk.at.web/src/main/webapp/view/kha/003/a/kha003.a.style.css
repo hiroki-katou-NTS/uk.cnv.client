@@ -1,0 +1,84 @@
+
+.width-common {
+    width: 27px;
+}
+
+#A4_3 {
+    width: 300px;
+}
+
+.panel_padding {
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.panel_padding span {
+    display: table;
+    margin: 44px auto;
+}
+
+.panel_common {
+    height: 110px;
+    vertical-align: middle;
+    width: 70px;
+    word-break: break-all;
+    text-align: center;
+}
+
+.bacg-active {
+    background-color: #C6E0B4;
+}
+
+.bacg-inactive {
+    color: #A6A6A6;
+    background-color: #F2F2F2;
+    cursor: not-allowed;
+}
+
+.item_a_6_1 {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.item_a_6_2 {
+    height: 80px;
+    padding-top: 79px;
+}
+
+.item_a_6_4_to_67 {
+    height: 145px;
+    width: 100px;
+    margin-right: -4px;
+    display: inline-block;
+    text-align: center;
+}
+
+.button_top_right_corner {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+}
+
+span.label.layout-setting.summary-item {
+    word-break: break-all;
+}
+
+table#main-table .panel.panel-frame {
+    border-radius: 3px;
+}
+
+table#main-table td {
+    border: 1px solid transparent;
+}
+
+#append_area {
+    padding: 0!important;
+    height: 169px;
+    background-color: #BDD7EE;
+}
+
+table#single-list tr td {
+    height: 24px;
+}

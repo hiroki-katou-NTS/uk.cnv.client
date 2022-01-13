@@ -9,9 +9,14 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
+import nts.arc.task.AsyncTaskInfo;
 import nts.arc.time.GeneralDate;
+import nts.gul.text.IdentifierUtil;
+import nts.uk.ctx.at.schedule.app.command.budget.external.actualresult.dto.ExecutionInfor;
 import nts.uk.shr.com.time.TimeWithDayAttr;
 
 /**
@@ -19,6 +24,7 @@ import nts.uk.shr.com.time.TimeWithDayAttr;
  */
 
 @Stateless
+@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class RegisterWorkSchedule<T> {
 	
 	@Inject
@@ -30,28 +36,37 @@ public class RegisterWorkSchedule<T> {
 	private static final String DATE_FORMAT = "yyyy/MM/dd";
 
 	
-	public ResultRegisWorkSchedule handle(List<WorkScheduleCommand> command) {
+	public ExecutionInfor handle(List<WorkScheduleCommand> command) {
 		if (command.isEmpty())
 			return null;
-		ResultRegisWorkSchedule rs = null;
 		String viewMode = command.get(0).viewMode;
+		String executeId = IdentifierUtil.randomUniqueId();
+        
 		if (viewMode.equals("shift")) {
-			List<WorkScheduleSaveCommand<T>> dataReg = convertParam(command, "shift");
-			rs = regisWorkScheduleShift.handle(dataReg);
+			List<WorkScheduleSaveCommand<T>> dataReg = convertParam(command, "shift", executeId);
+			AsyncTaskInfo taskInfor = regisWorkScheduleShift.handle(dataReg);
+			return ExecutionInfor.builder()
+	                .taskInfor(taskInfor)
+	                .executeId(executeId)
+	                .build();
 		} else {
-			List<WorkScheduleSaveCommand<T>> dataReg = convertParam(command, "other");
-			rs = regisWorkSchedule.handle(dataReg);
+			List<WorkScheduleSaveCommand<T>> dataReg = convertParam(command, "other", executeId);
+			AsyncTaskInfo taskInfor = regisWorkSchedule.handle(dataReg);
+			return ExecutionInfor.builder()
+	                .taskInfor(taskInfor)
+	                .executeId(executeId)
+	                .build();
 		}
-		return rs;
 	}
 	
 	@SuppressWarnings({"rawtypes","unchecked"})
-	private List<WorkScheduleSaveCommand<T>> convertParam(List<WorkScheduleCommand> command, String viewMode) {
+	private List<WorkScheduleSaveCommand<T>> convertParam(List<WorkScheduleCommand> command, String viewMode, String executeId) {
 		List<WorkScheduleSaveCommand<T>> rs = new ArrayList<WorkScheduleSaveCommand<T>>();
 		if (viewMode == "shift") {
 			for (WorkScheduleCommand wsCmd : command) {
 				GeneralDate ymd = GeneralDate.fromString(wsCmd.ymd, DATE_FORMAT);
 				WorkScheduleSaveCommand<T> ws = new WorkScheduleSaveCommand<T>(wsCmd.sid, ymd, wsCmd.shiftCode);
+				ws.setExecuteId(executeId);
 				rs.add(ws);
 			}
 		} else {
@@ -68,6 +83,7 @@ public class RegisterWorkSchedule<T> {
 					mapAttendIdWithTime.put(34, endTime);
 				} 
 				WorkScheduleSaveCommand<T> ws = new WorkScheduleSaveCommand(wsCmd.sid, ymd, workInfor, mapAttendIdWithTime, new ArrayList<>(), false);
+				ws.setExecuteId(executeId);
 				rs.add(ws);
 			}
 		}

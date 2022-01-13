@@ -22,10 +22,10 @@ public class AddAffWorkplaceHistoryCommand {
 	@PeregItem("IS00084")
 	private String  workplaceId;
 	
-	/** The normalWorkplaceCode. */
-	// 通常職場コード
-	@PeregItem("IS00085")
-	private String  normalWorkplaceId;
+//	/** The normalWorkplaceCode. */
+//	// 通常職場コード
+//	@PeregItem("IS00085")
+//	private String  normalWorkplaceId;
 	
 	/** 期間 */
 	/** 開始日 */

@@ -14,8 +14,6 @@ import nts.uk.ctx.at.record.dom.stampmanagement.workplace.WorkLocation;
 import nts.uk.ctx.at.record.dom.stampmanagement.workplace.WorkLocationRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampDakokuRepository;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.GetNewestStampNotRegisteredService;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.StampInfoDisp;
 import nts.uk.shr.com.context.AppContexts;
@@ -28,10 +26,7 @@ import nts.uk.shr.com.context.AppContexts;
  */
 @Stateless
 public class CardUnregistered {
-
-	@Inject
-	private StampRecordRepository recordRepo;
-
+	
 	@Inject
 	private StampDakokuRepository dakokuRepo;
 
@@ -40,7 +35,7 @@ public class CardUnregistered {
 
 	public List<CardUnregisteredDto> getAll(DatePeriod period) {
 		RetrieveNoStampCardRegisteredServiceRequireImpl require = new RetrieveNoStampCardRegisteredServiceRequireImpl(
-				recordRepo, dakokuRepo);
+				dakokuRepo);
 		List<CardUnregisteredDto> dto = new ArrayList<>();
 		String companyID = AppContexts.user().companyId();
 		String contractCode = AppContexts.user().contractCode();
@@ -94,19 +89,11 @@ public class CardUnregistered {
 			implements GetNewestStampNotRegisteredService.Require {
 
 		@Inject
-		private StampRecordRepository recordRepo;
-
-		@Inject
 		private StampDakokuRepository dakokuRepo;
 
 		@Override
-		public List<StampRecord> getStempRcNotResgistNumber(DatePeriod period) {
-			return recordRepo.getStempRcNotResgistNumber(AppContexts.user().contractCode(), period);
-		}
-
-		@Override
-		public List<Stamp> getStempRcNotResgistNumberStamp(String contractCode, DatePeriod period) {
-			return dakokuRepo.getStempRcNotResgistNumberStamp(contractCode, period);
+		public List<Stamp> getStempRcNotResgistNumberStamp(DatePeriod period) {
+			return dakokuRepo.getStempRcNotResgistNumberStamp(AppContexts.user().contractCode(), period);
 		}
 	}
 }

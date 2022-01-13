@@ -90,6 +90,7 @@ module nts.uk.at.view.kal013.a {
                     vm.getAlarmChecklist(value);
                     vm.showHiddenTabByCategory(value);
                     vm.selectedCategoryName(_.filter(common.workplaceCategory(), i => i.code == value)[0].name);
+                    vm.selectedTab('tab-1');
                 }
             });
 

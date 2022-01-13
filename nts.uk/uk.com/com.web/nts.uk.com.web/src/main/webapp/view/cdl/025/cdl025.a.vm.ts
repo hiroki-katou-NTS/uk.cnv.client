@@ -28,9 +28,10 @@ module nts.uk.com.view.cdl025.a {
                 self.component = new ccg.component.viewmodel.ComponentModel({ 
                     roleType: self.roleType,
                     multiple: self.multiple,
-                    currentCode: self.currentCode,
+                    selectedId: self.currentCode,
                     showEmptyItem: true,
-                    roleAtr : self.roleAtr
+                    roleAtr : self.roleAtr,
+                    onDialog: true
                 });
             }
 
@@ -47,7 +48,7 @@ module nts.uk.com.view.cdl025.a {
             /** btn decision*/
             decision(){
                 let self = this;
-                nts.uk.ui.windows.setShared("dataCdl025", self.component.currentCode());
+                nts.uk.ui.windows.setShared("dataCdl025", self.component.currentRoleId());
                 nts.uk.ui.windows.close();
             }
             

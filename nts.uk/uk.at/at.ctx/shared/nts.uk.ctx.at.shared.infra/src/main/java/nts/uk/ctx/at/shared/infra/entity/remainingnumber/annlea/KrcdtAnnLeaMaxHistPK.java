@@ -44,6 +44,6 @@ public class KrcdtAnnLeaMaxHistPK implements Serializable {
 	// 締め日.末日とする
 	@Column(name = "IS_LAST_DAY")
 	@Basic(optional = false)
-	public Integer isLastDay;
+	public boolean isLastDay;
 
 }

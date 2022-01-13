@@ -7,6 +7,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import nts.uk.ctx.exio.dom.input.domain.ImportingDomainId;
 import nts.uk.screen.com.app.cmf.cmf001.c.delete.Cmf001cDeleteCommand;
 import nts.uk.screen.com.app.cmf.cmf001.c.delete.Cmf001cDeleteCommandHandler;
 import nts.uk.screen.com.app.cmf.cmf001.c.get.GetImportableItemAndConstraint;
@@ -22,12 +23,13 @@ public class Cmf001cWebService {
 	private GetImportableItemAndConstraint importableItem;
 	
 	@POST
-	@Path("importable-item/{settingCode}/{itemNo}")
+	@Path("importable-item/{settingCode}/{domainId}/{itemNo}")
 	public ImportableItemDto getDomainConstraint(
 			@PathParam("settingCode") String settingCode,
+			@PathParam("domainId") int domainId,
 			@PathParam("itemNo") int itemNo) {
 		
-		return importableItem.get(settingCode, itemNo);
+		return importableItem.get(settingCode, ImportingDomainId.valueOf(domainId), itemNo);
 	}
 	
 	@Inject

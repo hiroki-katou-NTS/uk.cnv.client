@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.sys.portal.dom.standardmenu.MenuCode;
 import nts.uk.ctx.sys.portal.dom.webmenu.smartphonemenu.SPMenuEmployment;
@@ -90,12 +92,12 @@ public class JpaSPMenuRepository extends JpaRepository implements SPMenuReposito
 	}
 
 	private SPMenuEmployment toDomainEmp(SptmtSPMenuK s) {
-		return SPMenuEmployment.createFromJavaType(s.companyId, s.pk.roleId, s.pk.menuCode, s.dispAtr);
+		return SPMenuEmployment.createFromJavaType(s.companyId, s.pk.roleId, s.pk.menuCode, BooleanUtils.toInteger(s.dispAtr));
 	}
 
 	private SptmtSPMenuK toEntityEmp(SPMenuEmployment s) {
 		return new SptmtSPMenuK(new SptmtSPMenuKPK(s.getEmploymentRole(), s.getMenuCode().v()), s.getCompanyId(),
-				s.getDisplayAtr().value);
+				BooleanUtils.toBoolean(s.getDisplayAtr().value));
 	}
 
 	@Override
@@ -108,7 +110,7 @@ public class JpaSPMenuRepository extends JpaRepository implements SPMenuReposito
 	@Override
 	public List<SPMenuEmployment> findSPMenuEmploymentUse(String companyID, String roleID) {
 		return this.queryProxy().query(SEL_SP_MN_EMP, SptmtSPMenuK.class).setParameter("companyID", companyID)
-				.setParameter("roleID", roleID).setParameter("dispAtr", 1).getList(t -> toDomainEmp(t));
+				.setParameter("roleID", roleID).setParameter("dispAtr", true).getList(t -> toDomainEmp(t));
 	}
 
 	@Override

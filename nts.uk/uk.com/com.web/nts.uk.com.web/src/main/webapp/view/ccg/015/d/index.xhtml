@@ -11,6 +11,7 @@
     <ui:define name="htmlHead">
       <com:scriptfile set="IGNITE" />
       <com:stylefile path="ccg015.d.style.css" />
+      <com:scriptfile path="../../034/share/model.js" />
       <com:scriptfile path="ccg015.d.vm.js" />
       <script>var dialogSize = { width: 995, height: 620 };</script>
       <com:ValidatorScript>
@@ -121,7 +122,7 @@
                 <div class="contents_right panel panel-frame">
                   <!-- D7 -->
                   <com:ko-if bind="contentFlowMenu()">
-                    <div >
+                    <div style="text-align: center;">
                       <iframe id="frameF1" ></iframe>
                     </div>
                   </com:ko-if>

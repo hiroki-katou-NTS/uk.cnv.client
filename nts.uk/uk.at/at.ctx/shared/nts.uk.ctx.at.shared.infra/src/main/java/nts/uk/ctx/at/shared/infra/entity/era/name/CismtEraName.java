@@ -1,7 +1,6 @@
 package nts.uk.ctx.at.shared.infra.entity.era.name;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -58,7 +57,7 @@ public class CismtEraName extends ContractUkJpaEntity implements Serializable {
 
 	/** The system type. */
 	@Column(name="SYSTEM_TYPE")
-	private BigDecimal systemType;
+	private boolean systemType;
 
 	/* (non-Javadoc)
 	 * @see nts.arc.layer.infra.data.entity.JpaEntity#getKey()

@@ -4,19 +4,27 @@
  *****************************************************************/
 package nts.uk.ctx.sys.auth.pub.role;
 
+import nts.arc.time.GeneralDate;
+import nts.uk.shr.com.context.loginuser.role.LoginUserRoles;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import nts.arc.time.GeneralDate;
-import nts.uk.shr.com.context.loginuser.role.LoginUserRoles;
-
 /**
  * The Interface RoleExportRepo.
  */
 public interface RoleExportRepo {
-	
+
+
+	/**
+	 * find by company
+	 *
+	 * @param companyId
+	 * @return Role
+	 */
+	List<RoleExport> findByCompanyId(String companyId);
 	/**
 	 * Find by list role id.
 	 *
@@ -137,5 +145,7 @@ public interface RoleExportRepo {
 	 * @return ロールセット
 	 */
 	Optional<RoleSetExport> getRoleSetFromUserId(String userId, GeneralDate baseDate);
+	
+	Integer getEmployeeReferenceRange(String userId, int roleType, GeneralDate baseDate);
 
 }

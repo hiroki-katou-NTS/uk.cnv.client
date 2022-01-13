@@ -237,6 +237,8 @@ public class PrevisionalCalculationServiceImpl implements ProvisionalCalculation
 				new ArrayList<>(), //editState
 				Optional.empty(), //tempTime
 				new ArrayList<>(),//remarks
+				new ArrayList<>(),//ouenTime
+				new ArrayList<>(),//ouenTimeSheet
 				Optional.empty());
 	}
 

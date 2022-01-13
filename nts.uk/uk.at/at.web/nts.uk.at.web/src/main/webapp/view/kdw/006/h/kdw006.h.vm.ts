@@ -29,20 +29,7 @@ module nts.uk.at.view.kdw006.h.viewmodel {
             let getData = nts.uk.ui.windows.getShared("kdw006CResult");
             let appTypeEnum = __viewContext.enums.ApplicationType;
             _.forEach(appTypeEnum, (obj) => {
-                if (obj.value == 0 || 
-                    obj.value == 1 ||
-                    obj.value == 2 ||
-                    obj.value == 3 ||
-                    obj.value == 4 ||
-                    obj.value == 5 ||
-                    obj.value == 6 ||
-                    obj.value == 7 ||
-                    obj.value == 8 ||
-                    obj.value == 13 ||
-                    obj.value == 14 ||
-                    obj.value == 15) {
-                    self.items.push(new ItemModel(obj.value, obj.name));
-                }
+                self.items.push(new ItemModel(obj.value, obj.name));
             });
             self.currentCodeList(getData.appTypes);
             self.multicheck = getData.multi;

@@ -12,9 +12,10 @@
         <com:ValidatorScript>
           nts.uk.shr.com.time.TimeWithDayAttr
           nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeName
+          nts.uk.ctx.at.shared.dom.worktime.filtercriteria.WorkHoursFilterConditionName
         </com:ValidatorScript>
         <script>
-          var dialogSize = { width: 950, height: 640 };
+          var dialogSize = { width: 950, height: 700 };
         </script>
         <com:scriptfile set="IGNITE" />
         <com:scriptfile path="kdl001.a.start.js" />
@@ -25,7 +26,7 @@
 
       <ui:define name="content">
         <div id="contents-area">
-          <div class="label">#{i18n.getText('KDL001_2')}</div>
+          <!-- <div class="label">#{i18n.getText('KDL001_2')}</div>
           <div class="control-group valign-center">
             <div class="table">
               <div class="cell">
@@ -86,6 +87,74 @@
                 </div>
               </div>
             </div>
+          </div> -->
+
+          <div class="setting-zone">
+            <div class="flex valign-center ml-10">
+              <label id="A2_22">#{i18n.getText('KDL001_25')}</label>
+              <a id="A2_23" class="hyperlink ml-10" href="#" data-bind="visible: isAttendanceRole">#{i18n.getText('KDL001_26')}</a>
+              <button id="A2_24" class="ml-10" data-bind="ntsHelpButton: { textId: 'KDL001_27', position: 'right top' }, visible: isAttendanceRole">?</button>
+            </div>
+            <div class="query-zone">
+              <div id="A2_25" class="panel panel-frame query-part" data-bind="foreach: defaultKeywords">
+                <com:ko-if bind="no &lt; 6">
+                  <button class="A2_26 top-keyword-row" 
+                  data-bind="text: name, enable: notUseAtr, click: $parent.executeSearchByKeyword.bind($parent)"></button>
+                </com:ko-if>
+                <com:ko-if bind="no &gt; 5">
+                  <button class="A2_26 bottom-keyword-row" 
+                  data-bind="text: name, enable: notUseAtr, click: $parent.executeSearchByKeyword.bind($parent)"></button>
+                </com:ko-if>
+              </div>
+              <div class="table query-part query-input-part">
+                <div class="row">
+                  <div class="cell valign-center">
+                    <label id="A2_1">#{i18n.getText('KDL001_3')}</label>
+                  </div>
+                  <div class="cell valign-center">
+                    <input id="A2_2" class="ml-10" data-bind="ntsTimeWithDayEditor: {
+                      name: '#[KDL001_21]', 
+                      value: startTime, 
+                      constraint: 'TimeWithDayAttr',
+                      option: { timeWithDay: true },
+                      enable: true, 
+                      readonly: false, 
+                      required: false
+                    }" />
+                    <span id="A2_3" class="label">～</span>
+                    <input id="A2_4" data-bind="ntsTimeWithDayEditor: {
+                      name: '#[KDL001_22]', 
+                      value: endTime, 
+                      constraint: 'TimeWithDayAttr',
+                      option: { timeWithDay: true },
+                      enable: true, 
+                      readonly: false, 
+                      required: false
+                    }" />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="cell">
+                    <input id="A2_6" data-bind="ntsTextEditor: {
+                      name: '#[KDL001_31]',
+                      value: searchQuery,
+                      option: { width: '210px', placeholder: '#{i18n.getText('KDL001_31')}' }
+                    }" />
+                  </div>
+                </div>
+              </div>
+              <div class="query-part query-execute-part">
+                <button id="A2_7" data-bind="click: executeSearchByQuery">#{i18n.getText('KDL001_10')}</button>
+              </div>
+              <div class="query-part query-other-part">
+                <div id="A2_21" data-bind="ntsCheckBox: { 
+                  checked: isAllCheckShow, 
+                  enable: isEnableCheckStatus, 
+                  text: '#{i18n.getText('KDL001_24')}' 
+                }"></div>
+                <button id="A2_20" data-bind="click: clearSearch">#{i18n.getText('KDL001_11')}</button>
+              </div>
+            </div>
           </div>
           <div id="day-list-div">
             <table
@@ -113,6 +182,31 @@
           <button data-bind="click: closeDialog">
             #{i18n.getText('KDL001_19')}
           </button>
+        </div>
+        <div id="A6_1" class="popup-area">
+          <div class="flex valign-center">
+            <div id="A6_2" class="mr-10" data-bind="ntsFormLabel: { constraint: 'WorkHoursFilterConditionName' }">#{i18n.getText('KDL001_28')}</div>
+            <button id="A6_6" class="proceed" 
+            data-bind="click: executeSaveKeywords, enable: !nts.uk.ui.errors.hasError()">#{i18n.getText('KDL001_30')}</button>
+            <label id="A6_3">#{i18n.getText('KDL001_29')}</label>
+          </div>
+          <div data-bind="foreach: keywords">
+            <div id="A6_4" data-bind="ntsCheckBox: { checked: notUseAtr }"></div>
+            <com:ko-if bind="no &lt; 6">
+              <input class="A6_5 top-keyword-row mr-10" data-bind="ntsTextEditor: {
+                name: '#[KDL001_33]',
+                value: name,
+                constraint: 'WorkHoursFilterConditionName'
+              }"></input>
+            </com:ko-if>
+            <com:ko-if bind="no &gt; 5">
+              <input class="A6_5 bottom-keyword-row mr-10" data-bind="ntsTextEditor: {
+                name: '#[KDL001_33]',
+                value: name,
+                constraint: 'WorkHoursFilterConditionName'
+              }"></input>
+            </com:ko-if>
+          </div>
         </div>
       </ui:define>
     </ui:composition>

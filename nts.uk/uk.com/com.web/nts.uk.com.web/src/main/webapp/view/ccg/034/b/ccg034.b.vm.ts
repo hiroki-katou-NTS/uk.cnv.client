@@ -58,6 +58,7 @@ module nts.uk.com.view.ccg034.b {
         // Write directly into iframe body
         iframedoc.body.innerHTML = htmlSrc;
       }
+      ccg034.share.model.customload.loadLimitedLabelForIframe();
       vm.$nextTick(() => {
         $("#B1_1").width($("#B1_1").contents().find(".content-container").width());
         $("#B1_1").height($("#B1_1").contents().find(".content-container").height());

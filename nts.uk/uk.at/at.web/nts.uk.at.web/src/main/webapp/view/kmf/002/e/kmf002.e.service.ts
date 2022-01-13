@@ -35,9 +35,11 @@ module nts.uk.at.view.kmf002.e {
             return nts.uk.request.ajax("at", path.findFirstMonth);
         }
         
-        export function remove(year: string): JQueryPromise<any> {
-            let command: any = {};
-            command.year = year;
+        export function remove(year: string, startMonth: number): JQueryPromise<any> {
+            const command = {
+              year: year,
+              startMonth: startMonth
+            };
             return nts.uk.request.ajax("at", path.remove, command);
         }
         
@@ -78,6 +80,10 @@ module nts.uk.at.view.kmf002.e {
                 let _self = this;
                 _.forEach(data, function(newValue) {
                     _self.publicHolidayMonthSettings.push(new PublicHolidayMonthSettingDto(_self.year,newValue.month(),newValue.day()));
+                    // Increment year
+                    if (newValue.month() === 12) {
+                      _self.year = String(Number(_self.year) + 1);
+                    }
                 });
             }
         }

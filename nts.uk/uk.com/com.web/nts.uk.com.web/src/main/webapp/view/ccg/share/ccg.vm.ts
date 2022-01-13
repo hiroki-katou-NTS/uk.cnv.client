@@ -1884,10 +1884,11 @@ module nts.uk.com.view.ccg.share.ccg {
                     nts.uk.ui.dialog.alertError({ messageId: 'Msg_1199' });
                     return false;
                 }
+				/*
                 if (self.showWorktype && nts.uk.util.isNullOrEmpty(self.selectedWorkTypeCode())) {
                     nts.uk.ui.dialog.alertError({ messageId: 'Msg_1200' });
                     return false;
-                }
+                }*/
                 return true;
             }
 
@@ -2607,7 +2608,7 @@ var CCG001_HTML = `<div id="component-ccg001" class="cf height-maximum" style="v
                                 <!-- /ko -->
                                 <!-- ko if: showWorktype -->
                                     <div class="accordion" id="WorkTypeList"
-                                        data-bind="attr: {tabindex: ccg001Tabindex}, ntsAccordion: {enable: true}">
+                                        data-bind="attr: {tabindex: ccg001Tabindex}, ntsAccordion: {enable: true}" hidden ="true">
                                         <h3>
                                             <label>`+CCG001TextResource.CCG001_58+`</label>
                                         </h3>

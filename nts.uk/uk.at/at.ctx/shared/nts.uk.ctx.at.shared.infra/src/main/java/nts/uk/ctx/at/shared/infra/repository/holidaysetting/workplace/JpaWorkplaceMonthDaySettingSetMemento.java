@@ -75,7 +75,7 @@ public class JpaWorkplaceMonthDaySettingSetMemento implements WorkplaceMonthDayS
 				entity.setKshmtWkpMonthDaySetPK(new KshmtWkpMonthDaySetPK());
 				entity.getKshmtWkpMonthDaySetPK().setCid(this.companyId);
 				entity.getKshmtWkpMonthDaySetPK().setWkpId(this.workplaceId);
-				entity.getKshmtWkpMonthDaySetPK().setManageYear(this.year);
+				entity.getKshmtWkpMonthDaySetPK().setManageYear(item.getPublicHdManagementYear().v());
 				entity.getKshmtWkpMonthDaySetPK().setMonth(item.getMonth());
 				entity.setInLegalHd(item.getInLegalHoliday().v());
 				
@@ -83,14 +83,13 @@ public class JpaWorkplaceMonthDaySettingSetMemento implements WorkplaceMonthDayS
 			});
 		} else {
 			this.listKshmtWkpMonthDaySet.stream().forEach(e -> {
-				e.getKshmtWkpMonthDaySetPK().setCid(this.companyId);
-				e.getKshmtWkpMonthDaySetPK().setManageYear(this.year);
-				e.getKshmtWkpMonthDaySetPK().setMonth(publicHolidayMonthSettings.stream()
-														.filter(item -> e.getKshmtWkpMonthDaySetPK().getMonth() == item.getMonth())
-																	.findFirst().get().getMonth());
-				e.setInLegalHd(publicHolidayMonthSettings.stream()
+				PublicHolidayMonthSetting data = publicHolidayMonthSettings.stream()
 						.filter(item -> e.getKshmtWkpMonthDaySetPK().getMonth() == item.getMonth())
-									.findAny().get().getInLegalHoliday().v());
+						.findFirst().get();
+				e.getKshmtWkpMonthDaySetPK().setCid(this.companyId);
+				e.getKshmtWkpMonthDaySetPK().setManageYear(data.getPublicHdManagementYear().v());
+				e.getKshmtWkpMonthDaySetPK().setMonth(data.getMonth());
+				e.setInLegalHd(data.getInLegalHoliday().v());
 			});
 		}
 	}

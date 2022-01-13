@@ -27,6 +27,6 @@ public class KfnmtCatMapEachTypePk implements Serializable {
     public String wkAlarmCheckId;
 
     @Column(name = "FIXED_OPTIONAL")
-    public Boolean fixedOp;
+    public int fixedOp;
 
 }

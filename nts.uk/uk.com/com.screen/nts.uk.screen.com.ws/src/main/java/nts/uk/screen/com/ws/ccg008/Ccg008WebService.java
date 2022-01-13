@@ -90,7 +90,11 @@ public class Ccg008WebService {
 		InitDisplayPeriodSwitchSetDto rq609 = displayPeriodfinder.targetDateFromLogin();
 		
 		DatePeriod  datePeriod = rq609.getListDateProcessed().get(0).getDatePeriod();
-		return new Ccg008Dto(closure.getClosureId().value, rq609.getCurrentOrNextMonth(), rq609.getListDateProcessed().get(0).getTargetDate().toString(), datePeriod.end().toString());
+		return new Ccg008Dto(closure.getClosureId().value,
+				rq609.getCurrentOrNextMonth(),
+				datePeriod.start().toString(),
+				datePeriod.end().toString(),
+				rq609.getListDateProcessed().get(0).getTargetDate().toString());
 		 
 	}
 	
@@ -98,8 +102,11 @@ public class Ccg008WebService {
 	@POST
 	@Path("get-closure")
 	public Ccg008Dto closure(ClosureParams params) {
+		if (BuiltInUser.USER_ID.equals(AppContexts.user().userId())) {
+			return new Ccg008Dto(1, 0, null, null, null);
+		}
 		DatePeriod datePeriodClosure = ClosureService.getClosurePeriod(this.requireService.createRequire(), params.getClosureId(), YearMonth.of(params.getProcessDate()));
-		return new Ccg008Dto(params.getClosureId(), 0 , datePeriodClosure.start().toString(), datePeriodClosure.end().toString());
+		return new Ccg008Dto(params.getClosureId(), 0 , datePeriodClosure.start().toString(), datePeriodClosure.end().toString(), params.getProcessDate().toString());
 				
 	}
 	
@@ -123,7 +130,6 @@ public class Ccg008WebService {
 		}
 		if(topPageSetting.isPresent()) {
 			result.setTopMenuCode(topPageSetting.get().getTopMenuCode().v());
-			result.setSwitchingDate(topPageSetting.get().getSwitchingDate().v());
 			result.setSystem(topPageSetting.get().getMenuLogin().getSystem().value);
 			result.setMenuClassification(topPageSetting.get().getMenuLogin().getMenuClassification().value);
 			result.setLoginMenuCode(topPageSetting.get().getMenuLogin().getLoginMenuCode().v());

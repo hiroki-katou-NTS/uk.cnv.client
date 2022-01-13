@@ -1,0 +1,184 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="../../../../master/dialog.xhtml">
+		<ui:define name="htmlHead">
+			<script>var dialogSize = { width: 430, height: 400 };</script>
+			<com:scriptfile set="IGNITE" />
+			<com:stylefile path="kmf002.h.main.css" />
+			<com:scriptfile path="kmf002.h.vm.js" />
+		</ui:define>
+		<ui:define name="content">
+			<div id="contents-area">
+        <table id="table-bottom">
+					<colgroup>
+						<col width="60px"/>
+						<col width="310px"/>
+					</colgroup>
+					<thead>
+					<tr>
+						<th class="ui-widget-header">
+							<span id="H1_2" class="ui-iggrid-headertext">#{i18n.getText('KMF002_121')}</span>
+						</th>
+						<th class="ui-widget-header">
+							<span id="H1_10" class="ui-iggrid-headertext">#{i18n.getText('KMF002_129')}</span>
+						</th>
+					</tr>
+					</thead>
+					<tbody>
+					<!-- Thu 2 -->
+					<tr>
+						<td class="tbDay">
+							<label id="H1_3">#{i18n.getText('KMF002_122')}</label>
+						</td>
+						<td class="tbDay" data-bind="with: workdayValues()[0]">
+							<div data-bind="ntsRadioBoxGroup: {
+									options: $parent.workdayGroup,
+									optionsValue: 'code',
+									optionsText: 'name',
+									value: workdayDivision,
+                  hasFocus: true,
+									enable: true},
+									css: {
+										'nts-first-radio': workdayDivision() == 0,
+										'nts-second-radio': workdayDivision() == 1,
+										'nts-third-radio': workdayDivision() == 2
+									}" tabindex="1">
+							</div>
+						</td>
+					</tr>
+					<!-- Thu 3 -->
+					<tr data-bind="">
+						<td class="tbDay">
+							<label id="H1_4">#{i18n.getText('KMF002_123')}</label>
+						</td>
+						<td class="tbDay" data-bind="with: workdayValues()[1]">
+							<div data-bind="ntsRadioBoxGroup: {
+									options: $parent.workdayGroup,
+									optionsValue: 'code',
+									optionsText: 'name',
+									value: workdayDivision,
+									enable: true},
+									css: {
+										'nts-first-radio': workdayDivision() == 0,
+										'nts-second-radio': workdayDivision() == 1,
+										'nts-third-radio': workdayDivision() == 2
+									}" tabindex="1">
+							</div>
+						</td>
+					</tr>
+					<!-- Thu 4 -->
+					<tr>
+						<td class="tbDay">
+							<label id="H1_5">#{i18n.getText('KMF002_124')}</label>
+						</td>
+						<td class="tbDay" data-bind="with: workdayValues()[2]">
+							<div data-bind="ntsRadioBoxGroup: {
+									options: $parent.workdayGroup,
+									optionsValue: 'code',
+									optionsText: 'name',
+									value: workdayDivision,
+									enable: true},
+									css: {
+										'nts-first-radio': workdayDivision() == 0,
+										'nts-second-radio': workdayDivision() == 1,
+										'nts-third-radio': workdayDivision() == 2
+									}" tabindex="1">
+							</div>
+						</td>
+					</tr>
+					<!-- Thu 5 -->
+					<tr>
+						<td class="tbDay">
+							<label id="H1_6">#{i18n.getText('KMF002_125')}</label>
+						</td>
+						<td class="tbDay" data-bind="with: workdayValues()[3]">
+							<div data-bind="ntsRadioBoxGroup: {
+									options: $parent.workdayGroup,
+									optionsValue: 'code',
+									optionsText: 'name',
+									value: workdayDivision,
+									enable: true},
+									css: {
+										'nts-first-radio': workdayDivision() == 0,
+										'nts-second-radio': workdayDivision() == 1,
+										'nts-third-radio': workdayDivision() == 2
+									}" tabindex="1">
+							</div>
+						</td>
+					</tr>
+					<!-- Thu 6 -->
+					<tr>
+						<td class="tbDay">
+							<label id="H1_7">#{i18n.getText('KMF002_126')}</label>
+						</td>
+						<td class="tbDay" data-bind="with: workdayValues()[4]">
+							<div data-bind="ntsRadioBoxGroup: {
+									options: $parent.workdayGroup,
+									optionsValue: 'code',
+									optionsText: 'name',
+									value: workdayDivision,
+									enable: true},
+									css: {
+										'nts-first-radio': workdayDivision() == 0,
+										'nts-second-radio': workdayDivision() == 1,
+										'nts-third-radio': workdayDivision() == 2
+									}" tabindex="1">
+							</div>
+						</td>
+					</tr>
+					<!-- Thu 7 -->
+					<tr>
+						<td class="tbDay">
+							<label id="H1_8">#{i18n.getText('KMF002_127')}</label>
+						</td>
+						<td class="tbDay" data-bind="with: workdayValues()[5]">
+							<div data-bind="ntsRadioBoxGroup: {
+									options: $parent.workdayGroup,
+									optionsValue: 'code',
+									optionsText: 'name',
+									value: workdayDivision,
+									enable: true},
+									css: {
+										'nts-first-radio': workdayDivision() == 0,
+										'nts-second-radio': workdayDivision() == 1,
+										'nts-third-radio': workdayDivision() == 2
+									}" tabindex="1">
+							</div>
+						</td>
+					</tr>
+					<!-- CN -->
+					<tr>
+						<td class="tbDay">
+							<label id="H1_9">#{i18n.getText('KMF002_128')}</label>
+						</td>
+						<td class="tbDay" data-bind="with: workdayValues()[6]">
+							<div data-bind="ntsRadioBoxGroup: {
+									options: $parent.workdayGroup,
+									optionsValue: 'code',
+									optionsText: 'name',
+									value: workdayDivision,
+									enable: true},
+									css: {
+										'nts-first-radio': workdayDivision() == 0,
+										'nts-second-radio': workdayDivision() == 1,
+										'nts-third-radio': workdayDivision() == 2
+									}" tabindex="1">
+							</div>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+      </div>
+      <div id="functions-area-bottom">
+        <button id="H3_1" class="large proceed" data-bind="click: processSave, enable: $root.errors.isEmpty" tabindex="2">#{i18n.getText('KMF002_133')}</button>
+        <button id="H3_2" data-bind="click:closeDialog" tabindex="3">#{i18n.getText('KMF002_134')}</button>
+      </div>
+    </ui:define>
+  </ui:composition>
+</body>
+</html>

@@ -40,5 +40,11 @@ public class MyCustomizeException extends BusinessException {
 		this.errorLst.addAll(errorLst);
 		this.itemName = itemName;
 	}
+	
+	public MyCustomizeException(String messageId, List<String> parameterIds, List<String> errorLst, String itemName) {
+		super(messageId, parameterIds.stream().toArray(String[]::new));
+		this.errorLst.addAll(errorLst);
+		this.itemName = itemName;
+	}
 
 }

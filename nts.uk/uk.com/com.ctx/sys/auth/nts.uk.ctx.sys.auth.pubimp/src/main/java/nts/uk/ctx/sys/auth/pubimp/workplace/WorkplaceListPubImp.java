@@ -6,8 +6,10 @@ package nts.uk.ctx.sys.auth.pubimp.workplace;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -15,6 +17,7 @@ import javax.inject.Inject;
 
 import nts.arc.time.GeneralDate;
 import nts.uk.ctx.bs.employee.pub.workplace.master.WorkplacePub;
+import nts.uk.ctx.sys.auth.dom.adapter.workplace.WorkplaceAdapter;
 import nts.uk.ctx.sys.auth.dom.algorithm.AcquireListWorkplaceByEmpIDService;
 import nts.uk.ctx.sys.auth.dom.algorithm.AcquireUserIDFromEmpIDService;
 import nts.uk.ctx.sys.auth.dom.grant.service.RoleIndividualService;
@@ -68,6 +71,9 @@ public class WorkplaceListPubImp implements WorkplaceListPub{
 	
 	@Inject
 	private WorkPlaceAuthorityRepository workPlaceAuthorityRepository;
+	
+	@Inject
+	private WorkplaceAdapter workplaceAdapter;
 
 	/*
 	 * (non-Javadoc)
@@ -167,6 +173,21 @@ public class WorkplaceListPubImp implements WorkplaceListPub{
 					x.getCompanyId(), 
 					x.getFunctionNo().v(), 
 					x.isAvailability()));
+	}
+
+	@Override
+	public Map<String, String> getWorkPlace(String userID, String employeeID, GeneralDate date) {
+		//$参照範囲 = 社員参照範囲を取得する(ユーザID,ロール種類 .就業,基準日)
+		Integer range = roleExportRepo.getEmployeeReferenceRange(userID, RoleType.EMPLOYMENT.value, date);
+		//	if $参照範囲 == 自分のみ
+		if(range != null && range == EmployeeReferenceRange.ONLY_MYSELF.value) {
+			//return 所属職場を取得するAdapter.取得する(社員ID,基準日)
+			return workplaceAdapter.getAWorkplace(employeeID, date);
+		}
+		//$職場リスト = 指定社員が参照可能な職場リストを取得する(基準日,$参照範囲,社員ID)
+		List<String> workplaceList = this.getListWorkPlaceIDNoWkpAdmin(employeeID, range, date);
+		//return 所属職場リストを取得するAdapter.取得する(基準日,職場リスト)
+		return workplaceAdapter.getByListIds(workplaceList, date);
 	}
 }
 

@@ -61,12 +61,23 @@ public class KrqmtApproval extends ContractUkJpaEntity {
     @Column(name = "WKP_DISP_ATR")
     private int displayWorkPlaceName;
 
+    @Column(name = "APPROVE_FUNC_USE")
+    private int useApprovalFunction;
+
     @Override
     protected Object getKey() {
         return null;
     }
 
     public ApprovalListDisplaySetting toDomain() {
-        return ApprovalListDisplaySetting.create(companyID, appReasonDisAtr, advanceExcessMessDisAtr, actualExcessMessDisAtr, warningDateDisAtr, displayWorkPlaceName);
+        return ApprovalListDisplaySetting.create(
+                companyID,
+                appReasonDisAtr,
+                advanceExcessMessDisAtr,
+                actualExcessMessDisAtr,
+                warningDateDisAtr,
+                displayWorkPlaceName,
+                useApprovalFunction
+        );
     }
 }

@@ -1,6 +1,8 @@
 package nts.uk.screen.at.app.ksu.ksu001q.query;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 
@@ -8,6 +10,8 @@ import lombok.Data;
  *
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DailyExternalBudget {
 
 	/** 職場グループ */

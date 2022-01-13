@@ -35,7 +35,7 @@ public class KrcmtCalcMSetFleCom extends KrcstFlexMCalSet implements Serializabl
 	
 	/** 所定労動時間使用区分 */
 	@Column(name = "WITHIN_TIME_USE")
-	private int withinTimeUse;
+	private boolean withinTimeUse;
 
 	/*
 	 * (non-Javadoc)

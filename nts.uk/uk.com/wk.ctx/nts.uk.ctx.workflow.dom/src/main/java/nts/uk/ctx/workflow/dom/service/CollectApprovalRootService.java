@@ -9,6 +9,7 @@ import nts.uk.ctx.workflow.dom.approvermanagement.workroot.ApprovalPhase;
 import nts.uk.ctx.workflow.dom.approvermanagement.workroot.EmploymentRootAtr;
 import nts.uk.ctx.workflow.dom.approvermanagement.workroot.SystemAtr;
 import nts.uk.ctx.workflow.dom.service.output.ApprovalRootContentOutput;
+import nts.uk.ctx.workflow.dom.service.output.ApproverFromGroupOuput;
 import nts.uk.ctx.workflow.dom.service.output.ErrorFlag;
 import nts.uk.ctx.workflow.dom.service.output.LevelOutput;
 import nts.uk.ctx.workflow.dom.service.output.LevelOutput.LevelInforOutput.LevelApproverList.LevelApproverInfo;
@@ -83,7 +84,7 @@ public interface CollectApprovalRootService {
 	 * @param lowerApprove
 	 * @return
 	 */
-	public List<LevelApproverInfo> getApproverFromGroup(String companyID, String approverGroupCD, String specWkpId, String paramID, 
+	public ApproverFromGroupOuput getApproverFromGroup(String companyID, String approverGroupCD, String specWkpId, String paramID, 
 			Optional<Integer> opDispOrder, String employeeID, GeneralDate baseDate, SystemAtr systemAtr, Optional<Boolean> lowerApprove);
 	
 	/**

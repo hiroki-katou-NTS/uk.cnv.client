@@ -22,7 +22,11 @@ public enum OvertimeAppAtrShare {
 	/**
 	 * 早出残業・通常残業
 	 */
-	EARLY_NORMAL_OVERTIME(2, "Enum_APP_OVERTIME_EARLY_NORMAL");
+	EARLY_NORMAL_OVERTIME(2, "Enum_APP_OVERTIME_EARLY_NORMAL"),
+	/**
+	 * 複数回残業
+	 */
+	MULTIPLE_OVERTIME(3, "Enum_APP_OVERTIME_MULTIPLE");
 
 	public final int value;
 

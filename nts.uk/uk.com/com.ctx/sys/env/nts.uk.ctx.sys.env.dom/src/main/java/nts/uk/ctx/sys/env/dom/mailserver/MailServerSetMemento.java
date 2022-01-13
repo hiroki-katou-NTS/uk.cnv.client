@@ -29,7 +29,7 @@ public interface MailServerSetMemento {
 	 * Set Email Authentication
 	 * 
 	 */
-	public void setEmailAuthentication(EmailAuthentication emailAuthentication);
+	public void setEmailAuthentication(MailAddress emailAuthentication);
 
 	/**
 	 * Set password

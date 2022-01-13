@@ -227,7 +227,6 @@
 "労働条件","KSHMT_WORKCOND_WORK_TS",9,"SID","SID"
 "労働条件","KSHMT_WORKCOND_WORK_TS",9,"START_TIME_1","日曜の開始時刻1"
 "労働条件","KSHMT_WORKCOND_WORK_TS",9,"START_TIME_2","日曜の開始時刻2"
-"年休上限データ","KRCDT_HDPAID_MAX",1,"CID","CID"
 "年休上限データ","KRCDT_HDPAID_MAX",1,"CONTRACT_CD","CONTRACT_CD"
 "年休上限データ","KRCDT_HDPAID_MAX",1,"MAX_MINUTES","時間年休上限時間"
 "年休上限データ","KRCDT_HDPAID_MAX",1,"MAX_TIMES","半日上限回数"

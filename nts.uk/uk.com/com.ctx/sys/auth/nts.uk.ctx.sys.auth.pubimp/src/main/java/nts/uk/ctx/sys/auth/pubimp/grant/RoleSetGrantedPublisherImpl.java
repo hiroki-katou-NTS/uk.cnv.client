@@ -33,13 +33,15 @@ public class RoleSetGrantedPublisherImpl implements RoleSetGrantedPublisher {
 
 	@Override
 	public Optional<RoleSetGrantedJobTitleDto> getJobTitleGranted(String companyId) {
-		return roleSetJobRepo.getOneByCompanyId(companyId).map(j -> {
-			List<RoleSetGrantedJobTitleDetailDto> details = j.getDetails().stream()
-				.map(d -> new RoleSetGrantedJobTitleDetailDto(d.getRoleSetCd().v(), 
-						d.getJobTitleId(), d.getCompanyId()))
+		
+		List<RoleSetGrantedJobTitleDetailDto> details = roleSetJobRepo.getByCompanyId(companyId).stream()
+				.map(d -> new RoleSetGrantedJobTitleDetailDto( 
+						d.getRoleSetCd().v(), 
+						d.getJobTitleId(), 
+						d.getCompanyId()))
 				.collect(Collectors.toList());
-			return new RoleSetGrantedJobTitleDto(j.getCompanyId(), j.isApplyToConcurrentPerson(), details);
-		});
+		
+		return Optional.of(new RoleSetGrantedJobTitleDto(details));
 	}
 
 }

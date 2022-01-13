@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package nts.uk.screen.at.app.ksu001.extracttargetemployees;
 
@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import nts.arc.error.BusinessException;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
+import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.function.dom.adapter.RegulationInfoEmployeeAdapter;
 import nts.uk.ctx.at.function.dom.adapter.annualworkschedule.EmployeeInformationAdapter;
 import nts.uk.ctx.at.function.dom.adapter.annualworkschedule.EmployeeInformationImport;
@@ -54,14 +55,12 @@ import nts.uk.shr.com.context.AppContexts;
  */
 @Stateless
 public class ScreenQueryExtractTargetEmployees {
-	
+
 	@Inject
 	private EmployeeInformationAdapter empInfoAdapter;
-	
+
 	@Inject
 	private WorkplaceGroupAdapter workplaceGroupAdapter;
-	@Inject
-	private RegulationInfoEmployeeAdapter regulInfoEmployeeAdap;
 	@Inject
 	private RegulationInfoEmployeePub regulInfoEmpPub;
 	@Inject
@@ -80,67 +79,61 @@ public class ScreenQueryExtractTargetEmployees {
 	private EmpMedicalWorkStyleHistoryRepository empMedicalWorkStyleHisRepo;
 	@Inject
 	private NurseClassificationRepository nurseClassificationRepo;
-	
+
+
 	final static String SPACE = " ";
 	final static String ZEZO_TIME = "00:00";
 	final static String DATE_TIME_FORMAT = "yyyy/MM/dd HH:mm";
-	
+
 	public List<EmployeeInformationImport> getListEmp(ExtractTargetEmployeesParam param) {
-		
+
 		// step 1 get domainSv 組織を指定して参照可能な社員を取得する
-		RequireGetEmpImpl requireGetEmpImpl = new RequireGetEmpImpl(workplaceGroupAdapter, regulInfoEmployeeAdap, regulInfoEmpPub);
+		RequireGetEmpImpl requireGetEmpImpl = new RequireGetEmpImpl();
 		String epmloyeeId = AppContexts.user().employeeId();
 		TargetOrgIdenInfor targetOrgIdenInfor = param.targetOrgIdenInfor;
-		List<String> sids = GetEmpCanReferService.getByOrg(requireGetEmpImpl, param.baseDate,epmloyeeId , targetOrgIdenInfor);
-		
+		List<String> sids = GetEmpCanReferService.getByOrg(requireGetEmpImpl, epmloyeeId, param.systemDate, param.period, targetOrgIdenInfor);
+
 		// step 2, 3
-		EmployeeInformationQueryDtoImport input = new EmployeeInformationQueryDtoImport(sids, param.baseDate, false, false, false, false, false, false);
+		EmployeeInformationQueryDtoImport input = new EmployeeInformationQueryDtoImport(sids, param.systemDate, false, false, false, false, false, false);
 
 		List<EmployeeInformationImport> listEmp = empInfoAdapter.getEmployeeInfo(input);
 		//2020/9/7　発注済み step 4
 		//※スケ①-5_スケ修正(職場別)
 		if(listEmp.isEmpty()){
-			throw new BusinessException("Msg_1779"); 
+			throw new BusinessException("Msg_1779");
 		}
 		listEmp.sort( Comparator.comparing(EmployeeInformationImport :: getEmployeeCode));
 		List<String> sids2 = listEmp.stream().map(m -> m.getEmployeeId()).collect(Collectors.toList());
-		
+
 		// step 5 call AR_並び替え設定.
 		RequireSortEmpImpl requireSortEmpImpl = new RequireSortEmpImpl(belongScheduleTeamRepo,
 				employeeRankRepo, rankRepo, syJobTitleAdapter, syClassificationAdapter, empMedicalWorkStyleHisRepo,
-				nurseClassificationRepo);	
+				nurseClassificationRepo);
 		// 並び替える(Require, 年月日, List<社員ID>)
 		Optional<SortSetting> sortSetting = sortSettingRepo.get(AppContexts.user().companyId());
 		// if $並び替え設定.empty---return 社員IDリスト
 		if (!sortSetting.isPresent()) {
 			return listEmp;
 		}
-		
-		List<String> listSidOrder = sortSetting.get().sort(requireSortEmpImpl, param.baseDate, sids2);		
-				
+
+		List<String> listSidOrder = sortSetting.get().sort(requireSortEmpImpl, param.systemDate, sids2);
+
 		listEmp.sort(Comparator.comparing(v-> listSidOrder.indexOf(v.getEmployeeId())));
-		
+
 		return listEmp;
 	}
-	
+
 	@AllArgsConstructor
-	private static class RequireGetEmpImpl implements GetEmpCanReferService.Require {
-		
-		@Inject
-		private WorkplaceGroupAdapter workplaceGroupAdapter;
-		@Inject
-		private RegulationInfoEmployeeAdapter regulInfoEmpAdap;
-		@Inject
-		private RegulationInfoEmployeePub regulInfoEmpPub;
-		
+	private class RequireGetEmpImpl implements GetEmpCanReferService.Require {
+
 		@Override
-		public List<String> getEmpCanReferByWorkplaceGroup(GeneralDate date, String empId, String workplaceGroupID) {
-			List<String> data = workplaceGroupAdapter.getReferableEmp( date, empId, workplaceGroupID);
+		public List<String> getEmpCanReferByWorkplaceGroup(String empId, GeneralDate date, DatePeriod period, String workplaceGroupID) {
+			List<String> data = workplaceGroupAdapter.getReferableEmp(empId, date, period, workplaceGroupID);
 			return data;
 		}
-		
+
 		@Override
-		public List<String> getAllEmpCanReferByWorkplaceGroup(GeneralDate date, String empId) {
+		public List<String> getAllEmpCanReferByWorkplaceGroup(String empId, GeneralDate date, DatePeriod period) {
 			// don't have to implement it
 			return null;
 		}
@@ -148,19 +141,19 @@ public class ScreenQueryExtractTargetEmployees {
 		@Override
 		public List<String> sortEmployee(List<String> lstmployeeId, EmployeeSearchCallSystemType sysAtr, Integer sortOrderNo,
 				GeneralDate referenceDate, Integer nameType) {
-			List<String> data = regulInfoEmpAdap.sortEmployee(
-					AppContexts.user().companyId(), 
-					lstmployeeId, 
-					sysAtr.value, 
-					sortOrderNo, 
-					nameType, 
+			List<String> data = regulInfoEmpPub.sortEmployee(
+					AppContexts.user().companyId(),
+					lstmployeeId,
+					sysAtr.value,
+					sortOrderNo,
+					nameType,
 					GeneralDateTime.fromString(referenceDate.toString() + SPACE + ZEZO_TIME, DATE_TIME_FORMAT));
 			return data;
 		}
 
 		@Override
 		public String getRoleID() {
-			
+
 			return AppContexts.user().roles().forAttendance();
 		}
 
@@ -184,8 +177,8 @@ public class ScreenQueryExtractTargetEmployees {
 					.worktypeCodes(new ArrayList<String>())
 					.filterByClosure(false)
 					.closureIds(new ArrayList<Integer>())
-					.periodStart(GeneralDateTime.now())
-					.periodEnd(GeneralDateTime.now())
+					.periodStart( GeneralDateTime.fromString(q.getPeriodStart() + SPACE + ZEZO_TIME, DATE_TIME_FORMAT) )
+					.periodEnd( GeneralDateTime.fromString(q.getPeriodEnd() + SPACE + ZEZO_TIME, DATE_TIME_FORMAT) )
 					.includeIncumbents(true)
 					.includeWorkersOnLeave(true)
 					.includeOccupancy(true)
@@ -196,7 +189,7 @@ public class ScreenQueryExtractTargetEmployees {
 					.retireEnd(GeneralDateTime.now())
 					.sortOrderNo(null)
 					.nameType(null)
-					
+
 					.build();
 			List<RegulationInfoEmployeeExport> data = regulInfoEmpPub.find(query);
 			List<String> resultList = data.stream().map(item -> item.getEmployeeId())
@@ -205,10 +198,10 @@ public class ScreenQueryExtractTargetEmployees {
 		}
 
 	}
-	
+
 	@AllArgsConstructor
 	private static class RequireSortEmpImpl implements SortSetting.Require {
-		
+
 		@Inject
 		private  BelongScheduleTeamRepository belongScheduleTeamRepo;
 		@Inject
@@ -223,7 +216,7 @@ public class ScreenQueryExtractTargetEmployees {
 		private EmpMedicalWorkStyleHistoryRepository empMedicalWorkStyleHisRepo;
 		@Inject
 		private NurseClassificationRepository nurseClassificationRepo;
-		
+
 		@Override
 		public List<BelongScheduleTeam> getScheduleTeam(List<String> empIDs) {
 			return belongScheduleTeamRepo.get(AppContexts.user().companyId(), empIDs);
@@ -251,7 +244,7 @@ public class ScreenQueryExtractTargetEmployees {
 			List<EmpClassifiImport> data = syClassificationAdapter.getByListSIDAndBasedate(ymd, lstEmpId);
 			return data;
 		}
-		
+
 		@Override
 		public Optional<RankPriority> getRankPriorities() {
 			Optional<RankPriority> data = rankRepo.getRankPriority(AppContexts.user().companyId());

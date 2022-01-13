@@ -11,7 +11,7 @@ import nts.arc.primitive.constraint.TimeRange;
  *
  */
 //チェック条件値時間
-@TimeRange(min = "00:00", max = "999:59")
+@TimeRange(min = "-999:59", max = "999:59")
 public class CheckedTimeDuration extends TimeDurationPrimitiveValue<CheckedTimeDuration> {
 
 	/** The Constant serialVersionUID. */

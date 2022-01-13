@@ -30,26 +30,23 @@ public class JpaControlOfMonthlyItemsRepository extends JpaRepository implements
 	public Optional<ControlOfMonthlyItems> getControlOfMonthlyItem(String companyID, int itemMonthlyID) {
 		Optional<ControlOfMonthlyItems> data = this.queryProxy().query(GET_BY_CODE, KshmtMonItemControl.class)
 				.setParameter("companyID", companyID).setParameter("itemMonthlyID", itemMonthlyID)
-				.getSingle(c -> c.toDomain());
+				.getSingle(KshmtMonItemControl::toDomain);
 		return data;
 	}
 
 	@Override
 	public void updateControlOfMonthlyItem(ControlOfMonthlyItems controlOfMonthlyItems) {
 		KshmtMonItemControl newEntity = KshmtMonItemControl.toEntity(controlOfMonthlyItems);
-		KshmtMonItemControl updateEntity = this.queryProxy()
-				.find(newEntity.getKrcmtControlOfMonthlyItemsPK(), KshmtMonItemControl.class).get();
-		updateEntity.headerBgColorOfMonthlyPer = newEntity.headerBgColorOfMonthlyPer;
-		updateEntity.inputUnitOfTimeItem = newEntity.inputUnitOfTimeItem;
-		this.commandProxy().update(updateEntity);
-
+		this.queryProxy().find(newEntity.getKrcmtControlOfMonthlyItemsPK(), KshmtMonItemControl.class).ifPresent(updateEntity -> {
+			updateEntity.headerBgColorOfMonthlyPer = newEntity.headerBgColorOfMonthlyPer;
+			this.commandProxy().update(updateEntity);
+		});
 	}
 
 	@Override
 	public void addControlOfMonthlyItem(ControlOfMonthlyItems controlOfMonthlyItems) {
 		KshmtMonItemControl newEntity = KshmtMonItemControl.toEntity(controlOfMonthlyItems);
 		this.commandProxy().insert(newEntity);
-
 	}
 
 	@Override
@@ -63,18 +60,15 @@ public class JpaControlOfMonthlyItemsRepository extends JpaRepository implements
 				for (int i = 0; i < subList.size(); i++) {
 					statement.setInt(i + 2, subList.get(i));
 				}
-				data.addAll(new NtsResultSet(statement.executeQuery()).getList(rec -> {
-					return new  ControlOfMonthlyItems(
-							companyID,
-							rec.getInt("ITEM_MONTHLY_ID"),
-							rec.getString("HEADER_BACKGROUND_COLOR") != null ? new HeaderBackgroundColor(rec.getString("HEADER_BACKGROUND_COLOR")) : null,
-							rec.getBigDecimal("INPUT_UNIT"));
-				}));
-			}catch (Exception e) {
+				data.addAll(new NtsResultSet(statement.executeQuery()).getList(rec -> new ControlOfMonthlyItems(
+						companyID,
+						rec.getInt("ITEM_MONTHLY_ID"),
+						rec.getString("HEADER_BACKGROUND_COLOR") != null ? new HeaderBackgroundColor(rec.getString("HEADER_BACKGROUND_COLOR")) : null
+				)));
+			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		});
-		
 		return data;
 	}
 

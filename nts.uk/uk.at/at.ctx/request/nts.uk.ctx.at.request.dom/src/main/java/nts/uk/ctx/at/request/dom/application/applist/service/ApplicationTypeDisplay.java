@@ -25,16 +25,21 @@ public enum ApplicationTypeDisplay {
 	 * 早出普通残業申請
 	 */
 	EARLY_NORMAL_OVERTIME(2, "早出残業・通常残業"),
-	
+
+	/**
+	 * 複数回残業
+	 */
+	OVERTIME_MULTIPLE_TIME(3,"複数回残業"),
+
 	/**
 	 * 打刻申請
 	 */
-	STAMP_ADDITIONAL(3,"打刻申請"),
+	STAMP_ADDITIONAL(0,"打刻申請"),
 	
 	/**
 	 * 打刻申請TR
 	 */
-	STAMP_ONLINE_RECORD(4,"レコーダイメージ申請");
+	STAMP_ONLINE_RECORD(1,"レコーダイメージ申請");
 	
 	public int value;
 	

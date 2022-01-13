@@ -28,7 +28,7 @@ public class KscmtTallyByWkp extends ContractUkJpaEntity implements Serializable
     public KscmtTallyByWkpPk pk;
 
     @Column(name = "USE_ATR")
-    public int useAtr;
+    public boolean useAtr;
 
     @Override
     protected Object getKey() {
@@ -41,7 +41,7 @@ public class KscmtTallyByWkp extends ContractUkJpaEntity implements Serializable
             KscmtTallyByWkpPk pk = new KscmtTallyByWkpPk(companyId, x.getValue());
             KscmtTallyByWkp data = new KscmtTallyByWkp(
                 pk,
-                domain.isUsed(WorkplaceCounterCategory.of(x.getValue())) ? 1 : 0
+                domain.isUsed(WorkplaceCounterCategory.of(x.getValue()))
             );
             data.contractCd = AppContexts.user().contractCode();
             return data;
@@ -51,7 +51,7 @@ public class KscmtTallyByWkp extends ContractUkJpaEntity implements Serializable
 
     public static WorkplaceCounter toDomain(List<KscmtTallyByWkp> entities) {
         //TODO how to map entity to domain with category used ?
-        List<WorkplaceCounterCategory> useCategories = entities.stream().filter(i -> i.useAtr == 1).map(x -> {
+        List<WorkplaceCounterCategory> useCategories = entities.stream().filter(i -> i.useAtr).map(x -> {
             return EnumAdaptor.valueOf(x.pk.category, WorkplaceCounterCategory.class);
         }).collect(Collectors.toList());
 

@@ -9455,7 +9455,7 @@ var nts;
                             if (!disable)
                                 return;
                             self.eachKey(disable, function (obj) { return obj.columnKey; }, function (obj) { return !obj.uiReflected; }, function ($cell, obj) {
-                                helper.markCellWith(style.SEAL_CLS, $cell);
+                                helper.markCellWith(style.SEAL_CLS, $cell, obj.innerIdx);
                                 obj.uiReflected = true;
                             });
                         };
@@ -9474,9 +9474,14 @@ var nts;
                                     var $childCells = $cell.querySelectorAll("." + render.CHILD_CELL_CLS);
                                     if ($childCells && $childCells.length > 0) {
                                         if (makeup.textColor) {
-                                            _.forEach($childCells, function (c) {
-                                                c.style.color = makeup.textColor;
-                                            });
+                                            if (_.isNil(obj.innerIdx) || obj.innerIdx === -1) {
+                                                _.forEach($childCells, function (c) {
+                                                    c.style.color = makeup.textColor;
+                                                });
+                                            }
+                                            else if ($childCells.length > obj.innerIdx) {
+                                                $childCells[obj.innerIdx].style.color = makeup.textColor;
+                                            }
                                         }
                                         else
                                             helper.addClass($childCells, makeup.class);
@@ -10261,6 +10266,7 @@ var nts;
                             exTable[f].dataSource[ui.rowIndex][ui.columnKey][field] = ui.value;
                             return { updateTarget: updateTarget, value: oldVal };
                         }
+                        exTable[f].dataSource[ui.rowIndex][ui.columnKey][field] = ui.value;
                         return null;
                     }
                     update.cellData = cellData;
@@ -25874,6 +25880,7 @@ var nts;
                     v_1.FACON_DESC = "facon-desc";
                     v_1.ALIGN_LEFT = "halign-left";
                     v_1.ALIGN_RIGHT = "halign-right";
+                    v_1.ALIGN_CENTER = "halign-center";
                     v_1.DefaultRowConfig = { css: { height: BODY_ROW_HEIGHT } };
                     v_1._voilerRows = {};
                     v_1._encarRows = [];
@@ -27655,7 +27662,7 @@ var nts;
                                 tdStyle += "; display: none;";
                             else if (!_.isNil(col[0].columnCssClass)) {
                                 col[0].columnCssClass.split(' ').forEach(function (clz) {
-                                    if (clz === hpl.CURRENCY_CLS || clz === "halign-right") {
+                                    if (clz === hpl.CURRENCY_CLS || clz === v.ALIGN_RIGHT || clz === v.ALIGN_CENTER) {
                                         td.classList.add(clz);
                                     }
                                 });
@@ -27995,7 +28002,7 @@ var nts;
                                 tdStyle += "; display: none;";
                             else if (!_.isNil(col[0].columnCssClass)) {
                                 col[0].columnCssClass.split(' ').forEach(function (clz) {
-                                    if (clz === hpl.CURRENCY_CLS || clz === "halign-right") {
+                                    if (clz === hpl.CURRENCY_CLS || clz === v.ALIGN_RIGHT || clz === v.ALIGN_CENTER) {
                                         td.classList.add(clz);
                                     }
                                 });
@@ -32109,7 +32116,7 @@ var nts;
                                     after = parseFloat(cellValue);
                                     before = parseFloat($.data(calcCell, v.DATA));
                                     total = sum[currentPage] + ((isNaN(after) ? 0 : after) - (isNaN(before) ? 0 : before));
-                                    sum[currentPage] = total;
+                                    sum[currentPage] = parseFloat(total).toFixed(5).toDecimal();
                                     sumDone = true;
                                 }
                                 sum[sheet].textContent = sum.formatter === "Currency" ? ti.asCurrency(sum[currentPage]) : sum[currentPage];
@@ -32246,6 +32253,31 @@ var nts;
                                     if (control === dkn.LINK_LABEL) {
                                         var link = t.c.querySelector("a");
                                         link.innerHTML = cellValue;
+                                    }
+                                    else if (control === dkn.CHECKBOX) {
+                                        var check = t.c.querySelector("input[type='checkbox']");
+                                        if (!check)
+                                            return;
+                                        if (cellValue) {
+                                            check.setAttribute("checked", "checked");
+                                            check.checked = true;
+                                            var evt = document.createEvent("HTMLEvents");
+                                            evt.initEvent("change", false, true);
+                                            evt.resetValue = reset;
+                                            evt.checked = cellValue;
+                                            evt.stopUpdate = true;
+                                            check.dispatchEvent(evt);
+                                        }
+                                        else if (!cellValue) {
+                                            check.removeAttribute("checked");
+                                            check.checked = false;
+                                            var evt = document.createEvent("HTMLEvents");
+                                            evt.initEvent("change", false, true);
+                                            evt.resetValue = reset;
+                                            evt.checked = cellValue;
+                                            evt.stopUpdate = true;
+                                            check.dispatchEvent(evt);
+                                        }
                                     }
                                     else if (_.isObject(control) && control.type === dkn.COMBOBOX) {
                                         var sel = _.find(control.options, function (o) { return o.code === cellValue; });
@@ -33710,7 +33742,7 @@ var nts;
                                 }
                             }
                             var r = ti.closest($checkBox, "tr");
-                            if (r) {
+                            if (r && !evt.stopUpdate) {
                                 setChecked(checked, parseFloat($.data(r, lo.VIEW)), evt.resetValue, evt.pg);
                             }
                         });
@@ -36902,10 +36934,10 @@ var nts;
                                     color: self.metaholder.color,
                                     zIndex: self.pasteBand.zIndex || 1000
                                 });
-                                if (self.mode === "paste") {
-                                    self.metaholder.tempStart = self.metaholder.start;
-                                    self.metaholder.tempEnd = self.metaholder.end;
-                                }
+                                //                    if (self.mode === "paste") {
+                                //                        self.metaholder.tempStart = self.metaholder.start;
+                                //                        self.metaholder.tempEnd = self.metaholder.end;
+                                //                    }
                                 document.addEventListenerNS("mousemove.paste", manipulationMode.pasteMove.bind(self));
                                 document.addEventListenerNS("mouseup.paste", manipulationMode.pasteUp.bind(self));
                                 return;
@@ -37383,10 +37415,10 @@ var nts;
                                     color: self.pasteBand.color,
                                     zIndex: self.pasteBand.zIndex || 1000
                                 });
-                                if (self.mode === "paste") {
-                                    self.metaholder.tempStart = self.metaholder.start;
-                                    self.metaholder.tempEnd = self.metaholder.end;
-                                }
+                                //                    if (self.mode === "paste") {
+                                //                        self.metaholder.tempStart = self.metaholder.start;
+                                //                        self.metaholder.tempEnd = self.metaholder.end;
+                                //                    }
                                 document.addEventListenerNS("mousemove.paste", manipulationMode.pasteMove.bind(self));
                                 document.addEventListenerNS("mouseup.paste", manipulationMode.pasteUp.bind(self));
                                 self.placeholder.parentNode.removeChild(self.placeholder);
@@ -37754,6 +37786,10 @@ var nts;
                         }
                     }
                     support.closest = closest;
+                    function isInvisible(el) {
+                        return el.style.display === "none" || el.style.width === "0px";
+                    }
+                    support.isInvisible = isInvisible;
                 })(support || (support = {}));
                 var manipulationMode;
                 (function (manipulationMode) {
@@ -37777,7 +37813,7 @@ var nts;
                     manipulationMode.Metaresize = Metaresize;
                     function pasteMove() {
                         var self = this;
-                        if (!self.metaholder.isPressed || self.mode === "paste")
+                        if (!self.metaholder.isPressed /*|| self.mode === "paste"*/)
                             return;
                         var chart = self.metaholder.ancestorChart;
                         var startLine = chart.start, endLine = chart.end;
@@ -37933,7 +37969,7 @@ var nts;
                                 if (!self.metaresize.adjChart) {
                                     var minStart_1 = 9999;
                                     _.forEach(parent.children, function (child) {
-                                        if (child.html.style.display === "none")
+                                        if (support.isInvisible(child.html))
                                             return;
                                         if (nearestLine >= child.start && self.metaresize.start < child.start && child.start < minStart_1
                                             && child.id !== chart.id && child.canPaste) {
@@ -37947,7 +37983,7 @@ var nts;
                                 }
                                 else {
                                     _.forEach(parent.children, function (child) {
-                                        if (child.html.style.display === "none")
+                                        if (support.isInvisible(child.html))
                                             return;
                                         if (!child.canPaste && nearestLine >= child.start && nearestLine <= child.end) {
                                             cantPasteChart_1 = child;
@@ -37965,7 +38001,7 @@ var nts;
                                 }
                                 else if (self.metaresize.chart.definedType !== self.metaresize.adjChart.definedType) {
                                     var adjChart = self.metaresize.adjChart;
-                                    if (cantPasteChart_1) {
+                                    if (cantPasteChart_1 && adjChart.start >= cantPasteChart_1.end) {
                                         chart.reposition({ end: cantPasteChart_1.start, width: (cantPasteChart_1.start - self.metaresize.start) * chart.unitToPx - 1 });
                                         self.metaresize.tempEnd = cantPasteChart_1.start;
                                         adjChart.reposition({
@@ -38003,14 +38039,14 @@ var nts;
                             else {
                                 var minEnd = void 0, snatch = self._getSnatchInterval(chart), cantPasteChart_2;
                                 _.forEach(parent.children, function (child) {
-                                    if (child.html.style.display === "none")
+                                    if (support.isInvisible(child.html))
                                         return;
                                     if (!child.canPaste && child.id !== chart.id && nearestLine >= child.start && nearestLine <= child.end) {
                                         cantPasteChart_2 = child;
                                         return false;
                                     }
                                 });
-                                if (!_.isNil(cantPasteChart_2)) {
+                                if (!_.isNil(cantPasteChart_2) && chart.end <= cantPasteChart_2.start) {
                                     chart.reposition({ end: cantPasteChart_2.start, width: (cantPasteChart_2.start - self.metaresize.start) * chart.unitToPx - 1 });
                                     self.metaresize.tempEnd = cantPasteChart_2.start;
                                     if (self.metaresize.adjChart && self.metaresize.adjChart.id !== cantPasteChart_2.id) {
@@ -38049,7 +38085,7 @@ var nts;
                                 if (!self.metaresize.adjChart) {
                                     var maxEnd_1 = 0;
                                     _.forEach(parent.children, function (child) {
-                                        if (child.html.style.display === "none")
+                                        if (support.isInvisible(child.html))
                                             return;
                                         if (nearestLine <= child.end && child.start < self.metaresize.start && child.end > maxEnd_1
                                             && child.id !== chart.id && child.canPaste) {
@@ -38063,7 +38099,7 @@ var nts;
                                 }
                                 else {
                                     _.forEach(parent.children, function (child) {
-                                        if (child.html.style.display === "none")
+                                        if (support.isInvisible(child.html))
                                             return;
                                         if (!child.canPaste && nearestLine >= child.start && nearestLine <= child.end) {
                                             cantPasteChart_3 = child;
@@ -38085,7 +38121,7 @@ var nts;
                                 }
                                 else if (self.metaresize.chart.definedType !== self.metaresize.adjChart.definedType) {
                                     var minAdjEnd = void 0, adjChart = self.metaresize.adjChart, snatch = self._getSnatchInterval(chart);
-                                    if (cantPasteChart_3) {
+                                    if (cantPasteChart_3 && adjChart.end <= cantPasteChart_3.start) {
                                         chart.reposition({
                                             start: cantPasteChart_3.end,
                                             left: self.metaresize.left - (self.metaresize.start - cantPasteChart_3.end) * chart.unitToPx,
@@ -38132,14 +38168,14 @@ var nts;
                             else {
                                 var minStart = void 0, snatch = self._getSnatchInterval(chart), cantPasteChart_4;
                                 _.forEach(parent.children, function (child) {
-                                    if (child.html.style.display === "none")
+                                    if (support.isInvisible(child.html))
                                         return;
                                     if (!child.canPaste && nearestLine >= child.start && nearestLine <= child.end) {
                                         cantPasteChart_4 = child;
                                         return false;
                                     }
                                 });
-                                if (cantPasteChart_4) {
+                                if (cantPasteChart_4 && chart.start >= cantPasteChart_4.end) {
                                     chart.reposition({
                                         start: cantPasteChart_4.end,
                                         left: self.metaresize.left + (cantPasteChart_4.end - self.metaresize.start) * chart.unitToPx,

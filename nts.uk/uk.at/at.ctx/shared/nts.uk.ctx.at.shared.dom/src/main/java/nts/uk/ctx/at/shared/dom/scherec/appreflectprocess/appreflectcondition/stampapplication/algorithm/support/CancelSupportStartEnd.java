@@ -35,7 +35,7 @@ public class CancelSupportStartEnd {
 		// [input. 打刻取消(List)]でループ
 		listDestinationTimeApp.stream().forEach(data -> {
 			Optional<OuenWorkTimeSheetOfDailyAttendance> ouenOpt = dailyApp.getOuenTimeSheet().stream()
-					.filter(x -> x.getWorkNo() == data.getSupportWork().orElse(Integer.MAX_VALUE)).findFirst();
+					.filter(x -> x.getWorkNo().v() == data.getSupportWork().orElse(Integer.MAX_VALUE)).findFirst();
 
 			if (ouenOpt.isPresent()) {
 				// 処理中の応援枠NOがキーとなる[応援]をクリアする
@@ -79,8 +79,8 @@ public class CancelSupportStartEnd {
 				.create(old.getWorkContent().getWorkplace().getWorkplaceId(), null);
 		lstItemId.add(CancelAppStamp.createItemId(921, data.getEngraveFrameNo(), 10));
 
-		WorkContent workContent = WorkContent.create(workplace, old.getWorkContent().getWork(), old.getWorkContent().getWorkRemarks());
-		return Pair.of(OuenWorkTimeSheetOfDailyAttendance.create(old.getWorkNo(), workContent, sheet), lstItemId);
+		WorkContent workContent = WorkContent.create(workplace, old.getWorkContent().getWork(), Optional.empty());
+		return Pair.of(OuenWorkTimeSheetOfDailyAttendance.create(old.getWorkNo(), workContent, sheet, Optional.empty()), lstItemId);
 
 	}
 }

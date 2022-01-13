@@ -1,5 +1,7 @@
 package nts.uk.ctx.sys.env.dom.mailserver;
 
+import java.util.Comparator;
+
 import lombok.Getter;
 import lombok.Setter;
 import nts.arc.layer.dom.DomainObject;
@@ -10,7 +12,7 @@ import nts.arc.layer.dom.DomainObject;
 @Getter
 @Setter
 // SMTP情報
-public class SmtpInfo extends DomainObject {
+public class SmtpInfo extends DomainObject implements Comparable<SmtpInfo> {
 	
 	/** The server. */
 	// サーバ
@@ -29,5 +31,12 @@ public class SmtpInfo extends DomainObject {
 	public SmtpInfo(Server server, Port port){
 		this.server = server;
 		this.port = port;
+	}
+
+	@Override
+	public int compareTo(SmtpInfo o) {
+		return Comparator.comparing(SmtpInfo::getServer)
+				.thenComparing(SmtpInfo::getPort)
+				.compare(this, o);
 	}
 }

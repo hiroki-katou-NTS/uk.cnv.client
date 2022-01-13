@@ -16,8 +16,14 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.tuple.Pair;
 
 import lombok.val;
+import nts.arc.time.calendar.period.DatePeriod;
 import nts.gul.collection.CollectionUtil;
+import nts.uk.ctx.at.record.dom.confirmemployment.RestrictConfirmEmployment;
+import nts.uk.ctx.at.record.dom.confirmemployment.RestrictConfirmEmploymentRepository;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.finddata.IFindDataDCRecord;
+import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.operationsettings.TaskOperationMethod;
+import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.operationsettings.TaskOperationSetting;
+import nts.uk.ctx.at.shared.dom.scherec.taskmanagement.repo.operationsettings.TaskOperationSettingRepository;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.ApprovalUseSettingDto;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.CorrectionOfDailyPerformance;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.DPControlDisplayItem;
@@ -40,7 +46,7 @@ import nts.uk.screen.at.app.dailyperformance.correction.finddata.IFindData;
 import nts.uk.screen.at.app.dailyperformance.correction.month.asynctask.ParamCommonAsync;
 import nts.uk.screen.at.app.dailyperformance.correction.searchemployee.FindAllEmployee;
 import nts.uk.shr.com.context.AppContexts;
-import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.shr.com.license.option.OptionLicense;
 
 @Stateless
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -63,6 +69,12 @@ public class InfomationInitScreenProcess {
 	
 	@Inject
 	private DailyPerformanceCorrectionProcessor processor;
+	
+	@Inject
+	private RestrictConfirmEmploymentRepository restrictConfirmEmploymentRepository;
+	
+	@Inject
+	private TaskOperationSettingRepository taskOperationSettingRepository;
 
 	public Pair<DailyPerformanceCorrectionDto, ParamCommonAsync> initGetParam(DPParams param) {
 		
@@ -102,6 +114,16 @@ public class InfomationInitScreenProcess {
 		
 		//アルゴリズム「実績修正画面で利用するフォーマットを取得する」を実行する(thực hiện xử lý 「実績修正画面で利用するフォーマットを取得する」)
 		OperationOfDailyPerformanceDto dailyPerformanceDto = repo.findOperationOfDailyPerformance();
+		
+		// 就業確定の機能制限を取得する
+		Optional<RestrictConfirmEmployment> opRestrictConfirmEmployment = restrictConfirmEmploymentRepository.findByCompanyID(companyId);
+		screenDto.setConfirmEmployment(opRestrictConfirmEmployment.map(x -> x.isConfirmEmployment()).orElse(null));
+		
+		// 作業運用設定を取得する
+		Optional<TaskOperationSetting> opTaskOperationSetting = taskOperationSettingRepository.getTasksOperationSetting(companyId);
+		
+		screenDto.setShowWorkLoad(opTaskOperationSetting.map(x -> x.getTaskOperationMethod()==TaskOperationMethod.USED_IN_ACHIEVENTS).orElse(false)
+				&& AppContexts.optionLicense().attendance().workload());
 		
 		// アルゴリズム「休暇の管理状況をチェックする」を実行する | Get holiday setting data --休暇の管理状況をチェックする
 //		getHolidaySettingData(screenDto);

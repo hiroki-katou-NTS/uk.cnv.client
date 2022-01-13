@@ -13,34 +13,14 @@ module nts.uk.com.view.ccg015.e {
     $menuCreationLayout: JQuery = null;
     isMouseInsideLayout: KnockoutObservable<boolean> = ko.observable(false);
     itemList: KnockoutObservableArray<ItemModel> = ko.observableArray([]);
-    isRender: KnockoutObservable<boolean> = ko.observable(true);
+    isRenderKTG001: KnockoutObservable<boolean> = ko.observable(true);
+    isRenderKTG004: KnockoutObservable<boolean> = ko.observable(true);
+    isRenderKTG005: KnockoutObservable<boolean> = ko.observable(true);
     sortedIds: string[] = [];
 
     created(params: any) {
       const vm = this;
       vm.params = params;
-      // Init sortableList binding
-      ko.bindingHandlers.sortableList = {
-        init: (element, valueAccessor) => {
-          const list: KnockoutObservableArray<ItemModel> = valueAccessor();
-          $(element).sortable({
-            update: (event, ui) => {
-              // figure out its new position
-              const oldPosition = _.findIndex(list(), (item) => item.itemType === ui.item.attr('id'));
-              const newPosition = _.findIndex(ui.item.parent().children(), (item) => item.id === ui.item.attr('id'));
-              // remove the item and add it back in the right spot
-              if (oldPosition >= 0 && newPosition >= 0) {
-                // retrieve our actual data item
-                const tempList = list();
-                const tempItem = tempList[oldPosition];
-                tempList.splice(oldPosition, 1);
-                tempList.splice(newPosition, 0, tempItem);
-                list(tempList);
-              }
-            }
-          });
-        },
-      };
     }
 
     mounted() {
@@ -55,19 +35,22 @@ module nts.uk.com.view.ccg015.e {
           vm.isMouseInsideLayout(false);
         });
       // Init dragable item
+      let menuPosition = -1;
       $(".menu-creation-option:not(.disabled)").draggable({
         connectToSortable: `#${MENU_CREATION_LAYOUT_ID}`,
         helper: "clone",
         start: (event, ui) => {
           LayoutUtils.startDragItemFromMenu(ui);
         },
+        drag: (event, ui) => {
+          menuPosition = _.findIndex(vm.$menuCreationLayout.children(), (item) => item.classList.contains('menu-creation-option'));
+        },
         stop: (event, ui) => {
           const itemType = ui.helper.prevObject.attr('id');
-          const menuPosition = _.findIndex(vm.$menuCreationLayout.children(), (item) => item.classList.contains('menu-creation-option'));
           // Remove drag item
           ui.helper.remove();
           setTimeout(() => {
-            if (vm.isMouseInsideLayout()) {
+            if (vm.isMouseInsideLayout() && menuPosition >= 0) {
               vm.createItem(itemType, menuPosition);
             }
           }, 300);
@@ -123,22 +106,21 @@ module nts.uk.com.view.ccg015.e {
       const StandardWidgetTypeKTG004 = "0003";
       const StandardWidgetTypeKTG005 = "0001";
       const StandardWidgetTypeKTG001 = "0002";
-      vm.isRender(false);
       if (itemType === MenuPartType.PART_KTG_004) {
-         vm.$window.modal('at', '/view/ktg/004/b/index.xhtml', StandardWidgetTypeKTG004)
-            .then((result: any) => {
-              vm.isRender(true);
-        });
-      } else if (itemType === MenuPartType.PART_KTG_005){
-        vm.$window.modal('at', '/view/ktg/005/b/index.xhtml', StandardWidgetTypeKTG005)
-            .then((result: any) => {
-              vm.isRender(true);
-        });
+        vm.$window
+          .modal('at', '/view/ktg/004/b/index.xhtml', StandardWidgetTypeKTG004)
+          .then(() => vm.isRenderKTG004(false))
+          .then(() => vm.isRenderKTG004(true));
+      } else if (itemType === MenuPartType.PART_KTG_005) {
+        vm.$window
+          .modal('at', '/view/ktg/005/b/index.xhtml', StandardWidgetTypeKTG005)
+          .then(() => vm.isRenderKTG005(false))
+          .then(() => vm.isRenderKTG005(true));
       } else {
-        vm.$window.modal('at', '/view/ktg/001/b/index.xhtml', StandardWidgetTypeKTG001)
-            .then((result: any) => {
-              vm.isRender(true);
-        });
+        vm.$window
+          .modal('at', '/view/ktg/001/b/index.xhtml', StandardWidgetTypeKTG001)
+          .then(() => vm.isRenderKTG001(false))
+          .then(() => vm.isRenderKTG001(true));
       }
     }
 

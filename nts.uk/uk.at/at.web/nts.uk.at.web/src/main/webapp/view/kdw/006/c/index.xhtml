@@ -19,95 +19,217 @@
 				nts.uk.ctx.at.function.dom.dailyfix.ApplicationType
 			</com:EnumScript>
 
+			<com:ValidatorScript>
+				nts.uk.ctx.at.record.dom.workrecord.operationsetting.Comment
+			</com:ValidatorScript>
 		</ui:define>
 		<ui:define name="content">
 			<div id="functions-area">
-				<!-- C1_1 -->
-				<a class="goback" tabindex="1"
-					data-bind="ntsLinkButton: { action: jumpTo.bind($data, sideBar) }">#{i18n.getText('KDW006_25')}</a>
-				<!-- C1_2 -->
-				<button id="register-button" class="proceed" tabindex="2"
-					data-bind="click: saveData, timeClick: 1000" style="margin-left: 85px;">#{i18n.getText('KDW006_26')}</button>
+				<a id="C1_1" class="goback" tabindex="1" 
+					data-bind="ntsLinkButton: { action: jumpTo }">#{i18n.getText('KDW006_25')}</a>
+				<button id="C1_2" class="proceed" tabindex="2"
+					data-bind="click: saveData, enable: $root.errors.isEmpty" style="margin-left: 85px;">#{i18n.getText('KDW006_26')}</button>
 			</div>
 			<div id="contents-area">
-				<div id="screen-d">
-					<!-- C2_1 -->
-					<div id="label11" class="label">#{i18n.getText('KDW006_35')}</div>
+				<div id="contents">
+					<!--  -->
+					<div id="C2_1" class="header-text">#{i18n.getText('KDW006_280')}</div>
 
-					<!-- C2_2 -->
-					<div id="checkBox21" class="check-box-atr" tabindex="3"
-						data-bind="ntsCheckBox: { checked: identityProcessDto().useDailySelfCk}">#{i18n.getText('KDW006_36')}</div>
-					<!-- C2_3 -->
-					<div id="radioBox22" class="radio-error" tabindex="4"
-						data-bind="ntsRadioBoxGroup: {
-				        options: itemList,
-				        optionsValue: 'code',
-				        optionsText: 'name',
-				        value: identityProcessDto().yourselfConfirmError,
-				        enable: identityProcessDto().useDailySelfCk}">
+					<hr id="C2_2"/>
+
+					<div id="C2_3" class="left-content" data-bind="ntsFormLabel: { required: false }">#{i18n.getText('KDW006_281')}</div>
+					<div class="right-content">
+						<div id="C2_4" class="cf" tabindex="3" data-bind="ntsSwitchButton: {
+							name: $i18n('KDW006_281'),
+							options: ko.observableArray([
+										{ disp36AtrCode: false, disp36AtrName: $i18n('KDW006_303') },
+										{ disp36AtrCode: true, disp36AtrName: $i18n('KDW006_304') }
+									]),
+							optionsValue: 'disp36AtrCode',
+							optionsText: 'disp36AtrName',
+							value: daiPerformanceFunDto().disp36Atr,
+							enable: true,
+							required: false }"></div>
 					</div>
-					<!-- C2_4 -->
-					<div id="checkBox31" class="check-box-atr" tabindex="5"
-						data-bind="ntsCheckBox: { checked: approvalProcessDto().useDailyBossChk }">#{i18n.getText('KDW006_37')}</div>
-					<!-- C2_5 -->
-					<div id="radioBox32" class="radio-error" tabindex="6"
-						data-bind="ntsRadioBoxGroup: {
-				        options: itemList,
-				        optionsValue: 'code',
-				        optionsText: 'name',
-				        value: approvalProcessDto().supervisorConfirmError,
-				        enable: approvalProcessDto().useDailyBossChk}">
+					
+
+					<div id="C2_7" class="left-content" data-bind="ntsFormLabel: { required: false }, visible: checkLicense">#{i18n.getText('KDW006_282')}</div>
+					<div class="right-content" data-bind="visible: checkLicense">
+						<div id="C2_8" class="cf" tabindex="4" data-bind="ntsSwitchButton: {
+							name: $i18n('KDW006_282'),
+							options: ko.observableArray([
+										{ flexDispAtrCode: false, flexDispAtrName: $i18n('KDW006_303')},
+										{ flexDispAtrCode: true, flexDispAtrName: $i18n('KDW006_304')}
+									]),
+							optionsValue: 'flexDispAtrCode',
+							optionsText: 'flexDispAtrName',
+							value: daiPerformanceFunDto().flexDispAtr,
+							enable: true,
+							required: false }"></div>
 					</div>
-					<!-- C2_6 -->
-					<!-- fix bug 101969 -->
-<!-- 					<div id="checkBox41" class="check-box-atr" tabindex="7"
-						data-bind="ntsCheckBox: { checked: daiPerformanceFunDto().monthChkMsgAtr }">#{i18n.getText('KDW006_64')}</div> -->
-					<!-- C2_7 -->
-					<div id="checkBox51" class="check-box-atr" tabindex="8"
-						data-bind="ntsCheckBox: { checked: daiPerformanceFunDto().disp36Atr }">#{i18n.getText('KDW006_65')}</div>
-					<!-- C2_8 -->
-					<div id="checkBox61" class="check-box-atr" tabindex="9"
-						data-bind="ntsCheckBox: { checked: daiPerformanceFunDto().flexDispAtr }">#{i18n.getText('KDW006_66')}</div>
-					<!-- C2_9 -->
-					<!-- <div id="checkBox71" class="check-box-atr" tabindex="10"
-						data-bind="ntsCheckBox: { checked : daiPerformanceFunDto().autoSetTimeAtr }">#{i18n.getText('KDW006_67')}</div>-->
-					<!-- C2_10 -->
-					<div id="checkBox81" class="check-box-atr" tabindex="11"
-						data-bind="ntsCheckBox: { checked: daiPerformanceFunDto().manualFixAutoSetAtr }">#{i18n.getText('KDW006_68')}</div>
-					<!-- C2_11 -->
-					<!-- <div id="checkBox91" class="check-box-atr" tabindex="12"
-						data-bind="ntsCheckBox: { checked: daiPerformanceFunDto().breakClrTimeAtr }">#{i18n.getText('KDW006_69')}</div> -->
-					<!-- C2_12 -->
-					<div id="checkBox101" class="check-box-atr" tabindex="13"
-						data-bind="ntsCheckBox: { checked: daiPerformanceFunDto().clearManuAtr }">#{i18n.getText('KDW006_70')}</div>
-					<!-- C2_16 -->
-					<div id="checkBox161" class="check-box-atr" tabindex="14"
-						data-bind="ntsCheckBox: { checked: daiPerformanceFunDto().checkErrRefDisp }">#{i18n.getText('KDW006_84')}</div>
-						
-						
-					<!-- C2_13 -->
-					<div id="label13" class="label">#{i18n.getText('KDW006_77')}</div>
-					<!-- C2_14 -->
-					<button id="dialog" data-bind="click: openHDialog">#{i18n.getText('KDW006_78')}</button>
-					<!-- C2_15 -->
+
+					<div id="C2_11" class="left-content" data-bind="ntsFormLabel: { required: false }">#{i18n.getText('KDW006_283')}</div>
+					<div class="right-content">
+						<div id="C2_12" class="cf" tabindex="5" data-bind="ntsSwitchButton: {
+							name: $i18n('KDW006_283'),
+							options: ko.observableArray([
+										{ checkErrRefDispCode: false, checkErrRefDispName: $i18n('KDW006_303')},
+										{ checkErrRefDispCode: true, checkErrRefDispName: $i18n('KDW006_304')}
+									]),
+							optionsValue: 'checkErrRefDispCode',
+							optionsText: 'checkErrRefDispName',
+							value: daiPerformanceFunDto().checkErrRefDisp,
+							enable: true,
+							required: false }"></div>
+					</div>
+
+					<div id="C2_15" class="left-content" data-bind="ntsFormLabel: { required: false }">#{i18n.getText('KDW006_284')}</div>
+					<div class="right-content">
+						<button id="C2_16" tabindex="6" data-bind="click: openHDialog">#{i18n.getText('KDW006_55')}</button>
 								
-					<input id="textbox" data-bind="ntsTextEditor: {value: appType,
-							   	  name: '#[KDW006_35]',
-							   	  readonly: true,
-							   	  option: []}"
-							   	  ></input>
-					<div>
-						<!-- C3_1 -->
-						<div id="label11" class="label">#{i18n.getText('KDW006_60')}</div>
-						<!-- C3_2 -->
-						<div id="checkBox111" class="check-box-atr" tabindex="15"
-							data-bind="ntsCheckBox: { checked: monPerformanceFunDto().dailySelfChkDispAtr }">#{i18n.getText('KDW006_61')}</div>
-						<!-- C3_3 -->
-						<div id="checkBox121" class="check-box-atr" tabindex="16"
-							data-bind="ntsCheckBox: { checked: identityProcessDto().useMonthSelfCK }">#{i18n.getText('KDW006_36')}</div>
-						<!-- C3_4 -->
-						<div id="checkBox131" class="check-box-atr" tabindex="17"
-							data-bind="ntsCheckBox: { checked: approvalProcessDto().useMonthBossChk }">#{i18n.getText('KDW006_37')}</div>
+						<input id="C2_17" data-bind="ntsTextEditor: {
+									value: appType,
+									name: $i18n('KDW006_284'),
+									readonly: true,
+									option: ko.mapping.fromJS(new nts.uk.ui.option.TextEditorOption({
+										textmode: 'text',
+										width: '600px'
+									}))
+								}"/>
+					</div>
+
+					<div id="C2_18" class="left-content" data-bind="ntsFormLabel: { constraint: 'Comment', required: false }">#{i18n.getText('KDW006_285')}</div>
+					<div class="right-content">
+						<input id="C2_19" tabindex="7" data-bind="ntsTextEditor: {
+							name: $i18n('KDW006_285'),
+							value: daiPerformanceFunDto().comment,
+							constraint: 'Comment',
+							option: ko.mapping.fromJS(new nts.uk.ui.option.TextEditorOption({
+								textmode: 'text',
+								width: '652px'
+							})),
+							required: false,
+							enable: true,
+							readonly: false
+						}" />
+					</div>
+
+					<!--  -->
+					<div id="C3_1" class="header-text">#{i18n.getText('KDW006_286')}</div>
+
+					<hr id="C3_2"/>
+
+					<div id="C3_3" class="left-content" data-bind="ntsFormLabel: { required: false }">#{i18n.getText('KDW006_287')}</div>
+					<div class="right-content">
+						<div id="C3_4" class="cf" tabindex="8" data-bind="ntsSwitchButton: {
+							name: $i18n('KDW006_287'),
+							options: ko.observableArray([
+										{ dailySelfChkDispAtrCode: false, dailySelfChkDispAtrName: $i18n('KDW006_303')},
+										{ dailySelfChkDispAtrCode: true, dailySelfChkDispAtrName: $i18n('KDW006_304')}
+									]),
+							optionsValue: 'dailySelfChkDispAtrCode',
+							optionsText: 'dailySelfChkDispAtrName',
+							value: monPerformanceFunDto().dailySelfChkDispAtr,
+							enable: true,
+							required: false }"></div>
+					</div>
+
+					<div id="C3_7" class="left-content" data-bind="ntsFormLabel: { constraint: 'Comment', required: false }">#{i18n.getText('KDW006_285')}</div>
+					<div class="right-content">
+						<input id="C3_8" tabindex="9" data-bind="ntsTextEditor: {
+							name: $i18n('KDW006_285'),
+							value: monPerformanceFunDto().comment,
+							constraint: 'Comment',
+							option: ko.mapping.fromJS(new nts.uk.ui.option.TextEditorOption({
+								textmode: 'text',
+								width: '652px'
+							})),
+							required: false,
+							enable: true,
+							readonly: false
+						}" />
+					</div>
+					
+					<!--  -->
+					<div id="C4_1" class="header-text">#{i18n.getText('KDW006_288')}</div>
+					<button id="C4_2" tabindex="10" data-bind="ntsHelpButton: {
+						textId: 'KDW006_289',
+						textParams:[], 
+						position: 'right top' }">？</button>
+
+					<hr id="C4_3"/>
+
+					<div class="ui-iggrid">
+						<table id="C4_4">
+							<tr>
+								<th id="C4_5" class="ui-widget-header">#{i18n.getText('KDW006_290')}</th>
+								<th id="C4_6" class="ui-widget-header">#{i18n.getText('KDW006_293')}</th>
+								<th id="C4_7" class="ui-widget-header">#{i18n.getText('KDW006_291')}</th>
+								<th id="C4_8" class="ui-widget-header">#{i18n.getText('KDW006_293')}</th>
+								<th id="C4_9" class="ui-widget-header">#{i18n.getText('KDW006_292')}</th>
+							</tr>
+							<tr>
+								<td rowspan="2">
+									<div id="C4_10" tabindex="11"
+										data-bind="ntsCheckBox: { checked: identityProcessDto().useDailySelfCk }">#{i18n.getText('KDW006_294')}</div>
+								</td>
+								<td rowspan="2" class="bg-schedule-uncorrectable grayout"></td>
+								<td>
+									<div id="C4_11" tabindex="12"
+										data-bind="ntsCheckBox: { checked: approvalProcessDto().useDailyBossChk }">#{i18n.getText('KDW006_295')}</div>
+								</td>
+								<td rowspan="2" class="bg-schedule-uncorrectable grayout"></td>
+								<td rowspan="2">
+									<div id="C4_13" tabindex="14"
+										data-bind="ntsCheckBox: { checked: approvalProcessDto().useMonthBossChk }">#{i18n.getText('KDW006_297')}</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div id="C4_12" tabindex="13"
+										data-bind="ntsCheckBox: { checked: identityProcessDto().useMonthSelfCK }">#{i18n.getText('KDW006_296')}</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+
+					<div id="C4_14" class="left-content" data-bind="ntsFormLabel: { required: false }">#{i18n.getText('KDW006_298')}</div>
+					<div class="right-content">
+						<div id="C4_15" class="cf" tabindex="15" data-bind="ntsSwitchButton: {
+							name: $i18n('KDW006_298'),
+							options: itemList,
+							optionsValue: 'code',
+							optionsText: 'name',
+							value: identityProcessDto().yourselfConfirmError,
+							enable: identityProcessDto().useDailySelfCk
+						}"></div>
+					</div>
+
+					<div id="C4_18" class="left-content" data-bind="ntsFormLabel: { required: false }">#{i18n.getText('KDW006_301')}</div>
+					<div class="right-content">
+						<div id="C4_19" class="cf" tabindex="16" data-bind="ntsSwitchButton: {
+							name: $i18n('KDW006_301'),
+							options: itemList,
+							optionsValue: 'code',
+							optionsText: 'name',
+							value: approvalProcessDto().supervisorConfirmError,
+							enable: approvalProcessDto().useDailyBossChk
+						}"></div>
+					</div>
+
+					<div id="C4_22" class="left-content" data-bind="ntsFormLabel: { required: false }">#{i18n.getText('KDW006_302')}</div>
+					<div class="right-content">
+						<div id="C4_23" class="cf" tabindex="17" data-bind="ntsSwitchButton: {
+							name: $i18n('KDW006_302'),
+							options: ko.observableArray([
+										{ confirmEmployment: false, confirmEmploymentName: $i18n('KDW006_303')},
+										{ confirmEmployment: true, confirmEmploymentName: $i18n('KDW006_304')}
+									]),
+							optionsValue: 'confirmEmployment',
+							optionsText: 'confirmEmploymentName',
+							value: restrictConfirmEmploymentDto().confirmEmployment,
+							enable: true,
+							required: false }"></div>
 					</div>
 				</div>
 			</div>

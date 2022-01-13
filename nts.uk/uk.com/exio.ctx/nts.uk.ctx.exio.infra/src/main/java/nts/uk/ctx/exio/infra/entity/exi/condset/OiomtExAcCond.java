@@ -96,14 +96,14 @@ public class OiomtExAcCond extends ContractUkJpaEntity implements Serializable {
 	 */
 	@Basic(optional = true)
 	@Column(name = "CHECK_COMPLETED")
-	private int checkCompleted;
+	private Integer checkCompleted;
 
 	/**
 	 * 既存データの削除方法
 	 */
 	@Basic(optional = true)
 	@Column(name = "DELETE_EXT_DATA_METHOD")
-	private Integer deleteExtDataMethod;
+	private Boolean deleteExtDataMethod;
 
 	/**
 	 * Gets primary key of entity.

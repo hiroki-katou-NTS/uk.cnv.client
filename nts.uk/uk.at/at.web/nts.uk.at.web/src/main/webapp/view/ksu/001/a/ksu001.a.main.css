@@ -89,7 +89,7 @@
 }
 
 #A1_7 {
-	margin-left: 40px !important;
+	margin-left: 120px !important;
 }
 
 .generally, .simulation, .capture {
@@ -344,7 +344,8 @@
 	padding-bottom: 2px;
 	border-bottom: 1px solid #B1B1B1;
 	white-space: nowrap;
-	width: fit-content;
+	width: 1190px;
+	float: left;
 }
 
 #functon-area-row2-left {
@@ -352,6 +353,7 @@
 	margin-top: 5px;
 	height: 45px;
 	display: inline-block;
+	float: left;
 }
 
 #functon-area-row2-center {
@@ -359,6 +361,7 @@
 	height: 45px;
 	display: inline-block;
 	margin-bottom: 4px;
+	float: left;
 }
 
 #functon-area-row2-right {
@@ -367,6 +370,7 @@
 	margin-left: 57px;
 	height: 45px;
 	display: inline-block;
+	float: right;
 }
 
 #date-time-prev, #date-time-after {
@@ -584,23 +588,26 @@ html {
 }
 
 .toLeft {
-	margin-left: 308px;  
+	margin-left: 230px;  
 	float: left;
     height: 18px;
     padding-top: 2px;
+    width: 30px;
 }
 
 .toRight {
 	float: left;
     height: 18px;
     padding-top: 2px;
+    width: 30px;
 }
 
 .toDown {
-	height: 25px;
-	margin-left: 9px;
+	margin-left: 11px; 
+	margin-right: 1px;
 	float: left;
-	width: 18px;
+	width: 15px;
+	box-shadow: 1px 0px 0px 0px rgb(0 0 0 / 40%) !important;
 }
 
 .iconToDown {
@@ -609,11 +616,16 @@ html {
 }
 
 .iconToLeft {
-	margin-top: -5px;
+	margin-top: -7px;
 }
 
 .iconToRight {
-	margin-top: -5px;
+	margin-top: -7px;
+}
+
+#btnControlLeftRight {
+	width: max-content;
+	height: 18px;
 }
 
 #A5 {
@@ -654,4 +666,10 @@ table th, table td {
 
 #extable>div.ex-header-leftmost.xheader>table>tbody>tr>td>a {
 	pointer-events: none;
+}
+#vertComboBox * {
+	text-align: left;
+}
+#horzComboBox * {
+	text-align: left;
 }

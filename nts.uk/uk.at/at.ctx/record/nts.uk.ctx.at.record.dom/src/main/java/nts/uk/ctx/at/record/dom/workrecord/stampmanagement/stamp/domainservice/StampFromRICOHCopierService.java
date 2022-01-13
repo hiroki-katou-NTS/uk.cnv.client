@@ -51,7 +51,8 @@ public class StampFromRICOHCopierService {
 		Relieve relieve = new Relieve(AuthcMethod.IC_CARD_AUTHC, StampMeans.RICOH_COPIER);
 		
 		//return 社員の打刻データを作成する#作成する(require, 契約コード, 社員ID, empty, 打刻日時, $打刻する方法, $ボタン詳細設定.ボタン種類, 実績への反映内容, empty)
-		return CreateStampDataForEmployeesService.create(require, CID, contractCode, empId, Optional.empty(), stampDatetime, relieve, detailButtonSettings.get().getButtonType(), refectActualResult, Optional.empty());
+		return CreateStampDataForEmployeesService.create(require, CID, contractCode, empId, Optional.empty(),
+				stampDatetime, relieve, detailButtonSettings.get().getType(), refectActualResult, Optional.empty());
 	}
 
 	public static interface Require extends CreateStampDataForEmployeesService.Require {

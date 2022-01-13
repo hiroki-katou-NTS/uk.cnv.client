@@ -32,7 +32,7 @@ public class KrcdtTopPgAlTr extends ContractUkJpaEntity implements Serializable 
 	 * 中止フラグ
 	 */
 	@Column(name = "ABORT_FLAG")
-	public int abortFlag;
+	public boolean abortFlag;
 
 	@Override
 	protected Object getKey() {

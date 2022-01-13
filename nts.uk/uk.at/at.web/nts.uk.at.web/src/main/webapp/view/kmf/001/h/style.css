@@ -49,3 +49,7 @@
 .setting-zone > .flex.valign-center {
   margin-top: 15px;
 }
+
+#company-manage {
+  margin-top: -10px;
+}

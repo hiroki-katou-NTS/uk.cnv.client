@@ -11,11 +11,17 @@ import lombok.AllArgsConstructor;
 import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
+
+import nts.arc.time.YearMonth;
+import nts.arc.time.calendar.period.DatePeriod;
+
 import nts.uk.ctx.at.auth.dom.adapter.login.IGetInfoForLogin;
 import nts.uk.ctx.at.record.dom.adapter.employeemanage.EmployeeManageRCAdapter;
 import nts.uk.ctx.at.record.dom.adapter.employmentinfoterminal.infoterminal.EmpDataImport;
 import nts.uk.ctx.at.record.dom.adapter.employmentinfoterminal.infoterminal.GetMngInfoFromEmpIDListAdapter;
 import nts.uk.ctx.at.record.dom.daily.DailyRecordAdUpService;
+import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.CreatingDailyResultsCondition;
+import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.creationprocess.CreatingDailyResultsConditionRepository;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.ExecutionTypeDaily;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.createdailyoneday.createdailyresults.CreateDailyResults;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.createdailyresults.OutputCreateDailyOneDay;
@@ -27,19 +33,23 @@ import nts.uk.ctx.at.record.dom.employmentinfoterminal.infoterminal.receive.Stam
 import nts.uk.ctx.at.record.dom.employmentinfoterminal.infoterminal.receive.StampReceptionData.StampDataBuilder;
 import nts.uk.ctx.at.record.dom.employmentinfoterminal.infoterminal.repo.EmpInfoTerminalRepository;
 import nts.uk.ctx.at.record.dom.employmentinfoterminal.infoterminal.service.ConvertTimeRecordStampService;
+import nts.uk.ctx.at.record.dom.organization.EmploymentHistoryImported;
+import nts.uk.ctx.at.record.dom.organization.adapter.EmploymentAdapter;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.ContractCode;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampCard;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampCardRepository;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
+import nts.uk.ctx.at.record.dom.workrecord.actuallock.ActualLock;
+import nts.uk.ctx.at.record.dom.workrecord.actuallock.ActualLockRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampDakokuRepository;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.StampDataReflectResult;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
 import nts.uk.ctx.at.record.pub.employmentinfoterminal.infoterminal.ConvertTimeRecordStampPub;
 import nts.uk.ctx.at.record.pub.employmentinfoterminal.infoterminal.StampDataReflectResultExport;
 import nts.uk.ctx.at.record.pub.employmentinfoterminal.infoterminal.StampReceptionDataExport;
+import nts.uk.ctx.at.shared.dom.adapter.employee.EmpEmployeeAdapter;
+import nts.uk.ctx.at.shared.dom.adapter.employee.EmployeeImport;
 import nts.uk.ctx.at.shared.dom.adapter.employment.BsEmploymentHistoryImport;
 import nts.uk.ctx.at.shared.dom.adapter.employment.ShareEmploymentAdapter;
 import nts.uk.ctx.at.shared.dom.adapter.holidaymanagement.CompanyAdapter;
@@ -47,6 +57,8 @@ import nts.uk.ctx.at.shared.dom.adapter.holidaymanagement.CompanyInfo;
 import nts.uk.ctx.at.shared.dom.dailyattdcal.converter.DailyRecordShareFinder;
 import nts.uk.ctx.at.shared.dom.remainingnumber.algorithm.InterimRemainDataMngRegisterDateChange;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.service.AttendanceItemConvertFactory;
+import nts.uk.ctx.at.shared.dom.scherec.closurestatus.ClosureStatusManagement;
+import nts.uk.ctx.at.shared.dom.scherec.closurestatus.ClosureStatusManagementRepository;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.DailyRecordToAttendanceItemConverter;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
@@ -62,6 +74,8 @@ import nts.uk.ctx.at.shared.dom.workrule.closure.Closure;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureEmployment;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureEmploymentRepository;
 import nts.uk.ctx.at.shared.dom.workrule.closure.ClosureRepository;
+import nts.uk.ctx.at.shared.dom.workrule.closure.service.ClosureService;
+import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.context.loginuser.LoginUserContextManager;
 
 /**
@@ -76,9 +90,6 @@ public class ConvertTimeRecordStampPubImpl implements ConvertTimeRecordStampPub 
 
 	@Inject
 	private StampDakokuRepository stampDakokuRepository;
-
-	@Inject
-	private StampRecordRepository stampRecordRepository;
 
 	@Inject
 	private StampCardRepository stampCardRepository;
@@ -133,17 +144,29 @@ public class ConvertTimeRecordStampPubImpl implements ConvertTimeRecordStampPub 
     
     @Inject
     private TimeReflectFromWorkinfo timeReflectFromWorkinfo;
+
+    @Inject
+    private ClosureStatusManagementRepository closureStatusManagementRepo;
+    @Inject
+    private ActualLockRepository actualLockRepo;
+    @Inject
+    private EmploymentAdapter employmentAdapter;
+    @Inject
+	private CreatingDailyResultsConditionRepository creatingDailyResultsConditionRepo;
+    @Inject
+    private EmpEmployeeAdapter empEmployeeAdapter;
     
 	@Override
 	public  Optional<StampDataReflectResultExport> convertData(String empInfoTerCode,
 			String contractCode, StampReceptionDataExport stampReceptData) {
 
 		RequireImpl require = new RequireImpl(empInfoTerminalRepository,
-				stampDakokuRepository, stampRecordRepository, stampCardRepository,
+				stampDakokuRepository, stampCardRepository,
 				employeeManageRCAdapter, createDailyResults, temporarilyReflectStampDailyAttd,
 				dailyRecordAdUpService, getMngInfoFromEmpIDListAdapter, companyAdapter, iGetInfoForLogin, loginUserContextManager,
 				calcService, closureRepo, closureEmploymentRepo, shareEmploymentAdapter, attendanceItemConvertFactory, iCorrectionAttendanceRule,
-				interimRemainDataMngRegisterDateChange, dailyRecordShareFinder, timeReflectFromWorkinfo);
+				interimRemainDataMngRegisterDateChange, dailyRecordShareFinder, timeReflectFromWorkinfo,
+				closureStatusManagementRepo, actualLockRepo, employmentAdapter, creatingDailyResultsConditionRepo, empEmployeeAdapter);
 
 		Optional<StampDataReflectResult> convertDataOpt = ConvertTimeRecordStampService
 				.convertData(require, new EmpInfoTerminalCode(empInfoTerCode), new ContractCode(contractCode),
@@ -165,8 +188,6 @@ public class ConvertTimeRecordStampPubImpl implements ConvertTimeRecordStampPub 
 
 		private final StampDakokuRepository stampDakokuRepository;
 
-		private final StampRecordRepository stampRecordRepository;
-
 		private final StampCardRepository stampCardRepository;
 
 		private final EmployeeManageRCAdapter employeeManageRCAdapter;
@@ -185,40 +206,34 @@ public class ConvertTimeRecordStampPubImpl implements ConvertTimeRecordStampPub 
 		
 		private LoginUserContextManager loginUserContextManager;
 		
-		 private CalculateDailyRecordServiceCenter calcService;
+		private CalculateDailyRecordServiceCenter calcService;
 		 
-		 private ClosureRepository closureRepo;
+		private ClosureRepository closureRepo;
 
-		 private ClosureEmploymentRepository closureEmploymentRepo;
+		private ClosureEmploymentRepository closureEmploymentRepo;
 		 
-		 private ShareEmploymentAdapter shareEmploymentAdapter;
+		private ShareEmploymentAdapter shareEmploymentAdapter;
 		 
-		 private AttendanceItemConvertFactory attendanceItemConvertFactory;
+		private AttendanceItemConvertFactory attendanceItemConvertFactory;
 		
-		 private ICorrectionAttendanceRule iCorrectionAttendanceRule;
+		private ICorrectionAttendanceRule iCorrectionAttendanceRule;
 		 
-		 private InterimRemainDataMngRegisterDateChange interimRemainDataMngRegisterDateChange;
+		private InterimRemainDataMngRegisterDateChange interimRemainDataMngRegisterDateChange;
 		 
-		 private DailyRecordShareFinder dailyRecordShareFinder;
+		private DailyRecordShareFinder dailyRecordShareFinder;
 
-		 private TimeReflectFromWorkinfo timeReflectFromWorkinfo;
+		private TimeReflectFromWorkinfo timeReflectFromWorkinfo;
+		
+		protected ClosureStatusManagementRepository closureStatusManagementRepo;
+		protected ActualLockRepository actualLockRepo;
+		protected EmploymentAdapter employmentAdapter;
+		private CreatingDailyResultsConditionRepository creatingDailyResultsConditionRepo;
+		protected EmpEmployeeAdapter empEmployeeAdapter;
 		 
 		@Override
 		public Optional<EmpInfoTerminal> getEmpInfoTerminal(EmpInfoTerminalCode empInfoTerCode,
 				ContractCode contractCode) {
 			return empInfoTerminalRepository.getEmpInfoTerminal(empInfoTerCode, contractCode);
-		}
-
-		@Override
-		public Optional<StampRecord> getStampRecord(ContractCode contractCode, StampNumber stampNumber,
-				GeneralDateTime dateTime) {
-			return stampRecordRepository.get(contractCode.v(), stampNumber.v(), dateTime);
-		}
-
-		@Override
-		public void insert(StampRecord stampRecord) {
-			stampRecordRepository.insert(stampRecord);
-
 		}
 
 		@Override
@@ -289,12 +304,6 @@ public class ConvertTimeRecordStampPubImpl implements ConvertTimeRecordStampPub 
 		public Optional<Closure> closure(String companyId, int closureId) {
 			return closureRepo.findById(companyId, closureId);
 		}
-
-		@Override
-		public boolean existsStamp(ContractCode contractCode, StampNumber stampNumber, GeneralDateTime dateTime,
-				ChangeClockArt changeClockArt) {
-			return stampDakokuRepository.existsStamp(contractCode, stampNumber, dateTime, changeClockArt);
-		}
 		
 		public Map<String, BsEmploymentHistoryImport> employmentHistoryClones(String companyId, List<String> employeeId,
 				GeneralDate baseDate) {
@@ -354,6 +363,56 @@ public class ConvertTimeRecordStampPubImpl implements ConvertTimeRecordStampPub 
 		public OutputTimeReflectForWorkinfo get(String companyId, String employeeId, GeneralDate ymd,
 				WorkInfoOfDailyAttendance workInformation) {
 			return timeReflectFromWorkinfo.get(companyId, employeeId, ymd, workInformation);
+		}
+
+		@Override
+		public List<ClosureStatusManagement> getAllByEmpId(String employeeId) {
+			return closureStatusManagementRepo.getAllByEmpId(employeeId);
+		}
+
+		@Override
+		public Optional<ClosureEmployment> findByEmploymentCD(String employmentCode) {
+			return closureEmploymentRepo.findByEmploymentCD(AppContexts.user().companyId(), employmentCode);
+		}
+
+		@Override
+		public Optional<ActualLock> findById(int closureId) {
+			return actualLockRepo.findById(AppContexts.user().companyId(), closureId);
+		}
+
+		@Override
+		public List<EmploymentHistoryImported> getEmpHistBySid(String companyId, String employeeId) {
+			return employmentAdapter.getEmpHistBySid(companyId, employeeId);
+		}
+
+		@Override
+		public DatePeriod getClosurePeriod(int closureId, YearMonth processYm) {
+			DatePeriod datePeriodClosure = ClosureService.getClosurePeriod(
+					ClosureService.createRequireM1(closureRepo, closureEmploymentRepo), closureId, processYm);
+			return datePeriodClosure;
+
+		}
+
+		@Override
+		public Closure findClosureById(int closureId) {
+			String companyId = AppContexts.user().companyId();
+		return closureRepo.findById(companyId, closureId).get();
+		}
+
+		@Override
+		public Optional<CreatingDailyResultsCondition> creatingDailyResultsCondition(String cid) {
+			return creatingDailyResultsConditionRepo.findByCid(cid);
+		}
+
+		@Override
+		public EmployeeImport employeeInfo(CacheCarrier cacheCarrier, String empId) {
+			return empEmployeeAdapter.findByEmpIdRequire(cacheCarrier, empId);
+		}
+		
+		@Override
+		public boolean existsStamp(ContractCode contractCode, StampNumber stampNumber, GeneralDateTime dateTime,
+				ChangeClockAtr changeClockArt) {
+			return stampDakokuRepository.existsStamp(contractCode, stampNumber, dateTime, changeClockArt);
 		}
 	}
 }

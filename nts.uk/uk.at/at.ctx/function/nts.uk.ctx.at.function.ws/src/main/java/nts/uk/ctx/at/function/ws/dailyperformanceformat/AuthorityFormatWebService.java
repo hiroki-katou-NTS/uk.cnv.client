@@ -14,12 +14,15 @@ import nts.uk.ctx.at.function.app.command.dailyperformanceformat.AddAutDaiFormat
 import nts.uk.ctx.at.function.app.command.dailyperformanceformat.AddAuthorityDailyFormatCommand;
 import nts.uk.ctx.at.function.app.command.dailyperformanceformat.DeleteAuthFormatBySheetcmd;
 import nts.uk.ctx.at.function.app.command.dailyperformanceformat.DeleteAuthFormatBySheetcmdHandler;
+import nts.uk.ctx.at.function.app.command.dailyperformanceformat.DuplicateAuthorityDailyFormatCommand;
+import nts.uk.ctx.at.function.app.command.dailyperformanceformat.DuplicateAuthorityDailyFormatCommandHandler;
 import nts.uk.ctx.at.function.app.command.dailyperformanceformat.RemoveAuthorityCommand;
 import nts.uk.ctx.at.function.app.command.dailyperformanceformat.RemoveAuthorityCommandHandler;
 import nts.uk.ctx.at.function.app.command.dailyperformanceformat.UpdateAutDaiFormatCommandHandler;
 import nts.uk.ctx.at.function.app.command.dailyperformanceformat.UpdateAuthorityDailyFormatCommand;
 import nts.uk.ctx.at.function.app.find.dailyperformanceformat.DailyPerformanceAuthorityFinder;
 import nts.uk.ctx.at.function.app.find.dailyperformanceformat.DailyPerformanceCodeFinder;
+import nts.uk.ctx.at.function.app.find.dailyperformanceformat.dto.AuthorityDailyFormatDto;
 import nts.uk.ctx.at.function.app.find.dailyperformanceformat.dto.DailyAttendanceAuthorityDailyDto;
 import nts.uk.ctx.at.function.app.find.dailyperformanceformat.dto.DailyAttendanceAuthorityDetailDto;
 import nts.uk.ctx.at.function.app.find.dailyperformanceformat.dto.DailyPerformanceCodeDto;
@@ -33,6 +36,9 @@ public class AuthorityFormatWebService extends WebService {
 	
 	@Inject
 	private AddAutDaiFormatCommandHandler addAuthorityDailyCommandHandler;
+	
+	@Inject
+	private DuplicateAuthorityDailyFormatCommandHandler duplicateAutDaiFormatCommandHandler;
 	
 	@Inject
 	private UpdateAutDaiFormatCommandHandler updateAuthorityDailyCommandHandler;
@@ -57,6 +63,18 @@ public class AuthorityFormatWebService extends WebService {
 	@Path("addAuthorityDailyFormat")
 	public void addAuthorityDailyFormat(AddAuthorityDailyFormatCommand command) {
 		this.addAuthorityDailyCommandHandler.handle(command);
+	}
+	
+	@POST
+	@Path("duplicateAuthorityDailyFormat")
+	public void duplicateAuthorityDailyFormat(DuplicateAuthorityDailyFormatCommand command) {
+		this.duplicateAutDaiFormatCommandHandler.handle(command);
+	}
+	
+	@POST
+	@Path("findAllByCompanyIdAndCode/{formatCode}")
+	public AuthorityDailyFormatDto findAllByCompanyId(@PathParam("formatCode") String formatCode) {
+		return dailyPerformanceAuthorityFinder.findAllByCompanyId(formatCode);
 	}
 	
 //	@POST

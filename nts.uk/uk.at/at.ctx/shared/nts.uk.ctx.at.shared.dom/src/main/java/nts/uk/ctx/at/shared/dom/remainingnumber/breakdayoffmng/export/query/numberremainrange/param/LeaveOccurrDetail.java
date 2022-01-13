@@ -39,5 +39,21 @@ public class LeaveOccurrDetail extends AccumulationAbsenceDetail {
 		this.digestionCate = digestionCate;
 		this.extinctionDate = extinctionDate;
 	}
+	
+	/**
+	 * 	[1] 消化状態を判断する
+	 */
+	public DigestionAtr judgeDigestiveStatus(GeneralDate ymd) {
+		
+		if(this.digestionCate == DigestionAtr.EXPIRED) {
+			if(this.deadline.before(ymd)) {
+				return DigestionAtr.EXPIRED;
+			}
+			return DigestionAtr.UNUSED;
+		}
+		
+		return this.digestionCate;
+		
+	}
 
 }

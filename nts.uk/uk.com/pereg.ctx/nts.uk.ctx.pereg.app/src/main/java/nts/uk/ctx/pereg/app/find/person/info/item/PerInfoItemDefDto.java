@@ -55,6 +55,10 @@ public class PerInfoItemDefDto {
 	
 	private String initValue;
 	
+	private String personInfoItemGroupId;
+	
+	private String fieldGroupName;
+	
 	/**
 	 * @param itemDefinition
 	 * This constructor initial value from domain

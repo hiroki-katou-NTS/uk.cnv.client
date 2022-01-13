@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+	<ui:composition template="/master/dialog.xhtml">
+		<ui:define name="htmlHead">
+			<script>var dialogSize = { width: 740, height: 320 };</script>
+			<com:scriptfile set="IGNITE" />
+
+			<com:scriptfile path="../share/functional.js" />
+			<com:stylefile path="./kdw013.d.css" />
+			<com:scriptfile path="./kdw013.d.vm.js" />
+		</ui:define>
+		<ui:define name="content">
+			<div id="contents-area" class="kdw-013-d">
+				<table style="border-collapse: separate;">
+					<thead>
+						<tr>
+							<th style="width: 100px;" data-bind="i18n: 'KDW013_32'"></th>
+							<th style="width: 820px;" data-bind="i18n: 'KDW013_33'"></th>
+							<th style="width: 200px;" data-bind="i18n: 'KDW013_34'"></th>
+						</tr>
+
+
+					</thead>
+
+					<tbody data-bind="foreach: dataSource()">
+						<tr>
+							<td data-bind="text:$data.date "></td>
+							<td data-bind="text:$data.description "></td>
+							<com:ko-if bind="$data.overtimeLeaveAtr == 0">
+								<td><a class="btn-jump" tabindex = "1"
+									data-bind="ntsLinkButton: { action: $parent.jump.bind( {overtimeLeaveAtr:0 ,date:$data.date }) },text: '#{i18n.getText('KDW013_35')}'"></a></td>
+							</com:ko-if>
+							<com:ko-if bind="$data.overtimeLeaveAtr == 1">
+								<td><a class="btn-jump" tabindex = "1"
+									data-bind="ntsLinkButton: { action: $parent.jump.bind({overtimeLeaveAtr:1 ,date:$data.date }) },text: '#{i18n.getText('KDW013_36')}'"></a></td>
+							</com:ko-if>
+						</tr>
+					</tbody>
+				</table>
+				
+			</div>
+			<div id="functions-area-bottom" class="kdw-013-d">
+				<button tabindex = "2" data-bind="i18n: 'KDW013_37', click: $vm.close"></button>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+
+</html>

@@ -51,7 +51,8 @@ module nts.uk.com.view.cas001.a.viewmodel {
             multiple: false,
             isResize: true,
             rows: 5,
-            tabindex:4
+            tabindex: 5,
+            onDialog: true
         });
         listRole: KnockoutObservableArray<PersonRole> = ko.observableArray([]);
         ctgColumns: KnockoutObservableArray<any> = ko.observableArray([
@@ -61,9 +62,15 @@ module nts.uk.com.view.cas001.a.viewmodel {
                 headerText: getText('CAS001_69'), key: 'setting', width: 80, formatter: makeIcon
             }
         ]);
+        isFromCPS018: KnockoutObservable<boolean> = ko.observable(false);
 
         constructor() {
             let self = this;
+
+            let params = getShared("CAS001A_PARAMS") || { isFromCPS018: false };
+            self.isFromCPS018(params.isFromCPS018);
+            nts.uk.sessionStorage.removeItem(nts.uk.request.STORAGE_KEY_TRANSFER_DATA);
+
             block.grayout();
             self.component.columns([
                 { headerText: getText("CCG025_3"), prop: 'roleId', width: 50, hidden: true },
@@ -72,11 +79,17 @@ module nts.uk.com.view.cas001.a.viewmodel {
             ]);
             self.component.startPage().done(() =>{
                 self.personRoleList.removeAll();
-                self.personRoleList(_.map(__viewContext['screenModel'].component.listRole(), x => new nts.uk.com.view.cas001.a.viewmodel.PersonRole(x))); 
+                self.personRoleList(_.map(self.component.listRole(), (x: any) => new PersonRole(x)));
+                self.start();
+            });
+
+            self.component.listRole.subscribe(value => {
+                self.personRoleList.removeAll();
+                self.personRoleList(_.map(value, (x: any) => new PersonRole(x)));
                 self.start();
             });
             
-            self.component.currentCode.subscribe(function(newRoleId) {
+            self.component.currentRoleId.subscribe(function(newRoleId: string) {
                 if (self.personRoleList().length < 1) {
                     return;
                 }
@@ -91,15 +104,15 @@ module nts.uk.com.view.cas001.a.viewmodel {
                 let newPersonRole = _.find(self.personRoleList(), (role) => { return role.roleId === newRoleId });
                 if (newPersonRole) {
                     self.currentRole(newPersonRole);
+                    block.grayout();
+                    newPersonRole.loadRoleCategoriesList(newRoleId, false).done(() => {
+                        if (!self.currentCategoryId()) {
+                            newPersonRole.setCtgSelectedId(self.roleCategoryList());
+                        }
+                    }).always(() => {
+                        block.clear();
+                    });
                 }
-                block.grayout();
-                newPersonRole.loadRoleCategoriesList(newRoleId, false).done(() => {
-                    if (!self.currentCategoryId()) {
-                        newPersonRole.setCtgSelectedId(self.roleCategoryList());
-                    }
-                }).always(() => {
-                    block.clear(); 
-                });
             });
 
             self.currentCategoryId.subscribe((categoryId) => {
@@ -114,6 +127,25 @@ module nts.uk.com.view.cas001.a.viewmodel {
                     newCategory.loadRoleItems(self.currentRoleId(), categoryId).done(() => {
                         newCategory.setCategoryAuth(result);
                         self.currentRole().currentCategory(newCategory);
+                        let currentCategory = _.find(self.roleCategoryList(), roleCate => roleCate.categoryId == categoryId);
+                        if (currentCategory && currentCategory.categoryCode == 'CS00100') {
+                            self.itemListCbb([
+                                { code: 1, name: getText('CAS001_49') },
+                                { code: 3, name: getText('CAS001_51') }
+                            ]);
+                            if (self.anotherSelectedAll() == 2) {
+                                self.anotherSelectedAll(1);
+                            }
+                            if (self.seftSelectedAll() == 2) {
+                                self.seftSelectedAll(1);
+                            }
+                        } else {
+                            self.itemListCbb([
+                                { code: 1, name: getText('CAS001_49') },
+                                { code: 2, name: getText('CAS001_50') },
+                                { code: 3, name: getText('CAS001_51') }
+                            ]);
+                        }
                     }).always(() => {
                         block.clear(); 
                     });
@@ -242,7 +274,7 @@ module nts.uk.com.view.cas001.a.viewmodel {
                 if (!objSetofScreenC.isCancel) {
                     self.reload().always(() => {
                         if (objSetofScreenC.id !== null && objSetofScreenC.id != undefined) {
-                            self.component.currentCode(objSetofScreenC.id);
+                            self.component.currentRoleId(objSetofScreenC.id);
                         }
                     });
                 }
@@ -280,43 +312,17 @@ module nts.uk.com.view.cas001.a.viewmodel {
 
             return dfd.promise();
         }
+
         start() {
             let self = this;
                 if (self.personRoleList().length > 0) {
                     let selectedId = self.currentRoleId() !== '' ? self.currentRoleId() : self.personRoleList()[0].roleId;
-
                     self.currentRoleId(selectedId);
-
-
                 } else {
-
                     dialog({ messageId: "Msg_364" }).then(function() {
                         nts.uk.request.jump("/view/ccg/008/a/index.xhtml");
                     });
-
                 }
-        }
-
-        loadPersonRoleList(): JQueryPromise<any> {
-            let self = this,
-                dfd = $.Deferred();
-
-
-            self.component.startPage().done(() => {
-                self.personRoleList.removeAll();
-
-                _.forEach(self.component.listRole(), function(iPersonRole: IPersonRole) {
-
-                    self.personRoleList(_.map(self.component.listRole(), x => new PersonRole(x)));
-
-                });
-
-
-
-                dfd.resolve();
-
-            });
-            return dfd.promise();
         }
 
         saveData() {
@@ -411,6 +417,7 @@ module nts.uk.com.view.cas001.a.viewmodel {
     }
     export interface IPersonRoleCategory {
         categoryId: string;
+        categoryCode: string;
         categoryName: string;
         setting: boolean;
         categoryType: number;
@@ -450,6 +457,7 @@ module nts.uk.com.view.cas001.a.viewmodel {
         roleName: string;
         currentCategory: KnockoutObservable<PersonRoleCategory> = ko.observable(new PersonRoleCategory({
             categoryId: "",
+            categoryCode: "",
             categoryName: "",
             setting: true,
             categoryType: -1,
@@ -530,6 +538,7 @@ module nts.uk.com.view.cas001.a.viewmodel {
     export class PersonRoleCategory {
 
         categoryId: string;
+        categoryCode: string;
         categoryName: string;
         categoryType: number;
         setting: boolean;
@@ -564,6 +573,7 @@ module nts.uk.com.view.cas001.a.viewmodel {
         constructor(param: IPersonRoleCategory) {
             let self = this;
             self.categoryId = param ? param.categoryId : '';
+            self.categoryCode = param ? param.categoryCode : '';
             self.categoryName = param ? param.categoryName : '';
             self.categoryType = param ? param.categoryType : 0;
             self.setting = param ? param.setting : false;
@@ -647,6 +657,17 @@ module nts.uk.com.view.cas001.a.viewmodel {
                         value: '3',
                         text: getText('CAS001_51')
                     }];
+
+            let currentCategory = _.find(screenModel.roleCategoryList(), (roleCate: PersonRoleCategory) => roleCate.categoryId == CategoryId);
+            if (currentCategory && currentCategory.categoryCode == 'CS00100') {
+                array3E = [{
+                    value: '1',
+                    text: getText('CAS001_49')
+                }, {
+                        value: '3',
+                        text: getText('CAS001_51')
+                    }]
+            }
 
             service.getPersonRoleItemList(roleId, CategoryId).done(function(result: any) {
                 self.roleItemDatas(_.map(result.itemLst, x => new PersonRoleItem(x)));
@@ -741,17 +762,17 @@ module nts.uk.com.view.cas001.a.viewmodel {
             }).always(() => {
                 //register click change all event
                 $(() => {
-                    
+                    let currentCategory = _.find(screenModel.roleCategoryList(), (roleCate: PersonRoleCategory) => roleCate.categoryId == self.categoryId);
                     $('#anotherSelectedAll_auth').on('click', 'label input', (e) => {
                         // find index of selected input
                         const index = Array.prototype.indexOf.call($('#anotherSelectedAll_auth')[0].childNodes, $(e.currentTarget).parent()[0]);
-                        screenModel.changeAll('anotherSelectedAll_auth', index + 1);
+                        screenModel.changeAll('anotherSelectedAll_auth', currentCategory && currentCategory.categoryCode == 'CS00100' && index == 1 ? 3 : index + 1);
                     });
 
                     $('#seftSelectedAll_auth').on('click', 'label input', (e) => {
                         // find index of selected input
                         const index = Array.prototype.indexOf.call($('#seftSelectedAll_auth')[0].childNodes, $(e.currentTarget).parent()[0]);
-                        screenModel.changeAll('seftSelectedAll_auth', index + 1);
+                        screenModel.changeAll('seftSelectedAll_auth', currentCategory && currentCategory.categoryCode == 'CS00100' && index == 1 ? 3 : index + 1);
                     });
 
                     $('.ui-iggrid-header').on('focus', function() {
@@ -811,6 +832,7 @@ module nts.uk.com.view.cas001.a.viewmodel {
     }
     export class PersonRoleCategoryCommand {
         categoryId: string;
+        categoryCode: string;
         categoryName: string;
         categoryType: number;
         allowPersonRef: number;
@@ -834,6 +856,7 @@ module nts.uk.com.view.cas001.a.viewmodel {
             let sm: ScreenModel = __viewContext['screenModel'];
 
             this.categoryId = param.categoryId;
+            this.categoryCode = param.categoryCode;
             this.categoryName = param.categoryName;
             this.categoryType = param.categoryType;
             this.allowPersonRef = sm.allowPersonRef();

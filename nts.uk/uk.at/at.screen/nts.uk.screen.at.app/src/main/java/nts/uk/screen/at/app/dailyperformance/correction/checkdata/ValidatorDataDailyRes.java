@@ -18,8 +18,10 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.util.Strings;
 
 import lombok.val;
+import nts.arc.layer.app.cache.CacheCarrier;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.gul.collection.CollectionUtil;
@@ -29,6 +31,7 @@ import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.confirmationstatus.Ap
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.confirmationstatus.ConfirmStatusActualResult;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.confirmationstatus.change.approval.ApprovalStatusActualDayChange;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.confirmationstatus.change.confirm.ConfirmStatusActualDayChange;
+import nts.uk.ctx.at.record.dom.require.RecordDomRequireService;
 import nts.uk.ctx.at.record.dom.workinformation.WorkInfoOfDailyPerformance;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.EmployeeDailyPerErrorRepository;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.ErrorAlarmWorkRecord;
@@ -50,6 +53,7 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.flexshortage.Insu
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.flexshortage.InsufficientFlexHolidayMntRepository;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHoliday;
 import nts.uk.ctx.at.shared.dom.specialholiday.SpecialHolidayRepository;
+import nts.uk.ctx.at.shared.dom.workrule.closure.service.GetClosureStartForEmployee;
 import nts.uk.screen.at.app.dailymodify.query.DailyModifyResult;
 import nts.uk.screen.at.app.dailyperformance.correction.checkdata.dto.FlexShortageRCDto;
 import nts.uk.screen.at.app.dailyperformance.correction.dto.ApprovalConfirmCache;
@@ -88,6 +92,7 @@ public class ValidatorDataDailyRes {
 	
 	@Inject
 	private ConfirmStatusActualDayChange confirmStatusActualDayChange;
+	
 
 	private static final Integer[] CHILD_CARE = { 759, 760, 761, 762, 580 };
 	private static final Integer[] CARE = { 763, 764, 765, 766, 586 };
@@ -102,6 +107,11 @@ public class ValidatorDataDailyRes {
 			458, 459, 799, 801, 802, 804, 806, 807, 809, 811, 812, 814, 816, 817, 819, 821, 822 };
 	static final Map<Integer, Integer> DEVIATION_REASON_MAP = IntStream.range(0, DEVIATION_REASON.length).boxed()
 			.collect(Collectors.toMap(x -> DEVIATION_REASON[x], x -> x / 3 + 1));
+	
+	private static final Integer[] INPUT_CHECK_PLUS = { 3, 4, 5, 6, 31, 34, 41, 44, 51, 53, 59, 61, 67, 69, 75, 77, 79, 81, 83, 85, 
+			88, 91, 95, 98, 102, 105, 109, 112, 116, 119, 123, 126, 130, 133, 137, 140, 144, 147, 151, 154, 794, 795, 796, 797 };
+	public static final Map<Integer, Integer> INPUT_CHECK_PLUS_MAP = IntStream.range(0, INPUT_CHECK_PLUS.length).boxed()
+			.collect(Collectors.toMap(x -> INPUT_CHECK_PLUS[x], x -> x % 2 == 0 ? INPUT_CHECK_PLUS[x + 1] : INPUT_CHECK_PLUS[x - 1]));
 	
 	private final static String EMPTY_STRING = "";
 
@@ -295,6 +305,64 @@ public class ValidatorDataDailyRes {
 		});
 		return result;
 	}
+	
+	// UKDesign.UniversalK.就業.KDW_日別実績.KDW003_日別実績の修正.A：日別実績の修正_NEW.アルゴリズム.計算、登録.チェック処理.計算前エラーチェック.開始終了時刻順序不正チェック.開始終了時刻順序不正チェック
+	public List<DPItemValue> checkInputDataPlus(List<DPItemValue> items, List<DailyModifyResult> itemValues) {
+		List<DPItemValue> result = new ArrayList<>();
+		// loc chua item can check
+		List<DPItemValue> itemCanCheck = items.stream().filter(x -> INPUT_CHECK_PLUS_MAP.containsKey(x.getItemId()))
+				.collect(Collectors.toList());
+		if (itemCanCheck.isEmpty())
+			return result;
+		Map<Integer, String> itemCheckMap = itemCanCheck.stream()
+				.collect(Collectors.toMap(x -> x.getItemId(), x -> x.getValue() == null ? "" : x.getValue()));
+		List<DPItemValue> itemCheckDBs = new ArrayList<>();
+		// loc nhung thang chi duoc insert 1 trong 1 cap
+		itemCanCheck.forEach(x -> {
+			Integer itemCheck = INPUT_CHECK_PLUS_MAP.get(x.getItemId());
+			if (!itemCheckMap.containsKey(itemCheck)) {
+				itemCheckDBs.add(x);
+			}else {
+				if(itemCheck != null) {
+					 Integer itemId1 = x.getItemId();
+					 Integer itemId2 = INPUT_CHECK_PLUS_MAP.get(itemId1);
+					 String valueItemIdStart = (itemId1 < itemId2) ? x.getValue()
+							: itemCheckMap.get(itemId2);
+					 String valueItemIdEnd = (itemId1 > itemId2) ? x.getValue()
+								: itemCheckMap.get(itemId2);
+					if (Strings.isNotBlank(valueItemIdStart) && Strings.isNotBlank(valueItemIdEnd) && Integer.parseInt(valueItemIdStart) > Integer.parseInt(valueItemIdEnd)) {
+						x.setMessage("Msg_1400");
+						result.add(x);
+					}
+				}
+			}
+		});
+		if (itemCheckDBs.isEmpty())
+			return result;
+
+		if (itemValues.isEmpty())
+			return result;
+		Map<Integer, String> valueGetFromDBMap = itemValues.get(0).getItems().stream()
+				.collect(Collectors.toMap(x -> x.getItemId(), x -> x.getValue() == null ? "" : x.getValue()));
+		itemCheckDBs.stream().forEach(x -> {
+			Integer itemId = INPUT_CHECK_PLUS_MAP.get(x.getItemId()); 
+			if(itemId != null) {
+				 Integer itemId1 = x.getItemId();
+				 Integer itemId2 = INPUT_CHECK_PLUS_MAP.get(itemId1);
+				 String valueItemIdStart = (itemId1 < itemId2) ? x.getValue()
+						: itemCheckMap.containsKey(itemId2) ? itemCheckMap.get(itemId2)
+								: valueGetFromDBMap.get(itemId2);
+				 String valueItemIdEnd = (itemId1 > itemId2) ? x.getValue()
+							: itemCheckMap.containsKey(itemId2) ? itemCheckMap.get(itemId2)
+									: valueGetFromDBMap.get(itemId2);
+				if (Strings.isNotBlank(valueItemIdStart) && Strings.isNotBlank(valueItemIdEnd) && Integer.parseInt(valueItemIdStart) > Integer.parseInt(valueItemIdEnd)) {
+					x.setMessage("Msg_1400");
+					result.add(x);
+				}
+			}
+		});
+		return result;
+	}
 
 	public List<DPItemValue> checkContinuousHolidays(String employeeId, DateRange date) {
 		
@@ -474,9 +542,9 @@ public class ValidatorDataDailyRes {
 	 * 計算後エラーチェック
 	 */
 	public Map<Pair<String, GeneralDate>, ResultReturnDCUpdateData> errorCheckDivergence(List<IntegrationOfDaily> dailyResults,
-			List<IntegrationOfMonthly> monthlyResults) {
+			List<IntegrationOfMonthly> monthlyResults,Boolean checkUnLock) {
 		Map<Pair<String, GeneralDate>, ResultReturnDCUpdateData> resultError = new HashMap<>();
-
+		
 		// 乖離エラーのチェック
 		for (IntegrationOfDaily d : dailyResults) {
 			List<DPItemValue> divergenceErrors = new ArrayList<>();
@@ -731,7 +799,7 @@ public class ValidatorDataDailyRes {
 					if(itemValue != null && itemValue.getValue() != null && !itemValue.getValue().equals("")) {
 						return false;
 					}else {
-						val item = x.getAttendanceItemList().stream().filter(z -> !(z.intValue() == errorSelect.getErrorDisplayItem() && itemValue != null && itemValue.getValue() != null && !itemValue.getValue().equals("")))
+						val item = x.getAttendanceItemList().stream().filter(z -> !(z.equals(errorSelect.getErrorDisplayItem()) && itemValue != null && itemValue.getValue() != null && !itemValue.getValue().equals("")))
 								.collect(Collectors.toList());
 						if(!item.isEmpty()) {
 							x.setAttendanceItemList(item);

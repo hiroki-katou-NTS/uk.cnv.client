@@ -11,13 +11,13 @@ import nts.arc.enums.EnumAdaptor;
 @RequiredArgsConstructor
 public enum RangeCompareType {
     /* 範囲の間（境界値を含まない）（＜＞） */
-    BETWEEN_RANGE_OPEN(6, "＜＞"),
+    BETWEEN_RANGE_OPEN(6, "範囲の間（境界値を含まない）（＜＞）"),
     /* 範囲の間（境界値を含む）（≦≧） */
-    BETWEEN_RANGE_CLOSED(7, "≦≧"),
+    BETWEEN_RANGE_CLOSED(7, "範囲の間（境界値を含む）（≦≧）"),
     /* 範囲の外（境界値を含まない）（＞＜） */
-    OUTSIDE_RANGE_OPEN(8, "＞＜"),
+    OUTSIDE_RANGE_OPEN(8, "範囲の外（境界値を含まない）（＞＜）"),
     /* 範囲の外（境界値を含む）（≧≦） */
-    OUTSIDE_RANGE_CLOSED(9, "≧≦");
+    OUTSIDE_RANGE_CLOSED(9, "範囲の外（境界値を含む）（≧≦）");
 
     public final int value;
     public final String nameId;

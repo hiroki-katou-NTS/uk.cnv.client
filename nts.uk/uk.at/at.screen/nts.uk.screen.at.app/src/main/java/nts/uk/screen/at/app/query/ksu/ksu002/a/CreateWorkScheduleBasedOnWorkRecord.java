@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import nts.uk.ctx.at.schedule.dom.schedule.workschedule.ScheManaStatuTempo;
+import nts.uk.ctx.at.shared.dom.employeeworkway.EmployeeWorkingStatus;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingWork;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.GetListWtypeWtimeUseDailyAttendRecordService;
@@ -40,7 +40,7 @@ public class CreateWorkScheduleBasedOnWorkRecord {
 	@Inject
 	private GetDateInfoDuringThePeriod getDateInfoDuringThePeriod;
 
-	public List<WorkScheduleWorkInforDto> get(Map<ScheManaStatuTempo , Optional<IntegrationOfDaily>> param) {
+	public List<WorkScheduleWorkInforDto> get(Map<EmployeeWorkingStatus , Optional<IntegrationOfDaily>> param) {
 		
 		String companyId = AppContexts.user().companyId();
 		List<WorkScheduleWorkInforDto> result = new ArrayList<>();
@@ -76,7 +76,7 @@ public class CreateWorkScheduleBasedOnWorkRecord {
 		
 		param.forEach((key, value) -> {
 			// step 5.1
-			boolean needToWork = key.getScheManaStatus().needCreateWorkSchedule();
+			boolean needToWork = key.getWorkingStatus().needCreateWorkSchedule();
 			
 			if (value.isPresent()) {
 				

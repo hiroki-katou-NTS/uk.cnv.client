@@ -6,9 +6,9 @@ package nts.uk.ctx.sys.env.infra.repository.mailserver;
 
 import lombok.Setter;
 import nts.uk.ctx.sys.env.dom.mailserver.AuthenticationMethod;
-import nts.uk.ctx.sys.env.dom.mailserver.EmailAuthentication;
 import nts.uk.ctx.sys.env.dom.mailserver.EncryptionMethod;
 import nts.uk.ctx.sys.env.dom.mailserver.ImapInfo;
+import nts.uk.ctx.sys.env.dom.mailserver.MailAddress;
 import nts.uk.ctx.sys.env.dom.mailserver.MailServerGetMemento;
 import nts.uk.ctx.sys.env.dom.mailserver.Password;
 import nts.uk.ctx.sys.env.dom.mailserver.PopInfo;
@@ -77,8 +77,8 @@ public class JpaMailServerGetMemento implements MailServerGetMemento {
 	 * @see nts.uk.ctx.sys.env.dom.mailserver.MailServerGetMemento#getEmailAuthentication()
 	 */
 	@Override
-	public EmailAuthentication getEmailAuthentication() {
-		return new EmailAuthentication(this.sevstMailServer.getEmailAuth());
+	public MailAddress getEmailAuthentication() {
+		return new MailAddress(this.sevstMailServer.getEmailAuth());
 	}
 
 	/* (non-Javadoc)

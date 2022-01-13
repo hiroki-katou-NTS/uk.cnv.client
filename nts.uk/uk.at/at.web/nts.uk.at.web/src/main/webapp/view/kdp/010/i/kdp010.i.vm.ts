@@ -1,40 +1,49 @@
 module nts.uk.at.view.kdp010.i {
 	import block = nts.uk.ui.block;
-    import info = nts.uk.ui.dialog.info;
+	import info = nts.uk.ui.dialog.info;
 	import error = nts.uk.ui.dialog.error;
-    import errors = nts.uk.ui.errors;
+	import errors = nts.uk.ui.errors;
 	import ajax = nts.uk.request.ajax;
 	export module viewmodel {
 		const paths: any = {
-	        getSettingCommonStamp: "at/record/stamp/timestampinputsetting/getSettingCommonStamp"
-	    }
+			getSettingCommonStamp: "at/record/stamp/timestampinputsetting/getSettingCommonStamp"
+		}
 		export class ScreenModel {
 			// H1_2
 			optionHighlight: KnockoutObservableArray<any> = ko.observableArray([
 				{ id: 1, name: nts.uk.resource.getText("KDP010_108") },
 				{ id: 0, name: nts.uk.resource.getText("KDP010_109") }
 			]);
-			
+
 			selectedHighlight: KnockoutObservable<number> = ko.observable(1);
-			
+
 			// H2_2
 			contentsStampType: KnockoutObservableArray<any> = ko.observableArray([]);
 			selectedDay: KnockoutObservable<number> = ko.observable(1);
 			selectedDayOld: KnockoutObservable<number> = ko.observable(1);
-			
+
 			supportWplSetOption: KnockoutObservableArray<any> = ko.observableArray([
 				{ id: 0, name: nts.uk.resource.getText("KDP010_341") },
 				{ id: 1, name: nts.uk.resource.getText("KDP010_342") }
 			]);
+
 			supportWplSet: KnockoutObservable<number> = ko.observable(0);
-			supportWplSetEnable: KnockoutObservable<boolean> = ko.computed(():boolean => {
+
+			assignmentMethodOption: KnockoutObservableArray<any> = ko.observableArray([
+				{ id: 0, name: nts.uk.resource.getText("KDP010_345") },
+				{ id: 1, name: nts.uk.resource.getText("KDP010_346") }
+			]);
+
+			assignmentMethod: KnockoutObservable<number> = ko.observable(0);
+
+			supportWplSetEnable: KnockoutObservable<boolean> = ko.computed((): boolean => {
 				return this.selectedHighlight() == 1 && (this.selectedDay() == 14 || this.selectedDay() == 16 || this.selectedDay() == 17 || this.selectedDay() == 18);
 			});
-			
+
 			// H3_2
 			optionStamping: KnockoutObservableArray<any> = ko.observableArray(__viewContext.enums.GoingOutReason);
 			selectedStamping: KnockoutObservable<number> = ko.observable(0);
-			selectedStampingEnable: KnockoutObservable<boolean> = ko.computed(():boolean => {
+			selectedStampingEnable: KnockoutObservable<boolean> = ko.computed((): boolean => {
 				return this.selectedHighlight() == 1 && this.selectedDay() == 8;
 			});
 
@@ -64,41 +73,58 @@ module nts.uk.at.view.kdp010.i {
 			lstData: StampTypeCommand = null;
 			isFocus: KnockoutObservable<boolean> = ko.observable(true);
 			isChange: KnockoutObservable<number> = ko.observable(0);
-			checkGoOut :  KnockoutObservable<number> = ko.observable(0);
-            
-            showSelectedAudio = ko.observable(false);
+			checkGoOut: KnockoutObservable<number> = ko.observable(0);
+
+			isUseWork: KnockoutObservable<boolean | null> = ko.observable(null);
+			isSupportUse: KnockoutObservable<boolean | null> = ko.observable(null);
+			supportWorkPlaceEnable: KnockoutObservable<boolean | null> = ko.observable(null);
+
+			showSelectedAudio = ko.observable(false);
 			constructor() {
 				let self = this;
+				ko.computed({
+					read: () => {
+						const type = ko.unwrap(self.selectedDay);
+						const selectedHighlightRead = ko.unwrap(self.selectedHighlight);
+
+						if (selectedHighlightRead == 1) {
+							self.checkUseWorkPlace(type);
+						} else {
+							self.supportWorkPlaceEnable(false);
+						}
+					}
+				});
+
 				self.selectedDay.subscribe((newValue) => {
 					self.getDataFromContents(newValue);
 					if (self.isChange() == 0) {
-						let name = _.find(self.lstContents(), function(itemEmp) { return itemEmp.value == newValue; });
+						let name = _.find(self.lstContents(), function (itemEmp) { return itemEmp.value == newValue; });
 						self.simpleValue(name.name);
 					}
-					
-					if(!_.isNil(newValue) && newValue == 8 && self.checkGoOut() != 1){
+
+					if (!_.isNil(newValue) && newValue == 8 && self.checkGoOut() != 1) {
 						self.selectedStamping(0);
 					}
-					
-					if(!_.isNil(newValue) && newValue != 8){
+
+					if (!_.isNil(newValue) && newValue != 8) {
 						self.selectedStamping(0);
 					}
-					
+
 				})
 
-				self.simpleValue.subscribe(function(codeChanged: string) {
-						self.simpleValue($.trim(self.simpleValue()));
-					});
+				self.simpleValue.subscribe(function (codeChanged: string) {
+					self.simpleValue($.trim(self.simpleValue()));
+				});
 
 				self.selectedHighlight.subscribe((newValue) => {
 					if (self.selectedHighlight() == 1)
 						nts.uk.ui.errors.clearAll();
-				})
+				});
 				$('.ntsRadioBox').focus();
 			}
-            /**
-             * start page  
-             */
+			/**
+			 * start page  
+			 */
 			public startPage(): JQueryPromise<any> {
 				let self = this,
 					dfd = $.Deferred();
@@ -107,29 +133,40 @@ module nts.uk.at.view.kdp010.i {
 				self.isChange(0);
 				self.getDataFromContents(self.selectedDay());
 				block.invisible();
-				let tg = __viewContext.enums.ContentsStampType;
-				ajax(paths.getSettingCommonStamp).done(function(data: any) {
-					if(!data.supportUse){
-						_.remove(tg, (n:any) => {return n.value == 14 || n.value == 15 || n.value == 16 || n.value == 17 || n.value == 18;});
+				var tg = __viewContext.enums.ContentsStampType;
+
+				self.dataShare = nts.uk.ui.windows.getShared('KDP010_G');
+
+				_.remove(tg, (n: any) => { return n.value == 16; });
+				ajax(paths.getSettingCommonStamp).done(function (data: any) {
+					if (!data.supportUse) {
+						_.remove(tg, (n: any) => { return n.value == 14 || n.value == 15 || n.value == 17 || n.value == 18; });
 					}
-					if(!data.temporaryUse){
-						_.remove(tg, (n:any) => {return n.value == 12 || n.value == 13;});
+					if (!data.temporaryUse) {
+						_.remove(tg, (n: any) => { return n.value == 12 || n.value == 13; });
+					}
+					if (!data.entranceExitUse) {
+						_.remove(tg, (n: any) => { return n.value == 10 || n.value == 11; });
 					}
 					self.contentsStampType(tg);
+					self.isUseWork(data.workUse);
+					if (self.dataShare.stampMeans != 1 && self.dataShare.stampMeans != 3) {
+						self.isSupportUse(data.supportUse);
+					}
 					dfd.resolve();
-				}).fail(function(res:any) {
+				}).fail(function (res: any) {
 					error({ messageId: res.messageId });
 				}).always(() => {
 					block.clear();
 				});
 				return dfd.promise();
 			}
-			
+
 			public getDataStamp() {
 
 				let self = this;
 				self.dataShare = nts.uk.ui.windows.getShared('KDP010_G');
-                self.showSelectedAudio(self.dataShare.fromScreen === 'A');
+				self.showSelectedAudio(self.dataShare.fromScreen === 'A');
 				self.buttonPositionNo(self.dataShare.buttonPositionNo);
 				if (self.dataShare.dataShare != undefined) {
 					let data = self.dataShare.dataShare.lstButtonSet ? self.dataShare.dataShare.lstButtonSet.filter(x => x.buttonPositionNo == self.dataShare.buttonPositionNo)[0] : self.dataShare.dataShare;
@@ -143,31 +180,38 @@ module nts.uk.at.view.kdp010.i {
 						self.selectedHighlight(data.usrArt);
 						self.getTypeButton(data);
 						self.supportWplSet((data.supportWplSet == null || data.supportWplSet == undefined) ? 0 : data.supportWplSet);
+						self.assignmentMethod((data.taskChoiceArt == null || data.taskChoiceArt == undefined) ? 0 : data.taskChoiceArt);
 					} else {
-						let name = _.find(self.lstContents(), function(itemEmp) { return itemEmp.value == 1; });
+						let name = _.find(self.lstContents(), function (itemEmp) { return itemEmp.value == 1; });
 						self.simpleValue(name.name);
 					}
 				}
-				$(document).ready(function() {
+				$(document).ready(function () {
 					$('#highlight-radio').focus();
 				});
 			}
 
 			public getSimpleValue(value: number) {
 				let self = this;
-				let name = _.find(self.lstContents(), function(itemEmp) { return itemEmp.value == 1; });
+				let name = _.find(self.lstContents(), function (itemEmp) { return itemEmp.value == 1; });
 				self.simpleValue(name.name);
 			}
 
-            /**
-             * Pass Data to A
-             */
+			/**
+			 * Pass Data to A
+			 */
 			public passData(): void {
 				let self = this;
 				$('#correc').trigger("validate");
 				if (nts.uk.ui.errors.hasError() && self.selectedHighlight() == 1) {
 					return;
 				}
+
+				var taskChoiceArt = null;
+				if (ko.unwrap(self.isUseWork)) {
+					taskChoiceArt = ko.unwrap(self.supportWorkPlaceEnable) ? ko.unwrap(self.assignmentMethod) : null
+				}
+
 				self.dataStampPage = ({
 					buttonPositionNo: self.buttonPositionNo(),
 					buttonDisSet: ({
@@ -189,7 +233,8 @@ module nts.uk.at.view.kdp010.i {
 					}),
 					usrArt: self.selectedHighlight(),
 					audioType: self.selectedAudio(),
-					supportWplSet: self.supportWplSetEnable()?self.supportWplSet():null
+					taskChoiceArt: taskChoiceArt,
+					supportWplSet: self.supportWplSetEnable() ? self.supportWplSet() : null
 				});
 
 				if (self.dataShare.dataShare == undefined || self.dataShare.dataShare.lstButtonSet == undefined) {
@@ -212,16 +257,63 @@ module nts.uk.at.view.kdp010.i {
 			}
 			public getTypeButton(data: any): void {
 				let self = this,
-					changeClockArt = data.buttonType.stampType == null ? null: data.buttonType.stampType.changeClockArt,
-					changeCalArt = data.buttonType.stampType == null ? null: data.buttonType.stampType.changeCalArt,
-					setPreClockArt = data.buttonType.stampType == null ? null: data.buttonType.stampType.setPreClockArt,
-					changeHalfDay = data.buttonType.stampType == null ? null: data.buttonType.stampType.changeHalfDay,
+					changeClockArt = data.buttonType.stampType == null ? null : data.buttonType.stampType.changeClockArt,
+					changeCalArt = data.buttonType.stampType == null ? null : data.buttonType.stampType.changeCalArt,
+					setPreClockArt = data.buttonType.stampType == null ? null : data.buttonType.stampType.setPreClockArt,
+					changeHalfDay = data.buttonType.stampType == null ? null : data.buttonType.stampType.changeHalfDay,
 					reservationArt = data.buttonType.reservationArt;
 				let typeNumber = self.checkType(changeClockArt, changeCalArt, setPreClockArt, changeHalfDay, reservationArt);
 				self.selectedDay(typeNumber);
 				self.selectedDayOld(typeNumber);
 			}
 
+			checkUseWorkPlace(type: number) {
+				const vm = this;
+				switch (type) {
+					case 1:
+						vm.supportWorkPlaceEnable(true);
+						break;
+					case 2:
+						vm.supportWorkPlaceEnable(true);
+						break;
+					case 3:
+						vm.supportWorkPlaceEnable(true);
+						break;
+					case 4:
+						vm.supportWorkPlaceEnable(true);
+						break;
+					case 5:
+						vm.supportWorkPlaceEnable(true);
+						break;
+					case 6:
+						vm.supportWorkPlaceEnable(true);
+						break;
+					case 7:
+						vm.supportWorkPlaceEnable(true);
+						break;
+					case 12:
+						vm.supportWorkPlaceEnable(true);
+						break;
+					case 13:
+						vm.supportWorkPlaceEnable(true);
+						break;
+					case 14:
+						vm.supportWorkPlaceEnable(true);
+						break;
+					case 15:
+						vm.supportWorkPlaceEnable(true);
+						break;
+					case 17:
+						vm.supportWorkPlaceEnable(true);
+						break;
+					case 18:
+						vm.supportWorkPlaceEnable(true);
+						break;
+					default:
+						vm.supportWorkPlaceEnable(false);
+						break;
+				}
+			}
 
 			public checkType(changeClockArt: number, changeCalArt: number, setPreClockArt: number, changeHalfDay: any, reservationArt: number): number {
 				if (changeCalArt == 0 && setPreClockArt == 0 && (changeHalfDay == false || changeHalfDay == 0) && reservationArt == 0) {
@@ -357,9 +449,9 @@ module nts.uk.at.view.kdp010.i {
 
 			}
 
-            /**
-             * Close dialog
-             */
+			/**
+			 * Close dialog
+			 */
 			public closeDialog(): void {
 				let self = this;
 				nts.uk.ui.windows.close();
@@ -515,11 +607,12 @@ module nts.uk.at.view.kdp010.i {
 		setPreClockArt: number;
 		changeClockArt: number;
 		changeCalArt: number;
+		taskChoiceArt: number | null;
 	}
-	__viewContext.ready(function() {
-        var screenModel = new viewmodel.ScreenModel();
-        screenModel.startPage().done(function() {
-            __viewContext.bind(screenModel);
-        });   
-    });
+	__viewContext.ready(function () {
+		var screenModel = new viewmodel.ScreenModel();
+		screenModel.startPage().done(function () {
+			__viewContext.bind(screenModel);
+		});
+	});
 }

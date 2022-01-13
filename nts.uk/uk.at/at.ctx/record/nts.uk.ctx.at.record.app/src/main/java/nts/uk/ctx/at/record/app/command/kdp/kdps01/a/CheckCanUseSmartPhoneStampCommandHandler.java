@@ -32,12 +32,10 @@ import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampDakokuRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.CanEngravingUsed;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.MakeUseJudgmentResults;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.StampFunctionAvailableService;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
 import nts.uk.ctx.at.shared.dom.adapter.holidaymanagement.CompanyAdapter;
 import nts.uk.ctx.at.shared.dom.adapter.holidaymanagement.CompanyImport622;
 import nts.uk.ctx.at.shared.dom.dailyattdcal.converter.DailyRecordShareFinder;
@@ -76,9 +74,6 @@ public class CheckCanUseSmartPhoneStampCommandHandler extends CommandHandlerWith
 	private EmployeeRecordAdapter sysEmpPub;
 
 	@Inject
-	private StampRecordRepository stampRecordRepo;
-
-	@Inject
 	private StampDakokuRepository stampDakokuRepo;
 
 	@Inject
@@ -100,7 +95,7 @@ public class CheckCanUseSmartPhoneStampCommandHandler extends CommandHandlerWith
 	protected CheckCanUseSmartPhoneStampResult handle(CommandHandlerContext<CheckCanUseSmartPhoneStampCommand> context) {
 
 		StampFunctionAvailableServiceRequireImpl require = new StampFunctionAvailableServiceRequireImpl(stampUsageRepo,
-				stampCardRepo, stampCardEditRepo, companyAdapter, sysEmpPub, stampRecordRepo, stampDakokuRepo,
+				stampCardRepo, stampCardEditRepo, companyAdapter, sysEmpPub, stampDakokuRepo,
 				temporarilyReflectStampDailyAttd, getMngInfoFromEmpIDListAdapter, dailyRecordShareFinder,
 				createDailyResults, timeReflectFromWorkinfo);
 
@@ -155,9 +150,6 @@ public class CheckCanUseSmartPhoneStampCommandHandler extends CommandHandlerWith
 		private EmployeeRecordAdapter sysEmpPub;
 
 		@Inject
-		private StampRecordRepository stampRecordRepo;
-
-		@Inject
 		private StampDakokuRepository stampDakokuRepo;
 
 		private TemporarilyReflectStampDailyAttd temporarilyReflectStampDailyAttd;
@@ -201,11 +193,6 @@ public class CheckCanUseSmartPhoneStampCommandHandler extends CommandHandlerWith
 		}
 
 		@Override
-		public void insert(StampRecord stampRecord) {
-			this.stampRecordRepo.insert(stampRecord);
-		}
-
-		@Override
 		public void insert(Stamp stamp) {
 			this.stampDakokuRepo.insert(stamp);
 		}
@@ -213,12 +200,6 @@ public class CheckCanUseSmartPhoneStampCommandHandler extends CommandHandlerWith
 		@Override
 		public Optional<StampCard> getByCardNoAndContractCode(String stampNumber, String contractCode) {
 			return this.stampCardRepo.getByCardNoAndContractCode(stampNumber, contractCode);
-		}
-
-		@Override
-		public boolean existsStamp(ContractCode contractCode, StampNumber stampNumber, GeneralDateTime dateTime,
-				ChangeClockArt changeClockArt) {
-			return stampDakokuRepo.existsStamp(contractCode, stampNumber, dateTime, changeClockArt);
 		}
 
 		@Override
@@ -253,6 +234,12 @@ public class CheckCanUseSmartPhoneStampCommandHandler extends CommandHandlerWith
 				StampReflectRangeOutput stampReflectRangeOutput, IntegrationOfDaily integrationOfDaily,
 				ChangeDailyAttendance changeDailyAtt) {
 			return temporarilyReflectStampDailyAttd.reflectStamp(companyId, stamp, stampReflectRangeOutput, integrationOfDaily, changeDailyAtt);
+		}
+		
+		@Override
+		public boolean existsStamp(ContractCode contractCode, StampNumber stampNumber, GeneralDateTime dateTime,
+				ChangeClockAtr changeClockArt) {
+			return stampDakokuRepo.existsStamp(contractCode, stampNumber, dateTime, changeClockArt);
 		}
 	}
 

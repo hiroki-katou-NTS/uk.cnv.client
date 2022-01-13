@@ -39,18 +39,11 @@ public class TopPageSettingDto {
 	 **/
 	private String loginMenuCode;
 	
-	/** 
-	 * The switching date. 
-	 * 	切換日
-	 **/
-	private int switchingDate;
-	
 	public static TopPageSettingDto fromDomain(TopPageSettings domain) {
 		return TopPageSettingDto.builder()
 				.loginMenuCode(domain.getMenuLogin().getLoginMenuCode().v())
 				.menuClassification(domain.getMenuLogin().getMenuClassification().value)
 				.system(domain.getMenuLogin().getSystem().value)
-				.switchingDate(domain.getSwitchingDate().v())
 				.topMenuCode(domain.getTopMenuCode().v())
 				.build();
 	}

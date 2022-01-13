@@ -11,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.Getter;
 import lombok.Setter;
 import nts.uk.ctx.at.shared.dom.common.TimeOfDay;
@@ -52,11 +54,11 @@ public class KclmtCompensLeaveCom extends ContractUkJpaEntity implements Seriali
 
     /** 管理区分 */
     @Column(name = "MANAGE_ATR")
-    public int manageAtr;
+    public boolean manageAtr;
     
     /** 紐付け管理区分 */
     @Column(name = "LINK_MNG_ATR")
-    public int linkMngAtr;
+    public boolean linkMngAtr;
     
     /** 代休管理設定.取得と使用方法.休暇使用期限 */
     @Column(name = "EXPIRATION_USE_SET")
@@ -76,7 +78,7 @@ public class KclmtCompensLeaveCom extends ContractUkJpaEntity implements Seriali
     
     /** 代休管理設定.時間代休の消化単位.管理区分 */
     @Column(name = "TIME_MANAGE_ATR")
-    public int timeManageAtr;
+    public boolean timeManageAtr;
     
     /** 代休管理設定.時間代休の消化単位.消化単位 */
     @Column(name = "DIGESTION_UNIT")
@@ -84,11 +86,11 @@ public class KclmtCompensLeaveCom extends ContractUkJpaEntity implements Seriali
     
     /** 代休管理設定.発生設定.代休発生に必要な残業時間.使用区分 */ 
     @Column(name = "OCCURR_OT_USE_ATR")
-    public int occurrOtUseAtr;
+    public boolean occurrOtUseAtr;
     
     /** 代休管理設定.発生設定.代休発生に必要な残業時間.時間設定.時間区分 */
     @Column(name = "OCCURR_OT_TIME_ATR")
-    public int deadlCheckMonth;
+    public boolean deadlCheckMonth;
     
     /** 代休管理設定.発生設定.代休発生に必要な残業時間.時間設定.指定時間.一日の時間 */
     @Column(name = "DES_OT_ONEDAY_TIME")
@@ -104,11 +106,11 @@ public class KclmtCompensLeaveCom extends ContractUkJpaEntity implements Seriali
     
     /** 代休管理設定.発生設定.代休発生に必要な休日出勤時間.使用区分 */
     @Column(name = "OCCURR_HD_WORK_USE_ATR")
-    public int occurrHDWorkUseAtr;
+    public boolean occurrHDWorkUseAtr;
     
     /** 代休管理設定.発生設定.代休発生に必要な休日出勤時間.時間設定.時間区分 */
     @Column(name = "OCCURR_HD_WORK_TIME_ATR")
-    public int occurrHDWorkTimeAtr;
+    public boolean occurrHDWorkTimeAtr;
     
     /** 代休管理設定.発生設定.代休発生に必要な休日出勤時間.時間設定.指定時間.一日の時間 */
     @Column(name = "DES_HD_WORK_ONEDAY_TIME")
@@ -156,31 +158,31 @@ public class KclmtCompensLeaveCom extends ContractUkJpaEntity implements Seriali
     	
     	
     	HolidayWorkHourRequired holidayWorkHourRequired = new HolidayWorkHourRequired(
-    			this.occurrHDWorkUseAtr==1?true:false, 
+    			this.occurrHDWorkUseAtr, 
 				new TimeSetting(
 						new CertainPeriodOfTime(new TimeOfDay(this.cerTainHDWorkTime)),
 						new DesignatedTime(new OneDayTime(this.desHDWorkOneDayTime), new OneDayTime(this.desHDWorkHalfDayTime)),
-						EnumTimeDivision.valueOf(this.occurrHDWorkTimeAtr)));
+						EnumTimeDivision.valueOf(BooleanUtils.toInteger(this.occurrHDWorkTimeAtr))));
     	OvertimeHourRequired overtimeHourRequired = new OvertimeHourRequired(
-				this.occurrOtUseAtr==1?true:false, 
+				this.occurrOtUseAtr, 
 				new TimeSetting(
 						new CertainPeriodOfTime(new TimeOfDay(this.certainOtTime)),
 						new DesignatedTime(new OneDayTime(this.desOtOneDayTime), new OneDayTime(this.desOtHalfDayTime)),
-						EnumTimeDivision.valueOf(this.deadlCheckMonth)));
+						EnumTimeDivision.valueOf(BooleanUtils.toInteger(this.deadlCheckMonth))));
     	//発生設定
     	SubstituteHolidaySetting substituteHolidaySetting = new SubstituteHolidaySetting(holidayWorkHourRequired, overtimeHourRequired);
     	
     	// 時間代休の消化単位
     	CompensatoryDigestiveTimeUnit compensatoryDigestiveTimeUnit = new CompensatoryDigestiveTimeUnit(
-    			ManageDistinct.valueOf(this.timeManageAtr), 
+    			ManageDistinct.valueOf(BooleanUtils.toInteger(this.timeManageAtr)), 
     			TimeDigestiveUnit.valueOf(this.digestionUnit));
     	return new CompensatoryLeaveComSetting(
     			this.cid, 
-    			ManageDistinct.valueOf(this.manageAtr), 
+    			ManageDistinct.valueOf(BooleanUtils.toInteger(this.manageAtr)), 
     			compensatoryAcquisitionUse,
     			substituteHolidaySetting, 
     			compensatoryDigestiveTimeUnit, 
-    			ManageDistinct.valueOf(this.linkMngAtr));
+    			ManageDistinct.valueOf(BooleanUtils.toInteger(this.linkMngAtr)));
     }
 
    
@@ -216,7 +218,7 @@ public class KclmtCompensLeaveCom extends ContractUkJpaEntity implements Seriali
      */
     public KclmtCompensLeaveCom(String cid, Integer manageAtr) {
         this.cid = cid;
-        this.manageAtr = manageAtr;
+        this.manageAtr = BooleanUtils.toBoolean(manageAtr);
     }
 
     /*
@@ -265,21 +267,21 @@ public class KclmtCompensLeaveCom extends ContractUkJpaEntity implements Seriali
 			int occurrHDWorkTimeAtr, int desHDWorkOneDayTime, int desHDWorkHalfDayTime, int cerTainHDWorkTime) {
 		super();
 		this.cid = cid;
-		this.manageAtr = manageAtr;
-		this.linkMngAtr = linkMngAtr;
+		this.manageAtr = BooleanUtils.toBoolean(manageAtr);
+		this.linkMngAtr = BooleanUtils.toBoolean(linkMngAtr);
 		this.expirationUseSet = expirationUseSet;
 		this.prepaidGetAllow = prepaidGetAllow;
 		this.expDateMngMethod = expDateMngMethod;
 		this.expCheckMonthNumber = expCheckMonthNumber;
-		this.timeManageAtr = timeManageAtr;
+		this.timeManageAtr = BooleanUtils.toBoolean(timeManageAtr);
 		this.digestionUnit = digestionUnit;
-		this.occurrOtUseAtr = occurrOtUseAtr;
-		this.deadlCheckMonth = deadlCheckMonth;
+		this.occurrOtUseAtr = BooleanUtils.toBoolean(occurrOtUseAtr);
+		this.deadlCheckMonth = BooleanUtils.toBoolean(deadlCheckMonth);
 		this.desOtOneDayTime = desOtOneDayTime;
 		this.desOtHalfDayTime = desOtHalfDayTime;
 		this.certainOtTime = certainOtTime;
-		this.occurrHDWorkUseAtr = occurrHDWorkUseAtr;
-		this.occurrHDWorkTimeAtr = occurrHDWorkTimeAtr;
+		this.occurrHDWorkUseAtr = BooleanUtils.toBoolean(occurrHDWorkUseAtr);
+		this.occurrHDWorkTimeAtr = BooleanUtils.toBoolean(occurrHDWorkTimeAtr);
 		this.desHDWorkOneDayTime = desHDWorkOneDayTime;
 		this.desHDWorkHalfDayTime = desHDWorkHalfDayTime;
 		this.cerTainHDWorkTime = cerTainHDWorkTime;

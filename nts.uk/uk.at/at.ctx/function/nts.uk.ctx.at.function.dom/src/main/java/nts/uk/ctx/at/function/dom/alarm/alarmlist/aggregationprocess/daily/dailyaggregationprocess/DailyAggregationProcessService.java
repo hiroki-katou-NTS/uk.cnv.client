@@ -704,7 +704,7 @@ public class DailyAggregationProcessService {
 			}
 			return new DailyAttendanceItemAdapterDto(item.getCompanyId(), item.getAttendanceItemId(), name,
 					item.getDisplayNumber(), item.getUserCanUpdateAtr(), item.getDailyAttendanceAtr(),
-					item.getNameLineFeedPosition());
+					item.getNameLineFeedPosition(), item.getDisplayName());
 		}).collect(Collectors.toList());
 	}
 

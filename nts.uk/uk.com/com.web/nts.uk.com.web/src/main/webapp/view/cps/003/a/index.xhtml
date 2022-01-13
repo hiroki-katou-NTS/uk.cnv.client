@@ -25,10 +25,12 @@
 
 		<ui:define name="content">
 			<div id="functions-area">
+				<a tabindex="1" class="goback" 
+					data-bind="ntsLinkButton: { jump: '/view/cps/018/a/index.xhtml' }, visible: $vm.isFromCPS018">#{i18n.getText('CPS003_134')}</a>
 				<button type="button" class="proceed" data-bind="click: $vm.register, enable: employees().length > 0 &amp;&amp; !hasError()" tabindex="1">#{i18n.getText('CPS003_7')}</button>
-				<button type="button" data-bind="click: $vm.checkError, enable: employees().length > 0" tabindex="2">#{i18n.getText('CPS003_8')}</button>
-				<button id="export-file" type="button" data-bind="click: exportFile, enable: employees().length > 0 &amp;&amp; !hasError()" tabindex="3">#{i18n.getText('CPS003_9')}</button>
-				<button type="button" data-bind="click: openBDialog, enable: !hasError()" tabindex="3">#{i18n.getText('CPS003_10')}</button>
+				<button type="button" data-bind="click: $vm.checkError, enable: employees().length > 0 &amp;&amp; !isCS00100()" tabindex="2">#{i18n.getText('CPS003_8')}</button>
+				<button id="export-file" type="button" data-bind="click: exportFile, enable: employees().length > 0 &amp;&amp; !hasError() &amp;&amp; !isCS00100()" tabindex="3">#{i18n.getText('CPS003_9')}</button>
+				<button type="button" data-bind="click: openBDialog, enable: !hasError() &amp;&amp; !isCS00100()" tabindex="3">#{i18n.getText('CPS003_10')}</button>
 			</div>
 			<div id="contents-area" class="cf"
 				data-bind="let: {

@@ -37,6 +37,6 @@ public class KrcdtClosureSttMngPk {
 
 	// 締め日
 	@Column(name = "IS_LAST_DAY")
-	public int isLastDay;
+	public boolean isLastDay;
 
 }

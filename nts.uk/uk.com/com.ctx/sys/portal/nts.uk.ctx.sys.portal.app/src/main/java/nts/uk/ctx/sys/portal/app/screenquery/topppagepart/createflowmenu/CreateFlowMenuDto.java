@@ -12,12 +12,12 @@ import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.CreateFlowMenu;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.DisplayName;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.FileAttachmentSetting;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.FileName;
-import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.FixedClassification;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.FontSetting;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.FontSize;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.HorizontalAndVerticalPosition;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.HorizontalAndVerticalSize;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.HorizontalPosition;
+import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.ImageInformation;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.ImageSetting;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.LabelContent;
 import nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu.LabelSetting;
@@ -106,7 +106,13 @@ public class CreateFlowMenuDto implements CreateFlowMenu.MementoSetter, CreateFl
 						.menuName(domain.getMenuName().v()).row(domain.getSizeAndPosition().getRow().v())
 						.systemType(domain.getSystemType().value)
 						.verticalPosition(domain.getFontSetting().getPosition().getVerticalPosition().value)
-						.width(domain.getSizeAndPosition().getWidth().v()).build())
+						.width(domain.getSizeAndPosition().getWidth().v())
+						.textColor(domain.getFontSetting().getSizeAndColor().getFontColor().map(ColorCode::v).orElse(""))
+						.isFixed(domain.getImageInformation().map(data -> data.getIsFixed().value).orElse(null))
+						.ratio(domain.getImageInformation().map(ImageInformation::getRatio).orElse(null))
+						.fileId(domain.getImageInformation().map(data -> data.getFileId().orElse("")).orElse(""))
+						.fileName(domain.getImageInformation().map(data -> data.getFileName().map(FileName::v).orElse("")).orElse(""))
+						.build())
 				.collect(Collectors.toList());
 	}
 
@@ -139,13 +145,11 @@ public class CreateFlowMenuDto implements CreateFlowMenu.MementoSetter, CreateFl
 	public void setImageSettings(List<ImageSetting> imageSettings, String contractCode) {
 		this.imageData = imageSettings.stream()
 				.map(domain -> ImageSettingDto.builder().column(domain.getSizeAndPosition().getColumn().v())
-						.fileId(domain.getFileId().orElse(null))
-						.fileName(domain.getFileName().map(FileName::v).orElse(null))
-						.height(domain.getSizeAndPosition().getHeight().v()).isFixed(domain.getIsFixed().value)
-						.ratio(domain.getRatio())
+						.column(domain.getSizeAndPosition().getColumn().v()).height(domain.getSizeAndPosition().getHeight().v())
 						.row(domain.getSizeAndPosition().getRow().v()).width(domain.getSizeAndPosition().getWidth().v())
-						.build())
-				.collect(Collectors.toList());
+						.isFixed(domain.getImageInformation().getIsFixed().value).ratio(domain.getImageInformation().getRatio())
+						.fileName(domain.getImageInformation().getFileName().map(FileName::v).orElse(""))
+						.fileId(domain.getImageInformation().getFileId().orElse("")).build()).collect(Collectors.toList());
 	}
 
 	@Override
@@ -187,8 +191,8 @@ public class CreateFlowMenuDto implements CreateFlowMenu.MementoSetter, CreateFl
 		return this.menuData.stream()
 				.map(dto -> MenuSetting.builder()
 						.fontSetting(new FontSetting(
-								new SizeAndColor(dto.getBold() == SizeAndColor.BOLD, Optional.empty(), Optional.empty(),
-										new FontSize(dto.getFontSize())),
+								new SizeAndColor(dto.getBold() == SizeAndColor.BOLD, Optional.empty(),
+										Optional.ofNullable(dto.getTextColor()).map(ColorCode::new), new FontSize(dto.getFontSize())),
 								new HorizontalAndVerticalPosition(
 										EnumAdaptor.valueOf(dto.getHorizontalPosition(), HorizontalPosition.class),
 										EnumAdaptor.valueOf(dto.getVerticalPosition(), VerticalPosition.class))))
@@ -198,7 +202,10 @@ public class CreateFlowMenuDto implements CreateFlowMenu.MementoSetter, CreateFl
 								new HorizontalAndVerticalSize(dto.getRow()),
 								new HorizontalAndVerticalSize(dto.getHeight()),
 								new HorizontalAndVerticalSize(dto.getWidth())))
-						.systemType(EnumAdaptor.valueOf(dto.getSystemType(), System.class)).build())
+						.systemType(EnumAdaptor.valueOf(dto.getSystemType(), System.class))
+						.imageInformation(Optional.ofNullable(ImageInformation.createFromJavatype(dto.getIsFixed(),
+								dto.getRatio(), dto.getFileId(), dto.getFileName())))
+						.build())
 				.collect(Collectors.toList());
 	}
 
@@ -235,15 +242,13 @@ public class CreateFlowMenuDto implements CreateFlowMenu.MementoSetter, CreateFl
 	@Override
 	public List<ImageSetting> getImageSettings() {
 		return this.imageData.stream()
-				.map(dto -> ImageSetting.builder().fileId(Optional.ofNullable(dto.getFileId()))
-						.fileName(dto.getFileName() != null ? Optional.of(new FileName(dto.getFileName())) : Optional.empty())
-						.isFixed(EnumAdaptor.valueOf(dto.getIsFixed(), FixedClassification.class))
-						.ratio(dto.getRatio())
+				.map(dto -> ImageSetting.builder()
 						.sizeAndPosition(new SizeAndPosition(new HorizontalAndVerticalSize(dto.getColumn()),
 								new HorizontalAndVerticalSize(dto.getRow()), new HorizontalAndVerticalSize(dto.getHeight()),
 								new HorizontalAndVerticalSize(dto.getWidth())))
-						.build())
-				.collect(Collectors.toList());
+						.imageInformation(ImageInformation.createFromJavatype(dto.getIsFixed(), dto.getRatio(),
+								dto.getFileId(), dto.getFileName()))
+						.build()).collect(Collectors.toList());
 	}
 
 	@Override

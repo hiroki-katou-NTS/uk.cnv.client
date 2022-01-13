@@ -18,6 +18,7 @@ import nts.uk.ctx.workflow.dom.approvermanagement.workroot.EmploymentRootAtr;
 import nts.uk.ctx.workflow.dom.approvermanagement.workroot.PersonApprovalRoot;
 import nts.uk.ctx.workflow.dom.approvermanagement.workroot.PersonApprovalRootRepository;
 import nts.uk.ctx.workflow.dom.approvermanagement.workroot.SystemAtr;
+import nts.uk.ctx.workflow.infra.entity.approvermanagement.workroot.WwfmtAppover;
 import nts.uk.ctx.workflow.infra.entity.approvermanagement.workroot.WwfmtApprovalRoutePs;
 import nts.uk.ctx.workflow.infra.entity.approvermanagement.workroot.WwfmtPsApprovalRootPK;
 /**
@@ -239,6 +240,37 @@ public class JpaPersonApprovalRootRepository extends JpaRepository implements Pe
 				+ " AND c.sysAtr = 1"
 				+ " AND c.employmentRootAtr = 5"
 				+ " AND c.busEventId IN :lstEventID";
+		
+		private static final String FIND_LIST_SID_REGISTERED = "SELECT m FROM WwfmtApprovalRoutePs m"
+				+ " JOIN WwfmtAppover d "
+				+ "		ON m.wwfmtPsApprovalRootPK.approvalId = d.wwfmtAppoverPK.approvalId"
+				+ "		AND d.employeeId = :sid"
+				+ " WHERE m.startDate <= :baseDate"
+				+ "	AND m.endDate >= :baseDate";
+		
+		private static final String FIND_LIST_APPOVER = "SELECT d FROM WwfmtAppover d"
+				+ " JOIN WwfmtApprovalRoutePs m"
+				+ "		ON m.wwfmtPsApprovalRootPK.approvalId = d.wwfmtAppoverPK.approvalId"
+				+ " WHERE m.wwfmtPsApprovalRootPK.employeeId = :sid"
+				+ " AND m.startDate <= :baseDate"
+				+ "	AND m.endDate >= :baseDate";
+		
+		@Override
+		public List<String> getListSidRegistered(String sid, GeneralDate baseDate) {
+			return this.queryProxy().query(FIND_LIST_SID_REGISTERED, WwfmtApprovalRoutePs.class)
+					.setParameter("sid", sid)
+					.setParameter("baseDate", baseDate)
+					.getList(item -> item.wwfmtPsApprovalRootPK.employeeId);
+		}
+		
+		@Override
+		public List<String> getListAppover(String sid, GeneralDate baseDate) {
+			return this.queryProxy().query(FIND_LIST_APPOVER, WwfmtAppover.class)
+					.setParameter("sid", sid)
+					.setParameter("baseDate", baseDate)
+					.getList(item -> item.employeeId);
+		}
+		
 	/**
 	 * get all Person Approval Root
 	 * @param companyId

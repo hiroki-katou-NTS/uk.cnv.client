@@ -27,10 +27,6 @@ public class UserInfoUseMethodTest {
 
     SettingContactInformationDto settingContactInformationDto = null;
 
-    List<EmailDestinationFunctionDto> emailDestinationFunctionDtos = null;
-
-    EmailDestinationFunctionDto emailDestinationFunctionDto = null;
-
     List<OtherContactDto> otherContactDtos = null;
 
     UserInfoUseMethodDto domainDto1 = null;
@@ -41,23 +37,6 @@ public class UserInfoUseMethodTest {
 
     @Before
     public void initTest() {
-        emailDestinationFunctionDtos = new ArrayList<>();
-        emailDestinationFunctionDtos.add(EmailDestinationFunctionDto.builder()
-                .emailClassification(0)
-                .functionIds(new ArrayList<>())
-                .build());
-        emailDestinationFunctionDtos.add(EmailDestinationFunctionDto.builder()
-                .emailClassification(1)
-                .functionIds(new ArrayList<>())
-                .build());
-        emailDestinationFunctionDtos.add(EmailDestinationFunctionDto.builder()
-                .emailClassification(2)
-                .functionIds(new ArrayList<>())
-                .build());
-        emailDestinationFunctionDtos.add(EmailDestinationFunctionDto.builder()
-                .emailClassification(3)
-                .functionIds(new ArrayList<>())
-                .build());
 
         otherContactDtos = new ArrayList<>();
         otherContactDtos.add(OtherContactDto.builder()
@@ -136,7 +115,6 @@ public class UserInfoUseMethodTest {
                 .useOfPassword(1)
                 .useOfNotice(1)
                 .useOfLanguage(1)
-                .emailDestinationFunctionDtos(emailDestinationFunctionDtos)
                 .settingContactInformationDto(settingContactInformationDto)
                 .build();
 
@@ -146,8 +124,6 @@ public class UserInfoUseMethodTest {
         domain1.setMemento(domainDto2);
 
         emailDestinationFunction = new EmailDestinationFunction(EmailClassification.valueOf(0), new ArrayList<>());
-        emailDestinationFunctionDto = new EmailDestinationFunctionDto(0, new ArrayList<>());
-
         settingContactInformation = SettingContactInformation.builder().build();
     }
 

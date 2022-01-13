@@ -360,7 +360,8 @@
                     companyCode: vm.selectedCompanyCode(),
                     companyName: vm.companyName(),
                     contractCode: vm.contractCode(),
-                    employeeCode: vm.employeeCode()
+                    employeeCode: vm.employeeCode(),
+                    isFromD: true
                 }, true);
 
                 vm.$window
@@ -369,7 +370,8 @@
                         companyCode: vm.selectedCompanyCode(),
                         companyName: vm.companyName(),
                         contractCode: vm.contractCode(),
-                        employeeCode: vm.employeeCode()
+                        employeeCode: vm.employeeCode(),
+                        isFromD: true
                     }, {
                         width: 500,
                         height: 400

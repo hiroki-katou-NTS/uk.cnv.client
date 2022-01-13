@@ -38,6 +38,7 @@ export interface IOptionalItemDto {
     performanceAtr: number | null;
     unit: string;
     usageAtr: number | null;
+    inputCheck: boolean;
 }
 
 export interface IControlOfAttendanceItemsDto {
@@ -70,7 +71,7 @@ export interface OptionalItemApplication {
     timeUpper: number | null;
     upperCheck: boolean | null;
     unit: string;
-    inputUnitOfTimeItem: number | null;
+    inputUnitOfItem: number | null;
     optionalItemName: string;
     optionalItemNo: number | null;
     optionalItemAtr: number | null;
@@ -79,6 +80,7 @@ export interface OptionalItemApplication {
     amount: number | null;
     description: string | null;
     dispOrder: number | null;
+    inputCheckbox: boolean;
 }
 
 interface optionalItems {

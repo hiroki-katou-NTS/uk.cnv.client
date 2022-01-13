@@ -13,8 +13,19 @@ import java.util.stream.IntStream;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import nts.arc.primitive.PrimitiveValueBase;
+import nts.uk.ctx.at.request.dom.adapter.CalculationParams;
+import nts.uk.ctx.at.request.dom.adapter.OneDayAttendanceTimeTempCalcAdapter;
+import nts.uk.ctx.at.request.dom.application.overtime.*;
+import nts.uk.ctx.at.shared.dom.WorkInformation;
+import nts.uk.ctx.at.shared.dom.common.TimeZoneWithWorkNo;
+import nts.uk.ctx.at.shared.dom.worktime.predset.PredetemineTimeSetting;
+import nts.uk.ctx.at.shared.dom.worktime.predset.PredetemineTimeSettingRepository;
+import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSetting;
+import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSettingRepository;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.util.Strings;
 
 import nts.arc.enums.EnumAdaptor;
@@ -24,7 +35,6 @@ import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.request.dom.application.Application;
-import nts.uk.ctx.at.request.dom.application.ApplicationApprovalService;
 import nts.uk.ctx.at.request.dom.application.ApplicationRepository;
 import nts.uk.ctx.at.request.dom.application.ApplicationType;
 import nts.uk.ctx.at.request.dom.application.EmploymentRootAtr;
@@ -66,16 +76,6 @@ import nts.uk.ctx.at.request.dom.application.lateleaveearly.ArrivedLateLeaveEarl
 import nts.uk.ctx.at.request.dom.application.lateleaveearly.ArrivedLateLeaveEarlyRepository;
 import nts.uk.ctx.at.request.dom.application.optional.OptionalItemApplication;
 import nts.uk.ctx.at.request.dom.application.optional.OptionalItemApplicationRepository;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOverTime;
-import nts.uk.ctx.at.request.dom.application.overtime.AppOverTimeRepository;
-import nts.uk.ctx.at.request.dom.application.overtime.ApplicationTime;
-import nts.uk.ctx.at.request.dom.application.overtime.AttendanceType_Update;
-import nts.uk.ctx.at.request.dom.application.overtime.CalculationResult;
-import nts.uk.ctx.at.request.dom.application.overtime.OverStateOutput;
-import nts.uk.ctx.at.request.dom.application.overtime.OverTimeAtr;
-import nts.uk.ctx.at.request.dom.application.overtime.OvertimeAppAtr;
-import nts.uk.ctx.at.request.dom.application.overtime.OvertimeApplicationSetting;
-import nts.uk.ctx.at.request.dom.application.overtime.ReasonDivergence;
 import nts.uk.ctx.at.request.dom.application.overtime.CommonAlgorithm.CheckBeforeOutput;
 import nts.uk.ctx.at.request.dom.application.overtime.CommonAlgorithm.ICommonAlgorithmOverTime;
 import nts.uk.ctx.at.request.dom.application.overtime.CommonAlgorithm.InfoBaseDateOutput;
@@ -120,9 +120,6 @@ public class OvertimeServiceImpl implements OvertimeService {
 	
 	@Inject
 	private EmployeeRequestAdapter employeeRequestAdapter;
-	
-	@Inject
-	ApplicationApprovalService appRepository;
 	
 	@Inject
 	private CollectAchievement collectAchievement;
@@ -177,6 +174,15 @@ public class OvertimeServiceImpl implements OvertimeService {
 	private RecruitmentAppRepository recruitmentAppRepository;
 	@Inject
 	private OptionalItemApplicationRepository optionalItemApplicationRepository;
+
+	@Inject
+	private WorkTimeSettingRepository worktimeSetRepo;
+
+	@Inject
+	private OneDayAttendanceTimeTempCalcAdapter attendanceCalcAdapter;
+
+	@Inject
+	private PredetemineTimeSettingRepository predetemineTimeSetRepo;
 	
 	
 	@Override
@@ -197,29 +203,49 @@ public class OvertimeServiceImpl implements OvertimeService {
 		}
 	}
 
-	
-	
-
-
-
-	
-
-	
 
 	@Override
 	public DisplayInfoOverTime calculate(
 			String companyId,
 			String employeeId,
 			Optional<GeneralDate> dateOp,
+			OvertimeAppAtr overtimeAppAtr,
 			PrePostInitAtr prePostInitAtr,
 			OvertimeLeaveAppCommonSet overtimeLeaveAppCommonSet,
 			ApplicationTime advanceApplicationTime,
 			ApplicationTime achieveApplicationTime,
 			WorkContent workContent,
 			OvertimeAppSet overtimeAppSet,
-			Boolean agent) {
+			Boolean agent,
+			List<OvertimeHour> overtimeHours,
+			List<OvertimeReason> overtimeReasons,
+			Optional<AchievementDetail> opAchievementDetail) {
 		DisplayInfoOverTime output = new DisplayInfoOverTime();
 		output.setCalculatedFlag(CalculatedFlag.UNCALCULATED);
+
+		if (overtimeAppAtr == OvertimeAppAtr.MULTIPLE_OVERTIME && dateOp.isPresent()) {
+			List<TimeZoneWithWorkNo> workHourList = new ArrayList<>();
+			for (int i = 0; i < workContent.getTimeZones().size(); i++) {
+				workHourList.add(new TimeZoneWithWorkNo(
+						i + 1,
+						workContent.getTimeZones().get(i).getStart().v(),
+						workContent.getTimeZones().get(i).getEnd().v()
+				));
+			}
+			Pair<List<TimeZoneWithWorkNo>, List<BreakTimeSheet>> result = this.getWorkingHoursAndBreakHours(
+					companyId,
+					employeeId,
+					dateOp.get(),
+					overtimeHours,
+					overtimeReasons,
+					workHourList,
+					new WorkInformation(workContent.getWorkTypeCode().orElse(null), workContent.getWorkTimeCode().orElse(null)),
+					opAchievementDetail
+			);
+			workContent.setTimeZones(result.getLeft().stream().map(i -> new TimeZone(i.getTimeZone().getStartTime(), i.getTimeZone().getEndTime())).collect(Collectors.toList()));
+			workContent.setBreakTimes(result.getRight());
+		}
+
 		// 計算処理
 		CaculationOutput caculationOutput = this.getCalculation(
 				companyId,
@@ -238,6 +264,8 @@ public class OvertimeServiceImpl implements OvertimeService {
 			output.setCalculationResultOp(Optional.ofNullable(caculationOutput.getCalculationResult()));			
 			output.setCalculatedFlag(caculationOutput.getCalculatedFlag());
 		}
+		output.setCalculatedBreakTimes(workContent.getBreakTimes());
+		output.setCalculatedWorkTimes(workContent.getTimeZones());
 		// 残業時間帯の値と背景色をセット
 		return output;
 	}
@@ -880,7 +908,7 @@ public class OvertimeServiceImpl implements OvertimeService {
 			Optional<Integer> endTimeSPR,
 			Boolean agent
 			) {
-		DisplayInfoOverTime output = new DisplayInfoOverTime();
+		DisplayInfoOverTime output;
 		// 15_初期起動の処理
 		output = this.getInitData(
 				companyId,
@@ -890,61 +918,90 @@ public class OvertimeServiceImpl implements OvertimeService {
 				startTimeSPR,
 				endTimeSPR,
 				agent);
-		
-		
+
+		if (output.getInfoNoBaseDate().getOverTimeAppSet().getApplicationDetailSetting().getTimeCalUse() == NotUseAtr.NOT_USE && overtimeAppAtr == OvertimeAppAtr.MULTIPLE_OVERTIME)
+			throw new BusinessException("Msg_3237");
+
 		Integer prePost = output.getAppDispInfoStartup()
 			.getAppDispInfoWithDateOutput()
 			.getPrePostAtr().value;
+
+		if (overtimeAppAtr == OvertimeAppAtr.MULTIPLE_OVERTIME && dateOp.isPresent()) {
+            output.setLatestMultipleOvertimeApp(appOverTimeRepository.findLatestMultipleOvertimeApp(employeeId, dateOp.get(), EnumAdaptor.valueOf(prePost, PrePostAtr.class)));
+		}
+
 		WorkContent workContent = new WorkContent();
-		workContent.setWorkTypeCode(output.getInfoWithDateApplicationOp()
-										  .map(x -> x.getWorkTypeCD())
-										  .orElse(Optional.empty()));
-		workContent.setWorkTimeCode(
-				output.getInfoWithDateApplicationOp()
-				  .map(x -> x.getWorkTimeCD())
-				  .orElse(Optional.empty()));
-		List<TimeZone> timeZones = new ArrayList<TimeZone>();
-		List<BreakTimeSheet> breakTimes = new ArrayList<BreakTimeSheet>();
-		if (output.getInfoWithDateApplicationOp().isPresent()) {
-			Optional<WorkHours> workHours = output.getInfoWithDateApplicationOp().get().getWorkHours();
-			if (workHours.isPresent()) {
-				if (workHours.get().getStartTimeOp1().isPresent() || workHours.get().getEndTimeOp1().isPresent()) {
-					TimeZone timeZone = new TimeZone(
-							workHours.get().getStartTimeOp1().orElse(null),
-							workHours.get().getEndTimeOp1().orElse(null));
-					timeZones.add(timeZone);
-				}
-				if (workHours.get().getStartTimeOp2().isPresent() || workHours.get().getEndTimeOp2().isPresent()) {
-					TimeZone timeZone = new TimeZone(
-							workHours.get().getStartTimeOp2().orElse(null),
-							workHours.get().getEndTimeOp2().orElse(null));
-					timeZones.add(timeZone);
-				}
+		if (output.getLatestMultipleOvertimeApp().isPresent()) {
+			if (output.getLatestMultipleOvertimeApp().get().getWorkInfoOp().isPresent()) {
+				workContent.setWorkTypeCode(Optional.of(output.getLatestMultipleOvertimeApp().get().getWorkInfoOp().get().getWorkTypeCode().v()));
+				workContent.setWorkTimeCode(output.getLatestMultipleOvertimeApp().get().getWorkInfoOp().get().getWorkTimeCodeNotNull().map(PrimitiveValueBase::v));
 			}
-			Optional<BreakTimeZoneSetting> breakTime = output.getInfoWithDateApplicationOp().get().getBreakTime();
-			if (breakTime.isPresent()) {
-				List<DeductionTime> breakTimeZones = breakTime.get().getTimeZones();
-				breakTimes = IntStream.range(1, (int) breakTimeZones.stream().count())
+			if (output.getLatestMultipleOvertimeApp().get().getWorkHoursOp().isPresent()) {
+				workContent.setTimeZones(output.getLatestMultipleOvertimeApp().get().getWorkHoursOp().get()
+						.stream().map(i -> new TimeZone(
+								i.getTimeZone().getStartTime(),
+								i.getTimeZone().getEndTime()
+						)).collect(Collectors.toList()));
+			}
+			if (output.getLatestMultipleOvertimeApp().get().getBreakTimeOp().isPresent()) {
+				workContent.setBreakTimes(output.getLatestMultipleOvertimeApp().get().getBreakTimeOp().get()
+						.stream().map(i -> new BreakTimeSheet(
+								new BreakFrameNo(i.getWorkNo().v()),
+								i.getTimeZone().getStartTime(),
+								i.getTimeZone().getEndTime()
+						)).collect(Collectors.toList()));
+			}
+		} else {
+			workContent.setWorkTypeCode(output.getInfoWithDateApplicationOp()
+					.map(x -> x.getWorkTypeCD())
+					.orElse(Optional.empty()));
+			workContent.setWorkTimeCode(
+					output.getInfoWithDateApplicationOp()
+							.map(x -> x.getWorkTimeCD())
+							.orElse(Optional.empty()));
+			List<TimeZone> timeZones = new ArrayList<TimeZone>();
+			List<BreakTimeSheet> breakTimes = new ArrayList<BreakTimeSheet>();
+			if (output.getInfoWithDateApplicationOp().isPresent()) {
+				Optional<WorkHours> workHours = output.getInfoWithDateApplicationOp().get().getWorkHours();
+				if (workHours.isPresent()) {
+					if (workHours.get().getStartTimeOp1().isPresent() || workHours.get().getEndTimeOp1().isPresent()) {
+						TimeZone timeZone = new TimeZone(
+								workHours.get().getStartTimeOp1().orElse(null),
+								workHours.get().getEndTimeOp1().orElse(null));
+						timeZones.add(timeZone);
+					}
+					if (workHours.get().getStartTimeOp2().isPresent() || workHours.get().getEndTimeOp2().isPresent()) {
+						TimeZone timeZone = new TimeZone(
+								workHours.get().getStartTimeOp2().orElse(null),
+								workHours.get().getEndTimeOp2().orElse(null));
+						timeZones.add(timeZone);
+					}
+				}
+				Optional<BreakTimeZoneSetting> breakTime = output.getInfoWithDateApplicationOp().get().getBreakTime();
+				if (breakTime.isPresent()) {
+					List<DeductionTime> breakTimeZones = breakTime.get().getTimeZones();
+					breakTimes = IntStream.range(1, (int) breakTimeZones.stream().count())
 							.mapToObj(i -> new BreakTimeSheet(
 									new BreakFrameNo(i),
 									breakTimeZones.get(i).getStart(),
 									breakTimeZones.get(i).getEnd()))
 							.collect(Collectors.toList());
+				}
 			}
+			workContent.setTimeZones(timeZones);
+			workContent.setBreakTimes(breakTimes);
 		}
-		workContent.setTimeZones(timeZones);
-		workContent.setBreakTimes(breakTimes);
 		if (!(CollectionUtil.isEmpty(output.getInfoBaseDateOutput().getWorktypes())
 			|| !output.getAppDispInfoStartup().getAppDispInfoWithDateOutput().getOpWorkTimeLst().isPresent())) {
+			Optional<AchievementDetail> opAchievementDetail = appDispInfoStartupOutput.getAppDispInfoWithDateOutput().getOpActualContentDisplayLst().isPresent()
+					? appDispInfoStartupOutput.getAppDispInfoWithDateOutput().getOpActualContentDisplayLst().get().get(0).getOpAchievementDetail()
+					: Optional.empty();
 			// 計算を実行する
 			DisplayInfoOverTime temp = this.calculate(
 					companyId,
-					output.getAppDispInfoStartup()
-					.getAppDispInfoNoDateOutput()
-					.getEmployeeInfoLst()
-					.get(0)
-					.getSid(),
+					output.getAppDispInfoStartup().getAppDispInfoNoDateOutput().getEmployeeInfoLst().get(0).getSid(),
 					dateOp,
+					overtimeAppAtr,
 					EnumAdaptor.valueOf(prePost, PrePostInitAtr.class),
 					output.getInfoNoBaseDate().getOverTimeAppSet().getOvertimeLeaveAppCommonSet(),
 					output.getAppDispInfoStartup()
@@ -959,12 +1016,16 @@ public class OvertimeServiceImpl implements OvertimeService {
 					.orElse(null),
 					workContent,
 					output.getInfoNoBaseDate().getOverTimeAppSet(),
-					agent
-					);
+					agent,
+					output.getLatestMultipleOvertimeApp().isPresent() && output.getLatestMultipleOvertimeApp().get().getMultipleTimesOp().isPresent() ? output.getLatestMultipleOvertimeApp().get().getMultipleTimesOp().get().getOvertimeHours() : new ArrayList<>(),
+					output.getLatestMultipleOvertimeApp().isPresent() && output.getLatestMultipleOvertimeApp().get().getMultipleTimesOp().isPresent() ? output.getLatestMultipleOvertimeApp().get().getMultipleTimesOp().get().getOvertimeReasons() : new ArrayList<>(),
+					opAchievementDetail
+			);
 			output.setWorkdayoffFrames(temp.getWorkdayoffFrames());
 			output.setCalculationResultOp(temp.getCalculationResultOp());
 			output.setCalculatedFlag(temp.getCalculatedFlag());
-			
+			output.setCalculatedBreakTimes(temp.getCalculatedBreakTimes());
+			output.setCalculatedWorkTimes(temp.getCalculatedWorkTimes());
 		} else {
 			output.setCalculatedFlag(CalculatedFlag.UNCALCULATED);
 		}
@@ -991,54 +1052,84 @@ public class OvertimeServiceImpl implements OvertimeService {
 		displayInfoOverTime.setAppDispInfoStartup(appDispInfoStartupOutput);
 		// 申請日変更時処理
 		commonAlgorithmOverTime.changeApplicationDate(companyId, dateOp.orElse(null), displayInfoOverTime);
-		
-		WorkContent workContent = new WorkContent();
-		workContent.setWorkTypeCode(displayInfoOverTime.getInfoWithDateApplicationOp()
-										  .map(x -> x.getWorkTypeCD())
-										  .orElse(Optional.empty()));
-		workContent.setWorkTimeCode(
-				displayInfoOverTime.getInfoWithDateApplicationOp()
-				  .map(x -> x.getWorkTimeCD())
-				  .orElse(Optional.empty()));
-		List<TimeZone> timeZones = new ArrayList<TimeZone>();
-		List<BreakTimeSheet> breakTimes = new ArrayList<BreakTimeSheet>();
-		if (displayInfoOverTime.getInfoWithDateApplicationOp().isPresent()) {
-			Optional<WorkHours> workHours = displayInfoOverTime.getInfoWithDateApplicationOp().get().getWorkHours();
-			if (workHours.isPresent()) {
-				if (workHours.get().getStartTimeOp1().isPresent() || workHours.get().getEndTimeOp1().isPresent()) {
-					TimeZone timeZone = new TimeZone(
-							workHours.get().getStartTimeOp1().orElse(null),
-							workHours.get().getEndTimeOp1().orElse(null));
-					timeZones.add(timeZone);
-				}
-				if (workHours.get().getStartTimeOp2().isPresent() || workHours.get().getEndTimeOp2().isPresent()) {
-					TimeZone timeZone = new TimeZone(
-							workHours.get().getStartTimeOp2().orElse(null),
-							workHours.get().getEndTimeOp2().orElse(null));
-					timeZones.add(timeZone);
-				}
-			}
-			Optional<BreakTimeZoneSetting> breakTime = displayInfoOverTime.getInfoWithDateApplicationOp().get().getBreakTime();
-			if (breakTime.isPresent()) {
-				List<DeductionTime> breakTimeZones = breakTime.get().getTimeZones();
-				if(!CollectionUtil.isEmpty(breakTimeZones)) {
-					breakTimes = IntStream.range(0, (int) breakTimeZones.stream().count())
-							.mapToObj(i -> new BreakTimeSheet(
-									new BreakFrameNo(i+1),
-									breakTimeZones.get(i).getStart(),
-									breakTimeZones.get(i).getEnd()))
-							.collect(Collectors.toList());
-				}
-			}
+
+		if (overtimeAppAtr == OvertimeAppAtr.MULTIPLE_OVERTIME && dateOp.isPresent()) {
+			Optional<AppOverTime> app = appOverTimeRepository.findLatestMultipleOvertimeApp(employeeId, dateOp.get(), EnumAdaptor.valueOf(prePost.value, PrePostAtr.class));
+            displayInfoOverTime.setLatestMultipleOvertimeApp(app);
 		}
-		workContent.setTimeZones(timeZones);
-		workContent.setBreakTimes(breakTimes);
-		
+
+		WorkContent workContent = new WorkContent();
+		if (displayInfoOverTime.getLatestMultipleOvertimeApp().isPresent()) {
+			if (displayInfoOverTime.getLatestMultipleOvertimeApp().get().getWorkInfoOp().isPresent()) {
+				workContent.setWorkTypeCode(Optional.of(displayInfoOverTime.getLatestMultipleOvertimeApp().get().getWorkInfoOp().get().getWorkTypeCode().v()));
+				workContent.setWorkTimeCode(displayInfoOverTime.getLatestMultipleOvertimeApp().get().getWorkInfoOp().get().getWorkTimeCodeNotNull().map(PrimitiveValueBase::v));
+			}
+			if (displayInfoOverTime.getLatestMultipleOvertimeApp().get().getWorkHoursOp().isPresent()) {
+				workContent.setTimeZones(displayInfoOverTime.getLatestMultipleOvertimeApp().get().getWorkHoursOp().get()
+						.stream().map(i -> new TimeZone(
+								i.getTimeZone().getStartTime(),
+								i.getTimeZone().getEndTime()
+						)).collect(Collectors.toList()));
+			}
+			if (displayInfoOverTime.getLatestMultipleOvertimeApp().get().getBreakTimeOp().isPresent()) {
+				workContent.setBreakTimes(displayInfoOverTime.getLatestMultipleOvertimeApp().get().getBreakTimeOp().get()
+						.stream().map(i -> new BreakTimeSheet(
+								new BreakFrameNo(i.getWorkNo().v()),
+								i.getTimeZone().getStartTime(),
+								i.getTimeZone().getEndTime()
+						)).collect(Collectors.toList()));
+			}
+		} else {
+			workContent.setWorkTypeCode(displayInfoOverTime.getInfoWithDateApplicationOp()
+					.map(x -> x.getWorkTypeCD())
+					.orElse(Optional.empty()));
+			workContent.setWorkTimeCode(
+					displayInfoOverTime.getInfoWithDateApplicationOp()
+							.map(x -> x.getWorkTimeCD())
+							.orElse(Optional.empty()));
+			List<TimeZone> timeZones = new ArrayList<TimeZone>();
+			List<BreakTimeSheet> breakTimes = new ArrayList<BreakTimeSheet>();
+			if (displayInfoOverTime.getInfoWithDateApplicationOp().isPresent()) {
+				Optional<WorkHours> workHours = displayInfoOverTime.getInfoWithDateApplicationOp().get().getWorkHours();
+				if (workHours.isPresent()) {
+					if (workHours.get().getStartTimeOp1().isPresent() || workHours.get().getEndTimeOp1().isPresent()) {
+						TimeZone timeZone = new TimeZone(
+								workHours.get().getStartTimeOp1().orElse(null),
+								workHours.get().getEndTimeOp1().orElse(null));
+						timeZones.add(timeZone);
+					}
+					if (workHours.get().getStartTimeOp2().isPresent() || workHours.get().getEndTimeOp2().isPresent()) {
+						TimeZone timeZone = new TimeZone(
+								workHours.get().getStartTimeOp2().orElse(null),
+								workHours.get().getEndTimeOp2().orElse(null));
+						timeZones.add(timeZone);
+					}
+				}
+				Optional<BreakTimeZoneSetting> breakTime = displayInfoOverTime.getInfoWithDateApplicationOp().get().getBreakTime();
+				if (breakTime.isPresent()) {
+					List<DeductionTime> breakTimeZones = breakTime.get().getTimeZones();
+					if(!CollectionUtil.isEmpty(breakTimeZones)) {
+						breakTimes = IntStream.range(0, (int) breakTimeZones.stream().count())
+								.mapToObj(i -> new BreakTimeSheet(
+										new BreakFrameNo(i+1),
+										breakTimeZones.get(i).getStart(),
+										breakTimeZones.get(i).getEnd()))
+								.collect(Collectors.toList());
+					}
+				}
+			}
+			workContent.setTimeZones(timeZones);
+			workContent.setBreakTimes(breakTimes);
+		}
+		Optional<AchievementDetail> opAchievementDetail = displayInfoOverTime.getAppDispInfoStartup().getAppDispInfoWithDateOutput().getOpActualContentDisplayLst().isPresent()
+				? displayInfoOverTime.getAppDispInfoStartup().getAppDispInfoWithDateOutput().getOpActualContentDisplayLst().get().get(0).getOpAchievementDetail()
+				: Optional.empty();
 		// 計算を実行する
 		DisplayInfoOverTime displayInfoOverTimeTemp = this.calculate(
 				companyId,
 				employeeId,
 				dateOp,
+				overtimeAppAtr,
 				prePost,
 				overtimeAppSet.getOvertimeLeaveAppCommonSet(),
 				displayInfoOverTime.getAppDispInfoStartup()
@@ -1053,11 +1144,16 @@ public class OvertimeServiceImpl implements OvertimeService {
 					.orElse(null),
 				workContent,
 				overtimeAppSet,
-				agent
-				);
+				agent,
+				displayInfoOverTime.getLatestMultipleOvertimeApp().isPresent() && displayInfoOverTime.getLatestMultipleOvertimeApp().get().getMultipleTimesOp().isPresent() ? displayInfoOverTime.getLatestMultipleOvertimeApp().get().getMultipleTimesOp().get().getOvertimeHours() : new ArrayList<>(),
+				displayInfoOverTime.getLatestMultipleOvertimeApp().isPresent() && displayInfoOverTime.getLatestMultipleOvertimeApp().get().getMultipleTimesOp().isPresent() ? displayInfoOverTime.getLatestMultipleOvertimeApp().get().getMultipleTimesOp().get().getOvertimeReasons() : new ArrayList<>(),
+				opAchievementDetail
+		);
 		displayInfoOverTime.setCalculationResultOp(displayInfoOverTimeTemp.getCalculationResultOp());
 		displayInfoOverTime.setWorkdayoffFrames(displayInfoOverTimeTemp.getWorkdayoffFrames());
 		displayInfoOverTime.setCalculatedFlag(displayInfoOverTimeTemp.getCalculatedFlag());
+		displayInfoOverTime.setCalculatedBreakTimes(displayInfoOverTimeTemp.getCalculatedBreakTimes());
+		displayInfoOverTime.setCalculatedWorkTimes(displayInfoOverTimeTemp.getCalculatedWorkTimes());
 		return displayInfoOverTime;
 	}
 
@@ -1123,12 +1219,16 @@ public class OvertimeServiceImpl implements OvertimeService {
 		}
 		workContent.setTimeZones(timeZones);
 		workContent.setBreakTimes(breakTimes);
-		
+
+		Optional<AchievementDetail> opAchievementDetail = appDispInfoStartupOutput.getAppDispInfoWithDateOutput().getOpActualContentDisplayLst().isPresent()
+				? appDispInfoStartupOutput.getAppDispInfoWithDateOutput().getOpActualContentDisplayLst().get().get(0).getOpAchievementDetail()
+				: Optional.empty();
 		// 計算を実行する
 		DisplayInfoOverTime displayInfoOverTimeTemp = this.calculate(
 				companyId,
 				employeeId,
 				dateOp,
+				OvertimeAppAtr.MULTIPLE_OVERTIME,
 				prePost,
 				overtimeAppSet.getOvertimeLeaveAppCommonSet(),
 				appDispInfoStartupOutput
@@ -1141,8 +1241,11 @@ public class OvertimeServiceImpl implements OvertimeService {
 					selectWorkOutput.getApplicationTime(),
 				workContent,
 				overtimeAppSet,
-				agent
-				);
+				agent,
+				new ArrayList<>(),
+				new ArrayList<>(),
+				opAchievementDetail
+		);
 		displayInfoOverTimeTemp.setAppDispInfoStartup(appDispInfoStartupOutput);
 		InfoWithDateApplication infoWithDateApplication = new InfoWithDateApplication();
 		infoWithDateApplication.setApplicationTime(Optional.ofNullable(selectWorkOutput.getApplicationTime()));
@@ -1387,12 +1490,15 @@ public class OvertimeServiceImpl implements OvertimeService {
 				
 				workContent.setTimeZones(timeZones);
 				workContent.setBreakTimes(breakTimes);
-			
+			Optional<AchievementDetail> opAchievementDetail = displayInfoOverTime.getAppDispInfoStartup().getAppDispInfoWithDateOutput().getOpActualContentDisplayLst().isPresent()
+					? displayInfoOverTime.getAppDispInfoStartup().getAppDispInfoWithDateOutput().getOpActualContentDisplayLst().get().get(0).getOpAchievementDetail()
+					: Optional.empty();
 			// 計算処理を実行する
 			DisplayInfoOverTime temp = this.calculate(
 					companyId,
 					employeeId,
 					dateOp,
+					displayInfoOverTime.getOvertimeAppAtr(),
 					EnumAdaptor.valueOf(prePost, PrePostInitAtr.class),
 					displayInfoOverTime.getInfoNoBaseDate().getOverTimeAppSet().getOvertimeLeaveAppCommonSet(),
 					displayInfoOverTime.getAppDispInfoStartup()
@@ -1407,8 +1513,11 @@ public class OvertimeServiceImpl implements OvertimeService {
 						.orElse(null),
 					workContent,
 					displayInfoOverTime.getInfoNoBaseDate().getOverTimeAppSet(),
-					agent
-					);
+					agent,
+					new ArrayList<>(),
+					new ArrayList<>(),
+					opAchievementDetail
+			);
 			displayInfoOverTime.setCalculationResultOp(temp.getCalculationResultOp());
 			displayInfoOverTime.setWorkdayoffFrames(temp.getWorkdayoffFrames());
 		}
@@ -1516,7 +1625,9 @@ public class OvertimeServiceImpl implements OvertimeService {
 				companyId,
 				appOverTime.getApplication().getEmployeeID(),
 				appDates,
-				ApplicationType.OVER_TIME_APPLICATION);
+				ApplicationType.OVER_TIME_APPLICATION,
+                Optional.of(appOverTime.getOverTimeClf())
+        );
 		// 実績内容の取得
 		List<ActualContentDisplay> actualContentDisplayLst = collectAchievement.getAchievementContents(
 				companyId,
@@ -1703,6 +1814,63 @@ public class OvertimeServiceImpl implements OvertimeService {
 		return confirmMsgOutputsMulti;
 	}
 
-	
+	@Override
+	public Pair<List<TimeZoneWithWorkNo>, List<BreakTimeSheet>> getWorkingHoursAndBreakHours(String companyId,
+																							 String employeeId,
+																							 GeneralDate appDate,
+																							 List<OvertimeHour> overtimeHours,
+																							 List<OvertimeReason> overtimeReasons,
+																							 List<TimeZoneWithWorkNo> workingHours,
+																							 WorkInformation workInformation,
+																							 Optional<AchievementDetail> achievementDetail) {
+		// 複数回残業内容を作成する
+		OvertimeWorkMultipleTimes content = OvertimeWorkMultipleTimes.create(overtimeHours, overtimeReasons);
+
+		// 残業時間を計算のために勤務時間を判断する
+		workingHours = content.getWorkingHoursToCalculateOvertime(workingHours);
+
+		// 休憩時間帯を取得する
+		BreakTimeZoneSetting breakTimeZoneSetting = commonAlgorithmOverTime.selectWorkTypeAndTime(
+				companyId,
+				workInformation.getWorkTypeCode(),
+				workInformation.getWorkTimeCode(),
+				workingHours.isEmpty() ? Optional.empty() : Optional.of(workingHours.get(0).getTimeZone().getStartTime()),
+				workingHours.isEmpty() ? Optional.empty() : Optional.of(workingHours.get(0).getTimeZone().getEndTime()),
+				achievementDetail
+		);
+		List<BreakTimeSheet> breakTimeSheets = new ArrayList<>();
+		for (int i = 0; i < breakTimeZoneSetting.getTimeZones().size(); i++) {
+			breakTimeSheets.add(new BreakTimeSheet(
+					new BreakFrameNo(i + 1),
+					breakTimeZoneSetting.getTimeZones().get(i).getStart(),
+					breakTimeZoneSetting.getTimeZones().get(i).getEnd()
+			));
+		}
+
+		List<BreakTimeSheet> breakTimes = content.getBreakTimeToCalculateOvertime(
+				new OvertimeWorkMultipleTimes.Require() {
+					@Override
+					public Optional<WorkTimeSetting> getWorkTimeSetting(String companyId, String code) {
+						return worktimeSetRepo.findByCode(companyId, code);
+					}
+					@Override
+					public IntegrationOfDaily tempCalculateOneDayAttendanceTime(CalculationParams params) {
+						return attendanceCalcAdapter.calculate(params);
+					}
+					@Override
+					public Optional<PredetemineTimeSetting> getPredetemineTimeSetting(String companyId, String workTimeCode) {
+						return predetemineTimeSetRepo.findByWorkTimeCode(companyId, workTimeCode);
+					}
+				},
+				companyId,
+				employeeId,
+				appDate,
+				workInformation,
+				workingHours,
+				breakTimeSheets
+		);
+
+		return Pair.of(workingHours, breakTimes);
+	}
 	
 }

@@ -22,7 +22,7 @@ module nts.uk.com.view.ccg022.a.screenModel {
             //A4_1
             { id: 3, name: text('CCG022_21') },
         ]);
-        selectedSystemMode: KnockoutObservable<number> = ko.observable(0);
+        selectedSystemMode: KnockoutObservable<number> = ko.observable(1);
         infoLbl1: KnockoutObservable<string> = ko.observable("");
         infoLbl2: KnockoutObservable<string> = ko.observable("");
         usageStopMessage: KnockoutObservable<string> = ko.observable("");
@@ -90,7 +90,7 @@ module nts.uk.com.view.ccg022.a.screenModel {
                 let state = self.isSystemSelected();
                 let setting: IStopBySystem = state == 1 ? data.system : data.company;
                 self.isAdmin(data.admin);
-                self.selectedSystemMode(setting ? setting.systemStatus : 0);
+                self.selectedSystemMode(setting ? setting.systemStatus : 1);
                 if (state == 1) {
                     self.infoLbl1(self.genLbl(true, data.stopCompanys));
                     self.infoLbl2(self.genLbl(false, data.inProgressCompanys));

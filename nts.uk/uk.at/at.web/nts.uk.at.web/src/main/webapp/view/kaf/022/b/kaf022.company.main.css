@@ -151,3 +151,12 @@ div[class^="tab-content-"] .nts-fixed-table {
     padding-left: 10px;
     padding-top: 6px;
 }
+
+.mail-setting {
+  margin-bottom: 10px;
+  margin-left: 10px;
+}
+
+.ml-10 {
+  margin-left: 10px;
+}

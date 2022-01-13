@@ -11,6 +11,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.u
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.anno.AttendanceItemValue;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ValueType;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime.ConstraintTime;
 
 /** 総拘束時間 */
 @Data
@@ -68,5 +69,10 @@ public class ConstraintTimeDto implements ItemConst, AttendanceItemDataGate {
 		default:
 			return PropType.OBJECT;
 		}
+	}
+
+	public static ConstraintTimeDto fromDomain(ConstraintTime domain) {
+
+		return new ConstraintTimeDto(domain.getTotalConstraintTime().v(), domain.getLateNightConstraintTime().v());
 	}
 }

@@ -850,6 +850,35 @@ public class TimeSheetOfDeductionItem extends TimeVacationOffSetItem implements 
 				
 	}
 	
+	/**
+	 * 外出の相殺時間を削除する
+	 * （私用外出、組合外出の相殺時間のみを削除して返す）
+	 * @return
+	 */
+	public TimeSheetOfDeductionItem getAfterDeleteOffsetTime() {
+		if(this.deductionAtr.isGoOut() 
+				&& this.goOutReason.isPresent()?this.goOutReason.get().isPrivateOrUnion():false) {
+			//控除相殺時間を渡さずに作成する
+			return new TimeSheetOfDeductionItem(
+					this.timeSheet.clone(),
+					this.rounding.clone(),
+					this.recordedTimeSheet.stream().map(r -> r.clone()).collect(Collectors.toList()),
+					this.deductionTimeSheet.stream().map(d -> d.clone()).collect(Collectors.toList()),
+					WorkingBreakTimeAtr.valueOf(this.workingBreakAtr.toString()),
+					this.goOutReason.isPresent()
+						? Finally.of(GoingOutReason.valueOf(this.goOutReason.get().value))
+						: Finally.empty(),
+					this.breakAtr.isPresent()
+						? Finally.of(BreakClassification.valueOf(this.breakAtr.get().toString()))
+						: Finally.empty(),
+					this.shortTimeSheetAtr.map(s -> ShortTimeSheetAtr.valueOf(s.toString())),
+					DeductionClassification.valueOf(this.deductionAtr.toString()),
+					this.childCareAtr.map(c -> ChildCareAtr.valueOf(c.value)),
+					this.recordOutside ? true : false);
+		}
+		return this.clone();
+	}
+
 	public TimeSheetOfDeductionItem clone() {
 		TimeSheetOfDeductionItem clone = new TimeSheetOfDeductionItem(
 				this.timeSheet,

@@ -28,11 +28,11 @@ public class KscmtClassifyWorkSetPK implements Serializable {
 	private String cid;
 
 	/** The classify code. */
-	@Column(name = "CLSCD")
+	@Column(name = "CLS_CD")
 	private String classifyCode;
 	
 	/** The workday division. */
-	@Column(name = "WORK_DAY_ATR")
+	@Column(name = "WORKING_DAY_ATR")
 	private Integer	workdayDivision;
 
 	/**

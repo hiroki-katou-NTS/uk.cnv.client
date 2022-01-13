@@ -2,8 +2,11 @@ package nts.uk.ctx.at.record.app.command.stamp.card.stampcard.update;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -11,6 +14,7 @@ import javax.inject.Inject;
 import nts.arc.layer.app.command.CommandHandlerContext;
 import nts.arc.layer.app.command.CommandHandlerWithResult;
 import nts.arc.time.GeneralDate;
+import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.ContractCode;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampCard;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampCardRepository;
@@ -39,13 +43,14 @@ implements PeregUpdateListCommandHandler<UpdateStampCardCommand>{
 		List<UpdateStampCardCommand> cmd = context.getCommand();
 		List<MyCustomizeException> errorExceptionLst = new ArrayList<>();
 		List<StampCard> updateLst = new ArrayList<>();
+		String contractCode = AppContexts.user().contractCode();
 		// check duplicate cardNo trong cùng 1 contractCode
 		cmd.stream().forEach(command ->{
 			if (command.getStampNumber() != null) {
 
 				Optional<StampCard> origin = this.stampCardRepo.getByStampCardId(command.getStampNumberId());
 
-				String contractCode = AppContexts.user().contractCode();
+				
 				Optional<StampCard> duplicate = this.stampCardRepo.getByCardNoAndContractCode(command.getStampNumber(),
 						contractCode);
 
@@ -62,9 +67,44 @@ implements PeregUpdateListCommandHandler<UpdateStampCardCommand>{
 			}
 
 		});
+		Map<String, StampCard> insertMap = new HashMap<String, StampCard>();
+		List<String> errosSid = new ArrayList<String>();
+
+		for (StampCard stampCard : updateLst) {
+			if (updateLst.stream().anyMatch(x -> x.getStampNumber().v().equals(stampCard.getStampNumber().v()))
+					&& insertMap.containsKey(stampCard.getStampNumber().v())
+					
+					) {
+				errosSid.add(stampCard.getEmployeeId());
+			} else {
+				
+				insertMap.put(stampCard.getStampNumber().v(), stampCard);
+			}
+		}
 		
-		if(!updateLst.isEmpty()) {
-			stampCardRepo.updateAll(updateLst);
+		List<String> noCards = insertMap
+			.entrySet()
+			.stream()
+			.map(Map.Entry::getKey)
+			.collect(Collectors.toList());
+		if (!CollectionUtil.isEmpty(noCards)) {
+			
+			List<StampCard> stampCardList = 
+					stampCardRepo.getListStampCardByCardNumbersAndContract(
+							noCards,
+							contractCode);
+			List<StampCard> insertList = insertMap
+					.entrySet()
+					.stream()
+					.map(Map.Entry::getValue)
+					.collect(Collectors.toList());
+			insertList = insertList
+					.stream()
+					.filter(x -> !stampCardList.stream().anyMatch(y -> y.getStampNumber().v().equals(x.getStampNumber().v())))
+					.collect(Collectors.toList());
+			if(!insertList.isEmpty()) {
+				stampCardRepo.updateAll(insertList);
+			}
 		}
 		return errorExceptionLst;
 	}

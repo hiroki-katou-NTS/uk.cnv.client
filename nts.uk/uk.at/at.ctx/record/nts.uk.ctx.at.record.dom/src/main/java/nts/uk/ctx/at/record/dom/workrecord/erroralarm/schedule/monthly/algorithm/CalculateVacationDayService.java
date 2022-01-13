@@ -18,6 +18,7 @@ import nts.uk.ctx.at.record.dom.require.RecordDomRequireService;
 import nts.uk.ctx.at.record.dom.workrecord.erroralarm.schedule.monthly.TypeOfDays;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.dailyattendancework.IntegrationOfDaily;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.WorkInfoOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime.AttendanceTimeOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.aggr.export.attdstatus.AttendanceStatusList;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.AttendanceTimeOfMonthly;
@@ -40,14 +41,14 @@ public class CalculateVacationDayService {
 	private MonthIsBeforeThisMonthChecking monthIsBeforeThisMonthChecking;
 	@Inject
 	private GetWorkTypeService getWorkTypeService;
-	@Inject 
+	@Inject
 	private RecordDomRequireService requireService;
 	@Inject
 	private PredetemineTimeSettingRepository predTimeSetRepo;
-	
+
 	/**
 	 * 休暇日数を計算
-	 * 
+	 *
 	 * @param cid 会社ID
 	 * @param sid 社員ID
 	 * @param ym 年月
@@ -57,14 +58,14 @@ public class CalculateVacationDayService {
 	 * @param lstWorkSchedule  List＜勤務予定＞
 	 * @param typeOfDay 日数の種類
 	 * @param lstWorkType List＜勤務種類＞
-	 * 
+	 *
 	 */
 	public Double calVacationDay(String cid, String sid, YearMonth ym, PresentClosingPeriodImport presentClosingPeriod,
 			AttendanceTimeOfMonthly attendanceTimeOfMonthly, List<IntegrationOfDaily> lstDaily,
 			List<WorkScheduleWorkInforImport> lstWorkSchedule, TypeOfDays typeOfDay, List<WorkType> lstWorkType,
 			Map<DatePeriod, WorkingConditionItem> workingConditionItemMap) {
 		Double totalTime = 0.0;
-		
+
 		if (presentClosingPeriod != null) {
 			// 当月より前の月かチェック
 			boolean isBeforeThisMonth = monthIsBeforeThisMonthChecking.checkMonthIsBeforeThisMonth(ym,
@@ -73,7 +74,7 @@ public class CalculateVacationDayService {
 				if (attendanceTimeOfMonthly == null) {
 					return totalTime;
 				}
-				
+
 				// 日数 を計算
 				WorkDaysOfMonthly workDays = attendanceTimeOfMonthly.getVerticalTotal().getWorkDays();
 				return getNumberOfDays(typeOfDay, workDays);
@@ -89,7 +90,7 @@ public class CalculateVacationDayService {
 			if (monWorkTypeWorkTime == null) {
 				continue;
 			}
-			
+
 			Optional<WorkType> workTypeOpt = lstWorkType.stream().filter(x -> x.getWorkTypeCode().v().equals(monWorkTypeWorkTime.getWorkTypeCode())).findFirst();
 			Optional<IntegrationOfDaily> dailyOpt = lstDaily.stream().filter(x -> x.getYmd().equals(exDate)).findFirst();
 			WorkingConditionItem workingCondtionItem = null;
@@ -97,28 +98,28 @@ public class CalculateVacationDayService {
 			if (!condExDatePeriod.isPresent()) {
 				continue;
 			}
-			
-			if (!monWorkTypeWorkTime.getWorkTimeCode().isPresent()) {
-				continue;
+
+			Optional<PredetemineTimeSetting> predTimeSetInDayOpt = Optional.empty();
+			if (monWorkTypeWorkTime.getWorkTimeCode().isPresent()) {
+				predTimeSetInDayOpt = this.predTimeSetRepo.findByWorkTimeCode(cid, monWorkTypeWorkTime.getWorkTimeCode().get());
 			}
-			
+
 			workingCondtionItem = workingConditionItemMap.get(condExDatePeriod.get());
-			Optional<PredetemineTimeSetting> predTimeSetInDayOpt = this.predTimeSetRepo.findByWorkTimeCode(cid, monWorkTypeWorkTime.getWorkTimeCode().get());
-			
-			if (!workTypeOpt.isPresent() || !dailyOpt.isPresent() || !predTimeSetInDayOpt.isPresent() || workingCondtionItem == null) {
+
+			if (!workTypeOpt.isPresent() || workingCondtionItem == null) {
 				continue;
 			}
-			
+
 			// Input．日数の種類をチェック
-			totalTime += getNumberOfDays(typeOfDay, workTypeOpt.get(), dailyOpt.get(), workingCondtionItem, predTimeSetInDayOpt.get());
+			totalTime += getNumberOfDays(typeOfDay, workTypeOpt.get(), dailyOpt, workingCondtionItem, predTimeSetInDayOpt, monWorkTypeWorkTime.getWorkInfo());
 		}
-		
+
 		return totalTime;
 	}
 
 	/**
 	 * 日数 を計算
-	 * 
+	 *
 	 * @param typeOfDay
 	 *            日数の種類
 	 * @param attendanceTimeOfMonthly
@@ -158,38 +159,44 @@ public class CalculateVacationDayService {
 
 		return numberOfDays;
 	}
-	
+
 	private Double getNumberOfDays(
 			TypeOfDays typeOfDay,
 			WorkType workType,
-			IntegrationOfDaily daily,
+			Optional<IntegrationOfDaily> daily,
 			WorkingConditionItem workingCondtionItem,
-			PredetemineTimeSetting predetemineTimeSetting) {
-		
+			Optional<PredetemineTimeSetting> predetemineTimeSettingOpt,
+			WorkInfoOfDailyAttendance workInfo) {
 		WorkDaysOfMonthly workDays = new WorkDaysOfMonthly();
-		WorkTypeDaysCountTable workTypeDaysCountTable = new WorkTypeDaysCountTable(
-				workType, new VacationAddSet(), Optional.empty());
-		Map<GeneralDate, AttendanceTimeOfDailyAttendance> attendanceTimeOfDailys = new HashMap<>();
-		Map<GeneralDate, TimeLeavingOfDailyAttd> timeLeavingOfDailys = new HashMap<>();
-		daily.getAttendanceTimeOfDailyPerformance().ifPresent(c -> attendanceTimeOfDailys.put(daily.getYmd(), c));
-		daily.getAttendanceLeave().ifPresent(c -> timeLeavingOfDailys.put(daily.getYmd(), c));
-		// 出勤状態を取得する
-		AttendanceStatusList attendanceStatusList = new AttendanceStatusList(attendanceTimeOfDailys, timeLeavingOfDailys);
 		
-		val require = requireService.createRequire();
-				
-		workDays.aggregate(
-				require, daily.getEmployeeId(), AppContexts.user().companyId(),
-				daily.getYmd(),
-				workingCondtionItem.getLaborSystem(), 
-				workType, 
-				daily.getAttendanceTimeOfDailyPerformance().get(), 
-				daily.getSpecDateAttr().get(),
-				workTypeDaysCountTable, 
-				daily.getWorkInformation(), 
-				predetemineTimeSetting,
-				attendanceStatusList.isAttendanceDay(daily.getYmd()), //confirm with Du san
-				attendanceStatusList.isTwoTimesStampExists(daily.getYmd())); //confirm with Du san
+		daily.ifPresent(d -> {
+			Map<GeneralDate, AttendanceTimeOfDailyAttendance> attendanceTimeOfDailys = new HashMap<>();
+			Map<GeneralDate, TimeLeavingOfDailyAttd> timeLeavingOfDailys = new HashMap<>();
+			
+			d.getAttendanceTimeOfDailyPerformance().ifPresent(c -> attendanceTimeOfDailys.put(d.getYmd(), c));
+			d.getAttendanceLeave().ifPresent(c -> timeLeavingOfDailys.put(d.getYmd(), c));
+			
+			// 出勤状態を取得する
+			AttendanceStatusList attendanceStatusList = new AttendanceStatusList(attendanceTimeOfDailys, timeLeavingOfDailys);
+			
+			val require = requireService.createRequire();
+			PredetemineTimeSetting predetemineTimeSetting = predetemineTimeSettingOpt.isPresent() ? predetemineTimeSettingOpt.get() : null;
+
+			workDays.aggregate(
+					require,
+					d.getEmployeeId(), 
+					AppContexts.user().companyId(),
+					d.getYmd(),
+					workingCondtionItem.getLaborSystem(),
+					workType,
+					d.getAttendanceTimeOfDailyPerformance().orElse(null),
+					d.getSpecDateAttr().orElse(null),
+					new WorkTypeDaysCountTable(workType, new VacationAddSet(), Optional.empty()),
+					workInfo,
+					predetemineTimeSetting,
+					attendanceStatusList.isAttendanceDay(d.getYmd()), //confirm with Du san
+					attendanceStatusList.isTwoTimesStampExists(d.getYmd())); //confirm with Du san
+		});
 
 		return getNumberOfDays(typeOfDay, workDays);
 	}

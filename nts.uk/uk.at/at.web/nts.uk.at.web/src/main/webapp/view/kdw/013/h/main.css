@@ -1,0 +1,32 @@
+#contents-area>div, #contents-area>table{
+	margin-left: 13px;
+}
+.error{
+	color: red;
+}
+#contents-area table tr td>div{
+	min-height: 40px;
+}
+#contents-area table tr td >div.ui-igcombo-wrapper{
+	min-height: 32px;
+}
+#contents-area table tr td div.checkbox-wrapper{
+	top: 5px;
+}
+#contents-area table.basic-items tr td:first-child {
+	vertical-align: text-top;
+}
+table.optionItems tr td .ui-igcombo-dropdown {
+    width: 255px !important;
+}
+table.optionItems tr td .ui-igcombo-dropdown .ui-igcombo-listitemholder{
+	overflow: unset !important;
+} 
+table.optionItems tr td .ui-igcombo-list{
+	overflow-x: auto !important;
+	width: 253px !important;
+}
+.startTime{
+	display: inline-block;
+	min-width: 72px;
+} 

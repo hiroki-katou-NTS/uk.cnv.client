@@ -1,6 +1,6 @@
 package nts.uk.ctx.at.shared.dom.holidaymanagement.treatmentholiday;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -75,17 +75,6 @@ public class TreatmentHolidayTest {
 			assertThat(result.getHolidayDays().v()).isEqualTo(weeklyHolidayAcqMana.getWeeklyDays().v());
 		}
 
-		/**
-		 * 28日間を取得する
-		 */
-		@Test
-		public void test_get28Days() {
-			val result = treatmentHoliday.get28Days(require, GeneralDate.ymd(2021, 02, 10));
-
-			assertThat(result.start()).isEqualTo(GeneralDate.ymd(2021, 02, 8));
-			assertThat(result.end()).isEqualTo(GeneralDate.ymd(2021, 03, 7));
-		}
-
 	}
 
 	/**
@@ -119,17 +108,6 @@ public class TreatmentHolidayTest {
 			assertThat( result.getHolidayDays().v()).isEqualTo(4.0);
 		}
 
-		/**
-		 * 28日間を取得する
-		 */
-		@Test
-		public void test_get28Days() {
-			val result = this.treatmentHoliday.get28Days(require, GeneralDate.ymd(2021, 1, 29));
-
-			assertThat( result.start()).isEqualTo(GeneralDate.ymd(2021, 1, 29));
-			assertThat( result.end()).isEqualTo(GeneralDate.ymd(2021, 02, 25));
-		}
-
 	}
 
 	/**
@@ -161,17 +139,6 @@ public class TreatmentHolidayTest {
 			assertThat( result.getAddNonstatutoryHolidays()).isEqualTo(this.treatmentHoliday.getAddNonstatutoryHolidays());
 			assertThat( result.getPeriod()).isEqualTo(new DatePeriod(GeneralDate.ymd(2021, 1, 1), GeneralDate.ymd(2021, 1, 28)));
 			assertThat( result.getHolidayDays()).isEqualTo(this.holidayManageByYMD.getFourWeekHoliday());
-		}
-
-		/**
-		 *28日間を取得する
-		 */
-		@Test
-		public void test_get28Days() {
-			val result = treatmentHoliday.get28Days(require, GeneralDate.ymd(2021, 02, 10));
-
-			assertThat( result.start()).isEqualTo(GeneralDate.ymd(2021, 1, 29));
-			assertThat( result.end()).isEqualTo(GeneralDate.ymd(2021, 2, 25));
 		}
 
 	}

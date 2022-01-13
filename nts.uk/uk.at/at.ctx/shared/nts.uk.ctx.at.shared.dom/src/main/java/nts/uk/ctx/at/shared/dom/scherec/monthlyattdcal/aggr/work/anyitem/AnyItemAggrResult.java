@@ -16,6 +16,7 @@ import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.AttendanceTimeOfM
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.anyitem.AggregateAnyItem;
 import nts.uk.ctx.at.shared.dom.scherec.monthlyattdcal.monthly.anyitem.AnyItemOfMonthly;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItem;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.PerformanceAtr;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.calculation.Formula;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.calculation.disporder.FormulaDispOrder;
 
@@ -157,7 +158,8 @@ public class AnyItemAggrResult {
 	 * @return 任意項目集計結果
 	 */
 	public static AnyItemAggrResult calcFromMonthly(RequireM1 require, Integer optionalItemNo, OptionalItem optionalItem,
-			AttendanceTimeOfMonthly attendanceTime, List<AnyItemOfMonthly> anyItems, MonAggrCompanySettings companySets){
+			AttendanceTimeOfMonthly attendanceTime, List<AnyItemOfMonthly> anyItems, MonAggrCompanySettings companySets,
+			PerformanceAtr performanceAtr) {
 		
 		AnyItemAggrResult domain = AnyItemAggrResult.of(optionalItemNo, optionalItem);
 		
@@ -172,8 +174,8 @@ public class AnyItemAggrResult {
 		MonthlyRecordToAttendanceItemConverter monthlyRecordDto = monthlyConverter.withAttendanceTime(attendanceTime);
 		monthlyRecordDto = monthlyRecordDto.withAnyItem(anyItems);
 		val calcResult = optionalItem.caluculationFormula(
-				companySets.getCompanyId(), optionalItem, targetFormulas, targetFormulaOrders,
-				Optional.empty(), Optional.of(monthlyRecordDto));
+				companySets.getCompanyId(), targetFormulas, targetFormulaOrders,
+				Optional.empty(), Optional.of(monthlyRecordDto), performanceAtr);
 		if (calcResult != null){
 			if (calcResult.getTime().isPresent()){
 				domain.addTime(calcResult.getTime().get().intValue());

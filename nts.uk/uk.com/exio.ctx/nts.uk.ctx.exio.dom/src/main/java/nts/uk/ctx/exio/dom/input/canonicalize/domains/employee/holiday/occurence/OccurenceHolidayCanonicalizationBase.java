@@ -11,7 +11,6 @@ import nts.arc.task.tran.AtomTask;
 import nts.arc.time.GeneralDate;
 import nts.gul.text.IdentifierUtil;
 import nts.uk.ctx.exio.dom.input.ExecutionContext;
-import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalItem;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.DomainCanonicalization;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.employee.holiday.occurence.compensatory.CompensatoryHolidayCanonicalization;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.employee.holiday.occurence.compensatory.HolidayWorkCanonicalization;
@@ -21,7 +20,8 @@ import nts.uk.ctx.exio.dom.input.canonicalize.existing.AnyRecordToChange;
 import nts.uk.ctx.exio.dom.input.canonicalize.existing.AnyRecordToDelete;
 import nts.uk.ctx.exio.dom.input.canonicalize.existing.StringifiedValue;
 import nts.uk.ctx.exio.dom.input.canonicalize.methods.EmployeeCodeCanonicalization;
-import nts.uk.ctx.exio.dom.input.canonicalize.methods.IntermediateResult;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalItem;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.IntermediateResult;
 import nts.uk.ctx.exio.dom.input.errors.ExternalImportError;
 import nts.uk.ctx.exio.dom.input.meta.ImportingDataMeta;
 
@@ -48,7 +48,7 @@ public abstract class OccurenceHolidayCanonicalizationBase implements DomainCano
 			
 			employeeCodeCanonicalization.canonicalize(require, context, employeeCode)
 				.ifLeft(errors -> {
-					errors.forEach(error -> require.add(context, ExternalImportError.of(error)));
+					errors.forEach(error -> require.add(ExternalImportError.of(context.getDomainId(), error)));
 				})
 				.ifRight(interms -> {
 					canonicalize(require, context, keys, interms.collect(Collectors.toList()));
@@ -70,7 +70,7 @@ public abstract class OccurenceHolidayCanonicalizationBase implements DomainCano
 			if (interm.isImporting(Items.TARGET_DATE)) {
 				val key = RecordKey.of(interm);
 				if (keys.contains(key)) {
-					require.add(context, ExternalImportError.record(interm.getRowNo(), "受入データの中に重複レコード（社員と日付が同じ）があります。"));
+					require.add(ExternalImportError.record(interm.getRowNo(), context.getDomainId(), "受入データの中に重複レコード（社員と日付が同じ）があります。"));
 					continue;
 				}
 				keys.add(key);
@@ -130,7 +130,7 @@ public abstract class OccurenceHolidayCanonicalizationBase implements DomainCano
 		
 		// 日付不明
 		boolean isDateUnknown = interm.getItemByNo(Items.TARGET_DATE).map(d -> d.getValue()).orElse(null) == null;
-		interm = interm.addCanonicalized(CanonicalItem.of(Items.TARGET_DATE_UNKNOWN, isDateUnknown ? 1 : 0));
+		interm = interm.addCanonicalized(CanonicalItem.of(Items.TARGET_DATE_UNKNOWN, isDateUnknown));
 		
 		interm = canonicalizeExtends(require, context, interm);
 		

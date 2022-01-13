@@ -2,6 +2,7 @@ package nts.uk.ctx.at.request.app.command.application.applicationlist;
 
 import java.util.Optional;
 
+import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 
 import lombok.Data;
@@ -48,12 +49,28 @@ public class ListOfAppTypesCmd {
 	private String opString;
 	
 	public ListOfAppTypes toDomain() {
-		return new ListOfAppTypes(
-				EnumAdaptor.valueOf(appType, ApplicationType.class), 
-				appName, 
-				choice, 
-				Strings.isNotBlank(opProgramID) ? Optional.of(opProgramID) : Optional.empty(), 
-				opApplicationTypeDisplay != null ? Optional.of(EnumAdaptor.valueOf(opApplicationTypeDisplay, ApplicationTypeDisplay.class)) : Optional.empty(), 
-				Strings.isNotBlank(opString) ? Optional.of(opString) : Optional.empty());
+		ApplicationTypeDisplay opApplicationTypeEnum = null;
+		if(appType == ApplicationType.STAMP_APPLICATION.value){
+			if(opApplicationTypeDisplay == ApplicationTypeDisplay.STAMP_ADDITIONAL.value){
+				opApplicationTypeEnum = ApplicationTypeDisplay.STAMP_ADDITIONAL;
+			}else if(opApplicationTypeDisplay == ApplicationTypeDisplay.STAMP_ONLINE_RECORD.value){
+				opApplicationTypeEnum = ApplicationTypeDisplay.STAMP_ONLINE_RECORD;
+			}
+			return new ListOfAppTypes(
+					EnumAdaptor.valueOf(appType, ApplicationType.class),
+					appName,
+					choice,
+					Strings.isNotBlank(opProgramID) ? Optional.of(opProgramID) : Optional.empty(),
+					opApplicationTypeEnum != null ? Optional.of(opApplicationTypeEnum) : Optional.empty(),
+					Strings.isNotBlank(opString) ? Optional.of(opString) : Optional.empty());
+		}else {
+			return new ListOfAppTypes(
+					EnumAdaptor.valueOf(appType, ApplicationType.class),
+					appName,
+					choice,
+					Strings.isNotBlank(opProgramID) ? Optional.of(opProgramID) : Optional.empty(),
+					opApplicationTypeDisplay != null ? Optional.of(EnumAdaptor.valueOf(opApplicationTypeDisplay, ApplicationTypeDisplay.class)) : Optional.empty(),
+					Strings.isNotBlank(opString) ? Optional.of(opString) : Optional.empty());
+		}
 	}
 }

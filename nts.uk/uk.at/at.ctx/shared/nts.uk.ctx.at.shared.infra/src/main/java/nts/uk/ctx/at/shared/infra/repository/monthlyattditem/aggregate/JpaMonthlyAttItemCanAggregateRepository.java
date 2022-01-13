@@ -1,6 +1,5 @@
 package nts.uk.ctx.at.shared.infra.repository.monthlyattditem.aggregate;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -28,7 +27,7 @@ public class JpaMonthlyAttItemCanAggregateRepository extends JpaRepository
 	public List<MonthlyAttItemId> getMonthlyAtdItemCanAggregate(String cid) {
 		return this.queryProxy().query(SELECT_MONTHLY_ATTENDANCE_BY_CID, KrcctMonCalAttenItem.class)
 				.setParameter("cid", cid)
-				.setParameter("calculable", BigDecimal.ONE)
+				.setParameter("calculable", true)
 				.getList(t -> new MonthlyAttItemId(t.getAttItemId()));
 	}
 
@@ -36,7 +35,7 @@ public class JpaMonthlyAttItemCanAggregateRepository extends JpaRepository
 	public List<MonthlyAttItemId> getMonthlyAtdItemCanNotAggregate(String cid) {
 		return this.queryProxy().query(SELECT_MONTHLY_ATTENDANCE_BY_CID, KrcctMonCalAttenItem.class)
 				.setParameter("cid", cid)
-				.setParameter("calculable", BigDecimal.ZERO)
+				.setParameter("calculable", false)
 				.getList(t -> new MonthlyAttItemId(t.getAttItemId()));
 	}
 }

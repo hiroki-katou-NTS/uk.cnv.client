@@ -9,13 +9,12 @@ module nts.uk.at.view.kdw006 {
         let screenModel = new viewmodel.ScreenModel(dataShare);
         screenModel.startPage().done(function() {
             __viewContext.bind(screenModel);
-            let sidebar = 0;
-            if(dataShare){
-                sidebar = dataShare.ShareObject || 0;
-            }
+            // let sidebar = 0;
+            // if(dataShare){
+            //     sidebar = dataShare.ShareObject || 0;
+            // }
                 
-            $("#sidebar").ntsSideBar("active", sidebar);
-            $('#button1').focus();
+            $('#A1_5').focus();
         });
     });
 }

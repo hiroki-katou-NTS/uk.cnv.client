@@ -13,24 +13,22 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.primitivevalue.Heade
 @NoArgsConstructor
 public class ControlOfAttendanceItemsCmd {
 
-	/**会社ID*/
+	/**	会社ID*/
 	private String companyID;
 	
-	/**勤怠項目ID*/
+	/**	勤怠項目ID*/
 	private int itemDailyID;
 	
-	/**日別実績のヘッダ背景色*/
+	/**	日別実績のヘッダ背景色*/
 	private String headerBgColorOfDailyPer;
-
-	/**時間項目の入力単位*/
-	private BigDecimal inputUnitOfTimeItem;
+	
+	private UpdateDailyAttendanceItemCommand updateDailyAttendanceItemCommand;
 	
 	public static ControlOfAttendanceItems fromDomain(ControlOfAttendanceItemsCmd command) {
 		return new ControlOfAttendanceItems(
 				command.getCompanyID(),
 				command.getItemDailyID(),
-				command.getHeaderBgColorOfDailyPer()==null?null: new HeaderBackgroundColor(command.getHeaderBgColorOfDailyPer()),
-				command.getInputUnitOfTimeItem()==null? null : command.getInputUnitOfTimeItem() 
-				);
+				command.getHeaderBgColorOfDailyPer() == null ? null : new HeaderBackgroundColor(command.getHeaderBgColorOfDailyPer())
+		);
 	}
 }

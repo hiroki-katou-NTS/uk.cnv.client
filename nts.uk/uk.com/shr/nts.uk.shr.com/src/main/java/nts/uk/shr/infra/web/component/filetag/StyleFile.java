@@ -23,11 +23,17 @@ public class StyleFile extends UIComponentBase {
             "/lib/nittsu/ui/style/stylesheets/base.css",
             "/lib/generic/spectrum/spectrum.css"
     }));
+    
+    public static Set<String> FILES_FULLCALENDAR = new  LinkedHashSet<String>(Arrays.asList(new String[] {
+    		"/lib/generic/fullcalendar/main.min.css",
+    		"/lib/generic/fullcalendar/datepicker/fc-datepicker.css"
+    }));
 
     @SuppressWarnings("serial")
     private static Map<String, Set<String>> FILE_SETS = new HashMap<String, Set<String>>() {
         {
             this.put("BASIC", FILES_BASIC);
+            this.put("FULLCALENDAR", FILES_FULLCALENDAR);
         }
     };
     

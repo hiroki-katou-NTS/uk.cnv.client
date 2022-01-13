@@ -15,6 +15,7 @@ import javax.ejb.Stateless;
 import nts.arc.error.BusinessException;
 import nts.arc.layer.infra.data.DbConsts;
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.arc.layer.infra.data.database.DatabaseProduct;
 import nts.arc.layer.infra.data.jdbc.NtsResultSet;
 import nts.arc.layer.infra.data.jdbc.NtsStatement;
 import nts.arc.time.GeneralDate;
@@ -431,20 +432,22 @@ public class JpaLeaveManaDataRepo extends JpaRepository implements LeaveManaData
 	public void addAll(List<LeaveManagementData> domains) {
 		String INS_SQL = "INSERT INTO KRCDT_HD_WORK_MNG (INS_DATE, INS_CCD , INS_SCD , INS_PG,"
 				+ " UPD_DATE , UPD_CCD , UPD_SCD , UPD_PG," 
-				+ " LEAVE_MANA_ID, CID, SID, UNKNOWN_DATE, DAYOFF_DATE, EXPIRED_DATE, OCCURRED_DAYS, OCCURRED_TIMES,"
+				+ " LEAVE_MANA_ID, CONTRACT_CD, CID, SID, UNKNOWN_DATE, DAYOFF_DATE, EXPIRED_DATE, OCCURRED_DAYS, OCCURRED_TIMES,"
 				+ " UNUSED_DAYS, UNUSED_TIMES, SUB_HD_ATR, FULL_DAY_TIME, HALF_DAY_TIME, DISAPEAR_DATE )"
 				+ " VALUES (INS_DATE_VAL, INS_CCD_VAL, INS_SCD_VAL, INS_PG_VAL,"
 				+ " UPD_DATE_VAL, UPD_CCD_VAL, UPD_SCD_VAL, UPD_PG_VAL,"
-				+ " LEAVE_MANA_ID_VAL, CID_VAL, SID_VAL, UNKNOWN_DATE_VAL, DAYOFF_DATE_VAL, EXPIRED_DATE_VAL, OCCURRED_DAYS_VAL, OCCURRED_TIMES_VAL,"
+				+ " LEAVE_MANA_ID_VAL, CONTRACT_CD_VAL, CID_VAL, SID_VAL, UNKNOWN_DATE_VAL, DAYOFF_DATE_VAL, EXPIRED_DATE_VAL, OCCURRED_DAYS_VAL, OCCURRED_TIMES_VAL,"
 				+ " UNUSED_DAYS_VAL, UNUSED_TIMES_VAL, SUB_HD_ATR_VAL, FULL_DAY_TIME_VAL, HALF_DAY_TIME_VAL, DATE_VAL); ";
 		String insCcd = AppContexts.user().companyCode();
 		String insScd = AppContexts.user().employeeCode();
 		String insPg = AppContexts.programId();
+		String contractCd = AppContexts.user().contractCode();
 		
 		String updCcd = insCcd;
 		String updScd = insScd;
 		String updPg = insPg;
 		StringBuilder sb = new StringBuilder();
+		boolean isPostgreSQL = this.database().is(DatabaseProduct.POSTGRESQL);
 		domains.stream().forEach(c -> {
 			String sql = INS_SQL;
 			sql = sql.replace("INS_DATE_VAL", "'" + GeneralDateTime.now() + "'");
@@ -458,10 +461,15 @@ public class JpaLeaveManaDataRepo extends JpaRepository implements LeaveManaData
 			sql = sql.replace("UPD_PG_VAL", "'" + updPg + "'");
 
 			sql = sql.replace("LEAVE_MANA_ID_VAL", "'" + c.getID() + "'");
+			sql = sql.replace("CONTRACT_CD_VAL", "'" + contractCd + "'");
 			sql = sql.replace("CID_VAL", "'" + c.getCID()+ "'");
 			sql = sql.replace("SID_VAL", "'" + c.getSID()+ "'");
 			
-			sql = sql.replace("UNKNOWN_DATE_VAL", c.getComDayOffDate().isUnknownDate() == true? "1":"0");
+			if (isPostgreSQL) {
+				sql = sql.replace("UNKNOWN_DATE_VAL", "" + c.getComDayOffDate().isUnknownDate());
+			} else {
+	            sql = sql.replace("UNKNOWN_DATE_VAL", c.getComDayOffDate().isUnknownDate() == true? "1":"0");
+			}
 			sql = sql.replace("DAYOFF_DATE_VAL", c.getComDayOffDate().getDayoffDate().isPresent()
 					? "'" + c.getComDayOffDate().getDayoffDate().get() +"'" : "null");
 			sql = sql.replace("EXPIRED_DATE_VAL", c.getExpiredDate() == null? "null" : "'" + c.getExpiredDate() + "'");

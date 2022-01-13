@@ -4,6 +4,9 @@
   text-decoration: none;
   color: gray;
 }
+.limited-label-view {
+  z-index: 999;
+}
 #B1_1 {
   overflow: hidden;
   outline: 1px solid black;

@@ -1,5 +1,11 @@
 module nts.uk.com.view.cas001.a {
+    import setShared = nts.uk.ui.windows.setShared;
+
     __viewContext.ready(function() {
+        __viewContext.transferred.ifPresent((data: any) => {
+            setShared("CAS001A_PARAMS", data);
+        });
+
         __viewContext['screenModel'] = new viewmodel.ScreenModel();
         __viewContext.bind(__viewContext['screenModel']);
 

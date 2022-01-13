@@ -73,7 +73,7 @@ table td {
 	padding-top: 10px;
 }
 
-#J8_7, #J8_11 {
+#J8_2, #J8_7, #J8_11 {
 	width: 300px;
 	padding-left: 65px;
 }
@@ -86,4 +86,8 @@ table td {
 	width: 70px;
 	text-align: center;
 	margin: 0 -3px;
+}
+
+#J8_3 {
+  padding-left: 85px;
 }

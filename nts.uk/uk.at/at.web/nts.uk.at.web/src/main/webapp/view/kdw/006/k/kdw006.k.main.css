@@ -1,0 +1,67 @@
+.view-kdw .left-content {
+    width: 350px;
+    float: left;
+}
+
+.view-kdw .right-content {
+    padding-left: 415px;
+}
+
+.view-kdw {
+    padding: 20px;
+}
+
+.view-kdw .left-content .column-1 .title {
+    box-sizing: border-box;
+    float: left;
+    padding-top: 7px;
+}
+
+.view-kdw .left-content .column-2 {
+    padding-top: 10px;
+    text-align: right;
+}
+
+.view-kdw .left-content .column-2 span {
+    padding-right: 25px; 
+    float: left; 
+    padding-top: 5px;
+}
+
+.view-kdw .left-content .column-2 div {
+    width: 175px; 
+    box-sizing: border-box; 
+    float: left; 
+    padding-top: 5px;
+}
+
+.view-kdw .left-content .column-3 {
+    padding-top: 20px;
+}
+
+.view-kdw .right-content .column-1 {
+    padding-top: 40px;
+}
+
+.view-kdw .right-content .column-2 {
+    padding-top: 10px;
+}
+
+.view-kdw .right-content .column-3 {
+    padding-top: 10px;
+}
+
+.inputCode {
+    max-width: 185px !important;
+    width: 185px !important;
+}
+
+.inputName {
+    max-width: 185px !important;
+    width: 185px !important;
+}
+
+.inputMemo {
+    max-width: 185px !important;
+    width: 185px !important;
+}

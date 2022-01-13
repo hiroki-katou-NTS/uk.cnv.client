@@ -8,6 +8,7 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.time.*;
 import org.apache.commons.lang3.BooleanUtils;
 
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.val;
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.layer.infra.data.jdbc.map.JpaEntityMapper;
+import nts.uk.ctx.exio.dom.input.domain.ImportingDomainId;
 import nts.uk.ctx.exio.dom.input.importableitem.ItemType;
 import nts.uk.ctx.exio.dom.input.setting.ExternalImportCode;
 import nts.uk.ctx.exio.dom.input.setting.assembly.revise.ReviseItem;
@@ -30,11 +32,6 @@ import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.string.Padding;
 import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.string.PaddingLength;
 import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.string.PaddingMethod;
 import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.string.StringRevise;
-import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.time.HourlySegment;
-import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.time.TimeBase10Rounding;
-import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.time.TimeBase60Delimiter;
-import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.time.TimeBaseNumber;
-import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.time.TimeRevise;
 import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
 
 /**
@@ -60,7 +57,7 @@ public class XimmtReviseItem extends ContractUkJpaEntity implements Serializable
 	
 	/*  */
 	@Column(name = "IS_DECIMALIZATION")
-	private Integer isDecimalization;
+	private Boolean isDecimalization;
 	
 	/*  */
 	@Column(name = "DECIMAL_DEGIT_NUMBER")
@@ -68,7 +65,7 @@ public class XimmtReviseItem extends ContractUkJpaEntity implements Serializable
 	
 	/*  */
 	@Column(name = "USE_PADDING")
-	private Integer usePadding;
+	private Boolean usePadding;
 	
 	/*  */
 	@Column(name = "PADDING_LENGTH")
@@ -121,7 +118,7 @@ public class XimmtReviseItem extends ContractUkJpaEntity implements Serializable
 			val r = (StringRevise) reviseValue;
 			
 			entity.itemType = ItemType.STRING.value;
-			entity.usePadding = r.isUsePadding() ? 1 : 0;
+			entity.usePadding = r.isUsePadding();
 			r.getPadding().ifPresent(p -> {
 				entity.paddingLength = p.getLength().v();
 				entity.paddingMethod = p.getMethod().value;
@@ -136,7 +133,7 @@ public class XimmtReviseItem extends ContractUkJpaEntity implements Serializable
 			val r = (RealRevise) reviseValue;
 			
 			entity.itemType = ItemType.REAL.value;
-			entity.isDecimalization = r.isDecimalization() ? 1 : 0;
+			entity.isDecimalization = r.isDecimalization();
 			entity.decimalLength = r.getLength().map(l -> l.v()).orElse(null);
 		}
 		
@@ -147,12 +144,24 @@ public class XimmtReviseItem extends ContractUkJpaEntity implements Serializable
 			entity.dateFormat = r.getDateFormat().value;
 		}
 		
-		else if (reviseValue instanceof TimeRevise) {
-			val r = (TimeRevise) reviseValue;
+		else if (reviseValue instanceof TimeDurationRevise) {
+			val r = (TimeDurationRevise) reviseValue;
 			
 			// TIME_POINTでもDURATIONでもどちらでも良い。どちらにせよTimeReviseとしてtoDomainされるので問題ない。
 			entity.itemType = ItemType.TIME_DURATION.value;
 			
+			entity.hourly = r.getHourly().value;
+			entity.baseNumber = r.getBaseNumber().map(e -> e.value).orElse(null);
+			entity.delimiter = r.getDelimiter().map(e -> e.value).orElse(null);
+			entity.rounding = r.getRounding().map(e -> e.value).orElse(null);
+		}
+
+		else if (reviseValue instanceof TimePointRevise) {
+			val r = (TimePointRevise) reviseValue;
+
+			// TIME_POINTでもDURATIONでもどちらでも良い。どちらにせよTimeReviseとしてtoDomainされるので問題ない。
+			entity.itemType = ItemType.TIME_POINT.value;
+
 			entity.hourly = r.getHourly().value;
 			entity.baseNumber = r.getBaseNumber().map(e -> e.value).orElse(null);
 			entity.delimiter = r.getDelimiter().map(e -> e.value).orElse(null);
@@ -168,6 +177,7 @@ public class XimmtReviseItem extends ContractUkJpaEntity implements Serializable
 		return new ReviseItem(
 				pk.getCompanyId(),
 				new ExternalImportCode(pk.getSettingCode()),
+				ImportingDomainId.valueOf(pk.getDomainId()),
 				pk.getItemNo(),
 				getReviseValue(codeConvert));
 	}
@@ -176,8 +186,8 @@ public class XimmtReviseItem extends ContractUkJpaEntity implements Serializable
 		switch(EnumAdaptor.valueOf(itemType, ItemType.class)) {
 			case STRING:
 				return new StringRevise(
-						usePadding == 1,
-						Optional.ofNullable(usePadding == 1 ? new Padding(
+						usePadding,
+						Optional.ofNullable(usePadding ? new Padding(
 								new PaddingLength(paddingLength),
 								EnumAdaptor.valueOf(paddingMethod, PaddingMethod.class)) : null),
 						codeConvert);
@@ -187,13 +197,18 @@ public class XimmtReviseItem extends ContractUkJpaEntity implements Serializable
 			case REAL:
 				return new RealRevise(
 						BooleanUtils.toBoolean(isDecimalization),
-						Optional.ofNullable(isDecimalization == 1 ? new DecimalDigitNumber(decimalLength) : null));
+						Optional.ofNullable(isDecimalization ? new DecimalDigitNumber(decimalLength) : null));
 			case DATE:
 				return new DateRevise(
 						EnumAdaptor.valueOf(dateFormat, ExternalImportDateFormat.class));
 			case TIME_POINT:
+				return new TimePointRevise(
+						EnumAdaptor.valueOf(hourly, HourlySegment.class),
+						EnumAdaptor.optionalOf(baseNumber, TimeBaseNumber.class),
+						EnumAdaptor.optionalOf(delimiter, TimeBase60Delimiter.class),
+						EnumAdaptor.optionalOf(rounding, TimeBase10Rounding.class));
 			case TIME_DURATION:
-				return new TimeRevise(
+				return new TimeDurationRevise(
 						EnumAdaptor.valueOf(hourly, HourlySegment.class),
 						EnumAdaptor.optionalOf(baseNumber, TimeBaseNumber.class),
 						EnumAdaptor.optionalOf(delimiter, TimeBase60Delimiter.class),

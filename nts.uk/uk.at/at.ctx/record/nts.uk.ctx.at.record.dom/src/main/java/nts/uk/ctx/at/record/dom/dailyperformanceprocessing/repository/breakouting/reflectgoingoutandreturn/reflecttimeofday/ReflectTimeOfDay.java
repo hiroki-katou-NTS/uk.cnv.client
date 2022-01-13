@@ -16,7 +16,7 @@ import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.breakoutin
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.breakouting.reflectgoingoutandreturn.reflecttimeofday.preparetimeframe.PrepareTimeFrame;
 import nts.uk.ctx.at.record.dom.dailyperformanceprocessing.repository.reflectattdclock.AttendanceAtr;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
 import nts.uk.ctx.at.shared.dom.remainingnumber.annualleave.empinfo.grantremainingdata.AnnualLeaveGrantRemainingData;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.TimeActualStamp;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.TimeChangeMeans;
@@ -48,8 +48,8 @@ public class ReflectTimeOfDay {
 				timeFrameNext = Optional.of(listTimeFrame.get(i+1));
 			}
 			//戻りOR終了の場合 (臨時退勤)
-			if(stamp.getType().getChangeClockArt() == ChangeClockArt.RETURN || 
-			   stamp.getType().getChangeClockArt() == ChangeClockArt.TEMPORARY_LEAVING ) {
+			if(stamp.getType().getChangeClockArt() == ChangeClockAtr.RETURN || 
+			   stamp.getType().getChangeClockArt() == ChangeClockAtr.TEMPORARY_LEAVING ) {
 				if(!listTimeFrame.get(i).getEnd().isPresent()
 						|| !timeFrame.getEnd().isPresent()
 						|| !timeFrame.getEnd().get().getStamp().isPresent()
@@ -64,8 +64,8 @@ public class ReflectTimeOfDay {
 					break;
 				}
 			//外出OR開始の場合(臨時出勤 )
-			}else if(stamp.getType().getChangeClockArt() == ChangeClockArt.GO_OUT || 
-					   stamp.getType().getChangeClockArt() == ChangeClockArt.TEMPORARY_WORK ) {
+			}else if(stamp.getType().getChangeClockArt() == ChangeClockAtr.GO_OUT || 
+					   stamp.getType().getChangeClockArt() == ChangeClockAtr.TEMPORARY_WORK ) {
 				if(!listTimeFrame.get(i).getStart().isPresent() 
 						|| !timeFrame.getStart().isPresent()
 						|| !timeFrame.getStart().get().getStamp().isPresent()

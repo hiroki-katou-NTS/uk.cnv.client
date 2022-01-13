@@ -13,6 +13,7 @@
 		
 		<com:ValidatorScript>
 			nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.string.PaddingLength
+			nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.real.DecimalDigitNumber
 		</com:ValidatorScript>
 		
 		<com:EnumScript>
@@ -27,7 +28,7 @@
 
 	<ui:define name="content" >
 		<div id="functions-area">
-			<a class="goback" data-bind="ntsLinkButton: { jump: '../b/index.xhtml' }, text: '戻る'"></a>
+			<a class="goback" data-bind="ntsLinkButton: { action: clickBackButton }, text: '戻る'"></a>
 			<button class="proceed" data-bind="enable: canSave, click: save">登録</button>
 			<button class="danger" data-bind="enable: canDeleteSetting, click: deleteSetting">設定を削除する</button>
 		</div>
@@ -98,6 +99,7 @@
 									</div>
 									<div class="inline detail">
 										<input class="check-target" id="padding-length" data-bind="ntsNumberEditor: {
+											name: '桁埋め桁数',
 											value: paddingLength,
 											enable: usePadding() === true,
 											constraint: 'PaddingLength',
@@ -123,7 +125,12 @@
 										<div data-bind="ntsCheckBox: { checked: isDecimalization, text: '小数点を付与する' }"></div>
 									</div>
 									<div class="inline detail">
-										<input class="check-target" data-bind="ntsNumberEditor: {value: decimalizationLength, enable: isDecimalization, required: isDecimalization }" />
+										<input class="check-target" data-bind="ntsNumberEditor: {
+											name: '少数桁数',
+											value: decimalizationLength,
+											enable: isDecimalization,
+											constraint: 'DecimalDigitNumber',
+											required: isDecimalization }" />
 										桁目に付与
 									</div>
 								</div>

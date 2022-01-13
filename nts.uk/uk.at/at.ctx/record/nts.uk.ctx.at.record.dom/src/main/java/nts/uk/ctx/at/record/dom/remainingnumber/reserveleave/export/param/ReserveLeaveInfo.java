@@ -256,7 +256,7 @@ public class ReserveLeaveInfo implements Cloneable {
 			grantRemainingNumber.setExpirationStatus(LeaveExpirationStatus.EXPIRED);
 
 			// 未消化数を更新
-			val targetUndigestNumber = this.remainingNumber.getＲeserveLeaveUndigestedNumber();
+			val targetUndigestNumber = this.remainingNumber.getReserveLeaveUndigestedNumber();
 			val remainingNumber = grantRemainingNumber.getDetails().getRemainingNumber();
 			targetUndigestNumber.addDays(remainingNumber.getDays().v());
 		}
@@ -493,8 +493,7 @@ public class ReserveLeaveInfo implements Cloneable {
 						aggrPeriodWork.getPeriod().start());
 				
 				if(dummyData.isPresent()){
-					ReserveLeaveGrantRemainingData addData = new ReserveLeaveGrantRemainingData();
-					addData.setAllValue(dummyData.get());
+					ReserveLeaveGrantRemainingData addData = ReserveLeaveGrantRemainingData.of(dummyData.get());
 					this.grantRemainingList.add(addData);
 				}
 

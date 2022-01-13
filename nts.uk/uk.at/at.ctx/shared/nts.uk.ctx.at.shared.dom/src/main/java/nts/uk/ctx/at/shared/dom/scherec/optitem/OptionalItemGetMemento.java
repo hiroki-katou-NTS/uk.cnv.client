@@ -63,11 +63,11 @@ public interface OptionalItemGetMemento {
 	PerformanceAtr getPerformanceAtr();
 
 	/**
-	 * Gets the calculation result range.
+	 * Gets the inputControlSetting.
 	 *
-	 * @return the calculation result range
+	 * @return the inputControlSetting
 	 */
-	CalcResultRange getCalculationResultRange();
+	InputControlSetting getInputControlSetting();
 
 	/**
 	 * Gets the unit.

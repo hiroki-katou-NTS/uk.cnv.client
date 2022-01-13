@@ -1,5 +1,6 @@
 package nts.uk.ctx.at.aggregation.dom.schedulecounter.aggregationprocess.personcounter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +43,8 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.shortworkti
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.shortworktime.ShortWorkTimeOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.snapshot.SnapShot;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.temporarytime.TemporaryTimeOfDaily;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.OuenWorkTimeOfDailyAttendance;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.OuenWorkTimeSheetOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.vacationusetime.HolidayOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.WorkInfoOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workschedule.WorkScheduleTimeOfDaily;
@@ -50,6 +53,8 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime.At
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime.ConstraintTime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime.StayingTimeOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime.TotalWorkingTime;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.ExtraTimeItemNo;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.WorkingHoursUnitPrice;
 
 public class WorkingTimeCounterServiceHelper {
 	@Mocked
@@ -96,6 +101,12 @@ public class WorkingTimeCounterServiceHelper {
 
 	@Mocked
 	static List<RemarksOfDailyAttd> remarks;
+	
+	@Mocked
+	static List<OuenWorkTimeOfDailyAttendance> ouenTime;
+	
+	@Mocked
+	static List<OuenWorkTimeSheetOfDailyAttendance> ouenTimeSheet;
 
 	@Mocked
 	static Optional<SnapShot> snapshot;
@@ -113,7 +124,7 @@ public class WorkingTimeCounterServiceHelper {
 				,	outingTime, breakTime
 				,	Optional.of(AttendanceTimeOfDailyAttendanceHelp.createDailyAttendance(workingWithin, workingExtra))
 				,	attendanceLeave, shortTime, specDateAttr, attendanceLeavingGate, anyItemValue, editState, tempTime
-				,	remarks, snapshot);
+				,	remarks, ouenTime, ouenTimeSheet, snapshot);
 	}
 
 	public static class AttendanceTimeOfDailyAttendanceHelp {
@@ -248,13 +259,15 @@ public class WorkingTimeCounterServiceHelper {
 	public static class PremiumTimeOfDailyPerformanceHepler {
 		@Mocked
 		static AttendanceAmountDaily premiumAmount;
+		@Mocked
+		static WorkingHoursUnitPrice unitPrice;
 
 		public static PremiumTimeOfDailyPerformance createPremiumTimeOfDaily(AttendanceTime workingExtra) {
 			return new PremiumTimeOfDailyPerformance(Arrays.asList(createPremiumTime(workingExtra)));
 		}
 
 		public static PremiumTime createPremiumTime(AttendanceTime workingExtra) {
-			return new PremiumTime(1, workingExtra, premiumAmount);
+			return new PremiumTime(ExtraTimeItemNo.valueOf(1), workingExtra, premiumAmount, unitPrice);
 		}
 	}
 }

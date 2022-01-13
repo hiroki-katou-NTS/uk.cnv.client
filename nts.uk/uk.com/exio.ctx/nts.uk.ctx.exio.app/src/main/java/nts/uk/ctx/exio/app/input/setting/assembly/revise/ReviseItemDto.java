@@ -2,11 +2,13 @@ package nts.uk.ctx.exio.app.input.setting.assembly.revise;
 
 import java.util.Optional;
 
+import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.time.*;
 import org.apache.commons.lang3.BooleanUtils;
 
 import lombok.Data;
 import lombok.Value;
 import lombok.val;
+import nts.uk.ctx.exio.dom.input.domain.ImportingDomainId;
 import nts.uk.ctx.exio.dom.input.importableitem.ItemType;
 import nts.uk.ctx.exio.dom.input.setting.ExternalImportCode;
 import nts.uk.ctx.exio.dom.input.setting.assembly.revise.ReviseItem;
@@ -21,11 +23,6 @@ import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.string.Padding;
 import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.string.PaddingLength;
 import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.string.PaddingMethod;
 import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.string.StringRevise;
-import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.time.HourlySegment;
-import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.time.TimeBase10Rounding;
-import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.time.TimeBase60Delimiter;
-import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.time.TimeBaseNumber;
-import nts.uk.ctx.exio.dom.input.setting.assembly.revise.type.time.TimeRevise;
 
 @Value
 public class ReviseItemDto {
@@ -42,11 +39,12 @@ public class ReviseItemDto {
 				RevisingValue.of(domain.getRevisingValue()));
 	}
 	
-	public ReviseItem toDomain(String companyId, ItemType itemType) {
+	public ReviseItem toDomain(String companyId, int domainId,  ItemType itemType) {
 		
 		return new ReviseItem(
 				companyId,
 				new ExternalImportCode(settingCode),
+				ImportingDomainId.valueOf(domainId),
 				itemNo,
 				revisingValue.toDomain(itemType));
 	}
@@ -174,8 +172,9 @@ public class ReviseItemDto {
 			case DATE:
 				return toDomainDateRevise();
 			case TIME_DURATION:
+				return toDomainTimeDurationRevise();
 			case TIME_POINT:
-				return toDomainTimeRevise();
+				return toDomainTimePointRevise();
 			default:
 				throw new RuntimeException("unknown: " + itemType);
 			}
@@ -214,13 +213,26 @@ public class ReviseItemDto {
 			return new DateRevise(ExternalImportDateFormat.valueOf(dateFormat));
 		}
 
-		private TimeRevise toDomainTimeRevise() {
+		private TimeRevise toDomainTimeDurationRevise() {
 			
 			if (timeHourlySegment == -1) {
 				return null;
 			}
 			
-			return new TimeRevise(
+			return new TimeDurationRevise(
+					HourlySegment.valueOf(timeHourlySegment),
+					timeBaseNumber != -1 ? Optional.of(TimeBaseNumber.valueOf(timeBaseNumber)) : Optional.empty(),
+					timeDelimiter != -1 ? Optional.of(TimeBase60Delimiter.valueOf(timeDelimiter)) : Optional.empty(),
+					timeRounding != -1 ? Optional.of(TimeBase10Rounding.valueOf(timeRounding)) : Optional.empty());
+		}
+
+		private TimeRevise toDomainTimePointRevise() {
+
+			if (timeHourlySegment == -1) {
+				return null;
+			}
+
+			return new TimePointRevise(
 					HourlySegment.valueOf(timeHourlySegment),
 					timeBaseNumber != -1 ? Optional.of(TimeBaseNumber.valueOf(timeBaseNumber)) : Optional.empty(),
 					timeDelimiter != -1 ? Optional.of(TimeBase60Delimiter.valueOf(timeDelimiter)) : Optional.empty(),
@@ -240,7 +252,7 @@ public class ReviseItemDto {
 		
 		private Optional<ExternalImportCodeConvert> toDomainCodeConvert() {
 			
-			if (BooleanUtils.isNotTrue(useCodeConvert)) {
+			if (BooleanUtils.isNotTrue(useCodeConvert) || codeConvert.getDetails().size() == 0) {
 				return Optional.empty();
 			}
 			

@@ -2368,7 +2368,7 @@ module nts.uk.ui.exTable {
                 let disable = $.data(self.$container, internal.DISABLE);
                 if (!disable) return;
                 self.eachKey(disable, obj => obj.columnKey, obj => !obj.uiReflected, ($cell, obj) => {
-                    helper.markCellWith(style.SEAL_CLS, $cell);
+                    helper.markCellWith(style.SEAL_CLS, $cell, obj.innerIdx);
                     obj.uiReflected = true;
                 });
             }
@@ -2387,9 +2387,13 @@ module nts.uk.ui.exTable {
                         let $childCells = $cell.querySelectorAll("." + render.CHILD_CELL_CLS);
                         if ($childCells && $childCells.length > 0) {
                             if (makeup.textColor) {
-                                _.forEach($childCells, c => {
-                                    c.style.color = makeup.textColor;
-                                });
+                                if (_.isNil(obj.innerIdx) || obj.innerIdx === -1) {
+                                    _.forEach($childCells, c => {
+                                        c.style.color = makeup.textColor;
+                                    });
+                                } else if ($childCells.length > obj.innerIdx) {
+                                    $childCells[obj.innerIdx].style.color = makeup.textColor;
+                                }
                             } else helper.addClass($childCells, makeup.class);
                         } else if (makeup.textColor) {  // Don't set textColor
                             $cell.style.color = makeup.textColor;
@@ -3166,6 +3170,8 @@ module nts.uk.ui.exTable {
                 exTable[f].dataSource[ui.rowIndex][ui.columnKey][field] = ui.value;
                 return { updateTarget: updateTarget, value: oldVal };
             }
+            
+            exTable[f].dataSource[ui.rowIndex][ui.columnKey][field] = ui.value;
             return null;
         }
         

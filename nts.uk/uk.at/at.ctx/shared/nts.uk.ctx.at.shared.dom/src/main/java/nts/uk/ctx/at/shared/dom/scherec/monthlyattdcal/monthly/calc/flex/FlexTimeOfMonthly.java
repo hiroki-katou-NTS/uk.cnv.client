@@ -1944,7 +1944,7 @@ public class FlexTimeOfMonthly implements SerializableWithOptional{
 			Collection<AttendanceTimeOfDailyAttendance> dailyAttendanceTime){
 		
 		// 「フレックス集計方法」を確認する　（原則集計かどうか）
-		if (flexAggregateMethod == FlexAggregateMethod.PRINCIPLE){
+		if (flexAggregateMethod == FlexAggregateMethod.PRINCIPLE) {
 			
 			/** フレックス時間発生するかを確認する */
 			if (this.checkIsFlexTimeOccur(settingsByFlex.getFlexAggrSet())){
@@ -1971,6 +1971,11 @@ public class FlexTimeOfMonthly implements SerializableWithOptional{
 				// 所定労働時間を返す　（呼び出し元で就業時間に入れる）
 				return Optional.of(new AttendanceTimeMonth(predMinutes));
 			}
+		} else {
+			
+			/** 就業時間の合計処理 */
+			/** ○就業時間←就業合計時間 */
+			aggregateTotalWorkingTime.getWorkTime().totalizeWorkTime(datePeriod);
 		}
 		
 		return Optional.empty();
@@ -2218,6 +2223,14 @@ public class FlexTimeOfMonthly implements SerializableWithOptional{
 		/** 総労働対象時間を計算する  */
 		return new AttendanceTimeMonth(this.flexExcessTime.v() +
 				this.flexCarryforwardTime.getFlexCarryforwardWorkTime().v());
+	}
+	
+	/** フレックス時間の再計算 */
+	public void recalcFlexTime() {
+		
+		/**　フレックス時間を計算する　*/
+		val flexTime = this.flexExcessTime.valueAsMinutes() - this.flexShortageTime.valueAsMinutes();
+		this.flexTime.getFlexTime().setTime(new AttendanceTimeMonthWithMinus(flexTime));
 	}
 	
 	/**

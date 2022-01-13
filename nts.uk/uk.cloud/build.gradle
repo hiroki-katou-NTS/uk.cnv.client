@@ -1,4 +1,4 @@
-﻿import org.gradle.api.Project
+import org.gradle.api.Project
 
 apply plugin: 'java'
 
@@ -143,8 +143,8 @@ subprojects {
 
 		// Log4J
 		compile group: 'log4j', name: 'log4j', version: '1.2.17'
-		compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.7'
-		compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.7'
+		compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
+		compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
 
 		// SLF4J
 		compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
@@ -178,6 +178,10 @@ subprojects {
 
 		compile group: 'com.shr', name: 'nts.uk.shr.com', version: version
 
+		// テナント作成時の初期値コピーで参照する
+		compile group: 'uk.com:com.ctx:sys:assist:nts.uk.ctx.sys.assist.app', name: 'nts.uk.ctx.sys.assist.app', version: version
+		compile group: 'uk.com:com.ctx:sys:assist:nts.uk.ctx.sys.assist.dom', name: 'nts.uk.ctx.sys.assist.dom', version: version
+
 		// OneLogin Java SAML Toolkit
 		compile group: 'com.onelogin', name: 'java-saml', version: '2.5.0'
 		compile group: 'com.onelogin', name: 'java-saml-core', version: '2.5.0'
@@ -193,58 +197,33 @@ subprojects {
 
 project (':cloud.operate:nts.uk.ctx.cloud.operate.dom') {
 
-	repositories {
-		// use local repository
-		flatDir {
-			dirs localRepo
-	 	}
-	}
 	dependencies {
-		runtime(group: 'com.bs.company', name: 'nts.uk.ctx.bs.company.dom', version: version)
+		compile(group: 'com.bs.company', name: 'nts.uk.ctx.bs.company.dom', version: version)
+		compile(group: 'com.sys.gateway', name: 'nts.uk.ctx.sys.gateway.dom', version: version)
 	}
 }
 
 project (':cloud.operate:nts.uk.ctx.cloud.operate.app') {
 
-	repositories {
-		// use local repository
-		flatDir {
-			dirs localRepo
-	 	}
-	}
-
 	dependencies {
-		runtime(group: 'com.bs.company', name: 'nts.uk.ctx.bs.company.dom', version: version)
-		runtime(group: 'com.sys.gateway', name: 'nts.uk.ctx.sys.gateway.dom', version: version)
-		runtime(group: 'com.sys.tenant', name: 'nts.uk.ctx.sys.tenant.dom', version: version)
+		compile(group: 'com.bs.company', name: 'nts.uk.ctx.bs.company.dom', version: version)
+		compile(group: 'com.sys.gateway', name: 'nts.uk.ctx.sys.gateway.dom', version: version)
 
-		runtime project (':cloud.operate:nts.uk.ctx.cloud.operate.dom')
+		compile project (':cloud.operate:nts.uk.ctx.cloud.operate.dom')
 	}
 }
 
 project (':cloud.operate:nts.uk.ctx.cloud.operate.infra') {
 
-	repositories {
-		// use local repository
-		flatDir {
-			dirs localRepo
-	 	}
-	}
 	dependencies {
-		runtime project (':cloud.operate:nts.uk.ctx.cloud.operate.dom')
+		compile project (':cloud.operate:nts.uk.ctx.cloud.operate.dom')
 	}
 }
 
 project (':cloud.operate:nts.uk.ctx.cloud.operate.ws') {
 
-	repositories {
-		// use local repository
-		flatDir {
-			dirs localRepo
-	 	}
-	}
 	dependencies {
-		runtime project (':cloud.operate:nts.uk.ctx.cloud.operate.app')
+		compile project (':cloud.operate:nts.uk.ctx.cloud.operate.app')
 	}
 }
 
@@ -464,12 +443,29 @@ project (':cloud.web:nts.uk.cloud.web') {
 		runtime group: 'at.schedulealarm', name: 'nts.uk.ctx.at.schedulealarm.pubimp', version: version
 
 		runtime(group: 'com.sys.tenant', name: 'nts.uk.ctx.sys.tenant.dom', version: version)
+		
+		runtime(group: 'com.health', name: 'nts.uk.ctx.health.pub', version: version)
+		runtime(group: 'com.health', name: 'nts.uk.ctx.health.pubimp', version: version)
+		runtime(group: 'com.health', name: 'nts.uk.ctx.health.ac', version: version)
+		runtime(group: 'com.health', name: 'nts.uk.ctx.health.app', version: version)
+		runtime(group: 'com.health', name: 'nts.uk.ctx.health.dom', version: version)
+		runtime(group: 'com.health', name: 'nts.uk.ctx.health.infra', version: version)
+
+		runtime(group: 'uk.cnv.core', name: 'nts.uk.cnv.core', version: version)
+		runtime(group: 'nemunoki', name: 'nemunoki.oruta.shr', version: version)
 
 		runtime project (':cloud.operate:nts.uk.ctx.cloud.operate.ac')
 		runtime project (':cloud.operate:nts.uk.ctx.cloud.operate.app')
 		runtime project (':cloud.operate:nts.uk.ctx.cloud.operate.dom')
 		runtime project (':cloud.operate:nts.uk.ctx.cloud.operate.infra')
 		runtime project (':cloud.operate:nts.uk.ctx.cloud.operate.ws')
+
+		runtime group: 'nts.tenantlocator.client', name:'nts.tenantlocator.client', version:version
+		runtime group: 'nts.tenantlocator.common', name:'nts.tenantlocator.common', version:version
+        
+        compile group: 'nts.jobdistributor', name: 'nts.jobdistributor.common', version: version
+        compile group: 'nts.jobdistributor', name: 'nts.jobdistributor.client', version: version
+        compile group: 'nts.jobdistributor', name: 'nts.jobdistributor.worker', version: version
 	}
 
 	task tsc(type: Exec) {
@@ -488,14 +484,7 @@ project (':cloud.web:nts.uk.cloud.web') {
 		} else {
 			commandLine 'tsc'
 		}
-	}
-}
 
-project (':cloud.operate:nts.uk.ctx.cloud.operate.ac') {
-	dependencies {
-		compile project(':cloud.operate:nts.uk.ctx.cloud.operate.app')
-		compile project(':cloud.operate:nts.uk.ctx.cloud.operate.dom')
-		compile group: 'at.function', name: 'nts.uk.ctx.at.function.pub', version: version
 		args '--watch'
 		ignoreExitValue true
 	}

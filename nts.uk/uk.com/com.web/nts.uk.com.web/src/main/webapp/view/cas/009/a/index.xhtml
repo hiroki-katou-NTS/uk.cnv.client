@@ -21,120 +21,82 @@
 			<com:scriptfile path="/view/ccg/026/component.js" />
 
 			<com:stylefile path="cas009.a.style.css" />
-			<com:scriptfile path="cas009.a.service.js" />
-			<com:scriptfile path="cas009.a.start.js" />
 			<com:scriptfile path="cas009.a.vm.js" />
 		</ui:define>
 
 		<ui:define name="content">
 			<div id="functions-area">
 				<div class="container">
-					<button id="new" data-bind="click: $vm.createNew" tabindex="1">#{i18n.getText('CAS009_3')}</button>
+					<button id="new" data-bind="click: $vm.createNew">#{i18n.getText('CAS009_2')}</button>
 					<button id="registration"
 						data-bind="click: $vm.save, enable : $root.errors.isEmpty"
-						class="proceed" tabindex="2">#{i18n.getText('CAS009_4')}</button>
+						class="proceed">#{i18n.getText('CAS009_3')}</button>
 					<button id="delete"
 						data-bind="click: $vm.remove, enable: !!ko.toJS($vm.selectedRole.roleId)"
-						class="danger" tabindex="3">#{i18n.getText('CAS009_5')}</button>
-					<button id="reference"
-						data-bind="enable: $vm.enableDetail, click: $vm.openDialog, visible : $vm.canOpenDialog"
-						tabindex="4">#{i18n.getText('CAS009_6')}</button>
+						class="danger">#{i18n.getText('CAS009_4')}</button>
+					<!--<button id="reference"-->
+						<!--data-bind="enable: $vm.enableDetail, click: $vm.openDialog"-->
+						<!--tabindex="4">#{i18n.getText('CAS009_6')}</button>-->
 					<!--Export Excel-->
-					<button id="export"
-							data-bind="click: $vm.exportExcel"
-							tabindex="4">#{i18n.getText('CAS009_29')}</button>
+					<!--<button id="export"-->
+							<!--data-bind="click: $vm.exportExcel"-->
+							<!--tabindex="4">#{i18n.getText('CAS009_29')}</button>-->
 				</div>
 			</div>
 			<div id="contents-area" class="fixed-flex-layout">
 				<div class="container cf">
 					<div id="left-content" class="fixed-flex-layout-left"
 						data-bind="with: $vm.component025">
-						<div id='text_list' tabindex="5">#{i18n.getText('CAS009_7')}</div>
-						<div id='list_role' tabindex="6">
+						<div id='list_role'>
 							<ui:include src="/view/ccg/025/component/index.xhtml" />
 						</div>
 					</div>
 
-					<div id="right-content" class="fixed-flex-layout-right"
-						data-bind="with: $vm.selectedRole">
-						<table class="control-group">
-              <colgroup>
-                <col width="120px" />
-                <col width="*" />
-              </colgroup>
-							<tr>
-								<td><div
-										data-bind="ntsFormLabel: {
-											required: true, 
-											constraint: ['RoleCode' , 'RoleName']
-										}">#{i18n.getText('CAS009_10')}</div></td>
-								<td><input
-									data-bind="
-										attr: {
-											id: 'roleCode',
-											tabindex: 7
-										},
-										ntsTextEditor: {
-			                                 name: '#[CAS009_11]',
-			                                 constraint: 'RoleCode',
-			                                 value: roleCode,
-			                                 required: true,
-			                                 enable: $parent.isNewMode,
-			                                 immediate: true
-		                                 },
-		                                 hasFocus: roleCodeFocus" />
-									<input
-									data-bind="
-										attr: {
-											id: 'roleName',
-											tabindex: 8
-										},
-										ntsTextEditor: {
-			                                 name: '#[CAS009_12]',
-			                                 value: roleName,
-			                                 constraint: 'RoleName',
-			                                 required: true,
-			                                 immediate: true
-		                                 },
-		                                 hasFocus: roleNameFocus" />
-								</td>
-							</tr>
-							<tr>
-								<td><div data-bind="ntsFormLabel: {}">#{i18n.getText('CAS009_13')}</div></td>
-								<td>
-									<div
+					<div id="right-content"
+						 class="fixed-flex-layout-right"
+						 data-bind="with: $vm.selectedRole">
+						<div class="control-group valign-center">
+							<div data-bind="ntsFormLabel: {
+										required: true,
+										constraint: ['RoleCode' , 'RoleName']
+									}">#{i18n.getText('CAS009_5')}</div>
+							<input data-bind="
+									attr: {
+										id: 'roleCode'
+									},
+									ntsTextEditor: {
+										 name: '#[CAS009_6]',
+										 constraint: 'RoleCode',
+										 value: roleCode,
+										 required: true,
+										 enable: !!_.isEmpty(ko.toJS(roleId)),
+										 immediate: true
+									 },
+									 hasFocus: roleCodeFocus" />
+							<input data-bind="
+									attr: {
+										id: 'roleName'
+									},
+									ntsTextEditor: {
+										 name: '#[CAS009_7]',
+										 value: roleName,
+										 constraint: 'RoleName',
+										 required: true,
+										 immediate: true
+									 },
+									 hasFocus: roleNameFocus" />
+						</div>
+						<div class="control-group valign-center">
+							<div data-bind="ntsFormLabel: {required: true}">#{i18n.getText('CAS009_8')}</div>
+							<span data-bind="if: assignAtr() == 0">#{i18n.getText('CAS009_9')}</span>
+							<com:ko-if bind="assignAtr() == 1">
+								<div style="width: 215px"
 										data-bind="attr: {
-												tabindex: 9
-											},
-											ntsSwitchButton: {
-												options: $vm.enumAuthen,
-												optionsValue: 'code',
-												optionsText: 'name',
-												value: assignAtr,
-												enable: $parent.isNewMode
-											}"></div>
-								</td>
-							</tr>
-							<tr>
-								<td><div data-bind="ntsFormLabel: {}">#{i18n.getText('CAS009_16')}</div></td>
-								<td>
-									<div
-										data-bind="attr: {
-												tabindex: 10,
 												id: 'combo-box'
 											},
 											ntsComboBox: {
-												options: ko.computed(function() {
-													let at = ko.toJS($vm.selectedRole.assignAtr),
-														rat = Number(at),
-														er = ko.toJS($vm.enumRange);
-														
-													if (!rat) {
-														return er.slice(0, 1);
-													} else {
-														return er.slice(1, 4);
-													}
-												}),
+												name: '#[CAS009_10]',
+												options: $vm.enumRange,
 												optionsValue: 'value',
 												visibleItemsCount: 20,
 												value: employeeReferenceRange,
@@ -144,41 +106,23 @@
 												columns: [
 													{ prop: 'localizedName', length: 8 },
 												]
-											}"></div>
-								</td>
-							</tr>
-
-							<tr>
-								<td><div data-bind="ntsFormLabel: {}">#{i18n.getText('CAS009_17')}</div></td>
-								<td>
-									<div tabindex="11"
-										data-bind="attr: {
-											tabindex: 11
-										},
-										ntsSwitchButton: {
-											options: $vm.enumAllow,
-											optionsValue: 'code',
-											optionsText: 'name',
-											value: referFutureDate
-										}"></div>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="2"><ccg026-component
-										params="{
+											}">
+								</div>
+							</com:ko-if>
+						</div>
+						<ccg026-component
+								params="{
 													label: {
-														require: true,
-														text: 'CAS009_22'
+														require: false,
+														text: 'CAS009_14'
 													},
-													tabindex: 12,
+													tabindex: 0,
 													roleId: roleId,
 													roleType: 8,
 													changeData: permisions,
 													maxRow: 6
-												}"></ccg026-component>
-								</td>
-							</tr>
-						</table>
+												}">
+						</ccg026-component>
 					</div>
 				</div>
 			</div>

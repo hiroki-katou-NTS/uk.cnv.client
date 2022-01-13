@@ -24,26 +24,23 @@ public class RoleSetDto {
 
     /** ロールセット名称*/
     private String roleSetName;
-
-    /** 承認権限*/
-    private boolean approvalAuthority;
-
-    /** ロールID: オフィスヘルパーロール */
+    
+    //** ロールID: オフィスヘルパーロール *//*
     private String officeHelperRoleId;
 
-    /** ロールID: マイナンバーロール */
+    //** ロールID: マイナンバーロール *//*
     private String myNumberRoleId;
 
-    /** ロールID: 人事ロール */
+    //** ロールID: 人事ロール *//*
     private String humanResourceRoleId;
 
-    /** ロールID: 個人情報ロール */
+    //** ロールID: 個人情報ロール *//*
     private String personInfRoleId;
 
-    /** ロールID: 就業ロール */
+    //** ロールID: 就業ロール *//*
     private String employmentRoleId;
 
-    /** ロールID: 給与ロール */
+    //** ロールID: 給与ロール *//*
     private String salaryRoleId;
     
     /** list of web menu code */
@@ -56,16 +53,15 @@ public class RoleSetDto {
      */
     public static RoleSetDto build(RoleSet roleSet, List<WebMenuImportDto> listWebMenuDto) {
         RoleSetDto result = new RoleSetDto();
-        result.setApprovalAuthority(roleSet.hasApprovalAuthority());
         result.setCompanyId(roleSet.getCompanyId());
-        result.setEmploymentRoleId(roleSet.getEmploymentRoleId());
-        result.setHumanResourceRoleId(roleSet.getHRRoleId());
-        result.setMyNumberRoleId(roleSet.getMyNumberRoleId());
-        result.setOfficeHelperRoleId(roleSet.getOfficeHelperRoleId());
-        result.setPersonInfRoleId(roleSet.getPersonInfRoleId());
+        result.setEmploymentRoleId(roleSet.getEmploymentRoleId().orElse(null));
+        result.setHumanResourceRoleId(roleSet.getHRRoleId().orElse(null));
+        result.setMyNumberRoleId(roleSet.getMyNumberRoleId().orElse(null));
+        result.setOfficeHelperRoleId(roleSet.getOfficeHelperRoleId().orElse(null));
+        result.setPersonInfRoleId(roleSet.getPersonInfRoleId().orElse(null));
+        result.setSalaryRoleId(roleSet.getSalaryRoleId().orElse(null));
         result.setRoleSetCd(roleSet.getRoleSetCd().v());
         result.setRoleSetName(roleSet.getRoleSetName().v());
-        result.setSalaryRoleId(roleSet.getSalaryRoleId());
         result.setWebMenus(listWebMenuDto);
         return result;
     }

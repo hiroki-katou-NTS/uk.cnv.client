@@ -18,3 +18,8 @@ table th, td {
 #A1_1 {
   border-collapse: collapse;
 }
+
+#A2_1 {
+  color: red;
+  font-size: 1.5em;
+}

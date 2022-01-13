@@ -13,7 +13,8 @@ module cmm045.a.service {
         findByEmpIDLst: "at/request/application/applist/findByEmpIDLst",
         print: "at/request/application/applist/print",
 		approveCheck: "at/request/application/applist/approve",
-		approverAfterConfirm: "at/request/application/applist/approverAfterConfirm"
+		approverAfterConfirm: "at/request/application/applist/approverAfterConfirm",
+		getMenu: "sys/portal/webmenu/program"
     }
 
     /**
@@ -75,5 +76,8 @@ module cmm045.a.service {
 
 	export function approverAfterConfirm(param: any): JQueryPromise<Array<any>>{
         return nts.uk.request.ajax("at", paths.approverAfterConfirm, param);
+    }
+    export function getMenu(): JQueryPromise<Array<any>>{
+        return nts.uk.request.ajax("com", paths.getMenu);
     }
 }

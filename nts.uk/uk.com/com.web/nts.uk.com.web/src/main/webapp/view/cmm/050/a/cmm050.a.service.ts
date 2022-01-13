@@ -6,6 +6,7 @@ module nts.uk.com.view.cmm050.a {
         var path: any = {
                 find: "sys/env/mailserver/find",
                 save: "sys/env/mailserver/save",
+                checkDataChanged: "sys/env/mailserver/checkDataChanged",
             };
         
         /**
@@ -20,6 +21,10 @@ module nts.uk.com.view.cmm050.a {
          */
         export function registerMailServerSetting(data: model.MailServerDto): JQueryPromise<any> {
             return nts.uk.request.ajax(path.save, data);
+        }
+
+        export function checkDataChanged(data: model.MailServerDto): JQueryPromise<boolean> {
+          return nts.uk.request.ajax(path.checkDataChanged, data);
         }
     }
     

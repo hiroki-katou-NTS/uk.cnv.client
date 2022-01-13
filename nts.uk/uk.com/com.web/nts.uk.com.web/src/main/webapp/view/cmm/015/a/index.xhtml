@@ -7,109 +7,143 @@
 <body>
 	<ui:composition template="../../../../master/base.xhtml">
 		<ui:define name="htmlHead">
-			<com:ValidatorScript>
-				nts.uk.ctx.basic.dom.organization.payclassification.PayClassificationCode
-				nts.uk.ctx.basic.dom.organization.payclassification.PayClassificationName
-				nts.uk.ctx.basic.dom.organization.payclassification.Memo
-			</com:ValidatorScript>
 			<com:stylefile path="cmm015.a.main.css" />
 			<com:scriptfile set="IGNITE" />
-			<com:scriptfile path="cmm015.a.start.js" />
 			<com:scriptfile path="cmm015.a.vm.js" />
-			<com:scriptfile path="cmm015.a.service.js" />
+			<com:scriptfile path="/view/kcp/share/tree.js" of="/nts.uk.com.web"/>
 			<script type="text/javascript">
 			</script>
 		</ui:define>
 		<ui:define name="content">
-			<div id="functions-area" class="divHeader">
-				<button id="A_BTN_001"
-					data-bind="click: initRegisterPayClassification" class="btnStyle">新規</button>
-				<button id="A_BTN_002" data-bind="click: addPayClassification"
-					class="proceed btnStyle">登録</button>
-				<button id="A_BTN_003">マスタ修正ログ</button>
-				<button id="A_BTN_004"
-					data-bind="click: deletePayClassification, enable : isDeleteEnable"
-					class="danger btnStyle">削除</button>
-			</div>
-			<div id="contents-area">
-				<div id="left-content" class="bg-green caret-right caret-background">
-					<i class="icon icon-searchbox"></i>
-					<div class="cf">
-						<div style="float: left">
-							<div id="test"
-								data-bind="ntsSearchBox: {
-                                    comId: 'single-list',
-                                    items: dataSource,         
-                                    selected: currentCode, 
-                                    selectedKey: 'payClassificationCode', 
-                                    childField: 'childs', 
-                                    fields: ['payClassificationName', 'payClassificationCode']}" />
-							<br />
-							<table id="single-list"
-								data-bind="ntsGridList: {
-                                            width: 400,
-                                            height: 680,
-                                            options: dataSource,
-                                            optionsValue: 'payClassificationCode',
-                                            columns: columns,
-                                            multiple: false,
-                                            value: currentCode}"
-								class="cf">
-							</table>
+			<div id="contents-area" style="padding: 10px 20px;">
+				<div id="top-content" class="flex valign-center">
+					<div id="A1_1" data-bind="ntsFormLabel: {required: true}">#{i18n.getText('CMM015_10')}</div>
+					<div id="A1_2" style="margin-left: 15px;" tabindex="1"
+						data-bind="ntsDatePicker: { name: '#[CMM015_10]', value: transferDate, required: true }"
+					></div>
+					<button id="A1_3" tabindex="2" data-bind="click: clickMeans">#{i18n.getText('CMM015_11')}</button>
+				</div>
+
+				<div class="middle-content flex valign-center">
+					<div class="left" style="border-bottom: 0;">
+						<div id ="A2_1" class="panel panel-left flex" style="padding-top: 0px;">
+							<div class="side">
+								<label id ="A2_2" class="label">#{i18n.getText('CMM015_12')}</label>
+								<div style="padding-top: 20px;">
+									<label id ="A2_3" class="label">#{i18n.getText('CMM015_13')}</label>
+									<label id ="A2_4" class="label" data-bind="text: baseDateLeftText"></label>
+								</div>
+								<div class="bottom flex valign-center">
+									<div class="group-cbb">
+										<div id="A4_1" data-bind="ntsCheckBox: { checked: incumbentLeft, text: '#{i18n.getText('CMM015_14')}' }"></div>
+										<div id="A4_2" data-bind="ntsCheckBox: { checked: closedLeft, text: '#{i18n.getText('CMM015_15')}' }"></div>
+										<div id="A4_3" data-bind="ntsCheckBox: { checked: leaveLeft, text: '#{i18n.getText('CMM015_16')}' }"></div>
+										<div id="A4_4" data-bind="ntsCheckBox: { checked: retireeLeft, text: '#{i18n.getText('CMM015_17')}' }"></div>
+									</div>
+								</div>
+							</div>
+							<div data-bind="css: { 'disabled': !enableTransferDate() }">
+								<div id="tree-grid-left"></div>
+							</div>
+						</div>
+					</div>
+					<div class="center">
+						<div class="center-content"></div>
+					</div>
+					<div class="right" style="border-bottom: 0;">
+						<div id="A5_1" class="panel panel-right flex" style="padding-top: 0px;">
+							<div class="side">
+								<label id ="A5_2" class="label">#{i18n.getText('CMM015_19')}</label>
+								<div style="padding-top: 20px;">
+									<label id ="A5_3" class="label">#{i18n.getText('CMM015_20')}</label>
+									<label id ="A5_4" class="label" data-bind="text: baseDateRightText"></label>
+								</div>
+								<div class="bottom flex valign-center">
+									<div class="group-cbb">
+										<div id="A7_1" data-bind="ntsCheckBox: { checked: incumbentRight, text: '#{i18n.getText('CMM015_14') }' }"></div>
+										<div id="A7_2" data-bind="ntsCheckBox: { checked: closedRight, text: '#{i18n.getText('CMM015_15')}' }"></div>
+										<div id="A7_3" data-bind="ntsCheckBox: { checked: leaveRight, text: '#{i18n.getText('CMM015_16')}' }"></div>
+										<div id="A7_4" data-bind="ntsCheckBox: { checked: retireeRight, text: '#{i18n.getText('CMM015_17')}' }"></div>
+									</div>
+								</div>
+							</div>
+							<div data-bind="css: { 'disabled': !enableTransferDate() }">
+								<div id="tree-grid-right"></div>
+							</div>
 						</div>
 					</div>
 				</div>
 
-				<div id="right-content">
-					<table class="table_content" data-bind="with: currentItem">
-						<colgroup>
-							<col width="230px" />
-							<col width="*" />
-						</colgroup>
-						<tr>
-							<td class="row_1">
-								<div
-									data-bind="ntsFormLabel: { constraint: ['PayClassificationCode', 'PayClassificationName'], required: true }">
-									コード/名称</div>
-							</td>
-							<td class="valign-center">
-								<div>
-									<div class="input_002">
-										<input id="code"
-											data-bind="ntsTextEditor: {
-                                            value: INP_002_code,
-                                            constraint: 'PayClassificationCode',
-                                            enable: INP_002_enable}" />
-									</div>
+				<div class="middle-content flex">
+					<div class="left flex" style="border-top: 0;">
+						<div id ="A8_2" class="panel panel-left flex" style="margin-left: auto"> 
+							<div class="middle" style="margin-left: auto;">
+								<table id="A9" tabindex="4" data-bind="ntsGridList: {
+									name: '#[CMM015_18]',
+									width: 410,
+									rows: 7,
+									dataSource: tableDatasSource,
+									primaryKey: 'id',
+									columns: columnsSource,
+									multiple: true,
+									value: currentCodeListSource
+								}"></table>
+							</div>
+						</div>
+					</div>
+					<div class="center" style="margin-top: 30px; margin-bottom: 10px;">
+						<div class="flex valign-center" style="height: 100%; width: 120px;">
+							<button id="A11_1"
+								class="large proceed auto-height"
+								data-bind="enable: enableTransferDate(), click: onClickRegister">
+								#{i18n.getText('CMM015_24')}
+							</button>
+						</div>
+					</div>
+					<div class="right" style="border-top: 0;">
+						<div id="A12_2" class="panel panel-right" style="margin-left: auto">
+							<div class="middle">
+								<table id="A13" tabindex="6" data-bind="ntsGridList: {
+									name: '#[CMM015_30]',
+									width: 530,
+									rows: 7,
+									dataSource: tableDatasDest,
+									primaryKey: 'id',
+									columns: columnsDest,
+									multiple: false,
+									value: currentCodeListDest
+								}"></table>
+							</div>
+						</div>
+						<label id="A15_1" class="label" style="position: absolute; padding-top: 5px; white-space: nowrap;">#{i18n.getText('CMM015_36')}</label>
+					</div>
+				</div>
 
-									<div class="input_002">
-										<input id="name"
-											data-bind="ntsTextEditor: {
-                                            value: INP_003_name,
-                                            constraint: 'PayClassificationName'                                          
-                                            }" />
-									</div>
-
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<div data-bind="ntsFormLabel: {constraint: 'Memo'}">
-									<label id="A_LBL_003">メモ</label>
-								</div>
-							</td>
-							<td class="valign-center">
-								<div>
-									<textarea id="memo"
-										data-bind="ntsMultilineEditor: {
-											value: INP_004_notes,
-											constraint: 'Memo'
-											}" />
-								</div>
-							</td>
-						</tr>
-					</table>
+				<!-- A16 -->
+				<hr id="ruled-line"></hr>
+				
+				<div id="bottom-content">
+					<div class="top flex valign-center">
+						<div class="left flex valign-center">
+							<div id="A17_1" data-bind="ntsFormLabel: {}">#{i18n.getText('CMM015_40')}</div>
+							<div id="A17_2" tabindex="7" data-bind="ntsDateRangePicker: {
+									required: false, showNextPrevious: false, value: dateValue
+							}"></div>
+							<button id="A17_3" tabindex="8" data-bind="click: onClickTransfer">#{i18n.getText('CMM015_42')}</button>
+						</div>
+						<div class="right">
+							<button id="A17_4" class="danger large" data-bind="click: cancelExecuteTransfer">#{i18n.getText('CMM015_43')}</button>
+						</div>
+					</div>
+					<table id="A18" data-bind="ntsGridList: {
+						name: '#[CMM015_44]',
+						rows: 15,
+						dataSource: tableDatasHistory,
+						primaryKey: 'key',
+						columns: columnsHistory,
+						multiple: true,
+						value: currentCodeListHistory
+					}"></table>
 				</div>
 			</div>
 		</ui:define>

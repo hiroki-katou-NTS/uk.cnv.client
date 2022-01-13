@@ -108,34 +108,29 @@
         <div class="card-header uk-bg-accordion">
           <button class="btn btn-link" type="button">{{'KDWS03_53' | i18n}}</button>
         </div>
-        <div class="collapse">
-          <div class="card-body">
-                <div class="row">
-                <!-- G8_1: 超過時間 -->
-                <div class="col-8">{{'KDWS03_54' | i18n}}</div>
-                <!-- G8_2: 超過時間 -->
-                <div class="col-4 text-right">{{time36.time36 | timedr}}</div>
-              </div>
-              <div class="row pt-3">
-                <!-- G9_1: 超過上限時間 -->
-                <div class="col-8">{{'KDWS03_55' | i18n}}</div>
-                <!-- G9_2: 超過上限時間 -->
-                <div class="col-4 text-right">{{time36.maxTime36 | timedr}}</div>
-              </div>
-              <div class="row pt-3">
-                <!-- G10_1: 超過回数 -->
-                <div class="col-9">{{'KDWS03_56' | i18n}}</div>
-                <!-- G10_2: 超過回数 -->
-                <div class="col-3 text-right">{{'KDWS03_58' | i18n(time36.excessNumber)}}</div>
-              </div>
-              <div class="row pt-3">
-                <!-- G11_1: 超過上限回数 -->
-                <div class="col-9">{{'KDWS03_57' | i18n}}</div>
-                <!-- G11_2: 超過上限回数 -->
-                <div class="col-3 text-right">{{'KDWS03_58' | i18n(time36.maxExcessNumber)}}</div>
-              </div>
-          </div>
-        </div>
+
+        <div class="collapse" style="text-align: center">
+          <table class="table text-center">
+            <thead>
+              <tr class="uk-bg-lighten-gray">
+                <!-- G8-1: 超過時間	-->
+                <th class="pl-0 pr-0 text-center" colspan="2">{{'KDWS03_54' | i18n}}</th>
+                <!-- G10-1: 超過回数	-->
+                <th class="pl-0 pr-0 text-center" >{{'KDWS03_56' | i18n}}</th>            
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <!-- G8-2: 超過時間	-->
+                <td class="pl-0 pr-0 text-center" v-bind:class="time36CssAgree">{{ time36.time36 | timedr }}</td>
+                <!-- G9-2: 超過上限時間	-->
+                <td class="pl-0 pr-0 text-center" v-bind:class="time36CssAgree">{{ time36.maxTime36 | timedr }}</td>
+                <!-- G10-2: 超過回数-->
+                <td id="agree-excess" class="pl-0 pr-0 text-center"  v-bind:class="time36CssFrequency">{{'KDWS03_57' | i18n(time36.excessNumber)}}</td>          
+              </tr>
+            </tbody>
+          </table>           
+        </div>  
       </div>
     </div>
 </div>

@@ -2,19 +2,17 @@ package nts.uk.ctx.at.request.app.find.application.optitem;
 
 import nts.arc.error.BundledBusinessException;
 import nts.arc.error.BusinessException;
+import nts.arc.primitive.PrimitiveValueBase;
 import nts.uk.ctx.at.request.app.command.application.optionalitem.OptionalItemApplicationCommand;
 import nts.uk.ctx.at.request.app.find.application.optitem.optitemdto.*;
 import nts.uk.ctx.at.request.app.find.setting.company.applicationapprovalsetting.optionalitemappsetting.OptItemSetDto;
 import nts.uk.ctx.at.request.app.find.setting.company.applicationapprovalsetting.optionalitemappsetting.OptionalItemAppSetDto;
 import nts.uk.ctx.at.request.app.find.setting.company.applicationapprovalsetting.optionalitemappsetting.OptionalItemAppSetFinder;
-import nts.uk.ctx.at.request.dom.adapter.OptionalItemAdapter;
-import nts.uk.ctx.at.request.dom.adapter.OptionalItemImport;
 import nts.uk.ctx.at.request.dom.application.optional.OptionalItemApplication;
 import nts.uk.ctx.at.request.dom.application.optional.OptionalItemApplicationRepository;
 import nts.uk.ctx.at.request.dom.setting.company.applicationapprovalsetting.optionalitemappsetting.OptionalItemApplicationTypeCode;
 import nts.uk.ctx.at.shared.app.find.scherec.dailyattendanceitem.ControlOfAttendanceItemsDto;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.ControlOfAttendanceItems;
-import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.enums.TimeInputUnit;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattendanceitem.repository.ControlOfAttendanceItemsRepository;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcResultRange;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItem;
@@ -44,7 +42,7 @@ public class OptionalItemApplicationQuery {
 
 
     @Inject
-    private OptionalItemAdapter optionalItemAdapter;
+    private OptionalItemRepository optionalItemRepo;
 
 
     @Inject
@@ -75,26 +73,32 @@ public class OptionalItemApplicationQuery {
         String settingCode = domain.getCode().v();
         OptionalItemAppSetDto setting = optionalItemAppSetFinder.findByCode(new OptionalItemApplicationTypeCode(settingCode).v());
         List<Integer> optionalItemNos = setting.getSettingItems().stream().map(i -> i.getNo()).collect(Collectors.toList());
-        List<OptionalItemImport> optionalItems = optionalItemAdapter.findOptionalItem(cid, optionalItemNos);
-        List<ControlOfAttendanceItems> controlOfAttendanceItems = controlOfAttendanceItemsRepository.getByItemDailyList(cid,
-                optionalItemNos.stream().map(no -> DailyItemList.getOption(no).map(i -> i.itemId).orElse(0)).collect(Collectors.toList())
-        );
-        detail.setControlOfAttendanceItems(controlOfAttendanceItems.stream().map(ControlOfAttendanceItemsDto::fromDomain).collect(Collectors.toList()));
+        List<OptionalItem> optionalItems = optionalItemRepo.findByListNos(cid, optionalItemNos);
+//        List<ControlOfAttendanceItems> controlOfAttendanceItems = controlOfAttendanceItemsRepository.getByItemDailyList(cid,
+//                optionalItemNos.stream().map(no -> DailyItemList.getOption(no).map(i -> i.itemId).orElse(0)).collect(Collectors.toList())
+//        );
+//        detail.setControlOfAttendanceItems(controlOfAttendanceItems.stream().map(ControlOfAttendanceItemsDto::fromDomain).collect(Collectors.toList()));
         detail.setApplication(OptionalItemApplicationDto.fromDomain(domain));
         detail.getApplication().setName(setting.getName());
         detail.getApplication().setNote(setting.getNote());
         detail.setOptionalItems(optionalItems.stream().map(item ->
                 {
                     CalcResultRangeDto calcResultRangeDto = new CalcResultRangeDto();
-                    item.getCalcResultRange().saveToMemento(calcResultRangeDto);
+                    item.getInputControlSetting().getCalcResultRange().saveToMemento(calcResultRangeDto);
+                    if (item.getInputControlSetting().getDailyInputUnit().isPresent()) {
+                        calcResultRangeDto.setTimeInputUnit(item.getInputControlSetting().getDailyInputUnit().get().getTimeItemInputUnit().map(i -> i.value).orElse(null));
+                        calcResultRangeDto.setNumberInputUnit(item.getInputControlSetting().getDailyInputUnit().get().getNumberItemInputUnit().map(i -> i.value).orElse(null));
+                        calcResultRangeDto.setAmountInputUnit(item.getInputControlSetting().getDailyInputUnit().get().getAmountItemInputUnit().map(i -> i.value).orElse(null));
+                    }
                     OptionalItemDto optionalItemDto = new OptionalItemDto();
-                    optionalItemDto.setOptionalItemNo(item.getOptionalItemNo());
-                    optionalItemDto.setOptionalItemName(item.getOptionalItemName());
-                    optionalItemDto.setUnit(item.getOptionalItemUnit());
+                    optionalItemDto.setOptionalItemNo(item.getOptionalItemNo().v());
+                    optionalItemDto.setOptionalItemName(item.getOptionalItemName().v());
+                    optionalItemDto.setUnit(item.getUnit().map(PrimitiveValueBase::v).orElse(null));
+                    optionalItemDto.setInputCheck(item.getInputControlSetting().isInputWithCheckbox());
                     optionalItemDto.setCalcResultRange(calcResultRangeDto);
                     optionalItemDto.setOptionalItemAtr(item.getOptionalItemAtr().value);
-                    optionalItemDto.setDescription(item.getDescription());
-                    optionalItemDto.setDispOrder(setting.getSettingItems().stream().filter(i -> i.getNo() == item.getOptionalItemNo()).findFirst().map(OptItemSetDto::getDispOrder).orElse(1));
+                    optionalItemDto.setDescription(item.getDescription().map(PrimitiveValueBase::v).orElse(null));
+                    optionalItemDto.setDispOrder(setting.getSettingItems().stream().filter(i -> i.getNo() == item.getOptionalItemNo().v()).findFirst().map(OptItemSetDto::getDispOrder).orElse(1));
                     return optionalItemDto;
                 }
         ).collect(Collectors.toList()));
@@ -109,16 +113,14 @@ public class OptionalItemApplicationQuery {
         List<Integer> optionalItemNos = optionalItems.stream().map(anyItemNo -> anyItemNo.getItemNo()).collect(Collectors.toList());
         Map<Integer, OptionalItem> optionalItemMap = optionalItemRepository.findByListNos(cid, optionalItemNos).stream().collect(Collectors.toMap(optionalItem -> optionalItem.getOptionalItemNo().v(), item -> item));
         List<Integer> daiLyList = optionalItemNos.stream().map(no -> DailyItemList.getOption(no).map(i -> i.itemId).orElse(0)).collect(Collectors.toList());
-        Map<Integer, ControlOfAttendanceItems> controlOfAttendanceItemsMap = controlOfAttendanceItemsRepository.getByItemDailyList(cid, daiLyList).stream().collect(Collectors.toMap(item -> item.getItemDailyID(), item -> item));
+//        Map<Integer, ControlOfAttendanceItems> controlOfAttendanceItemsMap = controlOfAttendanceItemsRepository.getByItemDailyList(cid, daiLyList).stream().collect(Collectors.toMap(item -> item.getItemDailyID(), item -> item));
         BundledBusinessException exceptions = BundledBusinessException.newInstance();
         for (Iterator<AnyItemValueDto> iterator = optionalItems.iterator(); iterator.hasNext(); ) {
             AnyItemValueDto inputOptionalItem = iterator.next();
             /* Kiểm tra giá trị nằm trong giới hạn, vượt ra ngoài khoảng giới hạn thì thông báo lỗi Msg_1692 */
-            ControlOfAttendanceItems controlOfAttendanceItems = controlOfAttendanceItemsMap.get(DailyItemList.getOption(inputOptionalItem.getItemNo()).map(i -> i.itemId).orElse(0));
-            Optional<BigDecimal> unit = controlOfAttendanceItems != null ? controlOfAttendanceItems.getInputUnitOfTimeItem() : Optional.empty();
-            /* kiểm tra bội của đơn vị, không phải là bội thì thông báo lỗi Msg_1693*/
+//            ControlOfAttendanceItems controlOfAttendanceItems = controlOfAttendanceItemsMap.get(DailyItemList.getOption(inputOptionalItem.getItemNo()).map(i -> i.itemId).orElse(0));
             OptionalItem optionalItem = optionalItemMap.get(inputOptionalItem.getItemNo());
-            CalcResultRange range = optionalItem.getCalcResultRange();
+            CalcResultRange range = optionalItem.getInputControlSetting().getCalcResultRange();
             String itemName = optionalItemMap.get(inputOptionalItem.getItemNo()) != null ? optionalItemMap.get(inputOptionalItem.getItemNo()).getOptionalItemName().v() : "";
             String itemNo = optionalItemMap.get(inputOptionalItem.getItemNo()) != null ? optionalItemMap.get(inputOptionalItem.getItemNo()).getOptionalItemNo().v().toString() : "";
             if (inputOptionalItem.getAmount() != null) {
@@ -139,33 +141,72 @@ public class OptionalItemApplicationQuery {
                         || (range.getUpperLimit().isSET() && amountUpper != null && amountUpper.compareTo(amount) < 0)) {
                     exceptions.addMessage(new BusinessException("Msg_1692", itemName, itemNo));
                 }
-                if (unit.isPresent() && (amount % unit.get().intValue() != 0)) {
-                    exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+                if (optionalItem.getInputControlSetting().getDailyInputUnit().isPresent()) {
+                    optionalItem.getInputControlSetting().getDailyInputUnit().get().getAmountItemInputUnit().ifPresent(unit -> {
+                        switch (unit) {
+//                            case ONE:
+//                                if (amount % 1 != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+//                                break;
+                            case TEN:
+                                if (amount % 10 != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+                                break;
+                            case ONE_HUNDRED:
+                                if (amount % 100 != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+                                break;
+                            case ONE_THOUSAND:
+                                if (amount % 1000 != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+                                break;
+                            case TEN_THOUSAND:
+                                if (amount % 10000 != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+                                break;
+                            default:
+                                break;
+                        }
+                    });
                 }
                 register = true;
             }
             if (inputOptionalItem.getTimes() != null) {
-                BigDecimal numberLower = null;
-                BigDecimal numberUpper = null;
-                BigDecimal times = inputOptionalItem.getTimes();
-                if (range.getNumberRange().isPresent()
-                        && range.getNumberRange().get().getDailyTimesRange().isPresent()
-                        && range.getNumberRange().get().getDailyTimesRange().get().getLowerLimit().isPresent()) {
-                    numberLower = range.getNumberRange().get().getDailyTimesRange().get().getLowerLimit().get().v();
-                }
-                if (range.getNumberRange().isPresent()
-                        && range.getNumberRange().get().getDailyTimesRange().isPresent()
-                        && range.getNumberRange().get().getDailyTimesRange().get().getUpperLimit().isPresent()) {
-                    numberUpper = range.getNumberRange().get().getDailyTimesRange().get().getUpperLimit().get().v();
-                }
-                if ((range.getLowerLimit().isSET() && numberLower != null && numberLower.compareTo(times) > 0)
-                        || (range.getUpperLimit().isSET() && numberUpper != null && numberUpper.compareTo(times) < 0)) {
-                    exceptions.addMessage(new BusinessException("Msg_1692", itemName, itemNo));
-                }
-                if (unit.isPresent() && (times.doubleValue() % unit.get().doubleValue() != 0)) {
-                    exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
-                }
                 register = true;
+                if (!optionalItem.getInputControlSetting().isInputWithCheckbox()) {
+                    BigDecimal numberLower = null;
+                    BigDecimal numberUpper = null;
+                    BigDecimal times = inputOptionalItem.getTimes();
+                    if (range.getNumberRange().isPresent()
+                            && range.getNumberRange().get().getDailyTimesRange().isPresent()
+                            && range.getNumberRange().get().getDailyTimesRange().get().getLowerLimit().isPresent()) {
+                        numberLower = range.getNumberRange().get().getDailyTimesRange().get().getLowerLimit().get().v();
+                    }
+                    if (range.getNumberRange().isPresent()
+                            && range.getNumberRange().get().getDailyTimesRange().isPresent()
+                            && range.getNumberRange().get().getDailyTimesRange().get().getUpperLimit().isPresent()) {
+                        numberUpper = range.getNumberRange().get().getDailyTimesRange().get().getUpperLimit().get().v();
+                    }
+                    if ((range.getLowerLimit().isSET() && numberLower != null && numberLower.compareTo(times) > 0)
+                            || (range.getUpperLimit().isSET() && numberUpper != null && numberUpper.compareTo(times) < 0)) {
+                        exceptions.addMessage(new BusinessException("Msg_1692", itemName, itemNo));
+                    }
+                    if (optionalItem.getInputControlSetting().getDailyInputUnit().isPresent()) {
+                        optionalItem.getInputControlSetting().getDailyInputUnit().get().getNumberItemInputUnit().ifPresent(unit -> {
+                            switch (unit) {
+                                case ONE_HUNDREDTH:
+                                    if (times.remainder(new BigDecimal("0.01")).compareTo(BigDecimal.ZERO) != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+                                    break;
+                                case ONE_TENTH:
+                                    if (times.remainder(new BigDecimal("0.1")).compareTo(BigDecimal.ZERO) != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+                                    break;
+                                case ONE_HALF:
+                                    if (times.remainder(new BigDecimal("0.5")).compareTo(BigDecimal.ZERO) != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+                                    break;
+//                            case ONE:
+//                                if (times.doubleValue() % 1 != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+//                                break;
+                                default:
+                                    break;
+                            }
+                        });
+                    }
+                }
             }
             if (inputOptionalItem.getTime() != null) {
                 Integer timeLower = null;
@@ -185,8 +226,31 @@ public class OptionalItemApplicationQuery {
                         || (range.getUpperLimit().isSET() && timeUpper != null && timeUpper.compareTo(time) < 0)) {
                     exceptions.addMessage(new BusinessException("Msg_1692", itemName, itemNo));
                 }
-                if (unit.isPresent() && (time % unit.get().intValue() != 0)) {
-                    exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+                if (optionalItem.getInputControlSetting().getDailyInputUnit().isPresent()) {
+                    optionalItem.getInputControlSetting().getDailyInputUnit().get().getTimeItemInputUnit().ifPresent(unit -> {
+                        switch (unit) {
+//                            case ONE_MINUTE:
+//                                if (time % 1 != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+//                                break;
+                            case FIVE_MINUTES:
+                                if (time % 5 != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+                                break;
+                            case TEN_MINUTES:
+                                if (time % 10 != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+                                break;
+                            case FIFTEEN_MINUTES:
+                                if (time % 15 != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+                                break;
+                            case THIRTY_MINUTES:
+                                if (time % 30 != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+                                break;
+                            case SIXTY_MINUTES:
+                                if (time % 60 != 0) exceptions.addMessage(new BusinessException("Msg_1693", itemName, itemNo));
+                                break;
+                            default:
+                                break;
+                        }
+                    });
                 }
                 register = true;
             }

@@ -14,7 +14,7 @@ import nts.uk.file.at.app.export.attendanceitemprepare.ControlOfAttMonthlyRepoEx
 @Stateless
 public class JpaControlOfAttItemsMonthlyRepo extends JpaRepository implements ControlOfAttMonthlyRepoExcel {
 
-	private static final String GET_ALL = "select a.ITEM_MONTHLY_ID, a.INPUT_UNIT, a.HEADER_BACKGROUND_COLOR "
+	private static final String GET_ALL = "select a.ITEM_MONTHLY_ID, a.HEADER_BACKGROUND_COLOR "
 			+ "from KSHMT_MON_ITEM_CONTROL a where a.CID=?companyId";
 
 	@Override
@@ -32,16 +32,15 @@ public class JpaControlOfAttItemsMonthlyRepo extends JpaRepository implements Co
 
 	private void putRowToResult(Map<Integer, ControlOfAttMonthlyDtoExcel> listControl, Object[] x) {
 		Integer id = 0;
-		Integer unitItem = 0;
-		String headerBackground = (String) x[2];
+//		Float unitItem = 0f;
+		String headerBackground = (String) x[1];
 		if(x[0] !=null){
 			id = ((BigDecimal) x[0]).intValue();
 		}
-		if(x[1] !=null){
-			unitItem =((BigDecimal) x[1]).intValue();
-		}
-		ControlOfAttMonthlyDtoExcel control = 
-				new ControlOfAttMonthlyDtoExcel(id, headerBackground,unitItem );
+//		if(x[1] !=null){
+//			unitItem =((BigDecimal) x[1]).floatValue();
+//		}
+		ControlOfAttMonthlyDtoExcel control = new ControlOfAttMonthlyDtoExcel(id, headerBackground);
 		listControl.put(control.getItemMonthlyID(), control);
 	}
 //			

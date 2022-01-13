@@ -82,6 +82,11 @@ module nts.uk.at.view.kaf022.y.viewmodel {
             };
         }
 
+        public openDialogCDL011() {
+          nts.uk.ui.windows.setShared("CDL011_PARAM", 6);
+          nts.uk.ui.windows.sub.modal("com", "/view/cdl/011/a/index.xhtml");
+        }
+
     }
 
     class ItemModel {

@@ -406,12 +406,7 @@ var nts;
             }());
             ntsNumber.NumberFormatter = NumberFormatter;
             function getFormatter() {
-                switch (systemLanguage) {
-                    case 'ja':
-                        return new NumberFormatter();
-                    case 'en':
-                        return null;
-                }
+                return new NumberFormatter();
             }
             ntsNumber.getFormatter = getFormatter;
         })(ntsNumber = uk.ntsNumber || (uk.ntsNumber = {}));
@@ -2921,12 +2916,7 @@ var nts;
             }());
             time_1.DateTimeFormatter = DateTimeFormatter;
             function getFormatter() {
-                switch (systemLanguage) {
-                    case 'ja':
-                        return new DateTimeFormatter();
-                    case 'en':
-                        return null;
-                }
+                return new DateTimeFormatter();
             }
             time_1.getFormatter = getFormatter;
             function applyFormat(format, dateTime, formatter) {
@@ -3729,7 +3719,7 @@ var nts;
             request.STORAGE_KEY_TRANSFER_DATA = "nts.uk.request.STORAGE_KEY_TRANSFER_DATA";
             request.WEB_APP_NAME = {
                 comjs: 'nts.uk.com.js.web',
-                com: 'nts.uk.com.web',
+                com: 'nts.uk.cloud.web',
                 pr: 'nts.uk.pr.web',
                 at: 'nts.uk.at.web',
                 hr: 'nts.uk.hr.web',
@@ -17031,7 +17021,7 @@ var nts;
                         var container = $(element);
                         if (nts.uk.util.isNullOrUndefined(container.attr("tabindex")))
                             container.attr("tabindex", "0");
-                        container.addClass("ntsControl ntsCheckBox").on("click", function (e) {
+                        container.addClass("ntsControl").on("click", function (e) {
                             if (container.data("readonly") === true)
                                 e.preventDefault();
                         });

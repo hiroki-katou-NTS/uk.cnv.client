@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.enterprise.inject.spi.CDI;
 
+import lombok.val;
 import nts.arc.diagnose.performance.responsetime.aggregate.ResponseTimeAggregateFilter;
 import nts.arc.layer.ws.preprocess.RequestFilterCollector;
 import nts.arc.layer.ws.preprocess.RequestFilterMapping;
@@ -32,6 +34,9 @@ public class UkRequestFilterCollector implements RequestFilterCollector {
 	private static final List<RequestFilterMapping> FILTERS = new ArrayList<>();
 	
 	static {
+			// Filterにせよその先の一般処理にせよ、基本的にThreadLocalを使う側にすべて倒せるよう、一番最初にスイッチしておく
+			FILTERS.add(RequestFilterMapping.map(PathPattern.ALL_REQUESTS, new ContextHolderSwitch()));
+
 			FILTERS.add(RequestFilterMapping.map(PathPattern.ALL_REQUESTS, new RequestPerformanceLogFilter()));
 			FILTERS.add(RequestFilterMapping.map(PathPattern.ALL_REQUESTS, new CorsPreflightFilter()));
 			FILTERS.add(RequestFilterMapping.map(PathPattern.ALL_REQUESTS, new SharingSessionFilter()));
@@ -55,15 +60,21 @@ public class UkRequestFilterCollector implements RequestFilterCollector {
 			
 			// アクセス制限
 			FILTERS.add(RequestFilterMapping.map(PathPattern.ALL_REQUESTS, new IpAddressRestrictor()));
-			
-			// This must be executed last
-			// 最後じゃなくても大丈夫かもしれないが、処理内容を考えると、念の為、最後にしておきたい。
-			FILTERS.add(RequestFilterMapping.map(PathPattern.ALL_REQUESTS, new ContextHolderSwitch()));
 	}
 
 	@Override
 	public List<RequestFilterMapping> collect() {
+
+		val criteria = CDI.current().select(Criteria.class);
+		if (!criteria.isUnsatisfied()) {
+			return criteria.get().select(FILTERS);
+		}
+
 		return FILTERS;
 	}
 
+	public interface Criteria {
+
+		List<RequestFilterMapping> select(List<RequestFilterMapping> source);
+	}
 }

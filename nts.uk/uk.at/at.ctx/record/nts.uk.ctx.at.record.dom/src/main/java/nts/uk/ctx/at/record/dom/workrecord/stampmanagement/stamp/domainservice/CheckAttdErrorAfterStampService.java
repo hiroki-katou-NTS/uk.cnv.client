@@ -225,12 +225,13 @@ public class CheckAttdErrorAfterStampService {
 		// làm ở bước trên rồi nhá
 
 		// if $ボタン詳細設定.ボタン種類.打刻種類.empty
-		if (!btnSet.get().getButtonType().getStampType().isPresent()) {
-		// return false
-			return false;
-		}
+		// Không cần thiết nữa vì ButtonType đã được thay bằng StampType ở Dakoku7
+//		if (!btnSet.get().getButtonType().getStampType().isPresent()) {
+//		// return false
+//			return false;
+//		}
 		//	return $ボタン詳細設定.ボタン種類.打刻種類.時刻変更区分.打刻後のエラー確認する必要があるか()	
-		return btnSet.get().getButtonType().getStampType().get().getChangeClockArt().checkWorkingOut();
+		return btnSet.get().getType().getChangeClockArt().checkWorkingOut();
 	}
 
 	public static interface Require {

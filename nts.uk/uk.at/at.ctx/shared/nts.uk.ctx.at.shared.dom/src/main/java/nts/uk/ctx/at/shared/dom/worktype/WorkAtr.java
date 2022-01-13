@@ -66,4 +66,18 @@ public enum WorkAtr {
 		// Not found.
 		return null;
 	}
+	
+	/**
+	 * [1] 日数カウントを取得する	
+	 */
+	public DailyActualDayCount countDays() {
+		switch (this) {
+		case OneDay:
+			return new DailyActualDayCount(1.0);
+		case Monring:
+		case Afternoon:
+			return new DailyActualDayCount(0.5);
+		}
+		return null;
+	}
 }

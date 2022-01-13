@@ -44,7 +44,7 @@ public class JpaAlarmCheckConditionScheduleRepository extends JpaRepository impl
 	
 	private static final String SEL_CTG_SUB_BY_CONTRACT_CD_AND_CD = "SELECT * FROM KSCCT_ALCHK_CATEGORY_SUB "
 			+ " WHERE CONTRACT_CD = @contractCd"
-			+ " AND CD = @code　"
+			+ " AND CD = @code"
 			+ " ORDER BY DISPORDER ASC"; /** -> ra 1 condition*/
 	
 	private static final String SEL_MSG_BY_CID_AND_CD = "SELECT * FROM KSCMT_ALCHK_MESSAGE "

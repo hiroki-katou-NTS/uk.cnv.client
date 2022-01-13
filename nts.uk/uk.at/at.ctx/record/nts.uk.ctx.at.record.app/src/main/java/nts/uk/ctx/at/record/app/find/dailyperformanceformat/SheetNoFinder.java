@@ -40,5 +40,17 @@ public class SheetNoFinder {
 		
 		return sheetNo;
 	}
+	
+	public List<String> getAllBusinessTypeCode() {
+		
+		String companyId = AppContexts.user().companyId();
+		
+		List<String> listBusinessTypeCode = workTypeFormatDailyRepository.getBusinessTypeFormatByCompanyId(companyId).stream()
+				.map(e -> e.getBusinessTypeCode().v())
+				.distinct()
+				.collect(Collectors.toList());
+		
+		return listBusinessTypeCode;
+	}
 
 }

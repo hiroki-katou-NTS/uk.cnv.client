@@ -1,84 +1,52 @@
-#label11 {
-	padding-left: 40px;
+.header-text {
+	display: inline-block;
+	margin: 5px 1%;
 }
 
-
-#screen-d .check-box-atr {
-	display:block;
-	padding-top: 5px;
-	margin-left: 60px;
+.left-content {
+	display: inline-block;
+	width: 31%;
+    margin: 5px 0 5px 2%;
 }
 
-.ntsRadioBox span.label{
-	padding-left: 3px !important;
+.right-content {
+	display: inline-block;
+	width: 60%;
 }
 
-
-#screen-d .radio-error {
-	margin-left: 90px;
+.nts-switch-button {
+	width: 100px;
 }
 
-.ntsRadioBox {
-	padding-left: 10px;
+.ntsCheckBox  {
+	margin: 5px 0;
 }
 
-#checkBox21
-{
-width: 176px;
-}
-#checkBox31{
-width: 147px;
-}
-#checkBox41{
-width: 415px;
-}
-#checkBox51{
-width: 415px;
-}
-#checkBox61{
-width: 415px;
-}
-#checkBox71{
-width: 415px;
-}
-#checkBox81{
-width: 415px;
-}
-#checkBox91{
-width: 415px;
-}
-#checkBox101{
-width: 415px;
-}
-#checkBox111{
-width: 415px;
-}
-#checkBox121{
-width: 415px;
-}
-#checkBox131{
-width: 415px;
-}
-#checkBox161{
-width: 500px;
+.grayout {
+	width: 40px;
 }
 
-#label13{
-	margin-left: 95px;
-	width: 200px;
-}
-
-#textbox{
-    margin-left: 20px;
-    height: 25px;
-    width: 830px;
-}
-#screen-d {
+#contents {
 	width: 1250px;
 }
-html {
-    overflow: hidden;
+
+#C4_4 {
+	margin: 5px 0 5px 2%;
+	width: 1000px;
 }
-#dialog {
-	top: -5px;
+
+#C4_4 th {
+    height: 50px;
+}
+
+#C4_4, #C4_4 th, #C4_4 td {
+	border: 1px solid black;
+	border-collapse: collapse;
+	text-align: center;
+}
+
+.right-content label span {
+	width: 100px;
+	display: flex;
+	justify-content: center;
 }

@@ -1,32 +1,27 @@
-.body-right {
-	margin-left: 50px;
+#left-content {
+	padding: 0px 5px 10px 12px;
 	float: left;
 }
 
-.layout-table td {
-	padding-bottom: 7px;
+#text_list {
+	padding-left: 4px;
 }
 
-button.nts-switch-button {
-	width: 85px;
+#right-content {
+	padding: 25px 0 0 25px;
+	float: left;
+	width: calc(100% - 550px);
 }
 
-#table-infor th, #table-infor td {
-	border: 1px solid black;
+#right-content .form-label {
+	width: 160px;
 }
 
-#table-infor th, #table-label th {
-	
+#right-content .nts-switch-button {
+	width: 70px;
 }
-
-#master-wrapper {
-	overflow: hidden !important;
-}
-
-#combo-box.ui-igcombo-wrapper {
-	width: 220px !important;
-}
-
-#contents-area .fixed-flex-layout-right{
-	margin-top: 30px;
+#right-content .radio-wrapper {
+	width: 70px;
+	flex-direction: column;
+	text-align: center;
 }

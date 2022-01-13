@@ -2,28 +2,25 @@ package nts.uk.ctx.exio.dom.input.setting;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.val;
 import nts.arc.layer.dom.objecttype.DomainAggregate;
 import nts.uk.ctx.exio.dom.input.ExecutionContext;
-import nts.uk.ctx.exio.dom.input.canonicalize.ImportingMode;
-import nts.uk.ctx.exio.dom.input.csvimport.CsvRecord;
+import nts.uk.ctx.exio.dom.input.csvimport.ExternalImportCsvFileInfo;
 import nts.uk.ctx.exio.dom.input.domain.ImportingDomainId;
-import nts.uk.ctx.exio.dom.input.errors.ExternalImportError;
 import nts.uk.ctx.exio.dom.input.setting.assembly.ExternalImportAssemblyMethod;
-import nts.uk.ctx.exio.dom.input.setting.assembly.RevisedDataRecord;
-import nts.uk.ctx.exio.dom.input.setting.assembly.mapping.ImportingMapping;
-import nts.uk.ctx.exio.dom.input.validation.ValidateData;
 
 /**
  * 受入設定
  */
 @Getter
-@AllArgsConstructor
 public class ExternalImportSetting implements DomainAggregate {
+	/**設定ベース種類*/
+	private ImportSettingBaseType baseType;
 
 	/** 会社ID */
 	private String companyId;
@@ -35,100 +32,59 @@ public class ExternalImportSetting implements DomainAggregate {
 	@Setter
 	private ExternalImportName name;
 
-	/** 受入ドメインID */
-	private ImportingDomainId externalImportDomainId;
-
-	/** 受入モード */
+	/** CSVファイル情報 */
 	@Setter
-	private ImportingMode importingMode;
+	private ExternalImportCsvFileInfo csvFileInfo;
 
-	/** 組立方法 */
-	private ExternalImportAssemblyMethod assembly;
+	/** ドメイン受入設定 **/
+	private Map<ImportingDomainId, DomainImportSetting> domainSettings;
 
-	/**
-	 * マッピングを更新する
-	 * @param itemList
-	 */
+	public ExternalImportSetting(
+			ImportSettingBaseType baseType,
+			String companyId,
+			ExternalImportCode code,
+			ExternalImportName name,
+			ExternalImportCsvFileInfo csvFileInfo,
+			Map<ImportingDomainId, DomainImportSetting> domainSettings) {
 
-	public void merge(RequireMerge require, List<Integer> itemList) {
-		
-		val mappingRequire = new ImportingMapping.RequireMerge() {
-			@Override
-			public void deleteReviseItems(List<Integer> itemNos) {
-				require.deleteReviseItems(code, itemNos);
-			}
-		};
-		
-		this.assembly.merge(mappingRequire, itemList);
+		this.baseType = baseType;
+		this.companyId = companyId;
+		this.code = code;
+		this.name = name;
+		this.csvFileInfo = csvFileInfo;
+		this.domainSettings = domainSettings;
 	}
 	
-	public static interface RequireMerge {
-		void deleteReviseItems(ExternalImportCode settingCode, List<Integer> itemNos);
+	public List<DomainImportSetting> getDomainSettings() {
+		return this.domainSettings.values().stream()
+				.sorted((ds1, ds2) -> ds1.getDomainId().compareTo(ds2.getDomainId()))
+				.collect(Collectors.toList());
 	}
 
-	/**
-	 * ドメインが変更されたのでマッピングを作り直す
-	 * @param domainId
-	 * @param items
-	 */
-	public void changeDomain(RequireChangeDomain require, ImportingDomainId domainId, List<Integer> items) {
-		externalImportDomainId = domainId;
-		assembly = ExternalImportAssemblyMethod.create(assembly.getCsvFileInfo(), items);
-		
-		// 受入ドメインが変わるので既存の編集設定はすべて削除
-		require.deleteReviseItems(code);
+	public void assemble(DomainImportSetting.RequireAssemble require, ExecutionContext context, InputStream csvFileStream) {
+		domainSettings.forEach((domainId, setting) -> {
+			setting.assemble(require, context, csvFileInfo, csvFileStream);
+		});
 	}
 	
-	public static interface RequireChangeDomain {
-		void deleteReviseItems(ExternalImportCode settingCode);
+	public static interface RequireMerge extends DomainImportSetting.RequireMerge {
+	}
+	public static interface RequireAssemble extends DomainImportSetting.RequireAssemble {
 	}
 
+	public ExternalImportAssemblyMethod getAssembly(ImportingDomainId domainId) {
+		return getDomainSetting(domainId).get().getAssembly();
+	}
+	
+	public Optional<DomainImportSetting> getDomainSetting(ImportingDomainId domain) {
+		if (baseType == ImportSettingBaseType.DOMAIN_BASE)  return this.domainSettings.entrySet().stream().findFirst().map(es-> es.getValue());
 
-	public void assemble(RequireAssemble require, ExecutionContext context, InputStream csvFileStream) {
-
-		assembly.getCsvFileInfo().parse(
-				csvFileStream,
-				r -> processRecord(require, context, r));
+		return this.domainSettings.containsKey(domain)
+				? Optional.of(this.domainSettings.get(domain))
+				: Optional.empty();
 	}
 
-	/**
-	 * 1レコード分の組み立て
-	 * @param require
-	 * @param context
-	 * @param columnNames
-	 * @param csvRecord
-	 */
-	private void processRecord(
-			RequireAssemble require,
-			ExecutionContext context,
-			CsvRecord csvRecord) {
-
-		val optRevisedData = assembly.assemble(require, context, csvRecord);
-		if(!optRevisedData.isPresent()) {
-			// データの組み立て結果が空の場合
-			return;
-		}
-
-		val revisedData = optRevisedData.get();
-
-		val errors = ValidateData.validate(require, context, revisedData);
-
-		if(errors.isEmpty()) {
-			require.save(context, revisedData);
-		}
-		else {
-			errors.forEach(error ->{
-				require.add(context, new ExternalImportError(revisedData.getRowNo(),
-																						   error.getItemNo(),
-																						   error.getMessage()));
-			});
-		}
-	}
-
-	public static interface RequireAssemble extends
-			ExternalImportAssemblyMethod.Require,
-			ValidateData.ValidateRequire {
-
-		void save(ExecutionContext context, RevisedDataRecord revisedDataRecord);
+	public void putDomainSettings(ImportingDomainId domainId, DomainImportSetting domainImportSetting) {
+		this.domainSettings.put(domainId, domainImportSetting);
 	}
 }

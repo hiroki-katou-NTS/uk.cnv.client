@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import nts.uk.ctx.at.record.dom.require.RecordDomRequireService;
 import nts.uk.ctx.at.shared.app.find.worktime.common.dto.WorkTimezoneCommonSetDto;
+import nts.uk.ctx.at.shared.app.find.worktime.flexset.dto.FlexWorkSettingDto;
 import nts.uk.ctx.at.shared.dom.WorkInformation;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.BasicScheduleService;
 import nts.uk.ctx.at.shared.dom.schedule.basicschedule.SetupType;
@@ -25,6 +26,7 @@ import nts.uk.ctx.at.shared.dom.worktime.flowset.FlowWorkSetting;
 import nts.uk.ctx.at.shared.dom.worktime.flowset.FlowWorkSettingRepository;
 import nts.uk.ctx.at.shared.dom.worktime.predset.PredetemineTimeSetting;
 import nts.uk.ctx.at.shared.dom.worktime.predset.PredetemineTimeSettingRepository;
+import nts.uk.ctx.at.shared.dom.worktime.service.WorkTimeForm;
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSetting;
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSettingRepository;
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSettingService;
@@ -101,12 +103,22 @@ public class GetMoreInformation {
 			//3.1:就業時間帯の設定を取得する
 			//emptyの運用はあり得ないため - QA : 112354
 			Optional<WorkTimeSetting> workTimeSetting = workTimeSettingRepository.findByCode(companyId, workTimeCode);
-			//3.2:call()
-			data.setWorkTimeForm(workTimeSetting.get().getWorkTimeDivision().getWorkTimeForm().value);
 			if(workTimeSetting.isPresent()) {
+				//3.2:call()
+				data.setWorkTimeForm(workTimeSetting.get().getWorkTimeDivision().getWorkTimeForm().value);
 				data.setWorkTimeSettingName(new WorkTimeSettingNameDto(
 						workTimeSetting.get().getWorkTimeDisplayName().getWorkTimeName().v(),
 						workTimeSetting.get().getWorkTimeDisplayName().getWorkTimeAbName().v()));
+				if(workTimeSetting.get().getWorkTimeDivision().getWorkTimeForm() == WorkTimeForm.FLEX) {
+					//3.3
+					Optional<FlexWorkSetting> dataFlex = flexWorkSettingRepository.find(companyId, workTimeCode);
+					if (dataFlex.isPresent()) {
+						FlexWorkSettingDto dto = new FlexWorkSettingDto();
+						dataFlex.get().saveToMemento(dto);
+						data.setCoreTimeFlexSetting(dto.getCoreTimeSetting());
+					}
+					
+				}
 			}
 		}
 

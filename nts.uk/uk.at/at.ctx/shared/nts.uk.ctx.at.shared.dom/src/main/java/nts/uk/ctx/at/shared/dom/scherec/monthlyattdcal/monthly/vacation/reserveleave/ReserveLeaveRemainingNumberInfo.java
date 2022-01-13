@@ -19,7 +19,7 @@ public class ReserveLeaveRemainingNumberInfo implements Cloneable {
 	/** 積立年休（マイナスあり） */
 	private ReserveLeave reserveLeaveWithMinus;
 	/** 未消化数 */
-	private ReserveLeaveUndigestedNumber ｒeserveLeaveUndigestedNumber;
+	private ReserveLeaveUndigestedNumber reserveLeaveUndigestedNumber;
 
 	/**
 	 * コンストラクタ
@@ -28,7 +28,7 @@ public class ReserveLeaveRemainingNumberInfo implements Cloneable {
 
 		this.reserveLeaveNoMinus = new ReserveLeave();
 		this.reserveLeaveWithMinus = new ReserveLeave();
-		this.ｒeserveLeaveUndigestedNumber = new ReserveLeaveUndigestedNumber();
+		this.reserveLeaveUndigestedNumber = new ReserveLeaveUndigestedNumber();
 	}
 
 	/**
@@ -40,12 +40,12 @@ public class ReserveLeaveRemainingNumberInfo implements Cloneable {
 	public static ReserveLeaveRemainingNumberInfo of(
 			ReserveLeave reserveLeaveNoMinus,
 			ReserveLeave reserveLeaveWithMinus,
-			ReserveLeaveUndigestedNumber ｒeserveLeaveUndigestedNumber){
+			ReserveLeaveUndigestedNumber reserveLeaveUndigestedNumber){
 
 		ReserveLeaveRemainingNumberInfo domain = new ReserveLeaveRemainingNumberInfo();
 		domain.reserveLeaveNoMinus = reserveLeaveNoMinus;
 		domain.reserveLeaveWithMinus = reserveLeaveWithMinus;
-		domain.ｒeserveLeaveUndigestedNumber = ｒeserveLeaveUndigestedNumber;
+		domain.reserveLeaveUndigestedNumber = reserveLeaveUndigestedNumber;
 		return domain;
 	}
 
@@ -55,7 +55,7 @@ public class ReserveLeaveRemainingNumberInfo implements Cloneable {
 		try {
 			cloned.reserveLeaveNoMinus = this.reserveLeaveNoMinus.clone();
 			cloned.reserveLeaveWithMinus = this.reserveLeaveWithMinus.clone();
-			cloned.ｒeserveLeaveUndigestedNumber = this.ｒeserveLeaveUndigestedNumber.clone();
+			cloned.reserveLeaveUndigestedNumber = this.reserveLeaveUndigestedNumber.clone();
 		}
 		catch (Exception e){
 			throw new RuntimeException("ReserveLeaveRemainingNumber clone error.");

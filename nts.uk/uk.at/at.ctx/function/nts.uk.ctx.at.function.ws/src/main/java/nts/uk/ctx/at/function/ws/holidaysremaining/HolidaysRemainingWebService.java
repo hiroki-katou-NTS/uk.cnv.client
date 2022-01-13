@@ -8,19 +8,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import lombok.val;
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.enums.EnumConstant;
 import nts.arc.layer.ws.WebService;
-import nts.uk.ctx.at.function.app.command.holidaysremaining.AddHdRemainManageCommandHandler;
-import nts.uk.ctx.at.function.app.command.holidaysremaining.HdRemainManageCommand;
-import nts.uk.ctx.at.function.app.command.holidaysremaining.RemoveHdRemainManageCommandHandler;
-import nts.uk.ctx.at.function.app.command.holidaysremaining.UpdateHdRemainManageCommandHandler;
-import nts.uk.ctx.at.function.app.find.holidaysremaining.DateHolidayRemainingDto;
-import nts.uk.ctx.at.function.app.find.holidaysremaining.HdRemainManageDto;
-import nts.uk.ctx.at.function.app.find.holidaysremaining.HdRemainManageFinder;
-import nts.uk.ctx.at.function.app.find.holidaysremaining.RoleWhetherLoginDto;
-import nts.uk.ctx.at.function.app.find.holidaysremaining.VariousVacationControlDto;
+import nts.uk.ctx.at.function.app.command.holidaysremaining.*;
+import nts.uk.ctx.at.function.app.find.holidaysremaining.*;
+import nts.uk.ctx.at.function.app.query.outputworkstatustable.CheckDailyPerformAuthorQuery;
 import nts.uk.ctx.at.function.dom.holidaysremaining.BreakSelection;
+import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.infra.i18n.resource.I18NResourcesForUK;
 
 @Path("at/function/holidaysremaining")
@@ -43,10 +39,31 @@ public class HolidaysRemainingWebService extends WebService {
 	@Inject
 	private I18NResourcesForUK i18n;
 
+	@Inject
+	private CheckDailyPerformAuthorQuery checkDailyPerformAuthor;
+
+
 	@POST
 	@Path("findAll")
-	public List<HdRemainManageDto> getHdRemainManageList() {
-		return this.hdRemainManageFinder.findAll();
+	public HDDto getHdRemainManageList() {
+		return this.hdRemainManageFinder.findAllNew();
+	}
+	@POST
+	@Path("findFreeSetting")
+	public   List<HdRemainManageDto> getHdRemainManageListFreeSetting() {
+		return this.hdRemainManageFinder.findFreeSetting();
+	}
+
+	@POST
+	@Path("findStandard")
+	public   List<HdRemainManageDto> getHdRemainManageListStandard() {
+		return this.hdRemainManageFinder.findFreeStandard();
+	}
+
+	@POST
+	@Path("getInfor/{setting}")
+	public   List<HdRemainManageDto> getHdRemainManage(@PathParam("setting") Integer setting) {
+		return this.hdRemainManageFinder.finBySetting(setting);
 	}
 
 	@POST
@@ -56,21 +73,27 @@ public class HolidaysRemainingWebService extends WebService {
 	}
 
 	@POST
+	@Path("findByLayOutId/{layOutId}")
+	public HdRemainManageDto getHdRemainManage(@PathParam("layOutId") String layOutId) {
+		return this.hdRemainManageFinder.findDtoByLayOutId(layOutId);
+	}
+
+	@POST
 	@Path("add")
-	public void addHdRemainManage(HdRemainManageCommand comand) {
-		this.addHdRemainManageCommandHandler.handle(comand);
+	public void addHdRemainManage(HdRemainManageCommand command) {
+		this.addHdRemainManageCommandHandler.handle(command);
 	}
 
 	@POST
 	@Path("update")
-	public void updateHdRemainManage(HdRemainManageCommand comand) {
-		this.updateHdRemainManageCommandHandler.handle(comand);
+	public void updateHdRemainManage(HdRemainManageCommand command) {
+		this.updateHdRemainManageCommandHandler.handle(command);
 	}
 
 	@POST
 	@Path("remove")
-	public void removerHdRemainManage(HdRemainManageCommand comand) {
-		this.removeHdRemainManageCommandHandler.handle(comand);
+	public void removerHdRemainManage(HdDeleteRemainManageCommand command) {
+		this.removeHdRemainManageCommandHandler.handle(command);
 	}
 
 	@POST
@@ -95,5 +118,12 @@ public class HolidaysRemainingWebService extends WebService {
 	@Path("getVariousVacationControl")
 	public VariousVacationControlDto getVariousVacationControl() {
 		return this.hdRemainManageFinder.getVariousVacationControl();
+	}
+
+	@POST
+	@Path("getCheckAuthor")
+	public boolean getCheckAuthor() {
+		val roleID = AppContexts.user().roles().forAttendance();
+		return checkDailyPerformAuthor.checkDailyPerformAuthor(roleID);
 	}
 }

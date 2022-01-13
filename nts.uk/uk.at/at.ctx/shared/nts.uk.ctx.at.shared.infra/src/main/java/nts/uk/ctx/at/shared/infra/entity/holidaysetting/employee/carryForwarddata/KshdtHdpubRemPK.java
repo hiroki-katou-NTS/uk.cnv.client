@@ -21,8 +21,4 @@ public class KshdtHdpubRemPK implements Serializable{
 	/** 社員ID */
 	@Column(name = "SID")
 	public String employeeId;
-
-	/** 対象月 */
-	@Column(name = "TAGETMONTH")
-	public int tagetmonth;
 }

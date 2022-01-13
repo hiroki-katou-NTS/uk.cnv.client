@@ -166,7 +166,7 @@ public class ExecAlarmListProcessingDefault implements ExecAlarmListProcessingSe
 						GeneralDate startDate = GeneralDate.fromString(checkConditionTime.getStartMonth().substring(0, 4) + "/" + checkConditionTime.getStartMonth().substring(4, 6) + "/01",
 								"yyyy/MM/dd");
 						GeneralDate endDate = GeneralDate
-								.fromString(checkConditionTime.getStartMonth().substring(0, 4) + "/" + checkConditionTime.getStartMonth().substring(4, 6) + "/01", "yyyy/MM/dd").addMonths(1)
+								.fromString(checkConditionTime.getEndMonth().substring(0, 4) + "/" + checkConditionTime.getEndMonth().substring(4, 6) + "/01", "yyyy/MM/dd").addMonths(1)
 								.addDays(-1);
 						PeriodByAlarmCategory periodByAlarmCategory = new PeriodByAlarmCategory(
 								checkConditionTime.getCategory(), checkConditionTime.getCategoryName(), startDate,

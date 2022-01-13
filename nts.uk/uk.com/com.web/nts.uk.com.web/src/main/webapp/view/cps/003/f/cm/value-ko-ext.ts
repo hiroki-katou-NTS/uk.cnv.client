@@ -51,7 +51,9 @@ module nts.custombinding {
                                     enable: true
                                 }"></div>
                                 <div class="text-box">
-                                    <input data-bind="ntsNumberEditor: { name: i18n('CPS003_81'), value: value, constraint: constraint, enable: m1, required: false, option: options }" />
+                                    <div style="position: relative; margin-top: -10px; margin-left: 2px">
+                                        <input data-bind="ntsNumberEditor: { name: i18n('CPS003_81'), value: value, constraint: constraint, enable: m1, required: false, option: options }"/>
+                                    </div>
                                 </div>
                                 <div class="dropdown-box">
                                     <div id="pk-amount" class="pk-amount" data-bind="ntsComboBox: {
@@ -69,7 +71,7 @@ module nts.custombinding {
                                         columns: [{ prop: 'optionText', length: 10 }]}"></div>
                                     <input data-bind="ntsNumberEditor: { name: i18n('CPS003_85'), value: value2, constraint: constraint, enable: m2, required: m2, option: options }" />
                                 </div>
-                                <div class="" data-bind="text: i18n('CPS003_86')"></div>
+                                <div class="" data-bind="text: i18n('CPS003_86'), style: { marginLeft: '35px'}"></div>
                             </div>`,
                     grDate: `<div class='selection-group-box' data-bind="let: { m3: ko.computed(function() { return mode() == '2' }), m4: ko.computed(function() { return mode() == '3' }) }">
                                 <div class="grant-selection-group" data-bind="ntsRadioBoxGroup: {

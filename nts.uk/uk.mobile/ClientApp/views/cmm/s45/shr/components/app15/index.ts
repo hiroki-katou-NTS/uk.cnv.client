@@ -68,8 +68,8 @@ export class CmmS45ShrComponentsApp15Component extends Vue {
 
                 optionalItems.forEach((optionalItem) => {
                     const item = optionalItemSetting.find((o) => o.itemNo == optionalItem.optionalItemNo);
-                    const controlAttendance = controlOfAttendanceItems.find((controlAttendance) => optionalItem.optionalItemNo == controlAttendance.itemDailyID - 640);
-                    const { calcResultRange, optionalItemAtr, optionalItemName, optionalItemNo, unit, description,dispOrder, } = optionalItem;
+                    // const controlAttendance = controlOfAttendanceItems.find((controlAttendance) => optionalItem.optionalItemNo == controlAttendance.itemDailyID - 640);
+                    const { calcResultRange, optionalItemAtr, optionalItemName, optionalItemNo, unit, description,dispOrder, inputCheck } = optionalItem;
                     const { lowerCheck, upperCheck,amountLower,amountUpper,numberLower,numberUpper,timeLower,timeUpper } = calcResultRange;
 
                     vm.optionalItemApplication.push({
@@ -84,19 +84,56 @@ export class CmmS45ShrComponentsApp15Component extends Vue {
                         amount: item ? item.amount : null,
                         number: item ? item.times : null,
                         time: item ? item.time : null,
-                        inputUnitOfTimeItem: controlAttendance ? controlAttendance.inputUnitOfTimeItem : null,
+                        inputUnitOfItem: vm.getInputUnit(optionalItemAtr, calcResultRange),
                         optionalItemAtr,
                         optionalItemName,
                         optionalItemNo,
                         unit,
                         description,
                         dispOrder,
+                        inputCheckbox: inputCheck
                     });
                 });
                 vm.optionalItemApplication.sort((a,b) => a.dispOrder - b.dispOrder );
                 vm.$emit('loading-complete');
             });
         });
+    }
+
+    private getInputUnit(optionalItemAtr: number, calcResultRange: any): number {
+        const vm = this;
+        if (optionalItemAtr == 0) {
+            switch (calcResultRange.timeInputUnit) {
+                case 0: return parseInt(vm.$i18n('KMK002_141'));
+                case 1: return parseInt(vm.$i18n('KMK002_142'));
+                case 2: return parseInt(vm.$i18n('KMK002_143'));
+                case 3: return parseInt(vm.$i18n('KMK002_144'));
+                case 4: return parseInt(vm.$i18n('KMK002_145'));
+                case 5: return parseInt(vm.$i18n('KMK002_146'));
+                default: return null;
+            }
+        }
+        if (optionalItemAtr == 1) {
+            switch (calcResultRange.numberInputUnit) {
+                case 0: return parseFloat(vm.$i18n('KMK002_150'));
+                case 1: return parseFloat(vm.$i18n('KMK002_151'));
+                case 2: return parseFloat(vm.$i18n('KMK002_152'));
+                case 3: return parseFloat(vm.$i18n('KMK002_153'));
+                default: return null;
+            }
+        }
+        if (optionalItemAtr == 2) {
+            switch (calcResultRange.amountInputUnit) {
+                case 0: return parseInt(vm.$i18n('KMK002_160'));
+                case 1: return parseInt(vm.$i18n('KMK002_161'));
+                case 2: return parseInt(vm.$i18n('KMK002_162'));
+                case 3: return parseInt(vm.$i18n('KMK002_163'));
+                case 4: return parseInt(vm.$i18n('KMK002_164'));
+                default: return null;
+            }
+        }
+
+        return null;
     }
 }
 

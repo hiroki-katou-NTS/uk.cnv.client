@@ -14,7 +14,7 @@ public class FileData {
 
 	private String fileName;
 	
-	private List<String> headers;
+	private Map<String,String> headers;
 	
 	private List<Map<String, Object>> datas;
 }

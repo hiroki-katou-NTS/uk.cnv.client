@@ -30,6 +30,7 @@ const initTime = (): TimeClock => ({
 class KDP002BViewModel extends ko.ViewModel {
 
     modeNikoNiko: KnockoutObservable<boolean | null> = ko.observable(null);
+    modeZeroTime: KnockoutObservable<boolean | null> = ko.observable(true);
     // B2_2
     employeeCodeName: KnockoutObservable<string> = ko.observable("基本給");
     // B3_2
@@ -69,7 +70,7 @@ class KDP002BViewModel extends ko.ViewModel {
     showBtnNoti: KnockoutObservable<boolean | null> = ko.observable(null);
     activeViewU: KnockoutObservable<boolean> = ko.observable(false);
     noticeSetting: KnockoutObservable<INoticeSet> = ko.observable(null);
-
+	stampTime: KnockoutObservable<string> = ko.observable('');
 
     constructor() {
         super();
@@ -77,9 +78,10 @@ class KDP002BViewModel extends ko.ViewModel {
 
     created(params: any) {
         const vm = this;
+		vm.stampTime(params.stampTime);
         vm.$window.shared("resultDisplayTime").done(displayTime => {
             vm.resultDisplayTime(displayTime);
-
+	
             vm.$window.shared("infoEmpToScreenB").done(infoEmp => {
 
                 vm.infoEmpFromScreenA = infoEmp;
@@ -123,12 +125,12 @@ class KDP002BViewModel extends ko.ViewModel {
             }
         });
 
-        vm.showBtnNoti.subscribe(() => {
+        // vm.showBtnNoti.subscribe(() => {
+        //     vm.settingSizeView();
+        // })
+        vm.workPlace.subscribe(() => {
             vm.settingSizeView();
-        })
-		vm.workPlace.subscribe(()=>{
-			vm.settingSizeView();
-		});
+        });
 
         vm.$ajax(kDP002RequestUrl.FINGER_STAMP_SETTING)
             .then((data: any) => {
@@ -148,6 +150,7 @@ class KDP002BViewModel extends ko.ViewModel {
                     $('#close-button').focus();
                 });
             }
+            vm.settingSizeView();
         }, 300);
 
         vm.showBtnNoti.subscribe(() => {
@@ -157,6 +160,12 @@ class KDP002BViewModel extends ko.ViewModel {
         vm.modeNikoNiko.subscribe(() => {
             vm.settingSizeView();
         });
+
+        if (vm.modeNikoNiko) {
+            if (ko.unwrap(vm.resultDisplayTime) == 0) {
+                vm.modeZeroTime(false);
+            }
+        }
 
         vm.showBtnNoti.valueHasMutated();
     }
@@ -181,34 +190,42 @@ class KDP002BViewModel extends ko.ViewModel {
 
     settingSizeView() {
         const vm = this;
-        
+
         if (!ko.unwrap(vm.showBtnNoti)) {
             if (!ko.unwrap(vm.modeNikoNiko)) {
-				if(vm.workPlace() != ""){
-					vm.$window.size(555, 470);	
-				}else{
-					vm.$window.size(530, 470);
-				}
+                if (vm.workPlace() != "") {
+                    if (ko.unwrap(vm.modeZeroTime)) {
+                        vm.$window.size(555, 470);
+                    }else {
+                        vm.$window.size(525, 470);
+                    }
+                } else {
+                    if (ko.unwrap(vm.modeZeroTime)) {
+                        vm.$window.size(530, 470);
+                    }else {
+                        vm.$window.size(500, 470);
+                    }
+                }
             } else {
-				if(vm.workPlace() != ""){	
-                	vm.$window.size(565, 470);
-				}else{
-					vm.$window.size(543, 470);
-				}
+                if (vm.workPlace() != "") {
+                    vm.$window.size(565, 470);
+                } else {
+                    vm.$window.size(543, 470);
+                }
             }
         } else {
             if (!ko.unwrap(vm.modeNikoNiko)) {
-                if(vm.workPlace() != ""){
-					vm.$window.size(590, 470);
-				}else{
-					vm.$window.size(568, 470);
-				}
+                if (vm.workPlace() != "") {
+                    vm.$window.size(590, 470);
+                } else {
+                    vm.$window.size(568, 470);
+                }
             } else {
-				if(vm.workPlace() != ""){
-                	vm.$window.size(610, 470);
-				}else{
-					vm.$window.size(588, 470);
-				}
+                if (vm.workPlace() != "") {
+                    vm.$window.size(610, 470);
+                } else {
+                    vm.$window.size(588, 470);
+                }
             }
         }
     }
@@ -553,7 +570,7 @@ enum Emoji {
 }
 
 interface INoticeSet {
-    personMsgColor: IColorSettingDto ; //個人メッセージ色
+    personMsgColor: IColorSettingDto; //個人メッセージ色
 }
 
 interface IColorSettingDto {

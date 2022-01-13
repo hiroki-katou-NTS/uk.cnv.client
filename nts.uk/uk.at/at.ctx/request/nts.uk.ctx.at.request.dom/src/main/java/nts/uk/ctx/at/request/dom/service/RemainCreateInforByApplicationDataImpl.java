@@ -92,6 +92,7 @@ import nts.uk.ctx.at.shared.dom.worktime.predset.PredetemineTimeSettingRepositor
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSetting;
 import nts.uk.ctx.at.shared.dom.worktime.worktimeset.WorkTimeSettingRepository;
 import nts.uk.ctx.at.shared.dom.worktype.WorkType;
+import nts.uk.ctx.at.shared.dom.worktype.WorkTypeCode;
 import nts.uk.ctx.at.shared.dom.worktype.WorkTypeRepository;
 import nts.uk.ctx.at.shared.dom.worktype.specialholidayframe.SpecialHdFrameNo;
 import nts.uk.shr.com.context.AppContexts;
@@ -237,8 +238,8 @@ public class RemainCreateInforByApplicationDataImpl implements RemainCreateInfor
 			case WORK_CHANGE_APPLICATION:
 				Optional<AppWorkChange> workChange = workChangeService.findbyID(cid, appData.getAppID());
 				workChange.ifPresent(x -> {
-					outData.setWorkTimeCode(x.getOpWorkTimeCD().map(time -> time.v()));
-					outData.setWorkTypeCode(x.getOpWorkTypeCD().map(type -> type.v()));
+					outData.setWorkTimeCode(x.getOpWorkTimeCD().map(time -> getWTimeCode(time)));
+					outData.setWorkTypeCode(x.getOpWorkTypeCD().map(type -> getWTypeCode(type)));
 				});
 				break;
 			case GO_RETURN_DIRECTLY_APPLICATION:
@@ -277,8 +278,8 @@ public class RemainCreateInforByApplicationDataImpl implements RemainCreateInfor
 
 				Optional<RecruitmentApp> recApp = recAppRepo.findByID(appData.getAppID());
 				recApp.ifPresent(y -> {
-					outData.setWorkTimeCode(Optional.of(y.getWorkInformation().getWorkTimeCode().v()));
-					outData.setWorkTypeCode(Optional.of(y.getWorkInformation().getWorkTypeCode().v()));
+					outData.setWorkTimeCode(Optional.ofNullable(getWTimeCode(y.getWorkInformation().getWorkTimeCode())));
+					outData.setWorkTypeCode(Optional.ofNullable(getWTypeCode(y.getWorkInformation().getWorkTypeCode())));
 
 				});
 
@@ -338,7 +339,6 @@ public class RemainCreateInforByApplicationDataImpl implements RemainCreateInfor
 						outData.setAppBreakTimeTotal(transferTimer.get().getHolidayTransTime().map(y -> y.v()));
 						outData.setAppOvertimeTimeTotal(transferTimer.get().getOverTransTime().map(y -> y.v()));
 					}
-					
 				}
 				break;
 
@@ -355,11 +355,9 @@ public class RemainCreateInforByApplicationDataImpl implements RemainCreateInfor
 				// 出張申請
 				this.businessTripRepo.findByAppId(cid, appData.getAppID()).ifPresent(x -> {
 					if (!x.getInfos().isEmpty()) {
-						WorkInformation wrkInfo = x.getInfos().get(0).getWorkInformation();
-						outData.setWorkTimeCode(wrkInfo.getWorkTimeCode() == null ? Optional.empty()
-								: Optional.of(wrkInfo.getWorkTimeCode().v()));
-						outData.setWorkTypeCode(wrkInfo.getWorkTypeCode() == null ? Optional.empty()
-								: Optional.of(wrkInfo.getWorkTypeCode().v()));
+						WorkInformation wrkInfo =  x.getInfos().get(0).getWorkInformation();
+						outData.setWorkTimeCode(Optional.ofNullable(getWTimeCode(wrkInfo.getWorkTimeCode())));
+						outData.setWorkTypeCode(Optional.ofNullable(getWTypeCode(wrkInfo.getWorkTypeCode())));
 					}
 				});
 				break;
@@ -389,6 +387,12 @@ public class RemainCreateInforByApplicationDataImpl implements RemainCreateInfor
 		return lstOutputData;
 	}
 
+	private String getWTypeCode(WorkTypeCode workTypeCode) {
+		return workTypeCode == null ? null : workTypeCode.v();
+	}
+	private String getWTimeCode(WorkTimeCode workTimeCode) {
+		return workTimeCode == null ? null : workTimeCode.v();
+	}
 	private Optional<TimeDigestionUsageInfor> fromTimeDegest(TimeDigestApplication time) {
 		return Optional.ofNullable(
 				new TimeDigestionUsageInfor(time.getTimeAnnualLeave() == null ? null : time.getTimeAnnualLeave().v(),

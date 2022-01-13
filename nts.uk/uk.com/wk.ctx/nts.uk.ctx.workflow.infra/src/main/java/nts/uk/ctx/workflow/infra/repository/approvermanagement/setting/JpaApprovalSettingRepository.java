@@ -24,18 +24,18 @@ public class JpaApprovalSettingRepository extends JpaRepository implements Appro
 	public Optional<PrincipalApprovalFlg> getPrincipalByCompanyId(String companyId) {
 		return this.queryProxy().query(SQL_FIND, WwfmtApprovalSetting.class)
 				.setParameter("companyId", companyId)
-				.getSingle(c-> EnumAdaptor.valueOf(c.selfApprovalAtr, PrincipalApprovalFlg.class));
+				.getSingle(c-> EnumAdaptor.valueOf(BooleanUtils.toInteger(c.selfApprovalAtr), PrincipalApprovalFlg.class));
 	}
 	
 	private WwfmtApprovalSetting toEntity(ApprovalSetting domain){
 		val entity = new WwfmtApprovalSetting();
 		entity.companyId = domain.getCompanyId();
-		entity.selfApprovalAtr = BooleanUtils.toInteger(domain.getPrinFlg());
+		entity.selfApprovalAtr = domain.getPrinFlg();
 		ApproverRegisterSet approverRegsterSet = domain.getApproverRegsterSet();
 		if (approverRegsterSet != null) {
-			entity.cmpUnitSet = approverRegsterSet.getCompanyUnit().value;
-			entity.wkpUnitSet = approverRegsterSet.getWorkplaceUnit().value;
-			entity.syaUnitSet = approverRegsterSet.getEmployeeUnit().value;			
+			entity.cmpUnitSet = BooleanUtils.toBoolean(approverRegsterSet.getCompanyUnit().value);
+			entity.wkpUnitSet = BooleanUtils.toBoolean(approverRegsterSet.getWorkplaceUnit().value);
+			entity.syaUnitSet = BooleanUtils.toBoolean(approverRegsterSet.getEmployeeUnit().value);			
 		}
 		return entity;
 	}
@@ -57,9 +57,10 @@ public class JpaApprovalSettingRepository extends JpaRepository implements Appro
 	 * @author yennth
 	 */
 	private ApprovalSetting toDomainApproval(WwfmtApprovalSetting entity){
-		ApproverRegisterSet approverRegsterSet = new ApproverRegisterSet(EnumAdaptor.valueOf(entity.cmpUnitSet, UseClassification.class),
-				EnumAdaptor.valueOf(entity.wkpUnitSet, UseClassification.class),
-				EnumAdaptor.valueOf(entity.syaUnitSet, UseClassification.class));
+		ApproverRegisterSet approverRegsterSet = new ApproverRegisterSet(
+				EnumAdaptor.valueOf(BooleanUtils.toInteger(entity.cmpUnitSet), UseClassification.class),
+				EnumAdaptor.valueOf(BooleanUtils.toInteger(entity.wkpUnitSet), UseClassification.class),
+				EnumAdaptor.valueOf(BooleanUtils.toInteger(entity.syaUnitSet), UseClassification.class));
 		ApprovalSetting domain = ApprovalSetting.createFromJavaType(entity.companyId, approverRegsterSet, BooleanUtils.toBoolean(entity.selfApprovalAtr));
 		return domain;
 	}
@@ -93,5 +94,4 @@ public class JpaApprovalSettingRepository extends JpaRepository implements Appro
 		this.commandProxy().update(entityUpdate);
 		
 	}
-	
 }

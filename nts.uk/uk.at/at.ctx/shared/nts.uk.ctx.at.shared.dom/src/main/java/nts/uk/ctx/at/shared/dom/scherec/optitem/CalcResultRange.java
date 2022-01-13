@@ -9,8 +9,10 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import lombok.Getter;
+import lombok.val;
 import nts.arc.layer.dom.DomainObject;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.calculation.CalcResultOfAnyItem;
+import nts.uk.shr.com.i18n.TextResource;
 
 /**
  * The Class CalculationResultRange.
@@ -53,7 +55,6 @@ public class CalcResultRange extends DomainObject {
 		this.numberRange = memento.getNumberRange();
 		this.timeRange = memento.getTimeRange();
 		this.amountRange = memento.getAmountRange();
-
 	}
 
 	/**
@@ -82,13 +83,13 @@ public class CalcResultRange extends DomainObject {
 	 * 上限下限チェック
 	 * @return
 	 */
-	public CalcResultOfAnyItem checkRange(CalcResultOfAnyItem calcResultOfAnyItem, OptionalItem optionalItem) {
+	public CalcResultOfAnyItem checkRange(CalcResultOfAnyItem calcResultOfAnyItem, OptionalItem optionalItem, PerformanceAtr performanceAtr) {
 		if(this.upperLimit.isSET()) {
-			BigDecimal upperValue = getUpperLimitValue(calcResultOfAnyItem, optionalItem);
+			val upperValue = getUpperLimitValue(calcResultOfAnyItem, optionalItem, performanceAtr);
 			calcResultOfAnyItem = calcResultOfAnyItem.reCreateCalcResultOfAnyItem(upperValue, optionalItem.getOptionalItemAtr());
 		}
 		if(this.lowerLimit.isSET()) {
-			BigDecimal lowerValue = getLowerLimitValue(calcResultOfAnyItem, optionalItem);
+			val lowerValue = getLowerLimitValue(calcResultOfAnyItem, optionalItem, performanceAtr);
 			calcResultOfAnyItem = calcResultOfAnyItem.reCreateCalcResultOfAnyItem(lowerValue, optionalItem.getOptionalItemAtr());
 		}
 		return calcResultOfAnyItem;
@@ -97,31 +98,38 @@ public class CalcResultRange extends DomainObject {
 		
 	/**
 	 * 上限値の制御
-	 * @param optionalItemAtr
+	 * @param calcResultOfAnyItem
+	 * @param optionalItem
 	 * @return
 	 */
-	public BigDecimal getUpperLimitValue(CalcResultOfAnyItem calcResultOfAnyItem, OptionalItem optionalItem) {
+	public Optional<BigDecimal> getUpperLimitValue(CalcResultOfAnyItem calcResultOfAnyItem, OptionalItem optionalItem, PerformanceAtr performanceAtr) {
 		switch(optionalItem.getOptionalItemAtr()) {
 		case TIME:
-			return this.timeRange.map(range -> {
+			if (!this.timeRange.isPresent()) return calcResultOfAnyItem.getTime();
+			
+			return this.timeRange.flatMap(range -> {
 				
 				return getValueOrUpper(() -> calcResultOfAnyItem.getTime(), 
-										() -> range.getUpper(optionalItem.getPerformanceAtr()));
-			}).orElse(BigDecimal.ZERO);
+										() -> range.getUpper(performanceAtr));
+			});
 			
 		case NUMBER:
-			return this.numberRange.map(range -> {
+			if (!this.numberRange.isPresent()) return calcResultOfAnyItem.getCount();
+			
+			return this.numberRange.flatMap(range -> {
 				
 				return getValueOrUpper(() -> calcResultOfAnyItem.getCount(), 
-										() -> range.getUpper(optionalItem.getPerformanceAtr()));
-			}).orElse(BigDecimal.ZERO);
+										() -> range.getUpper(performanceAtr));
+			});
 			
 		case AMOUNT:
-			return this.amountRange.map(range -> {
+			if (!this.amountRange.isPresent()) return calcResultOfAnyItem.getMoney();
+			
+			return this.amountRange.flatMap(range -> {
 				
 				return getValueOrUpper(() -> calcResultOfAnyItem.getMoney(), 
-										() -> range.getUpper(optionalItem.getPerformanceAtr()));
-			}).orElse(BigDecimal.ZERO);
+										() -> range.getUpper(performanceAtr));
+			});
 			
 		default:
 			throw new RuntimeException("unknown value of enum OptionalItemAtr");
@@ -130,58 +138,193 @@ public class CalcResultRange extends DomainObject {
 	
 	/**
 	 * 下限値の制御
-	 * @param optionalItemAtr
+	 * @param calcResultOfAnyItem
+	 * @param optionalItem
 	 * @return
 	 */
-	public BigDecimal getLowerLimitValue(CalcResultOfAnyItem calcResultOfAnyItem, OptionalItem optionalItem) {
+	public Optional<BigDecimal> getLowerLimitValue(CalcResultOfAnyItem calcResultOfAnyItem, OptionalItem optionalItem, PerformanceAtr performanceAtr) {
 		switch(optionalItem.getOptionalItemAtr()) {
 		case TIME:
-			return this.timeRange.map(range -> {
+			if (!this.timeRange.isPresent()) return calcResultOfAnyItem.getTime();
+			
+			return this.timeRange.flatMap(range -> {
 				
 				return getValueOrLower(() -> calcResultOfAnyItem.getTime(),
-										() -> range.getLower(optionalItem.getPerformanceAtr()));
-			}).orElse(BigDecimal.ZERO);
+										() -> range.getLower(performanceAtr));
+			});
 			
 		case NUMBER:
-			return this.numberRange.map(range -> {
+			if (!this.timeRange.isPresent()) return calcResultOfAnyItem.getCount();
+			
+			return this.numberRange.flatMap(range -> {
 				
 				return getValueOrLower(() -> calcResultOfAnyItem.getCount(),
-										() -> range.getLower(optionalItem.getPerformanceAtr()));
-			}).orElse(BigDecimal.ZERO);
+										() -> range.getLower(performanceAtr));
+			});
 			
 		case AMOUNT:
-			return this.amountRange.map(range -> {
+			if (!this.timeRange.isPresent()) return calcResultOfAnyItem.getMoney();
+			
+			return this.amountRange.flatMap(range -> {
 				
 				return getValueOrLower(() -> calcResultOfAnyItem.getMoney(),
-										() -> range.getLower(optionalItem.getPerformanceAtr()));
-			}).orElse(BigDecimal.ZERO);
+										() -> range.getLower(performanceAtr));
+			});
 			
 		default:
 			throw new RuntimeException("unknown value of enum OptionalItemAtr");
 		}
 	}
 	
-	private BigDecimal getValueOrUpper(Supplier<Optional<BigDecimal>> target, Supplier<Optional<BigDecimal>> limit) {
-		BigDecimal upperLimit = limit.get().orElse(BigDecimal.ZERO);
+	private Optional<BigDecimal> getValueOrUpper(Supplier<Optional<BigDecimal>> target, Supplier<Optional<BigDecimal>> limit) {
+		if (!limit.get().isPresent()) return target.get();
 			
 		return target.get().map(c -> {
 			/** 値 > 上限値　の場合　値←上限値とする。 */
-			if (c.compareTo(upperLimit) > 0) {
-				return upperLimit;
+			if (c.compareTo(limit.get().get()) > 0) {
+				return limit.get().get();
 			}
 			return c;
-		}).orElse(BigDecimal.ZERO);
+		});
 	}
 	
-	private BigDecimal getValueOrLower(Supplier<Optional<BigDecimal>> target, Supplier<Optional<BigDecimal>> limit) {
-		BigDecimal lowerLimit = limit.get().orElse(BigDecimal.ZERO);
+	private Optional<BigDecimal> getValueOrLower(Supplier<Optional<BigDecimal>> target, Supplier<Optional<BigDecimal>> limit) {
+		if (!limit.get().isPresent()) return target.get();
 			
 		return target.get().map(c -> {
 			/** 値 < 下限値　の場合　値←下限値とする。 */
-			if (c.compareTo(lowerLimit) < 0) {
-				return lowerLimit;
+			if (c.compareTo(limit.get().get()) < 0) {
+				return limit.get().get();
 			}
 			return c;
-		}).orElse(BigDecimal.ZERO);
+		});
+	}
+	
+	/**
+	 * 入力範囲チェック
+	 * UKDesign.ドメインモデル.NittsuSystem.UniversalK.就業.shared(勤務予定、勤務実績).任意項目.関数アルゴリズム.計算結果の範囲.<<Public>>入力範囲チェック.入力範囲チェック
+	 * 
+	 * @param inputValue      入力値
+	 * @param performanceAtr  実績区分
+	 * @param optionalItemAtr 任意項目の属性
+	 * @return
+	 */
+	public ValueCheckResult checkInputRange(BigDecimal inputValue, PerformanceAtr performanceAtr,
+			OptionalItemAtr optionalItemAtr) {
+		//「@上限値チェック」と「@下限値チェック」の内容を確認する
+		//上限値チェック = 設定する || 下限値チェック = 設定する
+		if(this.upperLimit == CalcRangeCheck.SET || this.lowerLimit == CalcRangeCheck.SET  ) {
+			//上限値、下限値を取得
+			ControlRangeValue controlRangeValue = this.getUpperLimit(performanceAtr, optionalItemAtr);
+			//入力範囲チェック
+			boolean checkRange = controlRangeValue.checkInputRange(inputValue);
+			//チェック結果
+			if(!checkRange) {
+				//入力範囲エラーメッセージ作成する
+				String errorContent = this.createInputRangeErrorMsg(controlRangeValue, optionalItemAtr);
+				return new ValueCheckResult(false, Optional.of(errorContent));
+			}
+		}
+		return new ValueCheckResult(true, Optional.empty());
+	}
+	
+	/**
+	 * 入力範囲エラーメッセージ作成する
+	 * @param controlRangeValue  制御範囲値
+	 */
+	private String createInputRangeErrorMsg(ControlRangeValue controlRangeValue,OptionalItemAtr optionalItemAtr) {
+		String upperLimit =""; 
+		String lowerLimit = ""; 
+		if(optionalItemAtr == OptionalItemAtr.TIME) {
+			if(this.upperLimit == CalcRangeCheck.SET) {
+				upperLimit = convertTime(controlRangeValue.getUpperLimit().get().intValue());
+			}
+			if(this.lowerLimit == CalcRangeCheck.SET) {
+				lowerLimit = convertTime(controlRangeValue.getLowerLimit().get().intValue());
+			}
+		}else if (optionalItemAtr == OptionalItemAtr.AMOUNT) {
+			if(this.upperLimit == CalcRangeCheck.SET) {
+				upperLimit = String.valueOf((int)controlRangeValue.getUpperLimit().get().doubleValue());
+			}
+			if(this.lowerLimit == CalcRangeCheck.SET) {
+				lowerLimit = String.valueOf((int)controlRangeValue.getLowerLimit().get().doubleValue());
+			}
+		}else {
+			if(this.upperLimit == CalcRangeCheck.SET) {
+				upperLimit = String.valueOf(controlRangeValue.getUpperLimit().get().doubleValue());
+			}
+			if(this.lowerLimit == CalcRangeCheck.SET) {
+				lowerLimit = String.valueOf(controlRangeValue.getLowerLimit().get().doubleValue());
+			}
+		}
+		//@上限値チェック = 設定する && @下限値チェック = 設定しない
+		if(this.upperLimit == CalcRangeCheck.SET && this.lowerLimit == CalcRangeCheck.NOT_SET) {
+			return TextResource.localize("Msg_2293",upperLimit);
+		}
+		//@上限値チェック = 設定しない && @下限値チェック = 設定する
+		if (this.upperLimit == CalcRangeCheck.NOT_SET && this.lowerLimit == CalcRangeCheck.SET) {
+			return TextResource.localize("Msg_2292", lowerLimit);
+		}
+		// @上限値チェック = 設定する && @下限値チェック = 設定する
+		return TextResource.localize("Msg_2291", lowerLimit,
+				upperLimit);
+	}
+
+	/**
+	 * 上限値を取得
+	 * UKDesign.ドメインモデル.NittsuSystem.UniversalK.就業.shared(勤務予定、勤務実績).任意項目.関数アルゴリズム.計算結果の範囲.上限下限チェック.上限値、下限値を取得
+	 */
+	public ControlRangeValue getUpperLimit(PerformanceAtr performanceAtr,OptionalItemAtr optionalItemAtr) {
+		boolean checkUpperCalcRange = this.getUpperLimit() == CalcRangeCheck.SET;
+		boolean checkLowerCalcRange = this.getLowerLimit() == CalcRangeCheck.SET;
+		switch(optionalItemAtr) {
+		case TIME:
+			return this.timeRange.map(range -> {
+				
+				return new ControlRangeValue( checkUpperCalcRange ? range.getUpper(performanceAtr) : Optional.empty(),
+						checkLowerCalcRange ? range.getLower(performanceAtr) : Optional.empty());
+			}).orElse(new ControlRangeValue(Optional.empty(),Optional.empty()));
+			
+		case NUMBER:
+			return this.numberRange.map(range -> {
+				
+				return new ControlRangeValue( checkUpperCalcRange ? range.getUpper(performanceAtr) : Optional.empty(),
+						checkLowerCalcRange ? range.getLower(performanceAtr) : Optional.empty());
+			}).orElse(new ControlRangeValue(Optional.empty(),Optional.empty()));
+			
+		default: //金額
+			return this.amountRange.map(range -> {
+				
+				return new ControlRangeValue( checkUpperCalcRange ? range.getUpper(performanceAtr) : Optional.empty(),
+						checkLowerCalcRange ? range.getLower(performanceAtr) : Optional.empty());
+			}).orElse(new ControlRangeValue(Optional.empty(),Optional.empty()));
+		}
+	}
+	
+	private String convertTime(Integer time) {
+		if (time == null) {
+			return "";
+		}
+		boolean check = false;
+		if(time<0) {
+			time = time*(-1);
+			check = true;
+		}
+		String m = String.valueOf(time % 60).length() > 1 ? String.valueOf(time % 60) : 0 + String.valueOf(time % 60);
+		String timeString = String.valueOf(time / 60) + ":" + m;
+		if(check) {
+			timeString ="-"+timeString;
+		}
+		return timeString;
+	}
+
+	public CalcResultRange(CalcRangeCheck upperLimit, CalcRangeCheck lowerLimit, Optional<NumberRange> numberRange,
+			Optional<TimeRange> timeRange, Optional<AmountRange> amountRange) {
+		super();
+		this.upperLimit = upperLimit;
+		this.lowerLimit = lowerLimit;
+		this.numberRange = numberRange;
+		this.timeRange = timeRange;
+		this.amountRange = amountRange;
 	}
 }

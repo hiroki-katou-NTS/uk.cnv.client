@@ -1,5 +1,6 @@
 package nts.uk.ctx.office.infra.repository.equipment.achievement;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -8,6 +9,7 @@ import javax.ejb.Stateless;
 
 import nts.arc.enums.EnumAdaptor;
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.office.dom.equipment.achievement.DigitsNumber;
 import nts.uk.ctx.office.dom.equipment.achievement.DisplayOfItems;
 import nts.uk.ctx.office.dom.equipment.achievement.EquipmentItemNo;
@@ -51,7 +53,7 @@ public class EquipmentUsageRecordItemSettingRepositoryImpl extends JpaRepository
 				Integer.valueOf(domain.getItemNo().v()));
 		entity.setPk(pk);
 		entity.setItemCls(domain.getInputcontrol().getItemCls().value);
-		entity.setItemLength(domain.getInputcontrol().getDigitsNo().map(String::valueOf).orElse(null));
+		entity.setItemLength(domain.getInputcontrol().getDigitsNo().map(DigitsNumber::v).orElse(null));
 		entity.setItemName(domain.getItems().getItemName().v());
 		entity.setMaxValue(domain.getInputcontrol().getMaximum().map(MaximumUsageRecord::v).orElse(null));
 		entity.setMinValue(domain.getInputcontrol().getMinimum().map(MinimumUsageRecord::v).orElse(null));
@@ -90,6 +92,9 @@ public class EquipmentUsageRecordItemSettingRepositoryImpl extends JpaRepository
 
 	@Override
 	public List<EquipmentUsageRecordItemSetting> findByCidAndItemNos(String cid, List<String> itemNos) {
+		
+		if (CollectionUtil.isEmpty(itemNos)) return Collections.emptyList();
+		
 		return this.queryProxy().query(SELECT_BY_CID_AND_ITEM_NOS, OfimtEquipmentDayItem.class).setParameter("cid", cid)
 				.setParameter("itemNos", itemNos).getList(this::toDomain);
 	}

@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.arc.layer.infra.data.database.DatabaseProduct;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPaletteCombinations;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPaletteOrg;
 import nts.uk.ctx.at.schedule.dom.shift.management.shiftPalette.ShiftPaletteOrgRepository;
@@ -87,6 +88,11 @@ public class JpaShiftPaletteOrgRepository extends JpaRepository implements Shift
 			+ " JOIN KSCMT_PALETTE_ORG_COMBI_DTL c ON b.TARGET_UNIT = c.TARGET_UNIT AND b.TARGET_ID = c.TARGET_ID AND b.PAGE = c.PAGE AND b.POSITION = c.POSITION"
 			+ " WHERE a.TARGET_UNIT = targetUnit AND a.TARGET_ID = 'targetId' AND a.USE_ATR = 1";
 	
+	private static final String FIND_BY_TARGETID_USE_POSTGRES = "SELECT a.CID, a.TARGET_UNIT, a.TARGET_ID, a.PAGE, a.PAGE_NAME, a.USE_ATR, a.NOTE, b.POSITION, b.POSITION_NAME, c.POSITION_ORDER, c.SHIFT_MASTER_CD"
+			+ " FROM KSCMT_PALETTE_ORG a  JOIN KSCMT_PALETTE_ORG_COMBI b ON a.TARGET_UNIT = b.TARGET_UNIT AND a.TARGET_ID = b.TARGET_ID AND a.PAGE = b.PAGE"
+			+ " JOIN KSCMT_PALETTE_ORG_COMBI_DTL c ON b.TARGET_UNIT = c.TARGET_UNIT AND b.TARGET_ID = c.TARGET_ID AND b.PAGE = c.PAGE AND b.POSITION = c.POSITION"
+			+ " WHERE a.TARGET_UNIT = targetUnit AND a.TARGET_ID = 'targetId' AND a.USE_ATR = true";
+	
 	private static final String FIND_BY_CID = "SELECT a.CID, a.TARGET_UNIT, a.TARGET_ID, a.PAGE, a.PAGE_NAME, a.USE_ATR, a.NOTE, b.POSITION, b.POSITION_NAME, c.POSITION_ORDER, c.SHIFT_MASTER_CD"
 			+ " FROM KSCMT_PALETTE_ORG a  JOIN KSCMT_PALETTE_ORG_COMBI b ON a.TARGET_UNIT = b.TARGET_UNIT AND a.TARGET_ID = b.TARGET_ID AND a.PAGE = b.PAGE"
 			+ " JOIN KSCMT_PALETTE_ORG_COMBI_DTL c ON b.TARGET_UNIT = c.TARGET_UNIT AND b.TARGET_ID = c.TARGET_ID AND b.PAGE = c.PAGE AND b.POSITION = c.POSITION"
@@ -117,7 +123,7 @@ public class JpaShiftPaletteOrgRepository extends JpaRepository implements Shift
 							rs.getString("TARGET_UNIT") != null ? Integer.valueOf(rs.getString("TARGET_UNIT")) : null,
 							rs.getString("TARGET_ID"),
 							rs.getString("PAGE") != null ? Integer.valueOf(rs.getString("PAGE")) : null,
-							rs.getString("PAGE_NAME"), Integer.valueOf(rs.getString("USE_ATR")) == 1 ? true : false,
+							rs.getString("PAGE_NAME"), rs.getBoolean("USE_ATR"),
 							rs.getString("NOTE"),
 							rs.getString("POSITION") != null ? Integer.valueOf(rs.getString("POSITION")) : null,
 							rs.getString("POSITION_NAME"), rs.getString("POSITION_ORDER") != null
@@ -158,7 +164,7 @@ public class JpaShiftPaletteOrgRepository extends JpaRepository implements Shift
 										}).collect(Collectors.toList());
 								return new KscmtPaletteOrgCombi(combiPk, positionName, null, cmpCombiDtls);
 							}).collect(Collectors.toList());
-					return new KscmtPaletteOrg(pk, pageName, useAtr ? 1 : 0, note, cmpCombis);
+					return new KscmtPaletteOrg(pk, pageName, useAtr, note, cmpCombis);
 				}).collect(Collectors.toList());
 	}
 
@@ -338,7 +344,12 @@ public class JpaShiftPaletteOrgRepository extends JpaRepository implements Shift
 		if (workplaceId == null) {
 			return new ArrayList<>();
 		}
-		String query = FIND_BY_TARGETID_USE;
+		String query;
+		if (database().is(DatabaseProduct.POSTGRESQL)) {
+			query = FIND_BY_TARGETID_USE_POSTGRES;
+		} else {
+			query = FIND_BY_TARGETID_USE;			
+		}
 		query = query.replaceFirst("targetUnit", String.valueOf(targetUnit));
 		query = query.replaceFirst("targetId", workplaceId);
 

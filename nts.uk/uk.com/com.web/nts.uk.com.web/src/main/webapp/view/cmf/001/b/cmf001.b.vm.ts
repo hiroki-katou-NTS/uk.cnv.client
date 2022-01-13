@@ -1,4 +1,4 @@
-/// <reference path="../../../../lib/nittsu/viewcontext.d.ts" />
+﻿/// <reference path="../../../../lib/nittsu/viewcontext.d.ts" />
 module nts.uk.com.view.cmf001.b.viewmodel {
 	import ajax = nts.uk.request.ajax;
 	import info = nts.uk.ui.dialog.info;
@@ -33,6 +33,8 @@ module nts.uk.com.view.cmf001.b.viewmodel {
 		itemNameRow: KnockoutObservable<number> = ko.observable();
 		importStartRow: KnockoutObservable<number> = ko.observable();
 		layoutItemNoList: KnockoutObservableArray<number> = ko.observableArray([]);
+		
+		csvFileId:string = "";
 
 		importDomainOption: KnockoutObservableArray<any> = ko.observableArray(__viewContext.enums.ImportingDomainId);
 		importModeOption: KnockoutObservableArray<any> = ko.observableArray(__viewContext.enums.ImportingMode);
@@ -42,7 +44,10 @@ module nts.uk.com.view.cmf001.b.viewmodel {
 		layout: KnockoutObservableArray<Layout> = ko.observableArray([]);
 		selectedItem: KnockoutObservable<string> = ko.observable();
 
-	    canEditDetail = ko.computed(() => !util.isNullOrEmpty(this.selectedCode()));
+		canAddItem: KnockoutObservable<boolean> =
+			ko.computed(() => !util.isNullOrEmpty(this.importDomain()));
+	    canEditDetail: KnockoutObservable<boolean> =
+			ko.computed(() => !util.isNullOrEmpty(this.selectedCode()));
 	    
 		settingListColumns: KnockoutObservableArray<any> = ko.observableArray([
 			{ headerText: "コード", 				key: "code", 					width: 50 	},
@@ -63,14 +68,18 @@ module nts.uk.com.view.cmf001.b.viewmodel {
 
 			self.startPage();
 
+			// 受入設定の変更検知
 			self.selectedCode.subscribe((value) => {
 				if (value) {
+					// 選択した場合、更新モードへ
 					self.updateMode();
 				} else {
+					// 選択解除した場合、新規モードへ
 					self.newMode();
 				}
 			})
 
+			self.importDomain.extend({notify: 'always'})
 			self.importDomain.subscribe((value) => {
 				if (value) {
 					let condition = {
@@ -84,7 +93,7 @@ module nts.uk.com.view.cmf001.b.viewmodel {
 					self.layoutItemNoList([]);
 				}
 			})
-
+	
 			self.layoutItemNoList.subscribe((value) => {
 				self.setLayout(value);
 			})
@@ -109,11 +118,11 @@ module nts.uk.com.view.cmf001.b.viewmodel {
 				dfd.resolve();
 			});
 		}
-
+	
 		getListData(){
 			var self = this;
 			let dfd = $.Deferred();
-			ajax("screen/com/cmf/cmf001/b/get/setting/all").done((lstData: Array<viewmodel.Setting>) => {
+			ajax("screen/com/cmf/cmf001/b/get/settings/domainbase").done((lstData: Array<viewmodel.Setting>) => {
 				let sortedData = _.orderBy(lstData, ['code'], ['asc']);
 				self.settingList(sortedData);
 				dfd.resolve();
@@ -130,12 +139,11 @@ module nts.uk.com.view.cmf001.b.viewmodel {
 			self.setInfo(SettingInfo.new());
 			self.isNewMode(true);
 		}
-
+	
 		updateMode(){
 			let self = this;
 			ajax("com", "screen/com/cmf/cmf001/b/get/setting/" + self.selectedCode()).done((infoData: viewmodel.SettingInfo) => {
 				self.setInfo(infoData);
-				self.layoutItemNoList(infoData.itemNoList);
 				self.isNewMode(false);
 				self.checkError();
 			});
@@ -145,16 +153,17 @@ module nts.uk.com.view.cmf001.b.viewmodel {
 			nts.uk.ui.errors.clearAll()
 			$('.check-target').ntsError('check');
 		}
-
+	
 		setInfo(info: SettingInfo){
 			let self = this;
 			self.settingCode(info.code);
 			self.settingName(info.name);
-			self.importDomain(info.domain);
 			self.importMode(info.mode);
 			self.itemNameRow(info.itemNameRow);
 			self.importStartRow(info.importStartRow);
-			//self.layoutItemNoList(info.itemNoList);
+			self.csvFileId=info.csvFileId;
+
+			self.importDomain(info.domains[0].domainId);
 		}
 
 		setLayout(itemNoList: number[]){
@@ -173,13 +182,14 @@ module nts.uk.com.view.cmf001.b.viewmodel {
 		}
 
 		canSave = ko.computed(() => !nts.uk.ui.errors.hasError() );
-
+	
 		save(){
 			let self = this;
 			self.checkError();
 			if(!nts.uk.ui.errors.hasError()){
 				let saveContents = {
 					createMode: self.isNewMode(),
+					baseType: 1,
 					setting: new SettingInfo(
 						__viewContext.user.companyId,
 						self.settingCode(),
@@ -188,31 +198,34 @@ module nts.uk.com.view.cmf001.b.viewmodel {
 						self.importMode(),
 						self.itemNameRow(),
 						self.importStartRow(),
+						self.csvFileId,
 						self.layoutItemNoList()),
 				};
 				ajax("screen/com/cmf/cmf001/b/save", saveContents).done(() => {
 					info(nts.uk.resource.getMessage("Msg_15", []));
 					self.reloadPage();
 					self.selectedCode(self.settingCode());
-                });
+	            }).fail(function(error) {
+					nts.uk.ui.dialog.alert({ messageId: error.messageId })
+				});
 			}
 		}
 
-    	canRemove = ko.computed(() => !util.isNullOrEmpty(this.selectedCode()));
-
+		canRemove = ko.computed(() => !util.isNullOrEmpty(this.selectedCode()));
+	
 		remove(){
 			let self = this;
 			let target = {code: self.selectedCode()};
-
+	
 			
-
-            ui.dialog.confirm({ messageId: "Msg_18" }).ifYes(() => {
-                this.$ajax("exio/input/setting/remove", target).done(() => {
+	
+	        ui.dialog.confirm({ messageId: "Msg_18" }).ifYes(() => {
+	            this.$ajax("exio/input/setting/remove", target).done(() => {
 					info(nts.uk.resource.getMessage("Msg_16", []));
 					self.reloadPage();
 					self.selectedCode("");
-                });
-            });
+	            });
+	        });
 		}
 
 		selectLayout() {
@@ -221,7 +234,7 @@ module nts.uk.com.view.cmf001.b.viewmodel {
 					domainId: self.importDomain(),
 					selectedItems: self.layoutItemNoList()
 			}, true);
-
+	
 			nts.uk.ui.windows.sub.modal("/view/cmf/001/d/index.xhtml").onClosed(function() {
 				// ダイアログを閉じたときの処理
 				if(!getShared('CMF001DCancel')){
@@ -233,9 +246,13 @@ module nts.uk.com.view.cmf001.b.viewmodel {
 		}
 
 		gotoDetailSetting() {
-			request.jump("../c/index.xhtml", { settingCode: this.settingCode() });
+			request.jump("../c/index.xhtml", {
+				settingCode: this.settingCode(),
+				domainId: this.importDomain(),
+				screenId: 'cmf001b'
+			});
 		}
-
+	
 		removeItem(target){
 			let self = this;
 			self.layoutItemNoList(self.layoutItemNoList().filter(function(itemNo){
@@ -246,50 +263,56 @@ module nts.uk.com.view.cmf001.b.viewmodel {
 
 
 
-
+	
 	export class Setting {
 		code: string;
 		name: string;
-
+	
 		constructor(code: string, name: string) {
 				this.code = code;
 				this.name = name;
 		}
 	}
-
+	
 	export class SettingInfo {
 		companyId: string;
 		code: string;
 		name: string;
-		domain: number;
 		mode: number;
 		itemNameRow: number;
 		importStartRow: number;
-		itemNoList: Array<number>;
-
-		constructor(companyId: string, code: string, name: string, domain: number, mode: number, itemNameRow: number, importStartRow: number, itemNoList: Array<number>) {
+		csvFileId: string;
+		domains:[];
+	
+		constructor(companyId: string, code: string, name: string, domain: number, mode: number, itemNameRow: number, importStartRow: number, csvFileId: string, itemNoList: Array<number>) {
 			this.companyId = companyId;
 			this.code = code;
 			this.name = name;
-			this.domain = domain;
 			this.mode = mode;
 			this.itemNameRow = itemNameRow;
 			this.importStartRow = importStartRow;
-			this.itemNoList = itemNoList;
+			this.csvFileId = csvFileId;
+			
+			this.domains = [
+				{
+					domainId:domain,
+					itemNoList:itemNoList
+				}
+			];
 		}
-
+	
 		static new(){
-			return new SettingInfo(__viewContext.user.companyId, "", "", null, null, null, null, [])
+			return new SettingInfo(__viewContext.user.companyId, "", "", null, null, null, [])
 		}
 	}
-
+	
 	export class Layout {
 		itemNo: number;
 		name: string;
 		required: boolean;
 		type: string;
 		source: string;
-
+	
 		constructor(itemNo: number,　name: string, required: boolean, type: string, source: string) {
 			this.itemNo = itemNo;
 			this.name = name;

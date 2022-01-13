@@ -1,28 +1,62 @@
+body{
+	min-width: 711px;
+	width: auto !important;
+}
 .container {
 	margin-left: 15px;
+;
 }
 
 .left-content {
 	display: inline-block;
 	vertical-align: top;
+	float: left;
 }
 
 .right-content {
 	display: inline-block;
 	vertical-align: top;
-	margin-left: 60px;
+}
+
+.right-content-1 {
+	display: inline-block;
+	vertical-align: top;
+	margin-left: 78px;
 }
 
 .form-label {
-    margin-right: 10px;
+	margin-right: 10px;
+}
+.control-group {
+	margin-bottom: 15px;
+	margin-top: 15px;
+}
+
+#combo-box {
+	width: 330px;
+}
+
+#combo-box2 {
+	width: 330px;
 }
 
 .caret-bottom {
 	font-size: 46px;
-	margin-left: 165px;
+	margin-left: 78px;
 	color: #E0F59E;
 	vertical-align: top;
 	line-height: 30px;
+}
+
+.caret-right.outline {
+	font-size: 70px;
+	margin: 10px 0px;
+	height: 4em;
+	margin-top: 30px;
+}
+
+.caret-right.outline:after {
+	border-width: 2.2em 0.4em;
 }
 
 .caret-bottom:after {
@@ -35,14 +69,48 @@
 
 #btn-selectuser {
 	margin-right: 10px;
-    margin-top: 30px;
-    margin-bottom: 20px;
+	margin-top: 30px;
+	margin-bottom: 20px;
 }
 
 #daterangepicker {
 	display: inline-block;
 }
 
-label.ntsControl.limited-label {
-	width : 400px;
+/*label.ntsControl.limited-label {*/
+/*width : 125px;*/
+/*margin-left: 15px;*/
+/*}*/
+
+.ui-widget-header {
+	background: #cff1a5;
+}
+
+.nts-gridlist.ui-iggrid table th.ui-widget-header {
+	text-align: inherit;
+}
+
+.table-food-td{
+	border: 1px solid #dddddd;
+}
+
+div.ntsLabel, label.ntsLabel, div.form-label, label.form-label {
+	width: 55px;
+}
+
+.caret-background:not(.deprecate).caret-bottom, .caret-background:not(.deprecate).caret-top, .caret-background:not(.deprecate).caret-left, .caret-background:not(.deprecate).caret-right {
+	margin: -20px;
+}
+#kcp005{
+	margin-top: 10px;
+}
+
+.code{
+	width: 120px;
+	padding-left: 5px;
+}
+.name{
+	width: 325px;
+	margin-left: -22px;
+
 }

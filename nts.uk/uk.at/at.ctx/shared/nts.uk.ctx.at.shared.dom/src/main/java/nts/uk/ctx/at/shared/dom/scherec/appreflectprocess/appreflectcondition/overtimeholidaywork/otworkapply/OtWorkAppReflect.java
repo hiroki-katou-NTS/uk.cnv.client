@@ -34,7 +34,10 @@ public class OtWorkAppReflect {
      */
     private AfterOtWorkAppReflect after;
 
-    private NotUseAtr reflectActualWorkAtr;
+	/**
+	 * 実績の勤務情報へ反映する
+	 */
+	private NotUseAtr reflectActualWorkAtr;
 
     public static OtWorkAppReflect create(int reflectActualWorkAtr, int reflectWorkInfoAtr, int reflectActualOvertimeHourAtr, int reflectBeforeBreak, int workReflect, int reflectPaytime, int reflectDivergence, int reflectBreakOuting) {
         return new OtWorkAppReflect(

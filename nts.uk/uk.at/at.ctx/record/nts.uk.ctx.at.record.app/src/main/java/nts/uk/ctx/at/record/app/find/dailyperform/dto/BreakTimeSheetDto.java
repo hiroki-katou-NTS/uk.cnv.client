@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.shared.dom.attendance.util.item.AttendanceItemDataGate;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.ItemConst;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.breaking.BreakTimeSheet;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.anno.AttendanceItemLayout;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.anno.AttendanceItemValue;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
@@ -78,5 +79,14 @@ public class BreakTimeSheetDto implements ItemConst, AttendanceItemDataGate {
 	@Override
 	public BreakTimeSheetDto clone() {
 		return new BreakTimeSheetDto(start, end, breakTime, no);
+	}
+
+	public static BreakTimeSheetDto fromDomain(BreakTimeSheet bt) {
+
+		return new BreakTimeSheetDto(
+				bt.getStartTime().v(),
+				bt.getEndTime().v(),
+				bt.getBreakTime().v(),
+				bt.getBreakFrameNo().v());
 	}
 }

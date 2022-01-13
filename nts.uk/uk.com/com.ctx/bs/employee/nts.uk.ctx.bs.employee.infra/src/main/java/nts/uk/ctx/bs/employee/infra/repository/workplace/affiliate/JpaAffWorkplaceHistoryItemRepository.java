@@ -71,7 +71,7 @@ public class JpaAffWorkplaceHistoryItemRepository extends JpaRepository implemen
 	 * @return
 	 */
 	private AffWorkplaceHistoryItem toDomain(BsymtAffiWorkplaceHistItem entity) {
-		return AffWorkplaceHistoryItem.createFromJavaType(entity.getHisId(), entity.getSid(), entity.getWorkPlaceId(),entity.getNormalWkpId());
+		return AffWorkplaceHistoryItem.createFromJavaType(entity.getHisId(), entity.getSid(), entity.getWorkPlaceId());
 	}
 
 	/**
@@ -81,13 +81,11 @@ public class JpaAffWorkplaceHistoryItemRepository extends JpaRepository implemen
 	 * @return
 	 */
 	private BsymtAffiWorkplaceHistItem toEntity(AffWorkplaceHistoryItem domain) {
-		return new BsymtAffiWorkplaceHistItem(domain.getHistoryId(), domain.getEmployeeId(), domain.getWorkplaceId(),
-				domain.getNormalWorkplaceId());
+		return new BsymtAffiWorkplaceHistItem(domain.getHistoryId(), domain.getEmployeeId(), domain.getWorkplaceId());
 	}
 
 	private void updateEntity(AffWorkplaceHistoryItem domain, BsymtAffiWorkplaceHistItem entity) {
 		entity.setWorkPlaceId(domain.getWorkplaceId());
-		entity.setNormalWkpId(domain.getNormalWorkplaceId());
 	}
 
 	@Override
@@ -146,7 +144,7 @@ public class JpaAffWorkplaceHistoryItemRepository extends JpaRepository implemen
 		List<AffWorkplaceHistoryItem> data = new ArrayList<>();
 		CollectionUtil.split(employeeId, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subList -> {
 			try (PreparedStatement statement = this.connection().prepareStatement(
-					"SELECT h.HIST_ID, h.SID, h.WORKPLACE_ID, h.NORMAL_WORKPLACE_ID from BSYMT_AFF_WKP_HIST_ITEM h"
+					"SELECT h.HIST_ID, h.SID, h.WORKPLACE_ID from BSYMT_AFF_WKP_HIST_ITEM h"
 						+ " INNER JOIN BSYMT_AFF_WKP_HIST wh ON wh.HIST_ID = h.HIST_ID"
 						+ " WHERE wh.START_DATE <= ? and wh.END_DATE >= ? AND wh.SID IN (" 
 						+ subList.stream().map(s -> "?").collect(Collectors.joining(",")) + ")")) {
@@ -158,7 +156,7 @@ public class JpaAffWorkplaceHistoryItemRepository extends JpaRepository implemen
 				}
 				data.addAll(new NtsResultSet(statement.executeQuery()).getList(rec -> {
 					return new AffWorkplaceHistoryItem(rec.getString("HIST_ID"), rec.getString("SID"),
-							rec.getString("WORKPLACE_ID"), rec.getString("NORMAL_WORKPLACE_ID"));
+							rec.getString("WORKPLACE_ID"));
 				}));
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -226,7 +224,7 @@ public class JpaAffWorkplaceHistoryItemRepository extends JpaRepository implemen
 		List<BsymtAffiWorkplaceHistItem> listHistItem = new ArrayList<>();
 		CollectionUtil.split(hisIds, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, (subList) -> {
 			String subLstHistpId = NtsStatement.In.createParamsString(subList);
-			String sql = "SELECT HIST_ID, SID, WORKPLACE_ID, NORMAL_WORKPLACE_ID " + "FROM BSYMT_AFF_WKP_HIST_ITEM "
+			String sql = "SELECT HIST_ID, SID, WORKPLACE_ID " + "FROM BSYMT_AFF_WKP_HIST_ITEM "
 					+ "WHERE HIST_ID IN (" + subLstHistpId + ")";
 
 			try (PreparedStatement stmt = this.connection().prepareStatement(sql)) {
@@ -236,7 +234,7 @@ public class JpaAffWorkplaceHistoryItemRepository extends JpaRepository implemen
 
 				listHistItem.addAll(new NtsResultSet(stmt.executeQuery()).getList(rs -> {
 					return new BsymtAffiWorkplaceHistItem(rs.getString("HIST_ID"), rs.getString("SID"),
-							rs.getString("WORKPLACE_ID"), rs.getString("NORMAL_WORKPLACE_ID"));
+							rs.getString("WORKPLACE_ID"));
 				}));
 
 			} catch (SQLException e) {
@@ -308,10 +306,10 @@ public class JpaAffWorkplaceHistoryItemRepository extends JpaRepository implemen
 	@Override
 	public void addAll(List<AffWorkplaceHistoryItem> domain) {
 		String INS_SQL = "INSERT INTO BSYMT_AFF_WKP_HIST_ITEM (INS_DATE, INS_CCD , INS_SCD , INS_PG,"
-				+ " UPD_DATE , UPD_CCD , UPD_SCD , UPD_PG," + " CONTRACT_CD, HIST_ID, SID, WORKPLACE_ID," + " NORMAL_WORKPLACE_ID)"
+				+ " UPD_DATE , UPD_CCD , UPD_SCD , UPD_PG," + " CONTRACT_CD, HIST_ID, SID, WORKPLACE_ID)"
 				+ " VALUES (INS_DATE_VAL, INS_CCD_VAL, INS_SCD_VAL, INS_PG_VAL,"
 				+ " UPD_DATE_VAL, UPD_CCD_VAL, UPD_SCD_VAL, UPD_PG_VAL,"
-				+ " CONTRACT_CD_VAL, HIST_ID_VAL, SID_VAL, WORKPLACE_ID_VAL, NORMAL_ID_VAL); ";
+				+ " CONTRACT_CD_VAL, HIST_ID_VAL, SID_VAL, WORKPLACE_ID_VAL); ";
 		
 		String contractCode = AppContexts.user().contractCode();
 		String insCcd = AppContexts.user().companyCode();
@@ -338,8 +336,6 @@ public class JpaAffWorkplaceHistoryItemRepository extends JpaRepository implemen
 			sql = sql.replace("HIST_ID_VAL", "'" + c.getHistoryId() + "'");
 			sql = sql.replace("SID_VAL", "'" + c.getEmployeeId() + "'");
 			sql = sql.replace("WORKPLACE_ID_VAL", c.getWorkplaceId() == null ? "null" : "'" + c.getWorkplaceId() + "'");
-			sql = sql.replace("NORMAL_ID_VAL",
-					c.getNormalWorkplaceId() == null ? "null" : "'" + c.getNormalWorkplaceId() + "'");
 
 			sb.append(sql);
 		});
@@ -353,7 +349,7 @@ public class JpaAffWorkplaceHistoryItemRepository extends JpaRepository implemen
 	public void updateAll(List<AffWorkplaceHistoryItem> domain) {
 
 		String UP_SQL = "UPDATE BSYMT_AFF_WKP_HIST_ITEM SET UPD_DATE = UPD_DATE_VAL, UPD_CCD = UPD_CCD_VAL, UPD_SCD = UPD_SCD_VAL, UPD_PG = UPD_PG_VAL,"
-				+ " WORKPLACE_ID = WORKPLACE_ID_VAL, NORMAL_WORKPLACE_ID = NORMAL_ID_VAL"
+				+ " WORKPLACE_ID = WORKPLACE_ID_VAL"
 				+ " WHERE HIST_ID = HIST_ID_VAL AND SID = SID_VAL;";
 		String updCcd = AppContexts.user().companyCode();
 		String updScd = AppContexts.user().employeeCode();
@@ -368,8 +364,6 @@ public class JpaAffWorkplaceHistoryItemRepository extends JpaRepository implemen
 			sql = sql.replace("UPD_PG_VAL", "'" + updPg + "'");
 
 			sql = sql.replace("WORKPLACE_ID_VAL", c.getWorkplaceId() == null ? "null" : "'" + c.getWorkplaceId() + "'");
-			sql = sql.replace("NORMAL_ID_VAL",
-					c.getNormalWorkplaceId() == null ? "null" : "'" + c.getNormalWorkplaceId() + "'");
 
 			sql = sql.replace("HIST_ID_VAL", "'" + c.getHistoryId() + "'");
 			sql = sql.replace("SID_VAL", "'" + c.getEmployeeId() + "'");

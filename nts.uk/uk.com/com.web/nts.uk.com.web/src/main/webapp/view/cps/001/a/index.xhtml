@@ -31,26 +31,28 @@
 
 		<ui:define name="content">
 			<div id="functions-area">
+				<a tabindex="1" class="goback" 
+					data-bind="ntsLinkButton: { jump: '/view/cps/018/a/index.xhtml' }, visible: $vm.isFromCPS018">#{i18n.getText('CPS001_157')}</a>
 				<button type="button" class="proceed"
 					data-bind="click: saveData, enable: $root.errors.isEmpty &amp;&amp; saveAble"
-					tabindex="1">#{i18n.getText('CPS001_4')}</button>
+					tabindex="2">#{i18n.getText('CPS001_4')}</button>
 				<button type="button" data-bind="click: unManagerEmployee,
 												 enable: !!employee.employeeId(),
 												 style: { visibility: enaBtnManagerEmp() ? 'visible' : 'hidden' }"
-					tabindex="2">#{i18n.getText('CPS001_5')}</button>
+					tabindex="3">#{i18n.getText('CPS001_5')}</button>
 				<button type="button" class="danger"
 					data-bind="click: deleteEmployee,					
 							   enable: !!employee.employeeId(),
-							   style: { visibility: enaBtnDelEmp() ? 'visible' : 'hidden' }" tabindex="3">#{i18n.getText('CPS001_6')}</button>
-				<span class="licenseCheck" data-bind="text:licenseCheck, css: classWarning, style: { visibility: licenseCheckDipslay() ? 'visible' : 'hidden' }"></span>
+							   style: { visibility: enaBtnDelEmp() ? 'visible' : 'hidden' }" tabindex="4">#{i18n.getText('CPS001_6')}</button>
+				<span class="licenseCheck" data-bind="text:licenseCheck, css: classWarning, style: { visibility: licenseCheckDipslay() ? 'visible' : 'hidden', marginLeft: $vm.isFromCPS018() ? '18px' : '140px'  }"></span>
 				<a class="goout"
 					data-bind="ntsLinkButton: { jump: '/view/cas/001/a/index.xhtml' }"
-					tabindex="4">#{i18n.getText('CPS001_7')}</a> <a class="goout"
+					tabindex="5">#{i18n.getText('CPS001_7')}</a> <a class="goout"
 					data-bind="ntsLinkButton: { jump: '/view/cps/008/a/index.xhtml' }"
-					tabindex="5">#{i18n.getText('CPS001_8')}</a>
+					tabindex="6">#{i18n.getText('CPS001_8')}</a>
 			</div>
 			<div id="contents-area" class="cf">
-				<div id="ccgcomponent" tabindex="6"></div>
+				<div id="ccgcomponent" tabindex="7"></div>
 				<com:ko tag="let" bind="{ 
 					text: nts.uk.resource.getText,
 					TABS: {

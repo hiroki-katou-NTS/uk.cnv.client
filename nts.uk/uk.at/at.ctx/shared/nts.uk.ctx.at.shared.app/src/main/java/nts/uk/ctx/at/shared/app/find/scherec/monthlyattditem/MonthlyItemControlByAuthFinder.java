@@ -1,5 +1,6 @@
 package nts.uk.ctx.at.shared.app.find.scherec.monthlyattditem;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,11 @@ public class MonthlyItemControlByAuthFinder {
 			return MonthlyItemControlByAuthDto.fromDomain(data.get());
 		return null;
 	}
-	
-	
-
+	// ドメインモデル「権限別月次項目制御」を取得する kdw002 ver7
+	public List<String> getMonthlytRolesByCid() {
+		List<String> listRoles = Collections.emptyList();
+		String companyID = AppContexts.user().companyId();
+		listRoles = repo.getMonthlytRolesByCid(companyID);
+		return listRoles;
+	}
 }

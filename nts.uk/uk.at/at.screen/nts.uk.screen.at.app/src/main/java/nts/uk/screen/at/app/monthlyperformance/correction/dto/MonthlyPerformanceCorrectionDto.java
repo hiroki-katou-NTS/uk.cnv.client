@@ -15,6 +15,7 @@ import nts.uk.ctx.at.record.app.find.monthly.root.common.ClosureDateDto;
 import nts.uk.ctx.at.record.app.find.workrecord.operationsetting.FormatPerformanceDto;
 import nts.uk.ctx.at.record.app.find.workrecord.operationsetting.IdentityProcessDto;
 import nts.uk.ctx.at.record.dom.adapter.company.AffCompanyHistImport;
+import nts.uk.ctx.at.record.dom.application.realitystatus.output.UseSetingOutput;
 import nts.uk.ctx.at.shared.app.find.scherec.monthlyattditem.MonthlyItemControlByAuthDto;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.converter.util.item.ItemValue;
 import nts.uk.screen.at.app.monthlyperformance.correction.param.MonthlyPerformanceParam;
@@ -112,6 +113,8 @@ public class MonthlyPerformanceCorrectionDto {
 	private String mess;
 	
 	private List<MPSateCellHideControl> mPSateCellHideControl = new ArrayList<>();
+	
+	private UseSetingOutput useSetingOutput;
 	
 	//history into company
 	private List<AffCompanyHistImport> lstAffComHist;

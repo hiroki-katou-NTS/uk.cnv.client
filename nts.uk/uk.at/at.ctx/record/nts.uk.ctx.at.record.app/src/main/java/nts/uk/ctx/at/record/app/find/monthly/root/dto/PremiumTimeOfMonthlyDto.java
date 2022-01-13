@@ -24,7 +24,7 @@ public class PremiumTimeOfMonthlyDto implements ItemConst, AttendanceItemDataGat
 	private List<AggregatePremiumTimeDto> premiumTimes;
 	
 	/**　割増金額合計*/
-	private int premiumAmountTotal;
+	private long premiumAmountTotal;
 
 	public static PremiumTimeOfMonthlyDto from(PremiumTimeOfMonthly domain) {
 		PremiumTimeOfMonthlyDto dto = new PremiumTimeOfMonthlyDto();

@@ -82,5 +82,7 @@ public interface WorkplaceMonthDaySettingRepository {
 	 * @param workplaceId the workplace id
 	 * @param year the year
 	 */
-	void remove(CompanyId companyId, String workplaceId, Year year);
+	void remove(CompanyId companyId, String workplaceId, Year year, Integer startMonth);
+	
+	void remove(WorkplaceMonthDaySetting domain);
 }

@@ -11,5 +11,5 @@ import nts.uk.ctx.at.request.dom.applicationreflect.object.ReflectStatusResult;
 
 public interface ReflectApplicationWorkRecordAdapter {
 	public Pair<ReflectStatusResult, Optional<AtomTask>> process(Object application, GeneralDate date,
-			ReflectStatusResult reflectStatus, GeneralDateTime reflectTime);
+			ReflectStatusResult reflectStatus, GeneralDateTime reflectTime, String execId);
 }

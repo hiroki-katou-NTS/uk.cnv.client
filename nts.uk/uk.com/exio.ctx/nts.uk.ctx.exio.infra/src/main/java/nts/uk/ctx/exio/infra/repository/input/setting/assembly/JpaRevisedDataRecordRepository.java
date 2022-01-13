@@ -22,13 +22,13 @@ public class JpaRevisedDataRecordRepository extends JpaRepository implements Rev
 	@Override
 	public void save(Require require, ExecutionContext context, RevisedDataRecord record) {
 		
-		WorkspaceSql.create(require, context, jdbcProxy()).insert(record);
+		WorkspaceSql.create(require, context, jdbcProxy(), this.database().product()).insert(record);
 	}
 
 	@Override
 	public int getMaxRowNumber(Require require, ExecutionContext context) {
 		
-		return WorkspaceSql.create(require, context, jdbcProxy())
+		return WorkspaceSql.create(require, context, jdbcProxy(), this.database().product())
 				.getMaxRowNumberOfRevisedData();
 	}
 
@@ -38,27 +38,27 @@ public class JpaRevisedDataRecordRepository extends JpaRepository implements Rev
 		val workspace = require.getDomainWorkspace(context.getDomainId());
 		String columnName = workspace.getItem(itemNo).get().getName();
 		
-		return WorkspaceSql.create(require, context, jdbcProxy())
+		return WorkspaceSql.create(require, context, jdbcProxy(), this.database().product())
 				.getStringsOfRevisedData(columnName);
 	}
 
 	@Override
 	public Optional<RevisedDataRecord> findByRowNo(Require require, ExecutionContext context, int rowNo) {
 		
-		return WorkspaceSql.create(require, context, jdbcProxy())
+		return WorkspaceSql.create(require, context, jdbcProxy(), this.database().product())
 				.findRevisedByRowNo(rowNo);
 	}
 
 	@Override
 	public List<RevisedDataRecord> findAll(Require require, ExecutionContext context) {
-		return WorkspaceSql.create(require, context, jdbcProxy()).findAllRevised();
+		return WorkspaceSql.create(require, context, jdbcProxy(), this.database().product()).findAllRevised();
 	}
 
 	@Override
 	public List<RevisedDataRecord> findByCriteria(
 			Require require, ExecutionContext context, int criteriaItemNo, String criteriaValue) {
 		
-		return WorkspaceSql.create(require, context, jdbcProxy())
+		return WorkspaceSql.create(require, context, jdbcProxy(), this.database().product())
 				.findRevisedWhere(criteriaItemNo, criteriaValue);
 	}
 }

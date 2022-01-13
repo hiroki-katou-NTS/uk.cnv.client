@@ -3,6 +3,7 @@ package nts.uk.ctx.at.record.dom.dailyperformanceformat;
 import java.math.BigDecimal;
 
 import lombok.Getter;
+import lombok.Setter;
 import nts.arc.layer.dom.AggregateRoot;
 import nts.uk.ctx.at.shared.dom.workrule.businesstype.BusinessTypeCode;
 
@@ -21,6 +22,7 @@ public class BusinessTypeFormatDaily extends AggregateRoot {
 	 * padding left "0"
 	 * 勤務種別コード
 	 */
+	@Setter
 	private BusinessTypeCode businessTypeCode;
 
 	/**

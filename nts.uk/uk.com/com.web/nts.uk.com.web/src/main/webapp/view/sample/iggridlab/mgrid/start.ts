@@ -259,7 +259,7 @@ module nts.uk.ui.gridlist {
 //                                    ]},
                                 { headerText: "表示", key: "show", dataType: "string", width: '40px', ntsControl: 'Image' },
                                 { headerText: "追加", key: "add", dataType: "string", width: "40px", ntsControl: "ImageAdd" },
-                                { headerText: "Select", key: "select", dataType: "boolean", width: "40px", checkbox: true, ntsControl: "Checkbox1" },
+                                { headerText: "Select", key: "select", dataType: "boolean", width: "40px", columnCssClass: "halign-center", checkbox: true, ntsControl: "Checkbox1" },
                                 { headerText: 'Inbound time', key: 'time', width: '140px', columnCssClass: "halign-right", headerCssClass: "center-align",
                                                 constraint: { 
 //                                                                primitiveValue: 'SampleTimeClock',

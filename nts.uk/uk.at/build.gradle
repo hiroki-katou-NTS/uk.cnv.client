@@ -155,8 +155,8 @@ subprojects {
 		
 		// Log4J
 		compile group: 'log4j', name: 'log4j', version: '1.2.17'
-		compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.7'
-		compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.7'
+		compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
+		compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
 		
 		// SLF4J
 		compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
@@ -280,6 +280,8 @@ project (':at.ctx:shared:nts.uk.ctx.at.shared.ac') {
 		compile(group: 'com.bs.person', name: 'nts.uk.ctx.bs.person.pub', version: version)
 		compile(group: 'com.workflow', name: 'nts.uk.ctx.workflow.pub', version: version)
 		compile(group: 'com.sys.assist', name: 'nts.uk.ctx.sys.assist.pub', version: version)
+		compile(group: 'com.sys.log', name: 'nts.uk.ctx.sys.log.pub', version: version)
+        compile(group: 'com.query',name: 'nts.uk.query.pub',version: version)
 	}
 }
 
@@ -348,11 +350,13 @@ project (':at.ctx:schedule:nts.uk.ctx.at.schedule.ac') {
 
 project (':at.ctx:schedule:nts.uk.ctx.at.schedule.pub') {
 	dependencies {
+		compile project(':at.ctx:schedule:nts.uk.ctx.at.schedule.dom')
 	}
 }
 
 project (':at.ctx:schedule:nts.uk.ctx.at.schedule.pubimp') {
 	dependencies {
+		compile project(':at.ctx:shared:nts.uk.ctx.at.shared.dom')
 		compile project(':at.ctx:schedule:nts.uk.ctx.at.schedule.pub')
 		compile project(':at.ctx:schedule:nts.uk.ctx.at.schedule.dom')
 		compile project(':at.ctx:schedule:nts.uk.ctx.at.schedule.app')

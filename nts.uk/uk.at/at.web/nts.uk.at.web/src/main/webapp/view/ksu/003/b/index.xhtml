@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+    <ui:composition template="../../../../master/dialog.xhtml">
+        <ui:define name="htmlHead">
+            <script>var dialogSize = { width: 995, height: 480 };</script>
+            <com:ValidatorScript>
+                nts.uk.ctx.at.schedule.dom.schedule.task.taskpalette.TaskPaletteName
+                nts.uk.ctx.at.schedule.dom.schedule.task.taskpalette.TaskPaletteRemark
+            </com:ValidatorScript>
+            <com:scriptfile set="IGNITE" />
+            <com:stylefile path="ksu003.b.style.css" />
+            <com:scriptfile path="ksu003.b.vm.js" />
+        </ui:define>
+
+        <ui:define name="content">
+            <div id="functions-area">
+                <!--B1-1-->
+                <button class="proceed" tabindex="1" data-bind="click: registerOrUpdate">#{i18n.getText('KSU003_74')}</button>
+                <!--B1-2-->
+                <button class="danger" tabindex="2" data-bind="click: remove, enable: enableDelete()">#{i18n.getText('KSU003_75')}</button>
+                <!--B1-3-->
+                <button data-bind="click: closeDialog" tabindex="3">#{i18n.getText('KSU003_77')}</button>
+            </div>
+            <div id="contents-area">
+                <!--B2-1-->
+                <div style="margin-left: 2%; margin-top: 8px;" data-bind="text: displayName()"></div>
+                <hr id="line" />
+                
+                
+                <!-- B2-4 ~ B2-8 -->
+                <div id="group-link-button" class="bg-green caret-background caret-bottom cf" 
+                        style="margin-bottom: 30px;" data-bind="foreach: textButtonArr">
+                    <a class="hyperlink" 
+                        data-bind="click: $parent.clickLinkButton.bind($parent, $element, $index),text: name()"></a>
+                </div>
+                <div class="container-custom">
+                    <!--B2-9-->
+                    <div id="name" data-bind="ntsFormLabel: {required: true, constraint: 'TaskPaletteName'}">
+                        #{i18n.getText('KSU003_78')}</div>
+                    <!--B2-10-->
+                    <input id="pageName" tabindex="5" style="margin-left: 28px;" data-bind="ntsTextEditor: {
+                                        value: taskPaletteOrgnization().name,
+                                        required: true, 
+                                        constraint: 'TaskPaletteName', 
+                                        option: ko.mapping.fromJS(new nts.uk.ui.option.TextEditorOption({                                        
+                                            width: '70px',
+                                            textalign: 'left'
+                                        })),  
+                                        name: '#[KSU003_78]'
+                                    }" />
+                </div>
+                <div class="container-custom">
+                    <!--B2-11-->
+                    <div id="name" data-bind="ntsFormLabel: {required: false, constraint: 'TaskPaletteRemark'}">
+                        #{i18n.getText('KSU003_79')}</div>
+                    <!--B2-12-->
+                    <textarea id="remarks" tabindex="6" rows="3" cols="87" style="margin-left: 28px;" data-bind="ntsMultilineEditor: {
+                                        value: taskPaletteOrgnization().remarks,
+                                        required: false, 
+                                        constraint: 'TaskPaletteRemark', 
+                                        name: '#[KSU003_79]'
+                                    }" />
+                </div>
+
+                <div class="container-custom">
+                    <!--B3-1-->
+                    <div id="name" data-bind="ntsFormLabel: {required: true}">
+                        #{i18n.getText('KSU003_80')}</div>
+                    <!--B3-2 ~ B3-11-->
+                    <div id="task" style="margin-left: 16px;" data-bind="ntsTableButton: {
+                        source: tasks, 
+                        row: 2, 
+                        column: 5, 
+                        contextMenu: contextMenu, 
+                        disableMenuOnDataNotSet:[1],
+                        click: openDialogKdl012.bind($data),
+                        mode: 'master'}"></div>
+                </div>                
+            </div>
+        </ui:define>
+        </ui:composition>
+</body>
+
+</html>

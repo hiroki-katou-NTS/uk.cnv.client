@@ -115,6 +115,8 @@ module nts.uk.at.view.kmw003.a.viewmodel {
         clickCounter: CLickCount = new CLickCount();
         workTypeNotFound: any = [];
         flagSelectEmployee: boolean = false;
+		// 就業確定を利用する ← 就業確定の機能制限.就業確定を行う
+		employmentConfirm: boolean = false;
         
         constructor(value:boolean) {
             let self = this;
@@ -397,10 +399,6 @@ module nts.uk.at.view.kmw003.a.viewmodel {
             }   
                      
             self.monthlyParam().lstLockStatus = [];
-            if (self.monthlyParam().actualTime) {
-                self.monthlyParam().actualTime.startDate = moment.utc(self.monthlyParam().actualTime.startDate, "YYYY/MM/DD").toISOString();
-                self.monthlyParam().actualTime.endDate = moment.utc(self.monthlyParam().actualTime.endDate, "YYYY/MM/DD").toISOString();
-            }
             self.noCheckColumn(false);
             let checkLoadKdw: boolean = localStorage.getItem('isKmw');
             nts.uk.characteristics.restore("cacheKMW003").done(function (cacheData) { 
@@ -410,7 +408,21 @@ module nts.uk.at.view.kmw003.a.viewmodel {
             localStorage.removeItem('isKmw');
             __viewContext.transferred.value = false;
             nts.uk.characteristics.save("cacheKMW003",self.monthlyParam());
+
+			if (self.monthlyParam().actualTime) {
+                self.monthlyParam().actualTime.startDate = moment.utc(self.monthlyParam().actualTime.startDate, "YYYY/MM/DD").toISOString();
+                self.monthlyParam().actualTime.endDate = moment.utc(self.monthlyParam().actualTime.endDate, "YYYY/MM/DD").toISOString();
+            }
             service.startScreen(self.monthlyParam()).done((data) => {
+				self.employmentConfirm = data.useSetingOutput.employmentConfirm;
+                if(self.employmentConfirm){
+                    let check = _.find(data.authorityDto, function(o) {
+                        return o.functionNo === 26;
+                    })
+                    if (check == null){
+                        self.employmentConfirm = false;
+                    } 
+                }
                 if (data.selectedClosure) {
                     let closureInfoArray = []
                     closureInfoArray = _.map(data.lstclosureInfoOuput, function(item: any) {
@@ -579,7 +591,15 @@ module nts.uk.at.view.kmw003.a.viewmodel {
                 // Fixed Header
                 self.setFixedHeader(data.lstFixedHeader);
                 self.extractionData();
-				$("#dpGrid").mGrid("destroy");
+				 /*if ($("#dpGrid").data('mGrid')) {
+	                $("#dpGrid").mGrid("destroy");
+	                $("#dpGrid").off();
+	            }*/
+				if ($("#dpGrid").hasClass("mgrid")) {
+	                $("#dpGrid").mGrid("destroy");
+	                $("#dpGrid").removeClass("mgrid");
+	                $("#dpGrid").off(); 
+	            }
                 self.loadGrid();
                 _.forEach(data.mpsateCellHideControl, (cellHide =>{
                     $('#dpGrid').mGrid("setState", cellHide.rowId, cellHide.columnKey, ["mgrid-hide"])
@@ -694,6 +714,10 @@ module nts.uk.at.view.kmw003.a.viewmodel {
                 items: [
                     { colorCode: '#94B7FE', labelText: '手修正（本人）' },
                     { colorCode: '#CEE6FF', labelText: '手修正（他人）' },
+					{ colorCode: '#F69164', labelText: getText("KMW003_42") },
+					{ colorCode: '#FFFF99', labelText: getText("KMW003_43") },
+					{ colorCode: '#FF99CC', labelText: getText("KMW003_44") },
+					{ colorCode: '#ff0000', labelText: getText("KMW003_45") },
                     { colorCode: '#DDDDD2', labelText: getText("KMW003_33") },
                 ]
             };
@@ -791,6 +815,7 @@ module nts.uk.at.view.kmw003.a.viewmodel {
                     nts.uk.ui.dialog.info({ messageId: 'Msg_15' });
 					
 					self.loadRowScreen().done(() => {
+						self.updateCellIsCal(data);
 						nts.uk.ui.block.clear();
 					});
                 }).fail(function(res: any) {
@@ -806,6 +831,14 @@ module nts.uk.at.view.kmw003.a.viewmodel {
                 });
             }
         }
+
+		updateCellIsCal(data:any){
+			_.forEach(data, row => {
+				_.forEach(row.itemChangeByCal, item => {
+					$("#dpGrid").mGrid("setState", row.employeeId,"A" + item.itemId, ["mgrid-calc"]);
+				});
+			});
+		}
 
         insertUpdate2() {
             let self = this;
@@ -1798,6 +1831,13 @@ module nts.uk.at.view.kmw003.a.viewmodel {
             nts.uk.ui.windows.setShared("CDL027Params", param);
             nts.uk.ui.windows.sub.modal('com',"/view/cdl/027/a/index.xhtml");
         }
+
+		openKDL006(){
+		 	nts.uk.ui.block.grayout();
+	        modal("/view/kdl/006/a/index.xhtml").onClosed(() => {
+	            nts.uk.ui.block.clear();
+	        });
+		}
         
         search(columnKey, rowId, val, valOld) {
             let dfd = $.Deferred();
@@ -1972,7 +2012,8 @@ module nts.uk.at.view.kmw003.a.viewmodel {
                 self.available_A1_9(self.checkAvailable(data, 12));
                 self.available_A1_11(self.checkAvailable(data, 12));
                 //A2_1
-                //$('#ccg001').hide();
+                $('#ccg001').show();
+
             } else if (initMode == 2) {
                 $('#cbClosureInfo').show();
                 //A4_7

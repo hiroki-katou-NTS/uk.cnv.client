@@ -43,10 +43,14 @@ module nts.uk.at.view.kaf012.a.viewmodel {
 				}
 			}
 			let empLst: Array<string> = [],
-				dateLst: Array<string> = [];
+				dateLst: Array<string> = [],
+				screenCode: number = null;
             vm.isSendMail = ko.observable(false);
             vm.application = ko.observable(new Application(vm.appType()));
 			if (!_.isEmpty(params)) {
+				if (!nts.uk.util.isNullOrUndefined(params.screenCode)) {
+					screenCode = params.screenCode;
+				}
 				if (!_.isEmpty(params.employeeIds)) {
 					empLst = params.employeeIds;
 				}
@@ -66,8 +70,14 @@ module nts.uk.at.view.kaf012.a.viewmodel {
                 vm.applyTimeData.push(new DataModel(i, vm.reflectSetting, vm.appDispInfoStartupOutput, vm.application));
             }
             vm.specialLeaveFrame = ko.observable(null);
+			let paramKAF000 = {
+				empLst, 
+				dateLst, 
+				appType: vm.appType(),
+				screenCode	
+			};
             vm.$blockui("show");
-            vm.loadData(empLst, dateLst, vm.appType())
+            vm.loadData(paramKAF000)
             .then((loadDataFlag: any) => {
                 if(loadDataFlag) {
 					vm.application().employeeIDLst(empLst);

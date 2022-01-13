@@ -13,8 +13,8 @@ public class AffWorkplaceHistoryItem {
 	// 職場ID
 	private String  workplaceId;
 	
-	/** The normalWorkplaceCode. */
-	// 通常職場コード
-	private String  normalWorkplaceId;
+//	/** The normalWorkplaceCode. */
+//	// 通常職場コード
+//	private String  normalWorkplaceId;
 }
 

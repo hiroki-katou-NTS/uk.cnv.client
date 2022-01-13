@@ -140,6 +140,22 @@ public class SpcVacationDaysOfMonthly implements Serializable{
 		
 	}
 	
+	/** 特別休暇合計日数の再集計 */
+	public void recalcTotal() {
+		
+		this.totalSpcVacationDays = new AttendanceDaysMonth(0d);
+		this.totalSpcVacationTime = new AttendanceTimeMonth(0);
+		
+		/** ○特別休暇日数を取得 */
+		for (val spe : this.spcVacationDaysList.entrySet()) {
+			
+			/** ○日数、時間を累計 */
+			this.totalSpcVacationDays = this.totalSpcVacationDays.addDays(spe.getValue().getDays().v());
+			this.totalSpcVacationTime = this.totalSpcVacationTime.addMinutes(spe.getValue().getTime().valueAsMinutes());
+		}
+	}
+	
+	
 	/**
 	 * 合算する
 	 * @param target 加算対象

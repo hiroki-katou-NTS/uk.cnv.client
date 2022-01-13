@@ -31,6 +31,8 @@ module nts.uk.at.view.kaf022.q.viewmodel {
         warningDays: KnockoutObservable<number>;
         // 所属職場名表示
         dispWorkplaceNameAtr: KnockoutObservable<number>;
+        // 承認機能を利用する
+        useApprovalFunction: KnockoutObservable<number>;
 
         constructor() {
             const self = this;
@@ -39,6 +41,7 @@ module nts.uk.at.view.kaf022.q.viewmodel {
             self.atdExcessAtr = ko.observable(1);
             self.warningDays = ko.observable(0);
             self.dispWorkplaceNameAtr = ko.observable(1);
+            self.useApprovalFunction = ko.observable(1);
 
             $("#fixed-table-q1").ntsFixedTable({});
             $("#fixed-table-q2").ntsFixedTable({});
@@ -53,6 +56,7 @@ module nts.uk.at.view.kaf022.q.viewmodel {
                 self.atdExcessAtr(data.atdExcessAtr);
                 self.warningDays(data.warningDays);
                 self.dispWorkplaceNameAtr(data.dispWorkplaceNameAtr);
+                self.useApprovalFunction(data.useApprovalFunction)
             }
         }
 
@@ -63,7 +67,8 @@ module nts.uk.at.view.kaf022.q.viewmodel {
                 preExcessAtr: self.preExcessAtr(),
                 atdExcessAtr: self.atdExcessAtr(),
                 warningDays: self.warningDays(),
-                dispWorkplaceNameAtr: self.dispWorkplaceNameAtr()
+                dispWorkplaceNameAtr: self.dispWorkplaceNameAtr(),
+                useApprovalFunction: self.useApprovalFunction()
             };
         }
 

@@ -1,0 +1,44 @@
+.flex-containter {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 10px;
+}
+
+.common-column {
+    float: left;
+    min-height: 250px;
+	width: 275px;
+}
+
+.panel-custom-header {
+	font-size: 1.5em;
+	text-align: center;
+	margin-top: 5px;
+	border-radius: 5px;
+}
+
+.label-description {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.btn-redirect-container {
+    margin-bottom: 20px;
+}
+
+.btn-redirect {
+    width: 230px;
+    margin-top: 10px;
+}
+
+#A2_1 {
+    margin: 10px 10px 20px 10px;
+}
+
+#A2_2 {
+    white-space: pre-line
+}
+
+.caret-right:after {
+	color: #97D155;
+}

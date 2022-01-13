@@ -12,16 +12,14 @@ import javax.ws.rs.Produces;
 
 import nts.arc.enums.EnumConstant;
 import nts.arc.layer.ws.WebService;
-import nts.uk.ctx.at.record.app.command.workrecord.operationsetting.ApprovalProcessCommand;
-import nts.uk.ctx.at.record.app.command.workrecord.operationsetting.DaiPerformanceFunCommand;
+import nts.uk.ctx.at.record.app.command.workrecord.operationsetting.DayFuncControlCommand;
 import nts.uk.ctx.at.record.app.command.workrecord.operationsetting.FormatPerformanceCommand;
-import nts.uk.ctx.at.record.app.command.workrecord.operationsetting.IdentityProcessCommand;
 import nts.uk.ctx.at.record.app.command.workrecord.operationsetting.MonPerformanceFunCommand;
-import nts.uk.ctx.at.record.app.command.workrecord.operationsetting.UpdateApprovalProcessCommandHandler;
-import nts.uk.ctx.at.record.app.command.workrecord.operationsetting.UpdateDaiPerformanceFunCommandHandler;
+import nts.uk.ctx.at.record.app.command.workrecord.operationsetting.RestrictConfirmEmploymentCommand;
+import nts.uk.ctx.at.record.app.command.workrecord.operationsetting.UpdateDayFuncControlCommandHandler;
 import nts.uk.ctx.at.record.app.command.workrecord.operationsetting.UpdateFormatPerformanceCommandHandler;
-import nts.uk.ctx.at.record.app.command.workrecord.operationsetting.UpdateIdentityProcessCommandHandler;
 import nts.uk.ctx.at.record.app.command.workrecord.operationsetting.UpdateMonPerformanceFunCommandHandler;
+import nts.uk.ctx.at.record.app.command.workrecord.operationsetting.UpdateRestrictConfirmEmploymentCommandHandler;
 import nts.uk.ctx.at.record.app.find.workrecord.operationsetting.ApplicationTypeFinder;
 import nts.uk.ctx.at.record.app.find.workrecord.operationsetting.ApprovalProcessDto;
 import nts.uk.ctx.at.record.app.find.workrecord.operationsetting.ApprovalProcessFinder;
@@ -33,6 +31,8 @@ import nts.uk.ctx.at.record.app.find.workrecord.operationsetting.IdentityProcess
 import nts.uk.ctx.at.record.app.find.workrecord.operationsetting.IdentityProcessFinder;
 import nts.uk.ctx.at.record.app.find.workrecord.operationsetting.MonPerformanceFunDto;
 import nts.uk.ctx.at.record.app.find.workrecord.operationsetting.MonPerformanceFunFinder;
+import nts.uk.ctx.at.record.app.find.workrecord.operationsetting.RestrictConfirmEmploymentDto;
+import nts.uk.ctx.at.record.app.find.workrecord.operationsetting.RestrictConfirmEmploymentFinder;
 import nts.uk.shr.com.context.AppContexts;
 
 /**
@@ -58,19 +58,19 @@ public class OperationSettingWebservice extends WebService {
 	private UpdateMonPerformanceFunCommandHandler updateMonPerformanceFunCommandHandler;
 	
 	@Inject
-	private UpdateDaiPerformanceFunCommandHandler updateDaiPerformanceFunCommandHandler;
-	
-	@Inject
 	private ApprovalProcessFinder approvalProcessFinder;
 	
 	@Inject
 	private IdentityProcessFinder identityProcessFinder;
 	
 	@Inject
-	private UpdateApprovalProcessCommandHandler updateApprovalProcessCommandHandler;
+	private RestrictConfirmEmploymentFinder restrictConfirmEmploymentFinder;
 	
 	@Inject
-	private UpdateIdentityProcessCommandHandler updateIdentityProcessCommandHandler;
+	private UpdateRestrictConfirmEmploymentCommandHandler updateRestrictConfirmEmploymentCommandHandler;
+	
+	@Inject
+	private UpdateDayFuncControlCommandHandler updateDayFuncControlCommandHandler;
 	
 	@Inject
 	private ApplicationTypeFinder appTypeFinder; 
@@ -85,7 +85,7 @@ public class OperationSettingWebservice extends WebService {
 	}
 	
 	@POST
-	@Path("getdaily")
+	@Path("getDaily")
 	public DaiPerformanceFunDto getDaiPerformanceFunById() {
 		String companyId = AppContexts.user().companyId();
 		DaiPerformanceFunDto dto =  daiPerformanceFunFinder.getDaiPerformanceFunById(companyId);
@@ -120,6 +120,15 @@ public class OperationSettingWebservice extends WebService {
 	}
 	
 	@POST
+	@Path("getRestrictConfirmEmp")
+	public RestrictConfirmEmploymentDto getRestrictConfirmEmp(){
+		String companyId = AppContexts.user().companyId();
+		RestrictConfirmEmploymentDto dto =  restrictConfirmEmploymentFinder.findByCompanyId(companyId);
+		
+		return dto;
+	}
+	
+	@POST
 	@Path("updateFormat")
 	public void updateFormatPerformance(FormatPerformanceCommand command){
 		updateFormatPerformanceCommandHandler.handle(command);
@@ -132,26 +141,26 @@ public class OperationSettingWebservice extends WebService {
 	}
 	
 	@POST
-	@Path("updateDaily")
-	public void updateDaiPerformanceFun(DaiPerformanceFunCommand command){
-		updateDaiPerformanceFunCommandHandler.handle(command);
+	@Path("updateDayFuncControl")
+	public void updateDayFuncControl(DayFuncControlCommand command){
+		updateDayFuncControlCommandHandler.handle(command);
 	}
 	
 	@POST
-	@Path("updateApproval")
-	public void updateApprovalProcess(ApprovalProcessCommand command){
-		updateApprovalProcessCommandHandler.handle(command);
-	}
-	
-	@POST
-	@Path("updateIdentity")
-	public void updateIdentityProcess(IdentityProcessCommand command){
-		updateIdentityProcessCommandHandler.handle(command);
+	@Path("updateRestrictConfirmEmp")
+	public void updateRestrictConfirmEmp(RestrictConfirmEmploymentCommand command){
+		updateRestrictConfirmEmploymentCommandHandler.handle(command);
 	}
 	
 	@POST
 	@Path("findApplicationType")
 	public List<EnumConstant> getApplicationType() {
 		return appTypeFinder.getAppWithOvertimeInfo();
+	}
+	@POST
+	@Path("licenseCheck")
+	public boolean licenseCheck() {
+		boolean check = AppContexts.optionLicense().customize().ootsuka();
+		return check;
 	}
 }

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 
@@ -13,14 +14,23 @@ import nts.arc.layer.infra.data.JpaRepository;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.record.dom.dailyperformanceformat.BusinessTypeFormatDaily;
 import nts.uk.ctx.at.record.dom.dailyperformanceformat.repository.BusinessTypeFormatDailyRepository;
+import nts.uk.ctx.at.record.infra.entity.dailyperformanceformat.KrcmtBusinessFormatSheet;
+import nts.uk.ctx.at.record.infra.entity.dailyperformanceformat.KrcmtBusinessFormatSheetPK;
 import nts.uk.ctx.at.record.infra.entity.dailyperformanceformat.KrcmtBusinessTypeDaily;
 import nts.uk.ctx.at.record.infra.entity.dailyperformanceformat.KrcmtBusinessTypeDailyPK;
+import nts.uk.ctx.at.shared.dom.workrule.businesstype.BusinessTypeCode;
 import nts.uk.shr.com.context.AppContexts;
 
 @Stateless
 public class JpaBusinessTypeFormatDailyRepository extends JpaRepository implements BusinessTypeFormatDailyRepository {
 
 	private static final String FIND;
+	
+	private static final String FIND_LISTCODE;
+	
+	private static final String FIND_SHEET_LISTCODE;
+	
+	private static final String FIND_SHEET_NAME; 
 
 	private static final String FIND_DETAIl;
 
@@ -45,6 +55,27 @@ public class JpaBusinessTypeFormatDailyRepository extends JpaRepository implemen
 		builderString.append("WHERE a.krcmtBusinessTypeDailyPK.companyId = :companyId ");
 		builderString.append("AND a.krcmtBusinessTypeDailyPK.businessTypeCode = :businessTypeCode ");
 		FIND = builderString.toString();
+		
+		builderString = new StringBuilder();
+		builderString.append("SELECT a ");
+		builderString.append("FROM KrcmtBusinessTypeDaily a ");
+		builderString.append("WHERE a.krcmtBusinessTypeDailyPK.companyId = :companyId ");
+		builderString.append("AND a.krcmtBusinessTypeDailyPK.businessTypeCode IN :listBusinessTypeCode ");
+		FIND_LISTCODE = builderString.toString();
+		
+		builderString = new StringBuilder();
+		builderString.append("SELECT a ");
+		builderString.append("FROM KrcmtBusinessFormatSheet a ");
+		builderString.append("WHERE a.krcmtBusinessFormatSheetPK.companyId = :companyId ");
+		builderString.append("AND a.krcmtBusinessFormatSheetPK.businessTypeCode IN :listBusinessTypeCode ");
+		FIND_SHEET_LISTCODE = builderString.toString();
+		
+		builderString = new StringBuilder();
+		builderString.append("SELECT a ");
+		builderString.append("FROM KrcmtBusinessFormatSheet a ");
+		builderString.append("WHERE a.krcmtBusinessFormatSheetPK.companyId = :companyId ");
+		builderString.append("AND a.krcmtBusinessFormatSheetPK.businessTypeCode = :businessTypeCode ");
+		FIND_SHEET_NAME = builderString.toString();
 
 		builderString = new StringBuilder();
 		builderString.append("SELECT a ");
@@ -214,5 +245,65 @@ public class JpaBusinessTypeFormatDailyRepository extends JpaRepository implemen
 				.setParameter("businessTypeCode", businessTypeCode)
 				.getList(f -> toDomain(f));
 	}
+
+	@Override
+	public void copy(String companyId, String businessTypeCode, List<String> listBusinessTypeCode) {
+		
+		List<BusinessTypeFormatDaily> listBusinessTypeFormatDailyBySelectedCode = this.getBusinessTypeFormat(companyId, businessTypeCode);
+		
+		List<KrcmtBusinessFormatSheet> listKrcmtBusinessFormatSheetBySelectedCode = this.queryProxy().query(FIND_SHEET_NAME, KrcmtBusinessFormatSheet.class)
+					.setParameter("companyId", companyId)
+					.setParameter("businessTypeCode", businessTypeCode)
+					.getList();
+		
+		List<KrcmtBusinessTypeDaily> listKrcmtBusinessTypeDaily = this.queryProxy().query(FIND_LISTCODE, KrcmtBusinessTypeDaily.class)
+					.setParameter("companyId", companyId)
+					.setParameter("listBusinessTypeCode", listBusinessTypeCode)
+					.getList();
+		
+		List<KrcmtBusinessFormatSheet> listKrcmtBusinessFormatSheet = this.queryProxy().query(FIND_SHEET_LISTCODE, KrcmtBusinessFormatSheet.class)
+					.setParameter("companyId", companyId)
+					.setParameter("listBusinessTypeCode", listBusinessTypeCode)
+					.getList();
+		
+		this.commandProxy().removeAll(listKrcmtBusinessTypeDaily);
+		this.commandProxy().removeAll(listKrcmtBusinessFormatSheet);
+		this.getEntityManager().flush();
+		
+		List<KrcmtBusinessFormatSheet> newListKrcmtBusinessFormatSheet = new ArrayList<KrcmtBusinessFormatSheet>();
+		List<KrcmtBusinessTypeDaily> newListKrcmtBusinessTypeDaily = new ArrayList<KrcmtBusinessTypeDaily>();
+		for (String code : listBusinessTypeCode) {
+			newListKrcmtBusinessFormatSheet.addAll(cloneKrcmtBusinessFormatSheetWithOtherCode(code, listKrcmtBusinessFormatSheetBySelectedCode));
+			newListKrcmtBusinessTypeDaily.addAll(toKrcmtBusinessTypeDailyFromList(code, listBusinessTypeFormatDailyBySelectedCode));
+		}
+		
+		this.commandProxy().insertAll(newListKrcmtBusinessFormatSheet);
+		this.commandProxy().insertAll(newListKrcmtBusinessTypeDaily);
+		
+	}	
 	
+	private List<KrcmtBusinessFormatSheet> cloneKrcmtBusinessFormatSheetWithOtherCode(String businessTypeCode, List<KrcmtBusinessFormatSheet> listEntity) {
+		List<KrcmtBusinessFormatSheet> result = listEntity.stream()
+				.map(e -> new KrcmtBusinessFormatSheet(
+						new KrcmtBusinessFormatSheetPK(e.krcmtBusinessFormatSheetPK.companyId, businessTypeCode, e.krcmtBusinessFormatSheetPK.sheetNo),
+						e.sheetName))
+				.collect(Collectors.toList());
+		 
+		return result;
+	}
+	
+	private List<KrcmtBusinessTypeDaily> toKrcmtBusinessTypeDailyFromList(String businessTypeCode, List<BusinessTypeFormatDaily> listBusinessTypeFormatDaily) {
+		
+		List<BusinessTypeFormatDaily> newListBusinessTypeFormatDaily = listBusinessTypeFormatDaily.stream()
+				.map(e -> {
+					BusinessTypeFormatDaily businessTypeFormatDaily = e.clone();
+					businessTypeFormatDaily.setBusinessTypeCode(new BusinessTypeCode(businessTypeCode));
+					return businessTypeFormatDaily;
+				}).collect(Collectors.toList());
+		
+		List<KrcmtBusinessTypeDaily> result = newListBusinessTypeFormatDaily.stream()
+				.map(e -> toEntity(e))
+				.collect(Collectors.toList());
+		return result;
+	}
 }

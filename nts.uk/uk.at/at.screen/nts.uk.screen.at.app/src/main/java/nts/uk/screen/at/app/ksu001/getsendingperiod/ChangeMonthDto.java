@@ -16,6 +16,8 @@ import nts.uk.screen.at.app.ksu001.eventinformationandpersonal.PersonalCondition
 import nts.uk.screen.at.app.ksu001.extracttargetemployees.EmployeeInformationDto;
 import nts.uk.screen.at.app.ksu001.getworkscheduleshift.ScheduleOfShiftDto;
 import nts.uk.screen.at.app.ksu001.processcommon.WorkScheduleWorkInforDto;
+import nts.uk.screen.at.app.ksu001.start.AggregatePersonalMapDto;
+import nts.uk.screen.at.app.ksu001.start.AggregateWorkplaceMapDto;
 import nts.uk.screen.at.app.ksu001.start.DataBasicDto;
 
 /**
@@ -40,5 +42,8 @@ public class ChangeMonthDto {
 
 	public List<ShiftMasterMapWithWorkStyle> shiftMasterWithWorkStyleLst;
 	public List<ScheduleOfShiftDto> listWorkScheduleShift; // ・List<勤務予定（シフト）dto>
+	
+	public AggregatePersonalMapDto aggreratePersonal; // 個人計集計結果　←集計内容によって情報が異なる (update ver5)
+	public AggregateWorkplaceMapDto aggrerateWorkplace; // ・職場計集計結果　←集計内容によって情報が異なる  (update ver5)
 	
 }

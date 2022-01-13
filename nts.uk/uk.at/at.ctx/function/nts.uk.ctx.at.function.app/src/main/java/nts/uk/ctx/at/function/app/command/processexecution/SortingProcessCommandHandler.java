@@ -61,6 +61,9 @@ public class SortingProcessCommandHandler extends CommandHandler<ScheduleExecute
      */
     @Override //振り分け処理
 	protected void handle(CommandHandlerContext<ScheduleExecuteCommand> context) {
+
+        log.info("SortingProcessCommandHandler handle");
+
         ScheduleExecuteCommand command = context.getCommand();
         String companyId = command.getCompanyId();
         String companyCd = command.getCompanyCd();
@@ -70,16 +73,19 @@ public class SortingProcessCommandHandler extends CommandHandler<ScheduleExecute
         boolean isAbolished = this.isCheckCompanyAbolished(companyId);
         //	取得した「廃止区分」をチェックする
         if (isAbolished) {
+            log.info("会社が廃止されているため中断");
             return;
         }
         // Step 2: ドメインモデル「実行タスク設定」を取得する
         Optional<ExecutionTaskSetting> executionTaskSettingOpt = execSettingRepo.getByCidAndExecCd(companyId, command.getExecItemCd());
         if (!executionTaskSettingOpt.isPresent()) {
+            log.info("実行タスク設定が取得できないため中断");
             return;
         }
         // Step 3: ドメインモデル「実行タスク設定.更新処理有効設定」をチェックする
         if (!executionTaskSettingOpt.get().isEnabledSetting()) {
             //無効の場合
+            log.info("実行タスク設定.更新処理有効設定が無効のため中断");
             return;//フロー終了
         }
         log.info(":更新処理自動実行_START_" + command.getExecItemCd() + "_" + GeneralDateTime.now());
@@ -92,12 +98,14 @@ public class SortingProcessCommandHandler extends CommandHandler<ScheduleExecute
             // case 利用停止する
             // Step 前回の更新処理が実行中の登録処理
             this.DistributionRegistProcess(companyId, execItemCd, execItemId, true);
+            log.info("前回の更新処理が実行中のため中断");
             return;
         } else {
             // case 利用停止しない
             // Step ドメインモデル「更新処理自動実行管理」取得する
             Optional<ProcessExecutionLogManage> logManageOpt = this.processExecLogManaRepo.getLogByCIdAndExecCd(companyId, execItemCd);
             if (!logManageOpt.isPresent()) {
+                log.info("更新処理自動実行管理が取得できないため中断");
                 return;
             }
             ProcessExecutionLogManage processExecutionLogManage = logManageOpt.get();
@@ -105,24 +113,34 @@ public class SortingProcessCommandHandler extends CommandHandler<ScheduleExecute
             // 「実行中」
             if (processExecutionLogManage.getCurrentStatus().isPresent()
             		&& processExecutionLogManage.getCurrentStatus().get() == CurrentExecutionStatus.RUNNING) {
+
+                log.info("更新処理自動実行管理.現在の実行状態：実行中");
+
                 // ドメインモデル「更新処理自動実行管理．前回実行日時」から5時間を経っているかチェックする
                 boolean checkLastTime = checkLastDateTimeLessthanNow5h(processExecutionLogManage.getLastExecDateTime().get());
                 if (checkLastTime) {
                     // Step 実行中の場合の登録処理 - Registration process when running
+                    log.info("更新処理自動実行管理.前回実行日時 から5時間経過していないため中断");
                     this.DistributionRegistProcess(companyId, execItemCd, execItemId, false);
                 } else {
                     // Step 実行処理
+                    log.info("実行中ステータスであるが5時間経過したため強制的に実行処理へ");
                     this.executeHandler(companyId, execItemCd, execItemId, nextDate);
                 }
             }
             // 「待機中」
             else if (processExecutionLogManage.getCurrentStatus().isPresent()
             		&& processExecutionLogManage.getCurrentStatus().get() == CurrentExecutionStatus.WAITING) {
+
+                log.info("更新処理自動実行管理.現在の実行状態：待機中");
+
                 // Step 実行処理
+                log.info("待機中ステータスであるため正常に実行処理へ");
                 this.executeHandler(companyId, execItemCd, execItemId, nextDate);
             }
         }
 
+        log.info("SortingProcessCommandHandler handle finished");
     }
 
     private void executeHandler(String companyId, String execItemCd, String execItemId, GeneralDateTime nextDate) {

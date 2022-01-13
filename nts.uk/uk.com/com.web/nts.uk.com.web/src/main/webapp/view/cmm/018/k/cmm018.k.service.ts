@@ -2,7 +2,7 @@ module nts.uk.com.view.cmm018.k.service{
     import format = nts.uk.text.format;
     // Service paths.
     var servicePath = {
-        searchModeEmployee: "workflow/approvermanagement/workroot/getEmployeesInfo",
+        searchModeEmployee: "screen/approvermanagement/workroot/getEmployeesInfo",
         personInfor: "workflow/approvermanagement/workroot/getInforPerson",
         jobGroup: "bs/employee/jobtitle/group/approver/getAll",
         jobGroupName: "bs/employee/jobtitle/group/approver/findByCd",

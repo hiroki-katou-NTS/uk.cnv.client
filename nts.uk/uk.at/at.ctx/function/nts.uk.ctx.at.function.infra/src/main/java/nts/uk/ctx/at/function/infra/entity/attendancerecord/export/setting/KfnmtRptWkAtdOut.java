@@ -77,7 +77,7 @@ public class KfnmtRptWkAtdOut extends UkJpaEntity
 
 	@Basic(optional = false)
 	@Column(name = "SEAL_USE_ATR")
-	private BigDecimal sealUseAtr;
+	private boolean sealUseAtr;
 
 	@Basic(optional = false)
 	@Column(name = "NAME_USE_ATR")
@@ -119,7 +119,7 @@ public class KfnmtRptWkAtdOut extends UkJpaEntity
 
 	@Override
 	public void setSealUseAtr(Boolean atr) {
-		this.sealUseAtr = atr ? BigDecimal.ONE : BigDecimal.ZERO;
+		this.sealUseAtr = atr;
 	}
 
 	@Override
@@ -181,7 +181,7 @@ public class KfnmtRptWkAtdOut extends UkJpaEntity
 
 	@Override
 	public Boolean getSealUseAtr() {
-		return BigDecimal.valueOf(1).compareTo(this.sealUseAtr) == 0;
+		return this.sealUseAtr;
 	}
 
 	@Override

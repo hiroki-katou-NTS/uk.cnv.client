@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.val;
 import nts.arc.time.GeneralDate;
@@ -24,11 +25,13 @@ import nts.uk.ctx.at.record.app.find.dailyperform.specificdatetttr.dto.SpecificD
 import nts.uk.ctx.at.record.app.find.dailyperform.temporarytime.dto.TemporaryTimeOfDailyPerformanceDto;
 import nts.uk.ctx.at.record.app.find.dailyperform.workinfo.dto.WorkInformationOfDailyDto;
 import nts.uk.ctx.at.record.app.find.dailyperform.workrecord.dto.AttendanceTimeByWorkOfDailyDto;
+import nts.uk.ctx.at.record.app.find.dailyperform.workrecord.dto.OuenWorkTimeOfDailyDto;
 import nts.uk.ctx.at.record.app.find.dailyperform.workrecord.dto.TimeLeavingOfDailyPerformanceDto;
 import nts.uk.ctx.at.record.dom.actualworkinghours.daily.workrecord.AttendanceTimeByWorkOfDaily;
 import nts.uk.ctx.at.record.dom.attendanceitem.util.AttendanceItemConverterCommonService;
 import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeSheetOfDaily;
 import nts.uk.ctx.at.record.dom.breakorgoout.BreakTimeOfDailyPerformance;
+import nts.uk.ctx.at.record.dom.daily.ouen.OuenWorkTimeOfDaily;
 import nts.uk.ctx.at.record.dom.daily.remarks.RemarksOfDailyPerform;
 import nts.uk.ctx.at.shared.dom.scherec.attendanceitem.converter.util.ItemConst;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.affiliationinfor.AffiliationInforOfDailyAttd;
@@ -50,6 +53,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.remarks.Rem
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.shortworktime.ShortTimeOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.snapshot.SnapShot;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.OuenWorkTimeSheetOfDailyAttendance;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.OuenWorkTimeOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.workinfomation.WorkInfoOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.worktime.AttendanceTimeOfDailyAttendance;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItem;
@@ -75,7 +79,7 @@ public class DailyRecordToAttendanceItemConverterImpl extends AttendanceItemConv
 		IntegrationOfDaily rs =  new IntegrationOfDaily(this.employeeId, this.ymd, workInfo(), calcAttr(), affiliationInfo(), pcLogInfo(),
 				this.errors, outingTime(), breakTime(), attendanceTime(), timeLeaving(),
 				shortTime(), specificDateAttr(), attendanceLeavingGate(), anyItems(), editStates(), temporaryTime(),
-				remarks(), snapshot());
+				remarks(), ouenWorkTimes(), new ArrayList<>(), snapshot());
 		
 		if(!ouenSheet().isEmpty())
 		rs.setOuenTimeSheet(ouenSheet());
@@ -107,6 +111,7 @@ public class DailyRecordToAttendanceItemConverterImpl extends AttendanceItemConv
 		this.withTemporaryTime(domain.getTempTime().orElse(null));
 		this.withPCLogInfo(domain.getPcLogOnInfo().orElse(null));
 		this.withRemarks(domain.getRemarks());
+		this.withOuenWorkTime(domain.getOuenTime());
 		this.withSnapshot(domain.getSnapshot().orElse(null));
 		this.withOuenSheet(domain.getOuenTimeSheet());
 		return this;
@@ -154,7 +159,7 @@ public class DailyRecordToAttendanceItemConverterImpl extends AttendanceItemConv
 
 	public DailyRecordToAttendanceItemConverter withEmployeeErrors(List<EmployeeDailyPerError> domain) {
 
-		this.errors = domain;
+		this.errors = domain.stream().map(x -> x.clone()).collect(Collectors.toList());
 		return this;
 	}
 
@@ -235,8 +240,7 @@ public class DailyRecordToAttendanceItemConverterImpl extends AttendanceItemConv
 	}
 
 	public DailyRecordToAttendanceItemConverter withEditStates(List<EditStateOfDailyAttd> domain) {
-
-		this.editStates = new ArrayList<>(domain);
+		this.editStates = domain.stream().map(x -> x.clone()).collect(Collectors.toList());
 		return this;
 	}
 
@@ -262,6 +266,14 @@ public class DailyRecordToAttendanceItemConverterImpl extends AttendanceItemConv
 		this.dtoSource.put(ItemConst.DAILY_REMARKS_NAME, RemarksOfDailyDto.getDto(this.employeeId, this.ymd, domain));
 		this.itemValues.put(ItemConst.DAILY_REMARKS_NAME, null);
 
+		return this;
+	}
+	
+	public DailyRecordToAttendanceItemConverter withOuenWorkTime(List<OuenWorkTimeOfDailyAttendance> domain) {
+
+		this.domainSource.put(ItemConst.DAILY_SUPPORT_TIME_NAME, OuenWorkTimeOfDaily.create(this.employeeId, this.ymd, domain));
+		this.dtoSource.put(ItemConst.DAILY_SUPPORT_TIME_NAME, null);
+		this.itemValues.put(ItemConst.DAILY_SUPPORT_TIME_NAME, null);
 		return this;
 	}
 
@@ -389,6 +401,14 @@ public class DailyRecordToAttendanceItemConverterImpl extends AttendanceItemConv
 		return (List<RemarksOfDailyAttd>) getDomains(ItemConst.DAILY_REMARKS_NAME);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<OuenWorkTimeOfDailyAttendance> ouenWorkTimes() {
+		
+		OuenWorkTimeOfDaily daily = (OuenWorkTimeOfDaily) getDomain(ItemConst.DAILY_SUPPORT_TIME_NAME);
+		return daily.getOuenTimes();
+	}
+
 	@Override
 	public Optional<SnapShot> snapshot() {
 
@@ -480,6 +500,9 @@ public class DailyRecordToAttendanceItemConverterImpl extends AttendanceItemConv
 			break;
 		case ItemConst.DAILY_REMARKS_NAME:
 			processOnDomain(type, c -> RemarksOfDailyDto.getDto(this.employeeId, this.ymd, (List<RemarksOfDailyAttd>) c));
+			break;
+		case ItemConst.DAILY_SUPPORT_TIME_NAME:
+			processOnDomain(type, c -> OuenWorkTimeOfDailyDto.from((OuenWorkTimeOfDaily) c));
 			break;
 		case ItemConst.DAILY_SNAPSHOT_NAME:
 			processOnDomain(type, c -> SnapshotDto.from(this.employeeId, this.ymd, (SnapShot) c));

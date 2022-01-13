@@ -16,19 +16,19 @@ public class ControlUnitDto {
     
     private String headerBgColorOfMonthlyPer;
     
-    private BigDecimal inputUnitOfTimeItem;
-    
     public static ControlUnitDto fromMonthlyDomain(ControlOfMonthlyItems monthlyItem) {
-        return new ControlUnitDto(monthlyItem.getCompanyId(), 
+        return new ControlUnitDto(
+                monthlyItem.getCompanyId(),
                 monthlyItem.getItemMonthlyId(), 
-                monthlyItem.getHeaderBgColorOfMonthlyPer().isPresent() ? monthlyItem.getHeaderBgColorOfMonthlyPer().get().v() : null, 
-                monthlyItem.getInputUnitOfTimeItem().isPresent() ? monthlyItem.getInputUnitOfTimeItem().get() : null);
+                monthlyItem.getHeaderBgColorOfMonthlyPer().isPresent() ? monthlyItem.getHeaderBgColorOfMonthlyPer().get().v() : null
+        );
     }
     
     public static ControlUnitDto fromDailyDomain(ControlOfAttendanceItems dailyItem) {
-        return new ControlUnitDto(dailyItem.getCompanyID(),
+        return new ControlUnitDto(
+                dailyItem.getCompanyID(),
                 dailyItem.getItemDailyID(),
-                dailyItem.getHeaderBgColorOfDailyPer().isPresent() ? dailyItem.getHeaderBgColorOfDailyPer().get().v() : null,
-                dailyItem.getInputUnitOfTimeItem().isPresent() ? dailyItem.getInputUnitOfTimeItem().get() : null);
+                dailyItem.getHeaderBgColorOfDailyPer().isPresent() ? dailyItem.getHeaderBgColorOfDailyPer().get().v() : null
+        );
     }
 }

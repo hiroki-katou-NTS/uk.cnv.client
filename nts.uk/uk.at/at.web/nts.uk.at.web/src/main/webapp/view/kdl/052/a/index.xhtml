@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="../../../../master/dialog.xhtml">
+		<ui:define name="htmlHead">
+			<script>var dialogSize = { width: 900, height: 580 };</script>
+			<com:scriptfile set="IGNITE" />
+			<!-- KCP005 -->
+			<com:scriptfile path="/view/kcp/share/list.js" of="/nts.uk.com.web"/>
+			<com:scriptfile path="kdl052.a.vm.js" />
+			<com:stylefile path="kdl052.a.style.css" />
+		</ui:define>	
+
+		<ui:define name="content">
+			 <div id="contents-area">
+			 <div style="display: flex;">
+				 <!-- Search Box -->
+				<div id="left-content">
+					<div id="search-box">
+						<div class="input-wrapper">
+							<span class="nts-editor-wrapped ntsControl"> 
+							<input id = "input-search"
+								data-bind="text:searchText"
+								class="ntsSearchBox nts-editor ntsSearchBox_Component"
+								type="text" placeholder="コード・名称で検索・・・" data-name="検索テキストボックス"
+								tabindex="-1" style="width: 220px;"></input>
+							</span> 
+							<i id="search-icon-new" class="img-icon"></i>
+                            <button id="search-btn" data-bind=" click: findData" class="caret-bottom " tabindex="-1">検索</button>
+						</div>						
+					</div>
+					<!--A1_5 KCP005 -->
+                    <div tabindex="-1" id="component-items-list"></div>
+				</div>
+				<div id="right-content">
+				 	<div class="container-custom">
+				 			<!-- A2_1 -->
+				 			<span>#{i18n.getText('Com_Person')}</span>
+                             <!-- A2_2 -->                             
+                            <span style="margin: 0px 10px 0px 45px;" data-bind="text : employeeCodeSelect"> </span>
+                            <span data-bind="text : employeeNameSelect"> </span>
+                             
+                            
+			 		</div>
+				 	<com:ko-if bind="managementCheck() == 1">
+                        <div class="container-custom">
+                            <!-- A2_3 -->
+                            <span style="font-size: 18px;">#{i18n.getText('KDL052_18')}</span>
+                            <!-- A2_4 -->
+                            <span style="margin-left: 50px; font-size: 18px;" data-bind="text: maxNumberOfYear" ></span>  
+                        </div>
+                        <!-- A2_14 -->
+                        <div class="container-custom" style="margin-left: 251px;">#{i18n.getText('KDL052_28')}</div>
+
+                        <div class="container-custom">
+                            <!-- A2_5 -->
+                            <span>#{i18n.getText('KDL052_19')}</span>
+                            <!-- A2_6 A2_7 A2_8 -->                          
+                            <span style="margin-left: 30px;" data-bind="text: upperLimitStartDate"></span> 
+                            <span>#{i18n.getText('KDL052_20')}</span> 
+                            <span data-bind="text: upperLimitEndDate"></span>                            
+                        </div>
+
+                        <div class="container-custom">
+                           <!-- A2_9 -->
+                            <span>#{i18n.getText('KDL052_21')}</span>
+                            <!-- A2_10 -->                             
+                            <span style="margin-left: 58px;" data-bind="text: maxNumberOfDays"></span>
+                                            
+                        </div>
+
+                        <div class="container-custom">
+                            <!-- A2_11 -->
+                            <span>#{i18n.getText('KDL052_22')}</span>
+                            <!-- A2_12 -->
+                            <span style="margin-left: 70px;" data-bind="text: numberOfUse"></span>                 
+                        </div>
+                        <!-- A2_13 -->
+                        <div style="margin: 30px 20px"> #{i18n.getText('KDL052_23')}</div>
+
+                        <!--A3_1-->
+                        <div style="margin-left: 20px;">
+                            <table id="single-list" data-bind="ntsGridList: {			
+                                name: '#[KDL052_24]',					
+                                height: 150,
+                                dataSource: itemLts,
+                                primaryKey: 'digestionDate',
+                                columns: columns,                            
+                                multiple: false,
+                                rows: 5,
+                                value: currentCode
+                            }"></table>
+                        </div>
+                        					 	
+					</com:ko-if>
+					<com:ko-if bind="managementCheck() == 0">
+                        <!--A7-->
+						<div style="margin-left: 5vw;font-size: 23px">#{i18n.getText('KDL052_27')}</div>
+					</com:ko-if>
+				</div>
+				</div>
+			</div>
+			<div id="functions-area-bottom">
+                <!--A6-->
+                <button tabindex="1"  id ="btnClose" data-bind="click: closeDialog">#{i18n.getText('KDL052_15')}</button>
+			</div>
+		</ui:define> 
+	</ui:composition>
+</body>
+</html>

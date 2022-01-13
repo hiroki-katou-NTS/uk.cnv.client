@@ -60,7 +60,10 @@ public class JpaStampCardRepository extends JpaRepository implements StampCardRe
 
 	private static final String GET_BY_STAMPCARD = "SELECT a FROM KrcmtStampCard a WHERE a.cardNo = :cardNo";
 
+
 	private static final String GET_LST_STAMPCARD_BY_LST_CODE= "SELECT a FROM KrcmtStampCard a WHERE a.cardNo IN :cardNos ";
+
+	private static final String GET_LST_STAMPCARD_BY_LST_CODE_CONTRACT = "SELECT a FROM KrcmtStampCard a WHERE a.cardNo IN :cardNos and a.contractCd = :contractCd";
 
 	@Override
 	public List<StampCard> getListStampCard(String sid) {
@@ -457,5 +460,23 @@ public class JpaStampCardRepository extends JpaRepository implements StampCardRe
 		return entities.stream()
 				.map(x -> toDomain(x))
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<StampCard> getListStampCardByCardNumbersAndContract(List<String> cardNos, String contractCode) {
+
+		List<KrcmtStampCard> entities = new ArrayList<>();
+		CollectionUtil.split(cardNos, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, listCardNo -> {
+			entities.addAll(this.queryProxy().query(GET_LST_STAMPCARD_BY_LST_CODE_CONTRACT, KrcmtStampCard.class)
+				.setParameter("cardNos", listCardNo)
+				.setParameter("contractCd", contractCode)
+				.getList());
+		});
+		if (entities.isEmpty())
+			return Collections.emptyList();
+
+		return entities.stream()
+			.map(x -> toDomain(x))
+			.collect(Collectors.toList());
 	}
 }

@@ -62,12 +62,6 @@ public class GetModifiOutbreakDigest {
 
 		val afterChangeResult = new AfterChangeHolidayInfoResult(digestOcc, assocAfterCorr);
 
-		// ＄変更後．紐付けされている振出の未相殺数を更新する（）
-		afterChangeResult.getOffsetNotAssoci();
-
-		// ＄変更後．紐付けされている振休の未相殺数を更新する（
-		afterChangeResult.getVactionNotAssoci();
-
 		return afterChangeResult;
 	}
 

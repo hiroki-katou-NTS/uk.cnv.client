@@ -4,10 +4,11 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.infra.repository.vacation.setting.acquisitionrule;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.uk.ctx.at.shared.dom.vacation.setting.SettingDistinct;
 import nts.uk.ctx.at.shared.dom.vacation.setting.acquisitionrule.AcquisitionRuleGetMemento;
 import nts.uk.ctx.at.shared.dom.vacation.setting.acquisitionrule.AnnualHoliday;
-import nts.uk.ctx.at.shared.dom.vacation.setting.acquisitionrule.HoursHoliday;
 import nts.uk.ctx.at.shared.infra.entity.vacation.setting.acquisitionrule.KarstAcquisitionRule;
 
 /**
@@ -59,7 +60,7 @@ public class JpaAcquisitionRuleGetMemento implements AcquisitionRuleGetMemento {
 	 */
 	@Override
 	public SettingDistinct getCategory() {
-		return SettingDistinct.valueOf(this.typeValue.getCategory());
+		return SettingDistinct.valueOf(BooleanUtils.toInteger(this.typeValue.isCategory()));
 	}
 
 	@Override

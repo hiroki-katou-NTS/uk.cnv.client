@@ -8,11 +8,8 @@ import java.util.Optional;
 
 import lombok.Getter;
 import lombok.Setter;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.AmountRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcRangeCheck;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcResultRangeGetMemento;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.NumberRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.TimeRange;
+import nts.arc.enums.EnumAdaptor;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.*;
 
 /**
  * The Class CalculationResultRangeDto.
@@ -26,31 +23,18 @@ public class CalcResultRangeDto implements CalcResultRangeGetMemento {
 
 	/** The lower check. */
 	private boolean lowerCheck;
-
-	// ===================== Optional ======================= //
-//	/** The number upper. */
-//	private Double numberUpper;
-//
-//	/** The number lower. */
-//	private Double numberLower;
-//
-//	/** The time upper. */
-//	private Integer timeUpper;
-//
-//	/** The time lower. */
-//	private Integer timeLower;
-//
-//	/** The amount upper. */
-//	private Integer amountUpper;
-//
-//	/** The amount lower. */
-//	private Integer amountLower;
 	
 	private NumberRangeDto numberRange;
 	
 	private TimeRangeDto timeRange;
 	
 	private AmountRangeDto amountRange;
+
+	private Integer timeInputUnit;
+
+	private Integer numberInputUnit;
+
+	private Integer amountInputUnit;
 
 	/*
 	 * (non-Javadoc)

@@ -1,6 +1,8 @@
 package nts.uk.ctx.sys.auth.dom.role.personrole;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import nts.arc.layer.dom.AggregateRoot;
 
 /**
@@ -10,36 +12,23 @@ import nts.arc.layer.dom.AggregateRoot;
  *
  */
 @Getter
+@AllArgsConstructor
 public class PersonRole extends AggregateRoot{
 	
 	/**
 	 *  ロールID
 	 */
 	private String roleId;
+	
+	/**
+	 * 会社ID
+	 */
+	private String companyId;
 
 	/**
 	 * 未来日参照許可
 	 */
+	@Setter
 	private Boolean referFutureDate;
-	
-	public PersonRole() {
-		super();
-	}
-
-
-	public PersonRole(String roleId, Boolean referFutureDate) {
-		super();
-		this.roleId = roleId;
-		this.referFutureDate = referFutureDate;
-	}
-	
-	public void setRoleId(String roleId) {
-		this.roleId = roleId;
-	}
-
-
-	public void setReferFutureDate(Boolean referFutureDate) {
-		this.referFutureDate = referFutureDate;
-	}
 
 }

@@ -11,13 +11,13 @@ import javax.inject.Inject;
 
 import nts.arc.time.GeneralDate;
 import nts.gul.collection.CollectionUtil;
-import nts.uk.ctx.at.schedule.dom.budget.premium.PersonCostCalculation;
-import nts.uk.ctx.at.schedule.dom.budget.premium.PersonCostCalculationRepository;
-import nts.uk.ctx.at.schedule.dom.budget.premium.PremiumItem;
-import nts.uk.ctx.at.schedule.dom.budget.premium.PremiumItemRepository;
 import nts.uk.ctx.at.schedule.pub.budget.premium.PersonCostSettingExport;
 import nts.uk.ctx.at.schedule.pub.budget.premium.PremiumItemDto;
 import nts.uk.ctx.at.schedule.pub.budget.premium.PremiumItemPub;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.PersonCostCalculation;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.PersonCostCalculationRepository;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.PremiumItem;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.premiumitem.PremiumItemRepository;
 import nts.arc.time.calendar.period.DatePeriod;
 /**
  * 
@@ -38,7 +38,7 @@ public class PremiumItemPubImpl implements PremiumItemPub {
 		return premiumItemRepository.findByCompanyID(companyID).stream()
 				.map(x -> new PremiumItemDto(
 						x.getCompanyID(),
-						x.getDisplayNumber(),
+						x.getDisplayNumber().value,
 						x.getName().v(),
 						x.getUseAtr().value))
 				.collect(Collectors.toList());
@@ -49,7 +49,7 @@ public class PremiumItemPubImpl implements PremiumItemPub {
 		return premiumItemRepository.findByCompanyIDAndDisplayNumber(companyID, displayNumbers).stream()
 				.map(x -> new PremiumItemDto(
 						x.getCompanyID(),
-						x.getDisplayNumber(),
+						x.getDisplayNumber().value,
 						x.getName().v(),
 						x.getUseAtr().value))
 				.collect(Collectors.toList());
@@ -85,7 +85,6 @@ public class PremiumItemPubImpl implements PremiumItemPub {
 			return result;
 		}
 		
-		List<Integer> itemNos = preiumItems.stream().map(c -> c.getDisplayNumber()).collect(Collectors.toList());
 //		List<PersonCostCalculation> personCosts = this.personCostCalculationRepository.findByCompanyIDAndDisplayNumberNotFull(companyID, period, itemNos);
 //		if(personCosts != null){
 			// 取得したドメインモデル「割増時間項目」のデータ分を処理をループする

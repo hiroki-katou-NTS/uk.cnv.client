@@ -38,15 +38,17 @@ public class RecoverWorkScheduleBeforeAppReflect {
 		}
 		IntegrationOfDaily domainDaily = new IntegrationOfDaily(workSchedule.getEmployeeID(), workSchedule.getYmd(),
 				workSchedule.getWorkInfo(), CalAttrOfDailyAttd.createAllCalculate(), workSchedule.getAffInfo(),
-				Optional.empty(), new ArrayList<>(), Optional.empty(), workSchedule.getLstBreakTime(),
+				Optional.empty(), new ArrayList<>(), workSchedule.getOutingTime(), workSchedule.getLstBreakTime(),
 				workSchedule.getOptAttendanceTime(), workSchedule.getOptTimeLeaving(),
 				workSchedule.getOptSortTimeWork(), Optional.empty(), Optional.empty(), Optional.empty(),
-				workSchedule.getLstEditState(), Optional.empty(), new ArrayList<>(), Optional.empty());
+				workSchedule.getLstEditState(), Optional.empty(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), Optional.empty());
 
 		// 申請取消の処理
 		DailyAfterAppReflectResult cancellationResult = CancellationOfApplication.process(require, application, date,
 				ScheduleRecordClassifi.SCHEDULE, domainDaily);
 		domainDaily = cancellationResult.getDomainDaily().getDomain();
+		// remove Optional<OutingTimeOfDailyAttd> outingTime
+		domainDaily.getOutingTime().ifPresent(x -> x.removeTimeDayNull());
 
 //		// 労働条件項目を取得
 //		Optional<WorkingConditionItem> workCondOpt = WorkingConditionService.findWorkConditionByEmployee(require,

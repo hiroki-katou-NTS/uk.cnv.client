@@ -2,9 +2,11 @@ package nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.Getter;
 import nts.arc.layer.dom.AggregateRoot;
+import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.work.WorkGroup;
 
 @Getter
@@ -31,5 +33,17 @@ public class IncentiveUnitPriceSetEachWork extends AggregateRoot {
 	public void addHis(IncentiveUnitPriceSetHis useHis) {
 	
 		this.useHis.add(useHis);
+	}
+	
+	/**
+	 * 基準日から設定を取得する
+	 * @param baseDate
+	 * @return
+	 */
+	public Optional<IncentiveUnitPriceSetHis> getPriceSetHis(GeneralDate baseDate) {
+		return this.useHis.stream()
+				.filter(t -> t.getStartUseDate().beforeOrEquals(baseDate))
+				.sorted((f,s) -> s.getStartUseDate().compareTo(f.getStartUseDate()))
+				.findFirst();
 	}
 }

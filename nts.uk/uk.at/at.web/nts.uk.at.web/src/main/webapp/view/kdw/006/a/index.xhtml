@@ -1,19 +1,17 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:com="http://xmlns.jcp.org/jsf/component"
-	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
 
 <body>
 	<ui:composition template="/master/sidebar.xhtml">
 		<ui:define name="sidebar-head">
 			<script>
-                var dialogSize = {
-                    width : 860,
-                    height : 630
-                };
-            </script>
+				var dialogSize = {
+					width: 860,
+					height: 630
+				};
+			</script>
 			<com:scriptfile set="IGNITE" />
 			<com:stylefile path="kdw006.main.css" />
 			<com:scriptfile path="kdw006.start.js" />
@@ -21,68 +19,156 @@
 			<com:scriptfile path="kdw006.service.js" />
 		</ui:define>
 
-		<ui:define name="sidebar">
-			<ul class="navigator">
-				<li><a id="COMMON" href="#tabpanel-common" role="tab-navigator">#{i18n.getText('KDW006_75')}</a></li>
-				<li><a id="DAILY" href="#tabpanel-daily" role="tab-navigator">#{i18n.getText('KDW006_8')}</a></li>
-				<li><a id="MONTHLY" href="#tabpanel-monthly" role="tab-navigator">#{i18n.getText('KDW006_7')}</a></li>
-			</ul>
+		<ui:define name="content">
+			<div id="functions-area">
+				<button id="A0_1" data-bind="click: exportExcel" tabindex="1">#{i18n.getText('KDW006_229')}</button>
+			</div>
+			<div id="contents-area">
+				<div class="column-left">
+					<div id="A1_1" class="panel panel-frame contents-area-left border-style">
+						<div data-itemno="A1_2" class="panel panel-gray-bg panel-custom-font-size">
+							#{i18n.getText('KDW006_263')}</div>
+						<div data-itemno="A1_4" class="label lbl-unit-setting-explanation">#{i18n.getText('KDW006_264')}
+						</div>
+						<div class="btn-icon" tabindex="2">
+							<button class="btn-unit-setting" id="A1_5"
+								data-bind="click: openC">#{i18n.getText('KDW006_265')}</button>
+							<span class="caret-right caret-inline"></span>
+						</div>
+						<!-- <div data-itemno="A1_6" class="caret-kdw006">
+							<span class="master_setting_caret caret-bottom caret-inline"></span>
+						</div> -->
+						<div data-itemno="A1_7" class="label lbl-unit-setting-explanation">#{i18n.getText('KDW006_266')}
+						</div>
+						<div class="btn-icon" tabindex="3">
+							<button class="btn-unit-setting" id="A1_8"
+								data-bind="click: openD">#{i18n.getText('KDW006_23')}</button>
+							<span class="caret-right caret-inline"></span>
+						</div>
+					</div>
+				</div>
+				<div data-itemno="A1_9">
+					<span class="caret-right caret-right-large"></span>
+				</div>
+				<div class="column-center">
+					<div id="A2_1" class="panel panel-frame contents-area-left border-style">
+						<div data-itemno="A2_2" class="panel panel-gray-bg panel-custom-font-size">
+							#{i18n.getText('KDW006_267')}</div>
+						<div data-itemno="A2_4" class="label lbl-unit-setting-explanation">#{i18n.getText('KDW006_268')}
+						</div>
+						<div class="btn-icon" tabindex="4">
+							<button class="btn-unit-setting" id="A2_5"
+								data-bind="click: open002Control">#{i18n.getText('KDW006_269')}</button>
+							<span class="caret-right caret-inline"></span>
+						</div>
+						<!-- <div data-itemno="A2_6" class="caret-kdw006">
+							<span class="master_setting_caret caret-bottom caret-inline"></span>
+						</div> -->
+						<div data-itemno="A2_7" class="label lbl-unit-setting-explanation">#{i18n.getText('KDW006_270')}
+						</div>
+						<div class="btn-icon" tabindex="5">
+							<button class="btn-unit-setting" id="A2_8"
+								data-bind="click: open002Setting">#{i18n.getText('KDW006_271')}</button>
+							<span class="caret-right caret-inline"></span>
+						</div>
+						<!-- <div data-itemno="A2_9" class="caret-kdw006">
+							<span class="master_setting_caret caret-bottom caret-inline"></span>
+						</div> -->
+						<div data-itemno="A2_10" class="label lbl-unit-setting-explanation">
+							#{i18n.getText('KDW006_272')}</div>
+						<div class="btn-icon" tabindex="6">
+							<button class="btn-unit-setting" id="A2_11"
+								data-bind="click: open008">#{i18n.getText('KDW006_274')}</button>
+							<span class="caret-right caret-inline"></span>
+						</div>
+						<!-- <div data-itemno="A2_12" class="caret-kdw006">
+							<span class="master_setting_caret caret-bottom caret-inline"></span>
+						</div> -->
+						<div data-itemno="A2_13" class="label lbl-unit-setting-explanation">
+							#{i18n.getText('KDW006_275')}</div>
+						<div class="btn-icon" tabindex="7">
+							<button class="btn-unit-setting" id="A2_14"
+								data-bind="click: openG">#{i18n.getText('KDW006_276')}</button>
+							<span class="caret-right caret-inline"></span>
+						</div>
+						<!-- <div data-itemno="A2_15" class="caret-kdw006">
+							<span class="master_setting_caret caret-bottom caret-inline"></span>
+						</div> -->
+						<div data-itemno="A2_16" class="label lbl-unit-setting-explanation">
+							#{i18n.getText('KDW006_277')}</div>
+						<div class="btn-icon" tabindex="8">
+							<button class="btn-unit-setting" id="A2_17"
+								data-bind="click: open007">#{i18n.getText('KDW006_278')}</button>
+							<span class="caret-right caret-inline"></span>
+						</div>
+						<!-- <div data-itemno="A2_18" class="caret-kdw006">
+							<span class="master_setting_caret caret-bottom caret-inline"></span>
+						</div> -->
+					</div>
+				</div>
+				<div class="column-center">
+					<div id="A3_1" class="panel panel-frame contents-area-left border-style">
+						<div data-itemno="A3_2" class="panel panel-gray-bg panel-custom-font-size">
+							#{i18n.getText('KDW006_279')}</div>
+						<div data-itemno="A3_4" class="label lbl-unit-setting-explanation">#{i18n.getText('KDW006_268')}
+						</div>
+						<div class="btn-icon" tabindex="10">
+							<button class="btn-unit-setting" id="A3_5"
+								data-bind="click: open002ControlMonth">#{i18n.getText('KDW006_269')}</button>
+							<span class="caret-right caret-inline"></span>
+						</div>
+						<!-- <div data-itemno="A3_6" class="caret-kdw006">
+							<span class="master_setting_caret caret-bottom caret-inline"></span>
+						</div> -->
+						<div data-itemno="A3_7" class="label lbl-unit-setting-explanation">#{i18n.getText('KDW006_270')}
+						</div>
+						<div class="btn-icon" tabindex="11">
+							<button class="btn-unit-setting" id="A3_8"
+								data-bind="click: open002SettingMonth">#{i18n.getText('KDW006_271')}</button>
+							<span class="caret-right caret-inline"></span>
+						</div>
+						<!-- <div data-itemno="A3_9" class="caret-kdw006">
+							<span class="master_setting_caret caret-bottom caret-inline"></span>
+						</div> -->
+						<div data-itemno="A3_10" class="label lbl-unit-setting-explanation">
+							#{i18n.getText('KDW006_273')}</div>
+						<div class="btn-icon" tabindex="12">
+							<button class="btn-unit-setting" id="A3_11"
+								data-bind="click: open008Month">#{i18n.getText('KDW006_274')}</button>
+							<span class="caret-right caret-inline"></span>
+						</div>
+					</div>
+				</div>
+				<div class="column-right">
+					<div id="A3_1" class="panel panel-frame contents-area-left border-style">
+						<div data-itemno="A3_2" class="panel panel-gray-bg panel-custom-font-size">
+							#{i18n.getText('KDW006_335')}</div>
+						<div data-itemno="A3_4" class="label lbl-unit-setting-explanation">#{i18n.getText('KDW006_336')}
+						</div>
+						<div class="btn-icon" tabindex="10">
+							<button class="btn-unit-setting" id="A3_5"
+								data-bind="click: openI">#{i18n.getText('KDW006_337')}</button>
+							<span class="caret-right caret-inline"></span>
+						</div>
+						<div data-itemno="A2_19" class="label lbl-unit-setting-explanation">
+							#{i18n.getText('KDW006_346')}</div>
+						<div class="btn-icon" tabindex="9">
+							<button class="btn-unit-setting" id="A2_20"
+								data-bind="click: openJ">#{i18n.getText('KDW006_340')}</button>
+							<span class="caret-right caret-inline"></span>
+						</div>
+						<div data-itemno="A3_7" class="label lbl-unit-setting-explanation">#{i18n.getText('KDW006_338')}
+						</div>
+						<div class="btn-icon" tabindex="11">
+							<button class="btn-unit-setting" id="A3_8"
+								data-bind="click: openK">#{i18n.getText('KDW006_339')}</button>
+							<span class="caret-right caret-inline"></span>
+						</div>
+					</div>
+				</div>
+			</div>
 		</ui:define>
-		<ui:define name="sidebar-content">
-			<div id="tabpanel-common" role="tabpanel">
-				<div class="sidebar-content-header">
-					<span class="title">#{i18n.getText('KDW006_75')}</span>
-					<button id="print-button-common"  data-bind="click: exportExcelCommon" tabindex="4">#{i18n.getText('KDW006_85')}</button>
-				</div>
-				<div class="contents-area">
-					<button id="button1" tabindex="1" class="x-large caret-right b-style" data-bind="click: openB">#{i18n.getText('KDW006_20')}</button>
-					<br></br>
-					<button id="button2" tabindex="2" class="x-large caret-right b-style" data-bind="click: openC">#{i18n.getText('KDW006_22')}</button>
-					<br></br>
-					<button id="button3" tabindex="3" class="x-large caret-right b-style" data-bind="click: openD">#{i18n.getText('KDW006_23')}</button>
-					<br></br>
-					
-				</div>
-			</div>
-			<div id="tabpanel-daily" role="tabpanel">
-				<div class="sidebar-content-header">
-					<span class="title">#{i18n.getText('KDW006_8')}</span>
-					<button id="print-button-daily"  data-bind="click: exportExcelDaily">#{i18n.getText('KDW006_85')}</button>
-				</div>
-				<div class="contents-area">
-					<button id="button4" tabindex="4" class="x-large caret-right b-style" data-bind="click: open002Control">#{i18n.getText('KDW006_2')}</button>
-					<br></br>
-					<button id="button5" tabindex="5" class="x-large caret-right b-style" data-bind="click: open002Setting">#{i18n.getText('KDW006_5')}</button>
-					<br></br>
-					<button id="button6" tabindex="6" class="x-large caret-right b-style" data-bind="click: open007">#{i18n.getText('KDW006_3')}</button>
-					<br></br>
-					<button id="button7" tabindex="7" class="x-large caret-right b-style" data-bind="click: open008">#{i18n.getText('KDW006_4')}</button>
-					<br></br>
-					<button id="button8" tabindex="8" class="x-large caret-right b-style" data-bind="click: open006_G">#{i18n.getText('KDW006_71')}</button>
-					<br></br>
-					<br></br>
-				</div>
-			</div>
-			<div id="tabpanel-monthly" role="tabpanel">
-				<div class="sidebar-content-header">
-					<span class="title">#{i18n.getText('KDW006_7')}</span>
-					<button id="print-button-monthly"  data-bind="click: exportExcelMonthly">#{i18n.getText('KDW006_85')}</button>
-				</div>
-				<div class="contents-area">
-					<button id="button4" tabindex="4" class="x-large caret-right b-style" data-bind="click: open002ControlMonth">#{i18n.getText('KDW006_2')}</button>
-					<br></br>
-					<button id="button5" tabindex="5" class="x-large caret-right b-style" data-bind="click: open002Month">#{i18n.getText('KDW006_5')}</button>
-					<br></br>
-					<!-- <button id="button6" tabindex="6" class="x-large caret-right" data-bind="click: open007Month">#{i18n.getText('KDW006_6')}</button>
-					<br></br> -->
-					<button id="button7" tabindex="7" class="x-large caret-right b-style" data-bind="click: open008Month">#{i18n.getText('KDW006_4')}</button>
-					<br></br>
-					<br></br>
-					
-				</div>
-			</div>
-		</ui:define>
-
 	</ui:composition>
 </body>
+
 </html>

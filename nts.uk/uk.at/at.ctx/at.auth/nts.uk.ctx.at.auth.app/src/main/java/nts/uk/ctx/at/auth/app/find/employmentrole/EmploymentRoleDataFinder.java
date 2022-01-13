@@ -25,7 +25,7 @@ public class EmploymentRoleDataFinder {
 	
 	public List<EmploymentRoleDataDto> getListEmploymentRole() {
 		String companyID = AppContexts.user().companyId();
-		List<EmploymentRoleDataDto> data = repo.getListEmploymentRole(companyID).stream()
+		List<EmploymentRoleDataDto> data = repo.getAllByCompanyId(companyID).stream()
 				.map(c-> EmploymentRoleDataDto.fromDomain(c)).collect(Collectors.toList());
 		if(data.isEmpty())
 			return Collections.emptyList();
@@ -33,8 +33,7 @@ public class EmploymentRoleDataFinder {
 	}
 	
 	public EmploymentRoleDataDto getEmploymentRoleById( String roleId) {
-		String companyID = AppContexts.user().companyId();
-		Optional<EmploymentRoleDataDto> data = repo.getEmploymentRoleById(companyID, roleId).map(c->EmploymentRoleDataDto.fromDomain(c));
+		Optional<EmploymentRoleDataDto> data = repo.getEmploymentRoleById(roleId).map(c->EmploymentRoleDataDto.fromDomain(c));
 		if(data.isPresent()) {
 			EmploymentRoleDataDto result = data.get();
 			result.setRole(roleAdaptor.findByRoleId(roleId).map(x -> new RoleDto(

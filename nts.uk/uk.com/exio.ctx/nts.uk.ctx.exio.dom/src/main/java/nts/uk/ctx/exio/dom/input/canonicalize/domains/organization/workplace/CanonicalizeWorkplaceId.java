@@ -11,8 +11,8 @@ import lombok.Value;
 import lombok.val;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.gul.text.IdentifierUtil;
-import nts.uk.ctx.exio.dom.input.canonicalize.CanonicalItem;
 import nts.uk.ctx.exio.dom.input.canonicalize.domains.organization.workplace.WorkplaceCanonicalization.Items;
+import nts.uk.ctx.exio.dom.input.canonicalize.result.CanonicalItem;
 
 /**
  * 職場IDを正準化する

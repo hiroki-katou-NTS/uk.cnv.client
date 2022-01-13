@@ -2,12 +2,9 @@ package nts.uk.ctx.at.record.dom.employmentinfoterminal.infoterminal;
 
 import java.util.Optional;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import lombok.Value;
 import lombok.val;
 import nts.arc.layer.dom.objecttype.DomainValue;
-import nts.gul.text.IdentifierUtil;
 import nts.uk.ctx.at.record.dom.employmentinfoterminal.infoterminal.receive.LeaveCategory;
 import nts.uk.ctx.at.record.dom.employmentinfoterminal.infoterminal.receive.StampReceptionData;
 import nts.uk.ctx.at.record.dom.stamp.card.stampcard.ContractCode;
@@ -16,13 +13,9 @@ import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.RefectActualRes
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Relieve;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampTypeDisplay;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.WorkInformationStamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.support.SupportCardNumber;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ButtonType;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockArt;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ReservationArt;
+import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.ChangeClockAtr;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.SetPreClockArt;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.StampType;
 import nts.uk.ctx.at.shared.dom.common.WorkplaceId;
@@ -56,7 +49,7 @@ public class CreateStampInfo implements DomainValue {
 	private final Optional<WorkplaceId> workPlaceId;
 
 	// [1] 打刻
-	public Optional<Pair<Stamp, StampRecord>> createStamp(ContractCode contractCode, StampReceptionData recept,  EmpInfoTerminalCode empInfoTerCode) {
+	public Optional<Stamp> createStamp(ContractCode contractCode, StampReceptionData recept,  EmpInfoTerminalCode empInfoTerCode) {
 		// 実績への反映内容
 		RefectActualResult refActualResults  = new RefectActualResult(
 				new WorkInformationStamp(workPlaceId.map(x -> x.v()), Optional.of(empInfoTerCode), this.getWorkLocationCd(),
@@ -66,7 +59,7 @@ public class CreateStampInfo implements DomainValue {
 						|| recept.getShift().isEmpty()) ? null : new WorkTimeCode(recept.getShift()),
 				(recept.getOverTimeHours().isEmpty() || recept.getMidnightTime().isEmpty()) ? null
 				: new OvertimeDeclaration(new AttendanceTime(Integer.parseInt(recept.getOverTimeHours())),
-						new AttendanceTime(Integer.parseInt(recept.getMidnightTime()))));
+						new AttendanceTime(Integer.parseInt(recept.getMidnightTime()))), null);
 		// 打刻する方法
 		Relieve relieve = new Relieve(recept.convertAuthcMethod(), StampMeans.TIME_CLOCK);
 
@@ -75,13 +68,11 @@ public class CreateStampInfo implements DomainValue {
 		if (!stampType.isPresent())
 			return Optional.empty();
 
-		Stamp stamp = new Stamp(contractCode, new StampNumber(recept.getIdNumber().trim()), recept.getDateTime(), relieve,
-				stampType.get(), refActualResults, Optional.empty(),
-				// 新しいGUIDを作成する
-				IdentifierUtil.randomUniqueId());
+		Stamp stamp = new Stamp(contractCode, new StampNumber(recept.getIdNumber()), recept.getDateTime(), relieve,
+				stampType.get(), refActualResults, Optional.empty());
 
-		StampRecord stampRecord = createStampRecord(contractCode, recept, stamp);
-		return Optional.of(Pair.of(stamp, stampRecord));
+//		StampRecord stampRecord = createStampRecord(contractCode, recept, stamp);
+		return Optional.of(stamp);
 	}
 
 	// [pvt-1] 打刻種類を作成する
@@ -95,7 +86,7 @@ public class CreateStampInfo implements DomainValue {
 		}
 
 		val leavCategory = LeaveCategory.valueStringOf(category);
-		Optional<ChangeClockArt>  changeClockArt = (leavCategory == null ? Optional.empty() : this.stampInfoConver.convertFromNR(leavCategory));
+		Optional<ChangeClockAtr>  changeClockArt = (leavCategory == null ? Optional.empty() : this.stampInfoConver.convertFromNR(leavCategory));
 		if (!changeClockArt.isPresent())
 			return Optional.empty();
 
@@ -125,9 +116,9 @@ public class CreateStampInfo implements DomainValue {
 	}
 
 	// [pvt-3] 打刻の打刻記録を作成
-	private StampRecord createStampRecord(ContractCode contractCode, StampReceptionData recept, Stamp stamp) {
-		ButtonType bt = new ButtonType(ReservationArt.NONE, Optional.of(stamp.getType()));
-		return new StampRecord(stamp.getStampRecordId(), contractCode, new StampNumber(recept.getIdNumber()), recept.getDateTime(),
-				new StampTypeDisplay(bt.getStampTypeDisplay()));
-	}
+//	private StampRecord createStampRecord(ContractCode contractCode, StampReceptionData recept, Stamp stamp) {
+//		ButtonType bt = new ButtonType(ReservationArt.NONE, Optional.of(stamp.getType()));
+//		return new StampRecord(stamp.getStampRecordId(), contractCode, new StampNumber(recept.getIdNumber()), recept.getDateTime(),
+//				new StampTypeDisplay(bt.getStampTypeDisplay()));
+//	}
 }

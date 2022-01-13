@@ -76,12 +76,13 @@ module nts.uk.at.view.kmk002.a {
                 usageAtr: number;
                 empConditionAtr: number;
                 performanceAtr: number;
-                calcResultRange: CalcResultRangeDto;
+                calcResultRange: any;
                 unit: string;
                 formulas: Array<FormulaDto>;
                 calAtr: number;
                 note: string;
                 description: string;
+                inputCheck: boolean;
             }
             /**
              * CalcResultRangeDto

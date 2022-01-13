@@ -1,5 +1,13 @@
 package nts.uk.screen.at.app.ksm008.query.l;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import nts.arc.time.GeneralDate;
@@ -7,30 +15,20 @@ import nts.uk.ctx.at.schedule.dom.schedule.alarm.consecutivework.limitworktime.M
 import nts.uk.ctx.at.schedule.dom.schedule.alarm.consecutivework.limitworktime.MaxDayOfWorkTimeOrganizationRepo;
 import nts.uk.ctx.at.schedulealarm.app.query.alarmcheck.AlarmCheckConditionsQuery;
 import nts.uk.ctx.at.schedulealarm.app.query.alarmcheck.AlarmCheckConditionsQueryDto;
-import nts.uk.ctx.at.schedulealarm.dom.alarmcheck.AlarmCheckConditionSchedule;
-import nts.uk.ctx.at.shared.dom.common.EmployeeId;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.DisplayInfoOrganization;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.GetTargetIdentifiInforService;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.TargetOrgIdenInfor;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.TargetOrganizationUnit;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.WorkplaceInfo;
+import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.EmpAffiliationInforAdapter;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.EmpOrganizationImport;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.WorkplaceGroupAdapter;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.adapter.WorkplaceGroupImport;
 import nts.uk.ctx.bs.employee.dom.workplace.group.AffWorkplaceGroupRespository;
 import nts.uk.ctx.bs.employee.dom.workplace.master.service.WorkplaceExportService;
 import nts.uk.ctx.bs.employee.dom.workplace.master.service.WorkplaceInforParam;
-import nts.uk.ctx.bs.employee.pub.workplace.export.EmpOrganizationPub;
-import nts.uk.ctx.bs.employee.pub.workplace.workplacegroup.EmpOrganizationExport;
 import nts.uk.screen.at.app.ksm008.query.j.Ksm008GetWkListRequestParam;
 import nts.uk.shr.com.context.AppContexts;
-
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Screen KSM008L : 初期起動の情報を取得する
@@ -39,9 +37,6 @@ import java.util.stream.Collectors;
  */
 @Stateless
 public class Ksm008LStartupOrgInfoScreenQuery {
-
-    @Inject
-    private EmpOrganizationPub empOrganizationPub;
 
     @Inject
     private WorkplaceGroupAdapter workplaceGroupAdapter;
@@ -57,6 +52,9 @@ public class Ksm008LStartupOrgInfoScreenQuery {
 
     @Inject
     private AlarmCheckConditionsQuery alarmCheckConditionsQuery;
+
+	@Inject
+	private EmpAffiliationInforAdapter empAffiliationInforAdapter;
 
     /**
      * コードと名称と説明を取得する
@@ -76,7 +74,7 @@ public class Ksm008LStartupOrgInfoScreenQuery {
 
     public Ksm008LStartOrgInfoDto getOrgInfo() {
         //1: 取得する(Require, 年月日, 社員ID): 対象組織識別情報
-        Ksm008LStartupOrgInfoScreenQuery.RequireImpl require = new Ksm008LStartupOrgInfoScreenQuery.RequireImpl(empOrganizationPub);
+        Ksm008LStartupOrgInfoScreenQuery.RequireImpl require = new Ksm008LStartupOrgInfoScreenQuery.RequireImpl();
         GeneralDate systemDate = GeneralDate.today();
         String employeeId = AppContexts.user().employeeId();
         TargetOrgIdenInfor targeOrg = GetTargetIdentifiInforService.get(require, systemDate, employeeId);
@@ -133,28 +131,14 @@ public class Ksm008LStartupOrgInfoScreenQuery {
         return workTimeList;
     }
 
-    @AllArgsConstructor
-    @NoArgsConstructor
-    private static class RequireImpl implements GetTargetIdentifiInforService.Require {
+	private class RequireImpl implements GetTargetIdentifiInforService.Require {
 
-        @Inject
-        private EmpOrganizationPub empOrganizationPub;
+		@Override
+		public List<EmpOrganizationImport> getEmpOrganization(GeneralDate referenceDate, List<String> listEmpId) {
 
-        @Override
-        public List<EmpOrganizationImport> getEmpOrganization(GeneralDate referenceDate, List<String> listEmpId) {
-            List<EmpOrganizationExport> exports = empOrganizationPub.getEmpOrganiztion(referenceDate, listEmpId);
-            if (exports.isEmpty()) {
-                return Collections.emptyList();
-            }
-            List<EmpOrganizationImport> data = exports
-                    .stream()
-                    .map(i -> {
-                        return new EmpOrganizationImport(new EmployeeId(i.getEmpId()), i.getBusinessName(), i.getEmpCd(), i.getWorkplaceId(), i.getWorkplaceGroupId());
-                    })
-                    .collect(Collectors.toList());
-            return data;
-        }
-    }
+			return empAffiliationInforAdapter.getEmpOrganization(referenceDate, listEmpId);
+		}
+	}
 
     @AllArgsConstructor
     @NoArgsConstructor

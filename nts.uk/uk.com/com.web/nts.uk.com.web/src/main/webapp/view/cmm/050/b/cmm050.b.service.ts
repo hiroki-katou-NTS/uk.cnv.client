@@ -1,46 +1,41 @@
 module nts.uk.com.view.cmm050.b {
-    export module service {
-        /**
-         * define path to service
-         */
-        var path: any = {
-                testMailServerSetting: "sys/env/mailserver/testMailSetting",
-            };
-        
-        /**
-         * 
-         */
-        export function testMailServerSetting(data: model.MailServerTest): JQueryPromise<any> {
-            return nts.uk.request.ajax(path.testMailServerSetting, data);
-        }
-    }
-    
+  export module service {
     /**
-     * Model define.
+     * define path to service
      */
-    export module model {
-        export class MailServerTest {
-            mailFrom: string;
-            mailTo: string;
-            contents: MailContents;
-            
-            constructor(mailFrom: string, mailTo: string, contents: MailContents){
-              
-                this.mailFrom = mailFrom;
-                this.mailTo = mailTo;
-                this.contents = contents;
-            }
-        }
+    var path = {
+      testMailServerSetting: "sys/env/mailserver/testMailSetting",
+    };
 
-        export class MailContents {
-            subject: string;
-            body: string;
-            
-            constructor(subject: string = "Mail test from server", body: string = "Hello, this is test message!!"){
-                this.subject = subject;
-                this.body = body;
-            }
-        }
+    /**
+     * 
+     */
+    export function testMailServerSetting(data: model.MailServerTest): JQueryPromise<any> {
+      return nts.uk.request.ajax(path.testMailServerSetting, data);
     }
-    
+  }
+
+  /**
+   * Model define.
+   */
+  export module model {
+    export class MailServerTest {
+      mailFrom: string;
+      mailTo: string;
+      contents: MailContents;
+
+      constructor(mailFrom: string, mailTo: string, contents: MailContents) {
+
+        this.mailFrom = mailFrom;
+        this.mailTo = mailTo;
+        this.contents = contents;
+      }
+    }
+
+    export class MailContents {
+      subject: string = nts.uk.resource.getText("CMM050_31");
+      body: string = nts.uk.resource.getText("CMM050_32");
+    }
+  }
+
 }

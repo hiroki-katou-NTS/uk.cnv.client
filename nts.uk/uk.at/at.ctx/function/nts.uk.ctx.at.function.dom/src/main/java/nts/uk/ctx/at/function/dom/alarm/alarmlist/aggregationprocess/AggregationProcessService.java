@@ -392,7 +392,9 @@ public class AggregationProcessService {
 							lstCheckType,
 							alarmEmployeeList,
 							alarmExtractConditions,
-							x.getCode().v());
+							x.getCode().v(),
+							counter,
+							shouldStop);
 					break;
 				case ANY_PERIOD:
 					break;

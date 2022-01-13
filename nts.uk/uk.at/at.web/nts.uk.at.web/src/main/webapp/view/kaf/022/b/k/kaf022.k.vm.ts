@@ -35,7 +35,7 @@ module nts.uk.at.view.kaf022.k.viewmodel {
         // 就業時間帯を反映する
         reflectWorkHour: KnockoutObservable<number>;
         // 出退勤を反映する
-        reflectAttendance: KnockoutObservable<number>;
+        // reflectAttendance: KnockoutObservable<number>;
         // 1日休暇の場合は出退勤を削除
         oneDayLeaveDeleteAttendance: KnockoutObservable<number>;
 
@@ -64,7 +64,7 @@ module nts.uk.at.view.kaf022.k.viewmodel {
             const self = this;
 
             self.oneDayLeaveDeleteAttendance = ko.observable(1);
-            self.reflectAttendance = ko.observable(1);
+            // self.reflectAttendance = ko.observable(1);
             self.reflectWorkHour = ko.observable(1);
             
             self.simultaneousApplyRequired = ko.observable(1);
@@ -93,7 +93,7 @@ module nts.uk.at.view.kaf022.k.viewmodel {
             }
             if (allData.substituteLeaveApplicationReflect) {
                 self.reflectWorkHour(allData.substituteLeaveApplicationReflect.reflectWorkHour || 0);
-                self.reflectAttendance(allData.substituteLeaveApplicationReflect.reflectAttendance || 0);
+                // self.reflectAttendance(allData.substituteLeaveApplicationReflect.reflectAttendance || 0);
                 self.oneDayLeaveDeleteAttendance(allData.substituteLeaveApplicationReflect.oneDayLeaveDeleteAttendance);
             }
             if (allData.substituteHdWorkApplicationSetting) {
@@ -119,7 +119,7 @@ module nts.uk.at.view.kaf022.k.viewmodel {
                 },
                 suspenseApplicationReflect: {
                     reflectWorkHour: self.reflectWorkHour(),
-                    reflectAttendance: self.reflectAttendance(),
+                    // reflectAttendance: self.reflectAttendance(),
                     oneDayLeaveDeleteAttendance: self.oneDayLeaveDeleteAttendance()
                 },
                 suspenseDrawOutApplicationSetting: {

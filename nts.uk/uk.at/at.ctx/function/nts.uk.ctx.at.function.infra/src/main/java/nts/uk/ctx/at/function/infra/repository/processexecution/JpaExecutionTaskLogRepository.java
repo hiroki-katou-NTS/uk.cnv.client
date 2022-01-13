@@ -67,7 +67,7 @@ public class JpaExecutionTaskLogRepository extends JpaRepository implements Exec
 	public void updateAll(String companyId, String execItemCd, String execId, List<ExecutionTaskLog> taskLogList) {
 		try {
 			for (ExecutionTaskLog executionTaskLog : taskLogList) {
-				String updateTableSQL = " UPDATE KFNDT_AUTOEXEC_TASK_LOG SET" + " STATUS = ?"
+				String updateTableSQL = " UPDATE KFNDT_AUTOEXEC_TASK_LOG SET" + " STATUS = CAST(? as numeric)"
 						+ " WHERE CID = ? AND EXEC_ITEM_CD = ? AND EXEC_ID = ? AND TASK_ID = ? ";
 				try (PreparedStatement ps = this.connection()
 						.prepareStatement(JDBCUtil.toUpdateWithCommonField(updateTableSQL))) {

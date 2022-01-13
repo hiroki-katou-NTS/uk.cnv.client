@@ -222,7 +222,8 @@ module nts.uk.at.view.kal004.tab2.viewModel {
                 endPreviousMonth: paramDaily.endPreviousMonth,
                 endCurrentMonth: paramDaily.endCurrentMonth,
                 endMonth: paramDaily.endMonth,
-                endFromStrMonth: paramDaily.endFromStrMonth
+                endFromStrMonth: paramDaily.endFromStrMonth,
+                processingYm: paramDaily.processingYm
             };
             nts.uk.ui.windows.setShared("extractionScheYearDto", extractionScheYearDto);
             nts.uk.ui.windows.setShared("categoryId", categoryId);
@@ -339,7 +340,7 @@ module nts.uk.at.view.kal004.tab2.viewModel {
         categoryId: number;
         categoryName: string;
         extractionPeriod: string;
-        ListSpecifiedMonth: Array<any> = __viewContext.enums.SpecifiedMonth;
+        ListSpecifiedMonth: Array<any> = __viewContext.enums.DailyClosingDateSpecifiedMonth;
         ListScheSpecifiedMonth: Array<any> = __viewContext.enums.ScheSpecifiedMonth;
         PreviousClassification: Array<any> = __viewContext.enums.PreviousClassification
         ListAlarmCategory: Array<any> = __viewContext.enums.AlarmCategory;

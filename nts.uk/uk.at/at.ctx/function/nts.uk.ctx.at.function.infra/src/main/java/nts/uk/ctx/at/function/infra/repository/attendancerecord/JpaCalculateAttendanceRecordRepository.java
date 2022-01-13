@@ -193,9 +193,7 @@ public class JpaCalculateAttendanceRecordRepository extends JpaAttendanceRecordR
 
 		calculateAttendanceRecord
 				.saveToMemento(new JpaCalculateAttendanceRecordSetMemento(kfnstAttndRec, kfnstAttndRecItems));
-		int useAtrValue = useAtr ? 1 : 0;
-
-		kfnstAttndRec.setUseAtr(new BigDecimal(useAtrValue));
+		kfnstAttndRec.setUseAtr(useAtr);
 		return kfnstAttndRec;
 
 	}

@@ -11,10 +11,13 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import lombok.val;
 import nts.arc.layer.app.command.CommandHandlerContext;
 import nts.arc.layer.app.command.CommandHandlerWithResult;
 import nts.gul.collection.CollectionUtil;
+import nts.uk.ctx.sys.auth.app.command.roleset.AddOrUpdateDefaultRoleSetCommandHandler;
 import nts.uk.ctx.sys.auth.app.command.roleset.AddRoleSetCommandHandler;
+import nts.uk.ctx.sys.auth.app.command.roleset.DefaultRoleSetCommand;
 import nts.uk.ctx.sys.auth.app.command.roleset.RoleSetCommand;
 import nts.uk.ctx.sys.portal.app.command.webmenu.WebMenuCommand;
 import nts.uk.ctx.sys.portal.app.command.webmenu.webmenulinking.AddRoleSetLinkWebMenuCommandHandler;
@@ -35,6 +38,9 @@ public class RegisterRoleSetCommandBaseHandler extends CommandHandlerWithResult<
     @Inject
     private AddRoleSetLinkWebMenuCommandHandler addRoleSetLinkWebMenuCommandHandler;
 
+    @Inject
+    private AddOrUpdateDefaultRoleSetCommandHandler addOrUpdateDefaultRoleSetCommandHandler;
+
     /**
      * アルゴリズム「新規登録」を実行する - Execute the algorithm "new registration"
      */
@@ -49,20 +55,19 @@ public class RegisterRoleSetCommandBaseHandler extends CommandHandlerWithResult<
                 command.getRoleSetCd()
                 , companyId
                 , command.getRoleSetName()
-                , command.isApprovalAuthority()
-                , command.getOfficeHelperRoleId()
-                , command.getMyNumberRoleId()
-                , command.getHumanResourceRoleId()
                 , command.getPersonInfRoleId()
-                , command.getEmploymentRoleId()
-                , command.getSalaryRoleId());
+                , command.getEmploymentRoleId());
         // register Role Set
         this.addRoleSetCommandHandler.handle(roleSetCommand);
-        
+        val isDefaultRoleSet = command.getDefaultRoleSet();
+        if(isDefaultRoleSet){
+            addOrUpdateDefaultRoleSetCommandHandler
+                    .handle(new DefaultRoleSetCommand(roleSetCommand.getRoleSetCd()));
+        }
         // build Role Set Link Web Menu command
         List<WebMenuCommand> listWebMenus = command.getWebMenus();
         List<String> listWebMenuCds = !CollectionUtil.isEmpty(listWebMenus) ?
-                listWebMenus.stream().map(item -> item.getWebMenuCode()).collect(Collectors.toList())
+                listWebMenus.stream().map(WebMenuCommand::getWebMenuCode).collect(Collectors.toList())
                 : new ArrayList<String>();
         RoleSetLinkWebMenuCommand roleSetLinkWebMenuCommand = new RoleSetLinkWebMenuCommand(
                 command.getRoleSetCd()
@@ -70,7 +75,6 @@ public class RegisterRoleSetCommandBaseHandler extends CommandHandlerWithResult<
                 , listWebMenuCds);
         // register Role Set Link Web Menu
         this.addRoleSetLinkWebMenuCommandHandler.handle(roleSetLinkWebMenuCommand);
-
         return command.getRoleSetCd();
     }
 }

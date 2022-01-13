@@ -24,17 +24,11 @@ public class ControlOfMonthlyItems extends AggregateRoot {
 	/**月別実績のヘッダ背景色*/
 	private Optional<HeaderBackgroundColor> headerBgColorOfMonthlyPer;
 
-	/**時間項目の入力単位*/
-	private Optional<BigDecimal> inputUnitOfTimeItem;
-
-	public ControlOfMonthlyItems(String companyId, int itemMonthlyId, HeaderBackgroundColor headerBgColorOfMonthlyPer, BigDecimal inputUnitOfTimeItem) {
+	public ControlOfMonthlyItems(String companyId, int itemMonthlyId, HeaderBackgroundColor headerBgColorOfMonthlyPer) {
 		super();
 		this.companyId = companyId;
 		this.itemMonthlyId = itemMonthlyId;
 		this.headerBgColorOfMonthlyPer = Optional.ofNullable(headerBgColorOfMonthlyPer);
-		this.inputUnitOfTimeItem = Optional.ofNullable(inputUnitOfTimeItem);
 	}
-	
-	
 
 }

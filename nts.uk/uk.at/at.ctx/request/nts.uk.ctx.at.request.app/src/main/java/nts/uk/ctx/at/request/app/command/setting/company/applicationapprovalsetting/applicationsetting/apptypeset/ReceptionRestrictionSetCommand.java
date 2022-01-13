@@ -62,10 +62,23 @@ public class ReceptionRestrictionSetCommand {
      */
     private Integer earlyNormalOvertime;
 
+    /**
+     * 時刻（複数回残業）
+     */
+    private Integer multipleOvertime;
+
     public ReceptionRestrictionSetting toDomain() {
         if (appType == ApplicationType.OVER_TIME_APPLICATION.value)
             return new ReceptionRestrictionSetting(
-                    OTAppBeforeAccepRestric.createNew(methodCheck, dateBeforehandRestrictions, useAtr, earlyOvertime, normalOvertime, earlyNormalOvertime),
+                    OTAppBeforeAccepRestric.createNew(
+                            methodCheck,
+                            dateBeforehandRestrictions,
+                            useAtr,
+                            earlyOvertime,
+                            normalOvertime,
+                            earlyNormalOvertime,
+                            multipleOvertime
+                    ),
                     new AfterhandRestriction(allowFutureDay),
                     null,
                     EnumAdaptor.valueOf(appType, ApplicationType.class));

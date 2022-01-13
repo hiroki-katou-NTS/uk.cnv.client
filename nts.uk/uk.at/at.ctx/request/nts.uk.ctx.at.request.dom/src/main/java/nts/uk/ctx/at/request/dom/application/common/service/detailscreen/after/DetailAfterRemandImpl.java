@@ -1,9 +1,6 @@
 package nts.uk.ctx.at.request.dom.application.common.service.detailscreen.after;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
@@ -185,7 +182,10 @@ public class DetailAfterRemandImpl implements DetailAfterRemand {
 //		}
 		//get mail login
 		List<MailDestinationImport> lstMailLogin = envAdapter.getEmpEmailAddress(cid, Arrays.asList(sidLogin), 6);
-		List<OutGoingMailImport> mailLogin = lstMailLogin.get(0).getOutGoingMails();
+		List<OutGoingMailImport> mailLogin = lstMailLogin.stream()
+				.findFirst()
+				.map(mail -> mail.getOutGoingMails())
+				.orElse(Collections.emptyList());
 		String loginMail = mailLogin.isEmpty() ||  mailLogin.get(0) == null || mailLogin.get(0).getEmailAddress() == null ? "" :
 					mailLogin.get(0).getEmailAddress();
 		//get name login

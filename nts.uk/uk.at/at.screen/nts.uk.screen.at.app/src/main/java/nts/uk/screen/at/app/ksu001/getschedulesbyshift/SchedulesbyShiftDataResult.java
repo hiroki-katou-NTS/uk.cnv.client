@@ -1,28 +1,31 @@
-/**
- * 
- */
 package nts.uk.screen.at.app.ksu001.getschedulesbyshift;
 
 import java.util.List;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import nts.uk.screen.at.app.ksu001.displayinshift.ShiftMasterMapWithWorkStyle;
+import nts.uk.screen.at.app.ksu001.aggreratepersonaltotal.AggregatePersonalDto;
+import nts.uk.screen.at.app.ksu001.aggrerateworkplacetotal.AggregateWorkplaceDto;
+import nts.uk.screen.at.app.ksu001.getshiftpalette.ShiftMasterDto;
 import nts.uk.screen.at.app.ksu001.getworkscheduleshift.ScheduleOfShiftDto;
 
-/**
- * @author laitv
- *
- */
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
 public class SchedulesbyShiftDataResult {
-	
-	public List<ScheduleOfShiftDto> listWorkScheduleShift;  // List<勤務予定（シフト）dto>
-	public List<ShiftMasterMapWithWorkStyle> listShiftMaster; // 取得したシフト一覧：List<シフトマスタ, Optional<出勤休日区分>>
 
+	// List<勤務予定（シフト）dto>
+	public List<ScheduleOfShiftDto> listWorkScheduleShift;    
+	
+	// Map<シフトマスタ, Optional<出勤休日区分>>
+	public Map<ShiftMasterDto, Integer> mapShiftMasterWithWorkStyle; 
+	
+	// 個人計集計結果　←集計内容によって情報が異なる
+	public AggregatePersonalDto aggreratePersonal;
+	
+	// ・職場計集計結果　←集計内容によって情報が異なる
+	public AggregateWorkplaceDto aggrerateWorkplace;
+	
 }

@@ -38,7 +38,7 @@ public class JpaGeneralSearchHistoryRepository extends JpaRepository implements 
 			+ " ORDER BY f.searchDate DESC";
 	
 	/** The Constant QUERY_SELECT_LAST_10_RESULTS. */
-	private static final String QUERY_SELECT_LAST_10_RESULTS = "SELECT TOP 10 * FROM SPTDT_GENERIC_SEARCH_HIST"
+	private static final String QUERY_SELECT_LAST_RESULTS = "SELECT * FROM SPTDT_GENERIC_SEARCH_HIST"
 			+ " WHERE CID = 'companyID'"
 			+ " AND USER_ID = 'userID'"
 			+ " AND SEARCH_ATR = 'searchCategory'"
@@ -135,7 +135,7 @@ public class JpaGeneralSearchHistoryRepository extends JpaRepository implements 
 	public List<GeneralSearchHistory> getLast10UsedSearches(String userID, String companyID,
 			int searchCategory) {
 		Connection con = this.getEntityManager().unwrap(Connection.class);
-		String query = QUERY_SELECT_LAST_10_RESULTS;
+		String query = QUERY_SELECT_LAST_RESULTS;
 		query = query.replace(COMPANY_ID, companyID);
 		query = query.replace(USER_ID, userID);
 		query = query.replace(SEARCH_CATEGORY, String.valueOf(searchCategory));
@@ -156,7 +156,7 @@ public class JpaGeneralSearchHistoryRepository extends JpaRepository implements 
 			if (listResult.isEmpty()) {
 				return Collections.emptyList();
 			} else {
-				return listResult;
+				return listResult.subList(0, Math.min(listResult.size(), 10)); // TOP 10
 			}
 		}
 	}

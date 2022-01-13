@@ -2,6 +2,7 @@ package nts.uk.ctx.at.function.infra.repository.processexecution;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.Query;
 
 import nts.arc.layer.infra.data.JpaRepository;
+import nts.arc.layer.infra.data.database.DatabaseProduct;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.at.function.dom.processexecution.executionlog.ProcessExecutionLog;
 //import nts.uk.ctx.at.function.dom.processexecution.executionlog.ProcessExecutionLogManage;
@@ -131,17 +133,25 @@ public class JpaProcessExecutionLogRepository extends JpaRepository
 		try {
 			for(KfnmtExecutionTaskLog kfnmtExecutionTaskLog : updateData.taskLogList) {
 				String updateTableSQL = " UPDATE KFNDT_AUTOEXEC_TASK_LOG SET"
-						+ " STATUS = ?"
+						+ " STATUS = CAST(? as numeric)"
 						+ " ,LAST_EXEC_DATETIME = ?"
 						+ " ,LAST_END_EXEC_DATETIME = ?"
-						+ " ,ERROR_SYSTEM = ?"
-						+ " ,ERROR_BUSINESS = ?"
+						+ " ,ERROR_SYSTEM = CAST(? as numeric)"
+						+ " ,ERROR_BUSINESS = CAST(? as numeric)"
 						+ " , ERROR_SYSTEM_CONT = ?"
 						+ " WHERE CID = ? AND EXEC_ITEM_CD = ? AND EXEC_ID = ? AND TASK_ID = ? ";
 				try (PreparedStatement ps = this.connection().prepareStatement(JDBCUtil.toUpdateWithCommonField(updateTableSQL))) {
 					ps.setString(1, kfnmtExecutionTaskLog.status ==null?null:kfnmtExecutionTaskLog.status.toString());
-					ps.setString(2, kfnmtExecutionTaskLog.lastExecDateTime ==null?null:kfnmtExecutionTaskLog.lastExecDateTime.toString());
-					ps.setString(3, kfnmtExecutionTaskLog.lastEndExecDateTime ==null?null:kfnmtExecutionTaskLog.lastEndExecDateTime.toString());
+					if (this.database().is(DatabaseProduct.POSTGRESQL)) {
+						ps.setTimestamp(2, kfnmtExecutionTaskLog.lastExecDateTime == null ? null : Timestamp.valueOf(kfnmtExecutionTaskLog.lastExecDateTime.localDateTime()));
+					} else {
+						ps.setString(2, kfnmtExecutionTaskLog.lastExecDateTime == null ? null : kfnmtExecutionTaskLog.lastExecDateTime.toString());
+					}
+					if (this.database().is(DatabaseProduct.POSTGRESQL)) {
+						ps.setTimestamp(3, kfnmtExecutionTaskLog.lastEndExecDateTime == null ? null : Timestamp.valueOf(kfnmtExecutionTaskLog.lastEndExecDateTime.localDateTime()));
+					} else {
+						ps.setString(3, kfnmtExecutionTaskLog.lastEndExecDateTime == null ? null : kfnmtExecutionTaskLog.lastEndExecDateTime.toString());
+					}
 					ps.setString(4, kfnmtExecutionTaskLog.errorSystem == null?null:(kfnmtExecutionTaskLog.errorSystem ==1?"1":"0"));
 					ps.setString(5, kfnmtExecutionTaskLog.errorBusiness == null?null:(kfnmtExecutionTaskLog.errorBusiness ==1?"1":"0"));
 					ps.setString(6, kfnmtExecutionTaskLog.errorSystemDetail == null?null:(kfnmtExecutionTaskLog.errorSystemDetail));

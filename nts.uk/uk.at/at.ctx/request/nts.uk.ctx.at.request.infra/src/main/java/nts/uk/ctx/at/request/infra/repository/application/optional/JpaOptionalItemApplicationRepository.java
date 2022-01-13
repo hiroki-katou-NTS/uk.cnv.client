@@ -115,7 +115,7 @@ public class JpaOptionalItemApplicationRepository extends JpaRepository implemen
                 entity.setKrqdtAppAnyvPk(new KrqdtAppAnyvPk(
                         cid,
                         domain.getAppID(),
-                        domain.getCode().v(),
+                        Integer.parseInt(domain.getCode().v()),
                         anyItemValue.getItemNo().v()
                 ));
                 entity.setTimes(anyItemValue.getTimes().isPresent() ? anyItemValue.getTimes().get().v() : null);

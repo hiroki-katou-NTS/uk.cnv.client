@@ -1,0 +1,234 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+>
+<body>
+<ui:composition template="../../../../master/base.xhtml">
+    <ui:define name="htmlHead">
+        <com:scriptfile set="IGNITE"/>
+        <com:ValidatorScript>
+            nts.uk.ctx.at.record.dom.workrecord.workmanagement.manhoursummarytable.ManHourSummaryTableCode
+            nts.uk.ctx.at.record.dom.workrecord.workmanagement.manhoursummarytable.ManHourSummaryTableName
+        </com:ValidatorScript>
+        <com:stylefile path="kha003.a.style.css"/>
+        <com:scriptfile path="kha003.a.vm.js"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div id="functions-area">
+            <!--A1_1-->
+            <button tabindex="-1" data-bind="click: clickNewButton, enable: $vm.isUpdateMode() &#124;&#124; $vm.isExecutionMode()">#{i18n.getText('KHA003_10')}</button>
+            <!--A1_2-->
+            <button tabindex="5" class="proceed"
+                    data-bind="click: clickRegistrationButton, enable: $root.errors.isEmpty() &amp;&amp; !$vm.isExecutionMode()">#{i18n.getText('KHA003_11')}</button>
+            <!--A1_3-->
+            <button tabindex="3" data-bind="click: clickDuplicateButton, enable: $vm.isUpdateMode() &#124;&#124; $vm.isExecutionMode()">#{i18n.getText('KHA003_12')}</button>
+            <!--A1_4-->
+            <button tabindex="-1" class="danger" data-bind="click: clickDeleteButton, enable: $vm.isUpdateMode() &#124;&#124; $vm.isExecutionMode()">#{i18n.getText('KHA003_13')}</button>
+            <!--A1_5-->
+            <button tabindex="-1" data-bind="click: clickOutputAllButton, enable: true">#{i18n.getText('KHA003_14')}</button>
+        </div>
+        <div id="contents-area">
+            <div class="table" style="margin-top: 8px;width: 100%">
+                <div class="cell valign-top" style="width: 22%">
+                    <!--A2_1-->
+                    <div data-bind="ntsPanel:{width: '350px', height: '400px', direction: 'right', showIcon: true, visible: true}">
+                        <!--A2_2-->
+                        <div tabindex="-1" style="width: 300px" data-bind="ntsSearchBox: {searchMode: 'filter',targetKey: 'code', comId: 'single-list',
+	                     items: layoutSettings, selected: currentCode, selectedKey: 'code', fields: ['name', 'code'], mode: 'igGrid'}"/>
+                        <!--A3-->
+                        <table tabindex="1" id="single-list" data-bind="ntsGridList: {
+                        rows: 20,
+                        options: layoutSettings,
+                        optionsValue: 'code',
+                        columns: [
+                                { headerText: '#{i18n.getText('KHA003_18')}', prop: 'code', width: 100 },
+                                { headerText: '#{i18n.getText('KHA003_19')}', prop: 'name', width: 200 }
+                            ],
+                        multiple: false,
+                        value: currentCode
+	                    }">
+                        </table>
+                    </div>
+                </div>
+                <div class="cell valign-top" style="padding-left: 20px">
+                    <div class="table">
+                        <!-- A4_1 -->
+                        <div class="cell valign-center">
+                            <div data-bind="ntsFormLabel: { constraint: ['ManHourSummaryTableCode','ManHourSummaryTableName'], enable: true, required:true }">#{i18n.getText('KHA003_20')}</div>
+                        </div>
+                        <div class="cell valign-center">
+                            <!-- A4_2 -->
+                            <input tabindex="2" class="width-common" id="A4_2"
+                                   data-bind="ntsTextEditor: {constraint: 'ManHourSummaryTableCode', value: manHour.code, enable: !$vm.isUpdateMode() &amp;&amp; !$vm.isExecutionMode(), required: true, name: '#[KHA003_21]'}, style: {marginRight: '5px'}"/>
+                        </div>
+                        <div class="cell valign-center">
+                             <!-- A4_3 -->
+                            <input tabindex="3" id="A4_3"
+                                   data-bind="ntsTextEditor: {constraint: 'ManHourSummaryTableName', value: manHour.name, required: true, name: '#[KHA003_22]'},  style: {width: '300px'}"/>
+                        </div>
+                    </div>
+                    <div class="table">
+                        <!-- A5_1 -->
+                        <div class="cell valign-center">
+                            <div style="padding: 10px 10px 10px 0px; font-size: 16px;font-weight: bold">#{i18n.getText('KHA003_23')}</div>
+                        </div>
+                    </div>
+                    <!-- A5_2 -->
+                    <div style="margin-left: 97px" id="appen-area-one" class="panel panel-frame table">
+                        <!-- A5_3 -->
+                        <div class="cell valign-center panel_padding">
+                            <div class="panel  panel_common bacg-active" data-itemtype="0" id="item_type_0">
+                                <span data-itemtype="0">#{i18n.getText('KHA003_24')}</span>
+                            </div>
+                        </div>
+                        <!-- A5_4 -->
+                        <div class="cell valign-center panel_padding">
+                            <div class="panel  panel_common bacg-active" data-itemtype="1" id="item_type_1">
+                                <span data-itemtype="1">#{i18n.getText('KHA003_25')}</span>
+                            </div>
+                        </div>
+                        <!-- A5_5 -->
+                        <div class="cell valign-center panel_padding">
+                            <div class="panel  panel_common bacg-active" data-itemtype="2" id="item_type_2">
+                                <span data-itemtype="2">#{i18n.getText('KHA003_26')}</span>
+                            </div>
+                        </div>
+                        <!-- A5_6 -->
+                        <com:ko-if bind="taskFrameSettingA56.taskFrameName">
+                            <div class="cell valign-center panel_padding">
+                                <div class="panel  panel_common bacg-active" data-itemtype="3" id="item_type_3">
+                                    <span data-bind="text:taskFrameSettingA56.taskFrameName" data-itemtype="3"></span>
+                                </div>
+                            </div>
+                        </com:ko-if>
+
+                        <!-- A5_7 -->
+                        <com:ko-if bind="taskFrameSettingA57.taskFrameName">
+                            <div class="cell valign-center panel_padding">
+                                <div class="panel  panel_common bacg-active" data-itemtype="4" id="item_type_4">
+                                    <span data-bind="text:taskFrameSettingA57.taskFrameName" data-itemtype="4"></span>
+                                </div>
+                            </div>
+                        </com:ko-if>
+
+                        <!-- A5_8 -->
+                        <com:ko-if bind="taskFrameSettingA58.taskFrameName">
+                            <div class="cell valign-center panel_padding">
+                                <div class="panel  panel_common bacg-active" data-itemtype="5" id="item_type_5">
+                                    <span data-bind="text:taskFrameSettingA58.taskFrameName" data-itemtype="5"></span>
+                                </div>
+                            </div>
+                        </com:ko-if>
+
+                        <!-- A5_9 -->
+                        <com:ko-if bind="taskFrameSettingA59.taskFrameName">
+                            <div class="cell valign-center panel_padding">
+                                <div class="panel  panel_common bacg-active" data-itemtype="6" id="item_type_6">
+                                    <span data-bind="text:taskFrameSettingA59.taskFrameName" data-itemtype="6"></span>
+                                </div>
+                            </div>
+                        </com:ko-if>
+
+                        <!-- A5_10 -->
+                        <com:ko-if bind="taskFrameSettingA510.taskFrameName">
+                            <div class="cell valign-center panel_padding">
+                                <div class="panel  panel_common bacg-active" data-itemtype="7" id="item_type_7">
+                                    <span data-bind="text:taskFrameSettingA510.taskFrameName" data-itemtype="7"></span>
+                                </div>
+                            </div>
+                        </com:ko-if>
+                    </div>
+                    <table id="main-table" style="width: 100%; margin-top: 10px;">
+                        <tbody>
+                        <tr>
+                            <td class="valign-center" id="free_area">
+                                <div class="panel panel-frame item_a_6_1">
+                                </div>
+                            </td>
+                            <td class="valign-center">
+                                <div class="panel panel-frame item_a_6_1"
+                                     style="background: #FFFF99;">
+                                    <div data-bind="ntsRadioBoxGroup: {
+                                                        options: itemList,
+                                                        optionsValue: 'id',
+                                                        optionsText: 'name',
+                                                        value: selectedId,
+                                                        enable: true
+                                                }">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="valign-center">
+                                <div id="append_area" class="panel panel-frame">
+                                    <com:ko-foreach bind="summaryItems">
+                                        <div class="panel panel-frame bacg-active item_a_6_4_to_67">
+                                            <button tabindex="-1" data-bind="attr:{id: 'item_type_' + summaryItemType}" class="button_top_right_corner">
+                                                <i class="icon icon-close"></i>
+                                            </button>
+                                            <span class="label layout-setting summary-item" data-bind="text:itemTypeName, attr: {'data-itemtype': summaryItemType}" style="display: table;margin: 61px auto;"></span>
+                                        </div>
+                                    </com:ko-foreach>
+                                    <div id="append_note" class="panel item_a_6_4_to_67" style="border: 2px solid transparent;">
+                                        <span class="label" style="display: table;margin: 49px auto;">#{i18n.getText('KHA003_38')}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="valign-center">
+                                <div class="panel panel-frame item_a_6_2" style="background: #F8CBAD;">
+                                    <div class="table" style="width: 100%">
+                                        <div class="cell valign-center" style="text-align: center">
+                                        <span class="label"
+                                              style="margin-bottom: 15px;">#{i18n.getText('KHA003_30')}</span>
+                                        </div>
+                                    </div>
+                                    <div class="table" style="width: 100%">
+                                        <div class="cell valign-center" style="text-align: center">
+                                            <div data-bind="ntsRadioBoxGroup: {
+                                            options: itemListA622,
+                                            optionsValue: 'id',
+                                            optionsText: 'name',
+                                            value: selectedIdA622,
+                                            enable: true}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="table">
+                        <div class="cell valign-center">
+                            <!--A7_1-->
+                            <div tabindex="-1"
+                                 data-bind="ntsCheckBox: {
+                                                checked: isA71Checked,
+                                                enable: true,
+                                                text: '#{i18n.getText('KHA003_39')}'
+                                            }"></div>
+                        </div>
+                    </div>
+                    <div class="table" style="width: 100%;text-align: center">
+                        <div class="cell valign-center">
+                            <!--A8_1-->
+                            <button tabindex="4"
+                                    style="width: 60%"
+                                    data-bind="click: clickRunButton,
+                                                enable: isA81Enable(),
+                                                attr:{ class: isA81Enable() ? 'proceed x-large' : 'x-large'}">
+                                #{i18n.getText('KHA003_40')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+</body>
+</html>

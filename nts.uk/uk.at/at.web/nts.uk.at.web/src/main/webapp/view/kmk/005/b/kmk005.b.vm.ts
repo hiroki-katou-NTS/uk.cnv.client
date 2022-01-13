@@ -479,7 +479,6 @@ module nts.uk.at.view.kmk005.b {
                 if (!nts.uk.ui.errors.hasError()) {
                     let bonusPayTimeItemListCommand: Array<any> = [], bonusPayTimeItemSpecListCommand: Array<any> = [],
                          lstUseArt: Array<boolean> = [], lstUseSpecArt: Array<boolean> = [];
-
                     lstUseArt.push(self.useAtr1() == 1 ? true : false);
                     lstUseArt.push(self.useAtr2() == 1 ? true : false);
                     lstUseArt.push(self.useAtr3() == 1 ? true : false);
@@ -523,6 +522,7 @@ module nts.uk.at.view.kmk005.b {
                     bonusPayTimeItemSpecListCommand.push({ timeItemName:self.timeItemSpecName8(), useAtr: self.useSpecAtr8(),timeItemNo: 8, timeItemTypeAtr: 1 });
                     bonusPayTimeItemSpecListCommand.push({ timeItemName:self.timeItemSpecName9(), useAtr: self.useSpecAtr9(),timeItemNo: 9, timeItemTypeAtr: 1 });
                     bonusPayTimeItemSpecListCommand.push({ timeItemName:self.timeItemSpecName10(), useAtr: self.useSpecAtr10(),timeItemNo: 10, timeItemTypeAtr: 1 });
+
 
                     service.checkUseArt(lstUseArt).done(function() {
                         service.getListBonusPTimeItem().done(function(res: Array<any>) {

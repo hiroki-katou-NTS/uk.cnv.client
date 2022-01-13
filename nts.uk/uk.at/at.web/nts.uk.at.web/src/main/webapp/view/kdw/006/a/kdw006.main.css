@@ -1,8 +1,84 @@
-.b-style {
-	width: 295px;
-	margin: 20px 20px 20px 20px;
+.column-left {
+	float: left;
+	margin-left: 10px;
 }
 
-#sidebar-area{
-	width: 120px;
+.column-right {
+	display: inline-block;
+}
+
+.column-center {
+	display: inline-block;
+	float: left;
+	margin-right: 40px;
+}
+
+.panel-frame {
+	width: 240px;
+	/* text-align: center; */
+}
+
+.panel-custom-font-size {
+	font-size: 2em;
+	text-align: center;
+	/* margin-top: 5px; */
+	border-radius: 5px;
+}
+
+.panel-row {
+	float: left;
+	padding: 0px 10px 0px 10px;
+}
+
+.panel-spacing {
+	height: 280px;
+	width: 40px;
+	float: left;
+}
+
+.lbl-unit-setting-explanation, .lbl-general-labor-explanation {
+	margin-top: 5px;
+}
+
+.btn-icon {
+	/* text-align: center; */
+}
+
+.btn-unit-setting {
+	width: 225px;
+	margin-bottom: 3px;
+	margin-top: 3px;
+}
+
+.caret-right:after {
+	color: #97D155;
+}
+
+.caret-inline {
+	margin-left: -5px;
+	top: -8px;
+}
+
+.caret-right-large:after {
+	float: left;
+	margin: 40px 6px;
+    border-left: 2em solid;
+    border-top: 4em solid transparent;
+    border-bottom: 4em solid transparent;
+}
+
+.master_setting_caret.caret-bottom:after {
+	color: #92D050;
+	border-width: 25px 55px;
+	margin-top: 5px;
+}
+
+div.caret-kdw006 {
+	text-align: center;
+	margin: 3px;
+}
+
+.btn-unit-fix {
+	margin-top: 10px;
+	width: 194px;
 }

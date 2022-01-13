@@ -18,6 +18,8 @@ export class Kdl001Component extends Vue {
     public isAddNone = false;
     public seledtedWkTimeCDs = [];
     public selectedWorkTimeCD: string;
+    public workplaceID: string;
+    public referenceDate: string;
 
     public created() {
         let self = this;
@@ -42,6 +44,8 @@ export class Kdl001Component extends Vue {
         self.seledtedWkTimeCDs = params.seledtedWkTimeCDs || self.seledtedWkTimeCDs;
         self.selectedWorkTimeCD = params.selectedWorkTimeCD || self.selectedWorkTimeCD;
         self.selectedWorkType = params.selectedWorkType || self.selectedWorkType;
+        self.workplaceID = params.workplaceID || self.workplaceID;
+        self.referenceDate = params.referenceDate || self.referenceDate;
     }
 
     public back() {
@@ -52,17 +56,19 @@ export class Kdl001Component extends Vue {
 
     private startPage() {
         let self = this;
-        self.$http.post('at', servicePath.getAllWkTime, { wkTimeCodes: self.seledtedWkTimeCDs }).then((result: { data: Array<IWorkTime> }) => {
+        let param = {
+            codes: self.seledtedWkTimeCDs,
+            workTimeSelected: self.selectedWorkTimeCD,
+            workPlaceId: self.workplaceID,
+            referenceDate: self.referenceDate,
+            display: self.isAddNone
+        };
+        self.$http.post('at', servicePath.getAllWkTime, param).then((result: { data: Array<IWorkTime> }) => {
             self.$mask('hide');
 
-            if (self.checkEmptyData(result.data)) {
+            self.setData(result.data);
 
-                self.addNone();
-
-                self.setData(result.data);
-
-                self.setSelectedItem();
-            }
+            self.setSelectedItem();
 
         }).catch((res: any) => {
             self.showError(res);
@@ -86,7 +92,11 @@ export class Kdl001Component extends Vue {
     private showError(res: any) {
         let self = this;
         self.$mask('hide');
-        if (!_.isEqual(res.message, 'can not found message id')) {
+        if (res.messageId == 'Msg_1525') {
+            self.$modal.error({ messageId: 'Msg_1525' }).then(() => {
+                self.$close();
+            });
+        } else if (!_.isEqual(res.message, 'can not found message id')) {
             self.$modal.error({ messageId: res.messageId, messageParams: res.parameterIds });
         } else {
             self.$modal.error(res.message);
@@ -217,7 +227,7 @@ export class Kdl001Component extends Vue {
 }
 
 const servicePath = {
-    getAllWkTime: 'at/shared/worktimesetting/get_worktime_by_codes'
+    getAllWkTime: 'at/shared/worktimesetting/get_worktimes_kdls01'
 };
 
 interface IWorkTime {
@@ -239,4 +249,6 @@ interface IParam {
     selectedWorkTimeCD: string;
     selectedWorkType: any;
     parentPage: string;
+    workplaceID: string;
+    referenceDate: string;
 }

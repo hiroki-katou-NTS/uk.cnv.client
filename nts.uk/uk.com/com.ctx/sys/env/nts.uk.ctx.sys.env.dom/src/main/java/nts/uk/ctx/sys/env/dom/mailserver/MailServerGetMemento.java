@@ -34,7 +34,7 @@ public interface MailServerGetMemento {
 	 * 
 	 * @return Email Authentication
 	 */
-	EmailAuthentication getEmailAuthentication();
+	MailAddress getEmailAuthentication();
 
 	/**
 	 * Gets password

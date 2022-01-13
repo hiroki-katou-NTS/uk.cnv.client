@@ -13,6 +13,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
+import nts.uk.shr.infra.file.storage.stream.FileStoragePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,8 +83,6 @@ public class ProcessRecoverListTblByCompanyHandle {
 	public static final Integer INDEX_H_START_DATE = 3;
 
 	public static Integer NUMBER_ERROR = 0;
-
-	private static final String DATA_STORE_PATH = ServerSystemProperties.fileStoragePath();
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RecoveryStorageService.class);
 
@@ -244,7 +243,7 @@ public class ProcessRecoverListTblByCompanyHandle {
 	}
 	
 	public static String getExtractDataStoragePath(String fileId) {
-		return DATA_STORE_PATH + "//packs//" + fileId;
+		return new FileStoragePath().getPathOfCurrentTenant().toString() + "//packs//" + fileId;
 	}
 	
 }

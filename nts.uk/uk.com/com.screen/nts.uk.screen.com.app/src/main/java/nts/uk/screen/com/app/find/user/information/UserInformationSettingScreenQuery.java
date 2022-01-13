@@ -3,24 +3,22 @@ package nts.uk.screen.com.app.find.user.information;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import nts.uk.ctx.sys.env.dom.mailnoticeset.MailFunction;
-import nts.uk.ctx.sys.env.dom.mailnoticeset.MailFunctionRepository;
+
 import nts.uk.ctx.sys.env.dom.mailnoticeset.company.UserInformationUseMethod;
 import nts.uk.ctx.sys.env.dom.mailnoticeset.company.UserInformationUseMethodRepository;
-import nts.uk.screen.com.app.find.user.information.setting.*;
+import nts.uk.screen.com.app.find.user.information.setting.ContactSettingDto;
+import nts.uk.screen.com.app.find.user.information.setting.OtherContactDto;
+import nts.uk.screen.com.app.find.user.information.setting.SettingContactInformationDto;
+import nts.uk.screen.com.app.find.user.information.setting.UserInformationUseMethodDto;
 import nts.uk.shr.com.context.AppContexts;
 
 @Stateless
 public class UserInformationSettingScreenQuery {
 	@Inject
     private UserInformationUseMethodRepository userInformationUseMethodrepository;
-	
-	@Inject
-	private MailFunctionRepository mailFunctionRepository;
 
 	/**
 	 * ユーザ情報の設定を取得する
@@ -36,23 +34,6 @@ public class UserInformationSettingScreenQuery {
 		UserInformationUseMethodDto userInformationUseMethodDto = UserInformationUseMethodDto.builder().build();
 		
 		if(!userInformationUseMethod.isPresent()) {
-			List<EmailDestinationFunctionDto> emailDestinationFunctionDtos = new ArrayList<>();
-			emailDestinationFunctionDtos.add(EmailDestinationFunctionDto.builder()
-					.emailClassification(0)
-					.functionIds(new ArrayList<>())
-					.build());
-			emailDestinationFunctionDtos.add(EmailDestinationFunctionDto.builder()
-					.emailClassification(1)
-					.functionIds(new ArrayList<>())
-					.build());
-			emailDestinationFunctionDtos.add(EmailDestinationFunctionDto.builder()
-					.emailClassification(2)
-					.functionIds(new ArrayList<>())
-					.build());
-			emailDestinationFunctionDtos.add(EmailDestinationFunctionDto.builder()
-					.emailClassification(3)
-					.functionIds(new ArrayList<>())
-					.build());
 
 			List<OtherContactDto> otherContacts = new ArrayList<>();
 			otherContacts.add(OtherContactDto.builder()
@@ -126,7 +107,6 @@ public class UserInformationSettingScreenQuery {
 					.build();
 
 			userInformationUseMethodDto.setCompanyId(loginCid);
-			userInformationUseMethodDto.setEmailDestinationFunctionDtos(emailDestinationFunctionDtos);
 			userInformationUseMethodDto.setSettingContactInformationDto(settingContactInformation);
 			userInformationUseMethodDto.setUseOfLanguage(0); //#114200
 			userInformationUseMethodDto.setUseOfNotice(0); //#114200
@@ -135,21 +115,8 @@ public class UserInformationSettingScreenQuery {
 		}
 		userInformationUseMethod.ifPresent(method -> method.setMemento(userInformationUseMethodDto));
 		
-		/**
-		 * Step get(): List<メール機能>
-		 */
-		List<MailFunction> mailFunctions = this.mailFunctionRepository.findAll();
-		List<MailFunctionDto> mailFunctionDtos = mailFunctions.stream()
-				.map(m -> {
-					MailFunctionDto dto = new MailFunctionDto();
-					m.saveToMemento(dto);
-					return dto;
-				})
-				.collect(Collectors.toList());
-		
 		return UserInformationSettingDto.builder()
 				.userInformationUseMethodDto(userInformationUseMethodDto)
-				.mailFunctionDtos(mailFunctionDtos)
 				.build();
 	}
 }

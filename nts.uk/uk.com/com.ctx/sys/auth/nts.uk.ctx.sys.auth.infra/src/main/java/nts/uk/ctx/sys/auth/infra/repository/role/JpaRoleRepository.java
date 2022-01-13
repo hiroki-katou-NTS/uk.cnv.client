@@ -29,11 +29,12 @@ import nts.arc.layer.infra.data.jdbc.NtsResultSet;
 import nts.arc.layer.infra.data.jdbc.NtsStatement;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.sys.auth.dom.role.Role;
+import nts.uk.ctx.sys.auth.dom.role.RoleAtr;
+import nts.uk.ctx.sys.auth.dom.role.RoleCode;
 import nts.uk.ctx.sys.auth.dom.role.RoleRepository;
+import nts.uk.ctx.sys.auth.dom.role.RoleType;
 import nts.uk.ctx.sys.auth.infra.entity.role.SacmtRole;
 import nts.uk.ctx.sys.auth.infra.entity.role.SacmtRole_;
-
-
 /**
  * The Class JpaRoleRepository.
  */
@@ -47,6 +48,23 @@ public class JpaRoleRepository extends JpaRepository implements RoleRepository {
 	private final static String GET_BY_ROLE_TYPE_ROLE_ATR = "SELECT e FROM SacmtRole e"
 			+ " WHERE e.cid = :companyId AND e.roleType = :roleType"
 			+ " AND e.assignAtr = :roleAtr ORDER BY e.assignAtr ASC, e.code ASC ";
+
+	private final static String GET_BY_ROLE_TYPE_ROLE_ATR_ROLE_CD = "SELECT e FROM SacmtRole e"
+			+ " WHERE e.cid = :companyId"
+			+ " AND e.roleType = :roleType"
+			+ " AND e.assignAtr = :roleAtr "
+			+ " AND e.code = :roleCode ";
+
+	
+	private final static String OBTAIN_ROLE_WORK = "SELECT e FROM SacmtRole e"
+			+ " WHERE e.cid = :cid"
+			+ " AND e.roleType = :roleType";
+	
+	private final static String GET_ROLE_WORK = "SELECT e FROM SacmtRole e"
+			+ " WHERE e.cid = :cid"
+			+ " AND e.roleId = :roleId";
+	
+	
 	
 	/* (non-Javadoc)
 	 * @see nts.uk.ctx.sys.auth.dom.role.RoleRepository#findById(java.lang.String)
@@ -134,6 +152,7 @@ public class JpaRoleRepository extends JpaRepository implements RoleRepository {
 		updateEntity.setName(role.getName().toString());
 		updateEntity.contractCd = (role.getContractCode().toString());
 		updateEntity.setAssignAtr(role.getAssignAtr().value);
+		updateEntity.setApprovalAuthority(role.getApprovalAuthority().orElse(null));
 		this.commandProxy().update(updateEntity);		
 	}
 	
@@ -152,6 +171,7 @@ public class JpaRoleRepository extends JpaRepository implements RoleRepository {
 		entity.setName(role.getName().toString());
 		entity.contractCd = (role.getContractCode().toString());
 		entity.setAssignAtr(role.getAssignAtr().value);
+		entity.setApprovalAuthority(role.getApprovalAuthority().orElse(null));
 		return entity;
 	}
 
@@ -195,17 +215,6 @@ public class JpaRoleRepository extends JpaRepository implements RoleRepository {
 	}
 
 	@Override
-	public Optional<Role> findRoleByRoleCode(String companyId,String roleCode, int roleType) {
-		String query ="SELECT e FROM SacmtRole e WHERE e.code = :code AND e.roleType = :roleType "
-				+ " AND e.cid = :companyId ";
-		return this.queryProxy().query(query, SacmtRole.class)
-				.setParameter("code", roleCode)
-				.setParameter("roleType", roleType)
-				.setParameter("companyId", companyId)
-				.getList().stream().map(x ->new Role(new JpaRoleGetMemento(x))).findFirst();
-	}
-
-	@Override
 	public Optional<Role> findByContractCDRoleTypeAndCompanyID(String contractCD, int roleType, String companyID) {
 		String query = "SELECT e FROM SacmtRole e WHERE e.contractCode = :contractCode AND e.roleType = :roleType AND e.cid = :cid";
 		return this.queryProxy().query(query, SacmtRole.class)
@@ -246,6 +255,62 @@ public class JpaRoleRepository extends JpaRepository implements RoleRepository {
 				throw new RuntimeException(e);
 			}
 		});
+		return result;
+	}
+
+	@Override
+	public boolean exists(String cid, RoleType roleType, RoleAtr assignAtr, RoleCode roleCode) {
+		List<SacmtRole> entities = this.queryProxy().query(GET_BY_ROLE_TYPE_ROLE_ATR_ROLE_CD, SacmtRole.class)
+				.setParameter("companyId", cid)
+				.setParameter("roleType", roleType.value)
+				.setParameter("roleAtr", assignAtr.value)
+				.setParameter("roleCode", roleCode.v())
+				.getList();
+		return entities != null && !entities.isEmpty();
+	}
+
+	@Override
+	public List<Role> obtainRoleWorks(String cid) {
+		
+		return this.queryProxy()
+			.query(OBTAIN_ROLE_WORK, SacmtRole.class)
+			.setParameter("cid", cid)
+			.setParameter("roleType", 3) // ロール種類.就業
+			.getList()
+			.stream()
+			.map(x-> new Role(new JpaRoleGetMemento(x)))
+			.filter(x -> x.getApprovalAuthority().orElse(false))
+			.collect(Collectors.toList());		
+		
+	}
+
+	@Override
+	public Optional<Role> getRoleWorks(String cid, String eplRoleId) {
+
+		return this.queryProxy()
+				.query(GET_ROLE_WORK, SacmtRole.class)
+				.setParameter("cid", cid)
+				.setParameter("roleId", eplRoleId) // ロール種類.就業
+				.getList()
+				.stream()
+				.map(x -> new Role(new JpaRoleGetMemento(x)))
+				.filter(x -> x.getApprovalAuthority().orElse(false))
+				.findFirst();
+	}
+	/**
+	 * find by company
+	 *
+	 * @param companyId
+	 * @return Role
+	 */
+	@Override
+	public List<Role> findByCompanyId(String companyId) {
+		List<Role> result = new ArrayList<>();
+		String query ="SELECT e FROM SacmtRole e WHERE e.cid = :CID ORDER BY e.assignAtr ASC, e.code ASC ";
+		List<SacmtRole> entities = this.queryProxy().query(query, SacmtRole.class).setParameter("CID", companyId).getList();
+		if (entities != null  && !entities.isEmpty()) {
+			return entities.stream().map(x ->new Role(new JpaRoleGetMemento(x))).collect(Collectors.toList());
+		}
 		return result;
 	}
 

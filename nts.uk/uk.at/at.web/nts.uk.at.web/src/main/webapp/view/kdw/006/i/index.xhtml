@@ -1,0 +1,176 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<body>
+	<ui:composition template="../../../../master/base.xhtml">
+		<ui:define name="htmlHead">
+			<com:scriptfile set="IGNITE" />
+			<com:stylefile path="kdw006.i.main.css" />
+			<com:scriptfile path="kdw006.i.start.js" />
+			<com:scriptfile path="kdw006.i.vm.js" />
+			<com:scriptfile path="kdw006.i.service.js" />
+
+			<com:EnumScript>
+				nts.uk.ctx.at.record.dom.jobmanagement.manhourrecordreferencesetting.ReferenceRange
+				nts.uk.ctx.at.record.dom.jobmanagement.manhourrecordreferencesetting.ElapsedMonths
+			</com:EnumScript>
+
+			<com:ValidatorScript>
+				nts.uk.ctx.at.shared.dom.common.time.TotalWorkDivergenceTime
+				nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.erroralarm.ErrorAlarmMessage
+			</com:ValidatorScript>
+		</ui:define>
+		<ui:define name="content">
+			<div id="functions-area">
+				<a id="I1_1" class="goback" tabindex="1"
+					data-bind="ntsLinkButton: { action: jumpTo}">#{i18n.getText('KDW006_25')}</a>
+				<button id="I1_2" class="proceed" tabindex="2" data-bind="click: register"
+					style="margin-left: 40px;">#{i18n.getText('KDW006_26')}</button>
+			</div>
+			<div id="contents-area">
+				<div id="contents">
+					<div id="I2_1" style="margin-bottom: 15px;" class="left-content"
+						data-bind="ntsFormLabel: { required: true }">#{i18n.getText('KDW006_307')}</div>
+					<div class="right-content">
+						<div id="I4_2" class="cf" tabindex="7" data-bind="ntsSwitchButton: {
+							name: $i18n('KDW006_307'),
+							options: ko.observableArray([
+										{ code: 1, name: $i18n('KDW006_185')},
+										{ code: 0, name: $i18n('KDW006_186')}
+									]),
+							optionsValue: 'code',
+							optionsText: 'name',
+							value: useAtrTask,
+							enable: true,
+							required: false }"></div>
+					</div>
+
+					<div id="I2_1" class="left-content" data-bind="ntsFormLabel: { required: false }">
+						#{i18n.getText('KDW006_234')}</div>
+					<div class="right-content">
+						<div id="I2_2" tabindex="3" data-bind="ntsComboBox: {
+							name: $i18n('KDW006_234'),
+							options: referenceRange,
+							optionsValue: 'value',
+							value: referenceRangeValue,
+							optionsText: 'name',
+							editable: false,
+							enable: useAtrTask() == 1,
+							required: false,
+							selectFirstIfNull: true,
+							columns: [
+								{ prop: 'code', length: 4 },
+								{ prop: 'name', length: 10 },
+							]}"></div>
+						<button id="I2_3" tabindex="4" data-bind="ntsHelpButton: {
+                            textId: 'KDW006_245',
+                            textParams:[], 
+							enable: useAtrTask() == 1,
+                            position: 'right top' }">？</button>
+					</div>
+
+					<div id="I3_1" class="left-content" data-bind="ntsFormLabel: { required: false }">
+						#{i18n.getText('KDW006_235')}</div>
+					<div class="right-content">
+						<div id="I3_2" tabindex="5" data-bind="ntsComboBox: {
+                                name: $i18n('KDW006_235'),
+                                options: elapsedMonths,
+                                optionsValue: 'value',
+                                visibleItemsCount: 7,
+                                value: elapsedMonthsValue,
+                                optionsText: 'name',
+                                editable: false,
+                                enable: useAtrTask() == 1,
+                                required: false,
+                                selectFirstIfNull: true,
+                                columns: [
+                                    { prop: 'code', length: 4 },
+                                    { prop: 'name', length: 10 },
+                                ]}"></div>
+						<div style="display: inline-block; width: 105px;">
+							<span id="I3_4" class="label">#{i18n.getText('KDW006_236')}</span>
+						</div>
+						<button id="I3_5" tabindex="6" data-bind="ntsHelpButton: {
+                                textId: 'KDW006_246',
+                                textParams:[], 
+								enable: useAtrTask() == 1,
+                                position: 'right top' }">？</button>
+					</div>
+
+					<div>
+						<div id="I4_1" class="left-content" style="float: left;"
+							data-bind="ntsFormLabel: { required: false }">#{i18n.getText('KDW006_237')}</div>
+						<div class="right-content" style="margin-left: 5px;">
+							<div class="I4-spacing">
+								<div id="I4_2" class="cf" tabindex="7" data-bind="ntsSwitchButton: {
+									name: $i18n('KDW006_242'),
+									options: ko.observableArray([
+												{ code: 0, name: $i18n('KDW006_186')},
+												{ code: 1, name: $i18n('KDW006_185')}
+											]),
+									optionsValue: 'code',
+									optionsText: 'name',
+									value: useAtr,
+									enable: enableSwich,
+									required: false }"></div>
+								<button id="I4_5" tabindex="8" data-bind="ntsHelpButton: {
+									textId: 'KDW006_238',
+									textParams:[], 
+									enable: useAtrTask() == 1,
+									position: 'right top' }">？</button>
+							</div>
+							<div class="I4-spacing">
+								<div class="d-flex">
+									<span id="I4_6" class="label">#{i18n.getText('KDW006_239')}</span>
+								</div>
+								<div class="d-flex mid-line-spacing">
+									<input id="I4_7" tabindex="9" data-bind="ntsTimeEditor: {
+										name: $i18n('KDW006_248'),
+										value: time,
+										constraint: 'TotalWorkDivergenceTime',
+										inputFormat: 'time',
+										mode: 'time',
+										option: {width: '50'},
+										enable: useAtr() == 1 &amp;&amp; useAtrTask() == 1}" />
+								</div>
+								<div class="d-flex">
+									<span id="I4_8" class="label">#{i18n.getText('KDW006_247')}</span>
+								</div>
+							</div>
+							<div class="I4-spacing">
+								<div class="d-flex">
+									<span id="I4_9" class="label">#{i18n.getText('KDW006_240')}</span>
+								</div>
+								<div class="d-flex mid-line-spacing">
+									<input id="I4_10" tabindex="10" data-bind="ntsTextEditor: {
+										name: $i18n('KDW006_244'),
+										value: displayMessage,
+										constraint: 'ErrorAlarmMessage',
+										option: ko.mapping.fromJS(new nts.uk.ui.option.TextEditorOption({
+											textmode: 'text',
+											width: '500px'
+										})),
+										required: false,
+										enable: useAtr() == 1 &amp;&amp; useAtrTask() == 1,
+										readonly: false
+									}" />
+								</div>
+								<div id="I4_11" tabindex="11" class="d-flex mid-line-spacing" data-bind="ntsColorPicker: {
+									name: $i18n('KDW006_243'),
+									value: messageColor,
+									enable: useAtr() == 1 &amp;&amp; useAtrTask() == 1, 
+									width: 50}"></div>
+								<div id="I4_12" tabindex="12" class="d-flex" data-bind="ntsCheckBox: { 
+									checked: boldAtr, enable: useAtr() == 1 &amp;&amp; useAtrTask() == 1 }">#{i18n.getText('KDW006_241')}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+
+</html>

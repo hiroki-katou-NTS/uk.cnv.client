@@ -7,6 +7,9 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+
+import org.apache.commons.lang3.BooleanUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import nts.uk.ctx.at.schedule.dom.workschedule.displaysetting.DisplayControlPersonalCondition;
@@ -30,7 +33,7 @@ public class KscmtSyacndDispCtl extends ContractUkJpaEntity implements Serializa
 
 	/** 表示区分 **/
 	@Column(name = "DISP_ATR")
-	public int dispAtr;
+	public boolean dispAtr;
 
 	/** 表示記号 **/
 	@Column(name = "SYNAME")
@@ -52,7 +55,7 @@ public class KscmtSyacndDispCtl extends ContractUkJpaEntity implements Serializa
 				? dom.getOtpWorkscheQualifi().get().getQualificationMark().v() : null;
 		return dom.getListConditionDisplayControl().stream().map(i -> {
 			KscmtSyacndDispCtlPK dispCtlPK = new KscmtSyacndDispCtlPK(dom.getCompanyID(), i.getConditionATR().value);
-			return new KscmtSyacndDispCtl(dispCtlPK, i.getDisplayCategory().value, qualificationMark);
+			return new KscmtSyacndDispCtl(dispCtlPK, BooleanUtils.toBoolean(i.getDisplayCategory().value), qualificationMark);
 
 		}).collect(Collectors.toList());
 	}

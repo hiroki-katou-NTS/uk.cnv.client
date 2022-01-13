@@ -3,6 +3,7 @@ package nts.uk.ctx.at.function.infra.entity.alarm.mailsettings;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,6 +14,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.NoArgsConstructor;
+import lombok.val;
+import nts.arc.primitive.PrimitiveValueBase;
+import nts.uk.ctx.at.function.dom.alarm.mailsettings.MailAddress;
 import nts.uk.ctx.at.function.dom.alarm.mailsettings.MailSettingAutomatic;
 import nts.uk.ctx.at.function.dom.alarm.mailsettings.MailSettings;
 import nts.uk.shr.infra.data.entity.ContractUkJpaEntity;
@@ -83,34 +87,37 @@ public class KfnmtMailSettingAutomatic extends ContractUkJpaEntity implements Se
 	public String adminMailRely;
 
 	public MailSettingAutomatic toDomain(List<String> mailSettingListCC, List<String> mailSettingListBCC, List<String> mailSettingListAdminCC, List<String> mailSettingListAdminBCC){
-		
-		MailSettings mailSet = new MailSettings(this.subject, this.text, mailSettingListCC, mailSettingListBCC, this.mailRely);
-		MailSettings adminMailSet = new MailSettings(this.adminSubject, this.adminText, mailSettingListAdminCC, mailSettingListAdminBCC, this.adminMailRely);
+		val mailSettingCC = mailSettingListCC.stream().map(MailAddress::new).collect(Collectors.toList());
+		val mailSettingBCC = mailSettingListBCC.stream().map(MailAddress::new).collect(Collectors.toList());
+		val mailSettingAdminCC = mailSettingListAdminCC.stream().map(MailAddress::new).collect(Collectors.toList());
+		val mailSettingAdminBCC = mailSettingListAdminBCC.stream().map(MailAddress::new).collect(Collectors.toList());
+		MailSettings mailSet = new MailSettings(this.subject, this.text, mailSettingCC, mailSettingBCC, this.mailRely);
+		MailSettings adminMailSet = new MailSettings(this.adminSubject, this.adminText, mailSettingAdminCC, mailSettingAdminBCC, this.adminMailRely);
 		 
 		return new MailSettingAutomatic(this.companyID, mailSet, this.senderAddress, adminMailSet);
 	}
 	
 	public static KfnmtMailSettingAutomatic toEntity(String IdCC, String IdBCC , String IdAdCC, String IdAdBCC, MailSettingAutomatic domain) {
 		
-		List<String> CC = domain.getMailSettings().get().getMailAddressCC();
+		List<String> CC = domain.getMailSettings().get().getMailAddressCC().stream().map(PrimitiveValueBase::v).collect(Collectors.toList());
 		List<KfnmtMailSettingList> mailSettingListCC = new ArrayList<>();
 		for (String c : CC) {
 			mailSettingListCC.add(new KfnmtMailSettingList(IdCC, c));
 		}
 		
-		List<String> BCC = domain.getMailSettings().get().getMailAddressBCC();
+		List<String> BCC = domain.getMailSettings().get().getMailAddressBCC().stream().map(PrimitiveValueBase::v).collect(Collectors.toList());
 		List<KfnmtMailSettingList> mailSettingListBCC = new ArrayList<>();
 		for (String c : BCC) {
 			mailSettingListBCC.add(new KfnmtMailSettingList(IdBCC, c));
 		}
 		
-		List<String> AdCC = domain.getMailSettingAdmins().get().getMailAddressCC();
+		List<String> AdCC = domain.getMailSettingAdmins().get().getMailAddressCC().stream().map(PrimitiveValueBase::v).collect(Collectors.toList());
 		List<KfnmtMailSettingList> mailSettingListAdCC = new ArrayList<>();
 		for (String c : AdCC) {
 			mailSettingListAdCC.add(new KfnmtMailSettingList(IdAdCC, c));
 		}
 		
-		List<String> AdBCC = domain.getMailSettingAdmins().get().getMailAddressBCC();
+		List<String> AdBCC = domain.getMailSettingAdmins().get().getMailAddressBCC().stream().map(PrimitiveValueBase::v).collect(Collectors.toList());
 		List<KfnmtMailSettingList> mailSettingListAdBCC = new ArrayList<>();
 		for (String c : AdBCC) {
 			mailSettingListAdBCC.add(new KfnmtMailSettingList(IdAdBCC, c));

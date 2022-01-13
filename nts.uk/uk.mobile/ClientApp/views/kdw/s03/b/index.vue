@@ -66,10 +66,19 @@
             </template>  
           </div>
           <!-- InputNumber -->
-          <div class="col-9 pl-0 pr-0" v-if="getItemType(key)==itemType.InputNumber">
+          <div class="col-9 pl-0 pr-0" v-if="getItemType(key)==itemType.InputNumericValue" >
             <nts-number-editor class="mb-3" v-model="screenData[0][key]" v-bind:record-name="key" v-bind:key="key" 
               :class-input="`${ getBackGroundColor(key) }`" v-bind:disabled="getItemLock(key)"/>
           </div>
+          <div class="col-9 pl-0 pr-0" v-if="getItemType(key)==itemType.InputNumber && getCheckboxType(key) != 'Checkbox'">
+            <nts-number-editor class="mb-3" v-model="screenData[0][key]" v-bind:record-name="key" v-bind:key="key" 
+              :class-input="`${ getBackGroundColor(key) }`" v-bind:disabled="getItemLock(key)"/>
+          </div>
+
+          <div class="col-9 pl-0 pr-0" v-if="getItemType(key)==itemType.InputNumber && getCheckboxType(key) == 'Checkbox'">
+            <nts-checkbox class="mb-3" v-model="screenData[0][key]" v-bind:value="1" v-bind:disabled="getItemLock(key)"/>
+          </div>
+
           <!-- InputMoney -->
           <div class="col-9 pl-0 pr-0" v-if="getItemType(key)==itemType.InputMoney">  
             <nts-number-editor class="mb-3" v-model="screenData[0][key]" v-bind:record-name="key" v-bind:key="key" 

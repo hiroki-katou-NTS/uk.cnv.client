@@ -17,14 +17,21 @@
 
 		<ui:define name="content">
 			<div id="functions-area">
+				<!--A1_4-->
 				<a id="button1" class="goback"
-					data-bind="ntsLinkButton: { action: jumpToHome.bind($data, sideBar)}">#{i18n.getText('KDW002_8')}</a>
-				<button tabindex="2" id="submitDataId" class="proceed" data-bind="click: submitData">#{i18n.getText('KDW002_2')}</button>
-				<!--  <button tabindex="3" class="copy"  data-bind="click: copy">#{i18n.getText('KDW002_14')}</button>  -->
+						data-bind="ntsLinkButton: { action: jumpToHome}">#{i18n.getText('KDW002_8')}</a>
+				<!--A1_1-->
+				<button tabindex="2" id="submitDataId" class="proceed" style="margin-left: 50px;"
+						data-bind="click: submitData">#{i18n.getText('KDW002_2')}</button>
+				<!--A1_5--> 
+				<button tabindex="3" class="copy" style=""
+				  		data-bind="click: copy, enable: !isNewMode()">#{i18n.getText('KDW002_14')}</button> 
+				<!--A1_2-->
 				<!--  <label class="mylabel">#{i18n.getText('KDW002_1')}</label> -->
 			</div>
 			<div id="contents-area" class="fixed-flex-layout">
 				<!-- <div class="container"> -->
+					<!--A2_1-->
 					<div class="fixed-flex-layout-left"
 						data-bind="ntsPanel:{ direction: 'right', visible: true}">
 						<label class="leftLabel">権限</label>
@@ -41,9 +48,11 @@
 							}"></table>
 					</div>
 					<div class="fixed-flex-layout-right">
+						<!--A3_1-->
 						<div style="width: 300px" tabindex="4" data-bind="ntsSearchBox: { targetKey: 'itemDailyID', mode: 'igGrid', comId: 'grid', 
 							items: datasources, selectedKey: 'itemDailyID', fields: ['displayNumber','itemDailyName']}" />
 					<!-- <button class="searchButton" data-bind="click: searchData">検索</button> -->
+					<!--A4_1-->
 					<table tabindex="5"  id="grid"></table>
 					</div>
 				</div>

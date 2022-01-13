@@ -5,10 +5,10 @@ import java.util.List;
 
 import nts.arc.time.GeneralDate;
 import nts.arc.time.YearMonth;
-import nts.uk.shr.com.security.audittrail.correction.content.DataCorrectionLog;
-import nts.uk.shr.com.security.audittrail.correction.content.TargetDataType;
 import nts.arc.time.calendar.period.DatePeriod;
 import nts.arc.time.calendar.period.YearMonthPeriod;
+import nts.uk.shr.com.security.audittrail.correction.content.DataCorrectionLog;
+import nts.uk.shr.com.security.audittrail.correction.content.TargetDataType;
 
 /**
  * 
@@ -19,6 +19,7 @@ import nts.arc.time.calendar.period.YearMonthPeriod;
 public interface DataCorrectionLogRepository {
 
 	List<DataCorrectionLog> getAllLogData(TargetDataType targetDataType, List<String> listEmployeeId, YearMonth ym, GeneralDate ymd);
+	List<DataCorrectionLog> getAllLogDataByYM(TargetDataType targetDataType, List<String> listEmployeeId, YearMonth ym, GeneralDate ymd);
 	
 	List<DataCorrectionLog> getAllLogData(TargetDataType targetDataType, List<String> listEmployeeId, DatePeriod datePeriod);
 
@@ -59,4 +60,6 @@ public interface DataCorrectionLogRepository {
 			DatePeriod period, TargetDataType targetDataType,
 			int offset, int limit);
 	
+	//取得する
+	List<DataCorrectionLog> getInfoLog(String sid, GeneralDate targetDate, Integer itemId, TargetDataType type);
 }

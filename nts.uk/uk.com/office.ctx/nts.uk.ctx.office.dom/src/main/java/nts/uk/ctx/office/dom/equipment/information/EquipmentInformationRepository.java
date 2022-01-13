@@ -30,4 +30,7 @@ public interface EquipmentInformationRepository {
 	
 	//[8] 分類コードの有効の設備情報を取得する
 	List<EquipmentInformation> findByClsCodeAndDate(String cid, String equipmentClsCode, GeneralDate date);
+	
+	//[9] Get
+	List<EquipmentInformation> findByCode(String equipmentClsCode);
 }

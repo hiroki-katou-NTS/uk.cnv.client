@@ -17,6 +17,7 @@ import nts.arc.time.GeneralDateTime;
 import nts.uk.ctx.at.request.dom.application.Application;
 import nts.uk.ctx.at.request.dom.application.ApplicationType;
 import nts.uk.ctx.at.request.dom.application.PrePostAtr;
+import nts.uk.ctx.at.request.dom.application.ReflectedState;
 import nts.uk.ctx.at.request.dom.application.overtime.AppOverTime;
 import nts.uk.ctx.at.request.dom.application.overtime.OvertimeAppAtr;
 import nts.uk.ctx.at.request.dom.reasonappdaily.ApplicationReasonInfo;
@@ -50,7 +51,8 @@ public class ReflectApplicationReason {
 		ITEMCONTENT.addAll(ItemContent.create(881, 15, null));
 	}
 
-	public static Optional<AtomTask> reflectReason(Require require, Application application, GeneralDate dateRefer, GeneralDateTime reflectTime) {
+	public static Optional<AtomTask> reflectReason(Require require, Application application, GeneralDate dateRefer,
+			GeneralDateTime reflectTime, String execId, ReflectedState reflectStatus) {
 
 		// 申請があるかのチェック
 		if (!application.getOpAppReason().isPresent() && !application.getOpAppStandardReasonCD().isPresent()) {
@@ -84,7 +86,7 @@ public class ReflectApplicationReason {
 			Map<Integer, String> mapItemDomain = createMap(lstReasonDai, application);
 			// 申請理由の編集状態と履歴を作成する
 			require.processCreateHist(application.getEmployeeID(), dateRefer, application.getAppID(),
-					ScheduleRecordClassifi.RECORD, mapItemDomain, reflectTime);
+					ScheduleRecordClassifi.RECORD, mapItemDomain, reflectTime, execId, reflectStatus);
 		});
 
 		return Optional.of(task);
@@ -164,6 +166,6 @@ public class ReflectApplicationReason {
 
 		// CreateEditStatusHistAppReasonAdapter.process
 		public void processCreateHist(String employeeId, GeneralDate date, String appId,
-				ScheduleRecordClassifi classification, Map<Integer, String> mapValue, GeneralDateTime reflectTime);
+				ScheduleRecordClassifi classification, Map<Integer, String> mapValue, GeneralDateTime reflectTime, String execId, ReflectedState reflectStatus);
 	}
 }

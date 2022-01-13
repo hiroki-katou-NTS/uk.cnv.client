@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:com="http://xmlns.jcp.org/jsf/component"
+>
+<body>
+<ui:composition template="../../../../master/dialog.xhtml">
+    <ui:define name="htmlHead">
+        <script>
+            var dialogSize = {
+                width: 1600,
+                height: 600
+            };
+        </script>
+        <com:stylefile path="kha003.c.style.css"/>
+        <com:scriptfile path="kha003.c.vm.js"/>
+        <com:scriptfile set="IGNITE"/>
+    </ui:define>
+    <ui:define name="content">
+        <div id="contents-area" style="display: none" data-bind="visible: true">
+            <!-- C1_1 -->
+            <span class="label"
+                  style="font-size: 16px;    font-weight: bold;margin-left: 40px">#{i18n.getText('KHA003_60')}</span>
+            <div class="table" style="margin-top: 8px;padding: 10px">
+                <div class="cell valign-top" data-bind="if:vm.c21isVisible()" >
+                    <!-- C2_1 -->
+                    <span class="label"
+                          style="font-size: 16px;    font-weight: bold;" data-bind="text:c21Text"></span>
+                    <!-- C2_2 -->
+                    <div style="width: 300px" data-bind="ntsSearchBox: {searchMode: 'filter',targetKey: 'code', comId: 'multi-list-c2_4',
+	                items: c24Items, selected: c24CurrentCodeList, selectedKey: 'code', fields: ['name', 'code'], mode: 'igGrid'}"/>
+                    <!-- C2_3 -->
+                    <a id="C2_3">
+                        <table tabindex="1" id="multi-list-c2_4" data-bind="ntsGridList: {
+                         rows: 12,
+                            options: c24Items,
+                            optionsValue: 'code',
+                            columns: columns,
+                            multiple: true,
+                            value: c24CurrentCodeList
+	                        }">
+                        </table>
+                    </a>
+                </div>
+                <div class="cell valign-top" data-bind="if:vm.c31isVisible()" >
+                    <!-- C3_1 -->
+                    <span class="label"
+                          style="font-size: 16px;    font-weight: bold;" data-bind="text:c31Text"></span>
+                    <!-- C3_2 -->
+                    <div style="width: 300px" data-bind="ntsSearchBox: {searchMode: 'filter',targetKey: 'code', comId: 'multi-list-c3_4',
+	                items: c34Items, selected: c34CurrentCodeList, selectedKey: 'code', fields: ['name', 'code'], mode: 'igGrid'}"/>
+                    <!-- C3_4 -->
+                    <table tabindex="2" id="multi-list-c3_4" data-bind="ntsGridList: {
+                       rows: 12,
+                            options: c34Items,
+                            optionsValue: 'code',
+                            columns: columns,
+                            multiple: true,
+                            value: c34CurrentCodeList
+	                        }">
+                    </table>
+                </div>
+                <div class="cell valign-top" data-bind="if:vm.c41isVisible()">
+                    <!-- C4_1 -->
+                    <span class="label"
+                          style="font-size: 16px;    font-weight: bold;" data-bind="text:c41Text"></span>
+                    <!-- C4_2 -->
+                    <div style="width: 300px" data-bind="ntsSearchBox: {searchMode: 'filter',targetKey: 'code', comId: 'multi-list-c4_4',
+	                items: c44Items, selected: c44CurrentCodeList, selectedKey: 'code', fields: ['name', 'code'], mode: 'igGrid'}"/>
+                    <!-- C4_4 -->
+                    <table tabindex="3" id="multi-list-c4_4" data-bind="ntsGridList: {
+                       rows: 12,
+                            options: c44Items,
+                            optionsValue: 'code',
+                            columns: columns,
+                            multiple: true,
+                            value: c44CurrentCodeList,
+	                        }">
+                    </table>
+                </div>
+                <div class="cell valign-top" data-bind="if:vm.c51isVisible()">
+                    <!-- C5_1 -->
+                    <span class="label"
+                          style="font-size: 16px;    font-weight: bold;" data-bind="text:c51Text"></span>
+                    <!-- C5_2 -->
+                    <div style="width: 300px" data-bind="ntsSearchBox: {searchMode: 'filter',targetKey: 'code', comId: 'multi-list-c5_4',
+	                items: c54Items, selected: c54CurrentCodeList, selectedKey: 'code', fields: ['name', 'code'], mode: 'igGrid'}"/>
+                    <!-- C5_4 -->
+                    <table tabindex="4" id="multi-list-c5_4" data-bind="ntsGridList: {
+                       rows: 12,
+                            options: c54Items,
+                            optionsValue: 'code',
+                            columns: columns,
+                            multiple: true,
+                            value: c54CurrentCodeList
+	                        }">
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="functions-area-bottom">
+            <!-- C6_1 -->
+            <button id="btn-f-close" tabindex="5" class="large proceed"
+                    data-bind="click:decide">#{i18n.getText('KHA003_64')}</button>
+            <!-- C6_2 -->
+            <button id="btn-f-stop" tabindex="6" class="large"
+                    data-bind="click:cancel">#{i18n.getText('KHA003_65')}</button>
+        </div>
+    </ui:define>
+</ui:composition>
+</body>
+</html>

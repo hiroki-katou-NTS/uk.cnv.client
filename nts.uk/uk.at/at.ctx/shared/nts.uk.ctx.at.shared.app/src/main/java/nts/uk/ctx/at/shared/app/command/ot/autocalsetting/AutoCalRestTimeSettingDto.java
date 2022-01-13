@@ -4,7 +4,9 @@
  *****************************************************************/
 package nts.uk.ctx.at.shared.app.command.ot.autocalsetting;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalAtrOvertime;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.AutoCalRestTimeSetting;
@@ -17,6 +19,8 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.autocalsetting.TimeLimitUpp
  */
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class AutoCalRestTimeSettingDto {
 
 	/** The rest time. */
@@ -80,6 +84,11 @@ public class AutoCalRestTimeSettingDto {
 			return new AutoCalSetting(TimeLimitUpperLimitSetting.valueOf(command.getLateNightTime().getUpLimitOtSet()),
 					AutoCalAtrOvertime.valueOf(command.getLateNightTime().getCalAtr()));
 		}
+	}
+
+	public static AutoCalRestTimeSettingDto fromDomain(AutoCalRestTimeSetting domain) {
+		return new AutoCalRestTimeSettingDto(AutoCalSettingDto.fromDomain(domain.getRestTime()),
+				AutoCalSettingDto.fromDomain(domain.getLateNightTime()));
 	}
 
 }

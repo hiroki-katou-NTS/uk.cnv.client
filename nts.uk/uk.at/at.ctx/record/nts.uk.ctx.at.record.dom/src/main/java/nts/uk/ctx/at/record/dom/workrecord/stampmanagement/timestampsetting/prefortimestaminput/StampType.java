@@ -39,7 +39,7 @@ public class StampType implements DomainValue, Cloneable{
 	/** 時刻変更区分 */
 	//打刻区分 old
 	@Getter
-	private final ChangeClockArt changeClockArt;
+	private final ChangeClockAtr changeClockArt;
 	
 	/** 計算区分変更対象 */
 	//勤務種類を半休に変更する 3 old
@@ -55,7 +55,7 @@ public class StampType implements DomainValue, Cloneable{
 	 * @param changeCalArt
 	 */
 	public StampType(boolean changeHalfDay, GoingOutReason goOutArt, SetPreClockArt setPreClockArt,
-			ChangeClockArt changeClockArt, ChangeCalArt changeCalArt) {
+			ChangeClockAtr changeClockArt, ChangeCalArt changeCalArt) {
 		super();
 		this.changeHalfDay = changeHalfDay;
 		this.goOutArt = Optional.ofNullable(goOutArt);
@@ -73,13 +73,13 @@ public class StampType implements DomainValue, Cloneable{
 	 * @param changeCalArt
 	 */
 	public static StampType getStampType(boolean changeHalfDay, GoingOutReason goOutArt, SetPreClockArt setPreClockArt,
-			ChangeClockArt changeClockArt, ChangeCalArt changeCalArt) {
-		if(changeClockArt != null && changeClockArt.value == ChangeClockArt.GO_OUT.value && goOutArt == null) {
+			ChangeClockAtr changeClockArt, ChangeCalArt changeCalArt) {
+		if(changeClockArt != null && changeClockArt.value == ChangeClockAtr.GO_OUT.value && goOutArt == null) {
 			throw new BusinessException("Msg_1704"); 
 		}
 		return new StampType(
 				changeHalfDay, 
-				changeClockArt != null ? changeClockArt.value == ChangeClockArt.GOING_TO_WORK.value ? null : goOutArt : null, 
+				changeClockArt != null ? changeClockArt.value == ChangeClockAtr.GOING_TO_WORK.value ? null : goOutArt : null, 
 				setPreClockArt, 
 				changeClockArt, 
 				changeCalArt);
@@ -98,19 +98,19 @@ public class StampType implements DomainValue, Cloneable{
 			return TextResource.localize("KDP011_36");
 		}
 		
-		if (this.changeCalArt == ChangeCalArt.EARLY_APPEARANCE && this.changeClockArt.equals(ChangeClockArt.GOING_TO_WORK)) {
+		if (this.changeCalArt == ChangeCalArt.EARLY_APPEARANCE && this.changeClockArt.equals(ChangeClockAtr.GOING_TO_WORK)) {
 			return TextResource.localize("KDP011_37");
 		}
 		
-		if (this.changeCalArt == ChangeCalArt.EARLY_APPEARANCE && this.changeClockArt.equals(ChangeClockArt.START_OF_SUPPORT)) {
+		if (this.changeCalArt == ChangeCalArt.EARLY_APPEARANCE && this.changeClockArt.equals(ChangeClockAtr.START_OF_SUPPORT)) {
 			return TextResource.localize("KDP011_40");
 		}
 		
-		if (this.changeCalArt == ChangeCalArt.BRARK && this.changeClockArt.equals(ChangeClockArt.GOING_TO_WORK)) {
+		if (this.changeCalArt == ChangeCalArt.BRARK && this.changeClockArt.equals(ChangeClockAtr.GOING_TO_WORK)) {
 			return TextResource.localize("KDP011_38");
 		}
 		
-		if (this.changeCalArt == ChangeCalArt.BRARK && this.changeClockArt.equals(ChangeClockArt.START_OF_SUPPORT)) {
+		if (this.changeCalArt == ChangeCalArt.BRARK && this.changeClockArt.equals(ChangeClockAtr.START_OF_SUPPORT)) {
 			return TextResource.localize("KDP011_41");
 		}
 		
@@ -143,11 +143,11 @@ public class StampType implements DomainValue, Cloneable{
 			return false;
 		}
 		
-		if(this.changeClockArt == ChangeClockArt.GOING_TO_WORK ) {
+		if(this.changeClockArt == ChangeClockAtr.GOING_TO_WORK ) {
 			if(this.changeCalArt == ChangeCalArt.NONE || this.changeCalArt == ChangeCalArt.EARLY_APPEARANCE ) {
 				return true;
 			}
-		}else if(this.changeClockArt == ChangeClockArt.START_OF_SUPPORT ) {
+		}else if(this.changeClockArt == ChangeClockAtr.START_OF_SUPPORT ) {
 			if(this.changeCalArt == ChangeCalArt.EARLY_APPEARANCE ) {
 				return true;
 			}
@@ -192,7 +192,7 @@ public class StampType implements DomainValue, Cloneable{
 	@Override
 	public StampType clone() {
 		return new StampType(changeHalfDay, goOutArt.map(x -> GoingOutReason.valueOf(x.value)),
-				SetPreClockArt.valueOf(setPreClockArt.value), ChangeClockArt.valueOf(changeClockArt.value),
+				SetPreClockArt.valueOf(setPreClockArt.value), ChangeClockAtr.valueOf(changeClockArt.value),
 				ChangeCalArt.valueOf(changeCalArt.value));
 	}
 }

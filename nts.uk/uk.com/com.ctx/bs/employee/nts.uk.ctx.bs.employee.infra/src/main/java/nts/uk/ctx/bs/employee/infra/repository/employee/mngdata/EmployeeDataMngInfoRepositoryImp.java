@@ -151,36 +151,36 @@ public class EmployeeDataMngInfoRepositoryImp extends JpaRepository implements E
 			"ji.JOB_CD, ji.JOB_NAME,",
 			"epl.CODE, epl.NAME,",
 			"cla.CLSCD, cla.CLSNAME",
-			"FROM [dbo].[BSYMT_SYAIN] mng",
-			"LEFT JOIN [dbo].[BSYMT_AFF_EMP_HIST] emh",
+			"FROM BSYMT_SYAIN mng",
+			"LEFT JOIN BSYMT_AFF_EMP_HIST emh",
 			"ON mng.SID = emh.SID AND mng.CID = emh.CID AND emh.START_DATE <= '{basedate} 23:59:59' AND emh.END_DATE >= '{basedate} 00:00:00'",
-			"LEFT JOIN [dbo].[BSYMT_AFF_EMP_HIST_ITEM] emhi",
+			"LEFT JOIN BSYMT_AFF_EMP_HIST_ITEM emhi",
 			"ON emh.HIST_ID = emhi.HIST_ID AND emhi.SID = mng.SID",
-			"LEFT JOIN [dbo].[BSYMT_EMPLOYMENT] epl", "ON emhi.EMP_CD = epl.CODE AND epl.CID = '{comid}'",
-			"LEFT JOIN [dbo].[BPSMT_PERSON] per", "ON mng.PID = per.PID",
-			"LEFT JOIN [dbo].[BSYMT_AFF_DEP_HIST] adh",
+			"LEFT JOIN BSYMT_EMPLOYMENT epl", "ON emhi.EMP_CD = epl.CODE AND epl.CID = '{comid}'",
+			"LEFT JOIN BPSMT_PERSON per", "ON mng.PID = per.PID",
+			"LEFT JOIN BSYMT_AFF_DEP_HIST adh",
 			"ON mng.SID = adh.SID AND adh.START_DATE <= '{basedate} 23:59:59' AND adh.END_DATE >= '{basedate} 00:00:00'",
-			"LEFT JOIN [dbo].[BSYMT_AFF_DEP_HIST_ITEM] adi",
+			"LEFT JOIN BSYMT_AFF_DEP_HIST_ITEM adi",
 			"ON adh.HIST_ID = adi.HIST_ID AND adh.CID = '{comid}' ",
-			"LEFT JOIN [dbo].[BSYMT_DEP_INFO] dpi",
+			"LEFT JOIN BSYMT_DEP_INFO dpi",
 			"ON adi.DEP_ID = dpi.DEP_ID AND dpi.CID = '{comid}'",
-			"LEFT JOIN [dbo].[BSYMT_AFF_WKP_HIST] awh",
+			"LEFT JOIN BSYMT_AFF_WKP_HIST awh",
 			"ON mng.SID = awh.SID AND mng.CID = awh.CID AND awh.CID = '{comid}' AND awh.START_DATE <= '{basedate} 23:59:59' AND awh.END_DATE >= '{basedate} 00:00:00'",
-			"LEFT JOIN [dbo].[BSYMT_AFF_WKP_HIST_ITEM] whi", "ON awh.HIST_ID = whi.HIST_ID ",
-			"LEFT JOIN [dbo].[BSYMT_WKP_INFO] wif",
+			"LEFT JOIN BSYMT_AFF_WKP_HIST_ITEM whi", "ON awh.HIST_ID = whi.HIST_ID ",
+			"LEFT JOIN BSYMT_WKP_INFO wif",
 			"ON wif.CID = '{comid}' AND wif.WKP_ID = whi.WORKPLACE_ID",
-			"LEFT JOIN [dbo].[BSYMT_AFF_JOB_HIST] ajh",
+			"LEFT JOIN BSYMT_AFF_JOB_HIST ajh",
 			"ON mng.SID = ajh.SID AND mng.CID = ajh.CID AND ajh.CID = '{comid}'  AND ajh.START_DATE <= '{basedate} 23:59:59' AND ajh.END_DATE >= '{basedate} 00:00:00'",
-			"LEFT JOIN [dbo].[BSYMT_AFF_JOB_HIST_ITEM] aji",
-			"ON ajh.HIST_ID = aji.HIST_ID AND ajh.SID = aji.SID", "LEFT JOIN [dbo].[BSYMT_JOB_HIST] jh",
+			"LEFT JOIN BSYMT_AFF_JOB_HIST_ITEM aji",
+			"ON ajh.HIST_ID = aji.HIST_ID AND ajh.SID = aji.SID", "LEFT JOIN BSYMT_JOB_HIST jh",
 			"ON aji.JOB_TITLE_ID = jh.JOB_ID AND jh.CID = '{comid}' AND jh.START_DATE <= '{basedate} 23:59:59' AND jh.END_DATE >= '{basedate} 00:00:00'",
-			"LEFT JOIN [dbo].[BSYMT_JOB_INFO] ji",
+			"LEFT JOIN BSYMT_JOB_INFO ji",
 			"ON jh.JOB_ID = ji.JOB_ID AND jh.HIST_ID = ji.HIST_ID AND jh.CID = ji.CID AND ji.CID = '{comid}'",
-			"LEFT JOIN [dbo].[BSYMT_AFF_CLASS_HIST] ach",
+			"LEFT JOIN BSYMT_AFF_CLASS_HIST ach",
 			"ON mng.SID = ach.SID AND mng.CID = ach.CID AND ach.CID = '{comid}' AND ach.START_DATE <= '{basedate} 23:59:59' AND ach.END_DATE >= '{basedate} 00:00:00'",
-			"LEFT JOIN [dbo].[BSYMT_AFF_CLASS_HIST_ITEM] ahi",
+			"LEFT JOIN BSYMT_AFF_CLASS_HIST_ITEM ahi",
 			"ON mng.SID = ahi.SID AND ach.HIST_ID = ahi.HIST_ID AND mng.CID = ach.CID AND ach.CID = '{comid}'",
-			"LEFT JOIN [dbo].[BSYMT_CLASSIFICATION] cla",
+			"LEFT JOIN BSYMT_CLASSIFICATION cla",
 			"ON ahi.CLASSIFICATION_CODE = cla.CLSCD AND cla.CID = ach.CID AND cla.CID = '{comid}'",
 			"WHERE mng.CID = '{comid}' AND mng.DEL_STATUS_ATR = 0 AND mng.SID IN ('{sids}')");
 	
@@ -916,5 +916,27 @@ public class EmployeeDataMngInfoRepositoryImp extends JpaRepository implements E
 				.setParameter("companyId", companyId)
 				.setParameter("employeeCode", employeeCd)
 				.getSingle(m -> toDomain(m));
+	}
+	private static final String FIND_EMPLOYEES_PIDS = "SELECT e FROM BsymtEmployeeDataMngInfo e "
+			+ "WHERE e.bsymtEmployeeDataMngInfoPk.pId IN :pId ";
+
+	@Override
+	public List<EmployeeDataMngInfo> getByPersonIdList(List<String> personIdList) {
+		List<EmployeeDataMngInfo> rs = new ArrayList<>();
+		CollectionUtil.split(personIdList, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, ids -> {
+			List<EmployeeDataMngInfo> _emps = queryProxy().query(FIND_EMPLOYEES_PIDS, BsymtEmployeeDataMngInfo.class)
+					.setParameter("pId", ids)
+					.getList(this::toDomain);
+			rs.addAll(_emps);
+		});
+		return rs;
+	}
+	// Pub get all Sid
+	@Override
+	public List<String> getAllSidByCid(String cid) {
+		List<String> listEntity = this.queryProxy().query(GET_ALL, BsymtEmployeeDataMngInfo.class)
+				.setParameter("cid", cid).getList().stream().map(x -> x.bsymtEmployeeDataMngInfoPk.sId).collect(Collectors.toList());
+
+		return listEntity;
 	}
 }

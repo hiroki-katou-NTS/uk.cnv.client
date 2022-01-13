@@ -19,9 +19,6 @@ public class TopPagePersonSettingDto {
 	/** The employee id. */
 	private String employeeId;
 	
-	/** The switch date. */
-	private Integer switchingDate;
-	
 	/** The login menu code. */
 	private String loginMenuCode;
 	
@@ -40,7 +37,6 @@ public class TopPagePersonSettingDto {
 				.loginMenuCode(domain.getMenuLogin().getLoginMenuCode().v())
 				.menuClassification(domain.getMenuLogin().getMenuClassification().value)
 				.system(domain.getMenuLogin().getSystem().value)
-				.switchingDate(domain.getSwitchingDate().v())
 				.topMenuCode(domain.getTopMenuCode().v())
 				.build();
 	}

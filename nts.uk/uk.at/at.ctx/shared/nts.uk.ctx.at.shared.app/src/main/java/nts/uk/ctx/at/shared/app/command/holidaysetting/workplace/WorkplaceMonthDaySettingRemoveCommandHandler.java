@@ -32,7 +32,8 @@ public class WorkplaceMonthDaySettingRemoveCommandHandler extends CommandHandler
 		WorkplaceMonthDaySettingRemoveCommand command = context.getCommand();
 		
 		// Remove
-		this.repository.remove(new CompanyId(companyId), command.getWorkplaceId(), new Year(command.getYear()));
+		this.repository.remove(new CompanyId(companyId), command.getWorkplaceId(), new Year(command.getYear()),
+				command.getStartMonth());
 	}
 
 }

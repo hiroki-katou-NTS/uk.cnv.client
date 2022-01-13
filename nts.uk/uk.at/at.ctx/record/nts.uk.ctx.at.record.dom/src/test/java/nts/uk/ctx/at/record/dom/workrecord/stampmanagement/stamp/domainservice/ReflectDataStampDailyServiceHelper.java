@@ -47,6 +47,8 @@ public class ReflectDataStampDailyServiceHelper {
 						null,
 						null,
 						null,
+						null,
+						null,
 						null),
 				new ArrayList<>());
 		
@@ -67,6 +69,8 @@ public class ReflectDataStampDailyServiceHelper {
 				new IntegrationOfDaily(employeeId,
 						stamp.getStampDateTime().toDate(),
 						new WorkInfoOfDailyAttendance(),
+						null,
+						null,
 						null,
 						null,
 						null,

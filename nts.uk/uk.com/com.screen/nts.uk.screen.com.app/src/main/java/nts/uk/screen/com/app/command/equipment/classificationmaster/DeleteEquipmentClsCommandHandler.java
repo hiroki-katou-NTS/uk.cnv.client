@@ -34,8 +34,7 @@ public class DeleteEquipmentClsCommandHandler extends CommandHandler<String> {
 	protected void handle(CommandHandlerContext<String> context) {
 		String command = context.getCommand();
 		// Step1: get(会社コード,設備分類コード): List<設備情報>
-		List<EquipmentInformation> equipInfors = this.equipmentInfoRepo.findByCidAndClsCode(
-				AppContexts.user().companyId(), command);
+		List<EquipmentInformation> equipInfors = this.equipmentInfoRepo.findByCode(command);
 		
 		// Step2: not 設備情報.empty
 		if (!equipInfors.isEmpty()) {

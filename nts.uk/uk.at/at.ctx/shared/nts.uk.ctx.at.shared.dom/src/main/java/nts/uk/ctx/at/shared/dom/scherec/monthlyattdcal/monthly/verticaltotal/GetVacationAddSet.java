@@ -27,11 +27,11 @@ public class GetVacationAddSet {
 		
 		val annualLeaveSet = require.annualPaidLeaveSetting(companyId);
 		if (annualLeaveSet != null) {
-			annualLeave = annualLeaveSet.getManageAnnualSetting().isWorkDayCalculate();
+//			annualLeave = annualLeaveSet.getManageAnnualSetting().isWorkDayCalculate();
 		}
 		val retentionYearlySet = require.retentionYearlySetting(companyId);
 		if (retentionYearlySet.isPresent()){
-			retentionYearly = retentionYearlySet.get().getLeaveAsWorkDays();
+//			retentionYearly = retentionYearlySet.get().getLeaveAsWorkDays();
 		}
 		//*****（未）　特別休暇の設定クラスが未実装または誤り。判定方法の設計確認要。
 		

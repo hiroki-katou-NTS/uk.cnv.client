@@ -6,5 +6,9 @@ import nts.arc.time.GeneralDate;
 import nts.uk.ctx.sys.auth.dom.role.Role;
 
 public interface EmpReferenceRangeService {
-	Optional<Role>  getByUserIDAndReferenceDate(String UserID, int roleType, GeneralDate referenceDate); 
+	
+	/**
+	 * @name 社員参照範囲を取得する
+	 */
+	Optional<Role> getByUserIDAndReferenceDate(String UserID, int roleType, GeneralDate referenceDate); 
 }

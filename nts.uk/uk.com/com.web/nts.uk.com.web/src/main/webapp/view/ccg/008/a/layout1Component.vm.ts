@@ -10,7 +10,7 @@ module nts.uk.com.view.ccg008.a.Layout1ComponentViewModel {
             <iframe class="iframe_fix" id="preview-iframe1" data-bind="attr:{src: $component.urlIframe1}"></iframe>
           </div>
           <!-- ko if: $component.isFlowmenu() -->
-            <div data-bind="foreach: $component.lstHtml">
+            <div data-bind="foreach: $component.lstHtml" style="display: flex; place-content: center;">
               <div data-bind="html: html" id="F1-frame" ></div>
             </div>
           <!-- /ko -->  
@@ -126,11 +126,12 @@ module nts.uk.com.view.ccg008.a.Layout1ComponentViewModel {
         const ifr = document.getElementById('frameF1');
         const iframedoc = (ifr as any).contentDocument || (ifr as any).contentWindow.document;
         iframedoc.body.innerHTML = htmlSrc;
-        const width = iframedoc.activeElement.scrollWidth;
-        const height = iframedoc.activeElement.scrollHeight;
+        const width = iframedoc.activeElement.scrollWidth + 20;
+        const height = iframedoc.activeElement.scrollHeight + 20;
         (ifr as any).width = `${width.toString()}px`;
         (ifr as any).height = `${height.toString()}px`;
       }
+      nts.uk.com.view.ccg034.share.model.customload.loadLimitedLabelForIframe();
     }
   }
 }

@@ -28,7 +28,7 @@ public class EmployeeWorkplaceAdapterImpl implements EmployeeWorkplaceAdapter {
         // ＄所属職場 ＝ RQ.社員ID（List）と基準日から所属職場IDを取得(社員IDリスト、基準日) //List<所属職場履歴項目>
         return this.workplacePub.findBySIdAndBaseDate(sIds, baseDate).stream()
                 .filter(value -> sIds.contains(value.getEmployeeId()))
-                .map(x -> new AffAtWorkplaceExport(x.getEmployeeId(), x.getWorkplaceId(), x.getHistoryID(), x.getNormalWorkplaceID()))
+                .map(x -> new AffAtWorkplaceExport(x.getEmployeeId(), x.getWorkplaceId(), x.getHistoryID()))
                 .collect(Collectors.toList());
     }
 }

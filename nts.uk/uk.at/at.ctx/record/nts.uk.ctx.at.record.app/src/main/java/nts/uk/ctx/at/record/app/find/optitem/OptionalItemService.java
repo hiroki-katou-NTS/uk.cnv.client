@@ -68,10 +68,9 @@ public class OptionalItemService {
             Optional<ControlOfMonthlyItems> controlMonthlyOpt = monthlyControlRepository
                     .getControlOfMonthlyItem(companyID, attandanceItemID);
             if (controlMonthlyOpt.isPresent()) {
-                controlMonthlyOpt.get().setInputUnitOfTimeItem(Optional.ofNullable(roundingUnit));
                 monthlyControlRepository.updateControlOfMonthlyItem(controlMonthlyOpt.get());
             } else {
-                ControlOfMonthlyItems controlMonth = new ControlOfMonthlyItems(companyID, attandanceItemID, null, roundingUnit);
+                ControlOfMonthlyItems controlMonth = new ControlOfMonthlyItems(companyID, attandanceItemID, null);
                 monthlyControlRepository.addControlOfMonthlyItem(controlMonth);
             }
         } 
@@ -82,10 +81,9 @@ public class OptionalItemService {
             Optional<ControlOfAttendanceItems> controlDailyOptional = dailyControlRepository
                     .getControlOfAttendanceItem(companyID, attandanceItemID);
             if (controlDailyOptional.isPresent()) {
-                controlDailyOptional.get().setInputUnitOfTimeItem(Optional.ofNullable(roundingUnit));
                 dailyControlRepository.updateControlOfAttendanceItem(controlDailyOptional.get());
             } else {
-                ControlOfAttendanceItems controlDaily = new ControlOfAttendanceItems(companyID, attandanceItemID, null, roundingUnit);
+                ControlOfAttendanceItems controlDaily = new ControlOfAttendanceItems(companyID, attandanceItemID, null);
                 dailyControlRepository.insertControlOfAttendanceItem(controlDaily);
             }
         } 

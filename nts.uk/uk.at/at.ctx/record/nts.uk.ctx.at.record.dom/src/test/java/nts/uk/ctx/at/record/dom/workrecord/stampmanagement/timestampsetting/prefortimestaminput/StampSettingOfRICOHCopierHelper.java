@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import nts.arc.enums.EnumAdaptor;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.stampsettingofRICOHcopier.PasswordForRICOH;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.stampsettingofRICOHcopier.StampSettingOfRICOHCopier;
 import nts.uk.ctx.at.shared.dom.common.color.ColorCode;
+import nts.uk.ctx.at.shared.dom.workrule.goingout.GoingOutReason;
 import nts.uk.shr.com.enumcommon.NotUseAtr;
 
 public class StampSettingOfRICOHCopierHelper {
@@ -14,12 +16,20 @@ public class StampSettingOfRICOHCopierHelper {
 	public static StampSettingOfRICOHCopier CreateStampSettingOfRICOHCopier() {
 		List<ButtonSettings> buttonSettings = new ArrayList<>();
 		
+		StampType stampType = new StampType(
+				true, 
+				EnumAdaptor.valueOf(0, GoingOutReason.class), 
+				EnumAdaptor.valueOf(0, SetPreClockArt.class), 
+				EnumAdaptor.valueOf(1, ChangeClockAtr.class),
+				EnumAdaptor.valueOf(0, ChangeCalArt.class));
+		
 		buttonSettings.add(new ButtonSettings(new ButtonPositionNo(1),
-				new ButtonDisSet(new ButtonNameSet(new ColorCode("DUMMY"), new ButtonName("DUMMY")), new ColorCode("DUMMY")),
-				new ButtonType(ReservationArt.CANCEL_RESERVATION, Optional.empty()),
 				NotUseAtr.NOT_USE,
+				new ButtonDisSet(new ButtonNameSet(new ColorCode("DUMMY"), new ButtonName("DUMMY")), new ColorCode("DUMMY")),
+				stampType,
 				AudioType.GOOD_JOB,
-				Optional.of(SupportWplSet.SELECT_AT_THE_TIME_OF_STAMPING)));
+				Optional.of(SupportWplSet.SELECT_AT_THE_TIME_OF_STAMPING),
+				Optional.of(AssignmentMethod.SELECT_AT_THE_TIME_OF_STAMPING)));
 		
 		List<StampPageLayout> pageLayoutSettings = new ArrayList<StampPageLayout>(); 
 		

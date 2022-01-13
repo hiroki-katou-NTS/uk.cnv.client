@@ -447,6 +447,16 @@ public class NursingLeaveSetting extends AggregateRoot {
         
         return new DatePeriod(starDate, endDate);
     }
+    
+    /**
+     * 管理期間を計算する
+     * @param criteriaDate 基準日
+     * @return　期間
+     */
+    public DatePeriod calcManagementPeriod(GeneralDate criteriaDate){
+    	
+    	return new DatePeriod(getThisYearStartMonthDay(criteriaDate), getNextStartMonthDay(criteriaDate).addDays(-1));
+    }
 
 
 	// Require

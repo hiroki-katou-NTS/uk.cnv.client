@@ -26,13 +26,16 @@
 			<div id="functions-area">
 				<!-- G1_1 -->
 				<a class="goback" tabindex="1"
-					data-bind="ntsLinkButton: { action: jumpTo.bind($data, sideBar) }">#{i18n.getText('KDW006_25')}</a>
+					data-bind="ntsLinkButton: { action: jumpTo }">#{i18n.getText('KDW006_25')}</a>
 				<!-- G1_2 -->
 				<button id="register-button" class="proceed" tabindex="2"
-					data-bind="click: saveData, enable: employmentList().length>0" >#{i18n.getText('KDW006_26')}</button>
+					data-bind="click: saveData, enable: employmentList().length>0 &amp;&amp; $root.errors.isEmpty()" >#{i18n.getText('KDW006_26')}</button>
 				<!-- G5_1 -->
 				<button id="copy-button" class="normal" tabindex="3"
-					data-bind="click: copyData" >#{i18n.getText('KDW006_52')}</button>
+					data-bind="click: copyData, enable: mode() != 0" >#{i18n.getText('KDW006_52')}</button>
+				<!-- G7_1 -->
+				<button id="delete-button" class="danger" tabindex="4"
+					data-bind="click: deleteEmployment, enable: mode() != 0" >#{i18n.getText('KDW006_306')}</button>
 			</div>
 			<div id="contents-area">
 				<div id="screen-g">
@@ -52,7 +55,7 @@
 								<div id="items-type1" data-bind="foreach: groups1">
 									<div class="up-part">
 										<span class="no-name-group"
-											data-bind="text: no + ' ' + name()"></span>
+											data-bind="text: noText + ' ' + name()"></span>
 										<button id="default-value"
 											data-bind="attr: {tabindex: no == 1 ? 6 :0 || no == 2 ? 9:0 || no == 3 ? 12:0 || no == 4 ? 15:0}, click: defaultValue">#{i18n.getText('KDW006_54')}</button>
 									</div>

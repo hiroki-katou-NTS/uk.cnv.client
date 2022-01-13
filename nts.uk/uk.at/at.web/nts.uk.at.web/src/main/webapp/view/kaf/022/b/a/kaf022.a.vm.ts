@@ -130,7 +130,7 @@ module nts.uk.at.view.kaf022.a.viewmodel {
                 new ItemModel(1, getText('KAF022_75')),
                 new ItemModel(0, getText('KAF022_82'))
             ]);
-            self.approvalSetting = ko.observable(new ItemA17(0, 0, false));
+            self.approvalSetting = ko.observable(new ItemA17(0, 0));
 
             // A19
             self.nightOvertimeReflect = ko.observable(0);
@@ -233,11 +233,12 @@ module nts.uk.at.view.kaf022.a.viewmodel {
                             obj.appType == 0 ? obj.otAppBeforeAccepRestric.opEarlyOvertime : null,
                             obj.appType == 0 ? obj.otAppBeforeAccepRestric.opNormalOvertime : null,
                             obj.appType == 0 ? obj.otAppBeforeAccepRestric.opEarlyNormalOvertime : null,
+                            obj.appType == 0 ? obj.otAppBeforeAccepRestric.opMultipleOvertime : null,
                             obj.afterhandRestriction.allowFutureDay
                         )
                     );
                 } else {
-                    self.dataReceptionRestrictionSettings.push(new ReceptionRestrictionSetting(getText(self.appTypeLabels[index]), appType.value, 0, 0, 1, null, null, null, 0));
+                    self.dataReceptionRestrictionSettings.push(new ReceptionRestrictionSetting(getText(self.appTypeLabels[index]), appType.value, 0, 0, 1, null, null, null, null, 0));
                 }
             });
 
@@ -252,8 +253,7 @@ module nts.uk.at.view.kaf022.a.viewmodel {
             let self = this;
             self.approvalSetting(new ItemA17(
                 allData.applicationSetting ? allData.applicationSetting.recordDate : 0,
-                allData.approvalSettingDto ? allData.approvalSettingDto.prinFlg : 0,
-                false //allData.jobAssign ? allData.jobAssign.isConcurrently : false
+                allData.approvalSettingDto ? allData.approvalSettingDto.prinFlg : 0
             ));
         }
 
@@ -327,7 +327,6 @@ module nts.uk.at.view.kaf022.a.viewmodel {
                 prePostDisplayAtr: self.prePostDisplayAtr(),
                 recordDate: self.approvalSetting().baseDateAtr(),
                 approvalByPersonAtr: self.approvalSetting().approvalByPersonAtr(),
-                includeConcurrentPersonel: self.approvalSetting().includeConcurrentPersonel(),
 
                 nightOvertimeReflectAtr: self.nightOvertimeReflect(),
 
@@ -403,9 +402,12 @@ module nts.uk.at.view.kaf022.a.viewmodel {
         normalOvertime: KnockoutObservable<number>;
         // 時刻（早出残業・通常残業）
         earlyNormalOvertime: KnockoutObservable<number>;
+        // 時刻（複数回残業）
+        multipleOvertime: KnockoutObservable<number>;
+
         requiredA7_23: KnockoutObservable<boolean>;
         constructor(appTypeName: string, appType: number, useAtr: number, dateBeforehandRestrictions: number,
-                    methodCheck: number, earlyOvertime: number, normalOvertime: number, earlyNormalOvertime: number, allowFutureDay: number) {
+                    methodCheck: number, earlyOvertime: number, normalOvertime: number, earlyNormalOvertime: number, multipleOvertime: number, allowFutureDay: number) {
             this.appTypeName = appTypeName;
             this.appType = appType;
             this.useAtr = ko.observable(useAtr == 1);
@@ -414,6 +416,7 @@ module nts.uk.at.view.kaf022.a.viewmodel {
             this.earlyOvertime = ko.observable(earlyOvertime);
             this.normalOvertime = ko.observable(normalOvertime);
             this.earlyNormalOvertime = ko.observable(earlyNormalOvertime);
+            this.multipleOvertime = ko.observable(multipleOvertime);
             this.allowFutureDay = ko.observable(allowFutureDay == 1);
 
             this.requiredA7_23 = ko.observable(methodCheck == 0);
@@ -457,12 +460,9 @@ module nts.uk.at.view.kaf022.a.viewmodel {
         baseDateAtr: KnockoutObservable<number>;
         // 本人による承認
         approvalByPersonAtr: KnockoutObservable<number>;
-        // 兼務者を含める
-        includeConcurrentPersonel: KnockoutObservable<number>;
-        constructor(baseDateAtr: number, approvalByPersonAtr: number, includeConcurrentPersonel: boolean) {
+        constructor(baseDateAtr: number, approvalByPersonAtr: number) {
             this.baseDateAtr = ko.observable(baseDateAtr);
             this.approvalByPersonAtr = ko.observable(approvalByPersonAtr);
-            this.includeConcurrentPersonel = ko.observable(includeConcurrentPersonel ? 1 : 0);
         }
     }
 

@@ -409,6 +409,18 @@ public class ClosureWs {
 		}
 		return closure.getClosureId().value;
 	}
+
+	@POST
+	@Path("get-current-closure-period-by-logged-in-employee")
+	public DatePeriodDto getClosurePeriod() {
+		DatePeriod period = ClosureService.findClosurePeriod(
+				createRequireM3(),
+				new CacheCarrier(),
+				AppContexts.user().employeeId(),
+				GeneralDate.today()
+		);
+		return new DatePeriodDto(period.start().toString(), period.end().toString());
+	}
 	
 	private ClosureService.RequireM3 createRequireM3 () {
 		return new ClosureService.RequireM3() {

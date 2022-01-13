@@ -17,9 +17,12 @@ import nts.arc.layer.infra.data.jdbc.NtsResultSet;
 import nts.arc.layer.infra.data.jdbc.NtsStatement;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
+import nts.arc.time.calendar.period.DatePeriod;
 import nts.gul.collection.CollectionUtil;
 import nts.uk.ctx.bs.employee.dom.jobtitle.affiliate.AffJobTitleHistoryItem;
 import nts.uk.ctx.bs.employee.dom.jobtitle.affiliate.AffJobTitleHistoryItemRepository;
+import nts.uk.ctx.bs.employee.dom.jobtitle.affiliate.AffJobTitleHistoryItemWithPeriod;
+import nts.uk.ctx.bs.employee.infra.entity.jobtitle.affiliate.BsymtAffJobTitleHist;
 import nts.uk.ctx.bs.employee.infra.entity.jobtitle.affiliate.BsymtAffJobTitleHistItem;
 import nts.uk.shr.com.context.AppContexts;
 
@@ -328,6 +331,45 @@ public class JpaAffJobTitleHistoryItemRepository extends JpaRepository
 		int  records = this.getEntityManager().createNativeQuery(sb.toString()).executeUpdate();
 		System.out.println(records);
 		
+	}
+	
+	private static final String GET_HIST_BY_SID_PERIOD = "SELECT m FROM BsymtAffJobTitleHist m"
+			+ " WHERE m.sid IN :sids "
+			+ " AND m.strDate <= :endDate "
+			+ "	AND m.endDate >= :startDate";
+
+	@Override
+	public List<AffJobTitleHistoryItemWithPeriod> getBySidAndDatePeriod(List<String> sids, DatePeriod datePeriod) {
+		
+		//$履歴IDリスト
+		List<BsymtAffJobTitleHist> listHists = new ArrayList<>();
+		
+		CollectionUtil.split(sids, DbConsts.MAX_CONDITIONS_OF_IN_STATEMENT, subSids -> {
+			listHists.addAll(this.queryProxy()
+					.query(GET_HIST_BY_SID_PERIOD, BsymtAffJobTitleHist.class)
+					.setParameter("sids", subSids)
+					.setParameter("startDate", datePeriod.start())
+					.setParameter("endDate", datePeriod.end())
+					.getList());
+		});
+		
+		//$履歴IDリスト
+		List<String> listHistIds = listHists.stream().map(item -> item.hisId).collect(Collectors.toList());
+		
+		//$履歴項目リスト
+		List<AffJobTitleHistoryItem> listHistItems = this.findByHitoryIds(listHistIds);
+
+		return listHistItems.stream()
+			.map(histItem -> {
+				Optional<BsymtAffJobTitleHist> filterHist = listHists.stream().filter(hist -> hist.hisId.equalsIgnoreCase(histItem.getHistoryId())).findFirst();
+				if(filterHist.isPresent()) {
+					DatePeriod period = new DatePeriod(filterHist.get().strDate, filterHist.get().endDate);
+					return new AffJobTitleHistoryItemWithPeriod(period.start(), period.end(), histItem.getHistoryId(), histItem.getEmployeeId(), histItem.getJobTitleId());
+				}
+				return null;
+			})
+			.filter(item -> item != null)
+			.collect(Collectors.toList());
 	}
 
 }

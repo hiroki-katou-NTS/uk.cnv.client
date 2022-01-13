@@ -11,7 +11,7 @@
 	margin-left: 20px;
 }
 #left-panel{
-	width: 330px !important;
+	width: 430px !important;
 	height: 400px !important;
 }
 caption, th, td{
@@ -24,4 +24,8 @@ caption, th, td{
 }
 html {
     overflow: hidden;
+}
+
+#left-side > #left-panel > #ccg025-component {
+	background-color: inherit;
 }

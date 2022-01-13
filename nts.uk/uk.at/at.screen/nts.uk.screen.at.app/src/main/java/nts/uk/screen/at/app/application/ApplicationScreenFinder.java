@@ -68,6 +68,9 @@ public class ApplicationScreenFinder {
 				case EARLY_NORMAL_OVERTIME:
 					queryString = Optional.of("overworkatr=2");
 					break;
+				case OVERTIME_MULTIPLE_TIME:
+					queryString = Optional.of("overworkatr=3");
+					break;
 				case STAMP_ADDITIONAL:
 					screenId = "A";
 					break;
@@ -96,6 +99,9 @@ public class ApplicationScreenFinder {
 						break;
 					case EARLY_NORMAL_OVERTIME:
 						queryString = Optional.of("overworkatr=2");
+						break;
+					case OVERTIME_MULTIPLE_TIME:
+						queryString = Optional.of("overworkatr=3");
 						break;
 					case STAMP_ADDITIONAL:
 						screenId = "A";

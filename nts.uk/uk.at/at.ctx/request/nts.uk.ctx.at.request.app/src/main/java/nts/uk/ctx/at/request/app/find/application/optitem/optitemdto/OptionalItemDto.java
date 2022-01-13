@@ -16,7 +16,7 @@ public class OptionalItemDto {
      */
     private String optionalItemName;
 
-    private String optionalItemUnit;
+    private boolean inputCheck;
 
     /**
      * The unit.

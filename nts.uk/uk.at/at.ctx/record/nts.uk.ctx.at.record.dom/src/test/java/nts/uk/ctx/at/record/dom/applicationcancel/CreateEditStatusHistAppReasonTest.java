@@ -17,6 +17,7 @@ import mockit.Injectable;
 import mockit.integration.junit4.JMockit;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.GeneralDateTime;
+import nts.uk.ctx.at.record.dom.adapter.request.application.state.RCReflectedState;
 import nts.uk.ctx.at.record.dom.editstate.EditStateOfDailyPerformance;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.ScheduleRecordClassifi;
 import nts.uk.ctx.at.shared.dom.scherec.appreflectprocess.appreflectcondition.reflectprocess.cancellation.ApplicationReflectHistory;
@@ -68,7 +69,7 @@ public class CreateEditStatusHistAppReasonTest {
 				GeneralDate.today(), // 対象日
 				"appId", // 申請ID
 				ScheduleRecordClassifi.SCHEDULE, // 予定実績区分
-				mapValue, GeneralDateTime.FAKED_NOW);// Map<勤怠項目ID,値>
+				mapValue, GeneralDateTime.FAKED_NOW, "1", RCReflectedState.WAITREFLECTION);// Map<勤怠項目ID,値>
 		assertThat(actualResult).extracting(x -> x.getEditState().get().getEditStateSetting())
 				.containsExactly(EditStateSetting.HAND_CORRECTION_MYSELF);
 
@@ -112,7 +113,7 @@ public class CreateEditStatusHistAppReasonTest {
 				GeneralDate.today(), // 対象日
 				"appId", // 申請ID
 				ScheduleRecordClassifi.SCHEDULE, // 予定実績区分
-				mapValue, GeneralDateTime.FAKED_NOW);// Map<勤怠項目ID,値>
+				mapValue, GeneralDateTime.FAKED_NOW, "1", RCReflectedState.WAITREFLECTION);// Map<勤怠項目ID,値>
 		assertThat(actualResult).extracting(x -> x.getEditState()).containsExactly(Optional.empty());
 	}
 

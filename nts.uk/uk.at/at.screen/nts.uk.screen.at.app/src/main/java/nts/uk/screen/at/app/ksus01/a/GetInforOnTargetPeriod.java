@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import lombok.AllArgsConstructor;
 import nts.arc.time.GeneralDate;
 import nts.arc.time.calendar.period.DatePeriod;
+import nts.uk.ctx.at.request.app.find.application.gobackdirectly.WorkInformationDto;
 import nts.uk.ctx.at.schedule.app.query.schedule.shift.management.shifttable.GetHolidaysByPeriod;
 import nts.uk.ctx.at.schedule.dom.schedule.workschedule.WorkSchedule;
 import nts.uk.ctx.at.schedule.dom.schedule.workschedule.WorkScheduleRepository;
@@ -168,14 +169,16 @@ public class GetInforOnTargetPeriod {
 				if (check) {
 					
 					WorkScheduleDto workScheduleDto = new WorkScheduleDto(workSchedule.getYmd().toString(), new ShiftMasterDto(k.getDisplayInfor().getName().v(), k.getDisplayInfor().getColorSmartPhone().v()),
-																			v.isPresent() ? v.get().value : null, listAttendaceDto);
+													v.isPresent() ? v.get().value : null, listAttendaceDto, 
+													WorkInformationDto.fromDomain(workSchedule.getWorkInfo().getRecordInfo()));
 					listWorkScheduleDto.add(workScheduleDto);
 					break;
 				} 
 			}
 			if (!check) {
 				WorkScheduleDto workScheduleDto = new WorkScheduleDto(workSchedule.getYmd().toString(), new ShiftMasterDto("", ""),
-																		null, Collections.emptyList());
+													null, Collections.emptyList(),
+													WorkInformationDto.fromDomain(workSchedule.getWorkInfo().getRecordInfo()));
 				listWorkScheduleDto.add(workScheduleDto);
 			}
 		}

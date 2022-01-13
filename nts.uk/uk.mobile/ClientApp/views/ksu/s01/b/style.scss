@@ -1,3 +1,42 @@
 .ksus01b {
+    text-align: center;
+    font-size: 4vw;
 
+    i {
+        width: 5vw;
+        margin: 0 1vw;
+    }
+
+    .bold {
+        font-weight: bold;
+    }
+
+    .large-icon {
+        font-size: 4.5vw;
+    }
+
+    .xxx-large {
+        font-size: xx-large;
+    }
+
+    .blue {
+        color: blue;
+    }
+
+    .left-container {
+        text-align: left;
+        width: 90%;
+        margin: auto;
+    }
+
+    .right-container {
+        text-align: right;
+        width: 90%;
+        margin: auto;
+    }
+
+    .center-container {
+        width: fit-content;
+        margin: auto;
+    }
 }

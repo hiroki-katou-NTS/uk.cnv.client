@@ -15,11 +15,7 @@ public enum CategorySetting {
 	/**
 	 * マスタ系タイプ(基準日のみ設定)
 	 */
-	MASTER_TYPE(7),
-	/**
-	 * マスタ系対ぴ(設定なし)
-	 */
-	MASTER_SYSTEM(8);
+	MASTER_TYPE(7);
 
 	/** The value. */
 	public final int value;

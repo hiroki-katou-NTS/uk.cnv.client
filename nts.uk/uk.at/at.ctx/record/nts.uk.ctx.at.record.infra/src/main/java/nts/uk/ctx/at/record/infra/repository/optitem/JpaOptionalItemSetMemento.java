@@ -9,18 +9,7 @@ import java.util.Optional;
 import nts.uk.ctx.at.record.infra.entity.optitem.KrcmtAnyv;
 import nts.uk.ctx.at.record.infra.entity.optitem.KrcmtAnyfResultRange;
 import nts.uk.ctx.at.shared.dom.common.CompanyId;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalcResultRange;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.CalculationClassification;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.DescritionOptionalItem;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.EmpConditionAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.NoteOptionalItem;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemName;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemNo;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemSetMemento;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemUsageAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.PerformanceAtr;
-import nts.uk.ctx.at.shared.dom.scherec.optitem.UnitOfOptionalItem;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.*;
 
 /**
  * The Class JpaOptionalItemSetMemento.
@@ -128,9 +117,15 @@ public class JpaOptionalItemSetMemento implements OptionalItemSetMemento {
 	 * CalcResultRange)
 	 */
 	@Override
-	public void setCalculationResultRange(CalcResultRange calculationResultRange) {
+	public void setInputControlSetting(InputControlSetting inputControlSetting) {
+		this.entity.setInputCheck(inputControlSetting.isInputWithCheckbox());
 		KrcmtAnyfResultRange entityRange = this.entity.getKrcstCalcResultRange();
-		calculationResultRange.saveToMemento(new JpaCalcResultRangeSetMemento(entityRange));
+		inputControlSetting.getCalcResultRange().saveToMemento(new JpaCalcResultRangeSetMemento(entityRange));
+		if (inputControlSetting.getDailyInputUnit().isPresent()) {
+			entityRange.setTimeItemInputUnit(inputControlSetting.getDailyInputUnit().get().getTimeItemInputUnit().map(i -> i.value).orElse(null));
+			entityRange.setNumberItemInputUnit(inputControlSetting.getDailyInputUnit().get().getNumberItemInputUnit().map(i -> i.value).orElse(null));
+			entityRange.setAmountItemInputUnit(inputControlSetting.getDailyInputUnit().get().getAmountItemInputUnit().map(i -> i.value).orElse(null));
+		}
 		this.entity.setKrcstCalcResultRange(entityRange);
 	}
 

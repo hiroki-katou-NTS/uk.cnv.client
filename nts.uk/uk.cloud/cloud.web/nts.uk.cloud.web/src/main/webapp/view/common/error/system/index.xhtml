@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="/master/freelayout.xhtml">
+		<ui:define name="htmlHead">
+			<title></title>
+			<script>
+				var dialogSize = { width: 800, height: 500 };
+				var dialogCloseButton = true;
+			</script>
+			<com:scriptfile set="IGNITE" />
+
+			<com:stylefile path="../common.error.style.css" />
+			<com:scriptfile path="../common.error.start.js" />
+		</ui:define>
+
+		<ui:define name="content" style="overflow: scroll;">
+			<div id="contents-area" class="cf"> 
+				<div id="error-time">
+					<label data-bind="text: errorAtTime"></label>
+				</div>
+				<div id="error-message">
+					ご迷惑をおかけして申し訳ございません。処理の実行中に問題が発生しました。<br /> 管理者へご連絡ください。
+				</div>
+				<button class="large" data-bind="click: gotoLogin">ログイン画面へ</button>
+
+				<com:ko-if bind="isDebugMode">
+					<pre data-bind="text:details" style="text-align: left"></pre>
+				</com:ko-if>
+			</div>
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

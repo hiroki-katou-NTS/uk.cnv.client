@@ -91,7 +91,7 @@ public class CollectCompanyListImpl implements CollectCompanyList {
 
 		// imported（権限管理）「会社」を取得する (imported (authority management) Acquire
 		// "company") Request No.51
-		List<CompanyBsImport> companys = this.companyBsAdapter.getAllCompany();
+		List<CompanyBsImport> companys = this.companyBsAdapter.getAllCompanyByContractCd(contractCd);
 
 		List<String> companyIdAll = companys.stream().map(item -> {
 			return item.getCompanyId();

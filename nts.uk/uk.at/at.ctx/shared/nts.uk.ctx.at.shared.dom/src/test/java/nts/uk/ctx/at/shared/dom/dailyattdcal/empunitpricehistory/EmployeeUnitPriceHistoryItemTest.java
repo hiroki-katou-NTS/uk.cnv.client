@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.junit.Test;
 
 import nts.arc.testing.assertion.NtsAssert;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.personcostcalc.employeeunitpricehistory.UnitPrice;
 
 /**
  * @author laitv
@@ -32,7 +33,7 @@ public class EmployeeUnitPriceHistoryItemTest {
 		EmployeeUnitPriceHistoryItem empUnitPriceHisItem = EmployeeUnitPriceHistoryHelper.getEmployeeUnitPriceHistoryItemDefault();
 		
 		Optional<WorkingHoursUnitPrice> result = empUnitPriceHisItem.getEmployeeHourlyUnitPrice(UnitPrice.Price_2);
-		
+
 		assertThat(result.get().v()).isEqualTo(200);
 	}
 	
@@ -45,7 +46,7 @@ public class EmployeeUnitPriceHistoryItemTest {
 		EmployeeUnitPriceHistoryItem empUnitPriceHisItem = EmployeeUnitPriceHistoryHelper.getEmployeeUnitPriceHistoryItemDefault();
 		
 		Optional<WorkingHoursUnitPrice> result = empUnitPriceHisItem.getEmployeeHourlyUnitPrice(UnitPrice.Price_10);
-		
+
 		assertThat(result).isEqualTo(Optional.empty());
 	}
 }

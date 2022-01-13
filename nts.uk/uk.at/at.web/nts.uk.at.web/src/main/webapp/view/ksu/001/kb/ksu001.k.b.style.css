@@ -1,0 +1,25 @@
+td[role ="rowheader"]{
+	background-color: #CFF1A5 !important;
+}
+
+.tabs-content #tab-1 .form-label {
+	width: 130px;
+}
+
+.switchbox-wrappers {
+	display: inline-flex;
+}
+
+.switchbox-wrappers .radio-wrapper {
+	width: 90px;
+	flex-direction: column;
+	text-align: center;
+}
+
+#swap-list_container, #person-list_container, .nts-fixed-table {
+	display: inline-block;
+}
+
+.tabs-panel.horizontal>.tabs-list {
+	padding: 10px;
+}

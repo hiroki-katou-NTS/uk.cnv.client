@@ -13,18 +13,6 @@
             </tr>
         </thead>
         <tbody>
-            <tr class="inline-radio" data-bind="with: overtimeAppReflect">
-                <td class="color-header" id="b3">#{i18n.getText('KAF022_419')}</td>
-                <td class="two-radio">
-                    <div data-bind="ntsRadioBoxGroup: {
-                            options: $parent.itemListB4,
-                            optionsValue: 'code',
-                            optionsText: 'name',
-                            value: reflectActualWorkAtr,
-                            enable: true}">
-                    </div>
-                </td>
-            </tr>
             <tr>
                 <td class="color-header">#{i18n.getText('KAF022_708')}</td>
                 <td><button style="margin: 5px 13px" data-bind="click: openODialog, enable: enableBtn">#{i18n.getText('KAF022_708')}</button></td>
@@ -127,6 +115,18 @@
             </tr>
         </thead>
         <tbody data-bind="with: overtimeLeaveAppCommonSetting">
+            <tr style="height: 45px">
+                <td class="color-header" id="b29">#{i18n.getText('KAF022_431')}</td>
+                <td class="vertical-radio">
+                    <div id="b30" data-bind="ntsRadioBoxGroup: {
+                                options: $parent.itemListB30,
+                                optionsValue: 'code',
+                                optionsText: 'name',
+                                value: extratimeExcessAtr,
+                                enable: true}">
+                    </div>
+                </td>
+            </tr>
             <tr class="inline-radio">
                 <td class="color-header" id="b23">#{i18n.getText('KAF022_422')}</td>
                 <td class="two-radio">
@@ -159,18 +159,6 @@
                             optionsValue: 'code',
                             optionsText: 'name',
                             value: overrideSet,
-                            enable: true}">
-                    </div>
-                </td>
-            </tr>
-            <tr style="height: 45px">
-                <td class="color-header" id="b29">#{i18n.getText('KAF022_431')}</td>
-                <td class="vertical-radio">
-                    <div id="b30" data-bind="ntsRadioBoxGroup: {
-                            options: $parent.itemListB30,
-                            optionsValue: 'code',
-                            optionsText: 'name',
-                            value: extratimeExcessAtr,
                             enable: true}">
                     </div>
                 </td>
@@ -214,10 +202,23 @@
         </thead>
         <tbody data-bind="with: overtimeAppReflect">
             <tr class="inline-radio">
+                <td class="color-header" id="b3">#{i18n.getText('KAF022_789')}</td>
+                <td class="two-radio">
+                    <div data-bind="ntsRadioBoxGroup: {
+                                        options: $parent.itemListB5,
+                                        optionsValue: 'code',
+                                        optionsText: 'name',
+                                        name:'#[KAF022_410]',
+                                        value: reflectActualWorkAtr,
+                                        enable: true}">
+                    </div>
+                </td>
+            </tr>
+            <tr class="inline-radio">
                 <td class="color-header">#{i18n.getText('KAF022_622')}</td>
                 <td/>
             </tr>
-            <tr class="inline-radio">
+            <!-- <tr class="inline-radio">
                 <td class="color-header">#{i18n.getText('KAF022_717')}</td>
                 <td class="two-radio">
                     <div data-bind="ntsRadioBoxGroup: {
@@ -228,7 +229,7 @@
                             enable: true}">
                     </div>
                 </td>
-            </tr>
+            </tr> -->
             <tr class="inline-radio">
                 <td class="color-header">#{i18n.getText('KAF022_718')}</td>
                 <td class="two-radio">

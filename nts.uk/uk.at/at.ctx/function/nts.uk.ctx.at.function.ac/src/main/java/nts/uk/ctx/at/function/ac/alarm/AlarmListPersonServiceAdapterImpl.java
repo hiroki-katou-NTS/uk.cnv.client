@@ -121,7 +121,8 @@ public class AlarmListPersonServiceAdapterImpl implements AlarmListPersonService
 			List<String> lstAnyConID, List<WorkPlaceHistImport> lstWplHist,
 			List<ResultOfEachCondition> lstResultCondition, List<AlarmListCheckInfor> lstCheckInfor,
 			List<AlarmEmployeeList> alarmEmployeeList, List<AlarmExtractionCondition> alarmExtractConditions,
-			String alarmCheckConditionCode) {
+			String alarmCheckConditionCode, Consumer<Integer> counter,
+			Supplier<Boolean> shouldStop) {
 		List<WorkPlaceHistImportAl> lstWkpIdAndPeriod = lstWplHist.stream().map(x -> 
 			new WorkPlaceHistImportAl(x.getEmployeeId(), 
 					x.getLstWkpIdAndPeriod().stream()
@@ -136,7 +137,9 @@ public class AlarmListPersonServiceAdapterImpl implements AlarmListPersonService
 				lstCheckInfor,
 				alarmEmployeeList,
 				alarmExtractConditions,
-				alarmCheckConditionCode);
+				alarmCheckConditionCode,
+				counter,
+				shouldStop);
 	}
 
 	@Override

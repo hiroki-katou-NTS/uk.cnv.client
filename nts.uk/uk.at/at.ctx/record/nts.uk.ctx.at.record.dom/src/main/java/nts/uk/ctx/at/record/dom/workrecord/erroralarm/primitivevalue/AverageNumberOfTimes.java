@@ -7,7 +7,7 @@ import nts.arc.primitive.constraint.IntegerRange;
  * PrimitiveValue: 平均回数
  *
  */
-@IntegerRange(min = 1, max = 99)
+@IntegerRange(min = 0, max = 99)
 public class AverageNumberOfTimes extends IntegerPrimitiveValue<AverageNumberOfTimes> {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;

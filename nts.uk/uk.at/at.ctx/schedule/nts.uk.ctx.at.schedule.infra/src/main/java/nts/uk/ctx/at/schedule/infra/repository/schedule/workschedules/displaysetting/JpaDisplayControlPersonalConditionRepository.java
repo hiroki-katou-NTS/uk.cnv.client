@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.arc.primitive.PrimitiveValueBase;
 import nts.uk.ctx.at.schedule.dom.schedule.setting.displaycontrol.PersonSymbolQualify;
@@ -32,7 +34,6 @@ public class JpaDisplayControlPersonalConditionRepository extends JpaRepository
 
 	private static final String DELETE_QUA = "delete from KscmtSyacndDispCtlQua a WHERE a.pk.cid = :cid ";
 	private static final String DELETE_DISPCTL = "delete from KscmtSyacndDispCtl a WHERE a.pk.cid = :cid ";
-	private static final String query = "SELECT a FROM KscmtSyacndDispCtl a WHERE a.pk.cid = :cid AND a.pk.cndAtr IN :cndAtr";
 	private static final String DELETE = "delete from KscmtSyacndDispCtlQua a "
 			+ " WHERE a.pk.cid = :cid AND a.pk.qualification IN :qualification ";
 	private static final String QUERY_QUALIFICATION = "SELECT a.pk.qualification FROM KscmtSyacndDispCtlQua a WHERE a.pk.cid = :cid ";
@@ -63,13 +64,13 @@ public class JpaDisplayControlPersonalConditionRepository extends JpaRepository
 				condition.getListConditionDisplayControl().stream()
 						.filter(e -> i.pk.cndAtr == e.getConditionATR().value)
 						.findFirst().ifPresent(d -> {
-					i.dispAtr = d.getDisplayCategory().value;
+					i.dispAtr = BooleanUtils.toBoolean(d.getDisplayCategory().value);
 					i.syname = condition.getOtpWorkscheQualifi().isPresent()
 							? condition.getOtpWorkscheQualifi().get().getQualificationMark().v()
 							: null;
 				});
 			} else {
-				i.dispAtr = NotUseAtr.NOT_USE.value;
+				i.dispAtr = false;
 			}
 		});
 		condition.getListConditionDisplayControl().stream()
@@ -79,7 +80,7 @@ public class JpaDisplayControlPersonalConditionRepository extends JpaRepository
 							? condition.getOtpWorkscheQualifi().get().getQualificationMark().v() : null;
 					KscmtSyacndDispCtl entity = new KscmtSyacndDispCtl(
 							new KscmtSyacndDispCtlPK(condition.getCompanyID(), d.getConditionATR().value),
-							d.getDisplayCategory().value,
+							BooleanUtils.toBoolean(d.getDisplayCategory().value),
 							qualificationMark
 					);
 					this.commandProxy().insert(entity);

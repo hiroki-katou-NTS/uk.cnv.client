@@ -35,7 +35,7 @@ public class DailyAttendanceItemAcFinder implements DailyAttendanceItemAdapter {
 		return this.dailyAttendanceItemPub.getDailyAttendanceItem(companyId, dailyAttendanceItemIds).stream().map(f -> {
 			return new DailyAttendanceItemAdapterDto(f.getCompanyId(), f.getAttendanceItemId(), f.getAttendanceName(),
 					f.getDisplayNumber(), f.getUserCanUpdateAtr(), f.getDailyAttendanceAtr(),
-					f.getNameLineFeedPosition());
+					f.getNameLineFeedPosition(), f.getDisplayName());
 		}).collect(Collectors.toList());
 	}
 
@@ -44,7 +44,7 @@ public class DailyAttendanceItemAcFinder implements DailyAttendanceItemAdapter {
 		return this.dailyAttendanceItemPub.getDailyAttendanceItemList(companyId).stream().map(f -> {
 			return new DailyAttendanceItemAdapterDto(f.getCompanyId(), f.getAttendanceItemId(), f.getAttendanceName(),
 					f.getDisplayNumber(), f.getUserCanUpdateAtr(), f.getDailyAttendanceAtr(),
-					f.getNameLineFeedPosition());
+					f.getNameLineFeedPosition(), f.getDisplayName());
 		}).collect(Collectors.toList());
 	}
 

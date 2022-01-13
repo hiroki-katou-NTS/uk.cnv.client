@@ -31,7 +31,7 @@ module nts.uk.at.view.kal003.a.tab {
                 owner: self
             });
 
-            $("#table-schedule-fixed").ntsFixedTable({ width: 820 });
+            $("#table-schedule-fixed").ntsFixedTable({ width: 510, height: 220 });
         }//end constructor
         
         initData(category): void {

@@ -8,7 +8,7 @@
 	<div class="sidebar-content-header">
 		<span class="title">#{i18n.getText('CCG018_45')}</span>
 		<a id="A1-4" class="goback" data-bind="click: jumpToCcg015 ,ntsLinkButton: { }">#{i18n.getText('CCG018_50')}</a>
-		<button tabindex="-1" id="A1-5" class="proceed"
+		<button tabindex="1" id="A1-5" class="proceed"
 			data-bind="click: save, enable: isNotEmpty">#{i18n.getText('CCG018_3')}</button>
 	</div>
 
@@ -81,7 +81,9 @@
 					</tr>
 				</tbody>
 			</table> -->
-			<table id="grid2"></table>
+			<div id="grid2-wrapper" style="width: fit-content;">
+				<table id="grid2"></table>
+			</div>
 		</div>
 	</div>
 

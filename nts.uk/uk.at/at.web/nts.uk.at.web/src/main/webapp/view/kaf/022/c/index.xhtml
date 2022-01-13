@@ -19,7 +19,7 @@
 
     <ui:define name="content">
         <div id="functions-area">
-            <a style="height: 25px" data-bind="ntsLinkButton: { jump: '../a/index.xhtml' }">#{i18n.getText('KAF022_706')}</a>
+            <a class="goback" style="height: 25px" data-bind="ntsLinkButton: { jump: '../a/index.xhtml' }">#{i18n.getText('KAF022_706')}</a>
             <button  id="btn_001" class="button proceed separate-button fix-button"
                      data-bind="click: registerEmploymentSet,
                                 enable: allowRegister() &amp;&amp; $root.errors.isEmpty()">#{i18n.getText('KAF022_1')}</button>
@@ -64,7 +64,7 @@
                                     optionsValue: 'code',
                                     optionsText: 'name',
                                     value: holidayTypeUseFlg,
-                                    enable: true}">
+                                    enable: enableRadio}">
                                 </div>
                             </td>
                         </tr>

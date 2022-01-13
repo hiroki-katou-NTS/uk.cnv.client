@@ -1,0 +1,206 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:com="http://xmlns.jcp.org/jsf/component"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+<body>
+	<ui:composition template="/master/base.xhtml">
+		<ui:define name="htmlHead">
+			<com:scriptfile set="IGNITE" />
+			<com:ValidatorScript>
+				nts.uk.ctx.at.shared.dom.scherec.taskmanagement.taskmaster.TaskNote
+				nts.uk.ctx.at.record.dom.jobmanagement.favoritetask.favoritetaskitem.FavoriteTaskName
+				
+				nts.uk.shr.com.time.AttendanceClock
+				nts.uk.ctx.at.shared.dom.common.time.AttendanceTime
+                nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeOfExistMinus
+                nts.uk.ctx.at.record.dom.daily.WorkTimes
+                nts.uk.ctx.at.shared.dom.worktype.WorkTypeCode
+                nts.uk.ctx.at.shared.dom.worktime.common.WorkTimeCode
+                nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.common.timestamp.WorkLocationCD
+                nts.uk.ctx.at.shared.dom.vacation.setting.compensatoryleave.EmploymentCode
+                nts.uk.ctx.bs.employee.dom.classification.ClassificationCode
+                nts.uk.ctx.bs.employee.dom.jobtitle.info.JobTitleCode
+                nts.uk.shr.com.primitive.WorkplaceCode
+                nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.deviationtime.DivergenceReasonContent
+                nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakgoout.BreakTimeGoOutTimes
+                nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.remarks.RecordRemarks
+                nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.deviationtime.DiverdenceReasonCode
+                nts.uk.shr.com.time.TimeWithDayAttr
+                nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.SuppNumValue
+                nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.WorkSuppComment
+                nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.timesheet.ouen.ChoiceCode
+                nts.uk.ctx.at.shared.dom.common.time.AttendanceTimeMonth
+                nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.optionalitemvalue.AnyItemAmount
+                nts.uk.ctx.at.shared.dom.common.anyitem.AnyAmountMonth
+                nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.optionalitemvalue.AnyItemTime
+                nts.uk.ctx.at.shared.dom.common.anyitem.AnyTimeMonth
+                nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.optionalitemvalue.AnyItemTimes
+                nts.uk.ctx.at.shared.dom.common.anyitem.AnyTimesMonth
+                nts.uk.ctx.at.shared.dom.workrule.businesstype.BusinessTypeCode
+			</com:ValidatorScript>
+			<com:EnumScript>
+				nts.uk.screen.at.app.dailyperformance.correction.dto.primitive.PrimitiveValueDaily
+			</com:EnumScript>
+			
+			<com:stylefile set="FULLCALENDAR" />
+			<com:scriptfile set="FULLCALENDAR" />
+
+			<com:scriptfile path="../share/functional.js" />
+			<com:scriptfile path="../share/dropdown.js" />
+			<com:scriptfile path="../share/input-time.js" />
+			<com:scriptfile path="../share/description.js" />
+			<com:scriptfile path="../share/temporary.js" />
+			<com:scriptfile path="./cores/fullcalendar.js" />
+			
+			<com:scriptfile path="./cores/component/one-day-favorite.js" />
+			<com:scriptfile path="./cores/component/task-favorite.js" />
+			
+			<com:scriptfile path="./cores/component/fc-event-header.js" />
+			<com:scriptfile path="./cores/component/fc-time-header.js" />
+			<com:scriptfile path="./cores/component/date-picker.js" />
+			<com:scriptfile path="./cores/component/approved-list.js" />
+			<com:scriptfile path="./cores/component/department.js" />
+			<com:scriptfile path="./cores/component/fc-setting.js" />
+			<com:scriptfile path="./cores/component/sb-resizer.js" />
+			
+
+
+			<com:stylefile path="./kdw013.a.css" />
+			<com:scriptfile path="./kdw013.a.vm.js" />
+
+			<com:scriptfile path="../b/kdw013.b.vm.js" />
+			<com:scriptfile path="../c/kdw013.c.vm.js" />
+		</ui:define>
+		<ui:define name="content">
+			<div id="functions-area">
+				<button id='btn_register' data-bind="i18n: 'KDW013_1', click: $vm.saveData, enable: $vm.$toggle.save, hasFocus: true" class="proceed"></button>
+				<button data-bind="i18n: 'KDW013_2', click: $vm.confirm, kdw-toggle: $vm.$toggle.confirm"></button>
+				<button data-bind="i18n: 'KDW013_3', click: $vm.removeConfirm, kdw-toggle: $vm.$toggle.remove"></button>
+				<button data-bind="i18n: 'KDW013_74', click: $vm.equipmentInput"></button>
+				
+			</div>
+			<div>
+				<div class="popup-area-f">
+					<!-- F1_2 -->
+ 					<button class="closeF" data-bind="click: closeFDialog, icon: 202, size: 12"></button>
+					<!-- F2_1 -->
+					<div class= "pb10 align-left" data-bind="i18n: 'KDW013_95'"></div>
+
+					<!-- F3_2 -->
+					<div class="textEditor pb10">
+						<!-- F3_1 -->
+						<div data-bind="ntsFormLabel: {required: true, constraint: 'FavoriteTaskName'}">#{i18n.getText('KDW013_71')}</div>
+						<input
+						  class="input-f"
+						  tabindex="1"
+						  id="KDW013_71"
+						  data-bind="ntsTextEditor: {
+							value: favTaskName, 
+							required: true,
+							constraint: 'FavoriteTaskName',
+							name: '#[KDW013_71]',
+							enable: true
+							}"
+						/>
+					</div>
+
+					<!-- F4_1 -->
+					<button class= "proceed normal" tabindex = "2" data-bind="i18n: 'KDW013_43', click: $vm.updateFavName"></button>
+				</div>
+				
+				<div class="popup-area-g">
+					<!-- G1_2 -->
+ 					<button class="closeG" data-bind="click: closeGDialog, icon: 202, size: 12"></button>
+					<!-- G2_1 -->
+					<div class= "pb10 align-left" data-bind="i18n: popupTitle"></div>
+
+					<!-- G3_2 -->
+					<div class="textEditor pb10">
+						<!-- G3_1 -->
+						<div data-bind="ntsFormLabel: {required: true, constraint: 'FavoriteTaskName'}">#{i18n.getText('KDW013_71')}</div>
+						<input
+						  class="input-g"
+						  tabindex="1"
+						  id="KDW013_71"
+						  data-bind="ntsTextEditor: {
+							value: oneDayFavTaskName, 
+							required: true,
+							constraint: 'FavoriteTaskName',
+							name: '#[KDW013_71]',
+							enable: true
+							}"
+						/>
+					</div>
+
+					<!-- G4_1 -->
+					<button class= "proceed normal" tabindex = "2" data-bind="i18n: btnContent, click: $vm.registerOneDayFavTask"></button>
+				</div>
+				<div class="popup-area-i">
+					<!-- I1_2 -->
+					<div class= "pb10 align-left" data-bind="i18n: 'KDW013_90'"></div>
+
+					<!--I2_1 -->
+					<!--I2_2 -->
+					
+					<div id="taskInfo" data-bind = "foreach: $vm.taskInfos()">
+						<div class="panel panel-frame panel-width">
+							
+							<table id="tbl-task">
+								<tr>
+									<td id ="name-i" data-bind="text: name"></td>
+									<td class="pl15 icon-edit">
+										<button class="go-button edit-button" tabindex="1" data-bind = "click: function(data){ $vm.openEDialog(data, $vm);}">
+											<i data-bind="ntsIcon: { no: 204, width: 15, height: 20}"></i>
+										</button>
+									</td>
+								</tr>
+							</table>
+							
+							<div>
+								<!--I2_3 -->
+								<label class="" data-bind="i18n: 'KDW013_25'"></label>
+	
+								<!--I2_4 -->
+								<label data-bind="text: time"></label>
+							</div>
+						</div>
+					</div>
+						
+				</div>
+			</div>
+			<div id="contents-area">
+				<div
+					data-bind="
+					fullcalendar: $vm.events,
+					employee: $vm.employee,
+					confirmers: $vm.confirmers,
+					editable: $vm.editable,
+					firstDay: $vm.firstDay,
+					scrollTime: $vm.scrollTime,
+					slotDuration: $vm.slotDuration,
+					initialDate: $vm.initialDate,
+					initialView: $vm.initialView,
+					isShowBreakTime:$vm.isShowBreakTime,
+					availableView: $vm.availableView,
+					breakTime: $vm.breakTime,
+					businessHours: $vm.businessHours,
+					attendanceTimes: $vm.attendanceTimes,
+					validRange: $vm.validRange,
+					event: {
+						datesSet: $vm.datesSet
+					},
+					components: {
+						view: 'kdp013b',
+						editor: 'kdp013c'
+					},
+					$datas: $vm.$datas,
+					$settings: $vm.$settings,
+					screenA: $vm
+				"></div>
+			</div>
+        </ui:define>
+    </ui:composition>
+</body>
+</html>

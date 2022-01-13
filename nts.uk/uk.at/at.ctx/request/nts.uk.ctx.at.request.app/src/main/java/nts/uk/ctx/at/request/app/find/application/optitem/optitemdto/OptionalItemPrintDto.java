@@ -33,4 +33,8 @@ public class OptionalItemPrintDto {
      */
     private Integer time;
 
+    private boolean inputCheckbox;
+
+    private Boolean timesChecked;
+
 }

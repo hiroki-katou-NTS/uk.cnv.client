@@ -33,11 +33,12 @@ module nts.uk.at.view.kmf002.d {
             return nts.uk.request.ajax("at", path.findAllEmpRegister + "/" + year);
         }
         
-        export function remove(year: string, employmentCode: string): JQueryPromise<any> {
+        export function remove(year: string, employmentCode: string, startMonth: number): JQueryPromise<any> {
             let employmentMonthDaySettingRemoveCommand: model.EmploymentMonthDaySettingRemoveCommand= new model.EmploymentMonthDaySettingRemoveCommand(year, employmentCode);
             let command: any = {};
             command.year = year;
             command.empCd = employmentCode;
+            command.startMonth = startMonth;
             return nts.uk.request.ajax("at", path.remove, command);
         }
         
@@ -83,6 +84,10 @@ module nts.uk.at.view.kmf002.d {
                 let _self = this;
                 _.forEach(data, function(newValue) {
                     _self.publicHolidayMonthSettingDto.push(new PublicHolidayMonthSettingDto(_self.year, newValue.month(), newValue.day()));
+                    // Increment year
+                    if (newValue.month() === 12) {
+                      _self.year = String(Number(_self.year) + 1);
+                    }
                 });
             }
         }

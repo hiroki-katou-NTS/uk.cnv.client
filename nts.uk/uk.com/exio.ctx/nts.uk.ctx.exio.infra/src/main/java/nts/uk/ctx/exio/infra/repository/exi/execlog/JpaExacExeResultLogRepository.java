@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.uk.ctx.exio.infra.entity.exi.execlog.OiodtExAcExecLog;
 import nts.uk.ctx.exio.infra.entity.exi.execlog.OiomtExacExeResultLogPk;
 import nts.uk.shr.com.context.AppContexts;
@@ -96,7 +98,7 @@ public class JpaExacExeResultLogRepository extends JpaRepository implements Exac
     			entity.userId,
     			entity.processStartDatetime,
     			EnumAdaptor.valueOf(entity.standardAtr, StandardFlg.class),
-    			EnumAdaptor.valueOf(entity.executeForm, ExtExecutionMode.class),
+    			EnumAdaptor.valueOf(entity.executeForm ? 1 : 0, ExtExecutionMode.class),
     			entity.targetCount,
     			entity.errorCount,
     			entity.fileName,
@@ -117,7 +119,7 @@ public class JpaExacExeResultLogRepository extends JpaRepository implements Exac
     			domain.getUserId(),
     			domain.getProcessStartDatetime(),
     			domain.getStandardAtr().value,
-    			domain.getExecuteForm().value,
+    			domain.getExecuteForm().value == 1,
     			domain.getTargetCount(),
     			domain.getErrorCount(),
     			domain.getFileName(),

@@ -9,9 +9,10 @@ import java.util.stream.Stream;
 
 import lombok.val;
 import nts.arc.time.GeneralDate;
+import nts.arc.time.calendar.period.DatePeriod;
 import nts.uk.ctx.at.schedule.dom.displaysetting.authcontrol.ScheModifyStartDateService;
-import nts.uk.ctx.at.schedule.dom.schedule.workschedule.ScheManaStatuTempo;
 import nts.uk.ctx.at.shared.dom.common.EmployeeId;
+import nts.uk.ctx.at.shared.dom.employeeworkway.EmployeeWorkingStatus;
 import nts.uk.ctx.at.shared.dom.workrule.organizationmanagement.workplace.GetEmpCanReferService;
 import nts.uk.ctx.at.shared.dom.workrule.shiftmaster.ShiftMaster;
 import nts.uk.ctx.at.shared.dom.workrule.shiftmaster.ShiftMasterImportCode;
@@ -112,9 +113,20 @@ public class WorkScheduleImportService {
 	 */
 	private static ImportResult checkIfEmployeeIsTarget(Require require, ImportResult interimResult) {
 
+		/* チェック対象の存在判定 */
+		if ( !interimResult.existsUncheckedResults() ) {
+			// チェック対象なし⇒終了
+			return interimResult;
+		}
+
+
 		/* 参照範囲チェック */
 		// 参照可能な社員を取得する
-		val referableEmployees = GetEmpCanReferService.getAll(require, GeneralDate.today(), require.getOwnEmployeeId().v());
+		val importableDates = interimResult.getImportableDates();
+		val referableEmployees = GetEmpCanReferService.getAll(
+					require, require.getOwnEmployeeId().v()
+				,	GeneralDate.today(), new DatePeriod( importableDates.get(0), importableDates.get(importableDates.size() - 1) )
+			);
 		// 参照可否でグループ化
 		// [Key] true: 参照範囲内(正常) / false: 参照範囲外(エラー)
 		val referableStatus = interimResult.getUncheckedResults().stream()
@@ -131,8 +143,8 @@ public class WorkScheduleImportService {
 		val checkedScheMngStatus = referableStatus.getOrDefault( true, Collections.emptyList() ).stream()
 				.map( detail -> {
 					// 予定管理状態を取得
-					val status = ScheManaStatuTempo.create( require, detail.getEmployeeId().v(), detail.getYmd() )
-									.getScheManaStatus();
+					val status = EmployeeWorkingStatus.create( require, detail.getEmployeeId().v(), detail.getYmd() )
+									.getWorkingStatus();
 					// 勤務予定が必要か
 					if( !status.needCreateWorkSchedule() ) {
 						// 必要ではない
@@ -159,6 +171,13 @@ public class WorkScheduleImportService {
 	 * @return 取り込み結果
 	 */
 	private static ImportResult checkForContentIntegrity(Require require, ImportResult interimResult) {
+
+		/* チェック対象の存在判定 */
+		if ( !interimResult.existsUncheckedResults() ) {
+			// チェック対象なし⇒終了
+			return interimResult;
+		}
+
 
 		/* シフトマスタのチェック */
 		// 取り込みコードを取得
@@ -206,6 +225,13 @@ public class WorkScheduleImportService {
 	 */
 	private static ImportResult checkForExistingWorkSchedule(Require require, ImportResult interimResult) {
 
+		/* チェック対象の存在判定 */
+		if ( !interimResult.existsUncheckedResults() ) {
+			// チェック対象なし⇒終了
+			return interimResult;
+		}
+
+
 		/* 既存の勤務予定をチェック */
 		// チェック結果
 		val checkedWorkSchedule = interimResult.getUncheckedResults().stream()
@@ -236,7 +262,7 @@ public class WorkScheduleImportService {
 
 	public interface Require extends	ScheModifyStartDateService.Require
 									,	GetEmpCanReferService.Require
-									,	ScheManaStatuTempo.Require
+									,	EmployeeWorkingStatus.Require
 									,	ShiftMaster.Require
 	{
 		/**

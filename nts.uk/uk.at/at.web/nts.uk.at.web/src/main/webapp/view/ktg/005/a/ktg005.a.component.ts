@@ -106,18 +106,14 @@ module nts.uk.ui.ktg005.a {
 			employeeCharge: false
 		});
 
-		constructor(private params: { currentOrNextMonth: 1 | 2, closureId: number }) {
-			super();
-		}
 
 		created() {
 			const vm = this;
-			const { params } = vm;
 			const { employeeId, companyId } = vm.$user;
 			const topPagePartCode = $(location).attr('search').split('=')[1];
 
 			vm.$blockui('invisibleView')
-				.then(() => vm.$ajax('at', REST_API.startScreenA, vm.params))
+				.then(() => vm.$ajax('at', REST_API.startScreenA))
 				.then((setting: IExecutionAppResult) => {
 					setting.appSettings = _
 						.chain(setting.appSettings)

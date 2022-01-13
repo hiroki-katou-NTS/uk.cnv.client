@@ -17,7 +17,7 @@ public enum EncryptionMethod {
 	SSL(1, "Enum_EncryptionMethod_SSL"),
 
 	/** The tsl. */
-	TSL(2, "Enum_EncryptionMethod_TSL");
+	TLS(2, "Enum_EncryptionMethod_TLS");
 
 	/** The value. */
 	public final int value;

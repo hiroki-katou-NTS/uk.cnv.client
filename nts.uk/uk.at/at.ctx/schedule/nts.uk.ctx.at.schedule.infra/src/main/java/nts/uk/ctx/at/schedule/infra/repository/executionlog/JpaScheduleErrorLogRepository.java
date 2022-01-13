@@ -4,9 +4,6 @@
  *****************************************************************/
 package nts.uk.ctx.at.schedule.infra.repository.executionlog;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,9 +35,8 @@ import nts.uk.shr.com.context.AppContexts;
  * The Class JpaScheduleErrorLogRepository.
  */
 @Stateless
-@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-public class JpaScheduleErrorLogRepository extends JpaRepository
-		implements ScheduleErrorLogRepository {
+//@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+public class JpaScheduleErrorLogRepository extends JpaRepository implements ScheduleErrorLogRepository {
 
 	/*
 	 * (non-Javadoc)
@@ -162,13 +158,17 @@ public class JpaScheduleErrorLogRepository extends JpaRepository
 	 */
 	@Override
 	public void add(ScheduleErrorLog domain) {
-			this.commandProxy().insert(this.toEntity(domain));
+//		if (!this.checkExistErrorByKey(domain.getExecutionId(), domain.getEmployeeId(), domain.getDate())) {
+			this.commandProxy().insert(this.toEntity(domain)); 
+//		}
 	}
 	
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@Override
 	public void addByTransaction(ScheduleErrorLog domain) {
+//		if (!this.checkExistErrorByKey(domain.getExecutionId(), domain.getEmployeeId(), domain.getDate())) { 
 			this.commandProxy().insert(this.toEntity(domain));
+//		}
 	}
 
 	@Override
@@ -216,42 +216,51 @@ public class JpaScheduleErrorLogRepository extends JpaRepository
 	@Override
 	public Boolean checkExistErrorByKey(String executionId, String employeeId, GeneralDate baseDate) {
 		
-		String sqlQuery = "select count(*) from KSCDT_BATCH_ERR_LOG where YMD = " + "'" + baseDate + "' and EXE_ID = " + "'" + executionId + "'"
-				+ "and SID = " + "'" + employeeId + "'";
+		return this.queryProxy().find(new KscdtScheErrLogPK(executionId, employeeId, baseDate), KscdtScheErrLog.class).isPresent();
 		
-		Connection con = this.getEntityManager().unwrap(Connection.class);
-		
-		try {
-			ResultSet rs = con.createStatement().executeQuery(sqlQuery);
-			int number = 0;
-			while(rs.next()){
-				number = rs.getInt(1);
-			}
-			if(number > 0) return true;
-			return false;
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
+//		String sqlQuery = "select count(*) from KSCDT_BATCH_ERR_LOG where YMD = " + "'" + baseDate + "' and EXE_ID = " + "'" + executionId + "'"
+//				+ "and SID = " + "'" + employeeId + "'";
+//		
+//		Connection con = this.getEntityManager().unwrap(Connection.class);
+//		
+//		try {
+//			ResultSet rs = con.createStatement().executeQuery(sqlQuery);
+//			int number = 0;
+//			while(rs.next()){
+//				number = rs.getInt(1);
+//			}
+//			if(number > 0) return true;
+//			return false;
+//		} catch (SQLException e) {
+//			throw new RuntimeException(e);
+//		}
 	}
 
 	@Override
 	public Boolean checkExistErrorByKey(String executionId, String employeeId) {
-		String sqlQuery = "select count(*) from KSCDT_BATCH_ERR_LOG where EXE_ID = " + "'" + executionId + "'"
-				+ "and SID = " + "'" + employeeId + "'";
 		
-		Connection con = this.getEntityManager().unwrap(Connection.class);
+		return !this.queryProxy().query("SELECT a FROM KscdtScheErrLog WHERE a.kscdtScheErrLogPK.exeId = :exeId "
+										+ " AND a.kscdtScheErrLogPK.sid = :sid", KscdtScheErrLog.class)
+									.setParameter("exeId", executionId)
+									.setParameter("sid", employeeId)
+									.getList().isEmpty();
 		
-		try {
-			ResultSet rs = con.createStatement().executeQuery(sqlQuery);
-			int number = 0;
-			while(rs.next()){
-				number = rs.getInt(1);
-			}
-			if(number > 0) return true;
-			return false;
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
+//		String sqlQuery = "select count(*) from KSCDT_BATCH_ERR_LOG where EXE_ID = " + "'" + executionId + "'"
+//				+ "and SID = " + "'" + employeeId + "'";
+//		
+//		Connection con = this.getEntityManager().unwrap(Connection.class);
+//		
+//		try {
+//			ResultSet rs = con.createStatement().executeQuery(sqlQuery);
+//			int number = 0;
+//			while(rs.next()){
+//				number = rs.getInt(1);
+//			}
+//			if(number > 0) return true;
+//			return false;
+//		} catch (SQLException e) {
+//			throw new RuntimeException(e);
+//		}
 	}
 
 	@Override

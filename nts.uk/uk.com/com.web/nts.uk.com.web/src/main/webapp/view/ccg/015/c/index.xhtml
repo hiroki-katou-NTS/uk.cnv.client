@@ -21,11 +21,11 @@
 					<table>
 						<tr>
 							<td>
-								<p>#{i18n.getText('CCG015_35')}</p>
+								<div id="lbl_code_name" data-bind="ntsFormLabel: {}">#{i18n.getText('CCG015_35')}</div>
 							</td>
 							<td>
 								<div id="lbl_code_name" data-bind="ntsFormLabel: {}">
-									<label>#{i18n.getText('CCG015_13')}</label>
+									#{i18n.getText('CCG015_13')}
 								</div>
 							</td>
 							<td>
@@ -37,11 +37,11 @@
 						</tr>
 						<tr>
 							<td class="pad_top_20">
-								<p>#{i18n.getText('CCG015_36')}</p>
+								<div id="lbl_code_name" data-bind="ntsFormLabel: {}">#{i18n.getText('CCG015_36')}</div>
 							</td>
 							<td class="pad_top_20">
 								<div id="lbl_code_name" data-bind="ntsFormLabel: {constraint : ['TopPageCode','TopPageName'],required: true}">
-									<label>#{i18n.getText('CCG015_13')}</label>
+									#{i18n.getText('CCG015_13')}
 								</div>
 							</td>
 							<td class="pad_top_20"><input tabindex="2" id="inp-code" class="nts-input save-error" data-bind="ntsTextEditor: {

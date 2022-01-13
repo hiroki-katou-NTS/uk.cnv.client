@@ -140,4 +140,13 @@ public interface WorkplaceApprovalRootRepository {
 	 * @return
 	 */
 	List<WorkplaceApprovalRoot> getAppRootByDatePeriod(String cid, DatePeriod period, SystemAtr sysAtr, List<Integer> lstRootAtr);
+	
+	/**
+	 * [1] 承認者として登録されている職場リストを取得する
+	 * 指定社員が基準日時点で承認者として登録されている職場リストを取得する
+	 * @param sid 社員ID
+	 * @param referDate 基準日
+	 * @return 職場リスト
+	 */
+	List<String> getWkpsAsApprovers(String sid, GeneralDate referDate);
 }

@@ -15,8 +15,6 @@ import nts.uk.ctx.at.record.dom.stamp.card.stampcard.StampNumber;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampDakokuRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampMeans;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.GetStampTypeToSuppressService;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.PortalStampSettings;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.timestampsetting.prefortimestaminput.PortalStampSettingsRepository;
@@ -55,9 +53,6 @@ public class GetSettingSmartPhone {
 
 	@Inject
 	private PortalStampSettingsRepository portalStampSettingsrepo;
-
-	@Inject
-	private StampRecordRepository stampRecordRepo;
 
 	@Inject
 	private StampDakokuRepository stampRepo;
@@ -107,11 +102,6 @@ public class GetSettingSmartPhone {
 		@Override
 		public List<StampCard> getListStampCard(String sid) {
 			return stampCardRepo.getListStampCard(sid);
-		}
-
-		@Override
-		public List<StampRecord> getStampRecord(List<StampNumber> stampNumbers, GeneralDate date) {
-			return stampRecordRepo.get(AppContexts.user().contractCode(), stampNumbers, date);
 		}
 
 		@Override

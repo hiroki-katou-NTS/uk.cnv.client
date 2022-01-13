@@ -56,7 +56,7 @@ public class DefaultBatchServer implements BatchServer, InitializeWhenDeploy {
 		// LoginUserContextは、呼び出し元の状態を引き継ぎたいので、RequestHeaderとして送る
 		api.getRequestDefine().customHeader(
 				BatchServer.CUSTOM_HEADER_USER_CONTEXT,
-				this.userContext.toBase64());
+				this.userContext.toBase64().get());
 		
 		val client = DefaultNtsHttpClient.createDefault();
 		client.request(api, communicationBuilder);

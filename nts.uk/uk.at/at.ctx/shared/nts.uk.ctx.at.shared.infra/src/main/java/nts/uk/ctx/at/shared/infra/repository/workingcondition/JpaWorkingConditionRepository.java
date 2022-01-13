@@ -835,13 +835,24 @@ public class JpaWorkingConditionRepository extends JpaRepository implements Work
 	
 	@Override
 	public List<WorkingCondition> getWorkingConditionByListEmpID(String companyID, List<String> lstEmpID) {
+		
 		List<WorkingCondition> data = new ArrayList<>();
-		for(String empID :lstEmpID) {
-			Optional<WorkingCondition> workingCondition  = getWorkingCondition(companyID, empID);
+		
+		String QUERY = "SELECT item FROM KshmtWorkcondHist item LEFT JOIN  item.kshmtWorkingCondItem hst WHERE item.cid = :cid AND item.kshmtWorkingCondPK.sid in :sids";
+		List<KshmtWorkcondHist> lstEntity = this.queryProxy().query(QUERY, KshmtWorkcondHist.class)
+				.setParameter("cid", companyID)
+				.setParameter("sids", lstEmpID)
+				.getList();
+		Map<String, List<KshmtWorkcondHist>> map = lstEntity.stream().collect(
+                Collectors.groupingBy(entity -> entity.getKshmtWorkingCondPK().getSid()));
+
+		map.forEach((key, value) -> {
+			Optional<WorkingCondition> workingCondition = KshmtWorkcondHist.toDomainHis(value);
 			if(workingCondition.isPresent()) {
 				data.add(workingCondition.get());
 			}
-		}
+		});
+		
 		return data;
 	}
 	

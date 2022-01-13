@@ -1,6 +1,6 @@
 package nts.uk.ctx.at.schedule.dom.importschedule;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import lombok.val;
 import nts.arc.testing.assertion.NtsAssert;
-import nts.uk.ctx.at.schedule.dom.schedule.workschedule.ScheManaStatus;
+import nts.uk.ctx.at.shared.dom.employeeworkway.WorkingStatus;
 
 /**
  * Test for ImportStatus
@@ -110,21 +110,21 @@ public class ImportStatusTest {
 
 
 	/**
-	 * Target	: from( ScheManaStatus )
+	 * Target	: from( WorkingStatus )
 	 */
 	@Test
-	public void test_from_ScheManaStatus() {
+	public void test_from_WorkingStatus() {
 
 		// 期待値※未チェック以外
 		@SuppressWarnings("serial")
-		val expected = new HashMap<ScheManaStatus, ImportStatus>() {{
-			put( ScheManaStatus.NOT_ENROLLED,			ImportStatus.EMPLOYEE_IS_NOT_ENROLLED );
-			put( ScheManaStatus.INVALID_DATA,			ImportStatus.EMPLOYEEINFO_IS_INVALID );
-			put( ScheManaStatus.DO_NOT_MANAGE_SCHEDULE,	ImportStatus.SCHEDULE_IS_NOTUSE );
+		val expected = new HashMap<WorkingStatus, ImportStatus>() {{
+			put( WorkingStatus.NOT_ENROLLED,			ImportStatus.EMPLOYEE_IS_NOT_ENROLLED );
+			put( WorkingStatus.INVALID_DATA,			ImportStatus.EMPLOYEEINFO_IS_INVALID );
+			put( WorkingStatus.DO_NOT_MANAGE_SCHEDULE,	ImportStatus.SCHEDULE_IS_NOTUSE );
 		}};
 
 		// 検証
-		Stream.of( ScheManaStatus.values() ).forEach( status -> {
+		Stream.of( WorkingStatus.values() ).forEach( status -> {
 
 			assertThat( ImportStatus.from( status ) )
 				.isEqualTo( expected.getOrDefault( status, ImportStatus.UNCHECKED ) );

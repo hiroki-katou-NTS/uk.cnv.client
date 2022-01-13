@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import javax.ejb.Stateless;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import nts.arc.layer.infra.data.JpaRepository;
 import nts.uk.ctx.sys.assist.dom.storage.DataStorageMng;
 import nts.uk.ctx.sys.assist.dom.storage.DataStorageMngRepository;
@@ -84,7 +86,7 @@ public class JpaDataStorageMngRepository extends JpaRepository implements DataSt
 	@Override
     public void update(String storeProcessingId, NotUseAtr doNotInterrupt){
 		SspttSaveMng entity = this.getEntityManager().find(SspttSaveMng.class, storeProcessingId);
-        entity.doNotInterrupt = doNotInterrupt.value;
+        entity.doNotInterrupt = BooleanUtils.toBoolean(doNotInterrupt.value);
 		this.commandProxy().update(entity);
     }
 	

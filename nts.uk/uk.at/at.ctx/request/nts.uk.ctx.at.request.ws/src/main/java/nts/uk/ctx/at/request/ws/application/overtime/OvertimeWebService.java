@@ -6,26 +6,22 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import nts.arc.layer.ws.WebService;
+import nts.arc.time.GeneralDate;
 import nts.uk.ctx.at.request.app.command.application.overtime.RegisterCommand;
 import nts.uk.ctx.at.request.app.command.application.overtime.RegisterCommandHandler;
 import nts.uk.ctx.at.request.app.command.application.overtime.RegisterCommandHandlerMultiple;
 import nts.uk.ctx.at.request.app.command.application.overtime.UpdateCommand;
 import nts.uk.ctx.at.request.app.command.application.overtime.UpdateCommandHandler;
 import nts.uk.ctx.at.request.app.find.application.holidaywork.dto.CheckBeforeOutputMultiDto;
-import nts.uk.ctx.at.request.app.find.application.overtime.AppOvertimeFinder;
-import nts.uk.ctx.at.request.app.find.application.overtime.BreakTimeZoneSettingDto;
-import nts.uk.ctx.at.request.app.find.application.overtime.DisplayInfoOverTimeDto;
-import nts.uk.ctx.at.request.app.find.application.overtime.ParamBreakTime;
-import nts.uk.ctx.at.request.app.find.application.overtime.ParamCalculation;
-import nts.uk.ctx.at.request.app.find.application.overtime.ParamCheckBeforeRegister;
-import nts.uk.ctx.at.request.app.find.application.overtime.ParamCheckBeforeUpdate;
-import nts.uk.ctx.at.request.app.find.application.overtime.ParamDetail;
-import nts.uk.ctx.at.request.app.find.application.overtime.ParamOverTimeChangeDate;
-import nts.uk.ctx.at.request.app.find.application.overtime.ParamOverTimeStart;
-import nts.uk.ctx.at.request.app.find.application.overtime.ParamSelectWork;
+import nts.uk.ctx.at.request.app.find.application.overtime.*;
 import nts.uk.ctx.at.request.app.find.application.overtime.dto.CheckBeforeOutputDto;
 import nts.uk.ctx.at.request.app.find.application.overtime.dto.DetailOutputDto;
+import nts.uk.ctx.at.request.app.find.application.overtime.dto.MultipleOvertimeContentDto;
 import nts.uk.ctx.at.request.dom.application.common.service.other.output.ProcessResult;
+
+import java.util.List;
+import java.util.Map;
+
 /**
  * Refactor5 
  * @author hoangnd
@@ -52,6 +48,12 @@ public class OvertimeWebService extends WebService {
 	public DisplayInfoOverTimeDto start(ParamOverTimeStart param) {
 		return appOvertimeFinder.start(param);
 	}
+
+	@POST
+    @Path("latestMultiApp")
+    public MultiOvertimWithWorkDayOffDto getLatestMultipleOvertimeApp(ParamOverTimeChangeDate param) {
+	    return appOvertimeFinder.getLatestMultipleOvertimeApp(param.employeeId, GeneralDate.fromString(param.dateOp, "yyyy/MM/dd"), param.prePost);
+    }
 	
 	@POST
 	@Path("breakTimes")

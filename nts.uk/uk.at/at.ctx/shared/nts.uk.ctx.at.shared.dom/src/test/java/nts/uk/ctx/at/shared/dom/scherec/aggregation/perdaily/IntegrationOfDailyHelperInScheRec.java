@@ -18,6 +18,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.WithinStatu
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.WithinStatutoryTimeOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.affiliationinfor.AffiliationInforOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.affiliationinfor.ClassificationCode;
+import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.TimeLeavingOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.attendancetime.WorkTimes;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakgoout.BreakTimeOfDaily;
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.breakouting.breaking.BreakTimeOfDailyAttd;
@@ -112,6 +113,8 @@ public class IntegrationOfDailyHelperInScheRec {
 					, new ArrayList<>()	// 編集状態
 					, Optional.empty()	// 臨時出退勤
 					, new ArrayList<>()	// 備考
+					, new ArrayList<>()	// 応援作業時間
+					, new ArrayList<>()	// 応援作業時間帯
 					, Optional.empty()	// スナップショット
 				);
 
@@ -137,8 +140,6 @@ public class IntegrationOfDailyHelperInScheRec {
 	public static IntegrationOfDaily createWithAffInfo(String employeeId, GeneralDate ymd, AffiliationInforOfDailyAttd affInfo) {
 		return IntegrationOfDailyHelperInScheRec.create( employeeId, ymd, workInfo, affInfo, breakTime );
 	}
-
-
 
 	/** 日別勤怠の所属情報に関するHelper **/
 	public static class AffInfoHelper {

@@ -1,0 +1,122 @@
+#listWorkTime{
+	margin-left: 50px;
+}
+.inlineAc {
+    display: inline-block;
+}
+.img-icon {
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.openDialogB {
+    width: 22px;
+    height: 22px;
+    vertical-align: top;
+}
+.closeAb{
+    width: 22px;
+    height: 22px;
+}
+.closeAb .icon.icon-close {
+    width: 16px;
+    height: 16px;
+    margin-left: -3px;
+    margin-top: -3px;
+}
+
+#tableButton1 {
+	background-color: rgb(237,250,194);
+	height: 60px;
+	margin-top: 3px;
+	width: -webkit-fill-available;
+    margin-left: 9px;
+}
+
+#tableButton1 button {
+	min-width: 176px;
+	height: 20px;
+	line-height: 18px;
+	box-shadow : 0 1px rgba(0, 0, 0, 0.4);
+	padding: 0px;
+}
+
+.ntsButtonTableButton button {
+	width: 190px !important;
+	height: 20px;
+	line-height: 18px;
+	box-shadow : 0 1px rgba(0, 0, 0, 0.4);
+	border : 1px solid #D3D3D3;
+	color : black;
+	padding: 0px;
+}
+
+.ntsButtonCellData button {
+	width: 190px !important;
+	height: 20px;
+	line-height: 18px;
+	box-shadow : 0 1px rgba(0, 0, 0, 0.4);
+	border : 1px solid grey;
+	color : black;
+	padding: 0px;
+}
+
+.ntsButtonUnabledData button {
+	width: 190px !important;
+	height: 20px;
+	line-height: 18px;
+	box-shadow : 0 1px rgba(0, 0, 0, 0.4);
+	border : 1px solid #ffcccb;
+	color : black;
+	padding: 0px;
+}
+
+#tableButton1 table td {
+	padding: 3px 3px !important;
+}
+
+#screen-Ab2 .listLink {
+	margin-bottom: -6px;
+}
+
+#screen-Ab2 .listLink .hyperlink {
+	color: #0066CC;
+	width: max-content;
+	height: 25px;
+	display: inline-block;
+	padding: 3px;
+}
+
+#screen-Ab2 .listLink .hyperlink.active {
+	background-color: #edfac2;
+}
+
+#ab2-area{
+	margin-top: -7px;
+	margin-left: 9px;	
+}
+
+#comboTime{
+	width: 874px;
+}
+
+#tableButton1 button {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.ntsTable .ntsButtonCellSelected {
+    background-color: #007fff !important;
+    color: white !important;
+    border : 1px solid grey;
+    box-shadow : none;
+    top: 2px;
+}
+
+.ntsTable .ntsButtonCellData {
+	border : 1px solid grey;
+}
+
+.ui-igcombo-list {
+	max-height: 260px !important;
+}

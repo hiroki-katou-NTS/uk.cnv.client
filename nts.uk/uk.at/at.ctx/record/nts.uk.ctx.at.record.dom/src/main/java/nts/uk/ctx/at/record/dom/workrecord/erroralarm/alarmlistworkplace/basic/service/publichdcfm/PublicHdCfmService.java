@@ -12,6 +12,8 @@ import nts.uk.ctx.at.shared.dom.holidaymanagement.publicholiday.configuration.Pu
 import nts.uk.ctx.at.shared.dom.scherec.alarm.alarmlistactractionresult.AlarmValueDate;
 import nts.uk.ctx.at.shared.dom.scherec.alarm.alarmlistactractionresult.AlarmValueMessage;
 import nts.uk.ctx.at.shared.dom.scherec.alarm.alarmlistactractionresult.MessageDisplay;
+import nts.uk.shr.com.company.CompanyAdapter;
+import nts.uk.shr.com.company.CompanyInfor;
 import nts.uk.shr.com.context.AppContexts;
 import nts.uk.shr.com.i18n.TextResource;
 import nts.uk.ctx.at.shared.dom.common.CompanyId;
@@ -34,6 +36,8 @@ public class PublicHdCfmService {
     private PublicHolidaySettingRepository publicHolidaySettingRepo;
     @Inject
     private CompanyMonthDaySettingRepository comMonthDaySettingRepo;
+    @Inject
+    private CompanyAdapter companyAdapter;
 
     /**
      * 公休日数確認
@@ -56,6 +60,8 @@ public class PublicHdCfmService {
             return results;
         }
 
+        Optional<CompanyInfor> companyInfor = companyAdapter.getCurrentCompany();
+
         // 「Input．期間．開始日．年」から「Input．期間．終了日．年」までループする。
         int startYear = ymPeriod.start().year();
         int endYear = ymPeriod.end().year();
@@ -64,7 +70,7 @@ public class PublicHdCfmService {
             Optional<CompanyMonthDaySetting> comMonDaySetOpt = comMonthDaySettingRepo.findByYear(new CompanyId(cid), new Year(startYear));
             if (!comMonDaySetOpt.isPresent()) {
                 // 「アラーム値メッセージ」を作成します。
-                String message = TextResource.localize("KAL020_10", AppContexts.user().companyCode());
+                String message = TextResource.localize("KAL020_10", AppContexts.user().companyCode() + "　" + companyInfor.map(CompanyInfor::getCompanyName).orElse(""));
 
                 // ドメインオブジェクト「抽出結果」を作成してリスト「抽出結果」に追加
                 ExtractResultDto result = new ExtractResultDto(new AlarmValueMessage(message),

@@ -2032,7 +2032,20 @@ public class CheckPersonInfoProcess {
 		masterName.put("IS00776" , "残数");		
 		masterName.put("IS00777" , "残日数");		
 		masterName.put("IS00778" , "残時間");		
-		masterName.put("IS00779" , "カード番号");		
+		masterName.put("IS00779" , "カード番号");
+		masterName.put("IS01077" , "期間");		
+		masterName.put("IS01078" , "開始日");		
+		masterName.put("IS01079" , "終了日");
+		masterName.put("IS01080" , "単価1");
+		masterName.put("IS01081" , "単価2");
+		masterName.put("IS01082" , "単価3");
+		masterName.put("IS01083" , "単価4");
+		masterName.put("IS01084" , "単価5");
+		masterName.put("IS01085" , "単価6");
+		masterName.put("IS01086" , "単価7");
+		masterName.put("IS01087" , "単価8");
+		masterName.put("IS01088" , "単価9");
+		masterName.put("IS01089" , "単価10");
 
 		return masterName;
 			

@@ -1,59 +1,32 @@
-input {
-	border-radius: 3px;
-	padding: 6px 12px;
-	border-width: 1px;
+.setting-zone {
+  margin-top: 10px;
+  margin-left: 20px;
 }
 
-td {
-	padding-top: 10px;
-	padding-bottom: 10px;
-	min-width: 160px;
+.flex.valign-center {
+  margin-bottom: 10px;
 }
 
-#mail_setting_register {
-	margin-left: 25px;
+.setting-label {
+  width: 200px;
 }
 
-#right-content {
-	margin-left: 45px;
+.address-input {
+  width: 800px !important;
 }
 
-.input_002 {
-	display: inline-block;
+.port-input {
+  width: 100px !important;
 }
 
-.input_002>input {
-	margin-right: 5px;
+.ml-10 {
+  margin-left: 10px;
 }
 
-#test_send_mail {
-	display: inline-block
+#A8_1 {
+  padding-right: 5px;
 }
 
-.table_content{
-	width: 650px;
-}
-
-.method_info {
-	width: 1015px;
-	margin-top: 50px;
-	border: 1px solid #cccccc;
-	border-radius: 6px;
-	padding: 20px 35px;
-}
-
-.table_content_smtp {
-	margin-left: 25px;
-}
-
-.table_content_imap {
-	margin-left: 25px;
-}
-
-.table_content_pop {
-	margin-left: 25px;
-}
-
-.table_content_setting_encrypt {
-	margin-left: 25px;
+#A4_2 {
+  width: 300px !important;
 }

@@ -204,3 +204,11 @@ th {
 #kaf005-footer {
 	margin-top: 8px;
 }
+
+#kaf000-a-component3-prePost {
+	display: inline-flex;
+}
+
+#kaf005-b .control-group {
+	margin-bottom: 10px !important;
+}

@@ -21,6 +21,7 @@ import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.optionalite
 import nts.uk.ctx.at.shared.dom.scherec.dailyattdcal.dailyattendance.optionalitemvalue.AnyItemValueOfDailyAttd;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItem;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.OptionalItemNo;
+import nts.uk.ctx.at.shared.dom.scherec.optitem.PerformanceAtr;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.TermsOfUseForOptItem;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.applicable.EmpCondition;
 import nts.uk.ctx.at.shared.dom.scherec.optitem.calculation.CalcResultOfAnyItem;
@@ -97,7 +98,7 @@ public class AnyItemValueOfDaily {
         		List<Formula> optFormulas = formulaList.stream().filter(t -> t.getOptionalItemNo().equals(optionalItem.getOptionalItemNo())).collect(Collectors.toList());
         		List<FormulaDispOrder> optOrders = formulaOrderList.stream().filter(t -> t.getOptionalItemNo().equals(optionalItem.getOptionalItemNo())).collect(Collectors.toList());
         		//計算処理
-        		calcResult = optionalItem.caluculationFormula(companyId, optionalItem, optFormulas, optOrders, dailyRecordDto, Optional.empty());
+        		calcResult = optionalItem.caluculationFormula(companyId, optFormulas, optOrders, dailyRecordDto, Optional.empty(), PerformanceAtr.DAILY_PERFORMANCE);
         	}
         	anyItemList.add(calcResult);
         	

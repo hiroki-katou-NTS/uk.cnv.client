@@ -1,5 +1,7 @@
 package nts.uk.ctx.sys.portal.dom.toppagepart.createflowmenu;
 
+import java.util.Optional;
+
 import lombok.Builder;
 import lombok.Getter;
 import nts.arc.layer.dom.DomainObject;
@@ -41,4 +43,9 @@ public class MenuSetting extends DomainObject {
 	 * メニュー名称
 	 */
 	private DisplayName menuName;
+	
+	/**
+	 * 画像情報
+	 */
+	private Optional<ImageInformation> imageInformation;
 }

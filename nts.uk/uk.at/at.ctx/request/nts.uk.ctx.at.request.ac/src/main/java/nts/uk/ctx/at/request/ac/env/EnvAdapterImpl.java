@@ -15,7 +15,6 @@ import nts.uk.ctx.at.request.dom.application.common.adapter.sys.dto.OutGoingMail
 import nts.uk.ctx.at.request.dom.application.common.adapter.sys.dto.PopInfoImport;
 import nts.uk.ctx.at.request.dom.application.common.adapter.sys.dto.SmtpInfoImport;
 import nts.uk.ctx.sys.env.pub.maildestination.IMailDestinationPub;
-import nts.uk.ctx.sys.env.pub.maildestination.OutGoingMail;
 import nts.uk.ctx.sys.env.pub.mailserver.MailServerPub;
 import nts.uk.ctx.sys.env.pub.mailserver.MailServerSetExport;
 
@@ -29,14 +28,15 @@ public class EnvAdapterImpl implements EnvAdapter {
 
 	@Override
 	public List<MailDestinationImport> getEmpEmailAddress(String cID, List<String> sIDs, Integer functionID) {
-		List<MailDestinationImport> listEmpMail = iMailDestinationPub.getEmpEmailAddress(cID, sIDs, functionID).stream()
-				.map(x -> new MailDestinationImport(x.getEmployeeID(), mapGoingMail(x.getOutGoingMails())))
+		List<MailDestinationImport> listEmpMail = iMailDestinationPub.getEmployeeMails(cID, sIDs, functionID)
+				.getSentMailLists().stream()
+				.map(x -> new MailDestinationImport(x.getSid(), mapGoingMail(x.getMailAddresses())))
 				.collect(Collectors.toList());
 		return listEmpMail;
 	}
 
-	private List<OutGoingMailImport> mapGoingMail(List<OutGoingMail> outGoingMails) {
-		return outGoingMails.stream().map(x -> new OutGoingMailImport(x.getEmailAddress()))
+	private List<OutGoingMailImport> mapGoingMail(List<String> outGoingMails) {
+		return outGoingMails.stream().map(x -> new OutGoingMailImport(x))
 				.collect(Collectors.toList());
 	}
 	@Override

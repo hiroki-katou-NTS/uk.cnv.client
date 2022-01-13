@@ -24,8 +24,6 @@ import nts.uk.ctx.at.record.dom.stampmanagement.workplace.WorkLocation;
 import nts.uk.ctx.at.record.dom.stampmanagement.workplace.WorkLocationRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.Stamp;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampDakokuRepository;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecord;
-import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.StampRecordRepository;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.EmployeeStampInfo;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.GetListStampEmployeeService;
 import nts.uk.ctx.at.record.dom.workrecord.stampmanagement.stamp.domainservice.StampInfoDisp;
@@ -46,9 +44,6 @@ public class DisplayScreenStampingResultFinder {
 	private StampCardRepository stampCardRepository;
 
 	@Inject
-	private StampRecordRepository stampRecordRepository;
-
-	@Inject
 	private StampDakokuRepository stampDakokuRepository;
 	
 	@Inject
@@ -60,7 +55,7 @@ public class DisplayScreenStampingResultFinder {
 		List<DisplayScreenStampingResultDto> res = new ArrayList<>();
 		// DS 社員の打刻データを取得する
 		// 取得する(@Require, 社員ID, 年月日) 社員の打刻データ
-		GetListStampEmployeeService.Require require = new RequireImpl(stampCardRepository, stampRecordRepository,
+		GetListStampEmployeeService.Require require = new RequireImpl(stampCardRepository,
 				stampDakokuRepository);
 		for (GeneralDate date : datePerriod.datesBetween()) {
 			Optional<EmployeeStampInfo> optStampDataOfEmployees = GetListStampEmployeeService.get(require, employeeId,
@@ -156,19 +151,13 @@ public class DisplayScreenStampingResultFinder {
 	@AllArgsConstructor
 	private static class RequireImpl implements GetListStampEmployeeService.Require {
 		private StampCardRepository stampCardRepository;
-		private StampRecordRepository stampRecordRepository;
 		private StampDakokuRepository stampDakokuRepository;
 
 		@Override
 		public List<StampCard> getListStampCard(String sid) {
 			return stampCardRepository.getListStampCard(sid);
 		}
-
-		@Override
-		public List<StampRecord> getStampRecord(List<StampNumber> stampNumbers, GeneralDate date) {
-			return stampRecordRepository.get(AppContexts.user().contractCode(), stampNumbers, date);
-		}
-
+		
 		@Override
 		public List<Stamp> getStamp(List<StampNumber> stampNumbers, GeneralDate date) {
 			return stampDakokuRepository.get(AppContexts.user().contractCode(), stampNumbers, date);
