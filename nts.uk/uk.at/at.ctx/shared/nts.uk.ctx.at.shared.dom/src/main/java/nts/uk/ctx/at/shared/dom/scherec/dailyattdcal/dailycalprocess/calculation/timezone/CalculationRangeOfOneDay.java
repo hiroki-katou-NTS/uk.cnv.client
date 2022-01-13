@@ -1028,7 +1028,7 @@ public class CalculationRangeOfOneDay {
 				.collect(Collectors.toList());
 		if(schedules.isEmpty()) {
 			//労働条件項目から勤務時間帯を取得する
-			return this.predetermineTimeSetForCalc.reCreate(workingCondition.getWorkCategory().getWorkTime().getWorkingHours(date));
+			return this.predetermineTimeSetForCalc.reCreate(workingCondition.getWorkCategory().getWorkTime().getWorkingHoursOfDayOfWeek(date));
 		}
 		return this.predetermineTimeSetForCalc.reCreate(schedules);
 	}

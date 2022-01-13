@@ -30,7 +30,7 @@ public class PersonalWorkCategoryTest {
 				Helper.createSingleDay(new TimeZone(1, TimeWithDayAttr.hourMinute(8, 00), TimeWithDayAttr.hourMinute(17, 00))), //平日
 				Helper.createSingleDay(new TimeZone(1, TimeWithDayAttr.hourMinute(9, 00), TimeWithDayAttr.hourMinute(18, 00))), //休出
 				Helper.createMondayOnly(new TimeZone(1, TimeWithDayAttr.hourMinute(10, 00), TimeWithDayAttr.hourMinute(19, 00)))); //曜日別（月曜のみ）
-		List<TimeZone> result = target.getWorkingHours(GeneralDate.ymd(2022, 1, 3)); //月曜
+		List<TimeZone> result = target.getWorkingHoursOfDayOfWeek(GeneralDate.ymd(2022, 1, 3)); //月曜
 		assertThat(result)
 				.extracting(
 						t -> t.getCnt(),
@@ -46,7 +46,7 @@ public class PersonalWorkCategoryTest {
 				Helper.createSingleDay(new TimeZone(1, TimeWithDayAttr.hourMinute(8, 00), TimeWithDayAttr.hourMinute(17, 00))), //平日
 				Helper.createSingleDay(new TimeZone(1, TimeWithDayAttr.hourMinute(9, 00), TimeWithDayAttr.hourMinute(18, 00))), //休出
 				Helper.createMondayOnly(new TimeZone(1, TimeWithDayAttr.hourMinute(10, 00), TimeWithDayAttr.hourMinute(19, 00)))); //曜日別（月曜のみ）
-		List<TimeZone> result = target.getWorkingHours(GeneralDate.ymd(2022, 1, 1)); //土曜
+		List<TimeZone> result = target.getWorkingHoursOfDayOfWeek(GeneralDate.ymd(2022, 1, 1)); //土曜
 		assertThat(result)
 				.extracting(
 						t -> t.getCnt(),
@@ -62,7 +62,7 @@ public class PersonalWorkCategoryTest {
 				Helper.createSingleDay(new TimeZone(1, TimeWithDayAttr.hourMinute(8, 00), TimeWithDayAttr.hourMinute(17, 00))), //平日
 				Helper.createSingleDay(new TimeZone(1, TimeWithDayAttr.hourMinute(9, 00), TimeWithDayAttr.hourMinute(18, 00))), //休出
 				Helper.createAllEmpty()); //曜日別（全てEmpty）
-		List<TimeZone> result = target.getWorkingHours(GeneralDate.ymd(2022, 1, 3)); //月曜
+		List<TimeZone> result = target.getWorkingHoursOfDayOfWeek(GeneralDate.ymd(2022, 1, 3)); //月曜
 		assertThat(result)
 				.extracting(
 						t -> t.getCnt(),
@@ -78,7 +78,7 @@ public class PersonalWorkCategoryTest {
 				Helper.createSingleDayEmpty(), //平日（empty）
 				Helper.createSingleDay(new TimeZone(1, TimeWithDayAttr.hourMinute(9, 00), TimeWithDayAttr.hourMinute(18, 00))), //休出
 				Helper.createAllEmpty()); //曜日別（全てEmpty）
-		List<TimeZone> result = target.getWorkingHours(GeneralDate.ymd(2022, 1, 3)); //月曜
+		List<TimeZone> result = target.getWorkingHoursOfDayOfWeek(GeneralDate.ymd(2022, 1, 3)); //月曜
 		assertThat(result).isEmpty();
 	}
 	

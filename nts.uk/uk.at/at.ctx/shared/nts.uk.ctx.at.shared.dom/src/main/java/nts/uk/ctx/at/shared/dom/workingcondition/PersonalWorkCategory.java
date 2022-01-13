@@ -67,11 +67,11 @@ public class PersonalWorkCategory extends DomainObject {
 	}
 	
 	/**
-	 * [1] 勤務時間帯を取得する
+	 * [1] 曜日別の勤務時間帯を取得する
 	 * @param date 年月日
 	 * @return 勤務時間帯
 	 */
-	public List<TimeZone> getWorkingHours(GeneralDate date) {
+	public List<TimeZone> getWorkingHoursOfDayOfWeek(GeneralDate date) {
 		Optional<SingleDaySchedule> dayOfWeek = this.getDayOfWeek().getSingleDaySchedule(date);
 		if(!dayOfWeek.isPresent()) {
 			//平日時
